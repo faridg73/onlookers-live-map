@@ -138,14 +138,14 @@
   font-size: 0.925rem;
   color: var(--color-foreground);
   outline: none;
-}
 
-@utility field {
   &::placeholder {
     color: var(--color-muted-foreground);
   }
+
   &:focus {
     border-color: var(--color-signal);
   }
 }
+
 
