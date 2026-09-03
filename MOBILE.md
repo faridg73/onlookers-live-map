@@ -80,3 +80,18 @@ npx cap sync
 
 These map directly onto Onlooker's core flows: taking a live shot, pinning your
 position on the map, and getting notified when a bounty lands near you.
+
+## 5. Store submission kit (already prepared)
+
+A complete kit was generated for you in the project's Files panel
+(`store-kit/` folder):
+
+- `feature-graphic.png` — Google Play banner, exact 1024x500 spec
+- `screenshots/` — real app screenshots at required sizes:
+  - Play phone (1080x1920): map, feed, post, profile
+  - App Store 6.7" (1290x2796): map, feed, post, profile
+  - App Store 6.5" (1242x2688): map, feed, post, profile
+- `listing.md` — copy-paste description, keywords, categories, and the
+  full upload checklist for both stores
+
+The app icon lives at `public/app-icon.png` (1024x1024).

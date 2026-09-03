@@ -17,10 +17,33 @@ export function MapCanvas({
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+const containerRef = useRef<HTMLDivElement | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [fit, setFit] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const centeredRef = useRef(false);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+
+  // Fit the 1000x1000 world to the viewport (cover) and center it once,
+  // so the map fills any screen — phone, tablet, desktop, tall store shots.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const measure = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      const f = Math.max(w / 1000, h / 1000);
+      setFit(f);
+      if (!centeredRef.current) {
+        centeredRef.current = true;
+        setOffset({ x: (w - 1000 * f) / 2, y: (h - 1000 * f) / 2 });
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
   wheelRef.current = (e: WheelEvent) => {
@@ -83,9 +106,9 @@ export function MapCanvas({
       className="absolute inset-0 overflow-hidden bg-map touch-none select-none"
       style={{ cursor: drag.current ? "grabbing" : "grab" }}
     >
-      <div
+<div
         className="absolute left-0 top-0 origin-top-left"
-        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }}
+        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${fit * zoom})` }}
       >
         <svg width={1000} height={1000} viewBox="0 0 1000 1000" className="block">
           <defs>
@@ -168,7 +191,7 @@ export function MapCanvas({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={() => onSelect(isSel ? null : r.id)}
               className="absolute -translate-x-1/2 -translate-y-full"
-              style={{ left: r.x, top: r.y, transform: `translate(-50%,-100%) scale(${1 / zoom})`, transformOrigin: "bottom center" }}
+              style={{ left: r.x, top: r.y, transform: `translate(-50%,-100%) scale(${1 / (fit * zoom)})`, transformOrigin: "bottom center" }}
             >
               <span className="relative flex flex-col items-center">
                 {r.status === "open" && (
