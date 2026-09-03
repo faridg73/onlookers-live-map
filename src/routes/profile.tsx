@@ -63,7 +63,7 @@ function ProfileScreen() {
         ))}
       </div>
 
-<div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
+      <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
         <div className="flex items-center justify-between">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Available balance
