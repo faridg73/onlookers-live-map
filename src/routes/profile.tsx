@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Camera, Star, Wallet } from "lucide-react";
+import { Camera, Clock, PlusSquare, Radio, Star, Wallet } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 
@@ -26,6 +26,13 @@ const STATS = [
   { icon: Wallet, label: "Earned", value: "$248" },
   { icon: Camera, label: "Shots sent", value: "37" },
   { icon: Star, label: "Rating", value: "4.9" },
+];
+
+const ACTIVITY = [
+  { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+$8 bounty · 12 min ago" },
+  { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "$15 bounty · 1 hr ago" },
+  { icon: Camera, text: "Sent a live shot of the night market", meta: "+$6 bounty · 2 hrs ago" },
+  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+$20 bounty · yesterday" },
 ];
 
 function ProfileScreen() {
@@ -66,6 +73,22 @@ function ProfileScreen() {
           </button>
         </div>
         <div className="mt-2 font-display text-4xl text-foreground">$62.00</div>
+      </div>
+
+      <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
+      <div className="mt-3 space-y-2">
+        {ACTIVITY.map(({ icon: Icon, text, meta }) => (
+          <div
+            key={text}
+            className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3"
+          >
+            <Icon className="size-4 shrink-0 text-signal" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-foreground">{text}</p>
+              <p className="text-xs text-muted-foreground">{meta}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
