@@ -63,7 +63,7 @@ function ProfileScreen() {
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
+<div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
         <div className="flex items-center justify-between">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Available balance
@@ -73,6 +73,22 @@ function ProfileScreen() {
           </button>
         </div>
         <div className="mt-2 font-display text-4xl text-foreground">$62.00</div>
+      </div>
+
+      <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
+      <div className="mt-3 space-y-2">
+        {ACTIVITY.map(({ icon: Icon, text, meta }) => (
+          <div
+            key={text}
+            className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3"
+          >
+            <Icon className="size-4 shrink-0 text-signal" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-foreground">{text}</p>
+              <p className="text-xs text-muted-foreground">{meta}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
