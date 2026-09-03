@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Camera, Star, Wallet } from "lucide-react";
+import { Camera, Clock, PlusSquare, Radio, Star, Wallet } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 
@@ -26,6 +26,13 @@ const STATS = [
   { icon: Wallet, label: "Earned", value: "$248" },
   { icon: Camera, label: "Shots sent", value: "37" },
   { icon: Star, label: "Rating", value: "4.9" },
+];
+
+const ACTIVITY = [
+  { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+$8 bounty · 12 min ago" },
+  { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "$15 bounty · 1 hr ago" },
+  { icon: Camera, text: "Sent a live shot of the night market", meta: "+$6 bounty · 2 hrs ago" },
+  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+$20 bounty · yesterday" },
 ];
 
 function ProfileScreen() {
