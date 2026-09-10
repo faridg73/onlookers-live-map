@@ -31,7 +31,7 @@ jobs:
           security list-keychain -d user -s $KEYCHAIN_PATH
 
           PP_PATH=$RUNNER_TEMP/profile.mobileprovision
-          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --d -o $PP_PATH
+          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 -d -o $PP_PATH
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
 
