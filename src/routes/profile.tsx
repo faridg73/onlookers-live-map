@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+  BadgeDollarSign,
   Camera,
   ChevronRight,
   Clock,
