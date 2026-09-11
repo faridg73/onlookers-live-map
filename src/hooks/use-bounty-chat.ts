@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  canChat,
   countUnread,
   listMessages,
   markRead,
@@ -28,13 +29,15 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
     }
     setLoading(true);
     try {
+      const allowed = await canChat(key, userId);
+      setLocked(!allowed);
+      if (!allowed) {
+        setMessages([]);
+        return;
+      }
       const [rows, marker] = await Promise.all([listMessages(key), readMarker(key)]);
       setMessages(rows);
       setLastReadAt(marker);
-      // Reading is only permitted for participants, so a successful select of a
-      // thread that exists means the box is unlocked. An empty thread needs a
-      // probe: try the insert path lazily instead of guessing here.
-      setLocked(false);
     } catch {
       setLocked(true);
     } finally {
