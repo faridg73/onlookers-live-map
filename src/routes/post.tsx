@@ -5,6 +5,7 @@ import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CategorySelect } from "@/components/CategorySelect";
+import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
   categoryById,
   generateAccessCode,
@@ -46,6 +47,7 @@ function PostScreen() {
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
   const [accessCode, setAccessCode] = useState("");
+  const [spot, setSpot] = useState<PickedLocation | null>(null);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -73,6 +75,8 @@ function PostScreen() {
         bounty,
         category,
         accessCode: codeNeeded ? accessCode.trim() : null,
+        latitude: spot?.latitude,
+        longitude: spot?.longitude,
       });
       setBalance(locked.balance);
       addRequest({
@@ -130,6 +134,10 @@ function PostScreen() {
             placeholder="Corner of Ash Alley & 6th"
             className="field"
           />
+          <LocationPreviewMap address={place} onPick={setSpot} />
+          <span className="block text-xs font-medium text-foreground/70">
+            Drag the pin or tap the map to fix the exact spot. Zoom in to check the street.
+          </span>
         </label>
 
         <div className="space-y-2">

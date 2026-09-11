@@ -41,6 +41,8 @@ export async function lockBounty(input: {
   bounty: number;
   category?: string | null;
   accessCode?: string | null;
+  latitude?: number | undefined;
+  longitude?: number | undefined;
 }): Promise<LockedBounty> {
   try {
     return await createBountyRequest({ data: { ...input, minutes: 60 } });
