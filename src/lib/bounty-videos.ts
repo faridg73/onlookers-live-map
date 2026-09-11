@@ -156,11 +156,12 @@ export async function uploadBountyVideo({
   return data as BountyVideo;
 }
 
-export async function listVideosForRequest(requestId: string) {
+export async function listVideosForRequest(requestId: string, dbId?: string | null) {
+  const keys = dbId ? [requestId, dbId] : [requestId];
   const { data, error } = await supabase
     .from("bounty_videos")
     .select("*")
-    .eq("request_id", requestId)
+    .in("request_id", keys)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as BountyVideo[];

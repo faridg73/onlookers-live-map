@@ -51,7 +51,7 @@ export function BountyVideoDialog({
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const rows = await listVideosForRequest(request.id);
+      const rows = await listVideosForRequest(request.id, request.dbId ?? null);
       setVideos(rows);
       setThumbs(await thumbnailUrls(rows));
     } catch {
