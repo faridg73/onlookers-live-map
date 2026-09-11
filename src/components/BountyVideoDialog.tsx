@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { isClosed } from "@/lib/onlooker-store";
 import { useAuth } from "@/hooks/use-auth";
 import {
   acceptBountyVideo,
@@ -40,6 +41,7 @@ export function BountyVideoDialog({
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const closed = isClosed(request);
 
   const refresh = useCallback(async () => {
     setLoading(true);
