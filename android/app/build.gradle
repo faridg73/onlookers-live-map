@@ -53,18 +53,36 @@ try {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
 
+// Release signing credentials are never stored in this file.
+// They come from android/keystore.properties (git-ignored, for local builds)
+// or from environment variables (used by CI).
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(new FileInputStream(keystorePropsFile))
+}
+
+def resolvedStoreFile = keystoreProps['storeFile'] ?: System.getenv('ANDROID_KEYSTORE_FILE') ?: 'release.keystore'
+def resolvedStorePassword = keystoreProps['storePassword'] ?: System.getenv('ANDROID_KEYSTORE_PASSWORD')
+def resolvedKeyAlias = keystoreProps['keyAlias'] ?: System.getenv('ANDROID_KEY_ALIAS')
+def resolvedKeyPassword = keystoreProps['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
+
 android {
-    signingConfigs {
-        release {
-            storeFile file('release.keystore')
-            storePassword 'money$'
-            keyAlias 'onlooker-key'
-            keyPassword 'money$'
+    if (resolvedStorePassword && resolvedKeyAlias && resolvedKeyPassword) {
+        signingConfigs {
+            release {
+                storeFile file(resolvedStoreFile)
+                storePassword resolvedStorePassword
+                keyAlias resolvedKeyAlias
+                keyPassword resolvedKeyPassword
+            }
         }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+            }
         }
+    } else {
+        logger.lifecycle("No signing credentials found — release build will be unsigned. Set android/keystore.properties or ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD.")
     }
 }
