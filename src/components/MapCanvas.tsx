@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Share2 } from "lucide-react";
+import { LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
@@ -11,6 +11,24 @@ const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 4;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+/**
+ * Fallback regional center used when device geolocation is denied or
+ * unavailable. The stylised 0-1000 map space is treated as this region.
+ */
+export const REGIONAL_CENTER = { lat: 34.0522, lng: -118.2437 }; // Los Angeles
+/** Approximate degrees of lat/lng covered by the 1000x1000 map space. */
+const REGION_SPAN = 0.3;
+
+/** Project real lat/lng into the 0-1000 map space (clamped to the region). */
+function worldFromLatLng(lat: number, lng: number) {
+  const minLng = REGIONAL_CENTER.lng - REGION_SPAN / 2;
+  const maxLat = REGIONAL_CENTER.lat + REGION_SPAN / 2;
+  return {
+    x: clamp(((lng - minLng) / REGION_SPAN) * 1000, 0, 1000),
+    y: clamp(((maxLat - lat) / REGION_SPAN) * 1000, 0, 1000),
+  };
+}
 
 /** A stylised night-city map surface with cursor-anchored wheel zoom and drag pan. */
 export function MapCanvas({
