@@ -34,8 +34,8 @@ export function ExpiryCountdown({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold tabular-nums",
-        highlight ? "border" : "",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-bold tabular-nums",
+        highlight ? "border-2" : "text-foreground",
         className,
       )}
       style={

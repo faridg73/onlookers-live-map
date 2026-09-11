@@ -42,10 +42,10 @@ export function RequestCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-foreground/70">
             <span
               className={cn(
-                "inline-flex items-center gap-1.5",
+                "inline-flex items-center gap-1.5 font-bold",
                 request.status === "open" && "text-live",
                 request.status === "claimed" && "text-signal",
                 expired && "text-muted-foreground",
@@ -59,15 +59,15 @@ export function RequestCard({
             <span className="text-border">/</span>
             <span>{formatAgo(request.minutesAgo)}</span>
           </div>
-          <h3 className="mt-2 font-display text-lg leading-tight text-foreground">{request.title}</h3>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <h3 className="mt-2 font-display text-lg font-bold leading-tight text-foreground">{request.title}</h3>
+          <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-foreground/70">
             <MapPin className="size-3.5" /> {request.place}
           </p>
         </div>
 
-        <div className="shrink-0 rounded-xl border border-signal/40 bg-signal/10 px-3 py-2 text-center">
-          <div className="font-display text-xl leading-none text-signal">${pool}</div>
-          <div className="mt-1 text-[0.6rem] uppercase tracking-[0.16em] text-signal/70">
+        <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-3 py-2 text-center">
+          <div className="font-display text-2xl font-extrabold leading-none tabular-nums text-signal">${pool}</div>
+          <div className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-signal">
             {boosted > 0 ? `+$${boosted} boosted` : "bounty"}
           </div>
         </div>
@@ -76,11 +76,11 @@ export function RequestCard({
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span
           className={cn(
-            "rounded-full px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em]",
-            expired && "border border-border bg-surface-raised text-muted-foreground",
-            !expired && done && "border border-border bg-surface-raised text-foreground",
-            request.status === "claimed" && !done && "border border-signal/40 bg-signal/10 text-signal",
-            request.status === "open" && !done && "border border-live/40 bg-live/10 text-live",
+            "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em]",
+            expired && "border-border bg-surface-raised text-muted-foreground",
+            !expired && done && "border-border bg-surface-raised text-foreground",
+            request.status === "claimed" && !done && "border-signal/60 bg-signal/15 text-signal",
+            request.status === "open" && !done && "border-live/60 bg-live/15 text-live",
           )}
         >
           {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
@@ -90,7 +90,7 @@ export function RequestCard({
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
         )}
         {!done && pool >= HIGH_BOUNTY && (
-          <span className="rounded-full border border-signal/40 bg-signal/10 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-signal">
+          <span className="rounded-full border border-signal/60 bg-signal/15 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-signal">
             High bounty
           </span>
         )}

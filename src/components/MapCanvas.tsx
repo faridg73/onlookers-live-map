@@ -213,12 +213,12 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 )}
                 <span
                   className={cn(
-                    "relative rounded-full border px-2.5 py-1 font-display text-sm shadow-lg",
+                    "relative rounded-full border-2 px-3 py-1.5 font-display text-base font-extrabold tracking-tight tabular-nums shadow-lg",
                     isClosed(r)
                       ? "border-border bg-surface text-muted-foreground"
                       : isSel
                         ? "border-signal bg-signal text-signal-foreground"
-                        : "border-signal/50 bg-surface text-signal",
+                        : "border-signal bg-surface text-signal",
                   )}
                 >
                   ${r.bounty}
