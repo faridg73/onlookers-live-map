@@ -12,9 +12,53 @@ export type BountyVideo = {
   bounty_amount: number;
   note: string;
   storage_path: string;
+  thumb_path: string | null;
   duration_seconds: number | null;
   created_at: string;
 };
+
+/** Grab a still frame from a video file in the browser and return it as a JPEG. */
+async function captureThumbnail(file: File): Promise<Blob | null> {
+  if (typeof document === "undefined") return null;
+  const url = URL.createObjectURL(file);
+  try {
+    const video = document.createElement("video");
+    video.src = url;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "metadata";
+
+    await new Promise<void>((resolve, reject) => {
+      const fail = () => reject(new Error("thumbnail"));
+      video.onloadeddata = () => resolve();
+      video.onerror = fail;
+      setTimeout(fail, 8000);
+    });
+
+    await new Promise<void>((resolve) => {
+      video.onseeked = () => resolve();
+      video.currentTime = Math.min(1, (video.duration || 1) / 3);
+      setTimeout(resolve, 3000);
+    });
+
+    const width = video.videoWidth || 640;
+    const height = video.videoHeight || 360;
+    const scale = Math.min(1, 640 / width);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return await new Promise((resolve) =>
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.8),
+    );
+  } catch {
+    return null;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
 
 function extensionFor(file: File) {
   const fromName = file.name.includes(".") ? file.name.split(".").pop() : null;
@@ -51,6 +95,16 @@ export async function uploadBountyVideo({
     });
   if (uploadError) throw uploadError;
 
+  let thumbPath: string | null = null;
+  const thumb = await captureThumbnail(file);
+  if (thumb) {
+    const candidate = `${path.replace(/\.[^.]+$/, "")}-thumb.jpg`;
+    const { error: thumbError } = await supabase.storage
+      .from(BOUNTY_VIDEO_BUCKET)
+      .upload(candidate, thumb, { contentType: "image/jpeg", cacheControl: "3600", upsert: true });
+    if (!thumbError) thumbPath = candidate;
+  }
+
   const { data, error } = await supabase
     .from("bounty_videos")
     .insert({
@@ -61,6 +115,7 @@ export async function uploadBountyVideo({
       bounty_amount: request.bounty,
       note: note ?? "",
       storage_path: path,
+      thumb_path: thumbPath,
       duration_seconds: durationSeconds ?? null,
     })
     .select()
@@ -68,7 +123,9 @@ export async function uploadBountyVideo({
 
   if (error) {
     // Don't leave an orphan file behind if the record failed to save.
-    await supabase.storage.from(BOUNTY_VIDEO_BUCKET).remove([path]);
+    await supabase.storage
+      .from(BOUNTY_VIDEO_BUCKET)
+      .remove(thumbPath ? [path, thumbPath] : [path]);
     throw error;
   }
 
@@ -109,5 +166,30 @@ export async function playbackUrl(storagePath: string, expiresInSeconds = 60 * 6
 export async function deleteBountyVideo(video: BountyVideo) {
   const { error } = await supabase.from("bounty_videos").delete().eq("id", video.id);
   if (error) throw error;
-  await supabase.storage.from(BOUNTY_VIDEO_BUCKET).remove([video.storage_path]);
+  await supabase.storage
+    .from(BOUNTY_VIDEO_BUCKET)
+    .remove(video.thumb_path ? [video.storage_path, video.thumb_path] : [video.storage_path]);
+}
+
+/** Signed preview image URLs keyed by video id, for the videos that have a thumbnail. */
+export async function thumbnailUrls(videos: BountyVideo[], expiresInSeconds = 60 * 60) {
+  const withThumbs = videos.filter((v): v is BountyVideo & { thumb_path: string } =>
+    Boolean(v.thumb_path),
+  );
+  if (withThumbs.length === 0) return {} as Record<string, string>;
+
+  const { data, error } = await supabase.storage
+    .from(BOUNTY_VIDEO_BUCKET)
+    .createSignedUrls(
+      withThumbs.map((v) => v.thumb_path),
+      expiresInSeconds,
+    );
+  if (error || !data) return {} as Record<string, string>;
+
+  const map: Record<string, string> = {};
+  data.forEach((entry, i) => {
+    const video = withThumbs[i];
+    if (video && entry.signedUrl) map[video.id] = entry.signedUrl;
+  });
+  return map;
 }
