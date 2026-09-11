@@ -131,7 +131,11 @@ function FAQScreen() {
 
       <div className="mt-8 rounded-2xl border border-border bg-surface p-4">
         <p className="text-sm text-muted-foreground">
-          Still have questions? Review our{" "}
+          Still have questions?{" "}
+          <Link to="/contact" className="text-signal underline underline-offset-2">
+            Contact support
+          </Link>{" "}
+          or review our{" "}
           <Link to="/terms" className="text-signal underline underline-offset-2">
             Terms of Service
           </Link>{" "}
