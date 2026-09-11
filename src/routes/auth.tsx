@@ -67,12 +67,13 @@ function AuthScreen() {
     }
   }
 
-  async function google() {
+  async function oauth(provider: "google" | "apple") {
     if (!accepted) {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
-    const result = await lovable.auth.signInWithOAuth("google", {
+    rememberTermsAcceptance();
+    const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) toast.error(result.error.message);
