@@ -22,9 +22,10 @@ export function CategoryBadge({
         className,
       )}
       style={{
-        color: hue,
-        borderColor: `color-mix(in oklch, ${hue} 65%, transparent)`,
-        backgroundColor: `color-mix(in oklch, ${hue} 20%, transparent)`,
+        color: "white",
+        borderColor: `color-mix(in oklch, ${hue} 55%, black)`,
+        backgroundColor: `color-mix(in oklch, ${hue} 48%, oklch(0.18 0.02 260))`,
+        textShadow: "0 1px 2px rgb(0 0 0 / 0.45)",
       }}
     >
       <span aria-hidden>{meta.emoji}</span>
