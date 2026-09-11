@@ -562,6 +562,54 @@ export type Database = {
           },
         ]
       }
+      request_chat_reads: {
+        Row: {
+          created_at: string
+          last_read_at: string
+          request_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_read_at?: string
+          request_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_read_at?: string
+          request_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      request_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          request_key: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          request_key: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          request_key?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       requests: {
         Row: {
           bounty_amount: number
@@ -823,6 +871,10 @@ export type Database = {
           _user_id: string
         }
         Returns: number
+      }
+      can_chat_on_request: {
+        Args: { _request_key: string; _user_id: string }
+        Returns: boolean
       }
       can_view_dispute: {
         Args: { _request_id: string; _user_id: string }
