@@ -36,9 +36,9 @@ export function categoryById(id?: CategoryId | null) {
 export type LiveRequest = {
   id: string;
   title: string;
-  category?: CategoryId;
+  category?: CategoryId | undefined;
   /** Free-form instructions written by the requester */
-  instructions?: string;
+  instructions?: string | undefined;
   place: string;
   note: string;
   bounty: number;
