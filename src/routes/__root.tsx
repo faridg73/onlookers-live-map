@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OnlookerProvider } from "@/lib/onlooker-store";
 import { BoostProvider } from "@/lib/boosts-store";
 import { BottomNav } from "../components/BottomNav";
+import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { ProfileSetup } from "../components/ProfileSetup";
 
@@ -138,6 +139,7 @@ function RootComponent() {
         <BoostProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <Footer />
           <BottomNav />
           <ProfileSetup />
           <Toaster position="top-center" />
