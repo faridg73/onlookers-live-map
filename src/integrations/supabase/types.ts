@@ -570,6 +570,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      public_request_markers: {
+        Args: never
+        Returns: {
+          approx_latitude: number
+          approx_longitude: number
+          bounty_amount: number
+          category: string
+          created_at: string
+          expires_at: string
+          id: string
+          location_name: string
+        }[]
+      }
       reject_proof: {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
