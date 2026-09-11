@@ -6,6 +6,9 @@ export type BoostTotals = Record<string, number>;
 
 /** Sum of every chip-in per bounty, keyed by request id. */
 export async function fetchBoostTotals(): Promise<BoostTotals> {
+  // Chip-in rows are private, so signed-out visitors simply see no boosts.
+  const { data: session } = await supabase.auth.getSession();
+  if (!session.session) return {};
   const { data, error } = await supabase.from("bounty_boosts").select("request_id, amount");
   if (error) throw error;
   const totals: BoostTotals = {};
