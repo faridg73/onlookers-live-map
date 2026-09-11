@@ -185,7 +185,7 @@ function PostScreen() {
 
         <button
           type="submit"
-          disabled={posting || bounty < MIN_BOUNTY}
+          disabled={posting || bounty < MIN_BOUNTY || (permissionNeeded && !permissionOk)}
           className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
