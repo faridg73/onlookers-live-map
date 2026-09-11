@@ -12,8 +12,20 @@ function message(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
+/** Signed-out visitors must never hit the authenticated server functions. */
+async function isSignedIn() {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    return !!data.session;
+  } catch {
+    return false;
+  }
+}
+
 export async function readWalletBalance(): Promise<number | null> {
   try {
+    if (!(await isSignedIn())) return null;
     return await getWalletBalance();
   } catch {
     return null;
