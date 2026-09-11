@@ -51,19 +51,19 @@ function MapScreen() {
       <MapCanvas requests={requests} selectedId={selectedId} onSelect={select} />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 p-4">
-        <div className="pointer-events-auto mx-auto flex max-w-lg items-center gap-3 rounded-2xl border border-border bg-surface/85 px-4 py-3 backdrop-blur-xl">
+        <div className="pointer-events-auto mx-auto flex max-w-lg items-center gap-3 rounded-2xl border border-border bg-surface/90 px-4 py-3 backdrop-blur-xl">
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">
             <Zap className="size-4" strokeWidth={2.4} />
           </span>
           <div className="min-w-0 flex-1">
-            <h1 className="font-display text-base leading-none tracking-tight text-foreground">
+            <h1 className="font-display text-lg font-extrabold leading-none tracking-tight text-foreground">
               Onlooker
             </h1>
-            <p className="mt-1 text-[0.68rem] uppercase tracking-[0.16em] text-live">
+            <p className="mt-1 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-live">
               {openCount} live requests nearby
             </p>
           </div>
-          <button className="flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:text-foreground">
+          <button className="flex size-9 items-center justify-center rounded-lg border-2 border-border text-foreground transition-colors hover:border-signal/60">
             <Search className="size-4" />
           </button>
         </div>
