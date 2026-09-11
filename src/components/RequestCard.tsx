@@ -102,6 +102,30 @@ export function RequestCard({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {request.dbId && !done && (
+            <button
+              type="button"
+              disabled={cancelling}
+              onClick={async (e) => {
+                e.stopPropagation();
+                setCancelling(true);
+                try {
+                  const balance = await refundBounty(request.dbId!);
+                  remove(request.id);
+                  toast.success("Request cancelled", {
+                    description: `$${request.bounty} refunded — wallet balance $${balance.toFixed(2)}.`,
+                  });
+                } catch (error) {
+                  toast.error(error instanceof Error ? error.message : "Could not cancel.");
+                } finally {
+                  setCancelling(false);
+                }
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+            >
+              <X className="size-3.5" /> {cancelling ? "Refunding…" : "Cancel"}
+            </button>
+          )}
           <ShareBountyButton request={request} />
           <BountyVideoDialog request={request}>
             <button
