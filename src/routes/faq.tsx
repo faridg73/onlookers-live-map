@@ -120,7 +120,7 @@ function FAQScreen() {
               </span>
               <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+            <CollapsibleContent className="overflow-hidden">
               <div className="rounded-b-2xl border-x border-b border-border bg-surface px-4 pb-4 pt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
                 {answer}
               </div>
