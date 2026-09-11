@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Play, Trash2, Upload, Video } from "lucide-react";
+import { Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import {
@@ -189,6 +190,14 @@ export function BountyVideoDialog({
                       className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground"
                     >
                       <Play className="size-3.5" /> Watch
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Share video"
+                      onClick={() => void shareBountyVideo(v)}
+                      className="text-muted-foreground transition-colors hover:text-signal"
+                    >
+                      <Share2 className="size-4" />
                     </button>
                     {v.uploader_id === user.id && (
                       <button

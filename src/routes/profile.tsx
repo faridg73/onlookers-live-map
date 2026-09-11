@@ -3,6 +3,7 @@ import { Camera, Clock, PlusSquare, Radio, Star, Wallet } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
+import { Leaderboard } from "@/components/Leaderboard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -91,6 +92,8 @@ function ProfileScreen() {
           </div>
         ))}
       </div>
+
+      <Leaderboard />
 
       <MyBountyVideos />
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Play, Video } from "lucide-react";
+import { Play, Share2, Video } from "lucide-react";
+import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -104,6 +105,14 @@ export function MyBountyVideos() {
                   className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-foreground"
                 >
                   <Play className="size-3.5" /> Watch
+                </button>
+                <button
+                  type="button"
+                  aria-label="Share video"
+                  onClick={() => void shareBountyVideo(v)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-signal/50 bg-signal/10 px-3 py-1.5 text-xs font-semibold text-signal"
+                >
+                  <Share2 className="size-3.5" /> Share
                 </button>
               </div>
               {playing?.id === v.id && (

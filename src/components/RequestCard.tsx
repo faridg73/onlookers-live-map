@@ -1,5 +1,7 @@
 import { Clock, Eye, MapPin, Camera, Video } from "lucide-react";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { BoostBounty } from "@/components/BoostBounty";
+import { useBoosts } from "@/lib/boosts-store";
 import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +17,9 @@ export function RequestCard({
   onSelect?: (id: string) => void;
 }) {
   const done = request.status === "fulfilled";
+  const { boostOf } = useBoosts();
+  const boosted = boostOf(request.id);
+  const pool = request.bounty + boosted;
   return (
     <article
       onClick={() => onSelect?.(request.id)}
@@ -49,8 +54,10 @@ export function RequestCard({
         </div>
 
         <div className="shrink-0 rounded-xl border border-signal/40 bg-signal/10 px-3 py-2 text-center">
-          <div className="font-display text-xl leading-none text-signal">${request.bounty}</div>
-          <div className="mt-1 text-[0.6rem] uppercase tracking-[0.16em] text-signal/70">bounty</div>
+          <div className="font-display text-xl leading-none text-signal">${pool}</div>
+          <div className="mt-1 text-[0.6rem] uppercase tracking-[0.16em] text-signal/70">
+            {boosted > 0 ? `+$${boosted} boosted` : "bounty"}
+          </div>
         </div>
       </div>
 
@@ -69,6 +76,13 @@ export function RequestCard({
           <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
             {request.instructions || request.note}
           </p>
+        </div>
+      )}
+
+      {!done && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-raised px-3 py-2">
+          <span className="text-xs text-muted-foreground">Chip in to raise the payout</span>
+          <BoostBounty requestId={request.id} />
         </div>
       )}
 
