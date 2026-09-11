@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { SEED_REQUESTS, type LiveRequest } from "./onlooker";
+import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
 
 type NewRequest = {
   title: string;
   place: string;
   note: string;
   bounty: number;
+  category?: CategoryId;
+  instructions?: string;
 };
 
 type Store = {
@@ -43,6 +45,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       place: input.place,
       note: input.note,
       bounty: input.bounty,
+      category: input.category,
+      instructions: input.instructions,
       status: "open",
       minutesAgo: 0,
       watchers: 1,

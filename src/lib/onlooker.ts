@@ -1,8 +1,44 @@
 export type RequestStatus = "open" | "claimed" | "fulfilled";
 
+export type CategoryId =
+  | "food"
+  | "vehicles"
+  | "outdoors"
+  | "nightlife"
+  | "transit"
+  | "events"
+  | "parking"
+  | "weather";
+
+export type Category = {
+  id: CategoryId;
+  label: string;
+  emoji: string;
+  /** Prompt shown inside the instructions box for this category */
+  hint: string;
+};
+
+export const CATEGORIES: Category[] = [
+  { id: "food", label: "Food & Dining", emoji: "\u{1F37D}\u{FE0F}", hint: "e.g. Show the line at the door, the menu board, and whether the patio has free tables." },
+  { id: "vehicles", label: "Cars & Vehicles", emoji: "\u{1F697}", hint: "e.g. Cold start engine sound, 360\u00B0 walkaround, odometer photo, any dents or rust." },
+  { id: "outdoors", label: "Nature & Trails", emoji: "\u{1F3DE}\u{FE0F}", hint: "e.g. Trail conditions at the north gate, how muddy it is, and the view from the ridge." },
+  { id: "nightlife", label: "Nightlife & Bars", emoji: "\u{1F378}", hint: "e.g. How long is the queue, is there a cover charge, how busy is it inside." },
+  { id: "transit", label: "Transit & Traffic", emoji: "\u{1F686}", hint: "e.g. Photo of the departure board and how backed up the road is heading north." },
+  { id: "events", label: "Events & Concerts", emoji: "\u{1F3AB}", hint: "e.g. Crowd size at the gate, stage view from the back, merch line length." },
+  { id: "parking", label: "Parking", emoji: "\u{1F17F}\u{FE0F}", hint: "e.g. Wide shot of the lot, how many spots are open, and the posted hourly rate." },
+  { id: "weather", label: "Weather & Conditions", emoji: "\u{26C5}", hint: "e.g. Is the underpass flooded, how deep is the water, is the road still passable." },
+];
+
+export function categoryById(id?: CategoryId | null) {
+  return CATEGORIES.find((c) => c.id === id);
+}
+
 export type LiveRequest = {
   id: string;
   title: string;
+  category?: CategoryId | undefined;
+  /** Free-form instructions written by the requester */
+  instructions?: string | undefined;
   place: string;
   note: string;
   bounty: number;

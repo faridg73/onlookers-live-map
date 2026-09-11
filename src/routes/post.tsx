@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
 
 export const Route = createFileRoute("/post")({
   head: () => ({
@@ -31,10 +32,18 @@ function PostScreen() {
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(10);
+  const [category, setCategory] = useState<CategoryId>("food");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    addRequest({ title: title.trim(), place: place.trim(), note: note.trim(), bounty });
+    addRequest({
+      title: title.trim(),
+      place: place.trim(),
+      note: note.trim(),
+      bounty,
+      category,
+      instructions: note.trim(),
+    });
     toast.success("Request is live", { description: `$${bounty} bounty posted to nearby onlookers.` });
     navigate({ to: "/feed" });
   }
@@ -73,17 +82,44 @@ function PostScreen() {
           />
         </label>
 
+        <div className="space-y-2">
+          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+            Category
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setCategory(c.id)}
+                className={
+                  "rounded-full border px-3 py-1.5 text-xs transition-colors " +
+                  (category === c.id
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface text-muted-foreground hover:border-signal/50")
+                }
+              >
+                <span className="mr-1">{c.emoji}</span>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <label className="block space-y-1.5">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-            Details
+            Instructions for the onlooker
           </span>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            rows={4}
-            placeholder="One wide photo of the entrance is enough."
+            rows={5}
+            placeholder={categoryById(category)?.hint}
             className="field resize-none"
           />
+          <span className="block text-xs text-muted-foreground">
+            Spell out exactly what you want captured for {categoryById(category)?.label.toLowerCase()}.
+          </span>
         </label>
 
         <div className="space-y-2">
