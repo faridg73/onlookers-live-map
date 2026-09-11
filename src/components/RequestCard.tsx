@@ -74,6 +74,17 @@ export function RequestCard({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span
+          className={cn(
+            "rounded-full px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em]",
+            expired && "border border-border bg-surface-raised text-muted-foreground",
+            !expired && done && "border border-border bg-surface-raised text-foreground",
+            request.status === "claimed" && !done && "border border-signal/40 bg-signal/10 text-signal",
+            request.status === "open" && !done && "border border-live/40 bg-live/10 text-live",
+          )}
+        >
+          {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
+        </span>
         <CategoryBadge category={request.category} />
         {!done && (
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
