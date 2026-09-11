@@ -47,7 +47,6 @@ jobs:
           npx cap sync ios
 
       - name: Build Archive & Upload to App Store Connect
-
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
