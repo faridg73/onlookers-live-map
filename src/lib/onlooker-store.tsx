@@ -27,7 +27,7 @@ type NewRequest = {
   bounty: number;
   category?: CategoryId;
   instructions?: string;
-  accessCode?: string;
+  accessCode?: string | undefined;
   dbId?: string;
 };
 
