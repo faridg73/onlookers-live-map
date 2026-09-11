@@ -40,7 +40,7 @@ const SUBJECTS = [
 function ContactScreen() {
   const { user } = useAuth();
   const [form, setForm] = useState({
-    name: user?.user_metadata?.full_name ?? "",
+    name: user?.user_metadata?.["full_name"] ?? "",
     email: user?.email ?? "",
     subject: "",
     message: "",
