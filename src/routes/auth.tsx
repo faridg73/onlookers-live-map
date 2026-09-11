@@ -87,10 +87,29 @@ function AuthScreen() {
         You need an account to upload bounty videos and replay them later.
       </p>
 
+      <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={accepted}
+          onChange={(e) => setAccepted(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
+        />
+        <span>
+          By signing in, you agree to Onlooker&rsquo;s{" "}
+          <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">
+            Terms of Service
+          </Link>
+          , acknowledging that you operate independently, assume all legal and physical liability,
+          will only record in lawful public spaces without trespassing, and hold Onlooker harmless
+          from any legal actions.
+        </span>
+      </label>
+
       <button
         type="button"
         onClick={google}
-        className="mt-6 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised"
+        disabled={!accepted}
+        className="mt-4 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised disabled:opacity-50"
       >
         Continue with Google
       </button>
@@ -119,7 +138,7 @@ function AuthScreen() {
         />
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || !accepted}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
