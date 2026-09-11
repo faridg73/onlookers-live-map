@@ -46,6 +46,45 @@ const containerRef = useRef<HTMLDivElement | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const centeredRef = useRef(false);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  /** Device position projected into map space; null until geolocation resolves. */
+  const [userWorld, setUserWorld] = useState<{ x: number; y: number } | null>(null);
+  const [geoState, setGeoState] = useState<"pending" | "located" | "unavailable">("pending");
+  /** Latest fit/zoom for math inside stable callbacks. */
+  const viewRef = useRef({ fit: 1, zoom: 1 });
+  viewRef.current = { fit, zoom };
+
+  /** Center the viewport on a point in the 0-1000 map space. */
+  const centerOnWorld = useCallback((wx: number, wy: number) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const s = viewRef.current.fit * viewRef.current.zoom;
+    setOffset({ x: el.clientWidth / 2 - wx * s, y: el.clientHeight / 2 - wy * s });
+  }, []);
+
+  /** Ask the device for its position and center the map on it. */
+  const locateMe = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      setGeoState("unavailable");
+      return;
+    }
+    setGeoState("pending");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const w = worldFromLatLng(pos.coords.latitude, pos.coords.longitude);
+        setUserWorld(w);
+        setGeoState("located");
+        centerOnWorld(w.x, w.y);
+      },
+      () => setGeoState("unavailable"),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
+    );
+  }, [centerOnWorld]);
+
+  // Request the device location once on first load and auto-center on it.
+  // If denied/unavailable the map stays on the regional fallback center.
+  useEffect(() => {
+    locateMe();
+  }, [locateMe]);
 
   // Fit the 1000x1000 world to the viewport (cover) and center it once,
   // so the map fills any screen — phone, tablet, desktop, tall store shots.
