@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { CategorySelect } from "@/components/CategorySelect";
 import {
-  CATEGORIES,
   categoryById,
   generateAccessCode,
   needsAccessCode,
@@ -98,14 +98,16 @@ function PostScreen() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
-      <h1 className="font-display text-3xl tracking-tight text-foreground">Post a request</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground">
+        Post a request
+      </h1>
+      <p className="mt-2 text-sm font-semibold text-foreground/70">
         The higher the bounty, the faster someone walks over.
       </p>
 
       <form onSubmit={submit} className="mt-6 space-y-5">
         <label className="block space-y-1.5">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
             What do you want to see?
           </span>
           <input
@@ -118,7 +120,7 @@ function PostScreen() {
         </label>
 
         <label className="block space-y-1.5">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
             Where
           </span>
           <input
@@ -131,27 +133,10 @@ function PostScreen() {
         </label>
 
         <div className="space-y-2">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
             Category
           </span>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setCategory(c.id)}
-                className={
-                  "rounded-full border px-3 py-1.5 text-xs transition-colors " +
-                  (category === c.id
-                    ? "border-signal bg-signal text-signal-foreground"
-                    : "border-border bg-surface text-muted-foreground hover:border-signal/50")
-                }
-              >
-                <span className="mr-1">{c.emoji}</span>
-                {c.label}
-              </button>
-            ))}
-          </div>
+          <CategorySelect value={category} onChange={setCategory} />
         </div>
 
         {permissionNeeded && (
@@ -162,7 +147,7 @@ function PostScreen() {
               onChange={(e) => setPermissionOk(e.target.checked)}
               className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
             />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs font-medium text-foreground/75">
               I confirm I have permission from the seller, listing agent or property manager to have
               this property photographed or filmed, and that the onlooker may only capture areas
               open to the public or that access has been authorised.
@@ -172,7 +157,7 @@ function PostScreen() {
 
         {codeNeeded && (
           <div className="space-y-1.5 rounded-xl border border-signal/40 bg-surface p-3">
-            <span className="text-[0.65rem] uppercase tracking-[0.18em] text-signal">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-signal">
               Private access passcode
             </span>
             <div className="flex gap-2">
@@ -191,7 +176,7 @@ function PostScreen() {
                 Generate
               </button>
             </div>
-            <span className="block text-xs text-muted-foreground">
+            <span className="block text-xs font-medium text-foreground/70">
               Stays hidden until someone claims the bounty. They can quote it on site to prove the
               owner, agent or manager authorised the visit.
             </span>
@@ -199,7 +184,7 @@ function PostScreen() {
         )}
 
         <label className="block space-y-1.5">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
             Instructions for the onlooker
           </span>
           <textarea
@@ -209,13 +194,13 @@ function PostScreen() {
             placeholder={categoryById(category)?.hint}
             className="field resize-none"
           />
-          <span className="block text-xs text-muted-foreground">
+          <span className="block text-xs font-medium text-foreground/70">
             Spell out exactly what you want captured for {categoryById(category)?.label.toLowerCase()}.
           </span>
         </label>
 
         <div className="space-y-2">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
             Bounty
           </span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
@@ -229,7 +214,7 @@ function PostScreen() {
             (permissionNeeded && !permissionOk) ||
             (codeNeeded && accessCode.trim().length < 4)
           }
-          className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+          className="w-full rounded-xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
         </button>
