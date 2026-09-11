@@ -8,6 +8,7 @@ type NewRequest = {
   bounty: number;
   category?: CategoryId;
   instructions?: string;
+  dbId?: string;
 };
 
 type Store = {
@@ -16,6 +17,7 @@ type Store = {
   select: (id: string | null) => void;
   addRequest: (input: NewRequest) => LiveRequest;
   claim: (id: string) => void;
+  remove: (id: string) => void;
 };
 
 const StoreContext = createContext<Store | null>(null);
@@ -47,6 +49,7 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       bounty: input.bounty,
       category: input.category,
       instructions: input.instructions,
+      dbId: input.dbId,
       status: "open",
       minutesAgo: 0,
       watchers: 1,
@@ -60,6 +63,11 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     return created;
   }, []);
 
+  const remove = useCallback((id: string) => {
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+    setSelectedId((cur) => (cur === id ? null : cur));
+  }, []);
+
   const claim = useCallback((id: string) => {
     setRequests((prev) =>
       prev.map((r) => (r.id === id ? { ...r, status: "claimed", responses: r.responses + 1 } : r)),
@@ -67,8 +75,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim }),
-    [requests, selectedId, addRequest, claim],
+    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove }),
+    [requests, selectedId, addRequest, claim, remove],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

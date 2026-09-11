@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
 
@@ -23,8 +25,6 @@ export const Route = createFileRoute("/post")({
   component: PostScreen,
 });
 
-const BOUNTIES = [5, 10, 20, 40];
-
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
@@ -33,19 +33,46 @@ function PostScreen() {
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(10);
   const [category, setCategory] = useState<CategoryId>("food");
+  const [balance, setBalance] = useState<number | null>(null);
+  const [posting, setPosting] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  useEffect(() => {
+    void readWalletBalance().then(setBalance);
+  }, []);
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    addRequest({
-      title: title.trim(),
-      place: place.trim(),
-      note: note.trim(),
-      bounty,
-      category,
-      instructions: note.trim(),
-    });
-    toast.success("Request is live", { description: `$${bounty} bounty posted to nearby onlookers.` });
-    navigate({ to: "/feed" });
+    if (bounty < MIN_BOUNTY) {
+      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    setPosting(true);
+    try {
+      const locked = await lockBounty({
+        prompt: title.trim(),
+        locationName: place.trim(),
+        bounty,
+        category,
+      });
+      setBalance(locked.balance);
+      addRequest({
+        title: title.trim(),
+        place: place.trim(),
+        note: note.trim(),
+        bounty,
+        category,
+        instructions: note.trim(),
+        dbId: locked.id,
+      });
+      toast.success("Request is live", {
+        description: `$${bounty} locked from your wallet until it's fulfilled.`,
+      });
+      navigate({ to: "/feed" });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not post the request.");
+    } finally {
+      setPosting(false);
+    }
   }
 
   return (
@@ -126,30 +153,15 @@ function PostScreen() {
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Bounty
           </span>
-          <div className="flex gap-2">
-            {BOUNTIES.map((b) => (
-              <button
-                key={b}
-                type="button"
-                onClick={() => setBounty(b)}
-                className={
-                  "flex-1 rounded-xl border py-3 font-display text-lg transition-colors " +
-                  (bounty === b
-                    ? "border-signal bg-signal text-signal-foreground"
-                    : "border-border bg-surface text-muted-foreground hover:border-signal/50")
-                }
-              >
-                ${b}
-              </button>
-            ))}
-          </div>
+          <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
         </div>
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90"
+          disabled={posting || bounty < MIN_BOUNTY}
+          className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
         >
-          Go live
+          {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
         </button>
       </form>
     </div>
