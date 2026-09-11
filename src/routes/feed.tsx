@@ -28,6 +28,7 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "open", label: "Open" },
   { key: "claimed", label: "Claimed" },
   { key: "fulfilled", label: "Done" },
+  { key: "expired", label: "Expired" },
 ];
 
 function FeedScreen() {
