@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BadgeDollarSign, Landmark, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { CashOutCard } from "@/components/CashOutCard";
 import { listMyVideos, type BountyVideo } from "@/lib/bounty-videos";
 
 export const Route = createFileRoute("/payout-history")({
