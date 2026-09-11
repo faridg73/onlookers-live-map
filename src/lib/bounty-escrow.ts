@@ -12,8 +12,20 @@ function message(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
+/** Signed-out visitors must never hit the authenticated server functions. */
+async function isSignedIn() {
+  try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    return !!data.session;
+  } catch {
+    return false;
+  }
+}
+
 export async function readWalletBalance(): Promise<number | null> {
   try {
+    if (!(await isSignedIn())) return null;
     return await getWalletBalance();
   } catch {
     return null;
@@ -40,6 +52,7 @@ export async function lockBounty(input: {
 /** Reads the private access passcode for a claimed or owned request. */
 export async function readAccessCode(dbId: string): Promise<string | null> {
   try {
+    if (!(await isSignedIn())) return null;
     return await getBountyAccessCode({ data: { id: dbId } });
   } catch {
     return null;
@@ -59,9 +72,7 @@ export async function refundBounty(dbId: string): Promise<number> {
 /** Sweeps expired requests so their deposits go back to the requester. */
 export async function refundExpiredBounties() {
   try {
-    const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) return; // Signed-out visitors skip the sweep.
+    if (!(await isSignedIn())) return; // Signed-out visitors skip the sweep.
     await settleExpiredBounties();
   } catch {
     // Never let the background sweep break the map.
