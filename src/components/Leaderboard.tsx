@@ -29,13 +29,18 @@ export function Leaderboard({
 
   return (
     <section className="mt-8">
-      <div className="flex items-center gap-2">
-        <Trophy className="size-4 text-signal" />
-        <h2 className="font-display text-lg text-foreground">Top reporters</h2>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        The onlookers who have earned the most bounty cash.
-      </p>
+      {showHeading && (
+        <>
+          <div className="flex items-center gap-2">
+            <Trophy className="size-4 text-signal" />
+            <h2 className="font-display text-lg text-foreground">Top reporters</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The onlookers who have earned the most bounty cash.
+          </p>
+        </>
+      )}
+
 
       {rows === null ? (
         <p className="mt-3 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
