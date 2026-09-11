@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
-import type { RequestStatus } from "@/lib/onlooker";
+import { CATEGORIES, type CategoryId, type RequestStatus } from "@/lib/onlooker";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -34,7 +34,11 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
-  const list = requests.filter((r) => filter === "all" || r.status === filter);
+  const [cat, setCat] = useState<CategoryId | "all">("all");
+  const list = requests.filter(
+    (r) =>
+      (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
+  );
   const pot = requests.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   return (
