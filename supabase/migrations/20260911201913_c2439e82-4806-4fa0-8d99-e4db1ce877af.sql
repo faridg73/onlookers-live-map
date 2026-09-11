@@ -1,0 +1,2 @@
+ALTER TABLE public.escrows DROP CONSTRAINT escrows_status_check;
+ALTER TABLE public.escrows ADD CONSTRAINT escrows_status_check CHECK (status = ANY (ARRAY['held','reserved','submitted','disputed','released','refunded']));
