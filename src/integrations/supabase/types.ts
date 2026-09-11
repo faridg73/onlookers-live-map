@@ -692,6 +692,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      top_reporters_weekly: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          clips: number
+          display_name: string
+          total_earned: number
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
