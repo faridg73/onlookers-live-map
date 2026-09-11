@@ -46,6 +46,22 @@ export function categoryById(id?: CategoryId | null) {
   return CATEGORIES.find((c) => c.id === id);
 }
 
+/**
+ * Restricted categories happen on private property (homes, vehicles, boats,
+ * yards), so the requester sets a private access passcode the onlooker can
+ * quote on site if anyone asks who authorised them to be there.
+ */
+export const PRIVATE_ACCESS_CATEGORIES: CategoryId[] = ["realestate", "vehicles"];
+
+export function needsAccessCode(id?: CategoryId | null) {
+  return !!id && PRIVATE_ACCESS_CATEGORIES.includes(id);
+}
+
+/** Six-digit passcode, avoiding leading-zero confusion when read aloud. */
+export function generateAccessCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
 export type LiveRequest = {
   id: string;
   /** Database id of the escrowed request, when it was posted by this user */
