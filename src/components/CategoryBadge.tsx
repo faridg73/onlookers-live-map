@@ -7,7 +7,7 @@ export function CategoryBadge({
   compact,
   className,
 }: {
-  category?: CategoryId | null;
+  category?: CategoryId | null | undefined;
   compact?: boolean;
   className?: string;
 }) {
