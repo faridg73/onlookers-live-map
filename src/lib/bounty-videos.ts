@@ -130,7 +130,9 @@ export async function uploadBountyVideo({
   const { data, error } = await supabase
     .from("bounty_videos")
     .insert({
-      request_id: request.id,
+      // Save against the stored request when there is one, so escrow release
+      // and the bounty chat thread line up for both people.
+      request_id: request.dbId ?? request.id,
       uploader_id: user.id,
       request_title: request.title,
       request_place: request.place,
