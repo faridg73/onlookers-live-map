@@ -1,5 +1,5 @@
 import { Clock, Eye, MapPin, Camera } from "lucide-react";
-import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
 export function RequestCard({
@@ -53,7 +53,23 @@ export function RequestCard({
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{request.note}</p>
+      {categoryById(request.category) && (
+        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-raised px-2.5 py-1 text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+          <span>{categoryById(request.category)!.emoji}</span>
+          {categoryById(request.category)!.label}
+        </span>
+      )}
+
+      {(request.instructions || request.note) && (
+        <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
+          <div className="text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+            Instructions
+          </div>
+          <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+            {request.instructions || request.note}
+          </p>
+        </div>
+      )}
 
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/70 pt-3">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
