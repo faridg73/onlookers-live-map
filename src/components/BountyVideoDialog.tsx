@@ -287,6 +287,14 @@ export function BountyVideoDialog({
                       {disputingId === v.id ? "Sending…" : "Dispute this clip"}
                     </button>
                   )}
+                  {!v.accepted_at && (
+                    <Link
+                      to="/disputes"
+                      className="mt-2 block text-center text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
+                    >
+                      Dispute center
+                    </Link>
+                  )}
                   {playing?.id === v.id && (
                     <video
                       src={playing.url}
