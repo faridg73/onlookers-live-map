@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Crown, Trophy } from "lucide-react";
 import { fetchTopReporters, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
@@ -6,7 +7,15 @@ import { cn } from "@/lib/utils";
 const MEDALS = ["text-signal", "text-foreground", "text-muted-foreground"];
 
 /** Ranked list of the onlookers who have collected the most bounty cash. */
-export function Leaderboard({ limit = 10 }: { limit?: number }) {
+export function Leaderboard({
+  limit = 10,
+  showHeading = true,
+  moreLink = false,
+}: {
+  limit?: number;
+  showHeading?: boolean;
+  moreLink?: boolean;
+}) {
   const [rows, setRows] = useState<TopReporter[] | null>(null);
 
   useEffect(() => {
@@ -21,13 +30,18 @@ export function Leaderboard({ limit = 10 }: { limit?: number }) {
 
   return (
     <section className="mt-8">
-      <div className="flex items-center gap-2">
-        <Trophy className="size-4 text-signal" />
-        <h2 className="font-display text-lg text-foreground">Top reporters</h2>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        The onlookers who have earned the most bounty cash.
-      </p>
+      {showHeading && (
+        <>
+          <div className="flex items-center gap-2">
+            <Trophy className="size-4 text-signal" />
+            <h2 className="font-display text-lg text-foreground">Top reporters</h2>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The onlookers who have earned the most bounty cash.
+          </p>
+        </>
+      )}
+
 
       {rows === null ? (
         <p className="mt-3 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -82,6 +96,15 @@ export function Leaderboard({ limit = 10 }: { limit?: number }) {
             </li>
           ))}
         </ol>
+      )}
+
+      {moreLink && (
+        <Link
+          to="/leaderboard"
+          className="mt-3 flex items-center justify-center gap-1 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground hover:bg-surface-raised"
+        >
+          View full ranking
+        </Link>
       )}
     </section>
   );

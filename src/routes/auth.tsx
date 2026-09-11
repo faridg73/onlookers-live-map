@@ -98,6 +98,10 @@ function AuthScreen() {
           By signing in, you agree to Onlooker&rsquo;s{" "}
           <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">
             Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link to="/privacy" className="font-semibold text-foreground underline underline-offset-4">
+            Privacy Policy
           </Link>
           , acknowledging that you operate independently, assume all legal and physical liability,
           will only record in lawful public spaces without trespassing, and hold Onlooker harmless
