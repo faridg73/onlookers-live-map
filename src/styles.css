@@ -86,7 +86,7 @@
   --foreground: oklch(0.985 0 0);
   --surface: oklch(0.178 0 0); /* #0F0F0F charcoal */
   --surface-raised: oklch(0.23 0 0);
-  --map: oklch(0.05 0.005 255);
+  --map: oklch(0.96 0.01 250);
   --signal: oklch(0.912 0.262 124); /* #CCFF00 neon lime */
   --signal-foreground: oklch(0.14 0.03 124);
   --live: oklch(0.79 0.16 165);
