@@ -6,7 +6,15 @@ import { cn } from "@/lib/utils";
 const MEDALS = ["text-signal", "text-foreground", "text-muted-foreground"];
 
 /** Ranked list of the onlookers who have collected the most bounty cash. */
-export function Leaderboard({ limit = 10 }: { limit?: number }) {
+export function Leaderboard({
+  limit = 10,
+  showHeading = true,
+  moreLink = false,
+}: {
+  limit?: number;
+  showHeading?: boolean;
+  moreLink?: boolean;
+}) {
   const [rows, setRows] = useState<TopReporter[] | null>(null);
 
   useEffect(() => {
