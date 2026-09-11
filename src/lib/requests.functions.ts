@@ -73,7 +73,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     if (error || !row) {
       const message = error?.message ?? "Could not post the request.";
       throw new Error(
-        /insufficient/i.test(message)
+        /insufficient|wallet_balance_nonnegative/i.test(message)
           ? "Not enough wallet balance to lock this bounty. Top up first."
           : message,
       );
