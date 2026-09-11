@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
+import { CategoryBadge } from "@/components/CategoryBadge";
+import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
