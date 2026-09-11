@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  HelpCircle,
   PlusSquare,
   Radio,
   Shield,
