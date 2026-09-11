@@ -649,6 +649,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      dispute_bounty: {
+        Args: { _reason: string; _request_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
