@@ -239,6 +239,24 @@ const containerRef = useRef<HTMLDivElement | null>(null);
           })}
         </svg>
 
+        {/* you-are-here marker */}
+        {userWorld && (
+          <div
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: userWorld.x,
+              top: userWorld.y,
+              transform: `translate(-50%,-50%) scale(${1 / (fit * zoom)})`,
+            }}
+            aria-label="Your location"
+          >
+            <span className="relative flex size-5 items-center justify-center">
+              <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
+              <span className="size-3.5 rounded-full border-2 border-surface bg-live shadow-lg" />
+            </span>
+          </div>
+        )}
+
         {/* pins */}
         {requests.map((r) => {
           const isSel = r.id === selectedId;
