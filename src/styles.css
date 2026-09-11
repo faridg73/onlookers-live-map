@@ -107,6 +107,17 @@
   --border: oklch(0.27 0 0);
   --input: oklch(0.27 0 0);
   --ring: oklch(0.912 0.262 124);
+
+  /* Category hues used by the colour-coded request badges */
+  --cat-food: oklch(0.78 0.17 55);
+  --cat-vehicles: oklch(0.75 0.16 250);
+  --cat-outdoors: oklch(0.78 0.17 150);
+  --cat-nightlife: oklch(0.75 0.19 330);
+  --cat-transit: oklch(0.78 0.15 200);
+  --cat-events: oklch(0.76 0.18 20);
+  --cat-parking: oklch(0.75 0.14 285);
+  --cat-weather: oklch(0.85 0.16 100);
+  --urgent: oklch(0.7 0.2 30);
 }
 
 @layer base {

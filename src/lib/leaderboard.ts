@@ -20,3 +20,16 @@ export async function fetchTopReporters(limit = 10): Promise<TopReporter[]> {
     clips: Number(row.clips ?? 0),
   }));
 }
+
+/** Highest earners over the last 7 days, for the weekly mini-leaderboard. */
+export async function fetchTopReportersWeekly(limit = 5): Promise<TopReporter[]> {
+  const { data, error } = await supabase.rpc("top_reporters_weekly", { _limit: limit });
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    user_id: row.user_id,
+    display_name: row.display_name ?? "onlooker",
+    avatar_url: row.avatar_url ?? null,
+    total_earned: Number(row.total_earned ?? 0),
+    clips: Number(row.clips ?? 0),
+  }));
+}

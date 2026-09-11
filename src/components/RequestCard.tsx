@@ -1,4 +1,4 @@
-import { Clock, Eye, MapPin, Camera, Video, X } from "lucide-react";
+import { Eye, MapPin, Camera, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
@@ -7,7 +7,9 @@ import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
 import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
-import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import { CategoryBadge } from "@/components/CategoryBadge";
+import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
 export function RequestCard({
@@ -68,12 +70,17 @@ export function RequestCard({
         </div>
       </div>
 
-      {categoryById(request.category) && (
-        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-raised px-2.5 py-1 text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
-          <span>{categoryById(request.category)!.emoji}</span>
-          {categoryById(request.category)!.label}
-        </span>
-      )}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <CategoryBadge category={request.category} />
+        {!done && (
+          <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
+        )}
+        {!done && pool >= HIGH_BOUNTY && (
+          <span className="rounded-full border border-signal/40 bg-signal/10 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-signal">
+            High bounty
+          </span>
+        )}
+      </div>
 
       {(request.instructions || request.note) && (
         <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
@@ -101,11 +108,6 @@ export function RequestCard({
           <span className="inline-flex items-center gap-1.5">
             <Camera className="size-3.5" /> {request.responses}
           </span>
-          {!done && (
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5" /> {request.expiresInMin}m left
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-2">
           {request.dbId && !done && (
