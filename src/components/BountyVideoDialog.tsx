@@ -191,6 +191,14 @@ export function BountyVideoDialog({
                     >
                       <Play className="size-3.5" /> Watch
                     </button>
+                    <button
+                      type="button"
+                      aria-label="Share video"
+                      onClick={() => void shareBountyVideo(v)}
+                      className="text-muted-foreground transition-colors hover:text-signal"
+                    >
+                      <Share2 className="size-4" />
+                    </button>
                     {v.uploader_id === user.id && (
                       <button
                         type="button"
