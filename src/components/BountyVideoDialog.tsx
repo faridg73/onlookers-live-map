@@ -110,7 +110,9 @@ export function BountyVideoDialog({
     setDisputingId(video.id);
     try {
       await disputeBountyVideo(video.request_id, reason);
-      toast.success("Clip disputed. The bounty stays held until it is reviewed.");
+      toast.success("Clip disputed. Add evidence in the dispute center.", {
+        action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
+      });
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't dispute that clip.");
