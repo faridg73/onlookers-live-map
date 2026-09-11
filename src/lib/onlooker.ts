@@ -35,6 +35,8 @@ export function categoryById(id?: CategoryId | null) {
 
 export type LiveRequest = {
   id: string;
+  /** Database id of the escrowed request, when it was posted by this user */
+  dbId?: string | undefined;
   title: string;
   category?: CategoryId | undefined;
   /** Free-form instructions written by the requester */
