@@ -1,5 +1,7 @@
 import { Clock, Eye, MapPin, Camera, Video } from "lucide-react";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { BoostBounty } from "@/components/BoostBounty";
+import { useBoosts } from "@/lib/boosts-store";
 import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
