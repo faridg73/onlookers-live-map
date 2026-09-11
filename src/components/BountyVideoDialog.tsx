@@ -15,6 +15,7 @@ import {
   deleteBountyVideo,
   listVideosForRequest,
   playbackUrl,
+  thumbnailUrls,
   uploadBountyVideo,
   type BountyVideo,
 } from "@/lib/bounty-videos";
@@ -34,15 +35,19 @@ export function BountyVideoDialog({
   const [uploading, setUploading] = useState(false);
   const [note, setNote] = useState("");
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const inputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      setVideos(await listVideosForRequest(request.id));
+      const rows = await listVideosForRequest(request.id);
+      setVideos(rows);
+      setThumbs(await thumbnailUrls(rows));
     } catch {
       // A signed-out visitor simply sees nothing.
       setVideos([]);
+      setThumbs({});
     } finally {
       setLoading(false);
     }
@@ -158,7 +163,18 @@ export function BountyVideoDialog({
               {videos.map((v) => (
                 <div key={v.id} className="rounded-2xl border border-border bg-surface p-3">
                   <div className="flex items-center gap-3">
-                    <Video className="size-4 shrink-0 text-signal" />
+                    {thumbs[v.id] ? (
+                      <img
+                        src={thumbs[v.id]}
+                        alt={`Preview of ${v.note || "bounty video"}`}
+                        loading="lazy"
+                        className="size-12 shrink-0 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-surface-raised">
+                        <Video className="size-4 text-signal" />
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-foreground">
                         {v.note || "Live view capture"}

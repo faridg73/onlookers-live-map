@@ -1,0 +1,1 @@
+ALTER TABLE public.bounty_videos ADD COLUMN IF NOT EXISTS thumb_path text;

@@ -4,24 +4,31 @@ import { Play, Video } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { listMyVideos, playbackUrl, type BountyVideo } from "@/lib/bounty-videos";
+import { listMyVideos, playbackUrl, thumbnailUrls, type BountyVideo } from "@/lib/bounty-videos";
 
 export function MyBountyVideos() {
   const { user, loading } = useAuth();
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
+  const [thumbs, setThumbs] = useState<Record<string, string>>({});
 
   const refresh = useCallback(async () => {
     try {
-      setVideos(await listMyVideos());
+      const rows = await listMyVideos();
+      setVideos(rows);
+      setThumbs(await thumbnailUrls(rows));
     } catch {
       setVideos([]);
+      setThumbs({});
     }
   }, []);
 
   useEffect(() => {
     if (user) void refresh();
-    else setVideos([]);
+    else {
+      setVideos([]);
+      setThumbs({});
+    }
   }, [user, refresh]);
 
   async function watch(video: BountyVideo) {
@@ -70,7 +77,18 @@ export function MyBountyVideos() {
           {videos.map((v) => (
             <div key={v.id} className="rounded-2xl border border-border bg-surface p-3">
               <div className="flex items-center gap-3">
-                <Video className="size-4 shrink-0 text-signal" />
+                {thumbs[v.id] ? (
+                  <img
+                    src={thumbs[v.id]}
+                    alt={`Preview of ${v.request_title || "bounty video"}`}
+                    loading="lazy"
+                    className="size-14 shrink-0 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-surface-raised">
+                    <Video className="size-4 text-signal" />
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-foreground">
                     {v.request_title || "Live view capture"}
