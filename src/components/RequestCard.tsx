@@ -1,4 +1,4 @@
-import { Clock, Eye, MapPin, Camera, Video, X } from "lucide-react";
+import { Eye, MapPin, Camera, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
