@@ -327,20 +327,40 @@ const containerRef = useRef<HTMLDivElement | null>(null);
         })}
       </div>
 
-      <div className="absolute right-4 top-24 flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
-        {[
-          { label: "+", fn: () => zoomBy(1.35) },
-          { label: "−", fn: () => zoomBy(1 / 1.35) },
-        ].map((b) => (
-          <button
-            key={b.label}
-            type="button"
-            onClick={b.fn}
-            className="size-10 text-lg text-foreground transition-colors hover:bg-surface-raised"
-          >
-            {b.label}
-          </button>
-        ))}
+      <div className="absolute right-4 top-24 flex flex-col gap-2">
+        <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
+          {[
+            { label: "+", fn: () => zoomBy(1.35) },
+            { label: "−", fn: () => zoomBy(1 / 1.35) },
+          ].map((b) => (
+            <button
+              key={b.label}
+              type="button"
+              onClick={b.fn}
+              className="size-10 text-lg text-foreground transition-colors hover:bg-surface-raised"
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={locateMe}
+          aria-label="Recenter to my location"
+          title={
+            geoState === "unavailable"
+              ? "Location unavailable — showing the regional center"
+              : "Recenter to my location"
+          }
+          className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface/90 text-foreground backdrop-blur transition-colors hover:bg-surface-raised"
+        >
+          <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
+        </button>
+        {geoState === "unavailable" && (
+          <p className="w-28 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[10px] font-medium leading-tight text-muted-foreground backdrop-blur">
+            Location off — showing regional view
+          </p>
+        )}
       </div>
     </div>
   );
