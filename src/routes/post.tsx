@@ -4,7 +4,12 @@ import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
+import {
+  CATEGORIES,
+  categoryById,
+  needsPermissionConfirmation,
+  type CategoryId,
+} from "@/lib/onlooker";
 
 export const Route = createFileRoute("/post")({
   head: () => ({
