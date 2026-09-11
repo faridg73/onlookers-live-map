@@ -45,7 +45,7 @@ jobs:
           echo "$APP_STORE_P8_KEY" > ~/.private_keys/AuthKey_${APP_STORE_KEY_ID}.p8
 
           xcodebuild archive \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
