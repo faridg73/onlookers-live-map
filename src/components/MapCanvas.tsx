@@ -193,7 +193,20 @@ const containerRef = useRef<HTMLDivElement | null>(null);
             >
               <span className="relative flex flex-col items-center">
                 {r.status === "open" && (
-                  <span className="absolute bottom-0 size-8 animate-ping-slow rounded-full bg-live/25" />
+                  <span
+                    className="absolute bottom-0 size-8 animate-ping-slow rounded-full"
+                    style={{
+                      backgroundColor:
+                        r.bounty >= HIGH_BOUNTY && r.expiresInMin <= 15
+                          ? "color-mix(in oklch, var(--urgent) 30%, transparent)"
+                          : "color-mix(in oklch, var(--live) 25%, transparent)",
+                    }}
+                  />
+                )}
+                {r.status !== "fulfilled" && (
+                  <span className="mb-1">
+                    <CategoryBadge category={r.category} compact />
+                  </span>
                 )}
                 <span
                   className={cn(
@@ -207,6 +220,11 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 >
                   ${r.bounty}
                 </span>
+                {r.status !== "fulfilled" && r.bounty >= HIGH_BOUNTY && (
+                  <span className="mt-1">
+                    <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />
+                  </span>
+                )}
                 <span
                   className={cn(
                     "size-1.5 rotate-45 -translate-y-[3px]",
