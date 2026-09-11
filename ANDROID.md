@@ -30,6 +30,10 @@ You need `app-release.aab`. Two ways:
 
 ### Option B — build on your Mac
 
+First copy `android/keystore.properties.example` to `android/keystore.properties`
+and fill in your keystore and key passwords. That file is git-ignored, so the
+passwords stay on your machine only.
+
 ```bash
 npm install
 npm run build
