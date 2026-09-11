@@ -144,6 +144,22 @@ function PostScreen() {
           </div>
         </div>
 
+        {permissionNeeded && (
+          <label className="flex gap-3 rounded-xl border border-signal/40 bg-surface p-3">
+            <input
+              type="checkbox"
+              checked={permissionOk}
+              onChange={(e) => setPermissionOk(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
+            />
+            <span className="text-xs text-muted-foreground">
+              I confirm I have permission from the seller, listing agent or property manager to have
+              this property photographed or filmed, and that the onlooker may only capture areas
+              open to the public or that access has been authorised.
+            </span>
+          </label>
+        )}
+
         <label className="block space-y-1.5">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Instructions for the onlooker
