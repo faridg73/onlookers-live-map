@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -36,6 +37,11 @@ const FeedRoute = FeedRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayoutHistoryRoute = PayoutHistoryRouteImport.update({
+  id: '/payout-history',
+  path: '/payout-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostRoute = PostRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/feed'
     | '/leaderboard'
+    | '/payout-history'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/feed'
     | '/leaderboard'
+    | '/payout-history'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/feed'
     | '/leaderboard'
+    | '/payout-history'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   FeedRoute: typeof FeedRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  PayoutHistoryRoute: typeof PayoutHistoryRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payout-history': {
+      id: '/payout-history'
+      path: '/payout-history'
+      fullPath: '/payout-history'
+      preLoaderRoute: typeof PayoutHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   FeedRoute: FeedRoute,
   LeaderboardRoute: LeaderboardRoute,
+  PayoutHistoryRoute: PayoutHistoryRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
