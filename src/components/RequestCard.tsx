@@ -1,4 +1,8 @@
-import { Clock, Eye, MapPin, Camera, Video } from "lucide-react";
+import { Clock, Eye, MapPin, Camera, Video, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { refundBounty } from "@/lib/bounty-escrow";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
 import { ShareBountyButton } from "@/components/ShareBountyButton";
@@ -18,6 +22,8 @@ export function RequestCard({
   onSelect?: (id: string) => void;
 }) {
   const done = request.status === "fulfilled";
+  const [cancelling, setCancelling] = useState(false);
+  const { remove } = useOnlooker();
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
