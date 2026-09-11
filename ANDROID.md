@@ -17,7 +17,11 @@ You need `app-release.aab`. Two ways:
 ### Option A — let GitHub build it (no Android Studio needed)
 
 1. Push this project to GitHub (Lovable → GitHub → sync).
-2. On GitHub open **Actions → Build Android App Bundle for Google Play → Run workflow**
+2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add:
+   - `ANDROID_KEYSTORE_PASSWORD` — your keystore password
+   - `ANDROID_KEY_ALIAS` — `onlooker-key`
+   - `ANDROID_KEY_PASSWORD` — your key password
+3. Open **Actions → Build Android App Bundle for Google Play → Run workflow**
    (it also runs automatically on every push to `main`).
 3. When it finishes, open the run and download the **onlooker-release-aab** artifact.
 4. Unzip it — inside is `app-release.aab`.
@@ -25,6 +29,10 @@ You need `app-release.aab`. Two ways:
    add release notes, then **Next → Save → Review → Start rollout to internal testing**.
 
 ### Option B — build on your Mac
+
+First copy `android/keystore.properties.example` to `android/keystore.properties`
+and fill in your keystore and key passwords. That file is git-ignored, so the
+passwords stay on your machine only.
 
 ```bash
 npm install
