@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -30,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DisputesRoute = DisputesRouteImport.update({
+  id: '/disputes',
+  path: '/disputes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -86,6 +92,7 @@ const BIdRoute = BIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/disputes': typeof DisputesRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/disputes': typeof DisputesRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/disputes': typeof DisputesRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/disputes'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/disputes'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/disputes'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  DisputesRoute: typeof DisputesRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/disputes': {
+      id: '/disputes'
+      path: '/disputes'
+      fullPath: '/disputes'
+      preLoaderRoute: typeof DisputesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -278,6 +298,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  DisputesRoute: DisputesRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,

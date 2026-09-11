@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +34,7 @@ export function BountyVideoDialog({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -110,7 +111,9 @@ export function BountyVideoDialog({
     setDisputingId(video.id);
     try {
       await disputeBountyVideo(video.request_id, reason);
-      toast.success("Clip disputed. The bounty stays held until it is reviewed.");
+      toast.success("Clip disputed. Add evidence in the dispute center.", {
+        action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
+      });
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't dispute that clip.");
@@ -283,6 +286,14 @@ export function BountyVideoDialog({
                     >
                       {disputingId === v.id ? "Sending…" : "Dispute this clip"}
                     </button>
+                  )}
+                  {!v.accepted_at && (
+                    <Link
+                      to="/disputes"
+                      className="mt-2 block text-center text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
+                    >
+                      Dispute center
+                    </Link>
                   )}
                   {playing?.id === v.id && (
                     <video

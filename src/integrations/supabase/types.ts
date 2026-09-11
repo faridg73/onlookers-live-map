@@ -172,6 +172,44 @@ export type Database = {
           },
         ]
       }
+      dispute_evidence: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          request_id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          request_id: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_evidence_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escrows: {
         Row: {
           amount: number
@@ -750,6 +788,10 @@ export type Database = {
         }
         Returns: number
       }
+      can_view_dispute: {
+        Args: { _request_id: string; _user_id: string }
+        Returns: boolean
+      }
       close_expired_requests: { Args: never; Returns: number }
       credit_topup: {
         Args: {
@@ -792,6 +834,22 @@ export type Database = {
         Returns: boolean
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      list_disputes: {
+        Args: never
+        Returns: {
+          amount: number
+          dispute_reason: string
+          disputed_at: string
+          evidence_count: number
+          is_moderator: boolean
+          location_name: string
+          prompt: string
+          request_id: string
+          requester_id: string
+          spotter_id: string
+          status: string
+        }[]
+      }
       public_request_markers: {
         Args: never
         Returns: {
