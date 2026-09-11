@@ -34,6 +34,7 @@ export function BountyVideoDialog({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [loading, setLoading] = useState(false);
