@@ -59,7 +59,7 @@ release**, then re-run `npx cap sync` so the app ships the bundled web assets.
 
 ### Apple App Store
 
-1. In Xcode set the bundle identifier (`app.lovable.onlooker`), team, and version.
+1. In Xcode set the bundle identifier (`com.onlooker.app`), team, and version.
 2. Add app icons and a launch screen (icons live in `public/`).
 3. Product → Archive → Distribute App → App Store Connect.
 4. In App Store Connect fill in the listing, screenshots, privacy details

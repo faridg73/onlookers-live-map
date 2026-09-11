@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Onlooker</string>
     <string name="title_activity_main">Onlooker</string>
-    <string name="package_name">app.lovable.onlooker</string>
-    <string name="custom_url_scheme">app.lovable.onlooker</string>
+    <string name="package_name">com.onlooker.app</string>
+    <string name="custom_url_scheme">com.onlooker.app</string>
 </resources>

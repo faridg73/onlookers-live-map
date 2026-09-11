@@ -1,4 +1,4 @@
-package app.lovable.onlooker;
+package com.onlooker.app;
 
 import com.getcapacitor.BridgeActivity;
 

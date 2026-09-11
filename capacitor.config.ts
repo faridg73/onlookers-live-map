@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.onlooker',
+  appId: 'com.onlooker.app',
   appName: 'Onlooker',
   webDir: 'mobile-shell',
   server: { url: 'https://onlookers-live-map.lovable.app' },
