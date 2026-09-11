@@ -492,6 +492,38 @@ export type Database = {
           },
         ]
       }
+      request_access_codes: {
+        Row: {
+          code: string
+          created_at: string
+          request_id: string
+          requester_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          request_id: string
+          requester_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          request_id?: string
+          requester_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_access_codes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           bounty_amount: number
