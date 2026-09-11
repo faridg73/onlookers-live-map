@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Share2 } from "lucide-react";
+import { LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
@@ -11,6 +11,24 @@ const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 4;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+/**
+ * Fallback regional center used when device geolocation is denied or
+ * unavailable. The stylised 0-1000 map space is treated as this region.
+ */
+export const REGIONAL_CENTER = { lat: 34.0522, lng: -118.2437 }; // Los Angeles
+/** Approximate degrees of lat/lng covered by the 1000x1000 map space. */
+const REGION_SPAN = 0.3;
+
+/** Project real lat/lng into the 0-1000 map space (clamped to the region). */
+function worldFromLatLng(lat: number, lng: number) {
+  const minLng = REGIONAL_CENTER.lng - REGION_SPAN / 2;
+  const maxLat = REGIONAL_CENTER.lat + REGION_SPAN / 2;
+  return {
+    x: clamp(((lng - minLng) / REGION_SPAN) * 1000, 0, 1000),
+    y: clamp(((maxLat - lat) / REGION_SPAN) * 1000, 0, 1000),
+  };
+}
 
 /** A stylised night-city map surface with cursor-anchored wheel zoom and drag pan. */
 export function MapCanvas({
@@ -28,6 +46,45 @@ const containerRef = useRef<HTMLDivElement | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const centeredRef = useRef(false);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
+  /** Device position projected into map space; null until geolocation resolves. */
+  const [userWorld, setUserWorld] = useState<{ x: number; y: number } | null>(null);
+  const [geoState, setGeoState] = useState<"pending" | "located" | "unavailable">("pending");
+  /** Latest fit/zoom for math inside stable callbacks. */
+  const viewRef = useRef({ fit: 1, zoom: 1 });
+  viewRef.current = { fit, zoom };
+
+  /** Center the viewport on a point in the 0-1000 map space. */
+  const centerOnWorld = useCallback((wx: number, wy: number) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const s = viewRef.current.fit * viewRef.current.zoom;
+    setOffset({ x: el.clientWidth / 2 - wx * s, y: el.clientHeight / 2 - wy * s });
+  }, []);
+
+  /** Ask the device for its position and center the map on it. */
+  const locateMe = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      setGeoState("unavailable");
+      return;
+    }
+    setGeoState("pending");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const w = worldFromLatLng(pos.coords.latitude, pos.coords.longitude);
+        setUserWorld(w);
+        setGeoState("located");
+        centerOnWorld(w.x, w.y);
+      },
+      () => setGeoState("unavailable"),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
+    );
+  }, [centerOnWorld]);
+
+  // Request the device location once on first load and auto-center on it.
+  // If denied/unavailable the map stays on the regional fallback center.
+  useEffect(() => {
+    locateMe();
+  }, [locateMe]);
 
   // Fit the 1000x1000 world to the viewport (cover) and center it once,
   // so the map fills any screen — phone, tablet, desktop, tall store shots.
@@ -182,6 +239,24 @@ const containerRef = useRef<HTMLDivElement | null>(null);
           })}
         </svg>
 
+        {/* you-are-here marker */}
+        {userWorld && (
+          <div
+            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+            style={{
+              left: userWorld.x,
+              top: userWorld.y,
+              transform: `translate(-50%,-50%) scale(${1 / (fit * zoom)})`,
+            }}
+            aria-label="Your location"
+          >
+            <span className="relative flex size-5 items-center justify-center">
+              <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
+              <span className="size-3.5 rounded-full border-2 border-surface bg-live shadow-lg" />
+            </span>
+          </div>
+        )}
+
         {/* pins */}
         {requests.map((r) => {
           const isSel = r.id === selectedId;
@@ -252,20 +327,40 @@ const containerRef = useRef<HTMLDivElement | null>(null);
         })}
       </div>
 
-      <div className="absolute right-4 top-24 flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
-        {[
-          { label: "+", fn: () => zoomBy(1.35) },
-          { label: "−", fn: () => zoomBy(1 / 1.35) },
-        ].map((b) => (
-          <button
-            key={b.label}
-            type="button"
-            onClick={b.fn}
-            className="size-10 text-lg text-foreground transition-colors hover:bg-surface-raised"
-          >
-            {b.label}
-          </button>
-        ))}
+      <div className="absolute right-4 top-24 flex flex-col gap-2">
+        <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
+          {[
+            { label: "+", fn: () => zoomBy(1.35) },
+            { label: "−", fn: () => zoomBy(1 / 1.35) },
+          ].map((b) => (
+            <button
+              key={b.label}
+              type="button"
+              onClick={b.fn}
+              className="size-10 text-lg text-foreground transition-colors hover:bg-surface-raised"
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={locateMe}
+          aria-label="Recenter to my location"
+          title={
+            geoState === "unavailable"
+              ? "Location unavailable — showing the regional center"
+              : "Recenter to my location"
+          }
+          className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface/90 text-foreground backdrop-blur transition-colors hover:bg-surface-raised"
+        >
+          <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
+        </button>
+        {geoState === "unavailable" && (
+          <p className="w-28 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[10px] font-medium leading-tight text-muted-foreground backdrop-blur">
+            Location off — showing regional view
+          </p>
+        )}
       </div>
     </div>
   );

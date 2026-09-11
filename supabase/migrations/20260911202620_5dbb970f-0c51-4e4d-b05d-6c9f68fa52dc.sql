@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Signed-in users can view boosts" ON public.bounty_boosts;
