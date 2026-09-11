@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Map, Radio, PlusSquare, UserRound, Compass } from "lucide-react";
+import { Map, Radio, PlusSquare, UserRound, Compass, HelpCircle } from "lucide-react";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
@@ -7,6 +7,7 @@ const items = [
   { to: "/explore", label: "Explore", icon: Compass, exact: false },
   { to: "/post", label: "Post", icon: PlusSquare, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
+  { to: "/faq", label: "FAQ", icon: HelpCircle, exact: false },
 ] as const;
 
 export function BottomNav() {

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
@@ -34,6 +35,11 @@ const AuthRoute = AuthRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/explore'
+    | '/faq'
     | '/feed'
     | '/leaderboard'
     | '/payout-history'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/explore'
+    | '/faq'
     | '/feed'
     | '/leaderboard'
     | '/payout-history'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/explore'
+    | '/faq'
     | '/feed'
     | '/leaderboard'
     | '/payout-history'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
