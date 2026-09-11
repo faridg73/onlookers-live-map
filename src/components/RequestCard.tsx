@@ -90,7 +90,7 @@ export function RequestCard({
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
         )}
         {!done && pool >= HIGH_BOUNTY && (
-          <span className="rounded-full border border-signal/60 bg-signal/15 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-signal">
+          <span className="rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
             High bounty
           </span>
         )}
