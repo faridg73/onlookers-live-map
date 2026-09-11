@@ -639,6 +639,7 @@ export type Database = {
         }
         Returns: number
       }
+      close_expired_requests: { Args: never; Returns: number }
       credit_topup: {
         Args: {
           _amount: number
@@ -673,6 +674,7 @@ export type Database = {
         Returns: boolean
       }
       request_cashout: { Args: { _amount: number }; Returns: string }
+      request_is_live: { Args: { _request_id: string }; Returns: boolean }
       resolve_dispute: {
         Args: { _award_spotter: boolean; _request_id: string }
         Returns: boolean
