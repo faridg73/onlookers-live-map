@@ -17,6 +17,9 @@ export function RequestCard({
   onSelect?: (id: string) => void;
 }) {
   const done = request.status === "fulfilled";
+  const { boostOf } = useBoosts();
+  const boosted = boostOf(request.id);
+  const pool = request.bounty + boosted;
   return (
     <article
       onClick={() => onSelect?.(request.id)}
@@ -51,8 +54,10 @@ export function RequestCard({
         </div>
 
         <div className="shrink-0 rounded-xl border border-signal/40 bg-signal/10 px-3 py-2 text-center">
-          <div className="font-display text-xl leading-none text-signal">${request.bounty}</div>
-          <div className="mt-1 text-[0.6rem] uppercase tracking-[0.16em] text-signal/70">bounty</div>
+          <div className="font-display text-xl leading-none text-signal">${pool}</div>
+          <div className="mt-1 text-[0.6rem] uppercase tracking-[0.16em] text-signal/70">
+            {boosted > 0 ? `+$${boosted} boosted` : "bounty"}
+          </div>
         </div>
       </div>
 
