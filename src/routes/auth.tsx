@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,7 @@ function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/profile" });
@@ -40,6 +41,10 @@ function AuthScreen() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!accepted) {
+      toast.error("You must accept the Terms of Service to continue.");
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
@@ -63,6 +68,10 @@ function AuthScreen() {
   }
 
   async function google() {
+    if (!accepted) {
+      toast.error("You must accept the Terms of Service to continue.");
+      return;
+    }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
