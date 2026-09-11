@@ -93,7 +93,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="border-border bg-surface sm:max-w-md">
+      <DialogContent className="max-h-[85dvh] overflow-y-auto overscroll-contain border-border bg-surface sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">Ask for a live look</DialogTitle>
           <DialogDescription>
