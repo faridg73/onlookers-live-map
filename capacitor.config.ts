@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
     contentInset: 'always',
   },
   android: {
-    backgroundColor: '#0a1020',
+    backgroundColor: '#000000',
   },
 };
 
