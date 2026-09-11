@@ -4,6 +4,7 @@ import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { type LiveRequest } from "@/lib/onlooker";
+import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 
 const MIN_ZOOM = 0.6;
@@ -205,7 +206,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                     }}
                   />
                 )}
-                {r.status !== "fulfilled" && (
+                {!isClosed(r) && (
                   <span className="mb-1">
                     <CategoryBadge category={r.category} compact />
                   </span>
@@ -213,7 +214,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 <span
                   className={cn(
                     "relative rounded-full border px-2.5 py-1 font-display text-sm shadow-lg",
-                    r.status === "fulfilled"
+                    isClosed(r)
                       ? "border-border bg-surface text-muted-foreground"
                       : isSel
                         ? "border-signal bg-signal text-signal-foreground"
@@ -222,7 +223,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 >
                   ${r.bounty}
                 </span>
-                {r.status !== "fulfilled" && r.bounty >= HIGH_BOUNTY && (
+                {!isClosed(r) && r.bounty >= HIGH_BOUNTY && (
                   <span className="mt-1">
                     <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />
                   </span>
@@ -230,7 +231,7 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 <span
                   className={cn(
                     "size-1.5 rotate-45 -translate-y-[3px]",
-                    r.status === "fulfilled" ? "bg-border" : "bg-signal",
+                    isClosed(r) ? "bg-border" : "bg-signal",
                   )}
                 />
                 <span
