@@ -40,11 +40,14 @@ export type Database = {
       }
       bounty_videos: {
         Row: {
+          accepted_at: string | null
+          accepted_by: string | null
           bounty_amount: number
           created_at: string
           duration_seconds: number | null
           id: string
           note: string
+          payout_amount: number
           request_id: string
           request_place: string
           request_title: string
@@ -54,11 +57,14 @@ export type Database = {
           uploader_id: string
         }
         Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
           bounty_amount?: number
           created_at?: string
           duration_seconds?: number | null
           id?: string
           note?: string
+          payout_amount?: number
           request_id: string
           request_place?: string
           request_title?: string
@@ -68,11 +74,14 @@ export type Database = {
           uploader_id: string
         }
         Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
           bounty_amount?: number
           created_at?: string
           duration_seconds?: number | null
           id?: string
           note?: string
+          payout_amount?: number
           request_id?: string
           request_place?: string
           request_title?: string
@@ -550,6 +559,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_bounty_video: { Args: { _video_id: string }; Returns: number }
       adjust_wallet: {
         Args: {
           _amount: number
