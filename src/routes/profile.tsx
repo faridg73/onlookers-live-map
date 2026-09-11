@@ -5,7 +5,10 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  Gavel,
+  Headphones,
   HelpCircle,
+  MessageSquare,
   PlusSquare,
   Radio,
   Shield,
@@ -124,8 +127,26 @@ function ProfileScreen() {
         )}
       </div>
 
-      <h2 className="mt-8 font-display text-lg text-foreground">Settings &amp; legal</h2>
+      <h2 className="mt-8 font-display text-lg text-foreground">Support &amp; legal</h2>
       <div className="mt-3 space-y-2">
+        <Link
+          to="/contact"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Headphones className="size-4 text-signal" /> Contact &amp; Support
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
+        <Link
+          to="/disputes"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Gavel className="size-4 text-signal" /> Dispute center
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
         <Link
           to="/faq"
           className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
