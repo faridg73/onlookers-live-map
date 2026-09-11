@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BadgeDollarSign, Landmark, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { CashOutCard } from "@/components/CashOutCard";
 import { listMyVideos, type BountyVideo } from "@/lib/bounty-videos";
 
 export const Route = createFileRoute("/payout-history")({
@@ -86,7 +87,13 @@ function PayoutHistoryScreen() {
         </div>
       </div>
 
-      <div className="mt-6 space-y-3">
+      {user ? <CashOutCard /> : null}
+
+      <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        Accepted clips
+      </h2>
+
+      <div className="mt-3 space-y-3">
         {loading ? (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
             Loading your payouts…
