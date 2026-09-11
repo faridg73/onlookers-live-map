@@ -108,11 +108,6 @@ export function RequestCard({
           <span className="inline-flex items-center gap-1.5">
             <Camera className="size-3.5" /> {request.responses}
           </span>
-          {!done && (
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5" /> {request.expiresInMin}m left
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-2">
           {request.dbId && !done && (
