@@ -226,6 +226,32 @@ export function BountyVideoDialog({
                       </button>
                     )}
                   </div>
+                  {v.accepted_at ? (
+                    <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
+                      <BadgeDollarSign className="size-3.5" /> Accepted · $
+                      {Number(v.payout_amount).toFixed(2)} paid to the reporter
+                    </p>
+                  ) : (
+                    v.uploader_id !== user.id && (
+                      <button
+                        type="button"
+                        disabled={payingId === v.id}
+                        onClick={() => void accept(v)}
+                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                      >
+                        {payingId === v.id ? (
+                          <>
+                            <Loader2 className="size-3.5 animate-spin" /> Paying…
+                          </>
+                        ) : (
+                          <>
+                            <BadgeDollarSign className="size-3.5" /> Accept & pay $
+                            {Number(v.bounty_amount).toFixed(2)}
+                          </>
+                        )}
+                      </button>
+                    )
+                  )}
                   {playing?.id === v.id && (
                     <video
                       src={playing.url}
