@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      bounty_videos: {
+        Row: {
+          bounty_amount: number
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          note: string
+          request_id: string
+          request_place: string
+          request_title: string
+          storage_path: string
+          updated_at: string
+          uploader_id: string
+        }
+        Insert: {
+          bounty_amount?: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          note?: string
+          request_id: string
+          request_place?: string
+          request_title?: string
+          storage_path: string
+          updated_at?: string
+          uploader_id: string
+        }
+        Update: {
+          bounty_amount?: number
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          note?: string
+          request_id?: string
+          request_place?: string
+          request_title?: string
+          storage_path?: string
+          updated_at?: string
+          uploader_id?: string
+        }
+        Relationships: []
+      }
       claims: {
         Row: {
           claimed_at: string

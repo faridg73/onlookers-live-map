@@ -1,4 +1,5 @@
-import { Clock, Eye, MapPin, Camera } from "lucide-react";
+import { Clock, Eye, MapPin, Camera, Video } from "lucide-react";
+import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
@@ -85,6 +86,16 @@ export function RequestCard({
             </span>
           )}
         </div>
+        <div className="flex items-center gap-2">
+          <BountyVideoDialog request={request}>
+            <button
+              type="button"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Video className="size-3.5" /> Videos
+            </button>
+          </BountyVideoDialog>
         {onClaim && (
           <button
             type="button"
@@ -98,6 +109,7 @@ export function RequestCard({
             {done ? "Closed" : request.status === "claimed" ? "Add shot" : "Claim"}
           </button>
         )}
+        </div>
       </div>
     </article>
   );

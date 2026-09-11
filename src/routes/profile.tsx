@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Camera, Clock, PlusSquare, Radio, Star, Wallet } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { MyBountyVideos } from "@/components/MyBountyVideos";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -90,6 +91,8 @@ function ProfileScreen() {
           </div>
         ))}
       </div>
+
+      <MyBountyVideos />
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
       <div className="mt-3 space-y-3">
