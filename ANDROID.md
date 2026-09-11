@@ -23,15 +23,20 @@ You need `app-release.aab`. Two ways:
 
 1. Push this project to GitHub (Lovable → GitHub → sync).
 2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add:
-   - `ANDROID_KEYSTORE_PASSWORD` — your keystore password
+   - `ANDROID_KEYSTORE_PASSWORD` — the new keystore password shown when the key was generated
    - `ANDROID_KEY_ALIAS` — `onlooker-key`
-   - `ANDROID_KEY_PASSWORD` — your key password
+   - `ANDROID_KEY_PASSWORD` — same as the keystore password above
+   - `ANDROID_KEYSTORE_FILE` — `onlooker-upload.keystore`
 3. Open **Actions → Build Android App Bundle for Google Play → Run workflow**
    (it also runs automatically on every push to `main`).
-3. When it finishes, open the run and download the **onlooker-release-aab** artifact.
-4. Unzip it — inside is `app-release.aab`.
-5. Drag that file into the "Drop app bundles here to upload" box in Play Console,
+4. When it finishes, open the run and download the **onlooker-release-aab** artifact.
+5. Unzip it — inside is `app-release.aab`.
+6. Drag that file into the "Drop app bundles here to upload" box in Play Console,
    add release notes, then **Next → Save → Review → Start rollout to internal testing**.
+
+If Play Console rejects the upload with a certificate mismatch, go to **Play Console →
+Your app → Setup → App integrity → App signing**, and upload the new upload certificate
+(`onlooker-upload.pem`) generated from the keystore above.
 
 ### Option B — build on your Mac
 
