@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,7 @@ function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
   useEffect(() => {
     if (user) navigate({ to: "/profile" });
@@ -40,6 +41,10 @@ function AuthScreen() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!accepted) {
+      toast.error("You must accept the Terms of Service to continue.");
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signup") {
@@ -63,6 +68,10 @@ function AuthScreen() {
   }
 
   async function google() {
+    if (!accepted) {
+      toast.error("You must accept the Terms of Service to continue.");
+      return;
+    }
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
@@ -78,10 +87,29 @@ function AuthScreen() {
         You need an account to upload bounty videos and replay them later.
       </p>
 
+      <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={accepted}
+          onChange={(e) => setAccepted(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
+        />
+        <span>
+          By signing in, you agree to Onlooker&rsquo;s{" "}
+          <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">
+            Terms of Service
+          </Link>
+          , acknowledging that you operate independently, assume all legal and physical liability,
+          will only record in lawful public spaces without trespassing, and hold Onlooker harmless
+          from any legal actions.
+        </span>
+      </label>
+
       <button
         type="button"
         onClick={google}
-        className="mt-6 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised"
+        disabled={!accepted}
+        className="mt-4 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised disabled:opacity-50"
       >
         Continue with Google
       </button>
@@ -110,7 +138,7 @@ function AuthScreen() {
         />
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || !accepted}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
