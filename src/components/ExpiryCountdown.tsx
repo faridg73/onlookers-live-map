@@ -41,15 +41,16 @@ export function ExpiryCountdown({
       style={
         urgent
           ? {
-              color: "var(--urgent)",
-              borderColor: "color-mix(in oklch, var(--urgent) 60%, transparent)",
-              backgroundColor: "color-mix(in oklch, var(--urgent) 14%, transparent)",
+              color: "white",
+              borderColor: "color-mix(in oklch, var(--urgent) 55%, black)",
+              backgroundColor: "color-mix(in oklch, var(--urgent) 55%, black)",
+              textShadow: "0 1px 2px rgb(0 0 0 / 0.45)",
             }
           : highlight
             ? {
-                color: "var(--color-signal)",
-                borderColor: "color-mix(in oklch, var(--color-signal) 45%, transparent)",
-                backgroundColor: "color-mix(in oklch, var(--color-signal) 10%, transparent)",
+                color: "var(--signal-foreground)",
+                borderColor: "var(--color-signal)",
+                backgroundColor: "var(--color-signal)",
               }
             : undefined
       }

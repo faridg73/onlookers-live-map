@@ -78,9 +78,9 @@ export function RequestCard({
           className={cn(
             "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em]",
             expired && "border-border bg-surface-raised text-muted-foreground",
-            !expired && done && "border-border bg-surface-raised text-foreground",
-            request.status === "claimed" && !done && "border-signal/60 bg-signal/15 text-signal",
-            request.status === "open" && !done && "border-live/60 bg-live/15 text-live",
+            !expired && done && "border-border bg-foreground text-background",
+            request.status === "claimed" && !done && "border-signal bg-signal font-extrabold text-signal-foreground",
+            request.status === "open" && !done && "border-live bg-live font-extrabold text-background",
           )}
         >
           {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
@@ -90,7 +90,7 @@ export function RequestCard({
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
         )}
         {!done && pool >= HIGH_BOUNTY && (
-          <span className="rounded-full border border-signal/60 bg-signal/15 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-signal">
+          <span className="rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
             High bounty
           </span>
         )}
