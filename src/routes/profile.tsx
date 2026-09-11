@@ -78,6 +78,16 @@ function ProfileScreen() {
 
       <CashOutCard />
 
+      <Link
+        to="/payout-history"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <BadgeDollarSign className="size-4 text-signal" /> Payout history
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </Link>
+
       <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
       <div className="mt-3 space-y-2">
         {ACTIVITY.map(({ icon: Icon, text, meta }) => (
