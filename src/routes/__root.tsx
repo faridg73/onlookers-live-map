@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OnlookerProvider } from "../lib/onlooker-store";
+import { BoostProvider } from "../lib/boosts-store";
 import { BottomNav } from "../components/BottomNav";
 import { Toaster } from "../components/ui/sonner";
 

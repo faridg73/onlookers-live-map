@@ -79,6 +79,13 @@ export function RequestCard({
         </div>
       )}
 
+      {!done && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-raised px-3 py-2">
+          <span className="text-xs text-muted-foreground">Chip in to raise the payout</span>
+          <BoostBounty requestId={request.id} />
+        </div>
+      )}
+
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/70 pt-3">
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
