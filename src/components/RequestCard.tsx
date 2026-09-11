@@ -7,7 +7,9 @@ import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
 import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
-import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import { CategoryBadge } from "@/components/CategoryBadge";
+import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
 export function RequestCard({
