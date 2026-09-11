@@ -62,7 +62,7 @@ if (keystorePropsFile.exists()) {
     keystoreProps.load(new FileInputStream(keystorePropsFile))
 }
 
-def resolvedStoreFile = keystoreProps['storeFile'] ?: System.getenv('ANDROID_KEYSTORE_FILE') ?: 'release.keystore'
+def resolvedStoreFile = keystoreProps['storeFile'] ?: System.getenv('ANDROID_KEYSTORE_FILE') ?: 'onlooker-upload.keystore'
 def resolvedStorePassword = keystoreProps['storePassword'] ?: System.getenv('ANDROID_KEYSTORE_PASSWORD')
 def resolvedKeyAlias = keystoreProps['keyAlias'] ?: System.getenv('ANDROID_KEY_ALIAS')
 def resolvedKeyPassword = keystoreProps['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
