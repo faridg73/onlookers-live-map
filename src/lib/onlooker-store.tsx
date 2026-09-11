@@ -1,5 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
+import { refundExpiredBounties } from "./bounty-escrow";
+
+/** Stamps an absolute deadline so the timer keeps running across re-renders. */
+function withDeadline(r: LiveRequest): LiveRequest {
+  return { ...r, expiresAt: r.expiresAt ?? Date.now() + r.expiresInMin * 60_000 };
+}
+
+/** A bounty stops accepting claims, uploads and chip-ins once it is closed. */
+export function isClosed(r: LiveRequest) {
+  return r.status === "fulfilled" || r.status === "expired";
+}
 
 type NewRequest = {
   title: string;
@@ -23,7 +34,7 @@ type Store = {
 const StoreContext = createContext<Store | null>(null);
 
 export function OnlookerProvider({ children }: { children: ReactNode }) {
-  const [requests, setRequests] = useState<LiveRequest[]>(SEED_REQUESTS);
+  const [requests, setRequests] = useState<LiveRequest[]>(() => SEED_REQUESTS.map(withDeadline));
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   // Live feel: watcher counts drift upward over time.
@@ -31,12 +42,33 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     const t = setInterval(() => {
       setRequests((prev) =>
         prev.map((r) =>
-          r.status === "fulfilled"
+          isClosed(r)
             ? r
             : { ...r, watchers: r.watchers + (Math.random() < 0.45 ? 1 : 0) },
         ),
       );
     }, 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Automatic expiry: once the deadline passes the bounty closes itself and the
+  // requester's locked deposit is swept back to their wallet.
+  useEffect(() => {
+    const tick = () => {
+      const now = Date.now();
+      setRequests((prev) => {
+        let changed = false;
+        const next = prev.map((r) => {
+          if (isClosed(r) || !r.expiresAt || r.expiresAt > now) return r;
+          changed = true;
+          return { ...r, status: "expired" as const, expiresInMin: 0 };
+        });
+        if (changed) void refundExpiredBounties();
+        return changed ? next : prev;
+      });
+    };
+    tick();
+    const t = setInterval(tick, 15_000);
     return () => clearInterval(t);
   }, []);
 
@@ -55,6 +87,7 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       watchers: 1,
       responses: 0,
       expiresInMin: 60,
+      expiresAt: Date.now() + 60 * 60_000,
       requester: "you",
       x: 300 + Math.random() * 400,
       y: 300 + Math.random() * 300,
@@ -70,7 +103,7 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
 
   const claim = useCallback((id: string) => {
     setRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: "claimed", responses: r.responses + 1 } : r)),
+      prev.map((r) => (r.id === id && !isClosed(r) ? { ...r, status: "claimed" as const, responses: r.responses + 1 } : r)),
     );
   }, []);
 

@@ -1,4 +1,4 @@
-export type RequestStatus = "open" | "claimed" | "fulfilled";
+export type RequestStatus = "open" | "claimed" | "fulfilled" | "expired";
 
 export type CategoryId =
   | "food"
@@ -49,6 +49,8 @@ export type LiveRequest = {
   watchers: number;
   responses: number;
   expiresInMin: number;
+  /** Absolute deadline in epoch ms; derived from expiresInMin when the app loads */
+  expiresAt?: number | undefined;
   requester: string;
   /** map coordinates in the 0-1000 city space */
   x: number;
@@ -158,6 +160,7 @@ export const statusLabel: Record<RequestStatus, string> = {
   open: "Open",
   claimed: "Claimed",
   fulfilled: "Fulfilled",
+  expired: "Expired",
 };
 
 export function formatAgo(min: number) {

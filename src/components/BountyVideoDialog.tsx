@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { isClosed } from "@/lib/onlooker-store";
 import { useAuth } from "@/hooks/use-auth";
 import {
   acceptBountyVideo,
@@ -40,6 +41,7 @@ export function BountyVideoDialog({
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const closed = isClosed(request);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -151,7 +153,7 @@ export function BountyVideoDialog({
               />
               <button
                 type="button"
-                disabled={uploading}
+                disabled={uploading || closed}
                 onClick={() => inputRef.current?.click()}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
               >
@@ -161,7 +163,7 @@ export function BountyVideoDialog({
                   </>
                 ) : (
                   <>
-                    <Upload className="size-4" /> Record or upload video
+                    <Upload className="size-4" /> {closed ? "Submissions closed" : "Record or upload video"}
                   </>
                 )}
               </button>

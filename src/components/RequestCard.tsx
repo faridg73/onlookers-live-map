@@ -2,7 +2,7 @@ import { Eye, MapPin, Camera, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
-import { useOnlooker } from "@/lib/onlooker-store";
+import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
 import { ShareBountyButton } from "@/components/ShareBountyButton";
@@ -23,7 +23,8 @@ export function RequestCard({
   active?: boolean;
   onSelect?: (id: string) => void;
 }) {
-  const done = request.status === "fulfilled";
+  const expired = request.status === "expired";
+  const done = isClosed(request);
   const [cancelling, setCancelling] = useState(false);
   const { remove } = useOnlooker();
   const { boostOf } = useBoosts();
@@ -46,6 +47,7 @@ export function RequestCard({
                 "inline-flex items-center gap-1.5",
                 request.status === "open" && "text-live",
                 request.status === "claimed" && "text-signal",
+                expired && "text-muted-foreground",
               )}
             >
               {request.status === "open" && (
@@ -81,6 +83,13 @@ export function RequestCard({
           </span>
         )}
       </div>
+
+      {expired && (
+        <p className="mt-3 rounded-xl border border-border bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
+          This bounty ran out of time. Submissions and chip-ins are closed and the deposit went
+          back to the requester.
+        </p>
+      )}
 
       {(request.instructions || request.note) && (
         <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
@@ -154,7 +163,7 @@ export function RequestCard({
             }}
             className="rounded-full bg-signal px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {done ? "Closed" : request.status === "claimed" ? "Add shot" : "Claim"}
+            {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Add shot" : "Claim"}
           </button>
         )}
         </div>
