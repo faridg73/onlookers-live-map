@@ -70,6 +70,8 @@ export type LiveRequest = {
   category?: CategoryId | undefined;
   /** Free-form instructions written by the requester */
   instructions?: string | undefined;
+  /** Private access passcode, only revealed once the bounty is claimed */
+  accessCode?: string | undefined;
   place: string;
   note: string;
   bounty: number;
