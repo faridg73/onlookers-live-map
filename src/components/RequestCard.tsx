@@ -1,6 +1,7 @@
 import { Clock, Eye, MapPin, Camera, Video } from "lucide-react";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
+import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
 import { categoryById, formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
@@ -101,6 +102,7 @@ export function RequestCard({
           )}
         </div>
         <div className="flex items-center gap-2">
+          <ShareBountyButton request={request} />
           <BountyVideoDialog request={request}>
             <button
               type="button"

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Share2 } from "lucide-react";
+import { shareBounty } from "@/lib/bounty-share";
 import { type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
@@ -215,6 +217,18 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                     r.status === "fulfilled" ? "bg-border" : "bg-signal",
                   )}
                 />
+                <span
+                  role="button"
+                  aria-label="Share this bounty"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void shareBounty(r);
+                  }}
+                  className="mt-1 flex size-6 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground shadow-lg"
+                >
+                  <Share2 className="size-3" />
+                </span>
               </span>
             </button>
           );
