@@ -62,3 +62,19 @@ export async function resolveDispute(requestId: string, awardSpotter: boolean): 
   });
   if (error) throw error;
 }
+
+/** True when the signed-in account is an admin or moderator. */
+export async function isReviewStaff(): Promise<boolean> {
+  const { data: session } = await supabase.auth.getUser();
+  const userId = session.user?.id;
+  if (!userId) return false;
+  const { data, error } = await supabase.rpc("is_review_staff", { _user_id: userId });
+  if (error) return false;
+  return Boolean(data);
+}
+
+/** Admin-only: promote or demote a moderator by email address. */
+export async function setModerator(email: string, enabled: boolean): Promise<void> {
+  const { error } = await supabase.rpc("set_moderator", { _email: email, _enabled: enabled });
+  if (error) throw error;
+}

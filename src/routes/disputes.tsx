@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
   addEvidence,
+  isReviewStaff,
   listDisputes,
   listEvidence,
   resolveDispute,
@@ -38,6 +39,7 @@ function DisputesScreen() {
   const [cases, setCases] = useState<DisputeCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
+  const [staff, setStaff] = useState(false);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -51,8 +53,13 @@ function DisputesScreen() {
   }, []);
 
   useEffect(() => {
-    if (user) void refresh();
-    else setLoading(false);
+    if (user) {
+      void refresh();
+      void isReviewStaff().then(setStaff);
+    } else {
+      setStaff(false);
+      setLoading(false);
+    }
   }, [user, refresh]);
 
   return (
@@ -67,6 +74,15 @@ function DisputesScreen() {
           </p>
         </div>
       </header>
+
+      {staff && (
+        <Link
+          to="/admin/disputes"
+          className="mt-5 flex items-center justify-center rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-signal"
+        >
+          Open moderator dashboard
+        </Link>
+      )}
 
       {!user && (
         <div className="mt-8 rounded-2xl border border-border bg-surface p-6 text-center">

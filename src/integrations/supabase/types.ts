@@ -834,6 +834,7 @@ export type Database = {
         Returns: boolean
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       list_disputes: {
         Args: never
         Returns: {
@@ -877,6 +878,10 @@ export type Database = {
         Args: { _approve: boolean; _note: string; _payout_id: string }
         Returns: boolean
       }
+      set_moderator: {
+        Args: { _email: string; _enabled: boolean }
+        Returns: boolean
+      }
       settle_escrows: { Args: never; Returns: Json }
       top_reporters: {
         Args: { _limit?: number }
@@ -900,7 +905,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "moderator"
       claim_status: "in_progress" | "submitted" | "approved"
       request_status: "open" | "claimed" | "completed" | "expired"
     }
@@ -1030,7 +1035,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "moderator"],
       claim_status: ["in_progress", "submitted", "approved"],
       request_status: ["open", "claimed", "completed", "expired"],
     },
