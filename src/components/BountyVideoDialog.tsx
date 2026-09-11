@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   acceptBountyVideo,
   deleteBountyVideo,
+  disputeBountyVideo,
   listVideosForRequest,
   playbackUrl,
   thumbnailUrls,
@@ -40,6 +41,7 @@ export function BountyVideoDialog({
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
+  const [disputingId, setDisputingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const closed = isClosed(request);
 
@@ -97,6 +99,22 @@ export function BountyVideoDialog({
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
     } finally {
       setPayingId(null);
+    }
+  }
+
+  /** Requester flags a clip; the bounty stays locked until a moderator decides. */
+  async function dispute(video: BountyVideo) {
+    const reason = window.prompt("What is wrong with this clip?")?.trim();
+    if (!reason) return;
+    setDisputingId(video.id);
+    try {
+      await disputeBountyVideo(video.request_id, reason);
+      toast.success("Clip disputed. The bounty stays held until it is reviewed.");
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't dispute that clip.");
+    } finally {
+      setDisputingId(null);
     }
   }
 
@@ -253,6 +271,16 @@ export function BountyVideoDialog({
                         )}
                       </button>
                     )
+                  )}
+                  {!v.accepted_at && v.uploader_id !== user.id && (
+                    <button
+                      type="button"
+                      disabled={disputingId === v.id}
+                      onClick={() => void dispute(v)}
+                      className="mt-2 w-full rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
+                    >
+                      {disputingId === v.id ? "Sending…" : "Dispute this clip"}
+                    </button>
                   )}
                   {playing?.id === v.id && (
                     <video
