@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Play, Trash2, Upload, Video } from "lucide-react";
+import { Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import {

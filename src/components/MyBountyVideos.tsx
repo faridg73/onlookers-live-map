@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Play, Video } from "lucide-react";
+import { Play, Share2, Video } from "lucide-react";
+import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
