@@ -27,6 +27,18 @@ export async function acceptBountyVideo(videoId: string): Promise<number> {
   return Number(data ?? 0);
 }
 
+/**
+ * Requester flags a submitted clip within the review window. The money stays
+ * locked in escrow until a moderator resolves it.
+ */
+export async function disputeBountyVideo(requestId: string, reason: string): Promise<void> {
+  const { error } = await supabase.rpc("dispute_bounty", {
+    _request_id: requestId,
+    _reason: reason,
+  });
+  if (error) throw error;
+}
+
 /** Grab a still frame from a video file in the browser and return it as a JPEG. */
 async function captureThumbnail(file: File): Promise<Blob | null> {
   if (typeof document === "undefined") return null;
