@@ -341,7 +341,9 @@ export type Database = {
           display_name: string
           full_name: string
           id: string
+          onboarded: boolean
           rating: number
+          terms_accepted_at: string | null
           updated_at: string
           wallet_balance: number
         }
@@ -351,7 +353,9 @@ export type Database = {
           display_name?: string
           full_name?: string
           id: string
+          onboarded?: boolean
           rating?: number
+          terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
         }
@@ -361,7 +365,9 @@ export type Database = {
           display_name?: string
           full_name?: string
           id?: string
+          onboarded?: boolean
           rating?: number
+          terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
         }
