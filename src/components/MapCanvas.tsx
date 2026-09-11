@@ -1,36 +1,37 @@
+/// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { type LiveRequest } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
-
-const MIN_ZOOM = 0.6;
-const MAX_ZOOM = 4;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 /**
  * Fallback regional center used when device geolocation is denied or
- * unavailable. The stylised 0-1000 map space is treated as this region.
+ * unavailable. The stylised 0-1000 map space is anchored to this region.
  */
 export const REGIONAL_CENTER = { lat: 34.0522, lng: -118.2437 }; // Los Angeles
 /** Approximate degrees of lat/lng covered by the 1000x1000 map space. */
 const REGION_SPAN = 0.3;
 
-/** Project real lat/lng into the 0-1000 map space (clamped to the region). */
-function worldFromLatLng(lat: number, lng: number) {
+/** Turn a stored 0-1000 map-space point back into real coordinates. */
+function latLngFromWorld(x: number, y: number) {
   const minLng = REGIONAL_CENTER.lng - REGION_SPAN / 2;
   const maxLat = REGIONAL_CENTER.lat + REGION_SPAN / 2;
   return {
-    x: clamp(((lng - minLng) / REGION_SPAN) * 1000, 0, 1000),
-    y: clamp(((maxLat - lat) / REGION_SPAN) * 1000, 0, 1000),
+    lat: maxLat - (clamp(y, 0, 1000) / 1000) * REGION_SPAN,
+    lng: minLng + (clamp(x, 0, 1000) / 1000) * REGION_SPAN,
   };
 }
 
-/** A stylised night-city map surface with cursor-anchored wheel zoom and drag pan. */
+type Pixel = { left: number; top: number };
+
+/** Real Google street map with bounty pins drawn on top. */
 export function MapCanvas({
   requests,
   selectedId,
@@ -40,25 +41,44 @@ export function MapCanvas({
   selectedId: string | null;
   onSelect: (id: string | null) => void;
 }) {
-const containerRef = useRef<HTMLDivElement | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [fit, setFit] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const centeredRef = useRef(false);
-  const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
-  /** Device position projected into map space; null until geolocation resolves. */
-  const [userWorld, setUserWorld] = useState<{ x: number; y: number } | null>(null);
+  const holder = useRef<HTMLDivElement | null>(null);
+  const map = useRef<google.maps.Map | null>(null);
+  const overlay = useRef<google.maps.OverlayView | null>(null);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [tick, setTick] = useState(0);
+  const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
   const [geoState, setGeoState] = useState<"pending" | "located" | "unavailable">("pending");
-  /** Latest fit/zoom for math inside stable callbacks. */
-  const viewRef = useRef({ fit: 1, zoom: 1 });
-  viewRef.current = { fit, zoom };
 
-  /** Center the viewport on a point in the 0-1000 map space. */
-  const centerOnWorld = useCallback((wx: number, wy: number) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const s = viewRef.current.fit * viewRef.current.zoom;
-    setOffset({ x: el.clientWidth / 2 - wx * s, y: el.clientHeight / 2 - wy * s });
+  // Boot the map once.
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMaps()
+      .then((maps) => {
+        if (cancelled || !holder.current) return;
+        map.current = new maps.Map(holder.current, {
+          center: REGIONAL_CENTER,
+          zoom: 13,
+          clickableIcons: false,
+          disableDefaultUI: true,
+          gestureHandling: "greedy",
+        });
+        const ov = new maps.OverlayView();
+        ov.onAdd = () => {};
+        ov.onRemove = () => {};
+        ov.draw = () => setTick((t) => t + 1);
+        ov.setMap(map.current);
+        overlay.current = ov;
+        map.current.addListener("bounds_changed", () => setTick((t) => t + 1));
+        map.current.addListener("click", () => onSelect(null));
+        setReady(true);
+      })
+      .catch(() => setFailed(true));
+    return () => {
+      cancelled = true;
+      overlay.current?.setMap(null);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /** Ask the device for its position and center the map on it. */
@@ -70,204 +90,80 @@ const containerRef = useRef<HTMLDivElement | null>(null);
     setGeoState("pending");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const w = worldFromLatLng(pos.coords.latitude, pos.coords.longitude);
-        setUserWorld(w);
+        const at = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setUserPos(at);
         setGeoState("located");
-        centerOnWorld(w.x, w.y);
+        map.current?.panTo(at);
       },
       () => setGeoState("unavailable"),
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
     );
-  }, [centerOnWorld]);
+  }, []);
 
-  // Request the device location once on first load and auto-center on it.
-  // If denied/unavailable the map stays on the regional fallback center.
   useEffect(() => {
     locateMe();
   }, [locateMe]);
 
-  // Fit the 1000x1000 world to the viewport (cover) and center it once,
-  // so the map fills any screen — phone, tablet, desktop, tall store shots.
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const measure = () => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      const f = Math.max(w / 1000, h / 1000);
-      setFit(f);
-      if (!centeredRef.current) {
-        centeredRef.current = true;
-        setOffset({ x: (w - 1000 * f) / 2, y: (h - 1000 * f) / 2 });
-      }
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const wheelRef = useRef<(e: WheelEvent) => void>(() => {});
-  wheelRef.current = (e: WheelEvent) => {
-    const el = containerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
-    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
-    const next = clamp(zoom * Math.exp(-dy * 0.0018), MIN_ZOOM, MAX_ZOOM);
-    const k = next / zoom;
-    setOffset({ x: px - (px - offset.x) * k, y: py - (py - offset.y) * k });
-    setZoom(next);
+  const toPixel = (position: google.maps.LatLngLiteral): Pixel | null => {
+    const projection = overlay.current?.getProjection();
+    if (!projection) return null;
+    const point = projection.fromLatLngToContainerPixel(
+      new google.maps.LatLng(position.lat, position.lng),
+    );
+    return point ? { left: point.x, top: point.y } : null;
   };
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      wheelRef.current(e);
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
+  const zoomBy = (delta: number) => {
+    const z = map.current?.getZoom();
+    if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 3, 20));
+  };
 
-  const zoomBy = useCallback(
-    (factor: number) => {
-      const el = containerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const px = rect.width / 2;
-      const py = rect.height / 2;
-      setZoom((z) => {
-        const next = clamp(z * factor, MIN_ZOOM, MAX_ZOOM);
-        const k = next / z;
-        setOffset((o) => ({ x: px - (px - o.x) * k, y: py - (py - o.y) * k }));
-        return next;
-      });
-    },
-    [],
-  );
+  // `tick` re-runs pixel math whenever the map moves.
+  void tick;
+  const userPixel = ready && userPos ? toPixel(userPos) : null;
 
   return (
-    <div
-      ref={containerRef}
-      onPointerDown={(e) => {
-        (e.target as Element).setPointerCapture?.(e.pointerId);
-        drag.current = { x: e.clientX, y: e.clientY, ox: offset.x, oy: offset.y };
-      }}
-      onPointerMove={(e) => {
-        if (!drag.current) return;
-        setOffset({
-          x: drag.current.ox + (e.clientX - drag.current.x),
-          y: drag.current.oy + (e.clientY - drag.current.y),
-        });
-      }}
-      onPointerUp={() => (drag.current = null)}
-      onPointerLeave={() => (drag.current = null)}
-      className="absolute inset-0 overflow-hidden bg-map touch-none select-none"
-      style={{ cursor: drag.current ? "grabbing" : "grab" }}
-    >
-<div
-        className="absolute left-0 top-0 origin-top-left"
-        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${fit * zoom})` }}
-      >
-        <svg width={1000} height={1000} viewBox="0 0 1000 1000" className="block">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0H0V40" fill="none" stroke="oklch(0.94 0.01 250)" strokeWidth="0.6" />
-            </pattern>
-          </defs>
+    <div className="absolute inset-0 overflow-hidden bg-map">
+      <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
 
-          {/* bright base */}
-          <rect width="1000" height="1000" fill="oklch(0.97 0.01 250)" />
-          <rect width="1000" height="1000" fill="url(#grid)" />
+      {failed && (
+        <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+          <p className="text-sm font-semibold text-muted-foreground">
+            The map couldn&apos;t load right now. Pull to refresh or try again shortly.
+          </p>
+        </div>
+      )}
 
-          {/* water */}
-          <path
-            d="M0 120 C 160 190, 250 90, 360 160 L 300 0 L 0 0 Z"
-            fill="oklch(0.88 0.05 230)"
-          />
-          <path d="M640 1000 C 720 900, 880 940, 1000 860 L 1000 1000 Z" fill="oklch(0.88 0.05 230)" />
+      {/* you-are-here marker */}
+      {userPixel && (
+        <div
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+          style={{ left: userPixel.left, top: userPixel.top }}
+          aria-label="Your location"
+        >
+          <span className="relative flex size-5 items-center justify-center">
+            <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
+            <span className="size-3.5 rounded-full border-2 border-surface bg-live shadow-lg" />
+          </span>
+        </div>
+      )}
 
-          {/* park */}
-          <rect x="220" y="450" width="180" height="150" rx="18" fill="oklch(0.9 0.06 150)" />
-
-          {/* arterial roads */}
-          {[
-            "M0 300 H1000",
-            "M0 640 H1000",
-            "M180 0 V1000",
-            "M540 0 V1000",
-            "M840 0 V1000",
-            "M0 880 H1000",
-          ].map((d) => (
-            <path key={d} d={d} stroke="oklch(1 0 0)" strokeWidth="7" fill="none" />
-          ))}
-          {["M0 300 H1000", "M540 0 V1000"].map((d) => (
-            <path
-              key={`hl-${d}`}
-              d={d}
-              stroke="oklch(0.85 0.04 80)"
-              strokeWidth="1.4"
-              strokeDasharray="14 12"
-              fill="none"
-            />
-          ))}
-
-          {/* blocks */}
-          {Array.from({ length: 44 }).map((_, i) => {
-            const col = i % 8;
-            const row = Math.floor(i / 8);
-            const x = 40 + col * 118 + ((row % 2) * 14);
-            const y = 60 + row * 165;
-            const w = 74 + ((i * 13) % 30);
-            const h = 52 + ((i * 29) % 46);
-            return (
-              <rect
-                key={i}
-                x={x}
-                y={y}
-                width={w}
-                height={h}
-                rx={6}
-                fill="oklch(0.93 0.012 250)"
-                stroke="oklch(0.88 0.015 250)"
-                strokeWidth="0.8"
-              />
-            );
-          })}
-        </svg>
-
-        {/* you-are-here marker */}
-        {userWorld && (
-          <div
-            className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: userWorld.x,
-              top: userWorld.y,
-              transform: `translate(-50%,-50%) scale(${1 / (fit * zoom)})`,
-            }}
-            aria-label="Your location"
-          >
-            <span className="relative flex size-5 items-center justify-center">
-              <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
-              <span className="size-3.5 rounded-full border-2 border-surface bg-live shadow-lg" />
-            </span>
-          </div>
-        )}
-
-        {/* pins */}
-        {requests.map((r) => {
+      {/* pins */}
+      {ready &&
+        requests.map((r) => {
+          const pixel = toPixel(latLngFromWorld(r.x, r.y));
+          if (!pixel) return null;
           const isSel = r.id === selectedId;
           return (
             <button
               key={r.id}
               type="button"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => onSelect(isSel ? null : r.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(isSel ? null : r.id);
+              }}
               className="absolute -translate-x-1/2 -translate-y-full"
-              style={{ left: r.x, top: r.y, transform: `translate(-50%,-100%) scale(${1 / (fit * zoom)})`, transformOrigin: "bottom center" }}
+              style={{ left: pixel.left, top: pixel.top }}
             >
               <span className="relative flex flex-col items-center">
                 {r.status === "open" && (
@@ -312,7 +208,6 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 <span
                   role="button"
                   aria-label="Share this bounty"
-                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation();
                     void shareBounty(r);
@@ -325,13 +220,12 @@ const containerRef = useRef<HTMLDivElement | null>(null);
             </button>
           );
         })}
-      </div>
 
       <div className="absolute right-4 top-24 flex flex-col gap-2">
         <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
           {[
-            { label: "+", fn: () => zoomBy(1.35) },
-            { label: "−", fn: () => zoomBy(1 / 1.35) },
+            { label: "+", fn: () => zoomBy(1) },
+            { label: "−", fn: () => zoomBy(-1) },
           ].map((b) => (
             <button
               key={b.label}
