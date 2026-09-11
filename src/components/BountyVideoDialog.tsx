@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { isClosed } from "@/lib/onlooker-store";
 import { AccessPasscode } from "@/components/AccessPasscode";
+import { BountyChat } from "@/components/BountyChat";
 import { useAuth } from "@/hooks/use-auth";
 import {
   acceptBountyVideo,
@@ -50,7 +51,7 @@ export function BountyVideoDialog({
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const rows = await listVideosForRequest(request.id);
+      const rows = await listVideosForRequest(request.id, request.dbId ?? null);
       setVideos(rows);
       setThumbs(await thumbnailUrls(rows));
     } catch {
@@ -143,6 +144,7 @@ export function BountyVideoDialog({
           </DialogDescription>
         </DialogHeader>
         <AccessPasscode request={request} />
+        <BountyChat request={request} />
 
         {!user ? (
           <div className="rounded-2xl border border-border bg-surface p-5 text-center">
