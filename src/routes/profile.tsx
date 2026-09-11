@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  HelpCircle,
   PlusSquare,
   Radio,
   Shield,
@@ -125,6 +126,15 @@ function ProfileScreen() {
 
       <h2 className="mt-8 font-display text-lg text-foreground">Settings &amp; legal</h2>
       <div className="mt-3 space-y-2">
+        <Link
+          to="/faq"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <HelpCircle className="size-4 text-signal" /> Help &amp; FAQ
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
         <Link
           to="/terms"
           className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
