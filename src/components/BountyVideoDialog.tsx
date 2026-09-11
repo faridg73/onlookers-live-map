@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
