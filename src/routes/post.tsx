@@ -67,6 +67,16 @@ function PostScreen() {
       toast.error("Add a 6-digit code or word the onlooker can quote on site.");
       return;
     }
+    // Catch an empty wallet before posting, so the deposit never fails mid-flow.
+    const funds = await readWalletBalance();
+    setBalance(funds);
+    if (funds !== null && funds < bounty) {
+      toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
+        description: `Add funds to lock a $${bounty} bounty.`,
+        action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
+      });
+      return;
+    }
     setPosting(true);
     try {
       const locked = await lockBounty({
