@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 /** Loads the Maps JavaScript API once, asynchronously, and resolves when ready. */
 let loader: Promise<typeof google.maps> | null = null;
 
@@ -12,7 +13,7 @@ export function loadGoogleMaps(): Promise<typeof google.maps> {
   loader = new Promise((resolve, reject) => {
     const callbackName = "__onlookerMapsReady";
     (window as unknown as Record<string, unknown>)[callbackName] = () => {
-      resolve(window.google.maps);
+      resolve((window as unknown as { google: { maps: typeof google.maps } }).google.maps);
     };
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&callback=${callbackName}${
