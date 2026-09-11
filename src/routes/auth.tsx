@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
+import { rememberTermsAcceptance } from "@/lib/profile";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -46,6 +47,7 @@ function AuthScreen() {
       return;
     }
     setBusy(true);
+    rememberTermsAcceptance();
     try {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
@@ -67,12 +69,13 @@ function AuthScreen() {
     }
   }
 
-  async function google() {
+  async function oauth(provider: "google" | "apple") {
     if (!accepted) {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
-    const result = await lovable.auth.signInWithOAuth("google", {
+    rememberTermsAcceptance();
+    const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) toast.error(result.error.message);
@@ -111,11 +114,20 @@ function AuthScreen() {
 
       <button
         type="button"
-        onClick={google}
+        onClick={() => oauth("google")}
         disabled={!accepted}
         className="mt-4 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised disabled:opacity-50"
       >
         Continue with Google
+      </button>
+
+      <button
+        type="button"
+        onClick={() => oauth("apple")}
+        disabled={!accepted}
+        className="mt-3 w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-surface-raised disabled:opacity-50"
+      >
+        Continue with Apple
       </button>
 
       <div className="my-5 flex items-center gap-3 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">

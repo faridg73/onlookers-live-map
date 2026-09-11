@@ -15,6 +15,7 @@ import { OnlookerProvider } from "../lib/onlooker-store";
 import { BoostProvider } from "../lib/boosts-store";
 import { BottomNav } from "../components/BottomNav";
 import { Toaster } from "../components/ui/sonner";
+import { ProfileSetup } from "../components/ProfileSetup";
 
 function NotFoundComponent() {
   return (
@@ -138,6 +139,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
           <BottomNav />
+          <ProfileSetup />
           <Toaster position="top-center" />
         </BoostProvider>
       </OnlookerProvider>
