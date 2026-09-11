@@ -119,7 +119,8 @@ export function RequestCard({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {request.dbId && !done && (
+          {/* Cancelling is only allowed while nobody has claimed or submitted. */}
+          {request.dbId && request.status === "open" && (
             <button
               type="button"
               disabled={cancelling}
