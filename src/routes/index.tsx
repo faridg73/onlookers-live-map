@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Camera, Search, Zap } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
@@ -6,6 +7,9 @@ import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { useOnlooker } from "@/lib/onlooker-store";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): { b?: string | undefined } => ({
+    b: typeof search["b"] === "string" ? search["b"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Onlooker — Live views from people already there" },
@@ -26,6 +30,13 @@ export const Route = createFileRoute("/")({
 
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
+  const { b } = Route.useSearch();
+
+  // Opening a shared bounty link lands straight on that pin.
+  useEffect(() => {
+    if (b) select(b);
+  }, [b, select]);
+
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   const openCount = requests.filter((r) => r.status === "open").length;
 
