@@ -4,7 +4,12 @@ import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
+import {
+  CATEGORIES,
+  categoryById,
+  needsPermissionConfirmation,
+  type CategoryId,
+} from "@/lib/onlooker";
 
 export const Route = createFileRoute("/post")({
   head: () => ({
@@ -35,6 +40,8 @@ function PostScreen() {
   const [category, setCategory] = useState<CategoryId>("food");
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [permissionOk, setPermissionOk] = useState(false);
+  const permissionNeeded = needsPermissionConfirmation(category);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -44,6 +51,10 @@ function PostScreen() {
     e.preventDefault();
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    if (permissionNeeded && !permissionOk) {
+      toast.error("Confirm you have permission from the seller, agent or property manager first.");
       return;
     }
     setPosting(true);
@@ -133,6 +144,22 @@ function PostScreen() {
           </div>
         </div>
 
+        {permissionNeeded && (
+          <label className="flex gap-3 rounded-xl border border-signal/40 bg-surface p-3">
+            <input
+              type="checkbox"
+              checked={permissionOk}
+              onChange={(e) => setPermissionOk(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
+            />
+            <span className="text-xs text-muted-foreground">
+              I confirm I have permission from the seller, listing agent or property manager to have
+              this property photographed or filmed, and that the onlooker may only capture areas
+              open to the public or that access has been authorised.
+            </span>
+          </label>
+        )}
+
         <label className="block space-y-1.5">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Instructions for the onlooker
@@ -158,7 +185,7 @@ function PostScreen() {
 
         <button
           type="submit"
-          disabled={posting || bounty < MIN_BOUNTY}
+          disabled={posting || bounty < MIN_BOUNTY || (permissionNeeded && !permissionOk)}
           className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}

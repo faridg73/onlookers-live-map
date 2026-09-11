@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
-import type { RequestStatus } from "@/lib/onlooker";
+import { CATEGORIES, type CategoryId, type RequestStatus } from "@/lib/onlooker";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -34,7 +34,11 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
-  const list = requests.filter((r) => filter === "all" || r.status === filter);
+  const [cat, setCat] = useState<CategoryId | "all">("all");
+  const list = requests.filter(
+    (r) =>
+      (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
+  );
   const pot = requests.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   return (
@@ -57,6 +61,24 @@ function FeedScreen() {
             }
           >
             {f.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+        {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setCat(c.id)}
+            className={
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors " +
+              (cat === c.id
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            {c.emoji && <span className="mr-1">{c.emoji}</span>}
+            {c.label}
           </button>
         ))}
       </div>

@@ -11,7 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
+import {
+  CATEGORIES,
+  categoryById,
+  needsPermissionConfirmation,
+  type CategoryId,
+} from "@/lib/onlooker";
 
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
@@ -23,6 +28,8 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [category, setCategory] = useState<CategoryId>("food");
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [permissionOk, setPermissionOk] = useState(false);
+  const permissionNeeded = needsPermissionConfirmation(category);
 
   useEffect(() => {
     if (open) void readWalletBalance().then(setBalance);
@@ -33,6 +40,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     if (!title.trim() || !place.trim()) return;
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    if (permissionNeeded && !permissionOk) {
+      toast.error("Confirm you have permission from the seller, agent or property manager first.");
       return;
     }
     setPosting(true);
@@ -59,6 +70,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       setPlace("");
       setNote("");
       setBounty(10);
+      setPermissionOk(false);
       setOpen(false);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the request.");
@@ -116,6 +128,20 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               ))}
             </div>
           </Field>
+          {permissionNeeded && (
+            <label className="flex gap-3 rounded-xl border border-signal/40 bg-surface-raised p-3">
+              <input
+                type="checkbox"
+                checked={permissionOk}
+                onChange={(e) => setPermissionOk(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
+              />
+              <span className="text-xs text-muted-foreground">
+                I confirm I have permission from the seller, listing agent or property manager to
+                have this property photographed or filmed.
+              </span>
+            </label>
+          )}
           <Field label="Instructions for the onlooker">
             <textarea
               value={note}
@@ -130,7 +156,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
           </Field>
           <button
             type="submit"
-            disabled={posting || bounty < MIN_BOUNTY}
+            disabled={posting || bounty < MIN_BOUNTY || (permissionNeeded && !permissionOk)}
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             {posting ? "Locking bounty…" : `Post request — lock $${Number.isFinite(bounty) ? bounty : 0}`}
