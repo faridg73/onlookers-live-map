@@ -48,8 +48,11 @@ export async function refundBounty(dbId: string): Promise<number> {
 /** Sweeps expired requests so their deposits go back to the requester. */
 export async function refundExpiredBounties() {
   try {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return; // Signed-out visitors skip the sweep.
     await settleExpiredBounties();
   } catch {
-    // Signed-out visitors simply skip the sweep.
+    // Never let the background sweep break the map.
   }
 }
