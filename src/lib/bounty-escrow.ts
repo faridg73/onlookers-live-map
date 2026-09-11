@@ -1,6 +1,7 @@
 import {
   cancelBountyRequest,
   createBountyRequest,
+  getBountyAccessCode,
   getWalletBalance,
   settleExpiredBounties,
 } from "@/lib/requests.functions";
@@ -27,11 +28,21 @@ export async function lockBounty(input: {
   locationName: string;
   bounty: number;
   category?: string | null;
+  accessCode?: string | null;
 }): Promise<LockedBounty> {
   try {
     return await createBountyRequest({ data: { ...input, minutes: 60 } });
   } catch (error) {
     throw new Error(message(error, "Could not lock the bounty deposit."));
+  }
+}
+
+/** Reads the private access passcode for a claimed or owned request. */
+export async function readAccessCode(dbId: string): Promise<string | null> {
+  try {
+    return await getBountyAccessCode({ data: { id: dbId } });
+  } catch {
+    return null;
   }
 }
 
