@@ -92,6 +92,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cashouts: {
+        Row: {
+          amount: number
+          created_at: string
+          environment: string
+          error_message: string
+          id: string
+          status: string
+          stripe_transfer_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          environment?: string
+          error_message?: string
+          id?: string
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          environment?: string
+          error_message?: string
+          id?: string
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       claims: {
         Row: {
           claimed_at: string
@@ -226,6 +262,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payout_accounts: {
+        Row: {
+          created_at: string
+          details_submitted: boolean
+          environment: string
+          payouts_enabled: boolean
+          requirements_note: string
+          stripe_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details_submitted?: boolean
+          environment?: string
+          payouts_enabled?: boolean
+          requirements_note?: string
+          stripe_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details_submitted?: boolean
+          environment?: string
+          payouts_enabled?: boolean
+          requirements_note?: string
+          stripe_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       payout_requests: {
         Row: {
@@ -603,6 +672,7 @@ export type Database = {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
       }
+      request_cashout: { Args: { _amount: number }; Returns: string }
       resolve_dispute: {
         Args: { _award_spotter: boolean; _request_id: string }
         Returns: boolean
