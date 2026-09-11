@@ -93,7 +93,7 @@ function ProfileScreen() {
         ))}
       </div>
 
-      <Leaderboard />
+      <Leaderboard limit={5} moreLink />
 
       <MyBountyVideos />
 

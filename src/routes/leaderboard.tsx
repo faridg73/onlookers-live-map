@@ -45,7 +45,7 @@ function LeaderboardPage() {
         </div>
       </div>
 
-      <Leaderboard limit={100} heading={null} />
+      <Leaderboard limit={100} showHeading={false} />
     </div>
   );
 }
