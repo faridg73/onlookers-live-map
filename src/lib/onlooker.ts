@@ -58,6 +58,7 @@ export type LiveRequest = {
 export const SEED_REQUESTS: LiveRequest[] = [
   {
     id: "r1",
+    category: "transit",
     title: "How long is the ferry line?",
     place: "Pier 41 Terminal",
     note: "Trying to decide if I should walk over now or wait it out.",
@@ -73,6 +74,7 @@ export const SEED_REQUESTS: LiveRequest[] = [
   },
   {
     id: "r2",
+    category: "nightlife",
     title: "Is the night market still open?",
     place: "Ash Alley & 6th",
     note: "Photo of the entrance would be perfect. Any angle.",
@@ -88,6 +90,7 @@ export const SEED_REQUESTS: LiveRequest[] = [
   },
   {
     id: "r3",
+    category: "outdoors",
     title: "Sunset from the east ridge?",
     place: "Ridgeline Overlook",
     note: "Want to know if the fog rolled in before I drive up.",
@@ -103,6 +106,7 @@ export const SEED_REQUESTS: LiveRequest[] = [
   },
   {
     id: "r4",
+    category: "parking",
     title: "Any parking left in Lot C?",
     place: "Harbor Stadium Lot C",
     note: "Game starts in 40. A wide shot of the lot helps.",
@@ -118,6 +122,7 @@ export const SEED_REQUESTS: LiveRequest[] = [
   },
   {
     id: "r5",
+    category: "weather",
     title: "Street flooded after the storm?",
     place: "Lowell & Canal",
     note: "Neighbours reporting water. Need eyes on the underpass.",
@@ -133,6 +138,7 @@ export const SEED_REQUESTS: LiveRequest[] = [
   },
   {
     id: "r6",
+    category: "outdoors",
     title: "Cherry trees blooming yet?",
     place: "Verona Park, north gate",
     note: "One photo of the north path is all I need.",
