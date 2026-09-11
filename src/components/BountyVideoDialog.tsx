@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import {
+  acceptBountyVideo,
   deleteBountyVideo,
   listVideosForRequest,
   playbackUrl,
@@ -37,6 +38,7 @@ export function BountyVideoDialog({
   const [note, setNote] = useState("");
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  const [payingId, setPayingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
@@ -80,6 +82,19 @@ export function BountyVideoDialog({
       setPlaying({ id: video.id, url: await playbackUrl(video.storage_path) });
     } catch {
       toast.error("Couldn't open that video.");
+    }
+  }
+
+  async function accept(video: BountyVideo) {
+    setPayingId(video.id);
+    try {
+      const paid = await acceptBountyVideo(video.id);
+      toast.success(`Accepted. $${paid.toFixed(2)} sent to the reporter's wallet.`);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
+    } finally {
+      setPayingId(null);
     }
   }
 
@@ -182,6 +197,7 @@ export function BountyVideoDialog({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(v.created_at).toLocaleString()}
+                        {v.accepted_at && ` · Paid $${Number(v.payout_amount).toFixed(2)}`}
                       </p>
                     </div>
                     <button
@@ -210,6 +226,32 @@ export function BountyVideoDialog({
                       </button>
                     )}
                   </div>
+                  {v.accepted_at ? (
+                    <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
+                      <BadgeDollarSign className="size-3.5" /> Accepted · $
+                      {Number(v.payout_amount).toFixed(2)} paid to the reporter
+                    </p>
+                  ) : (
+                    v.uploader_id !== user.id && (
+                      <button
+                        type="button"
+                        disabled={payingId === v.id}
+                        onClick={() => void accept(v)}
+                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                      >
+                        {payingId === v.id ? (
+                          <>
+                            <Loader2 className="size-3.5 animate-spin" /> Paying…
+                          </>
+                        ) : (
+                          <>
+                            <BadgeDollarSign className="size-3.5" /> Accept & pay $
+                            {Number(v.bounty_amount).toFixed(2)}
+                          </>
+                        )}
+                      </button>
+                    )
+                  )}
                   {playing?.id === v.id && (
                     <video
                       src={playing.url}

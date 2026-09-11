@@ -15,7 +15,17 @@ export type BountyVideo = {
   thumb_path: string | null;
   duration_seconds: number | null;
   created_at: string;
+  accepted_at: string | null;
+  accepted_by: string | null;
+  payout_amount: number;
 };
+
+/** Accept a clip: pays the reporter their bounty (minus the 15% app fee). */
+export async function acceptBountyVideo(videoId: string): Promise<number> {
+  const { data, error } = await supabase.rpc("accept_bounty_video", { _video_id: videoId });
+  if (error) throw error;
+  return Number(data ?? 0);
+}
 
 /** Grab a still frame from a video file in the browser and return it as a JPEG. */
 async function captureThumbnail(file: File): Promise<Blob | null> {
