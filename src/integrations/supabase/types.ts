@@ -834,6 +834,7 @@ export type Database = {
         Returns: boolean
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       list_disputes: {
         Args: never
         Returns: {
@@ -875,6 +876,10 @@ export type Database = {
       }
       resolve_payout: {
         Args: { _approve: boolean; _note: string; _payout_id: string }
+        Returns: boolean
+      }
+      set_moderator: {
+        Args: { _email: string; _enabled: boolean }
         Returns: boolean
       }
       settle_escrows: { Args: never; Returns: Json }
