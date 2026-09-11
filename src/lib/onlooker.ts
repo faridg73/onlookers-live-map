@@ -30,7 +30,17 @@ export const CATEGORIES: Category[] = [
   { id: "events", label: "Events & Concerts", emoji: "\u{1F3AB}", hint: "e.g. Crowd size at the gate, stage view from the back, merch line length." },
   { id: "parking", label: "Parking", emoji: "\u{1F17F}\u{FE0F}", hint: "e.g. Wide shot of the lot, how many spots are open, and the posted hourly rate." },
   { id: "weather", label: "Weather & Conditions", emoji: "\u{26C5}", hint: "e.g. Is the underpass flooded, how deep is the water, is the road still passable." },
+  { id: "realestate", label: "Real Estate & Open Houses", emoji: "\u{1F3E1}", hint: "e.g. Walk the open house room by room, show the yard, note damp spots and street noise." },
+  { id: "art", label: "Art Galleries & Exhibits", emoji: "\u{1F5BC}\u{FE0F}", hint: "e.g. Which pieces are on show, how busy the room is, and whether photography is allowed." },
+  { id: "sports", label: "Sporting & Events", emoji: "\u{1F3DF}\u{FE0F}", hint: "e.g. Crowd size, view from the seats, queue at the gate and the score right now." },
 ];
+
+/** Categories that require written permission from an owner or agent first. */
+export const PERMISSION_REQUIRED_CATEGORIES: CategoryId[] = ["realestate"];
+
+export function needsPermissionConfirmation(id?: CategoryId | null) {
+  return !!id && PERMISSION_REQUIRED_CATEGORIES.includes(id);
+}
 
 export function categoryById(id?: CategoryId | null) {
   return CATEGORIES.find((c) => c.id === id);
