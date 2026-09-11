@@ -65,6 +65,24 @@ function FeedScreen() {
         ))}
       </div>
 
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+        {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setCat(c.id)}
+            className={
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors " +
+              (cat === c.id
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            {c.emoji && <span className="mr-1">{c.emoji}</span>}
+            {c.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-5 space-y-3">
         {list.map((r) => (
           <RequestCard key={r.id} request={r} onClaim={claim} />
