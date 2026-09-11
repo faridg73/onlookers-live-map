@@ -11,7 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
+import {
+  CATEGORIES,
+  categoryById,
+  needsPermissionConfirmation,
+  type CategoryId,
+} from "@/lib/onlooker";
 
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
