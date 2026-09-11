@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import {
+  acceptBountyVideo,
   deleteBountyVideo,
   listVideosForRequest,
   playbackUrl,
@@ -37,6 +38,7 @@ export function BountyVideoDialog({
   const [note, setNote] = useState("");
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  const [payingId, setPayingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
@@ -80,6 +82,19 @@ export function BountyVideoDialog({
       setPlaying({ id: video.id, url: await playbackUrl(video.storage_path) });
     } catch {
       toast.error("Couldn't open that video.");
+    }
+  }
+
+  async function accept(video: BountyVideo) {
+    setPayingId(video.id);
+    try {
+      const paid = await acceptBountyVideo(video.id);
+      toast.success(`Accepted. $${paid.toFixed(2)} sent to the reporter's wallet.`);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
+    } finally {
+      setPayingId(null);
     }
   }
 
@@ -182,6 +197,7 @@ export function BountyVideoDialog({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(v.created_at).toLocaleString()}
+                        {v.accepted_at && ` · Paid $${Number(v.payout_amount).toFixed(2)}`}
                       </p>
                     </div>
                     <button
