@@ -5,6 +5,7 @@ import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { refundExpiredBounties } from "@/lib/bounty-escrow";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { b?: string | undefined } => ({
@@ -31,6 +32,11 @@ export const Route = createFileRoute("/")({
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
   const { b } = Route.useSearch();
+
+  // Send expired, unfulfilled deposits back to their requesters.
+  useEffect(() => {
+    void refundExpiredBounties();
+  }, []);
 
   // Opening a shared bounty link lands straight on that pin.
   useEffect(() => {

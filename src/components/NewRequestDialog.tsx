@@ -1,5 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +13,6 @@ import {
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CATEGORIES, categoryById, type CategoryId } from "@/lib/onlooker";
 
-const BOUNTIES = [5, 10, 20, 40];
-
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
   const [open, setOpen] = useState(false);
@@ -21,24 +21,50 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(10);
   const [category, setCategory] = useState<CategoryId>("food");
+  const [balance, setBalance] = useState<number | null>(null);
+  const [posting, setPosting] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  useEffect(() => {
+    if (open) void readWalletBalance().then(setBalance);
+  }, [open]);
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
-    addRequest({
-      title: title.trim(),
-      place: place.trim(),
-      note: note.trim(),
-      bounty,
-      category,
-      instructions: note.trim(),
-    });
-    toast.success("Request is live", { description: `$${bounty} bounty posted to nearby onlookers.` });
-    setTitle("");
-    setPlace("");
-    setNote("");
-    setBounty(10);
-    setOpen(false);
+    if (bounty < MIN_BOUNTY) {
+      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    setPosting(true);
+    try {
+      const locked = await lockBounty({
+        prompt: title.trim(),
+        locationName: place.trim(),
+        bounty,
+        category,
+      });
+      addRequest({
+        title: title.trim(),
+        place: place.trim(),
+        note: note.trim(),
+        bounty,
+        category,
+        instructions: note.trim(),
+        dbId: locked.id,
+      });
+      toast.success("Request is live", {
+        description: `$${bounty} locked from your wallet until it's fulfilled.`,
+      });
+      setTitle("");
+      setPlace("");
+      setNote("");
+      setBounty(10);
+      setOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not post the request.");
+    } finally {
+      setPosting(false);
+    }
   }
 
   return (
@@ -100,29 +126,14 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
             />
           </Field>
           <Field label="Bounty">
-            <div className="flex gap-2">
-              {BOUNTIES.map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setBounty(b)}
-                  className={
-                    "flex-1 rounded-xl border py-2 font-display text-base transition-colors " +
-                    (bounty === b
-                      ? "border-signal bg-signal text-signal-foreground"
-                      : "border-border bg-surface-raised text-muted-foreground hover:border-signal/50")
-                  }
-                >
-                  ${b}
-                </button>
-              ))}
-            </div>
+            <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
           </Field>
           <button
             type="submit"
-            className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90"
+            disabled={posting || bounty < MIN_BOUNTY}
+            className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            Post request
+            {posting ? "Locking bounty…" : `Post request — lock $${Number.isFinite(bounty) ? bounty : 0}`}
           </button>
         </form>
       </DialogContent>
