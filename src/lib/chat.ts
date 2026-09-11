@@ -17,6 +17,16 @@ export function chatKey(request: Pick<LiveRequest, "id" | "dbId">) {
   return request.dbId ?? request.id;
 }
 
+/** True once this person is a participant on the bounty (requester or reporter). */
+export async function canChat(key: string, userId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("can_chat_on_request", {
+    _request_key: key,
+    _user_id: userId,
+  });
+  if (error) return false;
+  return Boolean(data);
+}
+
 export async function listMessages(key: string): Promise<ChatMessage[]> {
   const { data, error } = await supabase
     .from("request_messages")
