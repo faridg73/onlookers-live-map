@@ -14,6 +14,7 @@ import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
+import { CashOutCard } from "@/components/CashOutCard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
