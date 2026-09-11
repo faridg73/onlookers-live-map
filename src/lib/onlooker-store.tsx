@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
-import { refundExpiredBounties } from "./bounty-escrow";
 
 /** Stamps an absolute deadline so the timer keeps running across re-renders. */
 function withDeadline(r: LiveRequest): LiveRequest {
@@ -63,7 +62,9 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
           changed = true;
           return { ...r, status: "expired" as const, expiresInMin: 0 };
         });
-        if (changed) void refundExpiredBounties();
+        // Imported lazily: the escrow module pulls in server bindings and a
+        // static import here creates a cycle that breaks this provider.
+        if (changed) void import("./bounty-escrow").then((m) => m.refundExpiredBounties());
         return changed ? next : prev;
       });
     };
