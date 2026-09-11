@@ -117,6 +117,9 @@
   --cat-events: oklch(0.76 0.18 20);
   --cat-parking: oklch(0.75 0.14 285);
   --cat-weather: oklch(0.85 0.16 100);
+  --cat-realestate: oklch(0.8 0.14 85);
+  --cat-art: oklch(0.74 0.17 305);
+  --cat-sports: oklch(0.79 0.18 135);
   --urgent: oklch(0.7 0.2 30);
 }
 

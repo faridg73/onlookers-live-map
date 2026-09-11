@@ -8,7 +8,10 @@ export type CategoryId =
   | "transit"
   | "events"
   | "parking"
-  | "weather";
+  | "weather"
+  | "realestate"
+  | "art"
+  | "sports";
 
 export type Category = {
   id: CategoryId;
