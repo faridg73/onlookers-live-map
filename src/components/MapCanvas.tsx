@@ -115,27 +115,23 @@ const containerRef = useRef<HTMLDivElement | null>(null);
         <svg width={1000} height={1000} viewBox="0 0 1000 1000" className="block">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0H0V40" fill="none" stroke="oklch(0.30 0.03 250)" strokeWidth="0.6" />
+              <path d="M40 0H0V40" fill="none" stroke="oklch(0.94 0.01 250)" strokeWidth="0.6" />
             </pattern>
-            <radialGradient id="glow" cx="50%" cy="40%" r="60%">
-              <stop offset="0%" stopColor="oklch(0.42 0.08 240)" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="oklch(0.16 0.03 255)" stopOpacity="0" />
-            </radialGradient>
           </defs>
 
-          <rect width="1000" height="1000" fill="oklch(0.17 0.03 255)" />
+          {/* bright base */}
+          <rect width="1000" height="1000" fill="oklch(0.97 0.01 250)" />
           <rect width="1000" height="1000" fill="url(#grid)" />
-          <rect width="1000" height="1000" fill="url(#glow)" />
 
           {/* water */}
           <path
             d="M0 120 C 160 190, 250 90, 360 160 L 300 0 L 0 0 Z"
-            fill="oklch(0.24 0.06 240)"
+            fill="oklch(0.88 0.05 230)"
           />
-          <path d="M640 1000 C 720 900, 880 940, 1000 860 L 1000 1000 Z" fill="oklch(0.24 0.06 240)" />
+          <path d="M640 1000 C 720 900, 880 940, 1000 860 L 1000 1000 Z" fill="oklch(0.88 0.05 230)" />
 
           {/* park */}
-          <rect x="220" y="450" width="180" height="150" rx="18" fill="oklch(0.28 0.05 155)" />
+          <rect x="220" y="450" width="180" height="150" rx="18" fill="oklch(0.9 0.06 150)" />
 
           {/* arterial roads */}
           {[
@@ -146,13 +142,13 @@ const containerRef = useRef<HTMLDivElement | null>(null);
             "M840 0 V1000",
             "M0 880 H1000",
           ].map((d) => (
-            <path key={d} d={d} stroke="oklch(0.34 0.02 250)" strokeWidth="7" fill="none" />
+            <path key={d} d={d} stroke="oklch(1 0 0)" strokeWidth="7" fill="none" />
           ))}
           {["M0 300 H1000", "M540 0 V1000"].map((d) => (
             <path
               key={`hl-${d}`}
               d={d}
-              stroke="oklch(0.55 0.06 245)"
+              stroke="oklch(0.85 0.04 80)"
               strokeWidth="1.4"
               strokeDasharray="14 12"
               fill="none"
@@ -175,8 +171,8 @@ const containerRef = useRef<HTMLDivElement | null>(null);
                 width={w}
                 height={h}
                 rx={6}
-                fill="oklch(0.22 0.025 255)"
-                stroke="oklch(0.3 0.03 250)"
+                fill="oklch(0.93 0.012 250)"
+                stroke="oklch(0.88 0.015 250)"
                 strokeWidth="0.8"
               />
             );
