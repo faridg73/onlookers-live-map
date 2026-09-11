@@ -7,6 +7,8 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import {
   CATEGORIES,
   categoryById,
+  generateAccessCode,
+  needsAccessCode,
   needsPermissionConfirmation,
   type CategoryId,
 } from "@/lib/onlooker";
@@ -42,6 +44,8 @@ function PostScreen() {
   const [posting, setPosting] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
   const permissionNeeded = needsPermissionConfirmation(category);
+  const codeNeeded = needsAccessCode(category);
+  const [accessCode, setAccessCode] = useState("");
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -57,6 +61,10 @@ function PostScreen() {
       toast.error("Confirm you have permission from the seller, agent or property manager first.");
       return;
     }
+    if (codeNeeded && accessCode.trim().length < 4) {
+      toast.error("Add a 6-digit code or word the onlooker can quote on site.");
+      return;
+    }
     setPosting(true);
     try {
       const locked = await lockBounty({
@@ -64,6 +72,7 @@ function PostScreen() {
         locationName: place.trim(),
         bounty,
         category,
+        accessCode: codeNeeded ? accessCode.trim() : null,
       });
       setBalance(locked.balance);
       addRequest({
@@ -73,6 +82,7 @@ function PostScreen() {
         bounty,
         category,
         instructions: note.trim(),
+        accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
       });
       toast.success("Request is live", {
@@ -160,6 +170,34 @@ function PostScreen() {
           </label>
         )}
 
+        {codeNeeded && (
+          <div className="space-y-1.5 rounded-xl border border-signal/40 bg-surface p-3">
+            <span className="text-[0.65rem] uppercase tracking-[0.18em] text-signal">
+              Private access passcode
+            </span>
+            <div className="flex gap-2">
+              <input
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value)}
+                maxLength={40}
+                placeholder="e.g. 481902 or BLUEGATE"
+                className="field flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => setAccessCode(generateAccessCode())}
+                className="shrink-0 rounded-xl border border-signal/50 px-3 text-xs font-semibold uppercase tracking-[0.12em] text-signal"
+              >
+                Generate
+              </button>
+            </div>
+            <span className="block text-xs text-muted-foreground">
+              Stays hidden until someone claims the bounty. They can quote it on site to prove the
+              owner, agent or manager authorised the visit.
+            </span>
+          </div>
+        )}
+
         <label className="block space-y-1.5">
           <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Instructions for the onlooker
@@ -185,7 +223,12 @@ function PostScreen() {
 
         <button
           type="submit"
-          disabled={posting || bounty < MIN_BOUNTY || (permissionNeeded && !permissionOk)}
+          disabled={
+            posting ||
+            bounty < MIN_BOUNTY ||
+            (permissionNeeded && !permissionOk) ||
+            (codeNeeded && accessCode.trim().length < 4)
+          }
           className="w-full rounded-xl bg-signal py-4 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
         >
           {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}

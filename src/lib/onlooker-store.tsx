@@ -27,6 +27,7 @@ type NewRequest = {
   bounty: number;
   category?: CategoryId;
   instructions?: string;
+  accessCode?: string | undefined;
   dbId?: string;
 };
 
@@ -103,6 +104,7 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       bounty: input.bounty,
       category: input.category,
       instructions: input.instructions,
+      accessCode: input.accessCode,
       dbId: input.dbId,
       status: "open",
       minutesAgo: 0,

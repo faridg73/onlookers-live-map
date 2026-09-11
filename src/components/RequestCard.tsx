@@ -8,6 +8,7 @@ import { BoostBounty } from "@/components/BoostBounty";
 import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { AccessPasscode } from "@/components/AccessPasscode";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
@@ -101,6 +102,8 @@ export function RequestCard({
           </p>
         </div>
       )}
+
+      <AccessPasscode request={request} />
 
       {!done && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-raised px-3 py-2">
