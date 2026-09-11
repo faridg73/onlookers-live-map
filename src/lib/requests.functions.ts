@@ -65,6 +65,16 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       );
     }
 
+    // The passcode lives in its own table so only the requester and the
+    // onlooker who claims the bounty can ever read it.
+    if (data.accessCode) {
+      await supabaseAdmin.from("request_access_codes").insert({
+        request_id: row.id,
+        requester_id: context.userId,
+        code: data.accessCode,
+      });
+    }
+
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("wallet_balance")
@@ -72,6 +82,22 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       .maybeSingle();
 
     return { id: row.id, balance: Number(profile?.wallet_balance ?? 0) };
+  });
+
+/**
+ * Returns the private access passcode for a request. RLS only lets the
+ * requester and a spotter who has claimed that request read it.
+ */
+export const getBountyAccessCode = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }): Promise<string | null> => {
+    const { data: row } = await context.supabase
+      .from("request_access_codes")
+      .select("code")
+      .eq("request_id", data.id)
+      .maybeSingle();
+    return row?.code ?? null;
   });
 
 /**
