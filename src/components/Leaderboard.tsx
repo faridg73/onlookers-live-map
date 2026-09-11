@@ -96,6 +96,15 @@ export function Leaderboard({
           ))}
         </ol>
       )}
+
+      {moreLink && (
+        <Link
+          to="/leaderboard"
+          className="mt-3 flex items-center justify-center gap-1 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground hover:bg-surface-raised"
+        >
+          View full ranking
+        </Link>
+      )}
     </section>
   );
 }
