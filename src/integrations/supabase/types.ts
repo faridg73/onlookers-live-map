@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      bounty_boosts: {
+        Row: {
+          amount: number
+          booster_id: string
+          created_at: string
+          id: string
+          request_id: string
+        }
+        Insert: {
+          amount: number
+          booster_id: string
+          created_at?: string
+          id?: string
+          request_id: string
+        }
+        Update: {
+          amount?: number
+          booster_id?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+        }
+        Relationships: []
+      }
       bounty_videos: {
         Row: {
           bounty_amount: number
@@ -559,6 +583,16 @@ export type Database = {
         Returns: boolean
       }
       settle_escrows: { Args: never; Returns: Json }
+      top_reporters: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          clips: number
+          display_name: string
+          total_earned: number
+          user_id: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
