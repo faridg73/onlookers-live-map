@@ -25,6 +25,7 @@ export type Database = {
           request_place: string
           request_title: string
           storage_path: string
+          thumb_path: string | null
           updated_at: string
           uploader_id: string
         }
@@ -38,6 +39,7 @@ export type Database = {
           request_place?: string
           request_title?: string
           storage_path: string
+          thumb_path?: string | null
           updated_at?: string
           uploader_id: string
         }
@@ -51,6 +53,7 @@ export type Database = {
           request_place?: string
           request_title?: string
           storage_path?: string
+          thumb_path?: string | null
           updated_at?: string
           uploader_id?: string
         }
