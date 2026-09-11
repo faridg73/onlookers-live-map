@@ -75,17 +75,7 @@ function ProfileScreen() {
         ))}
       </div>
 
-      <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-            Available balance
-          </span>
-          <button className="text-xs font-semibold uppercase tracking-[0.14em] text-signal">
-            Cash out
-          </button>
-        </div>
-        <div className="mt-2 font-display text-4xl text-foreground">$62.00</div>
-      </div>
+      <CashOutCard />
 
       <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
       <div className="mt-3 space-y-2">
