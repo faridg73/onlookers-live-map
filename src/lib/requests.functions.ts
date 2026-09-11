@@ -41,6 +41,20 @@ export const createBountyRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ id: string; balance: number }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // The escrow trigger debits the wallet in the same transaction, so check the
+    // balance up front and fail with a message people can act on.
+    const { data: current } = await supabaseAdmin
+      .from("profiles")
+      .select("wallet_balance")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const available = Number(current?.wallet_balance ?? 0);
+    if (available < data.bounty) {
+      throw new Error(
+        `Not enough wallet balance to lock this bounty. You have $${available.toFixed(2)} available — top up first.`,
+      );
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("requests")
       .insert({
@@ -59,7 +73,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     if (error || !row) {
       const message = error?.message ?? "Could not post the request.";
       throw new Error(
-        /insufficient/i.test(message)
+        /insufficient|wallet_balance_nonnegative/i.test(message)
           ? "Not enough wallet balance to lock this bounty. Top up first."
           : message,
       );
