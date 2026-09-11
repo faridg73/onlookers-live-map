@@ -1,14 +1,19 @@
 # Onlooker — Google Play release guide
 
 Everything for the Android app is already in this project: the Android app folder,
-the signing key (`android/app/release.keystore`), the app icons and splash screens,
+the signing key (`android/app/onlooker-upload.keystore`), the app icons and splash screens,
 and an automated build.
+
+> **New signing key generated:** because the previous keystore password was stored in
+> git history, a fresh upload key was created. Use the new keystore and its password
+> for all future builds. The old `release.keystore` is no longer used.
 
 App details Play already expects:
 
 - Package name: `app.lovable.onlooker`
 - App name: Onlooker
 - Version: 1.0 (version code 2)
+- New upload key SHA-256: `90:E7:A7:63:D5:FF:2C:6F:07:2A:05:65:53:03:49:49:FB:FE:6D:9F:07:DC:DB:AD:FC:AF:CD:AE:AA:C5:25:1D`
 
 ## Get the file Play is asking for (.aab)
 
@@ -18,15 +23,20 @@ You need `app-release.aab`. Two ways:
 
 1. Push this project to GitHub (Lovable → GitHub → sync).
 2. In the GitHub repo, go to **Settings → Secrets and variables → Actions** and add:
-   - `ANDROID_KEYSTORE_PASSWORD` — your keystore password
+   - `ANDROID_KEYSTORE_PASSWORD` — the new keystore password shown when the key was generated
    - `ANDROID_KEY_ALIAS` — `onlooker-key`
-   - `ANDROID_KEY_PASSWORD` — your key password
+   - `ANDROID_KEY_PASSWORD` — same as the keystore password above
+   - `ANDROID_KEYSTORE_FILE` — `onlooker-upload.keystore`
 3. Open **Actions → Build Android App Bundle for Google Play → Run workflow**
    (it also runs automatically on every push to `main`).
-3. When it finishes, open the run and download the **onlooker-release-aab** artifact.
-4. Unzip it — inside is `app-release.aab`.
-5. Drag that file into the "Drop app bundles here to upload" box in Play Console,
+4. When it finishes, open the run and download the **onlooker-release-aab** artifact.
+5. Unzip it — inside is `app-release.aab`.
+6. Drag that file into the "Drop app bundles here to upload" box in Play Console,
    add release notes, then **Next → Save → Review → Start rollout to internal testing**.
+
+If Play Console rejects the upload with a certificate mismatch, go to **Play Console →
+Your app → Setup → App integrity → App signing**, and upload the new upload certificate
+(`onlooker-upload.pem`) generated from the keystore above.
 
 ### Option B — build on your Mac
 
