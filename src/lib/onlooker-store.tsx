@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type Context,
+  type ReactNode,
+} from "react";
 import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
 
 /** Stamps an absolute deadline so the timer keeps running across re-renders. */
@@ -30,7 +39,19 @@ type Store = {
   remove: (id: string) => void;
 };
 
-const StoreContext = createContext<Store | null>(null);
+// Keep one context identity across Vite hot updates. Without this, the root
+// provider can retain the previous module's context while a refreshed route
+// reads from a newly-created context and incorrectly reports no provider.
+const STORE_CONTEXT_KEY = Symbol.for("onlooker.store-context");
+const globalContexts = globalThis as typeof globalThis & {
+  [STORE_CONTEXT_KEY]?: Context<Store | null>;
+};
+const existingStoreContext = globalContexts[STORE_CONTEXT_KEY];
+const StoreContext = existingStoreContext ?? createContext<Store | null>(null);
+
+if (!existingStoreContext) {
+  globalContexts[STORE_CONTEXT_KEY] = StoreContext;
+}
 
 export function OnlookerProvider({ children }: { children: ReactNode }) {
   const [requests, setRequests] = useState<LiveRequest[]>(() => SEED_REQUESTS.map(withDeadline));
