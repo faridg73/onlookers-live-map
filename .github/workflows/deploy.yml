@@ -54,23 +54,34 @@ jobs:
           APP_STORE_P8_KEY: ${{ secrets.APP_STORE_P8_KEY }}
         run: |
           mkdir -p ~/.private_keys
-          echo "$APP_STORE_P8_KEY" > ~/.private_keys/AuthKey_${APP_STORE_KEY_ID}.p8
+          KEY_PATH=~/.private_keys/AuthKey_${APP_STORE_KEY_ID}.p8
+          echo "$APP_STORE_P8_KEY" > "$KEY_PATH"
+
+          AUTH_ARGS=(
+            -allowProvisioningUpdates
+            -authenticationKeyPath "$HOME/.private_keys/AuthKey_${APP_STORE_KEY_ID}.p8"
+            -authenticationKeyID "$APP_STORE_KEY_ID"
+            -authenticationKeyIssuerID "$APP_STORE_ISSUER_ID"
+          )
 
           xcodebuild archive \
             -project ios/App/App.xcodeproj \
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath $RUNNER_TEMP/App.xcarchive
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            "${AUTH_ARGS[@]}"
 
           xcodebuild -exportArchive \
             -archivePath $RUNNER_TEMP/App.xcarchive \
             -exportOptionsPlist ios/App/App/ExportOptions.plist \
             -exportPath $RUNNER_TEMP/build \
-            -allowProvisioningUpdates
+            "${AUTH_ARGS[@]}"
+
+          IPA_PATH=$(ls $RUNNER_TEMP/build/*.ipa | head -n 1)
 
           xcrun altool --upload-app \
             --type ios \
-            --file $RUNNER_TEMP/build/App.ipa \
+            --file "$IPA_PATH" \
             --apiKey "$APP_STORE_KEY_ID" \
             --apiIssuer "$APP_STORE_ISSUER_ID"
