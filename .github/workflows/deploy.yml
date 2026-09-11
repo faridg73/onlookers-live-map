@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-16.4
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
