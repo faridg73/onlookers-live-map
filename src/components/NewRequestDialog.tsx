@@ -28,6 +28,8 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [category, setCategory] = useState<CategoryId>("food");
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [permissionOk, setPermissionOk] = useState(false);
+  const permissionNeeded = needsPermissionConfirmation(category);
 
   useEffect(() => {
     if (open) void readWalletBalance().then(setBalance);
@@ -38,6 +40,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     if (!title.trim() || !place.trim()) return;
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    if (permissionNeeded && !permissionOk) {
+      toast.error("Confirm you have permission from the seller, agent or property manager first.");
       return;
     }
     setPosting(true);
