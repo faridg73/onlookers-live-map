@@ -1,5 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Camera, Clock, PlusSquare, Radio, Star, Wallet } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  Camera,
+  ChevronRight,
+  Clock,
+  FileText,
+  PlusSquare,
+  Radio,
+  Shield,
+  Star,
+  Wallet,
+} from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
@@ -106,6 +116,28 @@ function ProfileScreen() {
         ) : (
           mine.map((r) => <RequestCard key={r.id} request={r} />)
         )}
+      </div>
+
+      <h2 className="mt-8 font-display text-lg text-foreground">Settings &amp; legal</h2>
+      <div className="mt-3 space-y-2">
+        <Link
+          to="/terms"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <FileText className="size-4 text-signal" /> Terms of Service
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
+        <Link
+          to="/privacy"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Shield className="size-4 text-signal" /> Privacy Policy
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </Link>
       </div>
     </div>
   );
