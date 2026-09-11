@@ -12,6 +12,7 @@ const createSchema = z.object({
   locationName: z.string().trim().min(2).max(160),
   bounty: z.number().finite().min(MIN_BOUNTY).max(5000),
   category: z.string().trim().max(40).nullable().optional(),
+  accessCode: z.string().trim().min(4).max(40).nullable().optional(),
   minutes: z.number().int().min(10).max(720).default(60),
   latitude: z.number().min(-90).max(90).default(0),
   longitude: z.number().min(-180).max(180).default(0),
