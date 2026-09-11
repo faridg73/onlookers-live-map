@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin, Zap } from "lucide-react";
 
-type Search = { amt?: number; place?: string; title?: string };
+type Search = {
+  amt?: number | undefined;
+  place?: string | undefined;
+  title?: string | undefined;
+};
 
 export const Route = createFileRoute("/b/$id")({
   validateSearch: (search: Record<string, unknown>): Search => ({
