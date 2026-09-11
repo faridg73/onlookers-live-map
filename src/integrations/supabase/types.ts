@@ -46,6 +46,7 @@ export type Database = {
           created_at: string
           duration_seconds: number | null
           id: string
+          is_public: boolean
           note: string
           payout_amount: number
           request_id: string
@@ -55,6 +56,7 @@ export type Database = {
           thumb_path: string | null
           updated_at: string
           uploader_id: string
+          view_count: number
         }
         Insert: {
           accepted_at?: string | null
@@ -63,6 +65,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          is_public?: boolean
           note?: string
           payout_amount?: number
           request_id: string
@@ -72,6 +75,7 @@ export type Database = {
           thumb_path?: string | null
           updated_at?: string
           uploader_id: string
+          view_count?: number
         }
         Update: {
           accepted_at?: string | null
@@ -80,6 +84,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          is_public?: boolean
           note?: string
           payout_amount?: number
           request_id?: string
@@ -89,6 +94,7 @@ export type Database = {
           thumb_path?: string | null
           updated_at?: string
           uploader_id?: string
+          view_count?: number
         }
         Relationships: []
       }
@@ -582,6 +588,79 @@ export type Database = {
         }
         Relationships: []
       }
+      video_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comments_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          score: number
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string
+          score: number
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          score?: number
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_reviews_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallet_transactions: {
         Row: {
           amount: number
@@ -653,6 +732,26 @@ export type Database = {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
       }
+      explore_clips: {
+        Args: { _limit?: number; _offset?: number }
+        Returns: {
+          average_rating: number
+          bounty_amount: number
+          comment_count: number
+          created_at: string
+          duration_seconds: number
+          id: string
+          note: string
+          request_place: string
+          request_title: string
+          review_count: number
+          storage_path: string
+          thumb_path: string
+          uploader_avatar: string
+          uploader_name: string
+          view_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -660,6 +759,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_clip_views: { Args: { _video_id: string }; Returns: number }
       public_request_markers: {
         Args: never
         Returns: {
