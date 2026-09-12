@@ -49,13 +49,14 @@ export function BountyChat({
 
   // Fire the celebration on both screens the moment the approval notice lands.
   useEffect(() => {
+    if (loading) return;
+    const firstPass = !settled.current;
+    settled.current = true;
     const approval = [...messages].reverse().find((m) => isApprovalMessage(m.body));
-    if (!approval) return;
-    const first = lastApproval.current === null;
-    if (lastApproval.current === approval.id) return;
+    if (!approval || lastApproval.current === approval.id) return;
     lastApproval.current = approval.id;
-    if (!first) setCelebrate(true);
-  }, [messages]);
+    if (!firstPass) setCelebrate(true);
+  }, [messages, loading]);
 
   if (!user || loading) return null;
 
