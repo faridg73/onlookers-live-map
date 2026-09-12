@@ -50,15 +50,7 @@ export function useDistanceUnit(position?: MapPosition | null) {
       if (!cancelled && country) setUnit(unitForCountry(country));
     };
 
-    if (position) {
-      void applyCountry(position);
-    } else if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => void applyCountry({ lat: coords.latitude, lng: coords.longitude }),
-        () => {},
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
-      );
-    }
+    if (position) void applyCountry(position);
 
     return () => {
       cancelled = true;

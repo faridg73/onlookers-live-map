@@ -13,6 +13,7 @@ import {
   type RequestStatus,
 } from "@/lib/onlooker";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
+import { requestCurrentPosition } from "@/lib/geolocation";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -63,13 +64,16 @@ function FeedScreen() {
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
 
-  const locate = () => {
-    if (!("geolocation" in navigator)) return;
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setUserPosition({ lat: coords.latitude, lng: coords.longitude }),
-      () => {},
-      { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
-    );
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const locate = async () => {
+    setLocationError(null);
+    try {
+      const { coords } = await requestCurrentPosition();
+      setUserPosition({ lat: coords.latitude, lng: coords.longitude });
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : "Location is unavailable.");
+    }
   };
 
   useEffect(() => {
@@ -118,8 +122,13 @@ function FeedScreen() {
           onClick={locate}
           className="mt-3 w-full rounded-lg border border-signal bg-surface px-3 py-2 text-xs font-bold text-signal"
         >
-          Turn on location to show distances
+          {locationError ? "Retry location" : "Turn on location to show distances"}
         </button>
+      )}
+      {locationError && !userPosition && (
+        <p className="mt-2 text-xs text-muted-foreground" role="status">
+          {locationError}
+        </p>
       )}
 
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">

@@ -44,12 +44,33 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+function withDeploymentCachePolicy(request: Request, response: Response): Response {
+  const pathname = new URL(request.url).pathname;
+  const headers = new Headers(response.headers);
+  const contentType = headers.get("content-type") ?? "";
+
+  if (contentType.includes("text/html") || pathname === "/manifest.webmanifest") {
+    headers.set("cache-control", "no-cache, no-store, must-revalidate");
+    headers.set("pragma", "no-cache");
+    headers.set("expires", "0");
+  } else if (/\/[\w-]+\.[a-f0-9]{8,}\.(?:js|css)$/i.test(pathname)) {
+    headers.set("cache-control", "public, max-age=31536000, immutable");
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      return withDeploymentCachePolicy(request, normalized);
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
