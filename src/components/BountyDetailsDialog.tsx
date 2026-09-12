@@ -33,15 +33,21 @@ export function BountyDetailsDialog({
   request,
   onClaim,
   children,
+  userPosition = null,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
   children: ReactNode;
+  /** Used to unlock the on-the-spot instant snippet capture. */
+  userPosition?: MapPosition | null;
 }) {
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
+  const pooled = boostOf(request.id);
+  const pool = request.bounty + pooled;
 
   return (
     <>
