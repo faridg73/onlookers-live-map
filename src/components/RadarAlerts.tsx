@@ -42,6 +42,13 @@ export function RadarAlerts() {
       if (near) {
         toast.success(`New bounty near ${near.name}`, {
           description: `${request.title} · $${request.bounty}`,
+          duration: 12000,
+          action: {
+            label: "Claim it",
+            onClick: () => {
+              window.location.href = `/?b=${encodeURIComponent(request.id)}`;
+            },
+          },
         });
       }
     }
