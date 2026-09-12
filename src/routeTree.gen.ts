@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DisputesRouteImport } from './routes/disputes'
@@ -23,6 +22,7 @@ import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -30,11 +30,6 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -97,10 +92,15 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDisputesRoute = AdminDisputesRouteImport.update({
-  id: '/disputes',
-  path: '/disputes',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/disputes',
+  path: '/admin/disputes',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BIdRoute = BIdRouteImport.update({
   id: '/b/$id',
@@ -116,7 +116,6 @@ const ApiPublicPaymentsWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
@@ -131,11 +130,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
@@ -150,12 +149,12 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
@@ -170,13 +169,13 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/auth'
     | '/contact'
     | '/disputes'
@@ -191,11 +190,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
     | '/contact'
     | '/disputes'
@@ -210,11 +209,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/admin'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/auth'
     | '/contact'
     | '/disputes'
@@ -229,12 +228,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   DisputesRoute: typeof DisputesRoute
@@ -247,7 +246,9 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   TermsRoute: typeof TermsRoute
+  AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -258,13 +259,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -351,12 +345,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/disputes': {
       id: '/admin/disputes'
-      path: '/disputes'
+      path: '/admin/disputes'
       fullPath: '/admin/disputes'
       preLoaderRoute: typeof AdminDisputesRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/b/$id': {
       id: '/b/$id'
@@ -375,19 +376,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminRouteChildren {
-  AdminDisputesRoute: typeof AdminDisputesRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminDisputesRoute: AdminDisputesRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   DisputesRoute: DisputesRoute,
@@ -400,7 +390,9 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   TermsRoute: TermsRoute,
+  AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
