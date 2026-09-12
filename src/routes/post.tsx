@@ -61,6 +61,7 @@ function PostScreen() {
   const codeNeeded = needsAccessCode(category);
   const [accessCode, setAccessCode] = useState("");
   const [spot, setSpot] = useState<PickedLocation | null>(null);
+  const [minutes, setMinutes] = useState(60);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -100,6 +101,7 @@ function PostScreen() {
         accessCode: codeNeeded ? accessCode.trim() : null,
         latitude: spot?.latitude,
         longitude: spot?.longitude,
+        minutes,
       });
       setBalance(locked.balance);
       const details = subOption
