@@ -219,6 +219,12 @@ export function BountyChat({
         </div>
       )}
 
+      {readOnly ? (
+        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-surface-raised px-3 py-2.5 text-xs text-muted-foreground">
+          <Lock className="size-3.5" /> This chat is closed — view only, kept as a record of the
+          bounty.
+        </div>
+      ) : (
       <form onSubmit={submit} className="mt-3 flex items-center gap-2">
         <input
           ref={fileRef}
