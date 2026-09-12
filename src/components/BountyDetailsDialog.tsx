@@ -1,8 +1,11 @@
 import { useState, type ReactNode } from "react";
-import { ShieldCheck } from "lucide-react";
+import { HandCoins, ShieldCheck } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
+import { BoostBounty } from "@/components/BoostBounty";
+import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
-import type { LiveRequest } from "@/lib/onlooker";
+import { useBoosts } from "@/lib/boosts-store";
+import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
