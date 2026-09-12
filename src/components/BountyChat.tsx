@@ -86,18 +86,22 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="mt-3 rounded-2xl border border-border bg-surface-raised p-3"
+      className={cn(
+        bare ? "pt-3" : "mt-3 rounded-2xl border border-border bg-surface-raised p-3",
+      )}
     >
-      <div className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-foreground">
-        <MessageCircle className="size-3.5 text-signal" /> Messages
-        {unread > 0 && (
-          <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold text-signal-foreground">
-            {unread} new
-          </span>
-        )}
-      </div>
+      {!bare && (
+        <div className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-foreground">
+          <MessageCircle className="size-3.5 text-signal" /> Messages
+          {unread > 0 && (
+            <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold text-signal-foreground">
+              {unread} new
+            </span>
+          )}
+        </div>
+      )}
 
-      <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pr-1">
+      <div className={cn("mt-3 space-y-2 pr-1", bare ? "" : "max-h-56 overflow-y-auto")}>
         {messages.length === 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
             No messages yet — say hello and share the details.
