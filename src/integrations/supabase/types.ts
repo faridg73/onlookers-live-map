@@ -591,13 +591,17 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          media_type: string | null
+          media_url: string | null
           request_key: string
           sender_id: string
         }
         Insert: {
-          body: string
+          body?: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           request_key: string
           sender_id: string
         }
@@ -605,6 +609,8 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           request_key?: string
           sender_id?: string
         }
