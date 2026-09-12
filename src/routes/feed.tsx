@@ -105,7 +105,11 @@ function FeedScreen() {
 
       <div className="mt-5 space-y-3">
         {list.map((r) => (
-          <RequestCard key={r.id} request={r} onClaim={claim} compact />
+          <BountyDetailsDialog key={r.id} request={r} onClaim={claim}>
+            <div role="button" tabIndex={0}>
+              <RequestCard request={r} compact />
+            </div>
+          </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
