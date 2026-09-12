@@ -1099,6 +1099,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      hunter_trust: {
+        Args: { _user_id: string }
+        Returns: {
+          avg_response_minutes: number
+          completed_claims: number
+          completion_rate: number
+          hunter_level: number
+          total_claims: number
+          verified: boolean
+          xp: number
+        }[]
+      }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       list_disputes: {
