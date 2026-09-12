@@ -78,3 +78,58 @@ export function getStripeErrorMessage(error: unknown): string {
 
   return 'Stripe request failed';
 }
+
+const GATEWAY_V2_BASE = 'https://connector-gateway.lovable.dev/stripe';
+const STRIPE_API_VERSION = '2026-03-25.dahlia';
+
+/**
+ * Calls Stripe's v2 API (Connect accounts v2) through the connector gateway.
+ * Stripe no longer accepts v1 connected-account creation for new integrations.
+ */
+export async function stripeV2Request<T>(
+  env: StripeEnv,
+  method: 'GET' | 'POST',
+  path: string,
+  body?: unknown,
+): Promise<T> {
+  const connectionApiKey = getConnectionApiKey(env);
+  const lovableApiKey = getEnv('LOVABLE_API_KEY');
+
+  const response = await fetch(`${GATEWAY_V2_BASE}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Stripe-Version': STRIPE_API_VERSION,
+      'X-Connection-Api-Key': connectionApiKey,
+      'Lovable-API-Key': lovableApiKey,
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    console.error(`Stripe v2 request failed [${response.status}] ${path}: ${text}`);
+    let message = text;
+    try {
+      message = (JSON.parse(text) as { error?: { message?: string } }).error?.message ?? text;
+    } catch {
+      /* keep raw text */
+    }
+    throw new Error(message);
+  }
+  return JSON.parse(text) as T;
+}
+
+/**
+ * Test mode everywhere except the real production hosts, so bank setup and
+ * cash outs can be exercised safely from previews and local builds.
+ */
+export function resolveStripeEnvForHost(host: string | null | undefined): StripeEnv {
+  const value = (host ?? '').toLowerCase();
+  const isProductionHost =
+    value === 'onlookerlive.com' ||
+    value === 'www.onlookerlive.com' ||
+    value === 'onlookers-live-map.lovable.app';
+  if (!isProductionHost) return 'sandbox';
+  return process.env['STRIPE_LIVE_API_KEY'] ? 'live' : 'sandbox';
+}
