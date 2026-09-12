@@ -95,13 +95,16 @@ function PostScreen() {
         longitude: spot?.longitude,
       });
       setBalance(locked.balance);
+      const details = subOption
+        ? `Focus: ${subOption.label}${note.trim() ? `\n${note.trim()}` : ""}`
+        : note.trim();
       addRequest({
         title: title.trim(),
         place: place.trim(),
-        note: note.trim(),
+        note: details,
         bounty,
         category,
-        instructions: note.trim(),
+        instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
       });
