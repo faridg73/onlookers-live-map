@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { Confetti } from "@/components/Confetti";
+import { VideoRecorder } from "@/components/VideoRecorder";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
+import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +40,8 @@ export function BountyChat({
   const [sending, setSending] = useState(false);
   const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
   const [celebrate, setCelebrate] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [preparing, setPreparing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const lastApproval = useRef<string | null>(null);
@@ -69,6 +73,28 @@ export function BountyChat({
     );
   }
 
+  function attach(file: File) {
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return { file, preview: URL.createObjectURL(file) };
+    });
+  }
+
+  /** Clips are capped at 60 seconds and shrunk before they leave the phone. */
+  async function prepareVideo(file: File) {
+    setPreparing(true);
+    try {
+      const seconds = await videoDuration(file);
+      if (seconds > MAX_CLIP_SECONDS + 1) {
+        toast.error(`Clips can be at most ${MAX_CLIP_SECONDS} seconds.`);
+        return;
+      }
+      attach(await compressVideo(file));
+    } finally {
+      setPreparing(false);
+    }
+  }
+
   function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -77,10 +103,11 @@ export function BountyChat({
       toast.error("That file is larger than 200 MB.");
       return;
     }
-    setPending((prev) => {
-      if (prev) URL.revokeObjectURL(prev.preview);
-      return { file, preview: URL.createObjectURL(file) };
-    });
+    if (file.type.startsWith("video/")) {
+      void prepareVideo(file);
+      return;
+    }
+    attach(file);
   }
 
   function clearPending() {
@@ -194,6 +221,13 @@ export function BountyChat({
 
       {celebrate && <Confetti onDone={() => setCelebrate(false)} />}
 
+      {recording && !readOnly && (
+        <VideoRecorder
+          onClose={() => setRecording(false)}
+          onRecorded={(file) => void prepareVideo(file)}
+        />
+      )}
+
       {pending && !readOnly && (
         <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-2">
           {pending.file.type.startsWith("video/") ? (
@@ -236,10 +270,20 @@ export function BountyChat({
         <button
           type="button"
           aria-label="Attach a photo or clip"
+          disabled={preparing}
           onClick={() => fileRef.current?.click()}
-          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
         >
-          <ImagePlus className="size-4" />
+          {preparing ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+        </button>
+        <button
+          type="button"
+          aria-label={`Record a clip up to ${MAX_CLIP_SECONDS} seconds`}
+          disabled={preparing}
+          onClick={() => setRecording(true)}
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
+        >
+          <Video className="size-4" />
         </button>
         <input
           value={draft}
