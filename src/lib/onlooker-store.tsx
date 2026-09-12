@@ -29,6 +29,8 @@ type NewRequest = {
   instructions?: string;
   accessCode?: string | undefined;
   dbId?: string;
+  /** Minutes until the bounty expires by itself; defaults to one hour. */
+  expiresInMin?: number;
 };
 
 type Store = {

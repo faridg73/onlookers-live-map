@@ -43,9 +43,12 @@ export async function lockBounty(input: {
   accessCode?: string | null;
   latitude?: number | undefined;
   longitude?: number | undefined;
+  /** Minutes until the request expires and the deposit is swept back. */
+  minutes?: number;
 }): Promise<LockedBounty> {
   try {
-    return await createBountyRequest({ data: { ...input, minutes: 60 } });
+    const { minutes = 60, ...rest } = input;
+    return await createBountyRequest({ data: { ...rest, minutes } });
   } catch (error) {
     throw new Error(message(error, "Could not lock the bounty deposit."));
   }
