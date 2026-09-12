@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, Video, X } from "lucide-react";
 import { toast } from "sonner";
 import { Confetti } from "@/components/Confetti";
+import { VideoRecorder } from "@/components/VideoRecorder";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
+import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { cn } from "@/lib/utils";
 
