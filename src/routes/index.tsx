@@ -160,7 +160,12 @@ function MapScreen() {
       {selected && (
         <div className="absolute inset-x-0 bottom-[5.75rem] z-30 px-4">
           <div className="mx-auto max-w-lg animate-rise">
-            <BountyDetailsDialog request={selected} onClaim={claim} userPosition={userPosition}>
+            <BountyDetailsDialog
+              request={selected}
+              onClaim={claim}
+              userPosition={userPosition}
+              openOnMount={b === selected.id}
+            >
               <RequestCard
                 request={selected}
                 active
