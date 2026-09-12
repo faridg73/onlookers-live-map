@@ -76,6 +76,23 @@ export function BountyDetailsDialog({
 
           <RequestCard request={request} />
 
+          {!done && (
+            <div className="mt-2 rounded-2xl border border-border bg-surface-raised p-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-foreground">
+                  <HandCoins className="size-3.5 text-signal" />
+                  {pooled > 0 ? `Co-funded pool: $${pool}` : `Bounty: $${pool}`}
+                </span>
+                <BoostBounty requestId={request.id} />
+              </div>
+              <p className="mt-2 text-[0.7rem] text-muted-foreground">
+                Chip in to sweeten this bounty — everything you add goes to whoever films it.
+              </p>
+            </div>
+          )}
+
+          <InstantSnippetButton request={request} userPosition={userPosition} />
+
           <Button
             type="button"
             disabled={!claimable}
