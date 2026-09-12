@@ -272,7 +272,12 @@ export function BountyChat({
           bounty.
         </div>
       ) : (
-      <form onSubmit={submit} className="mt-3 flex items-center gap-2">
+      <>
+      <p className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-[0.68rem] text-muted-foreground">
+        <Lock className="mt-0.5 size-3 shrink-0 text-signal" aria-hidden />
+        <span>{CHAT_SAFETY_NOTE}</span>
+      </p>
+      <form onSubmit={submit} className="mt-2 flex items-center gap-2">
         <input
           ref={fileRef}
           type="file"
