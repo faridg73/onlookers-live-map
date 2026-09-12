@@ -46,6 +46,7 @@ export type Database = {
           created_at: string
           duration_seconds: number | null
           id: string
+          is_instant: boolean
           is_public: boolean
           note: string
           payout_amount: number
@@ -65,6 +66,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          is_instant?: boolean
           is_public?: boolean
           note?: string
           payout_amount?: number
@@ -84,6 +86,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           id?: string
+          is_instant?: boolean
           is_public?: boolean
           note?: string
           payout_amount?: number
@@ -458,40 +461,52 @@ export type Database = {
       }
       profiles: {
         Row: {
+          alias: string | null
           avatar_url: string | null
           created_at: string
           display_name: string
           full_name: string
+          hunter_level: number
           id: string
+          is_incognito: boolean
           onboarded: boolean
           rating: number
           terms_accepted_at: string | null
           updated_at: string
           wallet_balance: number
+          xp: number
         }
         Insert: {
+          alias?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string
           full_name?: string
+          hunter_level?: number
           id: string
+          is_incognito?: boolean
           onboarded?: boolean
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
+          xp?: number
         }
         Update: {
+          alias?: string | null
           avatar_url?: string | null
           created_at?: string
           display_name?: string
           full_name?: string
+          hunter_level?: number
           id?: string
+          is_incognito?: boolean
           onboarded?: boolean
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
+          xp?: number
         }
         Relationships: []
       }
@@ -821,6 +836,41 @@ export type Database = {
           },
         ]
       }
+      video_tips: {
+        Row: {
+          amount: number
+          created_at: string
+          creator_id: string
+          id: string
+          tipper_id: string
+          video_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          creator_id: string
+          id?: string
+          tipper_id: string
+          video_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          creator_id?: string
+          id?: string
+          tipper_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_tips_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wallet_transactions: {
         Row: {
           amount: number
@@ -878,6 +928,8 @@ export type Database = {
         }
         Returns: number
       }
+      award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
+      build_alias: { Args: { _user_id: string }; Returns: string }
       can_chat_on_request: {
         Args: { _request_key: string; _user_id: string }
         Returns: boolean
@@ -920,6 +972,27 @@ export type Database = {
           view_count: number
         }[]
       }
+      global_feed_clips: {
+        Args: { _limit?: number }
+        Returns: {
+          bounty_amount: number
+          created_at: string
+          hunter_level: number
+          id: string
+          latitude: number
+          longitude: number
+          note: string
+          request_place: string
+          request_title: string
+          storage_path: string
+          thumb_path: string
+          tip_total: number
+          uploader_avatar: string
+          uploader_id: string
+          uploader_name: string
+          view_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -943,6 +1016,16 @@ export type Database = {
           requester_id: string
           spotter_id: string
           status: string
+        }[]
+      }
+      public_profile_card: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          hunter_level: number
+          is_incognito: boolean
+          xp: number
         }[]
       }
       public_request_markers: {
@@ -977,6 +1060,11 @@ export type Database = {
         Returns: boolean
       }
       settle_escrows: { Args: never; Returns: Json }
+      submit_instant_snippet: { Args: { _video_id: string }; Returns: number }
+      tip_hunter: {
+        Args: { _amount: number; _video_id: string }
+        Returns: number
+      }
       top_reporters: {
         Args: { _limit?: number }
         Returns: {
