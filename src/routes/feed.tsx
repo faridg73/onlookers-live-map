@@ -77,18 +77,28 @@ function FeedScreen() {
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
+  // Category pills and typed keyword both filter in real time.
   const list = useMemo(() => {
-    const filtered = requests.filter(
-      (r) =>
-        (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
-    );
+    const q = query.trim().toLowerCase();
+    const filtered = requests.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (cat !== "all" && r.category !== cat) return false;
+      if (q) {
+        const catLabel = (
+          CATEGORIES.find((c) => c.id === r.category)?.label ?? ""
+        ).toLowerCase();
+        const haystack = `${r.title} ${r.location} ${r.category} ${catLabel}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
     if (!userPosition) return filtered;
     const from = userPosition;
     return [...filtered].sort(
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [requests, filter, cat, userPosition]);
+  }, [requests, filter, cat, query, userPosition]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
     userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
