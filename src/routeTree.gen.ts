@@ -27,6 +27,7 @@ import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
+import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -119,6 +120,11 @@ const DiscoverGroupIndexRoute = DiscoverGroupIndexRouteImport.update({
   path: '/discover/$group/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverGroupVenueRoute = DiscoverGroupVenueRouteImport.update({
+  id: '/discover/$group/$venue',
+  path: '/discover/$group/$venue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/b/$id': typeof BIdRoute
   '/admin': typeof AdminIndexRoute
   '/discover': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin/'
     | '/discover/'
+    | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin'
     | '/discover'
+    | '/discover/$group/$venue'
     | '/discover/$group'
     | '/api/public/payments/webhook'
   id:
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin/'
     | '/discover/'
+    | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   BIdRoute: typeof BIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
   DiscoverIndexRoute: typeof DiscoverIndexRoute
+  DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -406,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverGroupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover/$group/$venue': {
+      id: '/discover/$group/$venue'
+      path: '/discover/$group/$venue'
+      fullPath: '/discover/$group/$venue'
+      preLoaderRoute: typeof DiscoverGroupVenueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -434,6 +454,7 @@ const rootRouteChildren: RootRouteChildren = {
   BIdRoute: BIdRoute,
   AdminIndexRoute: AdminIndexRoute,
   DiscoverIndexRoute: DiscoverIndexRoute,
+  DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
