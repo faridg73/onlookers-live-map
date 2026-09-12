@@ -119,8 +119,16 @@ export function BountyChat({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const body = draft.trim();
+    const raw = draft.trim();
+    // Contact details never leave the platform: mask before anything is stored.
+    const body = maskContactInfo(raw);
     if ((!body && !pending) || sending) return;
+    if (body !== raw) {
+      toast.warning("Contact details hidden", {
+        description:
+          "Phone numbers, emails and outside links stay masked. Keep the whole job in Onlooker so your payment is protected.",
+      });
+    }
     setSending(true);
     try {
       const media = pending ? await uploadChatAttachment(key, pending.file) : null;
