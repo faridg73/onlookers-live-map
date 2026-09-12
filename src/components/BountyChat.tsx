@@ -212,7 +212,11 @@ export function BountyChat({
                       <Loader2 className="size-4 animate-spin" />
                     </div>
                   ))}
-                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                {m.body && (
+                  <p className="whitespace-pre-wrap break-words">
+                    {isSystemMessage(m) ? m.body : maskContactInfo(m.body)}
+                  </p>
+                )}
                 <p
                   className={cn(
                     "mt-1 text-[0.6rem]",
