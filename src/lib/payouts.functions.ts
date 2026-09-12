@@ -7,7 +7,9 @@ import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import {
   createStripeClient,
   getStripeErrorMessage,
-  resolveStripeEnv,
+  resolveStripeEnvForHost,
+  stripeV2Request,
+  type StripeEnv,
 } from "@/lib/stripe.server";
 
 export type PayoutStatus = {
@@ -17,9 +19,49 @@ export type PayoutStatus = {
   requirementsNote: string;
 };
 
+type V2Account = {
+  id: string;
+  configuration?: {
+    recipient?: {
+      capabilities?: {
+        stripe_balance?: {
+          stripe_transfers?: { status?: string };
+          payouts?: { status?: string };
+        };
+      };
+    };
+  };
+  requirements?: { entries?: { description?: string; awaiting_action_from?: string }[] };
+};
+
+function requestHost(): string | null {
+  const url = getRequest()?.url;
+  return url ? new URL(url).host : null;
+}
+
 function appOrigin(): string {
   const url = getRequest()?.url;
-  return url ? new URL(url).origin : "";
+  if (url) return new URL(url).origin;
+  return "https://onlookerlive.com";
+}
+
+function currentEnv(): StripeEnv {
+  return resolveStripeEnvForHost(requestHost());
+}
+
+function readAccount(account: V2Account) {
+  const capabilities = account.configuration?.recipient?.capabilities?.stripe_balance;
+  const payoutsEnabled =
+    capabilities?.stripe_transfers?.status === "active" && capabilities?.payouts?.status === "active";
+  const pending = (account.requirements?.entries ?? [])
+    .filter((entry) => entry.awaiting_action_from === "user")
+    .map((entry) => entry.description ?? "")
+    .filter(Boolean);
+  return {
+    payoutsEnabled,
+    detailsSubmitted: pending.length === 0,
+    requirementsNote: pending.slice(0, 4).join(", "),
+  };
 }
 
 /** Read (and refresh from Stripe) the reporter's bank payout status. */
@@ -38,25 +80,30 @@ export const getPayoutStatus = createServerFn({ method: "GET" })
     }
 
     try {
-      const stripe = createStripeClient(resolveStripeEnv());
-      const account = await stripe.accounts.retrieve(row.stripe_account_id);
-      const requirementsNote = (account.requirements?.currently_due ?? []).join(", ");
-      const payoutsEnabled = Boolean(account.payouts_enabled);
-      const detailsSubmitted = Boolean(account.details_submitted);
+      const account = await stripeV2Request<V2Account>(
+        currentEnv(),
+        "GET",
+        `/v2/core/accounts/${row.stripe_account_id}?include=configuration.recipient&include=requirements`,
+      );
+      const next = readAccount(account);
 
       await supabaseAdmin
         .from("payout_accounts")
-        .update({ payouts_enabled: payoutsEnabled, details_submitted: detailsSubmitted, requirements_note: requirementsNote })
+        .update({
+          payouts_enabled: next.payoutsEnabled,
+          details_submitted: next.detailsSubmitted,
+          requirements_note: next.requirementsNote,
+        })
         .eq("user_id", context.userId);
 
-      return { connected: true, payoutsEnabled, detailsSubmitted, requirementsNote };
+      return { connected: true, ...next };
     } catch (error) {
       return {
         connected: true,
         payoutsEnabled: row.payouts_enabled,
         detailsSubmitted: row.details_submitted,
         requirementsNote: row.requirements_note,
-        error: getStripeErrorMessage(error),
+        error: error instanceof Error ? error.message : getStripeErrorMessage(error),
       };
     }
   });
@@ -65,11 +112,10 @@ export const getPayoutStatus = createServerFn({ method: "GET" })
 export const startPayoutOnboarding = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ url?: string; error?: string }> => {
-    const env = resolveStripeEnv();
+    const env = currentEnv();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     try {
-      const stripe = createStripeClient(env);
       const { data: row } = await supabaseAdmin
         .from("payout_accounts")
         .select("stripe_account_id")
@@ -78,12 +124,27 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
 
       let accountId = row?.stripe_account_id;
       if (!accountId) {
-        const account = await stripe.accounts.create({
-          type: "express",
-          capabilities: { transfers: { requested: true } },
-          business_type: "individual",
+        const email =
+          (context.claims as { email?: string } | undefined)?.email ??
+          `hunter+${context.userId}@onlookerlive.com`;
+
+        const account = await stripeV2Request<V2Account>(env, "POST", "/v2/core/accounts", {
+          dashboard: "express",
+          contact_email: email,
+          identity: { country: "us", entity_type: "individual" },
+          defaults: {
+            currency: "usd",
+            responsibilities: { losses_collector: "application", fees_collector: "application" },
+          },
+          include: ["configuration.recipient", "requirements"],
+          configuration: {
+            recipient: {
+              capabilities: { stripe_balance: { stripe_transfers: { requested: true } } },
+            },
+          },
           metadata: { user_id: context.userId },
         });
+
         accountId = account.id;
         await supabaseAdmin.from("payout_accounts").upsert({
           user_id: context.userId,
@@ -93,16 +154,21 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
       }
 
       const origin = appOrigin();
-      const link = await stripe.accountLinks.create({
+      const link = await stripeV2Request<{ url: string }>(env, "POST", "/v2/core/account_links", {
         account: accountId,
-        type: "account_onboarding",
-        refresh_url: `${origin}/profile?payout=refresh`,
-        return_url: `${origin}/profile?payout=done`,
+        use_case: {
+          type: "account_onboarding",
+          account_onboarding: {
+            configurations: ["recipient"],
+            refresh_url: `${origin}/profile?payout=refresh`,
+            return_url: `${origin}/profile?payout=done`,
+          },
+        },
       });
 
       return { url: link.url };
     } catch (error) {
-      return { error: getStripeErrorMessage(error) };
+      return { error: error instanceof Error ? error.message : getStripeErrorMessage(error) };
     }
   });
 
@@ -111,7 +177,7 @@ export const cashOut = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data) => z.object({ amount: z.number().positive() }).parse(data))
   .handler(async ({ data, context }): Promise<{ amount?: number; error?: string }> => {
-    const env = resolveStripeEnv();
+    const env = currentEnv();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: account } = await supabaseAdmin
@@ -151,7 +217,10 @@ export const cashOut = createServerFn({ method: "POST" })
 
       return { amount: data.amount };
     } catch (error) {
-      const message = getStripeErrorMessage(error);
+      const raw = getStripeErrorMessage(error);
+      const message = raw.includes("balance_insufficient")
+        ? "The payments account does not have enough balance to send this cash out yet. Your money stayed in your wallet."
+        : raw;
       // Refund the wallet so the reporter never loses money on a failed transfer.
       await supabaseAdmin.rpc("adjust_wallet", {
         _user_id: context.userId,
