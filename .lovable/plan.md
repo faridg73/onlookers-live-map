@@ -6,6 +6,7 @@
 - Turn the Onlooker/live-request header into a clear tappable control.
 - When tapped, open a compact nearby-bounties panel showing only active requests within 5 miles, ordered nearest first and then by payout.
 - Make each nearby request selectable so tapping it focuses its map pin and opens its bounty details.
+- Add a prominent “Claim Bounty” button to every available nearby listing and keep closed or claimed requests clearly disabled.
 - Replace the remaining “within 5 km” wording with “within 5 miles.”
 - Show a useful empty state when location is unavailable or no active bounty is within five miles.
 
@@ -20,4 +21,5 @@
 - Confirm the zoom controls are fully visible and aligned.
 - Confirm the header opens and closes the five-mile request list.
 - Confirm choosing a request opens the matching map bounty card.
+- Confirm an available listing can be claimed directly from the nearby panel.
 - Confirm all nearby radius text uses miles.
