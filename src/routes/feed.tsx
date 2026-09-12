@@ -58,11 +58,34 @@ function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
-  const { unit, radius } = useDistanceUnit();
-  const list = requests.filter(
-    (r) =>
-      (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
-  );
+  const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
+  const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
+
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => setUserPosition({ lat: coords.latitude, lng: coords.longitude }),
+      () => {},
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+    );
+  }, []);
+
+  // Closest bounties first (like Google Local results); unknown distances go last.
+  const list = useMemo(() => {
+    const filtered = requests.filter(
+      (r) =>
+        (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
+    );
+    if (!userPosition) return filtered;
+    const from = userPosition;
+    return [...filtered].sort(
+      (a, b) =>
+        distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
+    );
+  }, [requests, filter, cat, userPosition]);
+
+  const distanceLabel = (r: (typeof requests)[number]) =>
+    userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
   const pot = requests.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   return (
