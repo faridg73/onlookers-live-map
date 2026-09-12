@@ -68,12 +68,20 @@ export async function listMessages(key: string): Promise<ChatMessage[]> {
   return (data ?? []) as ChatMessage[];
 }
 
-export async function sendMessage(key: string, body: string) {
+export async function sendMessage(
+  key: string,
+  body: string,
+  media?: { path: string; kind: string } | null,
+) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to send a message.");
-  const { error } = await supabase
-    .from("request_messages")
-    .insert({ request_key: key, sender_id: auth.user.id, body: body.trim() });
+  const { error } = await supabase.from("request_messages").insert({
+    request_key: key,
+    sender_id: auth.user.id,
+    body: body.trim(),
+    media_url: media?.path ?? null,
+    media_type: media?.kind ?? null,
+  });
   if (error) throw error;
 }
 
