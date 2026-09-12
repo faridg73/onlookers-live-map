@@ -18,7 +18,16 @@ function timeLabel(iso: string) {
  *
  * `bare` drops the card chrome so the thread can fill the chat drawer.
  */
-export function BountyChat({ requestKey, bare = false }: { requestKey: string; bare?: boolean }) {
+export function BountyChat({
+  requestKey,
+  bare = false,
+  readOnly = false,
+}: {
+  requestKey: string;
+  bare?: boolean;
+  /** Approved bounties become a historical log: no typing, no attachments. */
+  readOnly?: boolean;
+}) {
   const { user } = useAuth();
   const key = requestKey;
   const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
@@ -28,13 +37,25 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const lastApproval = useRef<string | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
     if (!locked && messages.length > 0 && unread > 0) void seen();
   }, [messages, locked, unread, seen]);
+
+  // Fire the celebration on both screens the moment the approval notice lands.
+  useEffect(() => {
+    const approval = [...messages].reverse().find((m) => isApprovalMessage(m.body));
+    if (!approval) return;
+    const first = lastApproval.current === null;
+    if (lastApproval.current === approval.id) return;
+    lastApproval.current = approval.id;
+    if (!first) setCelebrate(true);
+  }, [messages]);
 
   if (!user || loading) return null;
 
