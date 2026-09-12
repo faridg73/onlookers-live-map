@@ -1,22 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { listUnreadChatAlerts, type ChatNotification } from "@/lib/notifications";
+import { listUnreadChatAlerts, markAlertRead, type ChatNotification } from "@/lib/notifications";
 
 /**
  * Live count of unread chat messages waiting for the signed-in person, used for
- * the badge on the Profile tab.
+ * the badge on the Chats tab. Nearby-bounty alerts pop up as a toast instead.
  */
 export function useChatAlerts() {
   const { user } = useAuth();
-  const [alerts, setAlerts] = useState<ChatNotification[]>([]);
+  const [all, setAll] = useState<ChatNotification[]>([]);
+  const announced = useRef<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     if (!user) {
-      setAlerts([]);
+      setAll([]);
       return;
     }
-    setAlerts(await listUnreadChatAlerts());
+    setAll(await listUnreadChatAlerts());
   }, [user]);
 
   useEffect(() => {
@@ -42,6 +44,18 @@ export function useChatAlerts() {
       void supabase.removeChannel(channel);
     };
   }, [user, load]);
+
+  // Nearby bounty pings surface once, right away.
+  useEffect(() => {
+    for (const alert of all) {
+      if (alert.kind !== "bounty_nearby" || announced.current.has(alert.id)) continue;
+      announced.current.add(alert.id);
+      toast(alert.preview, { duration: 8000 });
+      void markAlertRead(alert.id);
+    }
+  }, [all]);
+
+  const alerts = useMemo(() => all.filter((a) => a.kind === "chat_message"), [all]);
 
   return { alerts, unread: alerts.length, reload: load };
 }
