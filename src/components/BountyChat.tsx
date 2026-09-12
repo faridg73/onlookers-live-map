@@ -214,7 +214,7 @@ export function BountyChat({
                   ))}
                 {m.body && (
                   <p className="whitespace-pre-wrap break-words">
-                    {isSystemMessage(m) ? m.body : maskContactInfo(m.body)}
+                    {isSystemMessage(m.body) ? m.body : maskContactInfo(m.body)}
                   </p>
                 )}
                 <p
