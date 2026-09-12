@@ -75,8 +75,8 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
   }, [key, userId]);
 
   const send = useCallback(
-    async (body: string) => {
-      await sendMessage(key, body);
+    async (body: string, media?: { path: string; kind: string } | null) => {
+      await sendMessage(key, body, media);
       const rows = await listMessages(key);
       setMessages(rows);
     },
@@ -88,7 +88,23 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
     setLastReadAt(new Date().toISOString());
   }, [key]);
 
+  // Fresh viewing links for any photos or clips shared in the thread.
+  useEffect(() => {
+    let alive = true;
+    const paths = messages.filter((m) => m.media_url).map((m) => m.media_url as string);
+    if (paths.length === 0) {
+      setMediaLinks({});
+      return;
+    }
+    void attachmentUrls(messages).then((urls) => {
+      if (alive) setMediaLinks(urls);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [messages]);
+
   const unread = userId ? countUnread(messages, userId, lastReadAt) : 0;
 
-  return { messages, unread, loading, locked, send, seen, reload: load };
+  return { messages, mediaLinks, unread, loading, locked, send, seen, reload: load };
 }
