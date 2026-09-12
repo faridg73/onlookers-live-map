@@ -41,6 +41,7 @@ export function BountyChat({
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const lastApproval = useRef<string | null>(null);
+  const settled = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
