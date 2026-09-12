@@ -26,6 +26,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
+import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -113,6 +114,11 @@ const DiscoverIndexRoute = DiscoverIndexRouteImport.update({
   path: '/discover/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverGroupIndexRoute = DiscoverGroupIndexRouteImport.update({
+  id: '/discover/$group/',
+  path: '/discover/$group/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/b/$id': typeof BIdRoute
   '/admin': typeof AdminIndexRoute
   '/discover': typeof DiscoverIndexRoute
+  '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin/'
     | '/discover/'
+    | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin'
     | '/discover'
+    | '/discover/$group'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/b/$id'
     | '/admin/'
     | '/discover/'
+    | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -262,6 +274,7 @@ export interface RootRouteChildren {
   BIdRoute: typeof BIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
   DiscoverIndexRoute: typeof DiscoverIndexRoute
+  DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -386,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover/$group/': {
+      id: '/discover/$group/'
+      path: '/discover/$group'
+      fullPath: '/discover/$group/'
+      preLoaderRoute: typeof DiscoverGroupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -414,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   BIdRoute: BIdRoute,
   AdminIndexRoute: AdminIndexRoute,
   DiscoverIndexRoute: DiscoverIndexRoute,
+  DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
