@@ -43,14 +43,37 @@ export function BountyChat({ request }: { request: LiveRequest }) {
     );
   }
 
+  function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error("That file is larger than 200 MB.");
+      return;
+    }
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return { file, preview: URL.createObjectURL(file) };
+    });
+  }
+
+  function clearPending() {
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return null;
+    });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const body = draft.trim();
-    if (!body || sending) return;
+    if ((!body && !pending) || sending) return;
     setSending(true);
     try {
-      await send(body);
+      const media = pending ? await uploadChatAttachment(key, pending.file) : null;
+      await send(body, media);
       setDraft("");
+      clearPending();
       await seen();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Message not sent.");
