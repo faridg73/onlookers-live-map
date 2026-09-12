@@ -14,7 +14,11 @@ export function CashOutCard() {
   const sendCashOut = useServerFn(cashOut);
 
   const [balance, setBalance] = useState<number | null>(null);
-  const [status, setStatus] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
+  const [status, setStatus] = useState<{
+    connected: boolean;
+    payoutsEnabled: boolean;
+    supported?: boolean | undefined;
+  } | null>(null);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -33,7 +37,11 @@ export function CashOutCard() {
     setBalance(Number(profile?.wallet_balance ?? 0));
     try {
       const next = await loadStatus();
-      setStatus({ connected: next.connected, payoutsEnabled: next.payoutsEnabled });
+      setStatus({
+        connected: next.connected,
+        payoutsEnabled: next.payoutsEnabled,
+        supported: next.supported,
+      });
     } catch {
       setStatus({ connected: false, payoutsEnabled: false });
     }
@@ -87,6 +95,9 @@ export function CashOutCard() {
   }
 
   if (balance === null) return null;
+  // Bank cash-outs need Stripe Connect on the platform account; when it's not
+  // available the Earnings Wallet "Request payout" flow handles withdrawals.
+  if (status?.supported === false) return null;
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
