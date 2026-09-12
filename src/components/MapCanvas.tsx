@@ -5,6 +5,7 @@ import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,8 @@ export function MapCanvas({
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
   const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
-  const [geoState, setGeoState] = useState<"pending" | "located" | "unavailable">("pending");
+  const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
+  const [geoMessage, setGeoMessage] = useState<string | null>(null);
 
   // Boot the map once.
   useEffect(() => {
@@ -57,7 +59,10 @@ export function MapCanvas({
         map.current.addListener("click", () => onSelect(null));
         setReady(true);
       })
-      .catch(() => setFailed(true));
+      .catch((error) => {
+        console.error("[Onlooker map] Google Maps failed to load", error);
+        setFailed(true);
+      });
     return () => {
       cancelled = true;
       overlay.current?.setMap(null);
@@ -79,35 +84,24 @@ export function MapCanvas({
   }, []);
 
   /** Ask the device for its precise position and center the map on it. */
-  const locateMe = useCallback(() => {
-    if (!("geolocation" in navigator)) {
-      setGeoState("unavailable");
-      onUserPositionChange?.(null);
-      return;
-    }
+  const locateMe = useCallback(async () => {
     setGeoState("pending");
-    const accept = (pos: GeolocationPosition) => {
+    setGeoMessage(null);
+    try {
+      const pos = await requestCurrentPosition();
       const at = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       setUserPos(at);
       onUserPositionChange?.(at);
       setGeoState("located");
       centerOn(at);
-    };
-    navigator.geolocation.getCurrentPosition(
-      accept,
-      () => {
-        // High accuracy can time out indoors — retry once with a coarse fix.
-        navigator.geolocation.getCurrentPosition(
-          accept,
-          () => {
-            setGeoState("unavailable");
-            onUserPositionChange?.(null);
-          },
-          { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 },
-        );
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
-    );
+    } catch (error) {
+      const denied = error instanceof GeolocationFailure && error.code === "denied";
+      setGeoState(denied ? "denied" : "unavailable");
+      setGeoMessage(
+        error instanceof Error ? error.message : "Your location could not be found. Try again.",
+      );
+      onUserPositionChange?.(null);
+    }
   }, [onUserPositionChange, centerOn]);
 
   useEffect(() => {
@@ -261,18 +255,14 @@ export function MapCanvas({
           type="button"
           onClick={locateMe}
           aria-label="Recenter to my location"
-          title={
-            geoState === "unavailable"
-              ? "Location unavailable — showing the regional center"
-              : "Recenter to my location"
-          }
+          title={geoMessage ?? "Recenter to my location"}
           className="flex size-11 items-center justify-center rounded-lg border border-border bg-surface/90 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-surface-raised"
         >
           <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
         </button>
-        {geoState === "unavailable" && (
+        {(geoState === "unavailable" || geoState === "denied") && (
           <p className="w-28 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[10px] font-medium leading-tight text-muted-foreground backdrop-blur">
-            Location off — showing regional view
+            {geoState === "denied" ? "Allow location in device settings" : "Location unavailable — tap to retry"}
           </p>
         )}
       </div>

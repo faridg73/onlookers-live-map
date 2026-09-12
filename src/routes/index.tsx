@@ -152,17 +152,15 @@ function MapScreen() {
         <div className="absolute inset-x-0 bottom-[5.75rem] z-30 px-4">
           <div className="mx-auto max-w-lg animate-rise">
             <BountyDetailsDialog request={selected} onClaim={claim}>
-              <div role="button" tabIndex={0}>
-                <RequestCard
-                  request={selected}
-                  active
-                  distanceLabel={
-                    userPosition
-                      ? formatDistance(distanceMiles(userPosition, requestMapPosition(selected)))
-                      : undefined
-                  }
-                />
-              </div>
+              <RequestCard
+                request={selected}
+                active
+                distanceLabel={
+                  userPosition
+                    ? formatDistance(distanceMiles(userPosition, requestMapPosition(selected)))
+                    : undefined
+                }
+              />
             </BountyDetailsDialog>
           </div>
         </div>
