@@ -10,7 +10,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -44,7 +43,20 @@ export function BountyDetailsDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`View details for ${request.title}`}
+          onClick={() => setOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setOpen(true);
+            }
+          }}
+        >
+          {children}
+        </div>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-display">Bounty details</DialogTitle>
