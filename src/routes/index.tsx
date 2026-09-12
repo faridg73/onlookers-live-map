@@ -84,9 +84,11 @@ function MapScreen() {
           aria-expanded={nearbyOpen}
           className="pointer-events-auto mx-auto grid w-full max-w-lg grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-surface/95 px-4 py-3 text-left shadow-lg backdrop-blur-xl"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">
-            <Zap className="size-4" strokeWidth={2.4} />
-          </span>
+          <img
+            src="/icon-192.png"
+            alt="Onlooker Live logo"
+            className="size-9 rounded-lg object-cover"
+          />
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-lg font-extrabold leading-none tracking-tight text-foreground">
               Onlooker
