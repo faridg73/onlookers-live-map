@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
+import { Confetti } from "@/components/Confetti";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
+import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
