@@ -21,12 +21,15 @@ export function RequestCard({
   active,
   onSelect,
   compact = false,
+  distanceLabel,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
   active?: boolean;
   onSelect?: (id: string) => void;
   compact?: boolean;
+  /** Pre-computed "4.2 mi" style label shown under the location. */
+  distanceLabel?: string | undefined;
 }) {
   const expired = request.status === "expired";
   const done = isClosed(request);
@@ -61,6 +64,9 @@ export function RequestCard({
               <MapPin className="size-3.5 shrink-0" />
               <span className="truncate">{request.place}</span>
             </p>
+            {distanceLabel && (
+              <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
+            )}
           </div>
           <div className="shrink-0 text-right">
             <div className="font-display text-2xl font-extrabold leading-none text-signal">${pool}</div>
