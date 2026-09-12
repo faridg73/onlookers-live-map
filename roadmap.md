@@ -5,3 +5,4 @@
 - [ ] Google Play: build the signed Android bundle and upload it to the internal testing release.
 - [ ] Fix map safe-area controls, add a clickable five-mile nearby bounty list, and use miles throughout.
 - [ ] Add a clear Claim Bounty action to each available bounty listing.
+- [ ] Replace both horizontal Feed filter rows with compact grids showing every option at once on phones.
