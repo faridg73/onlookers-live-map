@@ -40,6 +40,8 @@ export function BountyChat({
   const [sending, setSending] = useState(false);
   const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
   const [celebrate, setCelebrate] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [preparing, setPreparing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const lastApproval = useRef<string | null>(null);
@@ -71,6 +73,28 @@ export function BountyChat({
     );
   }
 
+  function attach(file: File) {
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return { file, preview: URL.createObjectURL(file) };
+    });
+  }
+
+  /** Clips are capped at 60 seconds and shrunk before they leave the phone. */
+  async function prepareVideo(file: File) {
+    setPreparing(true);
+    try {
+      const seconds = await videoDuration(file);
+      if (seconds > MAX_CLIP_SECONDS + 1) {
+        toast.error(`Clips can be at most ${MAX_CLIP_SECONDS} seconds.`);
+        return;
+      }
+      attach(await compressVideo(file));
+    } finally {
+      setPreparing(false);
+    }
+  }
+
   function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -79,10 +103,11 @@ export function BountyChat({
       toast.error("That file is larger than 200 MB.");
       return;
     }
-    setPending((prev) => {
-      if (prev) URL.revokeObjectURL(prev.preview);
-      return { file, preview: URL.createObjectURL(file) };
-    });
+    if (file.type.startsWith("video/")) {
+      void prepareVideo(file);
+      return;
+    }
+    attach(file);
   }
 
   function clearPending() {
