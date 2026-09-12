@@ -152,7 +152,47 @@ export function BountyChat({ request }: { request: LiveRequest }) {
         <div ref={endRef} />
       </div>
 
+      {pending && (
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-2">
+          {pending.file.type.startsWith("video/") ? (
+            <video src={pending.preview} className="size-12 rounded-lg bg-black object-cover" />
+          ) : (
+            <img
+              src={pending.preview}
+              alt="Attachment preview"
+              className="size-12 rounded-lg object-cover"
+            />
+          )}
+          <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+            {pending.file.name}
+          </p>
+          <button
+            type="button"
+            aria-label="Remove attachment"
+            onClick={clearPending}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
+
       <form onSubmit={submit} className="mt-3 flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*,video/*"
+          onChange={pickFile}
+          className="hidden"
+        />
+        <button
+          type="button"
+          aria-label="Attach a photo or clip"
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+        >
+          <ImagePlus className="size-4" />
+        </button>
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -163,7 +203,7 @@ export function BountyChat({ request }: { request: LiveRequest }) {
         <button
           type="submit"
           aria-label="Send message"
-          disabled={sending || draft.trim().length === 0}
+          disabled={sending || (draft.trim().length === 0 && !pending)}
           className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-40"
         >
           {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
