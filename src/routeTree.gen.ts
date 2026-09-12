@@ -16,6 +16,7 @@ import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
 import { Route as PostRouteImport } from './routes/post'
@@ -63,6 +64,11 @@ const FaqRoute = FaqRouteImport.update({
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HuntRoute = HuntRouteImport.update({
+  id: '/hunt',
+  path: '/hunt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
+  HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
   PostRoute: typeof PostRoute
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hunt': {
+      id: '/hunt'
+      path: '/hunt'
+      fullPath: '/hunt'
+      preLoaderRoute: typeof HuntRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -444,6 +464,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,
+  HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
   PostRoute: PostRoute,
