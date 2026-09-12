@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
@@ -34,6 +35,13 @@ export const Route = createFileRoute("/post")({
   component: PostScreen,
 });
 
+const DEADLINES: { minutes: number; label: string }[] = [
+  { minutes: 15, label: "15 min" },
+  { minutes: 30, label: "30 min" },
+  { minutes: 60, label: "1 hour" },
+  { minutes: 1440, label: "24 hours" },
+];
+
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
@@ -54,6 +62,7 @@ function PostScreen() {
   const codeNeeded = needsAccessCode(category);
   const [accessCode, setAccessCode] = useState("");
   const [spot, setSpot] = useState<PickedLocation | null>(null);
+  const [minutes, setMinutes] = useState(60);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -63,6 +72,10 @@ function PostScreen() {
     e.preventDefault();
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    if (note.trim().length < 10) {
+      toast.error("Tell the hunter exactly what to film before going live.");
       return;
     }
     if (permissionNeeded && !permissionOk) {
@@ -93,6 +106,7 @@ function PostScreen() {
         accessCode: codeNeeded ? accessCode.trim() : null,
         latitude: spot?.latitude,
         longitude: spot?.longitude,
+        minutes,
       });
       setBalance(locked.balance);
       const details = subOption
@@ -107,9 +121,11 @@ function PostScreen() {
         instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
+        expiresInMin: minutes,
       });
+      const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `$${bounty} locked from your wallet until it's fulfilled.`,
+        description: `$${bounty} held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });
     } catch (error) {
@@ -126,43 +142,53 @@ function PostScreen() {
   return (
     <div className="mx-auto max-w-lg px-4 pb-32 pt-6">
       <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-        Post a request
+        Request a video
       </h1>
       <p className="mt-1.5 text-sm font-semibold text-foreground/70">
-        The higher the bounty, the faster someone walks over.
+        Drop a pin, say exactly what to film, and set the reward. The higher the bounty, the faster
+        someone walks over.
       </p>
 
       <form onSubmit={submit} className="mt-5 space-y-3">
         <label className={`block space-y-2 ${card}`}>
-          <span className={sectionLabel}>What do you want to see?</span>
+          <span className={sectionLabel}>1 · Bounty title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            maxLength={120}
             placeholder="Is the queue still around the block?"
             className="field"
           />
+          <span className="block text-xs font-medium text-foreground/70">
+            One short line people see on the map and in the feed.
+          </span>
         </label>
 
         <div className={`space-y-2 ${card}`}>
           <label className="block space-y-2">
-            <span className={sectionLabel}>Where</span>
+            <span className={sectionLabel}>2 · Exact location</span>
             <input
               value={place}
               onChange={(e) => setPlace(e.target.value)}
               required
-              placeholder="Corner of Ash Alley & 6th"
+              placeholder="Search an address, park, gate or beach"
               className="field"
             />
           </label>
           <LocationPreviewMap address={place} onPick={setSpot} />
           <p className="text-xs font-medium text-foreground/70">
-            Drag the pin or tap the map to fix the exact spot. Zoom in to check the street.
+            No street address? Tap the map or drag the pin to lock the exact coordinates.
+            {spot && (
+              <span className="mt-1 block font-bold text-signal">
+                Pin locked: {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+              </span>
+            )}
           </p>
         </div>
 
         <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>Category</span>
+          <span className={sectionLabel}>3 · Category</span>
           <CategoryPicker
             value={tile}
             onChange={(id) => setTile(id as CategoryId)}
@@ -216,25 +242,67 @@ function PostScreen() {
         )}
 
         <label className={`block space-y-2 ${card}`}>
-          <span className={sectionLabel}>Instructions for the onlooker</span>
+          <span className={sectionLabel}>4 · Specific camera instructions</span>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={4}
-            placeholder={categoryById(category)?.hint}
+            required
+            minLength={10}
+            placeholder="Tell the hunter exactly what to film, which direction to pan, or what details to focus on."
             className="field resize-none"
           />
           <span className="block text-xs font-medium text-foreground/70">
-            Spell out exactly what you want captured for{" "}
-            {subOption
-              ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
-              : categoryById(category)?.label.toLowerCase()}.
+            {note.trim().length < 10
+              ? "Add at least one clear sentence so the hunter knows exactly what to capture."
+              : `Great — this is what they'll see for ${
+                  subOption
+                    ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
+                    : categoryById(category)?.label.toLowerCase()
+                }.`}
+            {categoryById(category)?.hint && ` Example: ${categoryById(category)?.hint}`}
           </span>
         </label>
 
         <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>Bounty</span>
+          <span className={sectionLabel}>5 · Reward</span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
+          <p className="flex items-start gap-2 rounded-xl border border-signal/30 bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
+            <span>
+              Your payment is held securely in escrow. Funds are only released to the Bounty Hunter
+              once you review and approve their video.
+            </span>
+          </p>
+        </div>
+
+        <div className={`space-y-2.5 ${card}`}>
+          <span className={sectionLabel}>6 · Request deadline</span>
+          <div className="grid grid-cols-4 gap-2">
+            {DEADLINES.map(({ minutes: m, label }) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMinutes(m)}
+                aria-pressed={minutes === m}
+                className={`rounded-2xl border-2 py-3 text-center text-sm font-extrabold transition-all ${
+                  minutes === m
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface-raised text-foreground hover:border-signal/60"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="flex items-start gap-2 text-xs font-medium text-foreground/70">
+            <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
+            <span>
+              If no Bounty Hunter claims this request in time, it expires automatically, disappears
+              from the live map, and your ${Number.isFinite(bounty) ? bounty : 0} goes straight back
+              to your wallet.
+            </span>
+          </p>
         </div>
 
         <div className="pt-1">
@@ -243,6 +311,7 @@ function PostScreen() {
             disabled={
               posting ||
               bounty < MIN_BOUNTY ||
+              note.trim().length < 10 ||
               (permissionNeeded && !permissionOk) ||
               (codeNeeded && accessCode.trim().length < 4)
             }

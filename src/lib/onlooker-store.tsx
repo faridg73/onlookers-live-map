@@ -29,6 +29,8 @@ type NewRequest = {
   instructions?: string;
   accessCode?: string | undefined;
   dbId?: string;
+  /** Minutes until the bounty expires by itself; defaults to one hour. */
+  expiresInMin?: number;
 };
 
 type Store = {
@@ -110,8 +112,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       minutesAgo: 0,
       watchers: 1,
       responses: 0,
-      expiresInMin: 60,
-      expiresAt: Date.now() + 60 * 60_000,
+      expiresInMin: input.expiresInMin ?? 60,
+      expiresAt: Date.now() + (input.expiresInMin ?? 60) * 60_000,
       requester: "you",
       x: 300 + Math.random() * 400,
       y: 300 + Math.random() * 300,
