@@ -48,7 +48,13 @@ export function CashOutCard() {
     try {
       const result = await beginOnboarding();
       if (result.error || !result.url) throw new Error(result.error ?? "Could not open bank setup");
-      window.location.href = result.url;
+      // Stripe blocks its setup page inside frames, so always leave the preview frame.
+      const opened = window.open(result.url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        if (window.top && window.top !== window.self) window.top.location.href = result.url;
+        else window.location.href = result.url;
+      }
+      toast.info("Bank setup opened in a new tab. Come back here when you're done.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not open bank setup");
     } finally {
