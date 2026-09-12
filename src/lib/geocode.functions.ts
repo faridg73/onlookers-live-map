@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
 export type GeocodeResult = {
@@ -53,16 +52,14 @@ async function callGeocode(params: Record<string, string>): Promise<GeocodeResul
 
 /** Turns a typed address into coordinates for the mini preview map. */
 export const geocodeAddress = createServerFn({ method: "POST" })
-  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ address: z.string().trim().min(3).max(200) }).parse(data))
   .handler(async ({ data }): Promise<GeocodeResult | null> => callGeocode({ address: data.address }));
 
 /** Turns a dropped pin back into a street address. */
 export const reverseGeocode = createServerFn({ method: "POST" })
-  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z.object({ latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).parse(data),
   )
-  .handler(async ({ data }): Promise<GeocodeResult | null> =>
+  .handler(async ({ data }): Promise<GeocodeResult | null =>
     callGeocode({ latlng: `${data.latitude},${data.longitude}` }),
   );
