@@ -17,6 +17,11 @@ export type Venue = {
   longitude: number;
   /** Keywords used to surface matching live requests on the venue page. */
   match: string[];
+  /**
+   * Days of the week this spot is worth watching (0 = Sunday). Used by
+   * pop-up spots like markets and tailgates so they only show when they happen.
+   */
+  days?: number[];
 };
 
 export type VenueGroup = {
