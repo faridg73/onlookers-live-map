@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { RequestCard } from "@/components/RequestCard";
+import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CATEGORIES, type CategoryId, type RequestStatus } from "@/lib/onlooker";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
