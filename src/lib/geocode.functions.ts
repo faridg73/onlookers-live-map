@@ -60,6 +60,6 @@ export const reverseGeocode = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z.object({ latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).parse(data),
   )
-  .handler(async ({ data }): Promise<GeocodeResult | null =>
-    callGeocode({ latlng: `${data.latitude},${data.longitude}` }),
-  );
+  .handler(async ({ data }): Promise<GeocodeResult | null> => {
+    return callGeocode({ latlng: `${data.latitude},${data.longitude}` });
+  });
