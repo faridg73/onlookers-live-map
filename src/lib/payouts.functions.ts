@@ -17,7 +17,16 @@ export type PayoutStatus = {
   payoutsEnabled: boolean;
   detailsSubmitted: boolean;
   requirementsNote: string;
+  /** False when the platform payments account lacks Connect, so bank payouts can't run. */
+  supported?: boolean;
 };
+
+const CONNECT_UNSUPPORTED = "Direct bank cash-outs aren't available on this payments account yet. Use “Request payout” in your Earnings Wallet instead.";
+
+function isConnectUnsupported(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("Connect enabled");
+}
 
 type V2Account = {
   id: string;
@@ -168,6 +177,7 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
 
       return { url: link.url };
     } catch (error) {
+      if (isConnectUnsupported(error)) return { error: CONNECT_UNSUPPORTED };
       return { error: error instanceof Error ? error.message : getStripeErrorMessage(error) };
     }
   });
