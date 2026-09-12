@@ -1,8 +1,20 @@
-import { useState, type ReactNode } from "react";
-import { MessageSquare } from "lucide-react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { BadgeCheck, Loader2, MessageSquare, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 import { BountyChat } from "@/components/BountyChat";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { approveAndPay, fetchChatReview, requestRevision, type ChatReview } from "@/lib/chat-review";
 import { cn } from "@/lib/utils";
 
 export type ChatStage = "active" | "review" | "complete";
