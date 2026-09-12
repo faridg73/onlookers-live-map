@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_preferences: {
+        Row: {
+          area_label: string
+          created_at: string
+          email_enabled: boolean
+          phone: string
+          push_enabled: boolean
+          radius_miles: number
+          sms_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_label?: string
+          created_at?: string
+          email_enabled?: boolean
+          phone?: string
+          push_enabled?: boolean
+          radius_miles?: number
+          sms_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_label?: string
+          created_at?: string
+          email_enabled?: boolean
+          phone?: string
+          push_enabled?: boolean
+          radius_miles?: number
+          sms_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bounty_boosts: {
         Row: {
           amount: number
