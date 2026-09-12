@@ -17,7 +17,7 @@ export function CashOutCard() {
   const [status, setStatus] = useState<{
     connected: boolean;
     payoutsEnabled: boolean;
-    supported?: boolean;
+    supported?: boolean | undefined;
   } | null>(null);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
