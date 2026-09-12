@@ -125,24 +125,14 @@ function FeedScreen() {
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">
         What do you want to see?
       </p>
-      <div className="mt-2 grid grid-cols-3 gap-1.5">
-        {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setCat(c.id)}
-            className={
-              "min-w-0 rounded-lg border px-1.5 py-2 text-[0.68rem] font-semibold leading-tight transition-colors " +
-              (cat === c.id
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface text-muted-foreground hover:text-foreground")
-            }
-          >
-            <span className="flex min-h-8 items-center justify-center gap-1 text-center">
-              {c.emoji && <span className="shrink-0">{c.emoji}</span>}
-              <span>{c.id === "all" ? c.label : SHORT_CATEGORY_LABELS[c.id]}</span>
-            </span>
-          </button>
-        ))}
+      <div className="mt-2">
+        <CategoryPicker
+          value={cat}
+          onChange={(id) => setCat(id as CategoryId | "all")}
+          sub={sub}
+          onSubChange={setSub}
+          includeAll
+        />
       </div>
 
       <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-surface px-3">
