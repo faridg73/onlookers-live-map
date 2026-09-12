@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
+import type { Database } from "@/integrations/supabase/types";
 
-let cached: ReturnType<typeof createClient> | null = null;
+let cached: ReturnType<typeof createClient<Database>> | null = null;
 function getSupabase() {
   if (!cached) {
-    cached = createClient(
+    cached = createClient<Database>(
       process.env["SUPABASE_URL"]!,
       process.env["SUPABASE_SERVICE_ROLE_KEY"]!,
       { auth: { persistSession: false } },
