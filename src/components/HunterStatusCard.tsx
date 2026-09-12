@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { EyeOff, PartyPopper, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
+import { TrustBadge } from "@/components/TrustBadge";
 import { Switch } from "@/components/ui/switch";
+import { fetchTrustStats, type TrustStats } from "@/lib/trust";
 import {
   XP_PER_BOUNTY,
   XP_PER_LEVEL,
