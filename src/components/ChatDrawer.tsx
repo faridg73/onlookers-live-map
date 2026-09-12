@@ -75,7 +75,55 @@ export function ChatDrawer({
   const [selfOpen, setSelfOpen] = useState(false);
   const open = openProp ?? selfOpen;
   const setOpen = onOpenChange ?? setSelfOpen;
-  const stage = chatStage(status);
+  const [review, setReview] = useState<ChatReview | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [working, setWorking] = useState(false);
+
+  const refresh = useCallback(() => {
+    fetchChatReview(requestKey)
+      .then(setReview)
+      .catch(() => setReview(null));
+  }, [requestKey]);
+
+  useEffect(() => {
+    if (open) refresh();
+  }, [open, refresh]);
+
+  const closed = review?.closed ?? false;
+  const stage: ChatStage = closed ? "complete" : chatStage(status);
+  const reward = review?.bounty || bounty;
+  const canReview = Boolean(review?.isRequester && review?.videoId) && !closed;
+
+  async function approve() {
+    if (!review?.videoId || working) return;
+    setWorking(true);
+    try {
+      const paid = await approveAndPay(review.videoId, requestKey);
+      toast.success(`Approved — $${paid.toFixed(2)} released to the hunter.`);
+      setConfirming(false);
+      refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not approve this video.");
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function revise() {
+    if (working) return;
+    setWorking(true);
+    try {
+      await requestRevision(
+        requestKey,
+        "The requester asked for a revision. Please send another take of this bounty.",
+      );
+      toast.success("Revision requested in the chat.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not request a revision.");
+    } finally {
+      setWorking(false);
+    }
+  }
 
   return (
     <>
