@@ -169,6 +169,7 @@ function ClipCard({ clip }: { clip: ExploreClip }) {
             </span>
           </button>
         )}
+        {user && <LiveReactions videoId={clip.id} />}
       </div>
 
       <div className="space-y-3 p-4">

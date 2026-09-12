@@ -56,6 +56,22 @@
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
   --animate-confetti: confetti 2s linear forwards;
+  --animate-float-up: float-up 1.8s ease-out forwards;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-140px) scale(1);
+  }
 }
 
 @keyframes confetti {
