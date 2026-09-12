@@ -22,6 +22,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { CashOutCard } from "@/components/CashOutCard";
 import { EarningsWallet } from "@/components/EarningsWallet";
+import { AddFundsCard } from "@/components/AddFundsCard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 
 export const Route = createFileRoute("/profile")({
@@ -85,6 +86,8 @@ function ProfileScreen() {
       </div>
 
       <HunterStatusCard />
+
+      <AddFundsCard />
 
       <EarningsWallet />
 
