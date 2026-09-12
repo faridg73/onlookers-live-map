@@ -319,6 +319,7 @@ export function BountyChat({
           {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
         </button>
       </form>
+      </>
       )}
     </div>
   );
