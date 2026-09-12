@@ -3,6 +3,7 @@ import { useState } from "react";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CATEGORIES, type CategoryId, type RequestStatus } from "@/lib/onlooker";
+import { useDistanceUnit } from "@/hooks/use-distance-unit";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -49,6 +50,7 @@ function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
+  const { radius } = useDistanceUnit();
   const list = requests.filter(
     (r) =>
       (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
@@ -59,7 +61,8 @@ function FeedScreen() {
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        <span className="text-signal">${pot}</span> in open bounties within 5 miles of you.
+        <span className="text-signal">${pot}</span> in open bounties within {radius}{" "}
+        {radius === 5 ? "miles" : "km"} of you.
       </p>
 
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>

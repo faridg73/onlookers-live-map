@@ -8,6 +8,7 @@ import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
+import { useDistanceUnit } from "@/hooks/use-distance-unit";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { b?: string | undefined } => ({
@@ -38,6 +39,7 @@ function MapScreen() {
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [nearbyOpen, setNearbyOpen] = useState(false);
+  const { radius, radiusMiles, formatDistance } = useDistanceUnit();
 
   // Send expired, unfulfilled deposits back to their requesters.
   useEffect(() => {
@@ -58,11 +60,11 @@ function MapScreen() {
         request,
         distance: distanceMiles(userPosition, requestMapPosition(request)),
       }))
-      .filter(({ distance }) => distance <= 5)
+      .filter(({ distance }) => distance <= radiusMiles)
       .sort((a, b) => a.distance - b.distance || b.request.bounty - a.request.bounty);
-  }, [requests, userPosition]);
+  }, [requests, userPosition, radiusMiles]);
   const nearbyLabel = userPosition
-    ? `${nearby.length} live ${nearby.length === 1 ? "request" : "requests"} within 5 miles`
+    ? `${nearby.length} live ${nearby.length === 1 ? "request" : "requests"} within ${radius} ${radius === 5 ? "miles" : "km"}`
     : "Turn on location to find nearby requests";
 
   return (
@@ -119,7 +121,7 @@ function MapScreen() {
                       <span className="shrink-0 text-right">
                         <span className="block font-display text-lg font-extrabold text-signal">${request.bounty}</span>
                         <span className="flex items-center justify-end gap-1 text-[0.68rem] text-muted-foreground">
-                          <Navigation className="size-3" /> {distance.toFixed(1)} mi
+                          <Navigation className="size-3" /> {formatDistance(distance)}
                         </span>
                       </span>
                     </button>
@@ -140,8 +142,8 @@ function MapScreen() {
             ) : (
               <p className="px-4 py-6 text-center text-sm text-muted-foreground">
                 {userPosition
-                  ? "No active bounties are currently available within 5 miles."
-                  : "Allow location access to see available bounties within 5 miles."}
+                  ? `No active bounties are currently available within ${radius} ${radius === 5 ? "miles" : "km"}.`
+                  : `Allow location access to see available bounties within ${radius} ${radius === 5 ? "miles" : "km"}.`}
               </p>
             )}
           </section>
