@@ -310,6 +310,48 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          emailed_at: string | null
+          id: string
+          kind: string
+          message_id: string | null
+          preview: string
+          read_at: string | null
+          request_key: string
+          sender_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emailed_at?: string | null
+          id?: string
+          kind?: string
+          message_id?: string | null
+          preview?: string
+          read_at?: string | null
+          request_key: string
+          sender_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emailed_at?: string | null
+          id?: string
+          kind?: string
+          message_id?: string | null
+          preview?: string
+          read_at?: string | null
+          request_key?: string
+          sender_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payout_accounts: {
         Row: {
           created_at: string
@@ -938,6 +980,12 @@ export type Database = {
         Args: { _request_id: string; _user_id: string }
         Returns: boolean
       }
+      chat_participants: {
+        Args: { _request_key: string }
+        Returns: {
+          user_id: string
+        }[]
+      }
       close_expired_requests: { Args: never; Returns: number }
       credit_topup: {
         Args: {
@@ -1017,6 +1065,10 @@ export type Database = {
           spotter_id: string
           status: string
         }[]
+      }
+      mark_chat_notifications_read: {
+        Args: { _request_key: string }
+        Returns: number
       }
       public_profile_card: {
         Args: { _user_id: string }

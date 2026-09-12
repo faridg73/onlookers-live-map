@@ -10,6 +10,7 @@ import {
   sendMessage,
   type ChatMessage,
 } from "@/lib/chat";
+import { markChatAlertsRead } from "@/lib/notifications";
 
 /**
  * Live message history for one bounty thread. Returns `locked: true` when the
@@ -40,6 +41,7 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
       const [rows, marker] = await Promise.all([listMessages(key), readMarker(key)]);
       setMessages(rows);
       setLastReadAt(marker);
+      await markChatAlertsRead(key);
     } catch {
       setLocked(true);
     } finally {
@@ -85,7 +87,7 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
   );
 
   const seen = useCallback(async () => {
-    await markRead(key);
+    await Promise.all([markRead(key), markChatAlertsRead(key)]);
     setLastReadAt(new Date().toISOString());
   }, [key]);
 
