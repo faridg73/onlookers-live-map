@@ -40,6 +40,23 @@ function VenueScreen() {
   const group = groupBySlug(params.group)!;
   const venue = venueBySlug(params.group, params.venue)!;
   const { requests, claim } = useOnlooker();
+  const { isWatched, toggle } = useRadar();
+  const watched = isWatched(venue.slug);
+
+  const watch = () => {
+    const on = toggle({
+      slug: venue.slug,
+      name: venue.name,
+      area: venue.area,
+      latitude: venue.latitude,
+      longitude: venue.longitude,
+    });
+    toast.success(
+      on
+        ? `Following ${venue.name} — you'll be alerted about new bounties within five miles.`
+        : `Stopped following ${venue.name}.`,
+    );
+  };
 
   const related = requests.filter((r) =>
     venue.match.some((k) => `${r.place} ${r.title} ${r.note}`.toLowerCase().includes(k)),
@@ -82,6 +99,21 @@ function VenueScreen() {
           <Camera className="size-4" aria-hidden /> Post a bounty here
         </button>
       </VenueBountyDialog>
+
+      <button
+        type="button"
+        onClick={watch}
+        aria-pressed={watched}
+        className={`mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border-2 py-3 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors ${
+          watched
+            ? "border-signal bg-signal/15 text-signal"
+            : "border-border bg-surface text-foreground"
+        }`}
+      >
+        <Radar className="size-4" aria-hidden />
+        {watched ? "On your radar" : "Add to Bounty Radar"}
+      </button>
+
 
       <h2 className="mt-7 flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
         <Radio className="size-3.5 text-signal" aria-hidden /> Active live views
