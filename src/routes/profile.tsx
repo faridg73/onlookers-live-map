@@ -24,6 +24,7 @@ import { CashOutCard } from "@/components/CashOutCard";
 import { EarningsWallet } from "@/components/EarningsWallet";
 import { AddFundsCard } from "@/components/AddFundsCard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
+import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -86,6 +87,8 @@ function ProfileScreen() {
       </div>
 
       <HunterStatusCard />
+
+      <AlertSettingsCard />
 
       <AddFundsCard />
 
