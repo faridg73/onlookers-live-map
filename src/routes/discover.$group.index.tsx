@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ChevronRight, MapPin } from "lucide-react";
-import { groupBySlug } from "@/lib/venues";
+import { groupBySlug, isVenueOnToday } from "@/lib/venues";
 import { useOnlooker } from "@/lib/onlooker-store";
 
 export const Route = createFileRoute("/discover/$group/")({
@@ -49,7 +49,7 @@ function GroupScreen() {
       <p className="mt-1 text-sm text-muted-foreground">{group.tagline}</p>
 
       <div className="mt-5 space-y-3">
-        {group.venues.map((venue) => {
+        {group.venues.filter((venue) => isVenueOnToday(venue)).map((venue) => {
           const live = liveCount(venue.match);
           return (
             <Link
