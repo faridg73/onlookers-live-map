@@ -192,7 +192,9 @@ export function BountyChat({
         <div ref={endRef} />
       </div>
 
-      {pending && (
+      {celebrate && <Confetti onDone={() => setCelebrate(false)} />}
+
+      {pending && !readOnly && (
         <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-2">
           {pending.file.type.startsWith("video/") ? (
             <video src={pending.preview} className="size-12 rounded-lg bg-black object-cover" />
