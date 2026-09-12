@@ -209,7 +209,7 @@ export function MapCanvas({
           );
         })}
 
-      <div className="absolute right-4 flex flex-col gap-2 top-[calc(env(safe-area-inset-top)+5.75rem)]">
+      <div className="absolute right-4 z-40 flex flex-col gap-2 top-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
         <div className="grid grid-rows-2 overflow-hidden rounded-lg border border-border bg-surface/90 shadow-lg backdrop-blur">
           {[
             { label: "+", fn: () => zoomBy(1) },
