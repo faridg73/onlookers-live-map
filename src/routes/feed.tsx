@@ -3,11 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { CategoryPicker, type CategoryPickerValue } from "@/components/CategoryPicker";
 import { useOnlooker } from "@/lib/onlooker-store";
 import {
   CATEGORIES,
   distanceMiles,
   requestMapPosition,
+  subOptionById,
   type CategoryId,
   type MapPosition,
   type RequestStatus,
