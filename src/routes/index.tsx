@@ -4,6 +4,7 @@ import { Camera, ChevronDown, MapPin, Navigation, Zap } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
+import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onlooker";
