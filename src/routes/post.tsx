@@ -116,9 +116,11 @@ function PostScreen() {
         instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
+        expiresInMin: minutes,
       });
+      const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `$${bounty} locked from your wallet until it's fulfilled.`,
+        description: `$${bounty} held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });
     } catch (error) {
