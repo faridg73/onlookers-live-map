@@ -131,7 +131,7 @@ function MapScreen() {
                         </span>
                       </span>
                     </button>
-                    <BountyDetailsDialog request={request} onClaim={claim}>
+                    <BountyDetailsDialog request={request} onClaim={claim} userPosition={userPosition}>
                       <Button type="button" variant="outline" className="mt-3 h-10 w-full rounded-lg font-bold">
                         View details
                       </Button>
@@ -153,7 +153,7 @@ function MapScreen() {
       {selected && (
         <div className="absolute inset-x-0 bottom-[5.75rem] z-30 px-4">
           <div className="mx-auto max-w-lg animate-rise">
-            <BountyDetailsDialog request={selected} onClaim={claim}>
+            <BountyDetailsDialog request={selected} onClaim={claim} userPosition={userPosition}>
               <RequestCard
                 request={selected}
                 active

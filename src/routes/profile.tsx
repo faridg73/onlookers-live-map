@@ -21,6 +21,7 @@ import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { CashOutCard } from "@/components/CashOutCard";
+import { HunterStatusCard } from "@/components/HunterStatusCard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -81,6 +82,8 @@ function ProfileScreen() {
           </div>
         ))}
       </div>
+
+      <HunterStatusCard />
 
       <CashOutCard />
 

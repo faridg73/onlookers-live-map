@@ -1,8 +1,11 @@
 import { useState, type ReactNode } from "react";
-import { ShieldCheck } from "lucide-react";
+import { HandCoins, ShieldCheck } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
+import { BoostBounty } from "@/components/BoostBounty";
+import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
-import type { LiveRequest } from "@/lib/onlooker";
+import { useBoosts } from "@/lib/boosts-store";
+import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,15 +33,21 @@ export function BountyDetailsDialog({
   request,
   onClaim,
   children,
+  userPosition = null,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
   children: ReactNode;
+  /** Used to unlock the on-the-spot instant snippet capture. */
+  userPosition?: MapPosition | null;
 }) {
   const [open, setOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
+  const pooled = boostOf(request.id);
+  const pool = request.bounty + pooled;
 
   return (
     <>
@@ -66,6 +75,23 @@ export function BountyDetailsDialog({
           </DialogHeader>
 
           <RequestCard request={request} />
+
+          {!done && (
+            <div className="mt-2 rounded-2xl border border-border bg-surface-raised p-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-foreground">
+                  <HandCoins className="size-3.5 text-signal" />
+                  {pooled > 0 ? `Co-funded pool: $${pool}` : `Bounty: $${pool}`}
+                </span>
+                <BoostBounty requestId={request.id} />
+              </div>
+              <p className="mt-2 text-[0.7rem] text-muted-foreground">
+                Chip in to sweeten this bounty — everything you add goes to whoever films it.
+              </p>
+            </div>
+          )}
+
+          <InstantSnippetButton request={request} userPosition={userPosition} />
 
           <Button
             type="button"

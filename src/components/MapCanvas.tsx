@@ -5,6 +5,8 @@ import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { useBoosts } from "@/lib/boosts-store";
+import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
@@ -35,6 +37,15 @@ export function MapCanvas({
   const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
+  const { boostOf } = useBoosts();
+  const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
+
+  // Own status tier colours the marker; incognito hides the precise dot.
+  useEffect(() => {
+    void fetchHunterStats().then((stats) =>
+      setMe(stats ? { hunterLevel: stats.hunterLevel, isIncognito: stats.isIncognito } : null),
+    );
+  }, []);
 
   // Boot the map once.
   useEffect(() => {
@@ -154,10 +165,22 @@ export function MapCanvas({
           style={{ left: userPixel.left, top: userPixel.top }}
           aria-label="Your location"
         >
-          <span className="relative flex size-5 items-center justify-center">
-            <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
-            <span className="size-3.5 rounded-full border-2 border-surface bg-live shadow-lg" />
-          </span>
+          {me?.isIncognito ? (
+            <span className="flex flex-col items-center">
+              <span className="size-24 rounded-full border-2 border-dashed border-signal/60 bg-signal/10" />
+              <span className="-mt-14 rounded-full bg-surface/90 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur">
+                En route
+              </span>
+            </span>
+          ) : (
+            <span className="relative flex size-5 items-center justify-center">
+              <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
+              <span
+                className="size-3.5 rounded-full border-2 border-surface shadow-lg"
+                style={{ backgroundColor: tierForLevel(me?.hunterLevel ?? 1).dot }}
+              />
+            </span>
+          )}
         </div>
       )}
 
@@ -167,6 +190,8 @@ export function MapCanvas({
           const pixel = toPixel(requestMapPosition(r));
           if (!pixel) return null;
           const isSel = r.id === selectedId;
+          const pooled = boostOf(r.id);
+          const pool = r.bounty + pooled;
           return (
             <button
               key={r.id}
@@ -205,8 +230,13 @@ export function MapCanvas({
                         : "border-signal bg-surface text-signal",
                   )}
                 >
-                  ${r.bounty}
+                  ${pool}
                 </span>
+                {pooled > 0 && !isClosed(r) && (
+                  <span className="mt-1 rounded-full bg-signal px-2 py-0.5 text-[0.58rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground shadow">
+                    Co-funded pool
+                  </span>
+                )}
                 {!isClosed(r) && r.bounty >= HIGH_BOUNTY && (
                   <span className="mt-1">
                     <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />

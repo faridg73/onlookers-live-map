@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Eye, Loader2, MapPin, MessageCircle, Play, Star } from "lucide-react";
+import { Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
+import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/explore")({
 function ExplorePage() {
   const [clips, setClips] = useState<ExploreClip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"nearby" | "global">("nearby");
 
   useEffect(() => {
     void fetchExploreClips()
@@ -53,22 +55,46 @@ function ExplorePage() {
         Live views captured by Onlookers around the world and down the street.
       </p>
 
-      {loading && (
+      <div className="mt-5 grid grid-cols-2 gap-2 rounded-full border border-border bg-surface p-1">
+        {([
+          { id: "nearby" as const, label: "Recent clips", icon: Sparkle },
+          { id: "global" as const, label: "Global Feed", icon: Globe2 },
+        ]).map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            aria-pressed={tab === id}
+            className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition-colors ${
+              tab === id
+                ? "bg-signal text-signal-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Icon className="size-3.5" /> {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "global" && <GlobalFeedMap />}
+
+      {tab === "nearby" && loading && (
         <p className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" /> Loading clips…
         </p>
       )}
 
-      {!loading && clips.length === 0 && (
+      {tab === "nearby" && !loading && clips.length === 0 && (
         <p className="mt-10 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           No public clips yet. Complete a bounty and your capture shows up here.
         </p>
       )}
 
       <div className="mt-6 space-y-5">
-        {clips.map((clip) => (
-          <ClipCard key={clip.id} clip={clip} />
-        ))}
+        {tab === "nearby" &&
+          clips.map((clip) => (
+            <ClipCard key={clip.id} clip={clip} />
+          ))}
       </div>
     </main>
   );
