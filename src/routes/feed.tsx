@@ -130,7 +130,7 @@ function FeedScreen() {
       <div className="mt-2">
         <CategoryPicker
           value={cat}
-          onChange={(id) => setCat(id as CategoryId | "all")}
+          onChange={(id: CategoryPickerValue) => setCat(id)}
           sub={sub}
           onSubChange={setSub}
           includeAll
