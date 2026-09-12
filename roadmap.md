@@ -7,4 +7,4 @@
 - [x] Add a clear Claim Bounty action to each available bounty listing.
 - [x] Replace both horizontal Feed filter rows with compact grids showing every option at once on phones.
 - [x] Simplify Feed cards into compact, organized summaries with prominent claim actions and less text.
-- [ ] Automatically show miles or kilometers based on the user’s country, with an equivalent local search radius.
+- [x] Automatically show miles or kilometers based on the user’s country, with an equivalent local search radius.
