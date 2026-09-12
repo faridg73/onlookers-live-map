@@ -45,12 +45,20 @@ export function useChatAlerts() {
     };
   }, [user, load]);
 
-  // Nearby bounty pings surface once, right away.
+  // Nearby bounty pings surface once, right away, with a one-tap way in.
   useEffect(() => {
     for (const alert of all) {
       if (alert.kind !== "bounty_nearby" || announced.current.has(alert.id)) continue;
       announced.current.add(alert.id);
-      toast(alert.preview, { duration: 8000 });
+      toast(alert.preview, {
+        duration: 12000,
+        action: {
+          label: "Claim it",
+          onClick: () => {
+            window.location.href = `/?b=${encodeURIComponent(alert.request_key)}`;
+          },
+        },
+      });
       void markAlertRead(alert.id);
     }
   }, [all]);
