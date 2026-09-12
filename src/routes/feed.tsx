@@ -58,6 +58,7 @@ function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
+  const [query, setQuery] = useState("");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
 
