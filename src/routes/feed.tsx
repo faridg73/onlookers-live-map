@@ -50,7 +50,7 @@ function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
-  const { radius } = useDistanceUnit();
+  const { unit, radius } = useDistanceUnit();
   const list = requests.filter(
     (r) =>
       (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
@@ -61,8 +61,7 @@ function FeedScreen() {
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        <span className="text-signal">${pot}</span> in open bounties within {radius}{" "}
-        {radius === 5 ? "miles" : "km"} of you.
+        <span className="text-signal">${pot}</span> in open bounties within {radius} {unit} of you.
       </p>
 
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>

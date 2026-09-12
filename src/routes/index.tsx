@@ -39,7 +39,7 @@ function MapScreen() {
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [nearbyOpen, setNearbyOpen] = useState(false);
-  const { radius, radiusMiles, formatDistance } = useDistanceUnit();
+  const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
   // Send expired, unfulfilled deposits back to their requesters.
   useEffect(() => {
@@ -64,7 +64,7 @@ function MapScreen() {
       .sort((a, b) => a.distance - b.distance || b.request.bounty - a.request.bounty);
   }, [requests, userPosition, radiusMiles]);
   const nearbyLabel = userPosition
-    ? `${nearby.length} live ${nearby.length === 1 ? "request" : "requests"} within ${radius} ${radius === 5 ? "miles" : "km"}`
+    ? `${nearby.length} live ${nearby.length === 1 ? "request" : "requests"} within ${radius} ${unit}`
     : "Turn on location to find nearby requests";
 
   return (
@@ -142,8 +142,8 @@ function MapScreen() {
             ) : (
               <p className="px-4 py-6 text-center text-sm text-muted-foreground">
                 {userPosition
-                  ? `No active bounties are currently available within ${radius} ${radius === 5 ? "miles" : "km"}.`
-                  : `Allow location access to see available bounties within ${radius} ${radius === 5 ? "miles" : "km"}.`}
+                  ? `No active bounties are currently available within ${radius} ${unit}.`
+                  : `Allow location access to see available bounties within ${radius} ${unit}.`}
               </p>
             )}
           </section>
