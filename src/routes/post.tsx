@@ -137,38 +137,48 @@ function PostScreen() {
   return (
     <div className="mx-auto max-w-lg px-4 pb-32 pt-6">
       <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-        Post a request
+        Request a video
       </h1>
       <p className="mt-1.5 text-sm font-semibold text-foreground/70">
-        The higher the bounty, the faster someone walks over.
+        Drop a pin, say exactly what to film, and set the reward. The higher the bounty, the faster
+        someone walks over.
       </p>
 
       <form onSubmit={submit} className="mt-5 space-y-3">
         <label className={`block space-y-2 ${card}`}>
-          <span className={sectionLabel}>What do you want to see?</span>
+          <span className={sectionLabel}>1 · Bounty title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            maxLength={120}
             placeholder="Is the queue still around the block?"
             className="field"
           />
+          <span className="block text-xs font-medium text-foreground/70">
+            One short line people see on the map and in the feed.
+          </span>
         </label>
 
         <div className={`space-y-2 ${card}`}>
           <label className="block space-y-2">
-            <span className={sectionLabel}>Where</span>
+            <span className={sectionLabel}>2 · Exact location</span>
             <input
               value={place}
               onChange={(e) => setPlace(e.target.value)}
               required
-              placeholder="Corner of Ash Alley & 6th"
+              placeholder="Search an address, park, gate or beach"
               className="field"
             />
           </label>
           <LocationPreviewMap address={place} onPick={setSpot} />
           <p className="text-xs font-medium text-foreground/70">
-            Drag the pin or tap the map to fix the exact spot. Zoom in to check the street.
+            No street address? Tap the map or drag the pin to lock the exact coordinates.
+            {spot && (
+              <span className="mt-1 block font-bold text-signal">
+                Pin locked: {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+              </span>
+            )}
           </p>
         </div>
 
