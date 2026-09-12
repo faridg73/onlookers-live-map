@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Camera, ChevronDown, MapPin, Navigation, Zap } from "lucide-react";
+import { Camera, ChevronDown, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
