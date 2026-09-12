@@ -7,7 +7,38 @@ export type ChatMessage = {
   sender_id: string;
   body: string;
   created_at: string;
+  media_url: string | null;
+  media_type: string | null;
 };
+
+const BUCKET = "chat-attachments";
+
+/** Uploads a photo or video clip for a chat message and returns its stored path. */
+export async function uploadChatAttachment(key: string, file: File) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Sign in to send an attachment.");
+  if (file.size > 200 * 1024 * 1024) throw new Error("That file is larger than 200 MB.");
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const path = `${auth.user.id}/${key}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw error;
+  return { path, kind: file.type.startsWith("video/") ? "video" : "image" };
+}
+
+/** Short-lived viewing links for every message that carries an attachment. */
+export async function attachmentUrls(messages: ChatMessage[]) {
+  const paths = messages.filter((m) => m.media_url).map((m) => m.media_url as string);
+  if (paths.length === 0) return {};
+  const { data } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
+  const out: Record<string, string> = {};
+  for (const row of data ?? []) {
+    if (row.path && row.signedUrl) out[row.path] = row.signedUrl;
+  }
+  return out;
+}
 
 /**
  * A bounty conversation is keyed by the saved request when there is one, so
