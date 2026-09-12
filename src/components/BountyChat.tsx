@@ -8,6 +8,7 @@ import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
 import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
+import { CHAT_SAFETY_NOTE, maskContactInfo } from "@/lib/chat-safety";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
@@ -119,8 +120,16 @@ export function BountyChat({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const body = draft.trim();
+    const raw = draft.trim();
+    // Contact details never leave the platform: mask before anything is stored.
+    const body = maskContactInfo(raw);
     if ((!body && !pending) || sending) return;
+    if (body !== raw) {
+      toast.warning("Contact details hidden", {
+        description:
+          "Phone numbers, emails and outside links stay masked. Keep the whole job in Onlooker so your payment is protected.",
+      });
+    }
     setSending(true);
     try {
       const media = pending ? await uploadChatAttachment(key, pending.file) : null;
@@ -203,7 +212,11 @@ export function BountyChat({
                       <Loader2 className="size-4 animate-spin" />
                     </div>
                   ))}
-                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                {m.body && (
+                  <p className="whitespace-pre-wrap break-words">
+                    {isSystemMessage(m.body) ? m.body : maskContactInfo(m.body)}
+                  </p>
+                )}
                 <p
                   className={cn(
                     "mt-1 text-[0.6rem]",
@@ -259,7 +272,12 @@ export function BountyChat({
           bounty.
         </div>
       ) : (
-      <form onSubmit={submit} className="mt-3 flex items-center gap-2">
+      <>
+      <p className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-[0.68rem] text-muted-foreground">
+        <Lock className="mt-0.5 size-3 shrink-0 text-signal" aria-hidden />
+        <span>{CHAT_SAFETY_NOTE}</span>
+      </p>
+      <form onSubmit={submit} className="mt-2 flex items-center gap-2">
         <input
           ref={fileRef}
           type="file"
@@ -301,6 +319,7 @@ export function BountyChat({
           {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
         </button>
       </form>
+      </>
       )}
     </div>
   );

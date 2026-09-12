@@ -16,6 +16,7 @@ import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
 import { Route as PostRouteImport } from './routes/post'
@@ -25,6 +26,9 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
+import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
+import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
+import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -60,6 +64,11 @@ const FaqRoute = FaqRouteImport.update({
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HuntRoute = HuntRouteImport.update({
+  id: '/hunt',
+  path: '/hunt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -107,6 +116,21 @@ const BIdRoute = BIdRouteImport.update({
   path: '/b/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverIndexRoute = DiscoverIndexRouteImport.update({
+  id: '/discover/',
+  path: '/discover/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverGroupIndexRoute = DiscoverGroupIndexRouteImport.update({
+  id: '/discover/$group/',
+  path: '/discover/$group/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverGroupVenueRoute = DiscoverGroupVenueRouteImport.update({
+  id: '/discover/$group/$venue',
+  path: '/discover/$group/$venue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -122,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -131,6 +156,9 @@ export interface FileRoutesByFullPath {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
+  '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -141,6 +169,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -150,6 +179,9 @@ export interface FileRoutesByTo {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/admin': typeof AdminIndexRoute
+  '/discover': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
+  '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -161,6 +193,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/post': typeof PostRoute
@@ -170,6 +203,9 @@ export interface FileRoutesById {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/admin/': typeof AdminIndexRoute
+  '/discover/': typeof DiscoverIndexRoute
+  '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
+  '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -182,6 +218,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -191,6 +228,9 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/admin/'
+    | '/discover/'
+    | '/discover/$group/$venue'
+    | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -201,6 +241,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -210,6 +251,9 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/admin'
+    | '/discover'
+    | '/discover/$group/$venue'
+    | '/discover/$group'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -220,6 +264,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/hunt'
     | '/leaderboard'
     | '/payout-history'
     | '/post'
@@ -229,6 +274,9 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/admin/'
+    | '/discover/'
+    | '/discover/$group/$venue'
+    | '/discover/$group/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -240,6 +288,7 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
+  HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
   PostRoute: typeof PostRoute
@@ -249,6 +298,9 @@ export interface RootRouteChildren {
   AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  DiscoverIndexRoute: typeof DiscoverIndexRoute
+  DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
+  DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -301,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hunt': {
+      id: '/hunt'
+      path: '/hunt'
+      fullPath: '/hunt'
+      preLoaderRoute: typeof HuntRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -366,6 +425,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover/': {
+      id: '/discover/'
+      path: '/discover'
+      fullPath: '/discover/'
+      preLoaderRoute: typeof DiscoverIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover/$group/': {
+      id: '/discover/$group/'
+      path: '/discover/$group'
+      fullPath: '/discover/$group/'
+      preLoaderRoute: typeof DiscoverGroupIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover/$group/$venue': {
+      id: '/discover/$group/$venue'
+      path: '/discover/$group/$venue'
+      fullPath: '/discover/$group/$venue'
+      preLoaderRoute: typeof DiscoverGroupVenueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -384,6 +464,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,
+  HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
   PostRoute: PostRoute,
@@ -393,6 +474,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
   AdminIndexRoute: AdminIndexRoute,
+  DiscoverIndexRoute: DiscoverIndexRoute,
+  DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
+  DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

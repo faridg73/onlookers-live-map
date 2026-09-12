@@ -6,8 +6,8 @@ import { ChatInbox } from "@/components/ChatInbox";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
-  { to: "/feed", label: "Feed", icon: Radio, exact: false },
-  { to: "/explore", label: "Explore", icon: Compass, exact: false },
+  { to: "/discover", label: "Browse", icon: Compass, exact: false },
+  { to: "/hunt", label: "Earn", icon: Radio, exact: false },
   { to: "/post", label: "Post", icon: PlusSquare, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
 ] as const;
