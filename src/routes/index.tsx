@@ -48,6 +48,12 @@ function MapScreen() {
     void refundExpiredBounties();
   }, []);
 
+  // Remember where this person is so nearby bounty alerts can reach them.
+  useEffect(() => {
+    if (!userPosition) return;
+    void saveMyLocation(userPosition.lat, userPosition.lng);
+  }, [userPosition]);
+
   // Opening a shared bounty link lands straight on that pin.
   useEffect(() => {
     if (b) select(b);
