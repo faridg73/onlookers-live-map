@@ -88,6 +88,35 @@ export type LiveRequest = {
   y: number;
 };
 
+export type MapPosition = { lat: number; lng: number };
+
+export const REGIONAL_CENTER: MapPosition = { lat: 34.0522, lng: -118.2437 };
+const REGION_SPAN = 0.3;
+
+/** Turn a stored 0-1000 map-space point back into real coordinates. */
+export function requestMapPosition(request: Pick<LiveRequest, "x" | "y">): MapPosition {
+  const clampedX = Math.min(1000, Math.max(0, request.x));
+  const clampedY = Math.min(1000, Math.max(0, request.y));
+  return {
+    lat: REGIONAL_CENTER.lat + REGION_SPAN / 2 - (clampedY / 1000) * REGION_SPAN,
+    lng: REGIONAL_CENTER.lng - REGION_SPAN / 2 + (clampedX / 1000) * REGION_SPAN,
+  };
+}
+
+/** Straight-line distance between two map positions, in miles. */
+export function distanceMiles(from: MapPosition, to: MapPosition) {
+  const radians = (degrees: number) => (degrees * Math.PI) / 180;
+  const earthRadiusMiles = 3958.8;
+  const latitudeDelta = radians(to.lat - from.lat);
+  const longitudeDelta = radians(to.lng - from.lng);
+  const a =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(radians(from.lat)) *
+      Math.cos(radians(to.lat)) *
+      Math.sin(longitudeDelta / 2) ** 2;
+  return 2 * earthRadiusMiles * Math.asin(Math.sqrt(a));
+}
+
 export const SEED_REQUESTS: LiveRequest[] = [
   {
     id: "r1",

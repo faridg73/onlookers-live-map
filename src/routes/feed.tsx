@@ -45,16 +45,16 @@ function FeedScreen() {
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        <span className="text-signal">${pot}</span> in open bounties within 5 km of you.
+        <span className="text-signal">${pot}</span> in open bounties within 5 miles of you.
       </p>
 
-      <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      <div className="mt-5 grid grid-cols-5 gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={
-              "shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-[0.14em] transition-colors " +
+              "min-w-0 rounded-lg border px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
               (filter === f.key
                 ? "border-signal bg-signal text-signal-foreground"
                 : "border-border bg-surface text-muted-foreground hover:text-foreground")
@@ -65,20 +65,22 @@ function FeedScreen() {
         ))}
       </div>
 
-      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+      <div className="mt-2 grid grid-cols-3 gap-1.5">
         {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
           <button
             key={c.id}
             onClick={() => setCat(c.id)}
             className={
-              "shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors " +
+              "min-w-0 rounded-lg border px-1.5 py-2 text-[0.68rem] font-semibold leading-tight transition-colors " +
               (cat === c.id
                 ? "border-signal bg-signal text-signal-foreground"
                 : "border-border bg-surface text-muted-foreground hover:text-foreground")
             }
           >
-            {c.emoji && <span className="mr-1">{c.emoji}</span>}
-            {c.label}
+            <span className="flex min-h-8 items-center justify-center gap-1 text-center">
+              {c.emoji && <span className="shrink-0">{c.emoji}</span>}
+              <span>{c.label}</span>
+            </span>
           </button>
         ))}
       </div>
