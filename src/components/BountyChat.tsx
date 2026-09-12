@@ -3,8 +3,7 @@ import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
-import { chatKey, uploadChatAttachment } from "@/lib/chat";
-import type { LiveRequest } from "@/lib/onlooker";
+import { uploadChatAttachment } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
@@ -14,10 +13,12 @@ function timeLabel(iso: string) {
 /**
  * SMS-style thread between the requester and the reporter on the bounty. It
  * only unlocks once the bounty is claimed or a clip has been submitted.
+ *
+ * `bare` drops the card chrome so the thread can fill the chat drawer.
  */
-export function BountyChat({ request }: { request: LiveRequest }) {
+export function BountyChat({ requestKey, bare = false }: { requestKey: string; bare?: boolean }) {
   const { user } = useAuth();
-  const key = chatKey(request);
+  const key = requestKey;
   const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
     key,
     user?.id,
