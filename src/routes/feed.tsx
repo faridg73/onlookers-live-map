@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { RequestCard } from "@/components/RequestCard";
+import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { CATEGORIES, type CategoryId, type RequestStatus } from "@/lib/onlooker";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
@@ -105,7 +106,11 @@ function FeedScreen() {
 
       <div className="mt-5 space-y-3">
         {list.map((r) => (
-          <RequestCard key={r.id} request={r} onClaim={claim} compact />
+          <BountyDetailsDialog key={r.id} request={r} onClaim={claim}>
+            <div role="button" tabIndex={0}>
+              <RequestCard request={r} compact />
+            </div>
+          </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">

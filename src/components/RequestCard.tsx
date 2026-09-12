@@ -13,7 +13,7 @@ import { BountyChat } from "@/components/BountyChat";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+
 
 export function RequestCard({
   request,
@@ -38,7 +38,7 @@ export function RequestCard({
 
   if (compact) {
     return (
-      <article className="rounded-lg border border-border bg-surface p-3">
+      <article className="w-full cursor-pointer rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:border-signal/50">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-2">
@@ -68,16 +68,13 @@ export function RequestCard({
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-2 border-t border-border pt-3">
-          <ShareBountyButton request={request} />
-          <Button
-            type="button"
-            disabled={done || request.status !== "open" || !onClaim}
-            className="h-10 w-full rounded-lg font-bold"
-            onClick={() => onClaim?.(request.id)}
-          >
-            {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Already Claimed" : "Claim Bounty"}
-          </Button>
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
+          <span onClick={(e) => e.stopPropagation()}>
+            <ShareBountyButton request={request} />
+          </span>
+          <span className="text-xs font-bold uppercase tracking-[0.12em] text-signal">
+            Tap for details
+          </span>
         </div>
       </article>
     );
