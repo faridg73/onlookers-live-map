@@ -87,7 +87,7 @@ function FeedScreen() {
         const catLabel = (
           CATEGORIES.find((c) => c.id === r.category)?.label ?? ""
         ).toLowerCase();
-        const haystack = `${r.title} ${r.location} ${r.category} ${catLabel}`.toLowerCase();
+        const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
