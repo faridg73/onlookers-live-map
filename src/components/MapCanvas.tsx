@@ -65,32 +65,63 @@ export function MapCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** Ask the device for its position and center the map on it. */
+  /** Position waiting for the map to finish loading. */
+  const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
+
+  const centerOn = useCallback((at: google.maps.LatLngLiteral) => {
+    if (!map.current) {
+      pendingCenter.current = at;
+      return;
+    }
+    map.current.setCenter(at);
+    const z = map.current.getZoom();
+    if (typeof z !== "number" || z < 15) map.current.setZoom(15);
+  }, []);
+
+  /** Ask the device for its precise position and center the map on it. */
   const locateMe = useCallback(() => {
     if (!("geolocation" in navigator)) {
       setGeoState("unavailable");
+      onUserPositionChange?.(null);
       return;
     }
     setGeoState("pending");
+    const accept = (pos: GeolocationPosition) => {
+      const at = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      setUserPos(at);
+      onUserPositionChange?.(at);
+      setGeoState("located");
+      centerOn(at);
+    };
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const at = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setUserPos(at);
-        onUserPositionChange?.(at);
-        setGeoState("located");
-        map.current?.panTo(at);
-      },
+      accept,
       () => {
-        setGeoState("unavailable");
-        onUserPositionChange?.(null);
+        // High accuracy can time out indoors — retry once with a coarse fix.
+        navigator.geolocation.getCurrentPosition(
+          accept,
+          () => {
+            setGeoState("unavailable");
+            onUserPositionChange?.(null);
+          },
+          { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 },
+        );
       },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
     );
-  }, [onUserPositionChange]);
+  }, [onUserPositionChange, centerOn]);
 
   useEffect(() => {
     locateMe();
   }, [locateMe]);
+
+  // If the fix arrived before the map booted, apply it as soon as it's ready.
+  useEffect(() => {
+    if (ready && pendingCenter.current) {
+      const at = pendingCenter.current;
+      pendingCenter.current = null;
+      centerOn(at);
+    }
+  }, [ready, centerOn]);
 
   const toPixel = (position: google.maps.LatLngLiteral): Pixel | null => {
     const projection = overlay.current?.getProjection();
