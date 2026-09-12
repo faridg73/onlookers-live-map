@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { EyeOff, PartyPopper, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
+import { TrustBadge } from "@/components/TrustBadge";
 import { Switch } from "@/components/ui/switch";
+import { fetchTrustStats, type TrustStats } from "@/lib/trust";
 import {
   XP_PER_BOUNTY,
   XP_PER_LEVEL,
@@ -18,10 +20,12 @@ const SEEN_LEVEL_KEY = "onlooker.seen-level";
 /** Status, experience progress and the privacy mask toggle. */
 export function HunterStatusCard() {
   const [stats, setStats] = useState<HunterStats | null>(null);
+  const [trust, setTrust] = useState<TrustStats | null>(null);
   const [saving, setSaving] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
 
   useEffect(() => {
+    void fetchTrustStats().then(setTrust);
     void fetchHunterStats().then((next) => {
       setStats(next);
       if (!next) return;
@@ -64,6 +68,8 @@ export function HunterStatusCard() {
           </span>
           <HunterBadge level={stats.hunterLevel} />
         </div>
+
+        {trust && <TrustBadge stats={trust} className="mt-3" />}
 
         {celebrating && (
           <p className="mt-3 flex items-center gap-2 rounded-xl bg-signal/15 px-3 py-2 text-xs font-bold text-signal">

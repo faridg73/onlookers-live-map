@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
+import { LiveReactions } from "@/components/LiveReactions";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -169,6 +170,7 @@ function ClipCard({ clip }: { clip: ExploreClip }) {
             </span>
           </button>
         )}
+        {user && <LiveReactions videoId={clip.id} />}
       </div>
 
       <div className="space-y-3 p-4">
