@@ -13,7 +13,7 @@ import { BountyChat } from "@/components/BountyChat";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+
 
 export function RequestCard({
   request,
