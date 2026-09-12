@@ -169,17 +169,75 @@ export function ChatDrawer({
                 </SheetTitle>
                 <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                   <MessageSquare className="size-3.5 text-signal" />
-                  <span className="font-display text-sm font-extrabold text-signal">${bounty}</span>
+                <span className="font-display text-sm font-extrabold text-signal">${reward}</span>
                   reward
                 </p>
               </div>
               <ChatStatusBadge stage={stage} />
             </div>
+
+            {canReview && (
+              <div className="mt-3 rounded-2xl border border-signal/40 bg-surface-raised p-3">
+                <p className="text-xs font-semibold text-foreground">
+                  A video is waiting on your review.
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={revise}
+                    disabled={working}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-border px-3 py-2 text-xs font-bold text-foreground disabled:opacity-50"
+                  >
+                    <RotateCcw className="size-3.5" /> Request Revision
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirming(true)}
+                    disabled={working}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold text-signal-foreground disabled:opacity-50"
+                  >
+                    {working ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <BadgeCheck className="size-3.5" />
+                    )}
+                    Approve &amp; Pay
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
-            <BountyChat requestKey={requestKey} bare />
+            <BountyChat requestKey={requestKey} bare readOnly={closed} />
           </div>
+
+          <AlertDialog open={confirming} onOpenChange={setConfirming}>
+            <AlertDialogContent className="border-border bg-surface">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-display text-foreground">
+                  Approve this video?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-muted-foreground">
+                  Are you sure you want to approve this video? This will instantly release $
+                  {reward} to the Bounty Hunter.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={working}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(event) => {
+                    event.preventDefault();
+                    void approve();
+                  }}
+                  disabled={working}
+                  className="bg-signal text-signal-foreground hover:bg-signal/90"
+                >
+                  {working ? "Releasing…" : "Approve & Pay"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </SheetContent>
       </Sheet>
     </>
