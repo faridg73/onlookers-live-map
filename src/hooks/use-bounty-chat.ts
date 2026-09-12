@@ -10,6 +10,7 @@ import {
   sendMessage,
   type ChatMessage,
 } from "@/lib/chat";
+import { markChatAlertsRead } from "@/lib/notifications";
 
 /**
  * Live message history for one bounty thread. Returns `locked: true` when the
