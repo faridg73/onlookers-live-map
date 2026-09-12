@@ -55,6 +55,18 @@
   --color-ring-offset-background: var(--background);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
+  --animate-confetti: confetti 2s linear forwards;
+}
+
+@keyframes confetti {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(110vh) rotate(720deg);
+  }
 }
 
 @keyframes ping-slow {
