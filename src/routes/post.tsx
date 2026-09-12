@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CategorySelect } from "@/components/CategorySelect";
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
   categoryById,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
+  subOptionById,
   type CategoryId,
 } from "@/lib/onlooker";
 
