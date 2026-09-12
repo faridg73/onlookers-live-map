@@ -74,6 +74,10 @@ function PostScreen() {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
       return;
     }
+    if (note.trim().length < 10) {
+      toast.error("Tell the hunter exactly what to film before going live.");
+      return;
+    }
     if (permissionNeeded && !permissionOk) {
       toast.error("Confirm you have permission from the seller, agent or property manager first.");
       return;
