@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Camera, MapPin, Radio } from "lucide-react";
+import { Camera, MapPin, Radar, Radio } from "lucide-react";
+import { toast } from "sonner";
+import { useRadar } from "@/hooks/use-radar";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
