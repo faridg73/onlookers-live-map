@@ -263,10 +263,20 @@ export function BountyChat({
         <button
           type="button"
           aria-label="Attach a photo or clip"
+          disabled={preparing}
           onClick={() => fileRef.current?.click()}
-          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
         >
-          <ImagePlus className="size-4" />
+          {preparing ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
+        </button>
+        <button
+          type="button"
+          aria-label={`Record a clip up to ${MAX_CLIP_SECONDS} seconds`}
+          disabled={preparing}
+          onClick={() => setRecording(true)}
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
+        >
+          <Video className="size-4" />
         </button>
         <input
           value={draft}
