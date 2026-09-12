@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { isAdmin, listAllPayoutRequests, resolvePayout, type AdminPayout } from "@/lib/admin";
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
       { title: "Onlooker admin dashboard — payouts and disputes" },
