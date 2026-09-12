@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Lock, MessageCircle, Send } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
-import { chatKey } from "@/lib/chat";
+import { chatKey, uploadChatAttachment } from "@/lib/chat";
 import type { LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +18,14 @@ function timeLabel(iso: string) {
 export function BountyChat({ request }: { request: LiveRequest }) {
   const { user } = useAuth();
   const key = chatKey(request);
-  const { messages, unread, loading, locked, send, seen } = useBountyChat(key, user?.id);
+  const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
+    key,
+    user?.id,
+  );
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,14 +43,37 @@ export function BountyChat({ request }: { request: LiveRequest }) {
     );
   }
 
+  function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error("That file is larger than 200 MB.");
+      return;
+    }
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return { file, preview: URL.createObjectURL(file) };
+    });
+  }
+
+  function clearPending() {
+    setPending((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return null;
+    });
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const body = draft.trim();
-    if (!body || sending) return;
+    if ((!body && !pending) || sending) return;
     setSending(true);
     try {
-      await send(body);
+      const media = pending ? await uploadChatAttachment(key, pending.file) : null;
+      await send(body, media);
       setDraft("");
+      clearPending();
       await seen();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Message not sent.");
@@ -86,7 +114,29 @@ export function BountyChat({ request }: { request: LiveRequest }) {
                     : "border border-border bg-surface text-foreground",
                 )}
               >
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                {m.media_url &&
+                  (mediaLinks[m.media_url] ? (
+                    m.media_type === "video" ? (
+                      <video
+                        src={mediaLinks[m.media_url]}
+                        controls
+                        playsInline
+                        className="mb-2 w-full max-w-56 rounded-xl bg-black"
+                      />
+                    ) : (
+                      <img
+                        src={mediaLinks[m.media_url]}
+                        alt={m.body || "Shared photo"}
+                        loading="lazy"
+                        className="mb-2 w-full max-w-56 rounded-xl object-cover"
+                      />
+                    )
+                  ) : (
+                    <div className="mb-2 flex h-24 w-56 items-center justify-center rounded-xl bg-black/20">
+                      <Loader2 className="size-4 animate-spin" />
+                    </div>
+                  ))}
+                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                 <p
                   className={cn(
                     "mt-1 text-[0.6rem]",
@@ -102,7 +152,47 @@ export function BountyChat({ request }: { request: LiveRequest }) {
         <div ref={endRef} />
       </div>
 
+      {pending && (
+        <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-2">
+          {pending.file.type.startsWith("video/") ? (
+            <video src={pending.preview} className="size-12 rounded-lg bg-black object-cover" />
+          ) : (
+            <img
+              src={pending.preview}
+              alt="Attachment preview"
+              className="size-12 rounded-lg object-cover"
+            />
+          )}
+          <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+            {pending.file.name}
+          </p>
+          <button
+            type="button"
+            aria-label="Remove attachment"
+            onClick={clearPending}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
+
       <form onSubmit={submit} className="mt-3 flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*,video/*"
+          onChange={pickFile}
+          className="hidden"
+        />
+        <button
+          type="button"
+          aria-label="Attach a photo or clip"
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground"
+        >
+          <ImagePlus className="size-4" />
+        </button>
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -113,7 +203,7 @@ export function BountyChat({ request }: { request: LiveRequest }) {
         <button
           type="submit"
           aria-label="Send message"
-          disabled={sending || draft.trim().length === 0}
+          disabled={sending || (draft.trim().length === 0 && !pending)}
           className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-40"
         >
           {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
