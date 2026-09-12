@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { useOnlooker } from "@/lib/onlooker-store";
@@ -58,6 +59,7 @@ function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
+  const [query, setQuery] = useState("");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
 
@@ -76,18 +78,28 @@ function FeedScreen() {
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
+  // Category pills and typed keyword both filter in real time.
   const list = useMemo(() => {
-    const filtered = requests.filter(
-      (r) =>
-        (filter === "all" || r.status === filter) && (cat === "all" || r.category === cat),
-    );
+    const q = query.trim().toLowerCase();
+    const filtered = requests.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (cat !== "all" && r.category !== cat) return false;
+      if (q) {
+        const catLabel = (
+          CATEGORIES.find((c) => c.id === r.category)?.label ?? ""
+        ).toLowerCase();
+        const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
     if (!userPosition) return filtered;
     const from = userPosition;
     return [...filtered].sort(
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [requests, filter, cat, userPosition]);
+  }, [requests, filter, cat, query, userPosition]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
     userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
@@ -110,25 +122,9 @@ function FeedScreen() {
         </button>
       )}
 
-      <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
-      <div className="mt-2 grid grid-cols-5 gap-1.5">
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={
-              "min-w-0 rounded-lg border px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
-              (filter === f.key
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface text-muted-foreground hover:text-foreground")
-            }
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Category</p>
+      <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">
+        What do you want to see?
+      </p>
       <div className="mt-2 grid grid-cols-3 gap-1.5">
         {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
           <button
@@ -145,6 +141,46 @@ function FeedScreen() {
               {c.emoji && <span className="shrink-0">{c.emoji}</span>}
               <span>{c.id === "all" ? c.label : SHORT_CATEGORY_LABELS[c.id]}</span>
             </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-surface px-3">
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by keyword, place, or type..."
+          aria-label="Search bounties"
+          className="h-10 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            className="shrink-0 text-xs font-bold text-muted-foreground hover:text-foreground"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
+      <div className="mt-2 grid grid-cols-5 gap-1.5">
+        {FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={
+              "min-w-0 rounded-lg border px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
+              (filter === f.key
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            {f.label}
           </button>
         ))}
       </div>
