@@ -21,12 +21,15 @@ export function RequestCard({
   active,
   onSelect,
   compact = false,
+  distanceLabel,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
   active?: boolean;
   onSelect?: (id: string) => void;
   compact?: boolean;
+  /** Pre-computed "4.2 mi" style label shown under the location. */
+  distanceLabel?: string;
 }) {
   const expired = request.status === "expired";
   const done = isClosed(request);

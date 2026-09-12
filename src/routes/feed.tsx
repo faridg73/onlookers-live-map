@@ -138,7 +138,7 @@ function FeedScreen() {
         {list.map((r) => (
           <BountyDetailsDialog key={r.id} request={r} onClaim={claim}>
             <div role="button" tabIndex={0}>
-              <RequestCard request={r} compact />
+              <RequestCard request={r} compact distanceLabel={distanceLabel(r)} />
             </div>
           </BountyDetailsDialog>
         ))}
