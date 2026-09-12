@@ -8,6 +8,7 @@ import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
 import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
+import { CHAT_SAFETY_NOTE, maskContactInfo } from "@/lib/chat-safety";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
