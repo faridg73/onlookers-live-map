@@ -110,20 +110,22 @@ function PostScreen() {
     }
   }
 
+  const sectionLabel =
+    "text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75";
+  const card = "rounded-2xl border border-border bg-surface p-4 shadow-sm";
+
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
-      <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground">
+    <div className="mx-auto max-w-lg px-4 pb-32 pt-6">
+      <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
         Post a request
       </h1>
-      <p className="mt-2 text-sm font-semibold text-foreground/70">
+      <p className="mt-1.5 text-sm font-semibold text-foreground/70">
         The higher the bounty, the faster someone walks over.
       </p>
 
-      <form onSubmit={submit} className="mt-6 space-y-5">
-        <label className="block space-y-1.5">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
-            What do you want to see?
-          </span>
+      <form onSubmit={submit} className="mt-5 space-y-3">
+        <label className={`block space-y-2 ${card}`}>
+          <span className={sectionLabel}>What do you want to see?</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -133,32 +135,30 @@ function PostScreen() {
           />
         </label>
 
-        <label className="block space-y-1.5">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
-            Where
-          </span>
-          <input
-            value={place}
-            onChange={(e) => setPlace(e.target.value)}
-            required
-            placeholder="Corner of Ash Alley & 6th"
-            className="field"
-          />
+        <div className={`space-y-2 ${card}`}>
+          <label className="block space-y-2">
+            <span className={sectionLabel}>Where</span>
+            <input
+              value={place}
+              onChange={(e) => setPlace(e.target.value)}
+              required
+              placeholder="Corner of Ash Alley & 6th"
+              className="field"
+            />
+          </label>
           <LocationPreviewMap address={place} onPick={setSpot} />
-          <span className="block text-xs font-medium text-foreground/70">
+          <p className="text-xs font-medium text-foreground/70">
             Drag the pin or tap the map to fix the exact spot. Zoom in to check the street.
-          </span>
-        </label>
+          </p>
+        </div>
 
-        <div className="space-y-2">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
-            Category
-          </span>
+        <div className={`space-y-2.5 ${card}`}>
+          <span className={sectionLabel}>Category</span>
           <CategorySelect value={category} onChange={setCategory} />
         </div>
 
         {permissionNeeded && (
-          <label className="flex gap-3 rounded-xl border border-signal/40 bg-surface p-3">
+          <label className="flex gap-3 rounded-2xl border border-signal/40 bg-surface p-4">
             <input
               type="checkbox"
               checked={permissionOk}
@@ -174,7 +174,7 @@ function PostScreen() {
         )}
 
         {codeNeeded && (
-          <div className="space-y-1.5 rounded-xl border border-signal/40 bg-surface p-3">
+          <div className="space-y-2 rounded-2xl border border-signal/40 bg-surface p-4">
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-signal">
               Private access passcode
             </span>
@@ -194,21 +194,19 @@ function PostScreen() {
                 Generate
               </button>
             </div>
-            <span className="block text-xs font-medium text-foreground/70">
+            <p className="text-xs font-medium text-foreground/70">
               Stays hidden until someone claims the bounty. They can quote it on site to prove the
               owner, agent or manager authorised the visit.
-            </span>
+            </p>
           </div>
         )}
 
-        <label className="block space-y-1.5">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
-            Instructions for the onlooker
-          </span>
+        <label className={`block space-y-2 ${card}`}>
+          <span className={sectionLabel}>Instructions for the onlooker</span>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            rows={5}
+            rows={4}
             placeholder={categoryById(category)?.hint}
             className="field resize-none"
           />
@@ -217,25 +215,25 @@ function PostScreen() {
           </span>
         </label>
 
-        <div className="space-y-2">
-          <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75">
-            Bounty
-          </span>
+        <div className={`space-y-2.5 ${card}`}>
+          <span className={sectionLabel}>Bounty</span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
         </div>
 
-        <button
-          type="submit"
-          disabled={
-            posting ||
-            bounty < MIN_BOUNTY ||
-            (permissionNeeded && !permissionOk) ||
-            (codeNeeded && accessCode.trim().length < 4)
-          }
-          className="w-full rounded-xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
-        >
-          {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
-        </button>
+        <div className="pt-1">
+          <button
+            type="submit"
+            disabled={
+              posting ||
+              bounty < MIN_BOUNTY ||
+              (permissionNeeded && !permissionOk) ||
+              (codeNeeded && accessCode.trim().length < 4)
+            }
+            className="w-full rounded-2xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-40"
+          >
+            {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
+          </button>
+        </div>
       </form>
     </div>
   );

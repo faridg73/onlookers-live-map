@@ -4,6 +4,7 @@ import { Camera, ChevronDown, MapPin, Navigation, Zap } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
+import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onlooker";
@@ -117,6 +118,9 @@ function MapScreen() {
                           <MapPin className="size-3 shrink-0" />
                           <span className="truncate">{request.place}</span>
                         </span>
+                        <span className="mt-0.5 block text-xs font-bold text-signal">
+                          {formatDistance(distance)} away
+                        </span>
                       </span>
                       <span className="shrink-0 text-right">
                         <span className="block font-display text-lg font-extrabold text-signal">${request.bounty}</span>
@@ -125,17 +129,11 @@ function MapScreen() {
                         </span>
                       </span>
                     </button>
-                    <Button
-                      type="button"
-                      className="mt-3 h-10 w-full rounded-lg font-bold"
-                      onClick={() => {
-                        claim(request.id);
-                        select(request.id);
-                        setNearbyOpen(false);
-                      }}
-                    >
-                      Claim Bounty
-                    </Button>
+                    <BountyDetailsDialog request={request} onClaim={claim}>
+                      <Button type="button" variant="outline" className="mt-3 h-10 w-full rounded-lg font-bold">
+                        View details
+                      </Button>
+                    </BountyDetailsDialog>
                   </li>
                 ))}
               </ul>
@@ -153,7 +151,19 @@ function MapScreen() {
       {selected && (
         <div className="absolute inset-x-0 bottom-[5.75rem] z-30 px-4">
           <div className="mx-auto max-w-lg animate-rise">
-            <RequestCard request={selected} onClaim={claim} active />
+            <BountyDetailsDialog request={selected} onClaim={claim}>
+              <div role="button" tabIndex={0}>
+                <RequestCard
+                  request={selected}
+                  active
+                  distanceLabel={
+                    userPosition
+                      ? formatDistance(distanceMiles(userPosition, requestMapPosition(selected)))
+                      : undefined
+                  }
+                />
+              </div>
+            </BountyDetailsDialog>
           </div>
         </div>
       )}
