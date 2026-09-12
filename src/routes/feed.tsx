@@ -42,24 +42,11 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
-const SHORT_CATEGORY_LABELS: Record<CategoryId, string> = {
-  food: "Food",
-  vehicles: "Vehicles",
-  outdoors: "Outdoors",
-  nightlife: "Nightlife",
-  transit: "Transit",
-  events: "Concerts",
-  parking: "Parking",
-  weather: "Weather",
-  realestate: "Real Estate",
-  art: "Art",
-  sports: "Sports",
-};
-
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
+  const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
@@ -82,19 +69,23 @@ function FeedScreen() {
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
-  // Category pills and typed keyword both filter in real time.
+  // Category tiles, sub-options and typed keyword all filter in real time.
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const subOption = cat === "all" ? undefined : subOptionById(cat, sub);
     const filtered = requests.filter((r) => {
       if (filter !== "all" && r.status !== filter) return false;
-      if (cat !== "all" && r.category !== cat) return false;
-      if (q) {
-        const catLabel = (
-          CATEGORIES.find((c) => c.id === r.category)?.label ?? ""
-        ).toLowerCase();
-        const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
+      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+      const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
+      if (cat !== "all") {
+        // A sub-option may point at its own stored category (Events → Sports).
+        const wanted = subOption?.category ?? cat;
+        if (r.category !== wanted) return false;
+        if (subOption && !subOption.category && !haystack.includes(subOption.label.toLowerCase())) {
+          return false;
+        }
       }
+      if (q && !haystack.includes(q)) return false;
       return true;
     });
     if (!userPosition) return filtered;
