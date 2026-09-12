@@ -18,9 +18,14 @@ function timeLabel(iso: string) {
 export function BountyChat({ request }: { request: LiveRequest }) {
   const { user } = useAuth();
   const key = chatKey(request);
-  const { messages, unread, loading, locked, send, seen } = useBountyChat(key, user?.id);
+  const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
+    key,
+    user?.id,
+  );
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
