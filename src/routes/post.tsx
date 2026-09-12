@@ -41,7 +41,12 @@ function PostScreen() {
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(10);
-  const [category, setCategory] = useState<CategoryId>("food");
+  // The picked 3x3 tile plus its sub-option; a sub-option may re-map the
+  // category that actually gets stored (e.g. Events → Sports game).
+  const [tile, setTile] = useState<CategoryId>("food");
+  const [sub, setSub] = useState<string | null>(null);
+  const subOption = subOptionById(tile, sub);
+  const category: CategoryId = subOption?.category ?? tile;
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
