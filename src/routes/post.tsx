@@ -225,7 +225,10 @@ function PostScreen() {
             className="field resize-none"
           />
           <span className="block text-xs font-medium text-foreground/70">
-            Spell out exactly what you want captured for {categoryById(category)?.label.toLowerCase()}.
+            Spell out exactly what you want captured for{" "}
+            {subOption
+              ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
+              : categoryById(category)?.label.toLowerCase()}.
           </span>
         </label>
 
