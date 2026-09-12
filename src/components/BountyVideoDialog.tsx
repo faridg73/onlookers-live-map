@@ -14,6 +14,7 @@ import {
 import { isClosed } from "@/lib/onlooker-store";
 import { AccessPasscode } from "@/components/AccessPasscode";
 import { BountyChat } from "@/components/BountyChat";
+import { chatKey } from "@/lib/chat";
 import { useAuth } from "@/hooks/use-auth";
 import {
   acceptBountyVideo,
@@ -144,7 +145,7 @@ export function BountyVideoDialog({
           </DialogDescription>
         </DialogHeader>
         <AccessPasscode request={request} />
-        <BountyChat request={request} />
+        <BountyChat requestKey={chatKey(request)} />
 
         {!user ? (
           <div className="rounded-2xl border border-border bg-surface p-5 text-center">

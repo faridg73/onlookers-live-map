@@ -1,4 +1,4 @@
-import { Eye, MapPin, Camera, Video, X } from "lucide-react";
+import { Eye, MapPin, Camera, MessageCircle, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
@@ -9,8 +9,9 @@ import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { AccessPasscode } from "@/components/AccessPasscode";
-import { BountyChat } from "@/components/BountyChat";
+import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { chatKey } from "@/lib/chat";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
@@ -171,7 +172,19 @@ export function RequestCard({
 
       <AccessPasscode request={request} />
 
-      <BountyChat request={request} />
+      <ChatDrawer
+        requestKey={chatKey(request)}
+        title={request.title}
+        bounty={pool}
+        status={request.status}
+      >
+        <button
+          type="button"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-raised px-3 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-signal"
+        >
+          <MessageCircle className="size-3.5 text-signal" /> Open chat
+        </button>
+      </ChatDrawer>
 
       {!done && (
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-raised px-3 py-2">

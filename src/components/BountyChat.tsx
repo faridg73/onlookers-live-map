@@ -3,8 +3,7 @@ import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
-import { chatKey, uploadChatAttachment } from "@/lib/chat";
-import type { LiveRequest } from "@/lib/onlooker";
+import { uploadChatAttachment } from "@/lib/chat";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
@@ -14,10 +13,12 @@ function timeLabel(iso: string) {
 /**
  * SMS-style thread between the requester and the reporter on the bounty. It
  * only unlocks once the bounty is claimed or a clip has been submitted.
+ *
+ * `bare` drops the card chrome so the thread can fill the chat drawer.
  */
-export function BountyChat({ request }: { request: LiveRequest }) {
+export function BountyChat({ requestKey, bare = false }: { requestKey: string; bare?: boolean }) {
   const { user } = useAuth();
-  const key = chatKey(request);
+  const key = requestKey;
   const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
     key,
     user?.id,
@@ -85,18 +86,22 @@ export function BountyChat({ request }: { request: LiveRequest }) {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="mt-3 rounded-2xl border border-border bg-surface-raised p-3"
+      className={cn(
+        bare ? "pt-3" : "mt-3 rounded-2xl border border-border bg-surface-raised p-3",
+      )}
     >
-      <div className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-foreground">
-        <MessageCircle className="size-3.5 text-signal" /> Messages
-        {unread > 0 && (
-          <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold text-signal-foreground">
-            {unread} new
-          </span>
-        )}
-      </div>
+      {!bare && (
+        <div className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-foreground">
+          <MessageCircle className="size-3.5 text-signal" /> Messages
+          {unread > 0 && (
+            <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold text-signal-foreground">
+              {unread} new
+            </span>
+          )}
+        </div>
+      )}
 
-      <div className="mt-3 max-h-56 space-y-2 overflow-y-auto pr-1">
+      <div className={cn("mt-3 space-y-2 pr-1", bare ? "" : "max-h-56 overflow-y-auto")}>
         {messages.length === 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
             No messages yet — say hello and share the details.
