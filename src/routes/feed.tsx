@@ -61,13 +61,18 @@ function FeedScreen() {
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
 
-  useEffect(() => {
+  const locate = () => {
     if (!("geolocation" in navigator)) return;
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => setUserPosition({ lat: coords.latitude, lng: coords.longitude }),
       () => {},
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
     );
+  };
+
+  useEffect(() => {
+    locate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
