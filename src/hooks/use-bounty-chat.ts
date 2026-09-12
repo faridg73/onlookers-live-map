@@ -21,6 +21,7 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
   const [lastReadAt, setLastReadAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [locked, setLocked] = useState(true);
+  const [mediaLinks, setMediaLinks] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     if (!userId) {
