@@ -114,7 +114,29 @@ export function BountyChat({ request }: { request: LiveRequest }) {
                     : "border border-border bg-surface text-foreground",
                 )}
               >
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                {m.media_url &&
+                  (mediaLinks[m.media_url] ? (
+                    m.media_type === "video" ? (
+                      <video
+                        src={mediaLinks[m.media_url]}
+                        controls
+                        playsInline
+                        className="mb-2 w-full max-w-56 rounded-xl bg-black"
+                      />
+                    ) : (
+                      <img
+                        src={mediaLinks[m.media_url]}
+                        alt={m.body || "Shared photo"}
+                        loading="lazy"
+                        className="mb-2 w-full max-w-56 rounded-xl object-cover"
+                      />
+                    )
+                  ) : (
+                    <div className="mb-2 flex h-24 w-56 items-center justify-center rounded-xl bg-black/20">
+                      <Loader2 className="size-4 animate-spin" />
+                    </div>
+                  ))}
+                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
                 <p
                   className={cn(
                     "mt-1 text-[0.6rem]",
