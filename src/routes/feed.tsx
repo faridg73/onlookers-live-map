@@ -3,11 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { CategoryPicker, type CategoryPickerValue } from "@/components/CategoryPicker";
 import { useOnlooker } from "@/lib/onlooker-store";
 import {
   CATEGORIES,
   distanceMiles,
   requestMapPosition,
+  subOptionById,
   type CategoryId,
   type MapPosition,
   type RequestStatus,
@@ -42,24 +44,11 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
-const SHORT_CATEGORY_LABELS: Record<CategoryId, string> = {
-  food: "Food",
-  vehicles: "Vehicles",
-  outdoors: "Outdoors",
-  nightlife: "Nightlife",
-  transit: "Transit",
-  events: "Concerts",
-  parking: "Parking",
-  weather: "Weather",
-  realestate: "Real Estate",
-  art: "Art",
-  sports: "Sports",
-};
-
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
   const [cat, setCat] = useState<CategoryId | "all">("all");
+  const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
@@ -82,19 +71,23 @@ function FeedScreen() {
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
-  // Category pills and typed keyword both filter in real time.
+  // Category tiles, sub-options and typed keyword all filter in real time.
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const subOption = cat === "all" ? undefined : subOptionById(cat, sub);
     const filtered = requests.filter((r) => {
       if (filter !== "all" && r.status !== filter) return false;
-      if (cat !== "all" && r.category !== cat) return false;
-      if (q) {
-        const catLabel = (
-          CATEGORIES.find((c) => c.id === r.category)?.label ?? ""
-        ).toLowerCase();
-        const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
+      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+      const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
+      if (cat !== "all") {
+        // A sub-option may point at its own stored category (Events → Sports).
+        const wanted = subOption?.category ?? cat;
+        if (r.category !== wanted) return false;
+        if (subOption && !subOption.category && !haystack.includes(subOption.label.toLowerCase())) {
+          return false;
+        }
       }
+      if (q && !haystack.includes(q)) return false;
       return true;
     });
     if (!userPosition) return filtered;
@@ -134,24 +127,14 @@ function FeedScreen() {
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">
         What do you want to see?
       </p>
-      <div className="mt-2 grid grid-cols-3 gap-1.5">
-        {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setCat(c.id)}
-            className={
-              "min-w-0 rounded-lg border px-1.5 py-2 text-[0.68rem] font-semibold leading-tight transition-colors " +
-              (cat === c.id
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface text-muted-foreground hover:text-foreground")
-            }
-          >
-            <span className="flex min-h-8 items-center justify-center gap-1 text-center">
-              {c.emoji && <span className="shrink-0">{c.emoji}</span>}
-              <span>{c.id === "all" ? c.label : SHORT_CATEGORY_LABELS[c.id]}</span>
-            </span>
-          </button>
-        ))}
+      <div className="mt-2">
+        <CategoryPicker
+          value={cat}
+          onChange={(id: CategoryPickerValue) => setCat(id)}
+          sub={sub}
+          onSubChange={setSub}
+          includeAll
+        />
       </div>
 
       <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-surface px-3">

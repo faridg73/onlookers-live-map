@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { CategorySelect } from "@/components/CategorySelect";
+import { CategoryPicker } from "@/components/CategoryPicker";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
   categoryById,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
+  subOptionById,
   type CategoryId,
 } from "@/lib/onlooker";
 
@@ -40,7 +41,12 @@ function PostScreen() {
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(10);
-  const [category, setCategory] = useState<CategoryId>("food");
+  // The picked 3x3 tile plus its sub-option; a sub-option may re-map the
+  // category that actually gets stored (e.g. Events → Sports game).
+  const [tile, setTile] = useState<CategoryId>("food");
+  const [sub, setSub] = useState<string | null>(null);
+  const subOption = subOptionById(tile, sub);
+  const category: CategoryId = subOption?.category ?? tile;
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
@@ -89,13 +95,16 @@ function PostScreen() {
         longitude: spot?.longitude,
       });
       setBalance(locked.balance);
+      const details = subOption
+        ? `Focus: ${subOption.label}${note.trim() ? `\n${note.trim()}` : ""}`
+        : note.trim();
       addRequest({
         title: title.trim(),
         place: place.trim(),
-        note: note.trim(),
+        note: details,
         bounty,
         category,
-        instructions: note.trim(),
+        instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
       });
@@ -154,7 +163,12 @@ function PostScreen() {
 
         <div className={`space-y-2.5 ${card}`}>
           <span className={sectionLabel}>Category</span>
-          <CategorySelect value={category} onChange={setCategory} />
+          <CategoryPicker
+            value={tile}
+            onChange={(id) => setTile(id as CategoryId)}
+            sub={sub}
+            onSubChange={setSub}
+          />
         </div>
 
         {permissionNeeded && (
@@ -211,7 +225,10 @@ function PostScreen() {
             className="field resize-none"
           />
           <span className="block text-xs font-medium text-foreground/70">
-            Spell out exactly what you want captured for {categoryById(category)?.label.toLowerCase()}.
+            Spell out exactly what you want captured for{" "}
+            {subOption
+              ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
+              : categoryById(category)?.label.toLowerCase()}.
           </span>
         </label>
 

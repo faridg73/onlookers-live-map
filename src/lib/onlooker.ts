@@ -13,27 +13,123 @@ export type CategoryId =
   | "art"
   | "sports";
 
+/** A refinement inside a category. `category` re-maps the stored category. */
+export type SubOption = { id: string; label: string; category?: CategoryId };
+
 export type Category = {
   id: CategoryId;
   label: string;
+  /** Compact label used in tight grids */
+  short: string;
   emoji: string;
   /** Prompt shown inside the instructions box for this category */
   hint: string;
+  subs: SubOption[];
 };
 
 export const CATEGORIES: Category[] = [
-  { id: "food", label: "Food & Dining", emoji: "\u{1F37D}\u{FE0F}", hint: "e.g. Show the line at the door, the menu board, and whether the patio has free tables." },
-  { id: "vehicles", label: "Cars & Vehicles", emoji: "\u{1F697}", hint: "e.g. Cold start engine sound, 360\u00B0 walkaround, odometer photo, any dents or rust." },
-  { id: "outdoors", label: "Nature & Trails", emoji: "\u{1F3DE}\u{FE0F}", hint: "e.g. Trail conditions at the north gate, how muddy it is, and the view from the ridge." },
-  { id: "nightlife", label: "Nightlife & Bars", emoji: "\u{1F378}", hint: "e.g. How long is the queue, is there a cover charge, how busy is it inside." },
-  { id: "transit", label: "Transit & Traffic", emoji: "\u{1F686}", hint: "e.g. Photo of the departure board and how backed up the road is heading north." },
-  { id: "events", label: "Events & Concerts", emoji: "\u{1F3AB}", hint: "e.g. Crowd size at the gate, stage view from the back, merch line length." },
-  { id: "parking", label: "Parking", emoji: "\u{1F17F}\u{FE0F}", hint: "e.g. Wide shot of the lot, how many spots are open, and the posted hourly rate." },
-  { id: "weather", label: "Weather & Conditions", emoji: "\u{26C5}", hint: "e.g. Is the underpass flooded, how deep is the water, is the road still passable." },
-  { id: "realestate", label: "Real Estate & Open Houses", emoji: "\u{1F3E1}", hint: "e.g. Walk the open house room by room, show the yard, note damp spots and street noise." },
-  { id: "art", label: "Art Galleries & Exhibits", emoji: "\u{1F5BC}\u{FE0F}", hint: "e.g. Which pieces are on show, how busy the room is, and whether photography is allowed." },
-  { id: "sports", label: "Sporting & Events", emoji: "\u{1F3DF}\u{FE0F}", hint: "e.g. Crowd size, view from the seats, queue at the gate and the score right now." },
+  { id: "food", label: "Food & Dining", short: "Food", emoji: "\u{1F37D}\u{FE0F}", hint: "e.g. Show the line at the door, the menu board, and whether the patio has free tables.", subs: [
+    { id: "wait", label: "Wait time" },
+    { id: "menu", label: "Menu & prices" },
+    { id: "seating", label: "Seating / patio" },
+    { id: "drivethru", label: "Drive-thru" },
+    { id: "market", label: "Market & groceries" },
+  ] },
+  { id: "vehicles", label: "Cars & Vehicles", short: "Vehicles", emoji: "\u{1F697}", hint: "e.g. Cold start engine sound, 360\u00B0 walkaround, odometer photo, any dents or rust.", subs: [
+    { id: "walkaround", label: "Walkaround" },
+    { id: "engine", label: "Cold start / engine" },
+    { id: "interior", label: "Interior & odometer" },
+    { id: "damage", label: "Damage & rust" },
+    { id: "boat", label: "Boats & RVs" },
+  ] },
+  { id: "outdoors", label: "Nature & Trails", short: "Outdoors", emoji: "\u{1F3DE}\u{FE0F}", hint: "e.g. Trail conditions at the north gate, how muddy it is, and the view from the ridge.", subs: [
+    { id: "trail", label: "Trail conditions" },
+    { id: "beach", label: "Beach & surf" },
+    { id: "crowd", label: "How busy" },
+    { id: "wildlife", label: "Wildlife" },
+    { id: "view", label: "Scenic view" },
+  ] },
+  { id: "nightlife", label: "Nightlife & Bars", short: "Nightlife", emoji: "\u{1F378}", hint: "e.g. How long is the queue, is there a cover charge, how busy is it inside.", subs: [
+    { id: "queue", label: "Line & wait" },
+    { id: "cover", label: "Cover charge" },
+    { id: "vibe", label: "Crowd & vibe" },
+    { id: "music", label: "Music / DJ" },
+    { id: "dresscode", label: "Dress code" },
+  ] },
+  { id: "transit", label: "Transit & Traffic", short: "Transit", emoji: "\u{1F686}", hint: "e.g. Photo of the departure board and how backed up the road is heading north.", subs: [
+    { id: "traffic", label: "Road traffic" },
+    { id: "board", label: "Departure board" },
+    { id: "station", label: "Station crowding" },
+    { id: "airport", label: "Airport lines" },
+    { id: "closure", label: "Closures & detours" },
+  ] },
+  { id: "events", label: "Events & Concerts", short: "Events", emoji: "\u{1F3AB}", hint: "e.g. Crowd size at the gate, stage view from the back, merch line length.", subs: [
+    { id: "concert", label: "Concert" },
+    { id: "sports", label: "Sports game", category: "sports" },
+    { id: "art", label: "Art & exhibits", category: "art" },
+    { id: "festival", label: "Festival & fair" },
+    { id: "gate", label: "Gate & entry line" },
+  ] },
+  { id: "parking", label: "Parking", short: "Parking", emoji: "\u{1F17F}\u{FE0F}", hint: "e.g. Wide shot of the lot, how many spots are open, and the posted hourly rate.", subs: [
+    { id: "street", label: "Street parking" },
+    { id: "lot", label: "Lot & garage" },
+    { id: "rates", label: "Rates & signs" },
+    { id: "ev", label: "EV charging" },
+    { id: "accessible", label: "Accessible spots" },
+  ] },
+  { id: "weather", label: "Weather & Conditions", short: "Weather", emoji: "\u{26C5}", hint: "e.g. Is the underpass flooded, how deep is the water, is the road still passable.", subs: [
+    { id: "flooding", label: "Flooding" },
+    { id: "snow", label: "Snow & ice" },
+    { id: "wind", label: "Wind & storm" },
+    { id: "smoke", label: "Smoke & haze" },
+    { id: "sky", label: "Sky right now" },
+  ] },
+  { id: "realestate", label: "Real Estate & Open Houses", short: "Real Estate", emoji: "\u{1F3E1}", hint: "e.g. Walk the open house room by room, show the yard, note damp spots and street noise.", subs: [
+    { id: "openhouse", label: "Open house walk" },
+    { id: "exterior", label: "Exterior & yard" },
+    { id: "condition", label: "Condition & damp" },
+    { id: "street", label: "Street & noise" },
+    { id: "rental", label: "Rental viewing" },
+  ] },
+  { id: "art", label: "Art Galleries & Exhibits", short: "Art", emoji: "\u{1F5BC}\u{FE0F}", hint: "e.g. Which pieces are on show, how busy the room is, and whether photography is allowed.", subs: [
+    { id: "onshow", label: "What's on show" },
+    { id: "busy", label: "How busy" },
+    { id: "photos", label: "Photo rules" },
+  ] },
+  { id: "sports", label: "Sporting & Events", short: "Sports", emoji: "\u{1F3DF}\u{FE0F}", hint: "e.g. Crowd size, view from the seats, queue at the gate and the score right now.", subs: [
+    { id: "score", label: "Score right now" },
+    { id: "seatview", label: "View from seats" },
+    { id: "crowd", label: "Crowd & queue" },
+  ] },
 ];
+
+/**
+ * The nine tiles shown in the 3x3 picker on both /feed and /post. Art and
+ * sports stay valid stored categories, reachable as sub-options of Events.
+ */
+export const PRIMARY_CATEGORY_IDS: CategoryId[] = [
+  "food",
+  "vehicles",
+  "outdoors",
+  "nightlife",
+  "transit",
+  "events",
+  "parking",
+  "weather",
+  "realestate",
+];
+
+export const PRIMARY_CATEGORIES: Category[] = PRIMARY_CATEGORY_IDS.map(
+  (id) => CATEGORIES.find((c) => c.id === id)!,
+);
+
+export function subOptionsFor(id?: CategoryId | null): SubOption[] {
+  return (id && CATEGORIES.find((c) => c.id === id)?.subs) || [];
+}
+
+export function subOptionById(categoryId: CategoryId, subId?: string | null) {
+  return subId ? subOptionsFor(categoryId).find((s) => s.id === subId) : undefined;
+}
 
 /** Categories that require written permission from an owner or agent first. */
 export const PERMISSION_REQUIRED_CATEGORIES: CategoryId[] = ["realestate"];
