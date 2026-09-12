@@ -61,13 +61,18 @@ function FeedScreen() {
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
 
-  useEffect(() => {
+  const locate = () => {
     if (!("geolocation" in navigator)) return;
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => setUserPosition({ lat: coords.latitude, lng: coords.longitude }),
       () => {},
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
     );
+  };
+
+  useEffect(() => {
+    locate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Closest bounties first (like Google Local results); unknown distances go last.
@@ -94,6 +99,16 @@ function FeedScreen() {
       <p className="mt-1 text-sm text-muted-foreground">
         <span className="text-signal">${pot}</span> in open bounties within {radius} {unit} of you.
       </p>
+
+      {!userPosition && (
+        <button
+          type="button"
+          onClick={locate}
+          className="mt-3 w-full rounded-lg border border-signal bg-surface px-3 py-2 text-xs font-bold text-signal"
+        >
+          Turn on location to show distances
+        </button>
+      )}
 
       <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
       <div className="mt-2 grid grid-cols-5 gap-1.5">
