@@ -38,7 +38,7 @@ export function RequestCard({
 
   if (compact) {
     return (
-      <article className="rounded-lg border border-border bg-surface p-3">
+      <article className="w-full cursor-pointer rounded-lg border border-border bg-surface p-3 text-left transition-colors hover:border-signal/50">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-2">
