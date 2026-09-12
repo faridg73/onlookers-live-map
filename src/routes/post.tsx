@@ -220,7 +220,7 @@ function PostScreen() {
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
         </div>
 
-        <div className="sticky bottom-[5.5rem] z-20 pt-1">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={
