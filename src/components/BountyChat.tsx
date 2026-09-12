@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
+import { Confetti } from "@/components/Confetti";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
 import { uploadChatAttachment } from "@/lib/chat";
+import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
@@ -16,7 +18,16 @@ function timeLabel(iso: string) {
  *
  * `bare` drops the card chrome so the thread can fill the chat drawer.
  */
-export function BountyChat({ requestKey, bare = false }: { requestKey: string; bare?: boolean }) {
+export function BountyChat({
+  requestKey,
+  bare = false,
+  readOnly = false,
+}: {
+  requestKey: string;
+  bare?: boolean;
+  /** Approved bounties become a historical log: no typing, no attachments. */
+  readOnly?: boolean;
+}) {
   const { user } = useAuth();
   const key = requestKey;
   const { messages, mediaLinks, unread, loading, locked, send, seen } = useBountyChat(
@@ -26,13 +37,27 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [pending, setPending] = useState<{ file: File; preview: string } | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const lastApproval = useRef<string | null>(null);
+  const settled = useRef(false);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
     if (!locked && messages.length > 0 && unread > 0) void seen();
   }, [messages, locked, unread, seen]);
+
+  // Fire the celebration on both screens the moment the approval notice lands.
+  useEffect(() => {
+    if (loading) return;
+    const firstPass = !settled.current;
+    settled.current = true;
+    const approval = [...messages].reverse().find((m) => isApprovalMessage(m.body));
+    if (!approval || lastApproval.current === approval.id) return;
+    lastApproval.current = approval.id;
+    if (!firstPass) setCelebrate(true);
+  }, [messages, loading]);
 
   if (!user || loading) return null;
 
@@ -109,6 +134,16 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
         )}
         {messages.map((m) => {
           const mine = m.sender_id === user.id;
+          if (isSystemMessage(m.body)) {
+            return (
+              <div key={m.id} className="flex justify-center px-2 py-1">
+                <p className="flex max-w-[92%] items-start gap-2 rounded-2xl border border-border bg-surface-raised px-3 py-2 text-center text-xs font-medium text-foreground">
+                  <Sparkles className="mt-0.5 size-3.5 shrink-0 text-signal" />
+                  <span className="whitespace-pre-wrap break-words text-left">{m.body}</span>
+                </p>
+              </div>
+            );
+          }
           return (
             <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
               <div
@@ -157,7 +192,9 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
         <div ref={endRef} />
       </div>
 
-      {pending && (
+      {celebrate && <Confetti onDone={() => setCelebrate(false)} />}
+
+      {pending && !readOnly && (
         <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border bg-surface p-2">
           {pending.file.type.startsWith("video/") ? (
             <video src={pending.preview} className="size-12 rounded-lg bg-black object-cover" />
@@ -182,6 +219,12 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
         </div>
       )}
 
+      {readOnly ? (
+        <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-surface-raised px-3 py-2.5 text-xs text-muted-foreground">
+          <Lock className="size-3.5" /> This chat is closed — view only, kept as a record of the
+          bounty.
+        </div>
+      ) : (
       <form onSubmit={submit} className="mt-3 flex items-center gap-2">
         <input
           ref={fileRef}
@@ -214,6 +257,7 @@ export function BountyChat({ requestKey, bare = false }: { requestKey: string; b
           {sending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
         </button>
       </form>
+      )}
     </div>
   );
 }
