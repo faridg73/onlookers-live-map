@@ -107,12 +107,18 @@ export const getPayoutStatus = createServerFn({ method: "GET" })
 
       return { connected: true, ...next };
     } catch (error) {
+      const unsupported = isConnectUnsupported(error);
       return {
         connected: true,
         payoutsEnabled: row.payouts_enabled,
         detailsSubmitted: row.details_submitted,
         requirementsNote: row.requirements_note,
-        error: error instanceof Error ? error.message : getStripeErrorMessage(error),
+        supported: unsupported ? false : true,
+        error: unsupported
+          ? CONNECT_UNSUPPORTED
+          : error instanceof Error
+            ? error.message
+            : getStripeErrorMessage(error),
       };
     }
   });
