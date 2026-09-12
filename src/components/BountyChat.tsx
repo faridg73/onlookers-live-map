@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Lock, MessageCircle, Send } from "lucide-react";
+import { ImagePlus, Loader2, Lock, MessageCircle, Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useBountyChat } from "@/hooks/use-bounty-chat";
-import { chatKey } from "@/lib/chat";
+import { chatKey, uploadChatAttachment } from "@/lib/chat";
 import type { LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
 
