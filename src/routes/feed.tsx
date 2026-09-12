@@ -31,6 +31,20 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
+const SHORT_CATEGORY_LABELS: Record<CategoryId, string> = {
+  food: "Food",
+  vehicles: "Vehicles",
+  outdoors: "Outdoors",
+  nightlife: "Nightlife",
+  transit: "Transit",
+  events: "Concerts",
+  parking: "Parking",
+  weather: "Weather",
+  realestate: "Real Estate",
+  art: "Art",
+  sports: "Sports",
+};
+
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("all");
@@ -48,7 +62,8 @@ function FeedScreen() {
         <span className="text-signal">${pot}</span> in open bounties within 5 miles of you.
       </p>
 
-      <div className="mt-5 grid grid-cols-5 gap-1.5">
+      <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
+      <div className="mt-2 grid grid-cols-5 gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -65,6 +80,7 @@ function FeedScreen() {
         ))}
       </div>
 
+      <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Category</p>
       <div className="mt-2 grid grid-cols-3 gap-1.5">
         {[{ id: "all" as const, label: "All types", emoji: "" }, ...CATEGORIES].map((c) => (
           <button
@@ -79,7 +95,7 @@ function FeedScreen() {
           >
             <span className="flex min-h-8 items-center justify-center gap-1 text-center">
               {c.emoji && <span className="shrink-0">{c.emoji}</span>}
-              <span>{c.label}</span>
+              <span>{c.id === "all" ? c.label : SHORT_CATEGORY_LABELS[c.id]}</span>
             </span>
           </button>
         ))}
@@ -87,7 +103,7 @@ function FeedScreen() {
 
       <div className="mt-5 space-y-3">
         {list.map((r) => (
-          <RequestCard key={r.id} request={r} onClaim={claim} />
+          <RequestCard key={r.id} request={r} onClaim={claim} compact />
         ))}
         {list.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">

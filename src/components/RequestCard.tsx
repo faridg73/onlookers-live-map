@@ -13,17 +13,20 @@ import { BountyChat } from "@/components/BountyChat";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export function RequestCard({
   request,
   onClaim,
   active,
   onSelect,
+  compact = false,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
   active?: boolean;
   onSelect?: (id: string) => void;
+  compact?: boolean;
 }) {
   const expired = request.status === "expired";
   const done = isClosed(request);
@@ -32,6 +35,54 @@ export function RequestCard({
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
+
+  if (compact) {
+    return (
+      <article className="rounded-lg border border-border bg-surface p-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
+              <span
+                className={cn(
+                  "shrink-0 rounded-md px-2 py-1 text-[0.62rem] font-extrabold uppercase",
+                  request.status === "open" && "bg-live text-background",
+                  request.status === "claimed" && "bg-signal text-signal-foreground",
+                  done && "bg-surface-raised text-muted-foreground",
+                )}
+              >
+                {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
+              </span>
+              <CategoryBadge category={request.category} compact />
+            </div>
+            <h3 className="mt-2 truncate font-display text-base font-bold text-foreground">
+              {request.title}
+            </h3>
+            <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="size-3.5 shrink-0" />
+              <span className="truncate">{request.place}</span>
+            </p>
+          </div>
+          <div className="shrink-0 text-right">
+            <div className="font-display text-2xl font-extrabold leading-none text-signal">${pool}</div>
+            {!done && <div className="mt-2"><ExpiryCountdown minutesLeft={request.expiresInMin} /></div>}
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-2 border-t border-border pt-3">
+          <ShareBountyButton request={request} />
+          <Button
+            type="button"
+            disabled={done || request.status !== "open" || !onClaim}
+            className="h-10 w-full rounded-lg font-bold"
+            onClick={() => onClaim?.(request.id)}
+          >
+            {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Already Claimed" : "Claim Bounty"}
+          </Button>
+        </div>
+      </article>
+    );
+  }
+
   return (
     <article
       onClick={() => onSelect?.(request.id)}
@@ -145,7 +196,9 @@ export function RequestCard({
                 e.stopPropagation();
                 setCancelling(true);
                 try {
-                  const balance = await refundBounty(request.dbId!);
+                  const requestId = request.dbId;
+                  if (!requestId) return;
+                  const balance = await refundBounty(requestId);
                   remove(request.id);
                   toast.success("Request cancelled", {
                     description: `$${request.bounty} refunded — wallet balance $${balance.toFixed(2)}.`,
