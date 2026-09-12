@@ -134,6 +134,16 @@ export function BountyChat({
         )}
         {messages.map((m) => {
           const mine = m.sender_id === user.id;
+          if (isSystemMessage(m.body)) {
+            return (
+              <div key={m.id} className="flex justify-center px-2 py-1">
+                <p className="flex max-w-[92%] items-start gap-2 rounded-2xl border border-border bg-surface-raised px-3 py-2 text-center text-xs font-medium text-foreground">
+                  <Sparkles className="mt-0.5 size-3.5 shrink-0 text-signal" />
+                  <span className="whitespace-pre-wrap break-words text-left">{m.body}</span>
+                </p>
+              </div>
+            );
+          }
           return (
             <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
               <div
