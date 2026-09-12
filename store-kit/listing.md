@@ -6,10 +6,24 @@ Copy the text into the store consoles. Files in this folder:
 | File | Purpose |
 | --- | --- |
 | `listing.md` | This file — copy-paste copy for both stores |
+| `google-play-icon-512.png` | Google Play store listing icon (512×512, no transparency) |
+| `app-store-icon-1024.png` | App Store icon master (1024×1024, no transparency) |
+| `app-icon-1024.png` / `app-icon-512.png` | Web/PWA master icons |
 | `feature-graphic.png` | Google Play feature graphic (1024×500) |
 | `screenshots/play-*.png` | Google Play phone screenshots (1080×1920) |
 | `screenshots/ios67-*.png` | App Store 6.7" screenshots (1290×2796) |
 | `screenshots/ios65-*.png` | App Store 6.5" screenshots (1242×2688) |
+
+All icons are generated from the Onlooker Live wordmark (neon-lime ring on black).
+Android launcher icons, iOS `AppIcon-512@2x.png` and the web/PWA icons in `public/`
+are already updated in the repo and ship with the next build.
+
+### Where each asset goes
+
+1. **Google Play listing icon** → Play Console › Grow › Store presence › Main store listing › App icon → upload `google-play-icon-512.png`.
+2. **Google Play feature graphic** → same page → upload `feature-graphic.png`.
+3. **Android app badge on the phone** → comes from the app bundle: run the **Build Android App Bundle for Google Play** workflow, then upload the new AAB.
+4. **App Store icon** → comes from the build: run the **Deploy iOS App to App Store Connect** workflow; the icon updates in App Store Connect once the build finishes processing.
 
 ---
 
