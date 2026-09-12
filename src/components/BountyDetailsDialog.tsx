@@ -95,8 +95,7 @@ export function BountyDetailsDialog({
               Yes, lock my claim
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+        </AlertDialogContent>
       </AlertDialog>
     </>
   );
