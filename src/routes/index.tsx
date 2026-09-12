@@ -117,6 +117,9 @@ function MapScreen() {
                           <MapPin className="size-3 shrink-0" />
                           <span className="truncate">{request.place}</span>
                         </span>
+                        <span className="mt-0.5 block text-xs font-bold text-signal">
+                          {formatDistance(distance)} away
+                        </span>
                       </span>
                       <span className="shrink-0 text-right">
                         <span className="block font-display text-lg font-extrabold text-signal">${request.bounty}</span>
@@ -125,17 +128,11 @@ function MapScreen() {
                         </span>
                       </span>
                     </button>
-                    <Button
-                      type="button"
-                      className="mt-3 h-10 w-full rounded-lg font-bold"
-                      onClick={() => {
-                        claim(request.id);
-                        select(request.id);
-                        setNearbyOpen(false);
-                      }}
-                    >
-                      Claim Bounty
-                    </Button>
+                    <BountyDetailsDialog request={request} onClaim={claim}>
+                      <Button type="button" variant="outline" className="mt-3 h-10 w-full rounded-lg font-bold">
+                        View details
+                      </Button>
+                    </BountyDetailsDialog>
                   </li>
                 ))}
               </ul>
