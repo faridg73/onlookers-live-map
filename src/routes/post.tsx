@@ -154,7 +154,12 @@ function PostScreen() {
 
         <div className={`space-y-2.5 ${card}`}>
           <span className={sectionLabel}>Category</span>
-          <CategorySelect value={category} onChange={setCategory} />
+          <CategoryPicker
+            value={tile}
+            onChange={(id) => setTile(id as CategoryId)}
+            sub={sub}
+            onSubChange={setSub}
+          />
         </div>
 
         {permissionNeeded && (
