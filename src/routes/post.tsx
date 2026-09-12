@@ -34,6 +34,13 @@ export const Route = createFileRoute("/post")({
   component: PostScreen,
 });
 
+const DEADLINES: { minutes: number; label: string }[] = [
+  { minutes: 15, label: "15 min" },
+  { minutes: 30, label: "30 min" },
+  { minutes: 60, label: "1 hour" },
+  { minutes: 1440, label: "24 hours" },
+];
+
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
