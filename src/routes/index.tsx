@@ -10,6 +10,7 @@ import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
+import { saveMyLocation } from "@/lib/hunter-location";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { b?: string | undefined } => ({
@@ -46,6 +47,12 @@ function MapScreen() {
   useEffect(() => {
     void refundExpiredBounties();
   }, []);
+
+  // Remember where this person is so nearby bounty alerts can reach them.
+  useEffect(() => {
+    if (!userPosition) return;
+    void saveMyLocation(userPosition.lat, userPosition.lng);
+  }, [userPosition]);
 
   // Opening a shared bounty link lands straight on that pin.
   useEffect(() => {

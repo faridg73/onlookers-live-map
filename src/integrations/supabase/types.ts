@@ -266,6 +266,30 @@ export type Database = {
           },
         ]
       }
+      hunter_locations: {
+        Row: {
+          created_at: string
+          latitude: number
+          longitude: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          latitude: number
+          longitude: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          latitude?: number
+          longitude?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       media_uploads: {
         Row: {
           captured_at: string
@@ -913,6 +937,33 @@ export type Database = {
           },
         ]
       }
+      wallet_balances: {
+        Row: {
+          available_balance: number
+          created_at: string
+          lifetime_earnings: number
+          pending_balance: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          lifetime_earnings?: number
+          pending_balance?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          lifetime_earnings?: number
+          pending_balance?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           amount: number
@@ -1098,6 +1149,10 @@ export type Database = {
         Returns: boolean
       }
       request_cashout: { Args: { _amount: number }; Returns: string }
+      request_earnings_payout: {
+        Args: { _amount: number; _destination: string }
+        Returns: string
+      }
       request_is_live: { Args: { _request_id: string }; Returns: boolean }
       resolve_dispute: {
         Args: { _award_spotter: boolean; _request_id: string }
