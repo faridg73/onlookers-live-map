@@ -5,29 +5,11 @@ import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { type LiveRequest } from "@/lib/onlooker";
+import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-
-/**
- * Fallback regional center used when device geolocation is denied or
- * unavailable. The stylised 0-1000 map space is anchored to this region.
- */
-export const REGIONAL_CENTER = { lat: 34.0522, lng: -118.2437 }; // Los Angeles
-/** Approximate degrees of lat/lng covered by the 1000x1000 map space. */
-const REGION_SPAN = 0.3;
-
-/** Turn a stored 0-1000 map-space point back into real coordinates. */
-function latLngFromWorld(x: number, y: number) {
-  const minLng = REGIONAL_CENTER.lng - REGION_SPAN / 2;
-  const maxLat = REGIONAL_CENTER.lat + REGION_SPAN / 2;
-  return {
-    lat: maxLat - (clamp(y, 0, 1000) / 1000) * REGION_SPAN,
-    lng: minLng + (clamp(x, 0, 1000) / 1000) * REGION_SPAN,
-  };
-}
 
 type Pixel = { left: number; top: number };
 
@@ -36,10 +18,12 @@ export function MapCanvas({
   requests,
   selectedId,
   onSelect,
+  onUserPositionChange,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
+  onUserPositionChange?: (position: MapPosition | null) => void;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -92,13 +76,17 @@ export function MapCanvas({
       (pos) => {
         const at = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setUserPos(at);
+        onUserPositionChange?.(at);
         setGeoState("located");
         map.current?.panTo(at);
       },
-      () => setGeoState("unavailable"),
+      () => {
+        setGeoState("unavailable");
+        onUserPositionChange?.(null);
+      },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
     );
-  }, []);
+  }, [onUserPositionChange]);
 
   useEffect(() => {
     locateMe();
@@ -151,7 +139,7 @@ export function MapCanvas({
       {/* pins */}
       {ready &&
         requests.map((r) => {
-          const pixel = toPixel(latLngFromWorld(r.x, r.y));
+          const pixel = toPixel(requestMapPosition(r));
           if (!pixel) return null;
           const isSel = r.id === selectedId;
           return (
@@ -221,8 +209,8 @@ export function MapCanvas({
           );
         })}
 
-      <div className="absolute right-4 top-24 flex flex-col gap-2">
-        <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface/90 backdrop-blur">
+      <div className="absolute right-4 flex flex-col gap-2 top-[calc(env(safe-area-inset-top)+5.75rem)]">
+        <div className="grid grid-rows-2 overflow-hidden rounded-lg border border-border bg-surface/90 shadow-lg backdrop-blur">
           {[
             { label: "+", fn: () => zoomBy(1) },
             { label: "−", fn: () => zoomBy(-1) },
@@ -231,7 +219,8 @@ export function MapCanvas({
               key={b.label}
               type="button"
               onClick={b.fn}
-              className="size-10 text-lg text-foreground transition-colors hover:bg-surface-raised"
+              aria-label={b.label === "+" ? "Zoom in" : "Zoom out"}
+              className="flex size-11 items-center justify-center border-b border-border text-xl font-bold leading-none text-foreground transition-colors last:border-b-0 hover:bg-surface-raised"
             >
               {b.label}
             </button>
@@ -246,7 +235,7 @@ export function MapCanvas({
               ? "Location unavailable — showing the regional center"
               : "Recenter to my location"
           }
-          className="flex size-10 items-center justify-center rounded-xl border border-border bg-surface/90 text-foreground backdrop-blur transition-colors hover:bg-surface-raised"
+          className="flex size-11 items-center justify-center rounded-lg border border-border bg-surface/90 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-surface-raised"
         >
           <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
         </button>
