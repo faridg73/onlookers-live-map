@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DisputesRouteImport } from './routes/disputes'
+import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -31,6 +32,7 @@ import { Route as DiscoverTrendingRouteImport } from './routes/discover.trending
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -50,6 +52,11 @@ const ContactRoute = ContactRouteImport.update({
 const DisputesRoute = DisputesRouteImport.update({
   id: '/disputes',
   path: '/disputes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DmcaRoute = DmcaRouteImport.update({
+  id: '/dmca',
+  path: '/dmca',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -143,12 +150,19 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
+  '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -167,12 +181,14 @@ export interface FileRoutesByFullPath {
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
+  '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -191,6 +207,7 @@ export interface FileRoutesByTo {
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -198,6 +215,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/disputes': typeof DisputesRoute
+  '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -216,6 +234,7 @@ export interface FileRoutesById {
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -224,6 +243,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/disputes'
+    | '/dmca'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -242,12 +262,14 @@ export interface FileRouteTypes {
     | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/payments/webhook'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/contact'
     | '/disputes'
+    | '/dmca'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -266,12 +288,14 @@ export interface FileRouteTypes {
     | '/discover/$group/$venue'
     | '/discover/$group'
     | '/api/public/payments/webhook'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/contact'
     | '/disputes'
+    | '/dmca'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -290,6 +314,7 @@ export interface FileRouteTypes {
     | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/payments/webhook'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +322,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   DisputesRoute: typeof DisputesRoute
+  DmcaRoute: typeof DmcaRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
@@ -315,6 +341,7 @@ export interface RootRouteChildren {
   DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -345,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/disputes'
       fullPath: '/disputes'
       preLoaderRoute: typeof DisputesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dmca': {
+      id: '/dmca'
+      path: '/dmca'
+      fullPath: '/dmca'
+      preLoaderRoute: typeof DmcaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -473,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -481,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   DisputesRoute: DisputesRoute,
+  DmcaRoute: DmcaRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,
@@ -499,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -249,6 +249,39 @@ export type Database = {
           },
         ]
       }
+      dmca_notices: {
+        Row: {
+          content_url: string
+          created_at: string
+          description: string
+          email: string
+          id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content_url: string
+          created_at?: string
+          description: string
+          email: string
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content_url?: string
+          created_at?: string
+          description?: string
+          email?: string
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       escrows: {
         Row: {
           amount: number
