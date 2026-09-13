@@ -93,6 +93,9 @@ export function CommunityPostCard({
           </span>
         </div>
 
+        {trust && <TrustBadge stats={trust} className="mt-2" />}
+
+
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((t) => (
