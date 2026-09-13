@@ -50,11 +50,62 @@ export function BountyDetailsDialog({
 }) {
   const [open, setOpen] = useState(openOnMount);
   const [confirming, setConfirming] = useState(false);
+  const [availabilityPrompt, setAvailabilityPrompt] = useState(false);
+  const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
   const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
   const pooled = boostOf(request.id);
   const pool = request.bounty + pooled;
+
+  /**
+   * Availability gate: re-verify the bounty is still open right now (locally,
+   * and against the live database record when one exists) before the hunter
+   * commits. Closed or expired bounties show a clean notice instead.
+   */
+  async function beginClaim() {
+    setChecking(true);
+    try {
+      const expiredNow =
+        request.status === "expired" ||
+        (request.expiresAt !== undefined && request.expiresAt <= Date.now());
+
+      if (isClosed(request) || request.status !== "open" || expiredNow) {
+        setUnavailableReason(
+          expiredNow
+            ? "This request has expired and is no longer accepting live captures."
+            : "The requester has already closed this request, so it is no longer available.",
+        );
+        return;
+      }
+
+      if (request.dbId) {
+        const { data } = await supabase
+          .from("requests")
+          .select("status, expires_at")
+          .eq("id", request.dbId)
+          .maybeSingle();
+        if (data) {
+          const dbExpired = new Date(data.expires_at).getTime() <= Date.now();
+          if (data.status !== "open" || dbExpired) {
+            setUnavailableReason(
+              dbExpired
+                ? "This request has expired and is no longer accepting live captures."
+                : data.status === "claimed"
+                  ? "Another onlooker has already claimed this request."
+                  : "The requester has already closed this request, so it is no longer available.",
+            );
+            return;
+          }
+        }
+      }
+
+      setAvailabilityPrompt(true);
+    } finally {
+      setChecking(false);
+    }
+  }
 
   return (
     <>
