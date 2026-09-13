@@ -211,6 +211,39 @@ export type Database = {
           },
         ]
       }
+      coin_purchases: {
+        Row: {
+          amount_cents: number
+          coins: number
+          created_at: string
+          environment: string
+          id: string
+          package_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          coins: number
+          created_at?: string
+          environment?: string
+          id?: string
+          package_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          coins?: number
+          created_at?: string
+          environment?: string
+          id?: string
+          package_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coin_transactions: {
         Row: {
           amount_gross: number
@@ -766,6 +799,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           created_at: string
@@ -1221,7 +1281,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_locations: {
+        Row: {
+          latitude: number | null
+          longitude: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          latitude?: number | null
+          longitude?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          latitude?: number | null
+          longitude?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_bounty_video: { Args: { _video_id: string }; Returns: number }
@@ -1252,6 +1332,17 @@ export type Database = {
         }[]
       }
       close_expired_requests: { Args: never; Returns: number }
+      credit_coin_purchase: {
+        Args: {
+          _amount_cents: number
+          _coins: number
+          _environment?: string
+          _package_id: string
+          _session_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       credit_topup: {
         Args: {
           _amount: number
@@ -1347,6 +1438,18 @@ export type Database = {
       mark_chat_notifications_read: {
         Args: { _request_key: string }
         Returns: number
+      }
+      onlookers_within_radius: {
+        Args: {
+          _exclude_user_id?: string
+          _latitude: number
+          _longitude: number
+          _radius_miles?: number
+        }
+        Returns: {
+          distance_miles: number
+          user_id: string
+        }[]
       }
       public_profile_card: {
         Args: { _user_id: string }
