@@ -128,7 +128,9 @@ export function CommunityPostCard({
             </span>
           )}
           {distanceLabel && <span className="font-bold text-signal">{distanceLabel}</span>}
-          {trust && <span className="font-bold text-foreground">{trust.completionRate}% rep</span>}
+          {trust && trust.totalClaims > 0 && (
+            <span className="font-bold text-foreground">{trust.completionRate}% rep</span>
+          )}
         </div>
 
         {post.tags.length > 0 && (
