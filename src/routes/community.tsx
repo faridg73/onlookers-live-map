@@ -171,13 +171,28 @@ function CommunityHub() {
             <MapIcon className="size-3.5" /> Map
           </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setComposing(true)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
-        >
-          <Plus className="size-4" /> Post
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setLiveFirst(true);
+              setComposing(true);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-signal/10 px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal"
+          >
+            <Radio className="size-4" /> Start live stream
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setLiveFirst(false);
+              setComposing(true);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+          >
+            <Plus className="size-4" /> Post
+          </button>
+        </div>
       </div>
 
       {view === "map" ? (
