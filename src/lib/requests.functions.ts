@@ -44,6 +44,21 @@ export const createBountyRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<{ id: string; balance: number }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // Content filter runs before any money moves: requests to film screens,
+    // ticket barcodes or broadcasts never reach the map, and each attempt is
+    // logged for a moderator to look at.
+    const matched = findForbiddenTerms(data.prompt, data.details, data.locationName);
+    if (matched.length > 0) {
+      await supabaseAdmin.from("moderation_flags").insert({
+        user_id: context.userId,
+        title: data.prompt,
+        details: data.details ?? "",
+        matched_terms: matched,
+        source: "request",
+      });
+      throw new Error(BLOCKED_REQUEST_MESSAGE);
+    }
+
     // The escrow trigger debits the wallet in the same transaction, so check the
     // balance up front and fail with a message people can act on.
     const { data: current } = await supabaseAdmin
