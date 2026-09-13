@@ -153,18 +153,20 @@ export function BountyDetailsDialog({
 
           <Button
             type="button"
-            disabled={!claimable}
+            disabled={!claimable || checking}
             className="mt-2 h-12 w-full rounded-xl font-bold"
-            onClick={() => setConfirming(true)}
+            onClick={() => void beginClaim()}
           >
             <ShieldCheck className="mr-2 size-4" />
-            {request.status === "expired"
-              ? "Expired"
-              : done
-                ? "Closed"
-                : request.status === "claimed"
-                  ? "Already claimed"
-                  : "Claim this bounty"}
+            {checking
+              ? "Checking availability…"
+              : request.status === "expired"
+                ? "Expired"
+                : done
+                  ? "Closed"
+                  : request.status === "claimed"
+                    ? "Already claimed"
+                    : "Claim this bounty"}
           </Button>
         </DialogContent>
       </Dialog>
