@@ -52,7 +52,7 @@ export async function fetchStreak(): Promise<StreakState | null> {
 export async function recordDailyEngagement(): Promise<CheckInResult | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
-  const { data, error } = await supabase.rpc("record_daily_engagement", {});
+  const { data, error } = await supabase.rpc("record_daily_engagement");
   if (error) throw new Error(error.message);
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) return null;
