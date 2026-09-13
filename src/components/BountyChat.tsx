@@ -97,20 +97,6 @@ export function BountyChat({
     }
   }
 
-  function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    if (file.size > 200 * 1024 * 1024) {
-      toast.error("That file is larger than 200 MB.");
-      return;
-    }
-    if (file.type.startsWith("video/")) {
-      void prepareVideo(file);
-      return;
-    }
-    attach(file);
-  }
 
   function clearPending() {
     setPending((prev) => {
