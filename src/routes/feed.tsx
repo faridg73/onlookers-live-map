@@ -94,7 +94,7 @@ function FeedScreen() {
     setRadiusChoice((current) =>
       current === "global" || radiusOptions.some((o) => o.miles === current)
         ? current
-        : radiusOptions[0].miles,
+        : (radiusOptions[0]?.miles ?? 5),
     );
   }, [radiusOptions]);
 
