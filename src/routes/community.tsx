@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { BottomNav } from "@/components/BottomNav";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
@@ -257,7 +256,6 @@ function CommunityHub() {
       />
       </div>
 
-      <BottomNav />
     </main>
   );
 }
