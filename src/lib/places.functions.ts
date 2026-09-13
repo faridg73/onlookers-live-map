@@ -21,6 +21,8 @@ export type DiscoveredPlace = {
   primaryType: string | null;
   rating: number | null;
   ratingCount: number | null;
+  /** Google photo resource name, used to load a thumbnail. */
+  photoName: string | null;
 };
 
 type RawPlace = {
@@ -31,10 +33,12 @@ type RawPlace = {
   location?: { latitude?: number; longitude?: number };
   rating?: number;
   userRatingCount?: number;
+  photos?: Array<{ name?: string }>;
 };
 
 const DISCOVERY_FIELDS =
-  "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount";
+  "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount,places.photos";
+
 
 function credentials() {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -58,6 +62,7 @@ function toDiscovered(raw: RawPlace): DiscoveredPlace[] {
       primaryType: raw.primaryTypeDisplayName?.text ?? null,
       rating: typeof raw.rating === "number" ? raw.rating : null,
       ratingCount: typeof raw.userRatingCount === "number" ? raw.userRatingCount : null,
+      photoName: raw.photos?.[0]?.name ?? null,
     },
   ];
 }
@@ -125,7 +130,7 @@ export const fetchPlaceById = createServerFn({ method: "POST" })
           Authorization: `Bearer ${creds.lovableKey}`,
           "X-Connection-Api-Key": creds.mapsKey,
           "X-Goog-FieldMask":
-            "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount",
+            "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount,photos",
         },
       },
     );
@@ -209,4 +214,44 @@ export const fetchNearbyPlaces = createServerFn({ method: "POST" })
         },
       ];
     });
+  });
+
+const photoSchema = z.object({
+  photoNames: z.array(z.string().min(5).max(600)).min(1).max(16),
+  maxWidthPx: z.number().int().min(120).max(1200).default(480),
+});
+
+/**
+ * Short-lived thumbnail URLs for place photos, keyed by photo resource name.
+ * Google's media endpoint is called server-side so the key stays private.
+ */
+export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => photoSchema.parse(data))
+  .handler(async ({ data }): Promise<Record<string, string>> => {
+    const creds = credentials();
+    if (!creds) return {};
+
+    const entries = await Promise.all(
+      data.photoNames.map(async (photoName) => {
+        try {
+          const response = await fetch(
+            `${GATEWAY_URL}/places/v1/${photoName}/media?maxWidthPx=${data.maxWidthPx}&skipHttpRedirect=true`,
+            {
+              headers: {
+                Authorization: `Bearer ${creds.lovableKey}`,
+                "X-Connection-Api-Key": creds.mapsKey,
+              },
+            },
+          );
+          if (!response.ok) return null;
+          const payload = (await response.json()) as { photoUri?: string };
+          return payload.photoUri ? ([photoName, payload.photoUri] as const) : null;
+        } catch (error) {
+          console.error("[places] photo lookup failed", error);
+          return null;
+        }
+      }),
+    );
+
+    return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => !!entry));
   });
