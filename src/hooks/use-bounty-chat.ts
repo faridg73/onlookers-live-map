@@ -56,7 +56,7 @@ export function useBountyChat(key: string, userId: string | null | undefined) {
   useEffect(() => {
     if (!userId) return;
     const channel = supabase
-      .channel(`request-messages-${key}`)
+      .channel(`request-messages-${key}-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
         {

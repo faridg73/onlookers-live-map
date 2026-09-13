@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Map, Radio, PlusSquare, UserRound, Compass, MessageCircle } from "lucide-react";
+import { Map, Radio, PlusSquare, UserRound, Compass, MessageCircle, Users } from "lucide-react";
 import { useChatAlerts } from "@/hooks/use-chat-alerts";
 import { ChatInbox } from "@/components/ChatInbox";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
-  { to: "/community", label: "Discover", icon: Compass, exact: false },
+  { to: "/discover", label: "Browse", icon: Compass, exact: false },
+  { to: "/community", label: "Meet", icon: Users, exact: false },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
   { to: "/post", label: "Post", icon: PlusSquare, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
 ] as const;
 
 const linkClass =
-  "group flex flex-col items-center gap-1 py-3 text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex flex-col items-center gap-1 py-3 text-[0.58rem] font-medium uppercase tracking-[0.08em] text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();

@@ -27,21 +27,31 @@ export function useChatAlerts() {
 
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel(`notifications-${user.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => void load(),
-      )
-      .subscribe();
+    // Several screens use this hook at once, so the channel topic must be unique
+    // per subscriber — reusing one topic makes Realtime throw when the second
+    // subscriber attaches listeners to an already-subscribed channel.
+    const topic = `notifications-${user.id}-${Math.random().toString(36).slice(2, 10)}`;
+    let channel: ReturnType<typeof supabase.channel> | undefined;
+    try {
+      channel = supabase
+        .channel(topic)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => void load(),
+        )
+        .subscribe();
+    } catch (error) {
+      // Live updates are a nicety: never let them break the page.
+      console.error("chat alert subscription failed", error);
+    }
     return () => {
-      void supabase.removeChannel(channel);
+      if (channel) void supabase.removeChannel(channel);
     };
   }, [user, load]);
 
