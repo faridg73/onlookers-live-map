@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Clock, DollarSign, Navigation, Radio } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { HunterEarningBanner } from "@/components/HunterEarningBanner";
+import { RecentActivityFeed } from "@/components/RecentActivityFeed";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
