@@ -407,7 +407,7 @@ function PostScreen() {
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
 
                 {(spot || parsed.venue) && (
                   <div className="space-y-2">
