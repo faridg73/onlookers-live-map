@@ -10,10 +10,9 @@ export type ExampleSeed = {
   title: string;
   body: string;
   kicker: string;
-  imagePosition: string;
 };
 
-type SeedCopy = Omit<ExampleSeed, "id" | "tag" | "imagePosition">;
+type SeedCopy = Omit<ExampleSeed, "id" | "tag">;
 
 const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
   friends: {
@@ -56,28 +55,22 @@ const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
     "street art": { kicker: "Street art", title: "New mural route with the artist stories", body: "A block-by-block look at fresh walls, signatures and details that are easy to miss." },
   },
   realestate: {
-    "open house": { kicker: "Open house", title: "Room-by-room tour before the afternoon rush", body: "Check the light, storage and street noise while the home is still quiet." },
-    rental: { kicker: "Rental check", title: "See the apartment beyond the listing photos", body: "A live look at closets, water pressure, parking and the walk from the entrance." },
-    walkthrough: { kicker: "Live walkthrough", title: "Uncut condo walkthrough with viewer requests", body: "Ask to revisit any room, inspect a finish or hold on the view as long as needed." },
-    neighborhood: { kicker: "Neighborhood tour", title: "What the block feels like at commute time", body: "Walk the nearest groceries, transit stop and side streets while traffic is active." },
-    "new build": { kicker: "New construction", title: "Construction progress from lobby to rooftop", body: "See current finishes, shared spaces and which areas are still being completed." },
-    "for sale": { kicker: "For sale", title: "Buyer-requested details the listing skipped", body: "A closer look at windows, appliances, ceilings and the immediate neighboring homes." },
+    "open houses": { kicker: "Open houses", title: "Room-by-room tour before the afternoon rush", body: "Check the natural light, storage, finishes and street noise while the home is still quiet." },
+    "home renovations": { kicker: "Home renovations", title: "Kitchen renovation progress from cabinets to tile", body: "Walk through the current work, material choices and the details being finished this week." },
+    "commercial sites": { kicker: "Commercial sites", title: "New mixed-use site from street level", body: "See the public-facing construction progress, surrounding access and what is planned for the block." },
+    "neighborhood tours": { kicker: "Neighborhood tours", title: "What the neighborhood feels like at commute time", body: "Walk the nearest groceries, transit stop, parks and side streets while the area is active." },
   },
   markets: {
-    "farmers market": { kicker: "Farmers market", title: "Peak-season finds from the first row", body: "Compare today's produce, prices and samples before the busiest hour." },
-    "food trucks": { kicker: "Food truck lot", title: "Shortest lines and best plates right now", body: "A live lap of every menu, current wait times and what people keep ordering." },
-    "pop-up": { kicker: "Pop-up", title: "Inside tonight's one-room design pop-up", body: "Meet the makers, see limited pieces and check what is still available." },
-    "flea market": { kicker: "Flea market", title: "Vintage aisle treasure hunt under $40", body: "Scan the tables live and call out anything you want inspected more closely." },
-    "block party": { kicker: "Block party", title: "Food, music and open tables by the stage", body: "See which end of the block is lively, where families are sitting and what is free." },
-    "cash only": { kicker: "Before you go", title: "Which market stalls are cash-only today", body: "A practical pass through payment signs, nearby ATMs and vendors taking contactless." },
+    "flea markets": { kicker: "Flea markets", title: "Vintage aisle treasure hunt under $40", body: "Scan the tables for records, clothing and odd finds worth inspecting more closely." },
+    "garage sales": { kicker: "Garage sales", title: "Early garage-sale finds before the good stuff goes", body: "A quick look at furniture, kitchenware, books and prices from the driveway." },
+    "street vendors": { kicker: "Street vendors", title: "Best plates and shortest lines on the block", body: "Compare today's menus, wait times and what regulars keep ordering." },
+    "antique fairs": { kicker: "Antique fairs", title: "Furniture and collectibles with stories attached", body: "Browse period pieces, maker marks and unusual finds with a closer view on request." },
   },
   events: {
     "live music": { kicker: "Live music", title: "Sound check from the front of the room", body: "Hear the room before doors, see the sightlines and find the calmest entrance." },
-    buskers: { kicker: "Street performance", title: "A brilliant brass trio on the plaza", body: "Catch a few songs, the crowd energy and the best place to stop without blocking foot traffic." },
-    festival: { kicker: "Festival live", title: "Opening hour before the festival fills up", body: "A quick orientation to stages, food, shade and the easiest route between them." },
-    sports: { kicker: "Game day", title: "Gate lines and fan energy before kickoff", body: "Compare entrances, merch queues and the atmosphere outside the stadium." },
-    theatre: { kicker: "Theatre night", title: "Arrival guide from box office to your seat", body: "See lobby flow, late-seating rules and what the view is like from the upper level." },
-    "free entry": { kicker: "Free entry", title: "Tonight's best no-ticket performance", body: "A live look at the crowd, start time and where there is still room to stand." },
+    "street buskers": { kicker: "Street buskers", title: "A brilliant brass set on the plaza", body: "Catch the sound, crowd energy and the best place to stop without blocking foot traffic." },
+    festivals: { kicker: "Festivals", title: "Opening hour before the festival fills up", body: "A quick orientation to stages, food, shade and the easiest route between them." },
+    "spontaneous gatherings": { kicker: "Happening now", title: "A crowd is forming in the square", body: "See what brought everyone together, how busy it is and where there is room to join." },
   },
 };
 
@@ -85,10 +78,9 @@ const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
 export function exampleSeeds(category: CommunityCategory, tag?: string | null): ExampleSeed[] {
   const entries = Object.entries(COPY[category]);
   const selected = tag ? entries.filter(([key]) => key === tag) : entries;
-  return selected.map(([seedTag, copy], index) => ({
+  return selected.map(([seedTag, copy]) => ({
     id: `${category}-${seedTag}`,
     tag: seedTag,
     ...copy,
-    imagePosition: `${20 + ((index * 17) % 61)}% ${25 + ((index * 13) % 51)}%`,
   }));
 }

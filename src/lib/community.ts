@@ -111,10 +111,10 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
   },
   {
     id: "realestate",
-    label: "Real Estate",
-    blurb: "Open houses and rentals, seen live",
+    label: "Real Estate & Construction",
+    blurb: "Properties, projects and neighborhoods",
     gradient: "linear-gradient(135deg,#9CE0FF 0%,#0F0F0F 72%)",
-    tags: ["open house", "rental", "walkthrough", "neighborhood", "new build", "for sale"],
+    tags: ["open houses", "home renovations", "commercial sites", "neighborhood tours"],
     iceBreakers: [
       {
         title: "Open house walkthrough at 2pm",
@@ -128,10 +128,10 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
   },
   {
     id: "markets",
-    label: "Local Markets",
-    blurb: "Stalls, food trucks and pop-ups",
+    label: "Local Markets & Yard Sales",
+    blurb: "Secondhand finds and street-side sellers",
     gradient: "linear-gradient(135deg,#FFE066 0%,#0F0F0F 72%)",
-    tags: ["farmers market", "food trucks", "pop-up", "flea market", "block party", "cash only"],
+    tags: ["flea markets", "garage sales", "street vendors", "antique fairs"],
     iceBreakers: [
       {
         title: "Farmers market, live from the stalls",
@@ -148,7 +148,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     label: "Events & Performances",
     blurb: "Shows, buskers and big nights out",
     gradient: "linear-gradient(135deg,#FF9E6B 0%,#0F0F0F 72%)",
-    tags: ["live music", "buskers", "festival", "sports", "theatre", "free entry"],
+    tags: ["live music", "street buskers", "festivals", "spontaneous gatherings"],
     iceBreakers: [
       {
         title: "Busker on the main plaza right now",
