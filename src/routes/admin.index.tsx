@@ -243,6 +243,44 @@ function AdminDashboard() {
           Open dispute review
         </Link>
       </section>
+
+      <section className="mt-10">
+        <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+          <ShieldAlert className="size-4 text-signal" /> Blocked requests
+        </h2>
+
+        {!loading && flags.length === 0 && (
+          <p className="mt-3 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            Nothing has been blocked by the content filter.
+          </p>
+        )}
+
+        <div className="mt-3 space-y-3">
+          {flags.map((flag) => (
+            <article key={flag.id} className="rounded-2xl border border-border bg-surface p-4">
+              <p className="font-display text-base text-foreground">{flag.title || "Untitled"}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {new Date(flag.created_at).toLocaleString()}
+              </p>
+              {flag.details && (
+                <p className="mt-2 rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
+                  {flag.details}
+                </p>
+              )}
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {flag.matched_terms.map((term) => (
+                  <span
+                    key={term}
+                    className="rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold text-urgent"
+                  >
+                    {term}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
