@@ -19,12 +19,14 @@ import { distanceMiles, type MapPosition } from "@/lib/onlooker";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import {
   COMMUNITY_CATEGORIES,
+  categoryDef,
   communityMediaUrls,
   isPinned,
   listCommunityPosts,
   type CommunityCategory,
   type CommunityPost,
 } from "@/lib/community";
+import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
