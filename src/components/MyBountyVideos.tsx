@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Play, Share2, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
+import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { toast } from "sonner";
 import { formatCredits } from "@/lib/credits";
 import { supabase } from "@/integrations/supabase/client";
