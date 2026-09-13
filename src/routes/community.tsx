@@ -137,21 +137,44 @@ function CommunityHub() {
 
   const label = useCallback((miles: number) => `${formatDistance(miles)} away`, [formatDistance]);
 
-  const visible = useMemo(() => {
+  /**
+   * A tag behaves as a subcategory: match it against the post's own tags, its
+   * lane tags and its words, so a chip like "language exchange" still finds
+   * posts that only mention it in the title or body.
+   */
+  const matchesTag = useCallback((post: CommunityPost, wanted: string) => {
+    const needle = wanted.trim().toLowerCase();
+    if (!needle) return true;
+    if (post.tags.some((t) => t.toLowerCase() === needle)) return true;
+    const haystack = `${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`.toLowerCase();
+    return haystack.includes(needle);
+  }, []);
+
+  const { rows: visible, fallback } = useMemo(() => {
     const limit = here ? radiusMilesFor(radius) : null;
-    const rows = posts
-      .filter((p) => (category === "all" || p.category === category) && (!tag || p.tags.includes(tag)))
+    const sort = (list: Array<{ post: CommunityPost; miles: number | null }>) =>
+      [...list].sort((a, b) => {
+        const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
+        if (pinDiff !== 0) return pinDiff;
+        if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
+        if (a.miles !== null) return -1;
+        if (b.miles !== null) return 1;
+        return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
+      });
+
+    const inRange = posts
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
-    return rows.sort((a, b) => {
-      const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
-      if (pinDiff !== 0) return pinDiff;
-      if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
-      if (a.miles !== null) return -1;
-      if (b.miles !== null) return 1;
-      return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
-    });
-  }, [posts, category, tag, radius, here, distanceFor]);
+
+    const inLane = inRange.filter(({ post }) => category === "all" || post.category === category);
+    const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
+
+    // Never dead-end on an empty subcategory: relax the tag, then the lane.
+    if (exact.length > 0) return { rows: sort(exact), fallback: null as null | "tag" | "lane" };
+    if (tag && inLane.length > 0) return { rows: sort(inLane), fallback: "tag" as const };
+    if (category !== "all" && inRange.length > 0) return { rows: sort(inRange), fallback: "lane" as const };
+    return { rows: [] as typeof inRange, fallback: null as null | "tag" | "lane" };
+  }, [posts, category, tag, radius, here, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
