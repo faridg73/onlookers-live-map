@@ -27,7 +27,9 @@ export async function fetchCreditWallet(): Promise<CreditWallet | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
 
-  const { error: ensureError } = await supabase.rpc("ensure_credit_wallet", {});
+  const { error: ensureError } = await supabase.rpc("ensure_credit_wallet", {
+    _user_id: auth.user.id,
+  });
   if (ensureError) throw new Error(ensureError.message);
 
   const { data, error } = await supabase
