@@ -27,7 +27,13 @@ export function AlertSettingsCard() {
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [smsState, setSmsState] = useState<{ ok: boolean; message: string } | null>(null);
+  const [pushState, setPushState] = useState<{ loading: boolean; registered: boolean; message?: string }>({
+    loading: false,
+    registered: false,
+  });
   const sendTestText = useServerFn(sendTestAlertText);
+  const saveToken = useServerFn(savePushToken);
+  const deleteToken = useServerFn(removePushToken);
 
   const sendTest = async () => {
     setTesting(true);
