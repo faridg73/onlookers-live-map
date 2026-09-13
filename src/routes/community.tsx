@@ -250,7 +250,7 @@ function CommunityHub() {
             aria-pressed={category === c.id}
             className={`group relative h-32 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
           >
-            <img src={visual.image} alt="" width={1024} height={640} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" />
+            <LoopingPreview imageUrl={visual.image} alt="" icon={Icon} coverClass={visual.coverClass} />
             <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
             <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
