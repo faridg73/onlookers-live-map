@@ -101,15 +101,15 @@ function ContactScreen() {
         <p className="mt-2 text-sm text-muted-foreground">
           For urgent issues, email{" "}
           <a
-            href="mailto:support@onlooker.app"
+            href="mailto:support@onlookerlive.com"
             className="font-semibold text-foreground underline underline-offset-4"
           >
-            support@onlooker.app
+            support@onlookerlive.com
           </a>
           .
         </p>
         <a
-          href="mailto:support@onlooker.app?subject=Onlooker%20Support%20Request"
+          href="mailto:support@onlookerlive.com?subject=Onlooker%20Support%20Request"
           className="mt-4 inline-flex items-center gap-2 rounded-full bg-signal px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground"
         >
           <Mail className="size-3.5" /> Open email app
