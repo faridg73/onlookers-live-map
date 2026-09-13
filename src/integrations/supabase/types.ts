@@ -635,31 +635,40 @@ export type Database = {
       payout_requests: {
         Row: {
           amount: number
+          cash_amount_usd: number
+          coins_redeemed: number
           created_at: string
           destination: string
           id: string
           note: string
           status: string
+          stripe_transfer_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
+          cash_amount_usd?: number
+          coins_redeemed?: number
           created_at?: string
           destination: string
           id?: string
           note?: string
           status?: string
+          stripe_transfer_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          cash_amount_usd?: number
+          coins_redeemed?: number
           created_at?: string
           destination?: string
           id?: string
           note?: string
           status?: string
+          stripe_transfer_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1479,6 +1488,7 @@ export type Database = {
         Returns: boolean
       }
       request_cashout: { Args: { _amount: number }; Returns: string }
+      request_coin_cashout: { Args: { _coins: number }; Returns: string }
       request_earnings_payout: {
         Args: { _amount: number; _destination: string }
         Returns: string

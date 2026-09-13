@@ -25,6 +25,7 @@ import { EarningsWallet } from "@/components/EarningsWallet";
 import { AddFundsCard } from "@/components/AddFundsCard";
 import { CoinWalletCard } from "@/components/CoinWalletCard";
 import { BuyCoinsCard } from "@/components/BuyCoinsCard";
+import { CoinPayoutDashboard } from "@/components/CoinPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 
@@ -99,6 +100,8 @@ function ProfileScreen() {
       <CoinWalletCard />
 
       <BuyCoinsCard />
+
+      <CoinPayoutDashboard />
 
       <CashOutCard />
 

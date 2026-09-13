@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Camera, ChevronDown, MapPin, Navigation } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Camera, ChevronDown, Coins, Layers, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
-import { RequestCard } from "@/components/RequestCard";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { BountyBottomSheet } from "@/components/BountyBottomSheet";
+import { isGoldBounty } from "@/lib/bounty-tiers";
+import { useBoosts } from "@/lib/boosts-store";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
-import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onlooker";
+import { distanceMiles, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
@@ -44,6 +46,8 @@ function MapScreen() {
   const { b, snap } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [nearbyOpen, setNearbyOpen] = useState(false);
+  const [goldOnly, setGoldOnly] = useState(false);
+  const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
   // Send expired, unfulfilled deposits back to their requesters.
@@ -61,6 +65,14 @@ function MapScreen() {
   useEffect(() => {
     if (b) select(b);
   }, [b, select]);
+
+  const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
+
+  // "High Bounties Only" hides everything but the pulsing 50+ coin gold pins.
+  const visible = useMemo(
+    () => (goldOnly ? requests.filter((request) => isGoldBounty(poolOf(request))) : requests),
+    [requests, goldOnly, poolOf],
+  );
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   const nearby = useMemo(() => {
@@ -81,7 +93,7 @@ function MapScreen() {
   return (
     <div className="fixed inset-0">
       <MapCanvas
-        requests={requests}
+        requests={visible}
         selectedId={selectedId}
         onSelect={select}
         onUserPositionChange={setUserPosition}
@@ -158,31 +170,46 @@ function MapScreen() {
             )}
           </section>
         )}
+
+        {/* sticky filter dock */}
+        <div className="pointer-events-auto mx-auto mt-2 grid w-full max-w-lg grid-cols-2 gap-2 rounded-lg border border-border bg-surface/95 p-1.5 shadow-lg backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => setGoldOnly(false)}
+            aria-pressed={!goldOnly}
+            className={`flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition-colors ${
+              goldOnly ? "text-muted-foreground" : "bg-surface-raised text-foreground"
+            }`}
+          >
+            <Layers className="size-3.5" /> All Views
+          </button>
+          <button
+            type="button"
+            onClick={() => setGoldOnly(true)}
+            aria-pressed={goldOnly}
+            className="flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition-colors"
+            style={
+              goldOnly
+                ? { backgroundColor: "var(--pin-gold)", color: "oklch(0.24 0.05 92)" }
+                : { color: "var(--pin-gold)" }
+            }
+          >
+            <Coins className="size-3.5" /> High Bounties
+          </button>
+        </div>
       </header>
 
-      {selected && (
-        <div className="absolute inset-x-0 bottom-[5.75rem] z-30 px-4">
-          <div className="mx-auto max-w-lg animate-rise">
-            <BountyDetailsDialog
-              request={selected}
-              onClaim={claim}
-              userPosition={userPosition}
-              openOnMount={b === selected.id}
-              autoSnap={snap === "1" && b === selected.id}
-            >
-              <RequestCard
-                request={selected}
-                active
-                distanceLabel={
-                  userPosition
-                    ? formatDistance(distanceMiles(userPosition, requestMapPosition(selected)))
-                    : undefined
-                }
-              />
-            </BountyDetailsDialog>
-          </div>
-        </div>
-      )}
+      <BountyBottomSheet
+        request={selected}
+        pool={selected ? poolOf(selected) : 0}
+        distanceLabel={
+          selected && userPosition
+            ? formatDistance(distanceMiles(userPosition, requestMapPosition(selected)))
+            : undefined
+        }
+        onClaim={claim}
+        onClose={() => select(null)}
+      />
 
       <NewRequestDialog>
         <button
