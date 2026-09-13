@@ -34,7 +34,19 @@ const LIVE_WINDOWS = [
  * Posts a bounty for one venue: either a 5-minute live stream inside the next
  * hour or two, or a pre-recorded clip with a hard delivery deadline.
  */
-export function VenueBountyDialog({ venue, children }: { venue: Venue; children: ReactNode }) {
+export function VenueBountyDialog({
+  venue,
+  children,
+  defaultTitle,
+  defaultNote,
+}: {
+  venue: Venue;
+  children: ReactNode;
+  /** Pre-filled request title, e.g. the event name tapped in Trending. */
+  defaultTitle?: string;
+  /** Pre-filled camera instructions for that event. */
+  defaultNote?: string;
+}) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
