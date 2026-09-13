@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 import type { LiveRequest } from "@/lib/onlooker";
+import type { ModerationReasonCode } from "@/lib/moderation-reasons";
 
 export const BOUNTY_VIDEO_BUCKET = "bounty-videos";
 
@@ -32,10 +33,15 @@ export async function acceptBountyVideo(videoId: string): Promise<number> {
  * Requester flags a submitted clip within the review window. The money stays
  * locked in escrow until a moderator resolves it.
  */
-export async function disputeBountyVideo(requestId: string, reason: string): Promise<void> {
+export async function disputeBountyVideo(
+  requestId: string,
+  reason: string,
+  reasonCode: ModerationReasonCode,
+): Promise<void> {
   const { error } = await supabase.rpc("dispute_bounty", {
     _request_id: requestId,
     _reason: reason,
+    _reason_code: reasonCode,
   });
   if (error) throw error;
 }

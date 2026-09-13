@@ -11,7 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { submitDmcaNotice } from "@/lib/dmca.functions";
+import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
 import { toast } from "sonner";
 
 const PROHIBITED = [
@@ -32,6 +34,7 @@ export function DmcaReportModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [contentUrl, setContentUrl] = useState("");
+  const [reasonCode, setReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -40,7 +43,7 @@ export function DmcaReportModal({
     setBusy(true);
     try {
       const result = await submitDmcaNotice({
-        data: { name, email, contentUrl, description },
+        data: { name, email, contentUrl, reasonCode, description },
       });
       if (!result.success) throw new Error(result.error ?? "Could not submit the report.");
       setDone(true);
@@ -56,6 +59,7 @@ export function DmcaReportModal({
     setName("");
     setEmail("");
     setContentUrl("");
+    setReasonCode("other_policy_violation");
     setDescription("");
     setDone(false);
   };
@@ -150,6 +154,16 @@ export function DmcaReportModal({
               maxLength={500}
               required
             />
+            <Select value={reasonCode} onValueChange={(value) => setReasonCode(value as ModerationReasonCode)}>
+              <SelectTrigger aria-label="Reason for report" className="h-11">
+                <SelectValue placeholder="Choose a reason" />
+              </SelectTrigger>
+              <SelectContent>
+                {MODERATION_REASONS.map((reason) => (
+                  <SelectItem key={reason.code} value={reason.code}>{reason.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Textarea
               placeholder="Describe the infringing material and why you believe it violates your rights (min. 20 characters)…"
               value={description}

@@ -6,11 +6,12 @@ interface Props {
   name?: string
   email?: string
   contentUrl?: string
+  reasonCode?: string
   description?: string
   noticeId?: string
 }
 
-const Email = ({ name, email, contentUrl, description, noticeId }: Props) => (
+const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>New DMCA / infringement report submitted on Onlooker Live</Preview>
@@ -23,6 +24,7 @@ const Email = ({ name, email, contentUrl, description, noticeId }: Props) => (
           <Text style={row}><strong>Name:</strong> {name || '—'}</Text>
           <Text style={row}><strong>Email:</strong> {email || '—'}</Text>
           <Text style={row}><strong>Content URL:</strong> {contentUrl || '—'}</Text>
+          <Text style={row}><strong>Reason code:</strong> {reasonCode || '—'}</Text>
           <Hr style={hr} />
           <Text style={row}><strong>Description of infringing material:</strong></Text>
           <Text style={row}>{description || '—'}</Text>
@@ -44,6 +46,7 @@ export const template = {
     name: 'Jane Rights',
     email: 'jane@example.com',
     contentUrl: 'https://onlookerlive.com/b/abc123',
+    reasonCode: 'duplicate_content',
     description: 'This clip reproduces my copyrighted broadcast footage without permission.',
     noticeId: '00000000-0000-0000-0000-000000000000',
   },

@@ -12,6 +12,7 @@ import {
   type DisputeCase,
   type DisputeEvidence,
 } from "@/lib/disputes";
+import { moderationReasonLabel } from "@/lib/moderation-reasons";
 
 export const Route = createFileRoute("/disputes")({
   head: () => ({
@@ -196,7 +197,8 @@ function DisputeCard({
           </span>
         </div>
         <p className="mt-3 rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
-          Reason: {item.dispute_reason || "No reason given."}
+          <span className="font-semibold text-foreground">{moderationReasonLabel(item.reason_code ?? "")}</span>
+          {item.dispute_reason ? ` · ${item.dispute_reason}` : ""}
         </p>
         <p className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
           {item.evidence_count} evidence {item.evidence_count === 1 ? "entry" : "entries"} ·{" "}
