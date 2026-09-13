@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { BadgeDollarSign, Camera, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { VideoRecorder } from "@/components/VideoRecorder";
+import { blockFileDrop, blockFilePaste } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";

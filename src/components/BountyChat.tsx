@@ -44,7 +44,7 @@ export function BountyChat({
   const [celebrate, setCelebrate] = useState(false);
   const [recording, setRecording] = useState(false);
   const [preparing, setPreparing] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  
   const endRef = useRef<HTMLDivElement>(null);
   const lastApproval = useRef<string | null>(null);
   const settled = useRef(false);
