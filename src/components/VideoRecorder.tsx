@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Circle, Loader2, Square, X } from "lucide-react";
+import { Camera, Circle, Loader2, SwitchCamera, Square, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
