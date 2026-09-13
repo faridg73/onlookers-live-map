@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, BadgeDollarSign, Landmark, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { CashOutCard } from "@/components/CashOutCard";
+import { CoinPayoutDashboard } from "@/components/CoinPayoutDashboard";
 import { listMyVideos, type BountyVideo } from "@/lib/bounty-videos";
+import { formatCoins } from "@/lib/coins";
 
 export const Route = createFileRoute("/payout-history")({
   head: () => ({
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/payout-history")({
   component: PayoutHistoryScreen,
 });
 
-const money = (n: number) => `$${n.toFixed(2)}`;
+const money = (n: number) => formatCoins(n);
 
 function PayoutHistoryScreen() {
   const { user, loading } = useAuth();
@@ -87,7 +88,7 @@ function PayoutHistoryScreen() {
         </div>
       </div>
 
-      {user ? <CashOutCard /> : null}
+      {user ? <CoinPayoutDashboard /> : null}
 
       <h2 className="mt-8 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         Accepted clips

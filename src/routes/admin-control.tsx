@@ -50,6 +50,7 @@ export const Route = createFileRoute("/admin-control")({
 });
 
 const money = (n: number) => `$${n.toFixed(2)}`;
+const coins = (n: number) => `${Math.round(n).toLocaleString()} LC`;
 const when = (iso: string) => new Date(iso).toLocaleString();
 
 type Tab = "moderation" | "cashouts" | "metrics";
@@ -292,7 +293,10 @@ function ControlCenter() {
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{row.destination}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-base font-black text-foreground">{money(row.amount)}</p>
+                    <p className="text-base font-black text-foreground">{coins(row.amount)}</p>
+                    <p className="text-[0.62rem] font-bold text-muted-foreground">
+                      {money(Math.round(row.amount) / 10)} cash
+                    </p>
                     <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                       {row.status}
                     </p>
@@ -332,10 +336,10 @@ function ControlCenter() {
         </section>
       ) : (
         <section className="grid grid-cols-2 gap-3">
-          <Metric label="Gross processed" value={money(metrics?.gross_usd ?? 0)} icon={BadgeDollarSign} />
-          <Metric label="Platform cut" value={money(metrics?.platform_cut_usd ?? 0)} icon={Gauge} />
+          <Metric label="Gross processed" value={coins(metrics?.gross_usd ?? 0)} icon={BadgeDollarSign} />
+          <Metric label="Platform cut" value={coins(metrics?.platform_cut_usd ?? 0)} icon={Gauge} />
           <Metric label="Active pins" value={String(metrics?.active_pins ?? 0)} icon={MapPin} />
-          <Metric label="Cash-outs pending" value={money(metrics?.pending_payouts_usd ?? 0)} icon={BadgeDollarSign} />
+          <Metric label="Cash-outs pending" value={coins(metrics?.pending_payouts_usd ?? 0)} icon={BadgeDollarSign} />
           <Metric label="Clips expired" value={String(metrics?.expired_clips ?? 0)} icon={TriangleAlert} />
         </section>
       )}

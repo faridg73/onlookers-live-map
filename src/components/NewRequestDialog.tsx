@@ -82,7 +82,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         dbId: locked.id,
       });
       toast.success("Request is live", {
-        description: `$${bounty} locked from your wallet until it's fulfilled.`,
+        description: `${bounty} LC locked from your coin wallet until it's fulfilled.`,
       });
       setTitle("");
       setPlace("");

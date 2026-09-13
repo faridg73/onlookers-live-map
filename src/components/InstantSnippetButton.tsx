@@ -65,7 +65,7 @@ export function InstantSnippetButton({
           durationSeconds: SNIPPET_SECONDS,
         });
         const paid = await payInstantSnippet(video.id);
-        toast.success(`Paid instantly — $${paid.toFixed(2)} is in your wallet.`);
+        toast.success(`Paid instantly — ${Math.round(paid)} LC is in your wallet.`);
         setOpen(false);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "That snippet could not be sent.");
@@ -159,7 +159,7 @@ export function InstantSnippetButton({
       >
         <DialogContent onClick={(e) => e.stopPropagation()} className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Instant snippet · ${request.bounty}</DialogTitle>
+            <DialogTitle>Instant snippet · {request.bounty} LC</DialogTitle>
             <DialogDescription>
               You are {Math.round(userPosition ? feetAway(userPosition, request) : 0)} ft from this
               spot. Film {SNIPPET_SECONDS} seconds and the money lands in your wallet right away —

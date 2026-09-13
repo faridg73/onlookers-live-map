@@ -42,7 +42,7 @@ const SECTIONS = [
 • 85% goes to the Onlooker who captured the media.
 • 15% is retained by Onlooker as a platform fee.
 
-For example, a $20.00 bounty pays the Onlooker $17.00. Payouts land in the Onlooker's wallet immediately and can be cashed out to a connected bank account once the balance reaches the $10.00 minimum.`
+For example, a 200 LC bounty pays the Onlooker 170 LC. Looker Coins land in the Onlooker's wallet immediately, and 10 Looker Coins are always worth $1.00 when cashed out to a connected bank account (100 LC minimum).`
   },
   {
     question: "When does a bounty expire?",
@@ -86,7 +86,7 @@ Posting a real estate bounty requires checking the authorization box in the requ
   },
   {
     question: "Can I boost an existing bounty?",
-    answer: `Yes. Anyone can chip in $3 or $5 to increase a bounty pool. Boosts raise the payout for the Onlooker who ultimately fulfills the request, making the request more attractive. Boosts are added to the bounty total and are not refundable once the bounty is fulfilled or expired.`
+    answer: `Yes. Anyone can chip in 10, 20 or 50 Looker Coins to increase a bounty pool. Boosts raise the payout for the Onlooker who ultimately fulfills the request, making the request more attractive. Boosts are added to the bounty total and are not refundable once the bounty is fulfilled or expired.`
   },
   {
     question: "What happens if my submission is rejected?",

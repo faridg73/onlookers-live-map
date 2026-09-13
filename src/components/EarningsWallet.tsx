@@ -9,8 +9,9 @@ import {
   type PayoutRequest,
   type WalletBalance,
 } from "@/lib/wallet";
+import { formatCoinCash, formatCoins } from "@/lib/coins";
 
-const money = (n: number) => `$${n.toFixed(2)}`;
+const money = (n: number) => formatCoins(n);
 
 /** Hunter earnings: available, pending clearance, lifetime, plus payout requests. */
 export function EarningsWallet() {
@@ -57,7 +58,9 @@ export function EarningsWallet() {
       </div>
 
       <div className="mt-2 font-display text-4xl text-foreground">{money(balance.available)}</div>
-      <p className="text-xs text-muted-foreground">Available to pay out</p>
+      <p className="text-xs text-muted-foreground">
+        Available to pay out · {formatCoinCash(balance.available)} cash value
+      </p>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-xl border border-border bg-surface p-3">

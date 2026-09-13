@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Play, Share2, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
+import { formatCoins } from "@/lib/coins";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { listMyVideos, playbackUrl, thumbnailUrls, type BountyVideo } from "@/lib/bounty-videos";
@@ -95,8 +96,8 @@ export function MyBountyVideos() {
                     {v.request_title || "Live view capture"}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {v.request_place} · {new Date(v.created_at).toLocaleDateString()} · $
-                    {Number(v.bounty_amount)}
+                    {v.request_place} · {new Date(v.created_at).toLocaleDateString()} ·{" "}
+                    {formatCoins(Number(v.bounty_amount))}
                   </p>
                 </div>
                 <button

@@ -33,7 +33,8 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
   const { data, error } = await getSupabase().rpc("credit_topup", {
     _user_id: userId,
     _session_id: session["id"],
-    _amount: amount,
+    // Card top-ups are priced in dollars but credited as Looker Coins (10 LC = $1.00).
+    _amount: Math.round(amount * 10),
     _environment: env,
   });
 

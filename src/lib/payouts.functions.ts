@@ -188,7 +188,7 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
     }
   });
 
-/** Move wallet money to the reporter's bank account. */
+/** Redeem Looker Coins from the wallet as cash into the reporter's bank account (10 LC = $1.00). */
 export const cashOut = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data) => z.object({ amount: z.number().positive() }).parse(data))
@@ -218,7 +218,8 @@ export const cashOut = createServerFn({ method: "POST" })
       const stripe = createStripeClient(env);
       const transfer = await stripe.transfers.create(
         {
-          amount: Math.round(data.amount * 100),
+          // data.amount is in Looker Coins; 10 coins = $1.00 = 100 cents.
+          amount: Math.round(data.amount * 10),
           currency: "usd",
           destination: account.stripe_account_id,
           metadata: { cashout_id: cashoutId, user_id: context.userId },

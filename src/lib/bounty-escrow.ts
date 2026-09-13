@@ -6,7 +6,7 @@ import {
   settleExpiredBounties,
 } from "@/lib/requests.functions";
 
-export const MIN_BOUNTY = 5;
+export const MIN_BOUNTY = 50;
 
 function message(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;

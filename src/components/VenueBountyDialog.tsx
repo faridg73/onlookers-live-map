@@ -85,7 +85,7 @@ export function VenueBountyDialog({
       return;
     }
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
       return;
     }
     if (!isRequestAllowed(title, note, venue.name)) {
@@ -96,7 +96,7 @@ export function VenueBountyDialog({
     setBalance(funds);
     if (funds !== null && funds < bounty) {
       toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
-        description: `Add funds to lock a $${bounty} bounty.`,
+        description: `Buy Looker Coins to lock a ${bounty} LC bounty.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
@@ -132,7 +132,7 @@ export function VenueBountyDialog({
         expiresInMin: minutes,
       });
       toast.success("Bounty is live", {
-        description: `$${bounty} held in escrow · ${windowLabel}`,
+        description: `${bounty} LC held in escrow · ${windowLabel}`,
       });
       setOpen(false);
       setTitle("");
@@ -254,7 +254,7 @@ export function VenueBountyDialog({
             disabled={posting || bounty < MIN_BOUNTY}
             className="w-full rounded-2xl bg-signal py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Lock $${Number.isFinite(bounty) ? bounty : 0}`}
+            {posting ? "Locking bounty…" : `Lock ${Number.isFinite(bounty) ? bounty : 0} LC`}
           </button>
         </form>
       </DialogContent>

@@ -1,12 +1,13 @@
-import { Flame, Zap } from "lucide-react";
+import { Coins, Flame, Zap } from "lucide-react";
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
+import { formatCoinCash, formatCoinWords, formatCoins } from "@/lib/coins";
 import { cn } from "@/lib/utils";
 
 const PRESETS: { amount: number; tag?: string; icon?: "popular" | "fast" }[] = [
-  { amount: 5 },
-  { amount: 10, tag: "Popular", icon: "popular" },
-  { amount: 20, tag: "Fastest", icon: "fast" },
-  { amount: 40 },
+  { amount: 50 },
+  { amount: 100, tag: "Popular", icon: "popular" },
+  { amount: 200, tag: "Fastest", icon: "fast" },
+  { amount: 400 },
 ];
 
 /** Preset bounty chips plus a custom amount box with a minimum. */
@@ -58,7 +59,10 @@ export function BountyAmountPicker({
                 </span>
               )}
               <span className="block font-display text-xl font-extrabold leading-none tabular-nums">
-                ${amount}
+                {amount}
+              </span>
+              <span className="mt-0.5 block text-[0.55rem] font-bold uppercase tracking-[0.14em] opacity-70">
+                LC
               </span>
             </button>
           );
@@ -71,7 +75,7 @@ export function BountyAmountPicker({
           custom ? "border-signal bg-surface-raised" : "border-border bg-surface-raised",
         )}
       >
-        <span className="font-display text-xl font-extrabold text-signal">$</span>
+        <Coins className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
         <input
           type="number"
           inputMode="decimal"
@@ -79,25 +83,28 @@ export function BountyAmountPicker({
           step="1"
           value={Number.isFinite(value) ? value : ""}
           onChange={(e) => onChange(Number(e.target.value))}
-          placeholder={`Custom amount (min $${MIN_BOUNTY})`}
+          placeholder={`Custom coins (min ${MIN_BOUNTY} LC)`}
           className="w-full bg-transparent font-display text-lg font-bold text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
           aria-label="Custom bounty amount"
         />
       </div>
 
       {tooLow && (
-        <p className="text-xs font-bold text-destructive">Bounties start at ${MIN_BOUNTY}.</p>
+        <p className="text-xs font-bold text-destructive">
+          Bounties start at {formatCoinWords(MIN_BOUNTY)}.
+        </p>
       )}
       {!tooLow && shortFall && (
         <p className="text-xs font-bold text-destructive">
-          Your wallet has ${balance?.toFixed(2)} — top up before locking ${value}.
+          Your wallet has {formatCoins(balance ?? 0)} — buy coins before locking{" "}
+          {formatCoins(value)}.
         </p>
       )}
       {!tooLow && !shortFall && (
         <p className="text-xs font-medium text-foreground/70">
-          ${Number.isFinite(value) ? value : 0} is held from your wallet until the request is
-          fulfilled, cancelled, or expires.
-          {balance != null && ` Balance: $${balance.toFixed(2)}.`}
+          {formatCoins(Number.isFinite(value) ? value : 0)} ({formatCoinCash(value)} value) is held
+          from your coin wallet until the request is fulfilled, cancelled, or expires.
+          {balance != null && ` Balance: ${formatCoins(balance)}.`}
         </p>
       )}
     </div>

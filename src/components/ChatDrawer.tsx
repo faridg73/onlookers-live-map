@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BadgeCheck, Loader2, MessageSquare, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { BountyChat } from "@/components/BountyChat";
+import { formatCoinWords } from "@/lib/coins";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -219,8 +220,8 @@ export function ChatDrawer({
                   Approve this video?
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-muted-foreground">
-                  Are you sure you want to approve this video? This will instantly release $
-                  {reward} to the Bounty Hunter.
+                  Are you sure you want to approve this video? This will instantly release{" "}
+                  {formatCoinWords(reward)} to the Bounty Hunter.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
