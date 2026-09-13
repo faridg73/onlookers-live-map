@@ -45,6 +45,7 @@ function CommunityHub() {
   const [tag, setTag] = useState<string | null>(null);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
+  const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
