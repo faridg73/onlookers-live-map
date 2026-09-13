@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Building2, LocateFixed, MapPin, Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ScrollableLane } from "@/components/ScrollableLane";
+
 import { geocodeAddress, reverseGeocode } from "@/lib/geocode.functions";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
