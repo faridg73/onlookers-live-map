@@ -53,7 +53,7 @@ export function CategoryPicker({
         </button>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {PRIMARY_CATEGORIES.map((c) => {
           const on = value === c.id;
           const hue = `var(--cat-${c.id})`;
@@ -64,7 +64,7 @@ export function CategoryPicker({
               onClick={() => select(c.id)}
               aria-pressed={on}
               className={cn(
-                "flex min-h-[4.5rem] flex-col items-center justify-center gap-1 rounded-2xl border-2 p-2 text-center transition-all",
+                "flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
                 on ? "shadow-[0_10px_28px_-16px_black]" : "border-border bg-surface-raised",
               )}
               style={
@@ -77,7 +77,7 @@ export function CategoryPicker({
               }
             >
               <span
-                className="flex size-8 items-center justify-center rounded-xl text-base"
+                className="flex size-8 items-center justify-center rounded-md text-base"
                 style={{
                   backgroundColor: `color-mix(in oklch, ${hue} 82%, black)`,
                   boxShadow: `0 0 0 2px color-mix(in oklch, ${hue} 40%, transparent)`,
@@ -100,7 +100,7 @@ export function CategoryPicker({
       </div>
 
       {subs.length > 0 && (
-        <div className="rounded-2xl border border-border bg-surface p-2.5">
+        <div className="border-l-2 border-signal bg-surface-raised p-3">
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Narrow it down
           </p>
