@@ -163,11 +163,12 @@ function PostScreen() {
             onChange={(e) => setTitle(e.target.value)}
             required
             maxLength={120}
-            placeholder="Is the queue still around the block?"
+            placeholder="e.g., How long is the entry line at Section A?"
             className="field"
           />
           <span className="block text-xs font-medium text-foreground/70">
-            One short line people see on the map and in the feed.
+            One short line about a real place — a line, a seat view, a queue — people see on the
+            map and in the feed.
           </span>
         </label>
 
@@ -178,7 +179,7 @@ function PostScreen() {
               value={place}
               onChange={(e) => setPlace(e.target.value)}
               required
-              placeholder="Search an address, park, gate or beach"
+              placeholder="Search a stadium, gate, section or street corner"
               className="field"
             />
           </label>
@@ -255,12 +256,12 @@ function PostScreen() {
             rows={4}
             required
             minLength={10}
-            placeholder="Ask for crowd atmosphere, line lengths, tailgates, or street views — public spaces only, never the stage show or game itself."
+            placeholder="e.g., What is the view from Seat 12? Ask for entry lines, crowd atmosphere, tailgates or street views — filmed on location, in public spaces only."
             className="field resize-none"
           />
           <span className="block text-xs font-medium text-foreground/70">
             {note.trim().length < 10
-              ? "Add at least one clear sentence so the hunter knows exactly what to capture."
+              ? "Add at least one clear sentence about the physical spot — the line, the view, the crowd — so the hunter knows exactly what to capture."
               : `Great — this is what they'll see for ${
                   subOption
                     ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
@@ -325,6 +326,10 @@ function PostScreen() {
           >
             {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
           </button>
+          <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
+            Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital
+            screen captures are strictly prohibited.
+          </p>
         </div>
       </form>
     </div>

@@ -87,7 +87,8 @@ function AuthScreen() {
         {mode === "signin" ? "Sign in" : "Create your account"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        You need an account to upload bounty videos and replay them later.
+        Sign in to request or film real-world views — entry lines, seat views, queues and venue
+        atmospheres — captured live on location.
       </p>
 
       <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
