@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTestAlertText } from "@/lib/sms.functions";
+import { savePushToken, removePushToken } from "@/lib/push.functions";
 import { toast } from "sonner";
-import { Bell, Mail, MapPin, MessageSquare } from "lucide-react";
+import { Bell, BellOff, BellRing, Mail, MapPin, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +15,7 @@ import {
   saveAlertPreferences,
   type AlertPreferences,
 } from "@/lib/alerts";
+import { disablePush, enablePush, pushConfigured } from "@/lib/push-notifications";
 
 /**
  * Bounty Radar settings: how far away someone wants to hear about new bounties
@@ -25,7 +27,13 @@ export function AlertSettingsCard() {
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
   const [smsState, setSmsState] = useState<{ ok: boolean; message: string } | null>(null);
+  const [pushState, setPushState] = useState<{ loading: boolean; registered: boolean; message?: string }>({
+    loading: false,
+    registered: false,
+  });
   const sendTestText = useServerFn(sendTestAlertText);
+  const saveToken = useServerFn(savePushToken);
+  const deleteToken = useServerFn(removePushToken);
 
   const sendTest = async () => {
     setTesting(true);
@@ -70,6 +78,48 @@ export function AlertSettingsCard() {
     }
   };
 
+  const togglePush = async () => {
+    if (!pushConfigured()) {
+      toast.error("Push notifications are not configured for this build yet.");
+      return;
+    }
+    setPushState((s) => ({ ...s, loading: true }));
+    try {
+      if (pushState.registered) {
+        await disablePush();
+        setPushState({ loading: false, registered: false, message: "Phone push disabled on this device." });
+        toast.success("Push notifications disabled");
+        return;
+      }
+
+      const result = await enablePush();
+      if (result.status === "registered") {
+        const saved = await saveToken({ data: { token: result.token, platform: "web" } });
+        if (saved.ok) {
+          setPushState({ loading: false, registered: true, message: "Phone push is active — you'll get bounty alerts even when the app is closed." });
+          toast.success("Push notifications enabled");
+        } else {
+          setPushState({ loading: false, registered: true, message: "Permission granted, but the token could not be saved." });
+          toast.error(saved.error ?? "Could not save push token");
+        }
+      } else if (result.status === "denied") {
+        setPushState({ loading: false, registered: false, message: "Permission was denied. Enable notifications in your browser/site settings to try again." });
+        toast.error("Notification permission denied");
+      } else if (result.status === "open-in-new-tab") {
+        setPushState({ loading: false, registered: false, message: "Open the app in its own tab (not the Lovable preview iframe) to allow notification permission." });
+        toast("Open Onlooker in its own tab to enable push alerts", { icon: "🔔" });
+      } else if (result.status === "unsupported") {
+        setPushState({ loading: false, registered: false, message: "This browser/device does not support Firebase push notifications." });
+        toast.error("Push not supported on this device");
+      } else {
+        setPushState({ loading: false, registered: false, message: "Push setup is incomplete." });
+      }
+    } catch (error) {
+      setPushState({ loading: false, registered: false, message: error instanceof Error ? error.message : "Could not set up push notifications." });
+      toast.error(error instanceof Error ? error.message : "Push setup failed");
+    }
+  };
+
   const rows: { key: "push_enabled" | "sms_enabled" | "email_enabled"; label: string; hint: string; icon: typeof Bell }[] =
     [
       { key: "push_enabled", label: "In-app alerts", icon: Bell, hint: "Pops up the moment a bounty lands nearby" },
@@ -99,6 +149,55 @@ export function AlertSettingsCard() {
             <Switch checked={prefs[key]} onCheckedChange={(v) => set(key, v)} aria-label={label} />
           </div>
         ))}
+      </div>
+
+      <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              {pushState.registered ? (
+                <BellRing className="size-4 text-signal" />
+              ) : (
+                <Bell className="size-4 text-muted-foreground" />
+              )}{" "}
+              Phone push alerts
+            </p>
+            <p className="mt-0.5 text-[0.7rem] text-muted-foreground">
+              {pushState.registered
+                ? "You'll get bounty alerts even when the app is closed."
+                : "Wake your phone when a bounty drops nearby — even with the app closed."}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant={pushState.registered ? "outline" : "default"}
+            size="sm"
+            className="h-9 shrink-0 rounded-xl font-bold"
+            disabled={pushState.loading}
+            onClick={() => void togglePush()}
+          >
+            {pushState.loading ? (
+              "Working…"
+            ) : pushState.registered ? (
+              <>
+                <BellOff className="mr-1.5 size-4" /> Disable
+              </>
+            ) : (
+              <>
+                <Bell className="mr-1.5 size-4" /> Enable
+              </>
+            )}
+          </Button>
+        </div>
+        {pushState.message && (
+          <p
+            className={`mt-2 text-[0.7rem] ${
+              pushState.registered ? "text-signal" : "text-muted-foreground"
+            }`}
+          >
+            {pushState.message}
+          </p>
+        )}
       </div>
 
       {prefs.sms_enabled && (
