@@ -125,7 +125,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 /**
- * The nine tiles shown in the 3x3 picker on both /feed and /post. Art and
+ * The twelve tiles shown in the picker grid on both /feed and /post. Art and
  * sports stay valid stored categories, reachable as sub-options of Events.
  */
 export const PRIMARY_CATEGORY_IDS: CategoryId[] = [
@@ -138,6 +138,9 @@ export const PRIMARY_CATEGORY_IDS: CategoryId[] = [
   "parking",
   "weather",
   "realestate",
+  "street",
+  "community",
+  "markets",
 ];
 
 export const PRIMARY_CATEGORIES: Category[] = PRIMARY_CATEGORY_IDS.map(
@@ -157,6 +160,17 @@ export const PERMISSION_REQUIRED_CATEGORIES: CategoryId[] = ["realestate"];
 
 export function needsPermissionConfirmation(id?: CategoryId | null) {
   return !!id && PERMISSION_REQUIRED_CATEGORIES.includes(id);
+}
+
+/**
+ * Categories covering spontaneous public happenings. These carry an extra
+ * public-spaces-only disclaimer: capture must happen on open streets, parks
+ * and public squares where nobody has an expectation of privacy.
+ */
+export const PUBLIC_SPACES_ONLY_CATEGORIES: CategoryId[] = ["street", "community", "markets"];
+
+export function needsPublicSpacesNotice(id?: CategoryId | null) {
+  return !!id && PUBLIC_SPACES_ONLY_CATEGORIES.includes(id);
 }
 
 export function categoryById(id?: CategoryId | null) {
