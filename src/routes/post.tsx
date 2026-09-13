@@ -36,6 +36,13 @@ import { formatCreditCash, formatCredits } from "@/lib/credits";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
+  CAPTURE_OPTIONS,
+  MAX_CAPTURE_MINUTES,
+  captureDurationLabel,
+  suggestedBountyForCapture,
+  type CaptureDuration,
+} from "@/lib/capture-format";
+import {
   categoryById,
   generateAccessCode,
   needsAccessCode,
