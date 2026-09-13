@@ -1,17 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Compass, Map as MapIcon, Plus, Radio, Rows3, Sparkles } from "lucide-react";
+import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import {
+  CommunityFeedFilters,
+  radiusMilesFor,
+  type RadiusChoiceId,
+} from "@/components/CommunityFeedFilters";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
+import { distanceMiles, type MapPosition } from "@/lib/onlooker";
+import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import {
   COMMUNITY_CATEGORIES,
   communityMediaUrls,
+  isPinned,
   listCommunityPosts,
   type CommunityCategory,
   type CommunityPost,
@@ -30,7 +39,7 @@ export const Route = createFileRoute("/community")({
       {
         property: "og:description",
         content:
-          "Community posts with live countdowns, pay-per-minute streams and tags for the things happening around you.",
+          "A media-first local feed with verified creators, live streams and Credit tipping for everything happening around you.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -49,6 +58,13 @@ function CommunityHub() {
   const [composing, setComposing] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [here, setHere] = useState<MapPosition | null>(null);
+  const [locating, setLocating] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [radius, setRadius] = useState<RadiusChoiceId>("tight");
+  const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
+
+  const unit = useDistanceUnit(here);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -67,6 +83,26 @@ function CommunityHub() {
     void load();
   }, [load]);
 
+  const locate = useCallback(() => {
+    setLocating(true);
+    setLocationError(null);
+    void requestCurrentPosition()
+      .then((position) => {
+        setHere({ lat: position.coords.latitude, lng: position.coords.longitude });
+      })
+      .catch((err: unknown) => {
+        setLocationError(
+          err instanceof GeolocationFailure ? err.message : "We couldn't find your location.",
+        );
+        setRadius("any");
+      })
+      .finally(() => setLocating(false));
+  }, []);
+
+  useEffect(() => {
+    locate();
+  }, [locate]);
+
   const tagChoices = useMemo(() => {
     const source =
       category === "all"
@@ -75,13 +111,56 @@ function CommunityHub() {
     return [...new Set(source)].slice(0, 14);
   }, [category]);
 
-  const visible = useMemo(
-    () =>
-      posts.filter(
-        (p) =>
-          (category === "all" || p.category === category) && (!tag || p.tags.includes(tag)),
-      ),
-    [posts, category, tag],
+  const distanceFor = useCallback(
+    (post: CommunityPost) => {
+      if (!here || post.latitude === null || post.longitude === null) return null;
+      return distanceMiles(here, { lat: post.latitude, lng: post.longitude });
+    },
+    [here],
+  );
+
+  const label = useCallback(
+    (miles: number) =>
+      unit === "mi"
+        ? `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi away`
+        : `${miles * 1.60934 < 10 ? (miles * 1.60934).toFixed(1) : Math.round(miles * 1.60934)} km away`,
+    [unit],
+  );
+
+  const visible = useMemo(() => {
+    const limit = here ? radiusMilesFor(radius) : null;
+    const rows = posts
+      .filter((p) => (category === "all" || p.category === category) && (!tag || p.tags.includes(tag)))
+      .map((p) => ({ post: p, miles: distanceFor(p) }))
+      .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
+    return rows.sort((a, b) => {
+      const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
+      if (pinDiff !== 0) return pinDiff;
+      if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
+      if (a.miles !== null) return -1;
+      if (b.miles !== null) return 1;
+      return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
+    });
+  }, [posts, category, tag, radius, here, distanceFor]);
+
+  const featured = visible.filter((r) => isPinned(r.post));
+  const rest = visible.filter((r) => !isPinned(r.post));
+
+  const renderCard = ({ post, miles }: { post: CommunityPost; miles: number | null }) => (
+    <CommunityPostCard
+      key={post.id}
+      post={post}
+      {...(post.mediaPath && media[post.mediaPath] ? { mediaUrl: media[post.mediaPath] } : {})}
+      {...(miles !== null ? { distanceLabel: label(miles) } : {})}
+      isMine={post.userId === user?.id}
+      onShowOnMap={() => {
+        if (post.latitude === null || post.longitude === null) return;
+        setFocus({ lat: post.latitude, lng: post.longitude, label: post.title });
+        setView("map");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
+      onChanged={() => void load()}
+    />
   );
 
   return (
@@ -95,7 +174,7 @@ function CommunityHub() {
           See what your city is doing now
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tap a lane, filter by tag, or open the map to see what is happening right now.
+          A live local stream — tap a lane, tighten the radius, or open the map.
         </p>
         <Link
           to="/discover"
@@ -164,7 +243,19 @@ function CommunityHub() {
         ))}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
+      <div className="mt-4 px-5 sm:px-8">
+        <CommunityFeedFilters
+          unit={unit}
+          value={radius}
+          onChange={setRadius}
+          locating={locating}
+          hasLocation={Boolean(here)}
+          locationError={locationError}
+          onRetryLocation={locate}
+        />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
         <div className="flex rounded-full border border-border p-0.5">
           <Button
             type="button"
@@ -218,12 +309,17 @@ function CommunityHub() {
 
       {view === "map" ? (
         <div className="mt-5 px-5 sm:px-8">
-          <GlobalFeedMap />
+          <GlobalFeedMap focus={focus} />
         </div>
       ) : (
-        <section className="mt-5 space-y-5 px-5 sm:px-8">
+        <section className="mt-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
-          {!loading && visible.length === 0 && (
+          {!loading && visible.length === 0 && here && radiusMilesFor(radius) !== null && (
+            <p className="mb-4 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              Nothing posted this close yet. Widen the radius, or be the first to post here.
+            </p>
+          )}
+          {!loading && posts.length === 0 && (
             <DiscoverStarterCards
               onStart={(starterCategory) => {
                 setCategory(starterCategory);
@@ -233,17 +329,10 @@ function CommunityHub() {
               }}
             />
           )}
-          {visible.map((post) => (
-            <CommunityPostCard
-              key={post.id}
-              post={post}
-              {...(post.mediaPath && media[post.mediaPath]
-                ? { mediaUrl: media[post.mediaPath] }
-                : {})}
-              isMine={post.userId === user?.id}
-              onChanged={() => void load()}
-            />
-          ))}
+          {featured.map(renderCard)}
+          <div className="columns-1 gap-4 [column-fill:_balance] xs:columns-2 sm:columns-2 lg:columns-3">
+            {rest.map(renderCard)}
+          </div>
         </section>
       )}
 
