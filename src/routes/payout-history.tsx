@@ -4,6 +4,7 @@ import { ArrowLeft, BadgeDollarSign, Landmark, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { CoinPayoutDashboard } from "@/components/CoinPayoutDashboard";
 import { listMyVideos, type BountyVideo } from "@/lib/bounty-videos";
+import { formatCoins } from "@/lib/coins";
 
 export const Route = createFileRoute("/payout-history")({
   head: () => ({
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/payout-history")({
   component: PayoutHistoryScreen,
 });
 
-const money = (n: number) => `$${n.toFixed(2)}`;
+const money = (n: number) => formatCoins(n);
 
 function PayoutHistoryScreen() {
   const { user, loading } = useAuth();
