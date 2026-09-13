@@ -7,6 +7,7 @@ export type DisputeCase = {
   amount: number;
   status: string;
   dispute_reason: string;
+  reason_code: string | null;
   disputed_at: string | null;
   requester_id: string;
   spotter_id: string | null;
@@ -25,7 +26,7 @@ export type DisputeEvidence = {
 
 /** Open disputes the signed-in person can see (their own, or all for moderators). */
 export async function listDisputes(): Promise<DisputeCase[]> {
-  const { data, error } = await supabase.rpc("list_disputes");
+  const { data, error } = await supabase.rpc("list_disputes_with_reasons");
   if (error) throw error;
   return (data ?? []).map((row) => ({
     ...row,

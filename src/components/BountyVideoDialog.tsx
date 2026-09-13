@@ -31,6 +31,7 @@ import {
   type BountyVideo,
 } from "@/lib/bounty-videos";
 import type { LiveRequest } from "@/lib/onlooker";
+import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
 
 export function BountyVideoDialog({
   request,
@@ -50,6 +51,9 @@ export function BountyVideoDialog({
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
+  const [disputeVideo, setDisputeVideo] = useState<BountyVideo | null>(null);
+  const [disputeReasonCode, setDisputeReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
+  const [disputeDetails, setDisputeDetails] = useState("");
   const [capturing, setCapturing] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [shareLabel, setShareLabel] = useState("");
@@ -135,12 +139,12 @@ export function BountyVideoDialog({
   }
 
   /** Requester flags a clip; the bounty stays locked until a moderator decides. */
-  async function dispute(video: BountyVideo) {
-    const reason = window.prompt("What is wrong with this clip?")?.trim();
-    if (!reason) return;
+  async function dispute(video: BountyVideo, reasonCode: ModerationReasonCode, reason: string) {
     setDisputingId(video.id);
     try {
-      await disputeBountyVideo(video.request_id, reason);
+      await disputeBountyVideo(video.request_id, reason, reasonCode);
+      setDisputeVideo(null);
+      setDisputeDetails("");
       toast.success("Clip disputed. Add evidence in the dispute center.", {
         action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
       });
@@ -367,7 +371,7 @@ export function BountyVideoDialog({
                     <button
                       type="button"
                       disabled={disputingId === v.id}
-                      onClick={() => void dispute(v)}
+                       onClick={() => setDisputeVideo(v)}
                       className="mt-2 w-full rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
                     >
                       {disputingId === v.id ? "Sending…" : "Dispute this clip"}
@@ -397,5 +401,42 @@ export function BountyVideoDialog({
         )}
       </DialogContent>
     </Dialog>
+    <Dialog open={Boolean(disputeVideo)} onOpenChange={(next) => { if (!next) setDisputeVideo(null); }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Report this capture</DialogTitle>
+          <DialogDescription>Choose the main issue and add details for the review team.</DialogDescription>
+        </DialogHeader>
+        <label className="space-y-2 text-sm text-foreground">
+          <span className="font-semibold">Reason</span>
+          <select
+            value={disputeReasonCode}
+            onChange={(event) => setDisputeReasonCode(event.target.value as ModerationReasonCode)}
+            className="w-full rounded-xl border border-border bg-surface px-3 py-3 text-sm text-foreground outline-none focus:border-signal"
+          >
+            {MODERATION_REASONS.map((reason) => (
+              <option key={reason.code} value={reason.code}>{reason.label}</option>
+            ))}
+          </select>
+        </label>
+        <textarea
+          value={disputeDetails}
+          onChange={(event) => setDisputeDetails(event.target.value)}
+          rows={4}
+          maxLength={2000}
+          placeholder="Describe what happened and include a timestamp when helpful."
+          className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-3 text-sm text-foreground outline-none focus:border-signal"
+        />
+        <button
+          type="button"
+          disabled={!disputeVideo || !disputeDetails.trim() || Boolean(disputingId)}
+          onClick={() => disputeVideo && void dispute(disputeVideo, disputeReasonCode, disputeDetails.trim())}
+          className="rounded-xl bg-signal px-4 py-3 text-sm font-semibold text-signal-foreground disabled:opacity-50"
+        >
+          Submit for review
+        </button>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
