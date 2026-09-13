@@ -201,10 +201,10 @@ function PostScreen() {
   }, [searchOrigin, searchVenues, step, venueQuery]);
 
   /** Locks in a capture length and scales the reward up to match it. */
-  const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action) => {
+  const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
     if (next === null && nextAction !== "meetup") setAction("live");
-    if (next !== null && nextAction === "live") setAction("clip");
+    if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
     setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
   };
 
