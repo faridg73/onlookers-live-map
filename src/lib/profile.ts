@@ -35,7 +35,7 @@ export async function fetchMyProfile(): Promise<MyProfile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded")
+    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded, onboarding_completed")
     .eq("id", user.id)
     .maybeSingle();
   if (error) throw error;

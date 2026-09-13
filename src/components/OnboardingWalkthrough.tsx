@@ -83,40 +83,32 @@ export function OnboardingWalkthrough() {
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/90 px-4 pb-6 pt-16 sm:items-center">
       <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-surface">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-          >
-            <div className="relative">
-              <img
-                src={slide.art}
-                alt={slide.alt}
-                width={1024}
-                height={768}
-                loading="lazy"
-                className="aspect-[4/3] w-full object-cover"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface to-transparent" />
-              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 backdrop-blur">
-                <Icon className="size-4 text-signal" />
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                  {slide.title}
-                </span>
-              </div>
-            </div>
-
-            <div className="px-6 pb-6 pt-4 text-center">
-              <h2 className="font-display text-2xl tracking-tight text-foreground">
+        <div key={step} className="animate-in fade-in slide-in-from-right-8 duration-300">
+          <div className="relative">
+            <img
+              src={slide.art}
+              alt={slide.alt}
+              width={1024}
+              height={768}
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface to-transparent" />
+            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 backdrop-blur">
+              <Icon className="size-4 text-signal" />
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
                 {slide.title}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{slide.body}</p>
+              </span>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+
+          <div className="px-6 pb-6 pt-4 text-center">
+            <h2 className="font-display text-2xl tracking-tight text-foreground">
+              {slide.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{slide.body}</p>
+          </div>
+        </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-border px-6 py-4">
           <div className="flex gap-1.5">
