@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
+import { Flame, Ticket } from "lucide-react";
 import { AreaPicker } from "@/components/AreaPicker";
 import { TrendingCard } from "@/components/TrendingCard";
+import { EventCard } from "@/components/EventCard";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
+import { useLiveEvents } from "@/hooks/use-live-events";
 import { discoveryGroupBySlug } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
+
 
 export const Route = createFileRoute("/discover/trending")({
   head: () => ({
