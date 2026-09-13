@@ -11,7 +11,10 @@ export type CategoryId =
   | "weather"
   | "realestate"
   | "art"
-  | "sports";
+  | "sports"
+  | "street"
+  | "community"
+  | "markets";
 
 /** A refinement inside a category. `category` re-maps the stored category. */
 export type SubOption = { id: string; label: string; category?: CategoryId };
@@ -100,6 +103,24 @@ export const CATEGORIES: Category[] = [
     { id: "score", label: "Score right now" },
     { id: "seatview", label: "View from seats" },
     { id: "crowd", label: "Crowd & queue" },
+  ] },
+  { id: "street", label: "Street & Park Performances", short: "Performances", emoji: "\u{1F3B8}", hint: "e.g. The busker's crowd size and energy from the public footpath. Open streets and parks only — never record a ticketed or private performance.", subs: [
+    { id: "buskers", label: "Buskers & musicians" },
+    { id: "parkshows", label: "Park shows" },
+    { id: "popupart", label: "Pop-up art" },
+    { id: "crowdsize", label: "Crowd & vibe" },
+  ] },
+  { id: "community", label: "Community Rescues & Public Phenomena", short: "Community", emoji: "\u{1F6A8}", hint: "e.g. A wide shot of the closed street from a safe public distance. Public streets and parks only — no private property, no confidential response details.", subs: [
+    { id: "petrescue", label: "Pet rescues" },
+    { id: "response", label: "Public response" },
+    { id: "alert", label: "Community alert" },
+    { id: "lostfound", label: "Lost & found" },
+  ] },
+  { id: "markets", label: "Local Markets & Pop-ups", short: "Markets", emoji: "\u{1F3EA}", hint: "e.g. Which stalls are set up, how long the lines are and the general crowd from the public walkway.", subs: [
+    { id: "farmers", label: "Farmers markets" },
+    { id: "foodtrucks", label: "Food trucks" },
+    { id: "blockparty", label: "Block parties" },
+    { id: "popupstalls", label: "Pop-up stalls" },
   ] },
 ];
 
