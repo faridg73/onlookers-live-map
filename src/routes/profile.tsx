@@ -26,6 +26,7 @@ import { BuyCreditsCard } from "@/components/BuyCreditsCard";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
+import { StreakCard } from "@/components/StreakCard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
