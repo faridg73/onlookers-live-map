@@ -27,7 +27,7 @@ export function LiveReactions({ videoId }: { videoId: string }) {
 
   useEffect(() => {
     const room = supabase
-      .channel(`clip-reactions:${videoId}`)
+      .channel(`clip-reactions:${videoId}:${Math.random().toString(36).slice(2, 10)}`)
       .on("broadcast", { event: "reaction" }, ({ payload }) => {
         const emoji = (payload as { emoji?: string })?.emoji;
         if (emoji) float(emoji);

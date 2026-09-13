@@ -52,7 +52,7 @@ export function ChatInbox({
   useEffect(() => {
     if (!open || !user) return;
     const channel = supabase
-      .channel("inbox-messages")
+      .channel(`inbox-messages-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "request_messages" },
