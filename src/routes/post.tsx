@@ -36,6 +36,13 @@ import { formatCreditCash, formatCredits } from "@/lib/credits";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
+  CAPTURE_OPTIONS,
+  MAX_CAPTURE_MINUTES,
+  captureDurationLabel,
+  suggestedBountyForCapture,
+  type CaptureDuration,
+} from "@/lib/capture-format";
+import {
   categoryById,
   generateAccessCode,
   needsAccessCode,
@@ -116,6 +123,8 @@ function PostScreen() {
   const [bounty, setBounty] = useState(20);
   const [tip, setTip] = useState(0);
   const [minutes, setMinutes] = useState(60);
+  const [capture, setCapture] = useState<CaptureDuration>(5);
+  const [customCapture, setCustomCapture] = useState(false);
   const [tile, setTile] = useState<CategoryId>("events");
   const [sub, setSub] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
@@ -169,6 +178,14 @@ function PostScreen() {
     };
   }, [searchOrigin, searchVenues, step, venueQuery]);
 
+  /** Locks in a capture length and scales the reward up to match it. */
+  const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action) => {
+    setCapture(next);
+    if (next === null && nextAction !== "meetup") setAction("live");
+    if (next !== null && nextAction === "live") setAction("clip");
+    setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
+  };
+
   const continueFromPrompt = () => {
     if (prompt.trim().length < 8) {
       toast.error("Describe the live view you want in one short sentence.");
@@ -178,6 +195,8 @@ function PostScreen() {
     setTitle(parsed.title.slice(0, 120));
     setNote(parsed.instructions);
     if (parsed.action === "live") setMinutes(15);
+    setCustomCapture(false);
+    applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
     if (parsed.action === "meetup") {
       setMinutes(60);
       setTile("community");
@@ -276,7 +295,7 @@ function PostScreen() {
       const actionLabel = ACTIONS.find((item) => item.id === action)?.label ?? "Request Video Clip";
       const detailLines = [
         `Format: ${actionLabel}`,
-        parsed.durationMinutes ? `Requested capture: ${parsed.durationMinutes} minutes` : "",
+        `Requested capture: ${captureDurationLabel(capture)}`,
         subOption ? `Focus: ${subOption.label}` : "",
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
@@ -539,7 +558,15 @@ function PostScreen() {
                       aria-pressed={action === id}
                       onClick={() => {
                         setAction(id);
-                        if (id === "live") setMinutes(15);
+                        if (id === "live") {
+                          setMinutes(15);
+                          setCustomCapture(false);
+                          applyCapture(null, id);
+                        }
+                        if (id === "clip" && capture === null) {
+                          setCustomCapture(false);
+                          applyCapture(5, id);
+                        }
                         if (id === "meetup") {
                           setMinutes(60);
                           setTile("community");
@@ -551,6 +578,64 @@ function PostScreen() {
                       <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
                     </Button>
                   ))}
+                 </div>
+
+                <div className="rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Format &amp; length</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {CAPTURE_OPTIONS.map((option) => {
+                      const on = !customCapture && capture === option.minutes;
+                      return (
+                        <Button
+                          key={option.id}
+                          type="button"
+                          variant="outline"
+                          aria-pressed={on}
+                          onClick={() => {
+                            setCustomCapture(false);
+                            applyCapture(option.minutes);
+                          }}
+                          className={`h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`}
+                        >
+                          {option.minutes === null && <Radio className="size-3.5" />}
+                          {option.label}
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-pressed={customCapture}
+                      onClick={() => {
+                        setCustomCapture(true);
+                        applyCapture(capture ?? 10);
+                      }}
+                      className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`}
+                    >
+                      Custom
+                    </Button>
+                  </div>
+                  {customCapture && (
+                    <label className="mt-3 flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={1}
+                        max={MAX_CAPTURE_MINUTES}
+                        value={capture ?? 10}
+                        onChange={(event) => {
+                          const next = Number(event.target.value);
+                          if (!Number.isFinite(next)) return;
+                          applyCapture(Math.max(1, Math.min(MAX_CAPTURE_MINUTES, Math.round(next))));
+                        }}
+                        className="field w-24"
+                      />
+                      <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
+                    </label>
+                  )}
+                  <p className="mt-3 text-xs font-medium text-muted-foreground">
+                    {captureDurationLabel(capture)} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
+                    {capture === null && " — the onlooker streams until you end the session."}
+                  </p>
                 </div>
 
                 <label className="block space-y-2">
