@@ -90,3 +90,21 @@ export async function markOnboardingCompleted() {
     .eq("id", user.id);
   if (error) throw error;
 }
+
+/** Custom event dispatched to re-open the walkthrough on demand. */
+export const REPLAY_ONBOARDING_EVENT = "onlooker:replay-onboarding";
+
+/** Reset the onboarding flag and ask the mounted walkthrough to re-open. */
+export async function replayOnboarding() {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("You must be signed in.");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ onboarding_completed: false })
+    .eq("id", user.id);
+  if (error) throw error;
+
+  window.dispatchEvent(new CustomEvent(REPLAY_ONBOARDING_EVENT));
+}

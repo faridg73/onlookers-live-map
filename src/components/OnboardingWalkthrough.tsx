@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { fetchMyProfile, markOnboardingCompleted } from "@/lib/profile";
+import { fetchMyProfile, markOnboardingCompleted, REPLAY_ONBOARDING_EVENT } from "@/lib/profile";
 import browseArt from "@/assets/onboarding-browse.png";
 import creditsArt from "@/assets/onboarding-credits.png";
 import captureArt from "@/assets/onboarding-capture.png";
