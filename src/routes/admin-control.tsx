@@ -6,6 +6,7 @@ import {
   Gauge,
   Loader2,
   MapPin,
+  Search,
   ShieldAlert,
   TriangleAlert,
   Undo2,
