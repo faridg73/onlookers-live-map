@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Circle, Loader2, Square, X } from "lucide-react";
+import { Camera, Circle, Loader2, Square, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
 
 /**
  * In-app camera for chat clips. Recording stops on its own at 60 seconds and
- * records at a modest bitrate so uploads stay quick.
+ * records at a modest bitrate so uploads stay quick. It is the only way media
+ * enters Onlooker Live — nothing can come from the photo gallery.
  */
 export function VideoRecorder({
   onClose,
   onRecorded,
+  onPhoto,
 }: {
   onClose: () => void;
   onRecorded: (file: File) => void;
+  /** When provided, a shutter button grabs a still frame from the live camera. */
+  onPhoto?: (file: File) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
