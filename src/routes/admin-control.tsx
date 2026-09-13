@@ -6,6 +6,7 @@ import {
   Gauge,
   Loader2,
   MapPin,
+  Search,
   ShieldAlert,
   TriangleAlert,
   Undo2,
@@ -68,6 +69,7 @@ function ControlCenter() {
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -137,6 +139,15 @@ function ControlCenter() {
   }
 
   const pending = payouts.filter((row) => row.status === "pending" || row.status === "requested");
+  const needle = query.trim().toLowerCase();
+  const visibleFlags = needle
+    ? flags.filter((flag) =>
+        [flag.title, flag.details ?? "", flag.display_name, ...flag.matched_terms]
+          .join(" ")
+          .toLowerCase()
+          .includes(needle),
+      )
+    : flags;
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-3xl px-4 pb-24 pt-8">
@@ -171,10 +182,19 @@ function ControlCenter() {
         </div>
       ) : tab === "moderation" ? (
         <section className="space-y-3">
-          {flags.length === 0 ? (
-            <Empty text="Nothing flagged. The content filter is quiet." />
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search flags, users or keywords — e.g. Ticketmaster"
+              className="w-full rounded-xl border border-border bg-surface-raised py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-live/40"
+            />
+          </div>
+          {visibleFlags.length === 0 ? (
+            <Empty text={needle ? "No flags match that search." : "Nothing flagged. The content filter is quiet."} />
           ) : (
-            flags.map((flag) => (
+            visibleFlags.map((flag) => (
               <article key={flag.id} className="rounded-2xl border border-border bg-surface-raised p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
