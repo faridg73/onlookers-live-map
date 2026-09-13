@@ -295,7 +295,7 @@ function PostScreen() {
       const actionLabel = ACTIONS.find((item) => item.id === action)?.label ?? "Request Video Clip";
       const detailLines = [
         `Format: ${actionLabel}`,
-        parsed.durationMinutes ? `Requested capture: ${parsed.durationMinutes} minutes` : "",
+        `Requested capture: ${captureDurationLabel(capture)}`,
         subOption ? `Focus: ${subOption.label}` : "",
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
