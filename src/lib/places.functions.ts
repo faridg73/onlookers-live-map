@@ -130,7 +130,7 @@ export const fetchPlaceById = createServerFn({ method: "POST" })
           Authorization: `Bearer ${creds.lovableKey}`,
           "X-Connection-Api-Key": creds.mapsKey,
           "X-Goog-FieldMask":
-            "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount",
+            "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount,photos",
         },
       },
     );
