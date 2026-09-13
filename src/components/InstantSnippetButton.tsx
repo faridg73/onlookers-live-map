@@ -28,9 +28,12 @@ type Phase = "ready" | "recording" | "sending";
 export function InstantSnippetButton({
   request,
   userPosition,
+  autoStart = false,
 }: {
   request: LiveRequest;
   userPosition: MapPosition | null;
+  /** Opens the camera immediately (used by nearby-bounty push links). */
+  autoStart?: boolean;
 }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -125,6 +128,11 @@ export function InstantSnippetButton({
     }, 1000);
     return () => clearInterval(timer);
   }, [phase]);
+
+  // A push alert deep-link lands with the camera already open.
+  useEffect(() => {
+    if (autoStart && inRange) setOpen(true);
+  }, [autoStart, inRange]);
 
   if (!user || !inRange) return null;
 
