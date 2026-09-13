@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyTipPicker } from "@/components/BountyTipPicker";
+import { VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
@@ -68,6 +70,8 @@ function PostScreen() {
   const [accessCode, setAccessCode] = useState("");
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [minutes, setMinutes] = useState(60);
+  const [tip, setTip] = useState(0);
+  const total = (Number.isFinite(bounty) ? bounty : 0) + (Number.isFinite(tip) ? tip : 0);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
