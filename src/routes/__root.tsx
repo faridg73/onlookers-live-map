@@ -17,6 +17,7 @@ import { BottomNav } from "../components/BottomNav";
 import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { ProfileSetup } from "../components/ProfileSetup";
+import { OnboardingWalkthrough } from "../components/OnboardingWalkthrough";
 
 function NotFoundComponent() {
   return (
@@ -142,6 +143,7 @@ function RootComponent() {
           <Footer />
           <BottomNav />
           <ProfileSetup />
+          <OnboardingWalkthrough />
           <Toaster position="top-center" />
         </BoostProvider>
       </OnlookerProvider>
