@@ -1,4 +1,7 @@
-/** Buyable Credits packs. Price ids match the checkout catalogue. */
+/**
+ * Buyable Credits packs. Every tier follows the fixed platform rate of
+ * 4 Credits per $1 USD, so the dollar value is always credits / 4.
+ */
 export type CreditPackage = {
   id: string;
   priceId: string;
@@ -11,29 +14,38 @@ export type CreditPackage = {
 
 export const CREDIT_PACKAGES: CreditPackage[] = [
   {
-    id: "credits_starter_pack",
-    priceId: "credits_starter_50",
-    name: "Starter Pack",
+    id: "credits_pack_20",
+    priceId: "credits_pack_20_usd",
+    name: "Starter",
     credits: 20,
-    priceCents: 499,
-    blurb: "Enough to fund your first couple of live view requests.",
+    priceCents: 500,
+    blurb: "Funds your first live view request.",
   },
   {
-    id: "credits_event_pro",
-    priceId: "credits_event_pro_120",
+    id: "credits_pack_40",
+    priceId: "credits_pack_40_usd",
     name: "Event Pro",
     credits: 40,
-    priceCents: 999,
-    blurb: "Cover a full game day of line checks, seat views and tips.",
-    badge: "Best Value",
+    priceCents: 1000,
+    blurb: "A full game day of line checks and seat views.",
+    badge: "Most Popular",
   },
   {
-    id: "credits_super_fan",
-    priceId: "credits_super_fan_300",
+    id: "credits_pack_80",
+    priceId: "credits_pack_80_usd",
     name: "Super Fan",
     credits: 80,
-    priceCents: 2199,
-    blurb: "For heavy requesters who tip onlookers every week.",
+    priceCents: 2000,
+    blurb: "For requesters who tip onlookers every week.",
+  },
+  {
+    id: "credits_pack_200",
+    priceId: "credits_pack_200_usd",
+    name: "Insider",
+    credits: 200,
+    priceCents: 5000,
+    blurb: "Best for teams and heavy weekly requesters.",
+    badge: "Best Value",
   },
 ];
 
