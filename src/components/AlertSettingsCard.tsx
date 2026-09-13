@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { sendTestAlertText } from "@/lib/sms.functions";
 import { toast } from "sonner";
 import { Bell, Mail, MapPin, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,30 @@ export function AlertSettingsCard() {
   const { user } = useAuth();
   const [prefs, setPrefs] = useState<AlertPreferences>(DEFAULT_ALERT_PREFERENCES);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [smsState, setSmsState] = useState<{ ok: boolean; message: string } | null>(null);
+  const sendTestText = useServerFn(sendTestAlertText);
+
+  const sendTest = async () => {
+    setTesting(true);
+    setSmsState(null);
+    try {
+      await saveAlertPreferences(prefs);
+      const result = await sendTestText({ data: { phone: prefs.phone } });
+      setSmsState(
+        result.ok
+          ? { ok: true, message: "Test text sent — check your phone." }
+          : { ok: false, message: result.error ?? "Could not send that text." },
+      );
+    } catch (error) {
+      setSmsState({
+        ok: false,
+        message: error instanceof Error ? error.message : "Could not send that text.",
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
