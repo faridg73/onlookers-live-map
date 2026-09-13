@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BadgeCheck, Clock, MapPin, Navigation, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
+import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { HunterBadge } from "@/components/HunterBadge";
