@@ -1,38 +1,38 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type CoinTransactionType = "bounty_payout" | "direct_tip" | "coin_purchase";
+export type CreditTransactionType = "bounty_payout" | "direct_tip" | "credit_purchase";
 
-export type CoinWallet = {
+export type CreditWallet = {
   id: string;
-  coinBalance: number;
+  creditBalance: number;
   updatedAt: string;
 };
 
-export type CoinLedgerEntry = {
+export type CreditLedgerEntry = {
   id: string;
   direction: "in" | "out";
   amountGross: number;
   amountNet: number;
   amountFee: number;
-  type: CoinTransactionType;
+  type: CreditTransactionType;
   requestId: string | null;
   createdAt: string;
 };
 
-/** Platform cut kept from every coin movement. */
+/** Platform cut kept from every credit movement. */
 export const PLATFORM_FEE_RATE = 0.2;
 
-/** Reads the signed-in member's Looker Coins wallet, creating it on first visit. */
-export async function fetchCoinWallet(): Promise<CoinWallet | null> {
+/** Reads the signed-in member's Credits wallet, creating it on first visit. */
+export async function fetchCreditWallet(): Promise<CreditWallet | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
 
-  const { error: ensureError } = await supabase.rpc("ensure_coin_wallet", {});
+  const { error: ensureError } = await supabase.rpc("ensure_credit_wallet", {});
   if (ensureError) throw new Error(ensureError.message);
 
   const { data, error } = await supabase
-    .from("user_wallets")
-    .select("id, coin_balance, updated_at")
+    .from("user_credit_wallets")
+    .select("id, credit_balance, updated_at")
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -40,18 +40,18 @@ export async function fetchCoinWallet(): Promise<CoinWallet | null> {
 
   return {
     id: data.id,
-    coinBalance: data.coin_balance,
+    creditBalance: data.credit_balance,
     updatedAt: data.updated_at,
   };
 }
 
-/** Recent coin movements for this wallet, newest first, tagged incoming or outgoing. */
-export async function listCoinTransactions(
+/** Recent credit movements for this wallet, newest first, tagged incoming or outgoing. */
+export async function listCreditTransactions(
   walletId: string,
   limit = 25,
-): Promise<CoinLedgerEntry[]> {
+): Promise<CreditLedgerEntry[]> {
   const { data, error } = await supabase
-    .from("coin_transactions")
+    .from("credit_transactions")
     .select(
       "id, sender_wallet_id, receiver_wallet_id, request_id, amount_gross, amount_platform_fee, amount_net, transaction_type, created_at",
     )
@@ -66,23 +66,23 @@ export async function listCoinTransactions(
     amountGross: row.amount_gross,
     amountNet: row.amount_net,
     amountFee: row.amount_platform_fee,
-    type: row.transaction_type as CoinTransactionType,
+    type: row.transaction_type as CreditTransactionType,
     requestId: row.request_id,
     createdAt: row.created_at,
   }));
 }
 
 /**
- * Atomically moves coins from the signed-in member to another member:
+ * Atomically moves credits from the signed-in member to another member:
  * balance check, debit, 20% platform fee, credit of the net amount, ledger entry.
  */
-export async function tipCoins(options: {
+export async function tipCredits(options: {
   receiverId: string;
   amount: number;
-  type?: Exclude<CoinTransactionType, "coin_purchase">;
+  type?: Exclude<CreditTransactionType, "credit_purchase">;
   requestId?: string | null;
 }): Promise<{ senderBalance: number; amountNet: number; amountFee: number }> {
-  const { data, error } = await supabase.rpc("tip_coins", {
+  const { data, error } = await supabase.rpc("tip_credits", {
     _receiver_id: options.receiverId,
     _amount: Math.round(options.amount),
     _transaction_type: options.type ?? "direct_tip",
@@ -90,7 +90,7 @@ export async function tipCoins(options: {
   });
 
   if (error) {
-    if (/insufficient coins/i.test(error.message)) throw new Error("Insufficient Coins");
+    if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");
     throw new Error(error.message);
   }
 
@@ -102,41 +102,41 @@ export async function tipCoins(options: {
   };
 }
 
-export const COIN_LABELS: Record<CoinTransactionType, string> = {
+export const CREDIT_LABELS: Record<CreditTransactionType, string> = {
   bounty_payout: "Bounty payout",
   direct_tip: "Direct tip",
-  coin_purchase: "Coin purchase",
+  credit_purchase: "Credit purchase",
 };
 
 /* ------------------------------------------------------------------
- * Looker Coins are now the only in-app currency. Every bounty, chip-in,
- * tip and reward payout is denominated in whole coins; dollars appear
- * only when buying coins by card or cashing coins out to a bank.
+ * Credits are now the only in-app currency. Every bounty, chip-in,
+ * tip and reward payout is denominated in whole credits; dollars appear
+ * only when buying credits by card or cashing credits out to a bank.
  * ------------------------------------------------------------------ */
 
 /** Fixed conversion used everywhere money is shown or settled. */
-export const COINS_PER_USD = 4;
+export const CREDITS_PER_USD = 4;
 
 /** Smallest bounty anyone can post. */
-export const MIN_BOUNTY_COINS = 20;
+export const MIN_BOUNTY_CREDITS = 20;
 
 /** Micro-tip sent from the global feed. */
-export const MICRO_TIP_COINS = 2;
+export const MICRO_TIP_CREDITS = 2;
 
-export const coinsToUsdValue = (coins: number) =>
-  Math.round((coins / COINS_PER_USD) * 100) / 100;
+export const creditsToUsdValue = (credits: number) =>
+  Math.round((credits / CREDITS_PER_USD) * 100) / 100;
 
-export const usdToCoins = (usd: number) => Math.round(usd * COINS_PER_USD);
+export const usdToCredits = (usd: number) => Math.round(usd * CREDITS_PER_USD);
 
-/** Compact badge form, e.g. "120 LC". */
-export const formatCoins = (coins: number) =>
-  `${Math.round(Number.isFinite(coins) ? coins : 0).toLocaleString()} LC`;
+/** Compact badge form, e.g. "120 Credits". */
+export const formatCredits = (credits: number) =>
+  `${Math.round(Number.isFinite(credits) ? credits : 0).toLocaleString()} Credits`;
 
-/** Spelled-out form for sentences, e.g. "120 Looker Coins". */
-export const formatCoinWords = (coins: number) => {
-  const n = Math.round(Number.isFinite(coins) ? coins : 0);
-  return `${n.toLocaleString()} Looker Coin${n === 1 ? "" : "s"}`;
+/** Spelled-out form for sentences, e.g. "120 Credits". */
+export const formatCreditWords = (credits: number) => {
+  const n = Math.round(Number.isFinite(credits) ? credits : 0);
+  return `${n.toLocaleString()} Credit${n === 1 ? "" : "s"}`;
 };
 
 /** Cash equivalent, e.g. "$12.00". */
-export const formatCoinCash = (coins: number) => `$${coinsToUsdValue(coins).toFixed(2)}`;
+export const formatCreditCash = (credits: number) => `$${creditsToUsdValue(credits).toFixed(2)}`;

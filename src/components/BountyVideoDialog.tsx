@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, Coins, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
-import { formatCoins } from "@/lib/coins";
+import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { formatCredits } from "@/lib/credits";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
@@ -125,7 +125,7 @@ export function BountyVideoDialog({
     setPayingId(video.id);
     try {
       const paid = await acceptBountyVideo(video.id);
-      toast.success(`Accepted. ${Math.round(paid)} LC sent to the reporter's wallet.`);
+      toast.success(`Accepted. ${Math.round(paid)} Credits sent to the reporter's wallet.`);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
@@ -292,7 +292,7 @@ export function BountyVideoDialog({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(v.created_at).toLocaleString()}
-                        {v.accepted_at && ` · Paid ${Math.round(Number(v.payout_amount))} LC`}
+                        {v.accepted_at && ` · Paid ${Math.round(Number(v.payout_amount))} Credits`}
                       </p>
                     </div>
                     <button
@@ -339,8 +339,8 @@ export function BountyVideoDialog({
                   </div>
                   {v.accepted_at ? (
                     <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
-                      <Coins className="size-3.5" /> Accepted ·{" "}
-                      {formatCoins(Number(v.payout_amount))} paid to the reporter
+                      <CoinsIcon className="size-3.5" /> Accepted ·{" "}
+                      {formatCredits(Number(v.payout_amount))} paid to the reporter
                     </p>
                   ) : (
                     v.uploader_id !== user.id && (
@@ -356,8 +356,8 @@ export function BountyVideoDialog({
                           </>
                         ) : (
                           <>
-                            <Coins className="size-3.5" /> Accept &amp; pay{" "}
-                            {formatCoins(Number(v.bounty_amount))}
+                            <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
+                            {formatCredits(Number(v.bounty_amount))}
                           </>
                         )}
                       </button>

@@ -1,4 +1,4 @@
-/** Server-only geofenced alert dispatch for brand new coin bounties. */
+/** Server-only geofenced alert dispatch for brand new credit bounties. */
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
 const SITE_URL = "https://onlookerlive.com";
@@ -6,8 +6,8 @@ const SITE_URL = "https://onlookerlive.com";
 /** How far around the venue pin we wake up onlookers (1.5 miles ≈ 2.4 km). */
 export const GEOFENCE_RADIUS_MILES = 1.5;
 
-/** The 20% platform cut, matching the coin ledger. */
-export const COIN_FEE_RATE = 0.2;
+/** The 20% platform cut, matching the credit ledger. */
+export const CREDIT_FEE_RATE = 0.2;
 
 const CATEGORY_COPY: Record<string, string> = {
   lines: "entry line",
@@ -92,7 +92,7 @@ export async function notifyLocalOnlookersOfBounty(
   const gross = Math.round(Number(request.bounty_amount ?? 0));
   if (!(gross > 0)) return { nearby: 0, pushed: 0 };
 
-  const net = gross - Math.floor(gross * COIN_FEE_RATE);
+  const net = gross - Math.floor(gross * CREDIT_FEE_RATE);
 
   const { data: nearby, error } = await supabaseAdmin.rpc("onlookers_within_radius", {
     _latitude: Number(request.latitude),
@@ -112,7 +112,7 @@ export async function notifyLocalOnlookersOfBounty(
   const body = `Someone wants a live view of the ${readableCategory(
     request.category,
     request.prompt,
-  )} outside the venue! Fulfill it right now to earn ${net} Looker Coins!`;
+  )} outside the venue! Fulfill it right now to earn ${net} Credits!`;
   const path = `/?b=${request.id}&snap=1`;
 
   await supabaseAdmin.from("notifications").insert(

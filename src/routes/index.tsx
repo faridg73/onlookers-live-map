@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Camera, ChevronDown, Coins, Layers, MapPin, Navigation } from "lucide-react";
+import { Camera, ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
@@ -68,7 +68,7 @@ function MapScreen() {
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
-  // "High Bounties Only" hides everything but the pulsing 50+ coin gold pins.
+  // "High Bounties Only" hides everything but the pulsing 50+ credit gold pins.
   const visible = useMemo(
     () => (goldOnly ? requests.filter((request) => isGoldBounty(poolOf(request))) : requests),
     [requests, goldOnly, poolOf],
@@ -194,7 +194,7 @@ function MapScreen() {
                 : { color: "var(--pin-gold)" }
             }
           >
-            <Coins className="size-3.5" /> High Bounties
+            <CoinsIcon className="size-3.5" /> High Bounties
           </button>
         </div>
       </header>

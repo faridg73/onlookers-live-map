@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { Coins, Loader2, Sparkles } from "lucide-react";
+import { CoinsIcon, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-import { COIN_PACKAGES, formatPackPrice } from "@/lib/coin-packages";
-import { startCoinPurchase } from "@/lib/coins.functions";
+import { CREDIT_PACKAGES, formatPackPrice } from "@/lib/credit-packages";
+import { startCreditPurchase } from "@/lib/credits.functions";
 
-/** Buy Looker Coins — three fixed packs that open card checkout. */
-export function BuyCoinsCard() {
+/** Buy Credits — three fixed packs that open card checkout. */
+export function BuyCreditsCard() {
   const [busy, setBusy] = useState<string | null>(null);
 
   async function buy(packageId: string) {
     setBusy(packageId);
     try {
-      const result = await startCoinPurchase({ data: { packageId } });
+      const result = await startCreditPurchase({ data: { packageId } });
       if (result.error) throw new Error(result.error);
       if (result.url) window.location.href = result.url;
     } catch (error) {
@@ -26,17 +26,17 @@ export function BuyCoinsCard() {
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-          Buy Looker Coins
+          Buy Credits
         </span>
-        <Coins className="size-4 text-live" />
+        <CoinsIcon className="size-4 text-live" />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Coins fund your live view requests and tips. They land in your wallet as soon as the payment
+        Credits fund your live view requests and tips. They land in your wallet as soon as the payment
         clears.
       </p>
 
       <div className="mt-4 space-y-2">
-        {COIN_PACKAGES.map((pack) => (
+        {CREDIT_PACKAGES.map((pack) => (
           <button
             key={pack.id}
             type="button"
@@ -58,7 +58,7 @@ export function BuyCoinsCard() {
                 )}
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">{pack.blurb}</p>
-              <p className="mt-1 font-display text-base text-live">{pack.coins} coins</p>
+              <p className="mt-1 font-display text-base text-live">{pack.credits} credits</p>
             </div>
             <span className="shrink-0 font-display text-lg text-foreground">
               {busy === pack.id ? (

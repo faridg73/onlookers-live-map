@@ -140,7 +140,7 @@
   --input: oklch(0.27 0 0);
   --ring: oklch(0.912 0.262 124);
 
-  /* Bounty pin tiers at the 4 LC = $1 rate: medium (4-199), gold (200+) */
+  /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
   --pin-standard: oklch(0.62 0.16 255);
   --pin-medium: oklch(0.75 0.19 55);
   --pin-silver: oklch(0.86 0.01 260);

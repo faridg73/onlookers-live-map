@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
-import { coinPackageById } from "@/lib/coin-packages";
+import { creditPackageById } from "@/lib/credit-packages";
 import {
   createStripeClient,
   getStripeErrorMessage,
@@ -23,17 +23,17 @@ function appOrigin(): string {
 }
 
 /**
- * Card checkout for a Looker Coins pack. Coins are only added to the wallet by
+ * Card checkout for a Credits pack. Credits are only added to the wallet by
  * the payment webhook, once the charge really settles.
  */
-export const startCoinPurchase = createServerFn({ method: "POST" })
+export const startCreditPurchase = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: { packageId: string }) =>
     z.object({ packageId: z.string().min(3).max(60) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ url?: string; error?: string }> => {
-    const pack = coinPackageById(data.packageId);
-    if (!pack) return { error: "That coin pack is no longer available." };
+    const pack = creditPackageById(data.packageId);
+    if (!pack) return { error: "That credit pack is no longer available." };
 
     const env = resolveStripeEnvForHost(requestHost());
     const userId = context.userId;
@@ -47,9 +47,9 @@ export const startCoinPurchase = createServerFn({ method: "POST" })
 
       const metadata = {
         userId,
-        kind: "coin_purchase",
+        kind: "credit_purchase",
         packageId: pack.id,
-        coins: String(pack.coins),
+        credits: String(pack.credits),
       };
 
       const session = await stripe.checkout.sessions.create({
@@ -57,7 +57,7 @@ export const startCoinPurchase = createServerFn({ method: "POST" })
         client_reference_id: userId,
         metadata,
         payment_intent_data: {
-          description: `${pack.name} — ${pack.coins} Looker Coins`,
+          description: `${pack.name} — ${pack.credits} Credits`,
           metadata,
         },
         line_items: [
@@ -69,14 +69,14 @@ export const startCoinPurchase = createServerFn({ method: "POST" })
                   currency: "usd",
                   unit_amount: pack.priceCents,
                   product_data: {
-                    name: `${pack.name} — ${pack.coins} Looker Coins`,
+                    name: `${pack.name} — ${pack.credits} Credits`,
                     description: pack.blurb,
                   },
                 },
               },
         ],
-        success_url: `${origin}/profile?coins=success`,
-        cancel_url: `${origin}/profile?coins=cancelled`,
+        success_url: `${origin}/profile?credits=success`,
+        cancel_url: `${origin}/profile?credits=cancelled`,
       });
 
       if (!session.url) {
@@ -85,7 +85,7 @@ export const startCoinPurchase = createServerFn({ method: "POST" })
       return { url: session.url };
     } catch (error) {
       const message = getStripeErrorMessage(error);
-      console.error("[coins] checkout failed", { env, userId, pack: pack.id, message });
+      console.error("[credits] checkout failed", { env, userId, pack: pack.id, message });
       return { error: message };
     }
   });

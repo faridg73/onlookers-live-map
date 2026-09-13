@@ -1,13 +1,13 @@
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Coins, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
+import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
-import { formatCoins } from "@/lib/coins";
+import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 
 /**
@@ -121,7 +121,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
     try {
       const amount = await tipHunter(clip.id);
       setTips((t) => t + amount);
-      toast.success(`You tipped ${Math.round(amount)} LC. Nice one.`);
+      toast.success(`You tipped ${Math.round(amount)} Credits. Nice one.`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "That tip did not go through.");
     } finally {
@@ -168,7 +168,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Eye className="size-3.5" /> {clip.views}
             {tips > 0 && (
-              <span className="ml-2 font-bold text-signal">{formatCoins(tips)} tipped</span>
+              <span className="ml-2 font-bold text-signal">{formatCredits(tips)} tipped</span>
             )}
           </span>
           <button
@@ -177,8 +177,8 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
             onClick={() => void tip()}
             className="inline-flex items-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
           >
-            {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <Coins className="size-3.5" />}
-            Micro-Tip Hunter {MICRO_TIP} LC
+            {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <CoinsIcon className="size-3.5" />}
+            Micro-Tip Hunter {MICRO_TIP} Credits
           </button>
         </div>
       </div>

@@ -69,7 +69,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     const available = Number(current?.wallet_balance ?? 0);
     if (available < data.bounty) {
       throw new Error(
-        `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} LC available — buy coins first.`,
+        `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} Credits available — buy credits first.`,
       );
     }
 

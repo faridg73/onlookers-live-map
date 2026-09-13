@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, Camera, Coins, MapPin } from "lucide-react";
+import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, markOnboardingCompleted } from "@/lib/profile";
 import browseArt from "@/assets/onboarding-browse.png";
-import coinsArt from "@/assets/onboarding-coins.png";
+import creditsArt from "@/assets/onboarding-credits.png";
 import captureArt from "@/assets/onboarding-capture.png";
 
 const SLIDES = [
@@ -17,10 +17,10 @@ const SLIDES = [
   },
   {
     title: "Request a Bounty",
-    body: "Can't find parking or want to check the merch line? Drop a coin bounty and get an onlooker on the ground to show you live video proof.",
-    art: coinsArt,
-    icon: Coins,
-    alt: "Illustration of a glowing Looker Coin token with orbiting coins",
+    body: "Can't find parking or want to check the merch line? Drop a credit bounty and get an onlooker on the ground to show you live video proof.",
+    art: creditsArt,
+    icon: CoinsIcon,
+    alt: "Illustration of a glowing Credit token with orbiting credits",
   },
   {
     title: "Capture & Earn",
