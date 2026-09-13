@@ -29,19 +29,16 @@ export async function listPools(): Promise<BountyPool[]> {
   if (error) throw new Error(error.message);
 
   const pools = data ?? [];
-  const { data: contributions } = await supabase
-    .from("pool_contributions")
-    .select("pool_id, user_id")
-    .in(
-      "pool_id",
-      pools.map((p) => p.id),
-    );
+  const poolIds = pools.map((p) => p.id);
 
-  const backers = new Map<string, Set<string>>();
-  for (const row of contributions ?? []) {
-    const set = backers.get(row.pool_id) ?? new Set<string>();
-    set.add(row.user_id);
-    backers.set(row.pool_id, set);
+  const backers = new Map<string, number>();
+  if (poolIds.length > 0) {
+    const { data: counts } = await supabase.rpc("pool_backer_counts", {
+      _pool_ids: poolIds,
+    });
+    for (const row of counts ?? []) {
+      backers.set(row.pool_id, row.backer_count);
+    }
   }
 
   return pools.map((p) => ({
@@ -55,7 +52,7 @@ export async function listPools(): Promise<BountyPool[]> {
     status: p.status,
     expiresAt: p.expires_at,
     createdAt: p.created_at,
-    backers: backers.get(p.id)?.size ?? 0,
+    backers: backers.get(p.id) ?? 0,
   }));
 }
 
