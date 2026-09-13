@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { uploadMedia } from "@/lib/media-upload";
 import type { LiveRequest } from "@/lib/onlooker";
 
 export type ChatMessage = {
@@ -21,10 +22,7 @@ export async function uploadChatAttachment(key: string, file: File) {
 
   const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
   const path = `${auth.user.id}/${key}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type, upsert: false });
-  if (error) throw error;
+  await uploadMedia({ bucket: BUCKET, path, file, contentType: file.type });
   return { path, kind: file.type.startsWith("video/") ? "video" : "image" };
 }
 
