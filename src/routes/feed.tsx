@@ -44,17 +44,21 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
-type RadiusChoice = number | "global";
+const PRESETS_MILES = [5, 15, 25] as const;
+const DEFAULT_CUSTOM_MILES = 100;
+
+type RadiusChoice = number | "custom";
 
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
   const [filter, setFilter] = useState<RequestStatus | "all">("open");
-  const [radiusChoice, setRadiusChoice] = useState<RadiusChoice>(5);
+  const [radiusChoice, setRadiusChoice] = useState<RadiusChoice>(PRESETS_MILES[0]);
+  const [customMiles, setCustomMiles] = useState(DEFAULT_CUSTOM_MILES);
   const [cat, setCat] = useState<CategoryId | "all">("all");
   const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const { unit, radius, formatDistance } = useDistanceUnit(userPosition);
+  const { unit, formatDistance } = useDistanceUnit(userPosition);
 
   const [locationError, setLocationError] = useState<string | null>(null);
 
@@ -92,25 +96,29 @@ function FeedScreen() {
 
   useEffect(() => {
     setRadiusChoice((current) =>
-      current === "global" || radiusOptions.some((o) => o.miles === current)
+      current === "custom" || radiusOptions.some((o) => o.miles === current)
         ? current
-        : (radiusOptions[0]?.miles ?? 5),
+        : (radiusOptions[0]?.miles ?? PRESETS_MILES[0]),
     );
   }, [radiusOptions]);
 
+  const effectiveRadiusMiles =
+    radiusChoice === "custom" ? customMiles : radiusChoice;
+
   const radiusLabel =
-    radiusChoice === "global"
-      ? "Global"
+    radiusChoice === "custom"
+      ? `${Math.round(unit === "mi" ? customMiles : customMiles * 1.609344)} ${unit}`
       : (radiusOptions.find((o) => o.miles === radiusChoice)?.label ?? `${radiusChoice} ${unit}`);
 
-  const nextWiderRadius: RadiusChoice =
-    radiusChoice === "global"
-      ? "global"
-      : (radiusOptions.find((o) => o.miles > radiusChoice)?.miles ?? "global");
+  const nextWiderRadius: RadiusChoice = useMemo(() => {
+    if (radiusChoice === "custom") return "custom";
+    const next = radiusOptions.find((o) => o.miles > radiusChoice)?.miles;
+    return next ?? "custom";
+  }, [radiusChoice, radiusOptions]);
 
   const withinRadius = (r: (typeof requests)[number]) => {
-    if (radiusChoice === "global" || !userPosition) return true;
-    return distanceMiles(userPosition, requestMapPosition(r)) <= radiusChoice;
+    if (!userPosition) return true;
+    return distanceMiles(userPosition, requestMapPosition(r)) <= effectiveRadiusMiles;
   };
 
   // Status, keyword and radius filters shared by both the list and the tile counters.
@@ -126,7 +134,7 @@ function FeedScreen() {
         .includes(q);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requests, filter, query, radiusChoice, userPosition]);
+  }, [requests, filter, query, radiusChoice, customMiles, userPosition]);
 
   const categoryCounts = useMemo(() => {
     const counts: Partial<Record<CategoryId, number>> = {};
@@ -168,13 +176,34 @@ function FeedScreen() {
     userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
   const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
+  const displayCustom = Math.round(unit === "mi" ? customMiles : customMiles * 1.609344);
+
+  const handleCustomInput = (value: string) => {
+    const num = parseInt(value.replace(/\D/g, ""), 10);
+    if (Number.isNaN(num) || num <= 0) return;
+    const miles = unit === "mi" ? num : num / 1.609344;
+    setCustomMiles(miles);
+  };
+
+  const expandRadius = () => {
+    if (nextWiderRadius === "custom") {
+      setRadiusChoice("custom");
+      setCustomMiles((m) => Math.max(m * 2, DEFAULT_CUSTOM_MILES));
+    } else {
+      setRadiusChoice(nextWiderRadius);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
           <span className="text-signal">${pot}</span> in open bounties{" "}
-          {radiusChoice === "global" ? "worldwide" : `within ${radiusLabel} of you`}.
+          {radiusChoice === "custom"
+            ? `within ${radiusLabel} of you`
+            : `within ${radiusLabel} of you`}
+          .
         </p>
         <div
           className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
@@ -199,20 +228,34 @@ function FeedScreen() {
           ))}
           <button
             type="button"
-            onClick={() => setRadiusChoice("global")}
-            aria-pressed={radiusChoice === "global"}
+            onClick={() => setRadiusChoice("custom")}
+            aria-pressed={radiusChoice === "custom"}
             className={
               "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
-              (radiusChoice === "global"
+              (radiusChoice === "custom"
                 ? "bg-signal text-signal-foreground"
                 : "text-muted-foreground hover:text-foreground")
             }
           >
-            Global
+            Custom
           </button>
         </div>
+        {radiusChoice === "custom" && (
+          <label className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-1">
+            <input
+              type="number"
+              min={1}
+              value={displayCustom}
+              onChange={(e) => handleCustomInput(e.target.value)}
+              aria-label={`Custom radius in ${unit}`}
+              className="w-12 bg-transparent text-center text-[0.7rem] font-bold text-foreground outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <span className="pr-1 text-[0.65rem] font-bold uppercase text-muted-foreground">
+              {unit}
+            </span>
+          </label>
+        )}
       </div>
-
 
       {!userPosition && (
         <button
@@ -292,21 +335,19 @@ function FeedScreen() {
         {list.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              {radiusChoice === "global"
-                ? "No live requests match — try another category, or check back as new bounties go live."
-                : `Nothing open within ${radiusLabel} of you right now.`}
+              Nothing open within {radiusLabel} of you right now.
             </p>
-            {radiusChoice !== "global" && (
-              <button
-                type="button"
-                onClick={() => setRadiusChoice(nextWiderRadius)}
-                className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
-              >
-                {nextWiderRadius === "global"
-                  ? "Search globally"
-                  : `Expand to ${radiusOptions.find((o) => o.miles === nextWiderRadius)?.label}`}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={expandRadius}
+              className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
+            >
+              {nextWiderRadius === "custom"
+                ? radiusChoice === "custom"
+                  ? `Expand to ${Math.round(unit === "mi" ? customMiles * 2 : customMiles * 2 * 1.609344)} ${unit}`
+                  : "Use custom radius"
+                : `Expand to ${radiusOptions.find((o) => o.miles === nextWiderRadius)?.label}`}
+            </button>
           </div>
         )}
       </div>
