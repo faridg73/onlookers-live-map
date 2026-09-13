@@ -378,8 +378,7 @@ function PostScreen() {
                   )}
                 </div>
 
-                {(
-                  <div>
+                <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
                     <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                       <Button
