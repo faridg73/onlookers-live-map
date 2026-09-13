@@ -257,7 +257,7 @@ function CommunityHub() {
         <CommunityFeedFilters
           unit={unit}
           value={radius}
-          onChange={setRadius}
+          onChange={changeRadius}
           locating={locating}
           hasLocation={Boolean(here)}
           locationError={locationError}
