@@ -151,7 +151,26 @@ function PostScreen() {
   }, [voice.error]);
 
   useEffect(() => {
-    if (step !== 2 || venueQuery.trim().length < 2) return;
+    let active = true;
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active) setSignedIn(Boolean(data.session));
+      })
+      .catch(() => {
+        if (active) setSignedIn(false);
+      });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (step !== 2 || !signedIn || venueQuery.trim().length < 2) return;
     let active = true;
     const timer = window.setTimeout(() => {
       setVenueBusy(true);
