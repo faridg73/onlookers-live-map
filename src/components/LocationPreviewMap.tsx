@@ -193,7 +193,7 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
             {status ?? pinned?.formatted ?? "Search above, tap the map, or drag the pin to the exact spot."}
           </p>
         </div>
-        {places.length > 0 && (
+        {!compact && places.length > 0 && (
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Nearby places">
             {places.map((place) => (
               <button
