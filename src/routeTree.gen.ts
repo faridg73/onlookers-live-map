@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminControlRouteImport } from './routes/admin-control'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as DisputesRouteImport } from './routes/disputes'
@@ -51,6 +52,11 @@ const AdminControlRoute = AdminControlRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-control'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/copyright'
     | '/disputes'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-control'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/copyright'
     | '/disputes'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin-control'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/copyright'
     | '/disputes'
@@ -369,6 +381,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminControlRoute: typeof AdminControlRoute
   AuthRoute: typeof AuthRoute
+  CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   CopyrightRoute: typeof CopyrightRoute
   DisputesRoute: typeof DisputesRoute
@@ -417,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -601,6 +621,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminControlRoute: AdminControlRoute,
   AuthRoute: AuthRoute,
+  CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   CopyrightRoute: CopyrightRoute,
   DisputesRoute: DisputesRoute,

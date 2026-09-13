@@ -6,7 +6,7 @@ import { ChatInbox } from "@/components/ChatInbox";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
-  { to: "/discover", label: "Browse", icon: Compass, exact: false },
+  { to: "/community", label: "Discover", icon: Compass, exact: false },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
   { to: "/post", label: "Post", icon: PlusSquare, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
