@@ -13,13 +13,13 @@ import { creditPackageById } from "@/lib/credit-packages";
 export const Route = createFileRoute("/balance")({
   head: () => ({
     meta: [
-      { title: "Balance — Credits, purchases and cash out" },
+      { title: "Balance & Cashout — Onlooker" },
       {
         name: "description",
         content:
           "See your Onlooker credit balance, every credit pack you bought, and cash your credits out to your bank.",
       },
-      { property: "og:title", content: "Your Onlooker Balance" },
+      { property: "og:title", content: "Balance & Cashout — Onlooker" },
       {
         property: "og:description",
         content: "Credits balance, purchase history and bank cash out in one place.",
