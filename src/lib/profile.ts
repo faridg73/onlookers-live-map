@@ -51,7 +51,7 @@ export async function fetchMyProfile(): Promise<MyProfile | null> {
   const { data: created, error: insertError } = await supabase
     .from("profiles")
     .insert(seed)
-    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded")
+    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded, onboarding_completed")
     .single();
   if (insertError) throw insertError;
   return created as MyProfile;
@@ -75,6 +75,18 @@ export async function completeMyProfile(input: {
       onboarded: true,
       terms_accepted_at: readRememberedTerms() ?? new Date().toISOString(),
     })
+    .eq("id", user.id);
+  if (error) throw error;
+}
+
+export async function markOnboardingCompleted() {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("You must be signed in.");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ onboarding_completed: true })
     .eq("id", user.id);
   if (error) throw error;
 }
