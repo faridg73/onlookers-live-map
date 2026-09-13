@@ -114,14 +114,14 @@ export const COIN_LABELS: Record<CoinTransactionType, string> = {
  * only when buying coins by card or cashing coins out to a bank.
  * ------------------------------------------------------------------ */
 
-/** Fixed conversion: 10 Looker Coins = $1.00 USD. */
-export const COINS_PER_USD = 10;
+/** Fixed conversion used everywhere money is shown or settled. */
+export const COINS_PER_USD = 4;
 
 /** Smallest bounty anyone can post. */
-export const MIN_BOUNTY_COINS = 50;
+export const MIN_BOUNTY_COINS = 20;
 
 /** Micro-tip sent from the global feed. */
-export const MICRO_TIP_COINS = 5;
+export const MICRO_TIP_COINS = 2;
 
 export const coinsToUsdValue = (coins: number) =>
   Math.round((coins / COINS_PER_USD) * 100) / 100;

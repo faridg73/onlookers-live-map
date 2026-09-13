@@ -6,7 +6,7 @@ import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
 
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
-export const MIN_BOUNTY = 50;
+export const MIN_BOUNTY = 20;
 
 const createSchema = z.object({
   prompt: z.string().trim().min(3).max(300),
@@ -69,7 +69,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     const available = Number(current?.wallet_balance ?? 0);
     if (available < data.bounty) {
       throw new Error(
-        `Not enough wallet balance to lock this bounty. You have $${available.toFixed(2)} available — top up first.`,
+        `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} LC available — buy coins first.`,
       );
     }
 

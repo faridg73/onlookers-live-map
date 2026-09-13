@@ -1,8 +1,8 @@
 import { Coins } from "lucide-react";
-import { formatCoins } from "@/lib/coins";
+import { formatCoinCash, formatCoins } from "@/lib/coins";
 import { cn } from "@/lib/utils";
 
-const TIPS = [0, 10, 20, 50];
+const TIPS = [0, 4, 8, 20];
 
 /**
  * Optional Bounty Wallet tip added on top of the escrowed reward, used to
@@ -40,7 +40,12 @@ export function BountyTipPicker({
                   : "border-border bg-surface-raised text-foreground hover:border-signal/60",
               )}
             >
-              {amount === 0 ? "None" : `+${amount}`}
+              <span className="block">{amount === 0 ? "None" : `+${amount}`}</span>
+              {amount > 0 && (
+                <span className="mt-0.5 block text-[0.6rem] font-bold opacity-70">
+                  {formatCoinCash(amount)}
+                </span>
+              )}
             </button>
           );
         })}
@@ -73,7 +78,7 @@ export function BountyTipPicker({
           a higher payout on the map, and is refunded with the bounty if nobody claims it.
           {value > 0 && (
             <span className="mt-1 block font-extrabold text-signal">
-              Total held: {formatCoins(total)}
+              Total held: {formatCoins(total)} · {formatCoinCash(total)}
             </span>
           )}
           {shortFall && (

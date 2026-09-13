@@ -1,14 +1,14 @@
 import type { LiveRequest } from "@/lib/onlooker";
 
 /** Coin value where a bounty becomes a glowing gold pin. */
-export const GOLD_BOUNTY_COINS = 500;
+export const GOLD_BOUNTY_COINS = 200;
 
 export type BountyTier = "standard" | "medium" | "gold";
 
 /** Which visual theme a pin uses, based on its total coin bounty. */
 export function bountyTier(coins: number): BountyTier {
   if (coins >= GOLD_BOUNTY_COINS) return "gold";
-  if (coins >= 10) return "medium";
+  if (coins >= 4) return "medium";
   return "standard";
 }
 
