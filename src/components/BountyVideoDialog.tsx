@@ -99,8 +99,12 @@ export function BountyVideoDialog({
     try {
       await uploadBountyVideo({ file, request, note });
       setNote("");
+      const rows = await listVideosForRequest(request.id, request.dbId ?? null);
+      setVideos(rows);
+      setThumbs(await thumbnailUrls(rows));
+      const mine = rows.find((row) => row.uploader_id === user?.id);
+      if (mine) setJustSent(mine);
       toast.success("Live capture sent to this bounty.");
-      await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Sending that capture failed.");
     } finally {
