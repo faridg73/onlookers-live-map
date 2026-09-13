@@ -168,6 +168,7 @@ function PostScreen() {
         <label className={`block space-y-2 ${card}`}>
           <span className={sectionLabel}>1 · Bounty title</span>
           <input
+            ref={titleRef}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -260,6 +261,7 @@ function PostScreen() {
         <label className={`block space-y-2 ${card}`}>
           <span className={sectionLabel}>4 · Specific camera instructions</span>
           <textarea
+            ref={noteRef}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={4}
@@ -341,6 +343,23 @@ function PostScreen() {
           </p>
         </div>
       </form>
+
+      <ContentModerationAlertModal
+        open={moderationOpen}
+        onOpenChange={setModerationOpen}
+        onEditRequest={() => {
+          setModerationOpen(false);
+          // Focus the first offending field. If the title is empty or the note
+          // contains the flagged text, prefer the note; otherwise start with title.
+          const titleHasForbidden = !isRequestAllowed(title, "", "");
+          const noteHasForbidden = !isRequestAllowed("", note, "");
+          if (noteHasForbidden && !titleHasForbidden) {
+            noteRef.current?.focus();
+          } else {
+            titleRef.current?.focus();
+          }
+        }}
+      />
     </div>
   );
 }
