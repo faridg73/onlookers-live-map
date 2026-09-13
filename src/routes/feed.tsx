@@ -285,10 +285,24 @@ function FeedScreen() {
           </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No live requests match — try another category, or check back as new bounties go live
-            near you.
-          </p>
+          <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              {radiusChoice === "global"
+                ? "No live requests match — try another category, or check back as new bounties go live."
+                : `Nothing open within ${radiusLabel} of you right now.`}
+            </p>
+            {radiusChoice !== "global" && (
+              <button
+                type="button"
+                onClick={() => setRadiusChoice(nextWiderRadius)}
+                className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
+              >
+                {nextWiderRadius === "global"
+                  ? "Search globally"
+                  : `Expand to ${radiusOptions.find((o) => o.miles === nextWiderRadius)?.label}`}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
