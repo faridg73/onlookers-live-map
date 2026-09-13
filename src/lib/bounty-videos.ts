@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { uploadMedia } from "@/lib/media-upload";
 import type { LiveRequest } from "@/lib/onlooker";
 
 export const BOUNTY_VIDEO_BUCKET = "bounty-videos";
@@ -108,23 +109,29 @@ export async function uploadBountyVideo({
 
   const path = `${user.id}/${request.id}/${Date.now()}.${extensionFor(file)}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from(BOUNTY_VIDEO_BUCKET)
-    .upload(path, file, {
-      contentType: file.type || "video/mp4",
-      cacheControl: "3600",
-      upsert: false,
-    });
-  if (uploadError) throw uploadError;
+  await uploadMedia({
+    bucket: BOUNTY_VIDEO_BUCKET,
+    path,
+    file,
+    contentType: file.type || "video/mp4",
+  });
 
   let thumbPath: string | null = null;
   const thumb = await captureThumbnail(file);
   if (thumb) {
     const candidate = `${path.replace(/\.[^.]+$/, "")}-thumb.jpg`;
-    const { error: thumbError } = await supabase.storage
-      .from(BOUNTY_VIDEO_BUCKET)
-      .upload(candidate, thumb, { contentType: "image/jpeg", cacheControl: "3600", upsert: true });
-    if (!thumbError) thumbPath = candidate;
+    try {
+      await uploadMedia({
+        bucket: BOUNTY_VIDEO_BUCKET,
+        path: candidate,
+        file: thumb,
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+      thumbPath = candidate;
+    } catch {
+      thumbPath = null;
+    }
   }
 
   const { data, error } = await supabase
