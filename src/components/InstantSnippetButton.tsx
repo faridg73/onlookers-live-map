@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadBountyVideo } from "@/lib/bounty-videos";
+import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import {
   SNIPPET_SECONDS,
   feetAway,
