@@ -91,7 +91,7 @@ export function Leaderboard({
                 </p>
               </div>
               <span className="font-display text-lg text-signal">
-                ${r.total_earned.toFixed(0)}
+                {formatCoins(r.total_earned)}
               </span>
             </li>
           ))}

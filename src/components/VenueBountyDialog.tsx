@@ -85,7 +85,7 @@ export function VenueBountyDialog({
       return;
     }
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
       return;
     }
     if (!isRequestAllowed(title, note, venue.name)) {
@@ -254,7 +254,7 @@ export function VenueBountyDialog({
             disabled={posting || bounty < MIN_BOUNTY}
             className="w-full rounded-2xl bg-signal py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Lock $${Number.isFinite(bounty) ? bounty : 0}`}
+            {posting ? "Locking bounty…" : `Lock ${Number.isFinite(bounty) ? bounty : 0} LC`}
           </button>
         </form>
       </DialogContent>

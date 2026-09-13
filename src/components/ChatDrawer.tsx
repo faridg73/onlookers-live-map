@@ -219,8 +219,8 @@ export function ChatDrawer({
                   Approve this video?
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-muted-foreground">
-                  Are you sure you want to approve this video? This will instantly release $
-                  {reward} to the Bounty Hunter.
+                  Are you sure you want to approve this video? This will instantly release{" "}
+                  {formatCoinWords(reward)} to the Bounty Hunter.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

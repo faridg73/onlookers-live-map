@@ -124,7 +124,7 @@ export function BountyVideoDialog({
     setPayingId(video.id);
     try {
       const paid = await acceptBountyVideo(video.id);
-      toast.success(`Accepted. $${paid.toFixed(2)} sent to the reporter's wallet.`);
+      toast.success(`Accepted. ${Math.round(paid)} LC sent to the reporter's wallet.`);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
@@ -291,7 +291,7 @@ export function BountyVideoDialog({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(v.created_at).toLocaleString()}
-                        {v.accepted_at && ` · Paid $${Number(v.payout_amount).toFixed(2)}`}
+                        {v.accepted_at && ` · Paid ${Math.round(Number(v.payout_amount))} LC`}
                       </p>
                     </div>
                     <button

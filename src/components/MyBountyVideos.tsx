@@ -95,8 +95,8 @@ export function MyBountyVideos() {
                     {v.request_title || "Live view capture"}
                   </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {v.request_place} · {new Date(v.created_at).toLocaleDateString()} · $
-                    {Number(v.bounty_amount)}
+                    {v.request_place} · {new Date(v.created_at).toLocaleDateString()} ·{" "}
+                    {formatCoins(Number(v.bounty_amount))}
                   </p>
                 </div>
                 <button

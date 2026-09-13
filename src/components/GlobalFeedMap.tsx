@@ -120,7 +120,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
     try {
       const amount = await tipHunter(clip.id);
       setTips((t) => t + amount);
-      toast.success(`You tipped $${amount.toFixed(2)}. Nice one.`);
+      toast.success(`You tipped ${Math.round(amount)} LC. Nice one.`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "That tip did not go through.");
     } finally {
@@ -166,7 +166,9 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
         <div className="flex items-center justify-between gap-3">
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Eye className="size-3.5" /> {clip.views}
-            {tips > 0 && <span className="ml-2 font-bold text-signal">${tips.toFixed(2)} tipped</span>}
+            {tips > 0 && (
+              <span className="ml-2 font-bold text-signal">{formatCoins(tips)} tipped</span>
+            )}
           </span>
           <button
             type="button"

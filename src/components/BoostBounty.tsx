@@ -19,7 +19,7 @@ export function BoostBounty({ requestId, disabled }: { requestId: string; disabl
     setPending(amount);
     try {
       await boost(requestId, amount);
-      toast.success(`You added $${amount} to the pool.`);
+      toast.success(`You added ${amount} LC to the pool.`);
     } catch {
       toast.error("Couldn't add to this bounty.");
     } finally {
@@ -39,14 +39,14 @@ export function BoostBounty({ requestId, disabled }: { requestId: string; disabl
             void chipIn(amount);
           }}
           className="inline-flex items-center gap-1 rounded-full border border-signal/50 bg-signal/10 px-2.5 py-1.5 text-xs font-semibold text-signal transition-colors hover:bg-signal/20 disabled:opacity-40"
-          aria-label={`Chip in $${amount} to this bounty`}
+          aria-label={`Chip in ${amount} Looker Coins to this bounty`}
         >
           {pending === amount ? (
             <Loader2 className="size-3 animate-spin" />
           ) : (
             <Plus className="size-3" />
           )}
-          ${amount}
+          {amount} LC
         </button>
       ))}
     </div>

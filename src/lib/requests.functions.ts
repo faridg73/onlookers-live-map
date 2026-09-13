@@ -6,14 +6,14 @@ import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
 
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
-export const MIN_BOUNTY = 5;
+export const MIN_BOUNTY = 50;
 
 const createSchema = z.object({
   prompt: z.string().trim().min(3).max(300),
   /** Camera instructions, scanned by the content filter (not stored here). */
   details: z.string().trim().max(2000).nullable().optional(),
   locationName: z.string().trim().min(2).max(160),
-  bounty: z.number().finite().min(MIN_BOUNTY).max(5000),
+  bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
   category: z.string().trim().max(40).nullable().optional(),
   accessCode: z.string().trim().min(4).max(40).nullable().optional(),
   minutes: z.number().int().min(15).max(1440).default(60),
