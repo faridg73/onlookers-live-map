@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Camera, MapPin, Radar, Radio } from "lucide-react";
+import { Camera, MapPin, Radar, Radio, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useRadar } from "@/hooks/use-radar";
 import { RequestCard } from "@/components/RequestCard";
@@ -7,10 +8,26 @@ import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { groupBySlug, venueBySlug } from "@/lib/venues";
+import { groupBySlug, venueBySlug, type Venue } from "@/lib/venues";
+import {
+  DISCOVERY_GROUPS,
+  discoveryGroupBySlug,
+  placeIdFromSlug,
+  venueFromPlace,
+} from "@/lib/discovery";
+import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
 
 export const Route = createFileRoute("/discover/$group/$venue")({
   loader: ({ params }) => {
+    const placeId = placeIdFromSlug(params.venue);
+    if (placeId) {
+      const group = discoveryGroupBySlug(params.group) ?? DISCOVERY_GROUPS[0]!;
+      return {
+        name: group.short,
+        area: group.name,
+        blurb: `${group.tagline}.`,
+      };
+    }
     const venue = venueBySlug(params.group, params.venue);
     if (!venue) throw notFound();
     return { name: venue.name, area: venue.area, blurb: venue.blurb };
@@ -37,10 +54,52 @@ export const Route = createFileRoute("/discover/$group/$venue")({
 
 function VenueScreen() {
   const params = Route.useParams();
-  const group = groupBySlug(params.group)!;
-  const venue = venueBySlug(params.group, params.venue)!;
+  const placeId = placeIdFromSlug(params.venue);
+  const dynamicGroup = discoveryGroupBySlug(params.group);
+  const curatedGroup = groupBySlug(params.group);
+  const curatedVenue = placeId ? null : venueBySlug(params.group, params.venue);
+
   const { requests, claim } = useOnlooker();
   const { isWatched, toggle } = useRadar();
+  const [place, setPlace] = useState<DiscoveredPlace | null>(null);
+  const [loading, setLoading] = useState(Boolean(placeId));
+
+  useEffect(() => {
+    if (!placeId) return;
+    let cancelled = false;
+    setLoading(true);
+    void fetchPlaceById({ data: { placeId } })
+      .then((result) => {
+        if (!cancelled) setPlace(result);
+      })
+      .catch((error) => console.error("[discovery] place details failed", error))
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [placeId]);
+
+  const group = dynamicGroup ?? DISCOVERY_GROUPS[0]!;
+  const venue: Venue | null = curatedVenue ?? (place ? venueFromPlace(place, group) : null);
+  const backLabel = dynamicGroup?.name ?? curatedGroup?.name ?? "All places";
+  const art = dynamicGroup?.art ?? curatedGroup?.art ?? "from-signal/30 to-sky-500/20";
+
+  if (!venue) {
+    return (
+      <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+        <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
+          ← All places
+        </Link>
+        <div className="mt-6 h-28 animate-pulse rounded-2xl border border-border bg-surface" />
+        <p className="mt-4 text-sm text-muted-foreground">
+          {loading ? "Loading this spot…" : "We couldn't load this spot. Go back and pick another."}
+        </p>
+      </div>
+    );
+  }
+
   const watched = isWatched(venue.slug);
 
   const watch = () => {
@@ -68,14 +127,14 @@ function VenueScreen() {
     <div className="mx-auto max-w-lg px-4 pb-32 pt-6">
       <Link
         to="/discover/$group"
-        params={{ group: group.slug }}
+        params={{ group: params.group }}
         className="text-xs font-bold uppercase tracking-[0.14em] text-signal"
       >
-        ← {group.name}
+        ← {backLabel}
       </Link>
 
       <div
-        className={`mt-3 flex h-28 items-center justify-center rounded-2xl bg-gradient-to-br text-5xl ${group.art}`}
+        className={`mt-3 flex h-28 items-center justify-center rounded-2xl bg-gradient-to-br text-5xl ${art}`}
         aria-hidden
       >
         {venue.emoji}
@@ -85,6 +144,13 @@ function VenueScreen() {
       <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
         <MapPin className="size-3.5" aria-hidden /> {venue.area}
       </p>
+      {place?.rating && (
+        <p className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground">
+          <Star className="size-3.5 text-signal" aria-hidden />
+          {place.rating.toFixed(1)}
+          {place.ratingCount ? ` · ${place.ratingCount} reviews` : ""}
+        </p>
+      )}
       <p className="mt-2 text-sm text-foreground/80">{venue.blurb}</p>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border">
@@ -113,7 +179,6 @@ function VenueScreen() {
         <Radar className="size-4" aria-hidden />
         {watched ? "On your radar" : "Add to Bounty Radar"}
       </button>
-
 
       <h2 className="mt-7 flex items-center gap-2 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
         <Radio className="size-3.5 text-signal" aria-hidden /> Active live views

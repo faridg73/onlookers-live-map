@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
+import { ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { RadarAlerts } from "@/components/RadarAlerts";
-import { VENUE_GROUPS, isVenueOnToday } from "@/lib/venues";
+import { AreaPicker } from "@/components/AreaPicker";
+import { DISCOVERY_GROUPS, discoveryGroupBySlug, placeSlug } from "@/lib/discovery";
+import { useDiscoveryArea } from "@/hooks/use-discovery-area";
+import { usePlaceList } from "@/hooks/use-place-list";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
@@ -13,16 +16,17 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/discover/")({
   head: () => ({
     meta: [
-      { title: "Browse Places — Onlooker Live Views" },
+      { title: "Browse Places Near You — Onlooker Live Views" },
       {
         name: "description",
         content:
-          "Browse traffic hotspots, nightlife strips, coastal lookouts, weekend markets and more, then request a live view from anywhere.",
+          "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a live view.",
       },
-      { property: "og:title", content: "Browse Places — Onlooker Live Views" },
+      { property: "og:title", content: "Browse Places Near You — Onlooker Live Views" },
       {
         property: "og:description",
-        content: "Pick a place category or open the live radar map and request a view nearby.",
+        content:
+          "Trending events, live sports and local hotspots around your city — request a live view from someone already there.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -31,20 +35,27 @@ export const Route = createFileRoute("/discover/")({
   component: DiscoverHome,
 });
 
+const WEEKEND = [0, 5, 6];
+
 function DiscoverHome() {
   const { requests, claim } = useOnlooker();
   const { spots, remove } = useRadar();
+  const { area } = useDiscoveryArea();
   const [view, setView] = useState<"grid" | "map">("grid");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const activeIn = (keywords: string[]) =>
-    requests.filter(
-      (r) =>
-        r.status === "open" &&
-        keywords.some((k) => `${r.place} ${r.title}`.toLowerCase().includes(k)),
-    ).length;
+  const eventsGroup = discoveryGroupBySlug("events");
+  const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
+    maxResults: 8,
+  });
 
+  const isWeekend = WEEKEND.includes(new Date().getDay());
   const selected = requests.find((r) => r.id === selectedId) ?? null;
+
+  const liveNear = (name: string) =>
+    requests.filter(
+      (r) => r.status === "open" && `${r.place} ${r.title}`.toLowerCase().includes(name.toLowerCase()),
+    ).length;
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
@@ -52,10 +63,15 @@ function DiscoverHome() {
 
       <h1 className="font-display text-3xl tracking-tight text-foreground">Browse places</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Start broad, drill down to the exact spot, then ask for a live view.
+        Everything here is pulled live from the area you're browsing — pick a spot and ask for a
+        view.
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-1">
+      <div className="mt-4">
+        <AreaPicker />
+      </div>
+
+      <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-1">
         {(
           [
             { id: "grid", label: "Categories", icon: LayoutGrid },
@@ -69,9 +85,7 @@ function DiscoverHome() {
             aria-pressed={view === tab.id}
             className={cn(
               "flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors",
-              view === tab.id
-                ? "bg-signal text-signal-foreground"
-                : "text-muted-foreground",
+              view === tab.id ? "bg-signal text-signal-foreground" : "text-muted-foreground",
             )}
           >
             <tab.icon className="size-4" aria-hidden />
@@ -96,13 +110,74 @@ function DiscoverHome() {
           )}
         </div>
       ) : (
-        <div className="mt-4 space-y-3">
-          {VENUE_GROUPS.map((group) => {
-            const venuesToday = group.venues.filter((v) => isVenueOnToday(v));
-            if (venuesToday.length === 0) return null;
-            const open = venuesToday.reduce((sum, v) => sum + activeIn(v.match), 0);
-            const popUp = group.venues.some((v) => v.days);
-            return (
+        <>
+          {eventsGroup && (
+            <section className="mt-5">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
+                    <Flame className="size-4 text-signal" aria-hidden /> Trending events & live
+                    sports
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {isWeekend ? "On this weekend" : "Coming up"} around {area.label}
+                  </p>
+                </div>
+                <Link
+                  to="/discover/$group"
+                  params={{ group: eventsGroup.slug }}
+                  className="shrink-0 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal"
+                >
+                  See all
+                </Link>
+              </div>
+
+              <div className="mt-3 -mx-4 flex gap-3 overflow-x-auto px-4 pb-2">
+                {eventsLoading && eventPlaces.length === 0
+                  ? [0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="h-28 w-44 shrink-0 animate-pulse rounded-2xl border border-border bg-surface"
+                      />
+                    ))
+                  : eventPlaces.slice(0, 8).map((place) => {
+                      const live = liveNear(place.name);
+                      return (
+                        <Link
+                          key={place.id}
+                          to="/discover/$group/$venue"
+                          params={{ group: eventsGroup.slug, venue: placeSlug(place.id) }}
+                          className="flex w-44 shrink-0 flex-col justify-between rounded-2xl border border-border bg-surface p-3 transition-colors hover:border-signal/60"
+                        >
+                          <span className="text-2xl" aria-hidden>
+                            {eventsGroup.emoji}
+                          </span>
+                          <span className="mt-2 line-clamp-2 text-sm font-bold text-foreground">
+                            {place.name}
+                          </span>
+                          <span className="mt-1 truncate text-[0.68rem] text-muted-foreground">
+                            {place.primaryType ?? "Venue"}
+                            {place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}
+                          </span>
+                          {live > 0 && (
+                            <span className="mt-1 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-signal">
+                              {live} live now
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                {!eventsLoading && eventPlaces.length === 0 && (
+                  <p className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
+                    No event venues found around {area.label} yet — try another city.
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          <div className="mt-4 space-y-3">
+            {DISCOVERY_GROUPS.map((group) => (
               <Link
                 key={group.slug}
                 to="/discover/$group"
@@ -116,23 +191,20 @@ function DiscoverHome() {
                     {group.emoji}
                   </span>
                   <span className="rounded-full bg-background/70 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground">
-                    {popUp ? `${venuesToday.length} on today` : `${venuesToday.length} places`}
+                    Near {area.label.split(",")[0]}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-display text-lg text-foreground">{group.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {group.tagline}
-                      {open > 0 && <span className="text-signal"> · {open} live now</span>}
-                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{group.tagline}</p>
                   </div>
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                 </div>
               </Link>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
