@@ -23,7 +23,7 @@ const STATUS_STYLES: Record<string, string> = {
   failed: "bg-urgent/15 text-urgent",
 };
 
-/** Payout Dashboard: turn earned Looker Credits into real money in the bank. */
+/** Payout Dashboard: turn earned Credits into real money in the bank. */
 export function CreditPayoutDashboard() {
   const loadStatus = useServerFn(getPayoutStatus);
   const beginOnboarding = useServerFn(startPayoutOnboarding);
@@ -76,7 +76,7 @@ export function CreditPayoutDashboard() {
   async function cashOutCredits() {
     const value = Math.round(Number(amount));
     if (!Number.isFinite(value) || value < MIN_CASHOUT_CREDITS) {
-      toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Looker Credits ($10.00)`);
+      toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Credits ($10.00)`);
       return;
     }
     if (credits !== null && value > credits) {
@@ -122,7 +122,7 @@ export function CreditPayoutDashboard() {
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {CREDITS_PER_USD} Looker Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
+        {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
       </p>
 
       {bank?.payoutsEnabled ? (

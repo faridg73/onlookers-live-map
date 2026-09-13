@@ -23,7 +23,7 @@ function appOrigin(): string {
 }
 
 /**
- * Card checkout for a Looker Credits pack. Credits are only added to the wallet by
+ * Card checkout for a Credits pack. Credits are only added to the wallet by
  * the payment webhook, once the charge really settles.
  */
 export const startCreditPurchase = createServerFn({ method: "POST" })
@@ -57,7 +57,7 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
         client_reference_id: userId,
         metadata,
         payment_intent_data: {
-          description: `${pack.name} — ${pack.credits} Looker Credits`,
+          description: `${pack.name} — ${pack.credits} Credits`,
           metadata,
         },
         line_items: [
@@ -69,7 +69,7 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
                   currency: "usd",
                   unit_amount: pack.priceCents,
                   product_data: {
-                    name: `${pack.name} — ${pack.credits} Looker Credits`,
+                    name: `${pack.name} — ${pack.credits} Credits`,
                     description: pack.blurb,
                   },
                 },

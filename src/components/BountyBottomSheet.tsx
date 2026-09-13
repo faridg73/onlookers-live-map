@@ -117,7 +117,7 @@ export function BountyBottomSheet({
           </span>
         </div>
         <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
-          {pool} credit bounty · {payout} Looker Credits paid to you once the requester approves your
+          {pool} credit bounty · {payout} Credits paid to you once the requester approves your
           clip.
         </p>
 

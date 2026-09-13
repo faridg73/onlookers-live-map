@@ -18,7 +18,7 @@ export async function shareBounty(request: LiveRequest, boosted = 0) {
   const url = bountyLink(request, boosted);
   const amount = request.bounty + boosted;
   const title = `${amount} Credits bounty — ${request.place}`;
-  const text = `${request.title} · ${amount} Looker Credits for a live view at ${request.place}. Anyone nearby?`;
+  const text = `${request.title} · ${amount} Credits for a live view at ${request.place}. Anyone nearby?`;
 
   const nav = typeof navigator === "undefined" ? null : navigator;
   if (nav?.share) {

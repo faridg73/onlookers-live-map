@@ -52,7 +52,7 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
   console.log("[webhook] wallet credited", { session: session["id"], userId, amount, fresh: data });
 }
 
-/** Adds a bought Looker Credits pack to the buyer's wallet exactly once. */
+/** Adds a bought Credits pack to the buyer's wallet exactly once. */
 async function creditCreditPurchase(session: Record<string, any>, env: StripeEnv) {
   const meta = session["metadata"] ?? {};
   const userId = meta.userId ?? session["client_reference_id"];

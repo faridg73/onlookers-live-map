@@ -85,7 +85,7 @@ export function VenueBountyDialog({
       return;
     }
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Credits.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
     if (!isRequestAllowed(title, note, venue.name)) {
@@ -96,7 +96,7 @@ export function VenueBountyDialog({
     setBalance(funds);
     if (funds !== null && funds < bounty) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
-        description: `Buy Looker Credits to lock a ${bounty} Credits bounty.`,
+        description: `Buy Credits to lock a ${bounty} Credits bounty.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;

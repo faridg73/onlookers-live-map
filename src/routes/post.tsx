@@ -86,7 +86,7 @@ function PostScreen() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Credits.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
     if (note.trim().length < 10) {
@@ -110,7 +110,7 @@ function PostScreen() {
     setBalance(funds);
     if (funds !== null && funds < total) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
-        description: `Buy Looker Credits to lock a ${total} Credits bounty${
+        description: `Buy Credits to lock a ${total} Credits bounty${
           tip > 0 ? " including your tip" : ""
         }.`,
         action: { label: "Buy credits", onClick: () => void navigate({ to: "/profile" }) },
@@ -320,7 +320,7 @@ function PostScreen() {
         </label>
 
         <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">05</span> · Looker Credit reward</span>
+          <span className={sectionLabel}><span className="text-signal">05</span> · Credit reward</span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
           <p className="flex items-start gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />

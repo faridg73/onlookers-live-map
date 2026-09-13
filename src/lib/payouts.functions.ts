@@ -188,7 +188,7 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
     }
   });
 
-/** Redeem Looker Credits from the wallet as cash into the reporter's bank account (4 Credits = $1.00). */
+/** Redeem Credits from the wallet as cash into the reporter's bank account (4 Credits = $1.00). */
 export const cashOut = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data) => z.object({ amount: z.number().positive() }).parse(data))
@@ -218,7 +218,7 @@ export const cashOut = createServerFn({ method: "POST" })
       const stripe = createStripeClient(env);
       const transfer = await stripe.transfers.create(
         {
-          // data.amount is in Looker Credits; 4 credits = $1.00 = 100 cents.
+          // data.amount is in Credits; 4 credits = $1.00 = 100 cents.
           amount: Math.round(data.amount * 25),
           currency: "usd",
           destination: account.stripe_account_id,

@@ -20,7 +20,7 @@ const SLIDES = [
     body: "Can't find parking or want to check the merch line? Drop a credit bounty and get an onlooker on the ground to show you live video proof.",
     art: creditsArt,
     icon: CoinsIcon,
-    alt: "Illustration of a glowing Looker Credit token with orbiting credits",
+    alt: "Illustration of a glowing Credit token with orbiting credits",
   },
   {
     title: "Capture & Earn",

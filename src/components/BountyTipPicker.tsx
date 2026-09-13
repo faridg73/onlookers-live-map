@@ -74,7 +74,7 @@ export function BountyTipPicker({
       <p className="flex items-start gap-2 text-xs font-medium text-foreground/75">
         <CoinsIcon className="mt-0.5 size-4 shrink-0 text-signal" />
         <span>
-          Optional tip in Looker Credits from your wallet. It rides along with the reward, shows as
+          Optional tip in Credits from your wallet. It rides along with the reward, shows as
           a higher payout on the map, and is refunded with the bounty if nobody claims it.
           {value > 0 && (
             <span className="mt-1 block font-extrabold text-signal">

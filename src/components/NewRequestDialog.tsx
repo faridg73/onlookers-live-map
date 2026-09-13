@@ -46,7 +46,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Credits.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
     if (permissionNeeded && !permissionOk) {

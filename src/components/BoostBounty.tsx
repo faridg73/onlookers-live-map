@@ -39,7 +39,7 @@ export function BoostBounty({ requestId, disabled }: { requestId: string; disabl
             void chipIn(amount);
           }}
           className="inline-flex items-center gap-1 rounded-full border border-signal/50 bg-signal/10 px-2.5 py-1.5 text-xs font-semibold text-signal transition-colors hover:bg-signal/20 disabled:opacity-40"
-          aria-label={`Chip in ${amount} Looker Credits to this bounty`}
+          aria-label={`Chip in ${amount} Credits to this bounty`}
         >
           {pending === amount ? (
             <Loader2 className="size-3 animate-spin" />

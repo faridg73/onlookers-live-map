@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CREDIT_PACKAGES, formatPackPrice } from "@/lib/credit-packages";
 import { startCreditPurchase } from "@/lib/credits.functions";
 
-/** Buy Looker Credits — three fixed packs that open card checkout. */
+/** Buy Credits — three fixed packs that open card checkout. */
 export function BuyCreditsCard() {
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export function BuyCreditsCard() {
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-          Buy Looker Credits
+          Buy Credits
         </span>
         <CoinsIcon className="size-4 text-live" />
       </div>

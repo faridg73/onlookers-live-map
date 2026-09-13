@@ -112,7 +112,7 @@ export async function notifyLocalOnlookersOfBounty(
   const body = `Someone wants a live view of the ${readableCategory(
     request.category,
     request.prompt,
-  )} outside the venue! Fulfill it right now to earn ${net} Looker Credits!`;
+  )} outside the venue! Fulfill it right now to earn ${net} Credits!`;
   const path = `/?b=${request.id}&snap=1`;
 
   await supabaseAdmin.from("notifications").insert(

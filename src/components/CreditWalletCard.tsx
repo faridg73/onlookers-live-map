@@ -20,7 +20,7 @@ const when = (iso: string) => {
   return new Date(iso).toLocaleDateString();
 };
 
-/** Looker Credits balance plus a feed of incoming and outgoing credit movement. */
+/** Credits balance plus a feed of incoming and outgoing credit movement. */
 export function CreditWalletCard() {
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
   const [ledger, setLedger] = useState<CreditLedgerEntry[]>([]);
@@ -45,7 +45,7 @@ export function CreditWalletCard() {
   if (loading) {
     return (
       <div className="mt-6 flex items-center gap-2 rounded-2xl border border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading Looker Credits…
+        <Loader2 className="size-4 animate-spin" /> Loading Credits…
       </div>
     );
   }
@@ -63,7 +63,7 @@ export function CreditWalletCard() {
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-          Looker Credits
+          Credits
         </span>
         <CoinsIcon className="size-4 text-live" />
       </div>

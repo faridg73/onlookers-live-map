@@ -22,7 +22,7 @@ export type CreditLedgerEntry = {
 /** Platform cut kept from every credit movement. */
 export const PLATFORM_FEE_RATE = 0.2;
 
-/** Reads the signed-in member's Looker Credits wallet, creating it on first visit. */
+/** Reads the signed-in member's Credits wallet, creating it on first visit. */
 export async function fetchCreditWallet(): Promise<CreditWallet | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
@@ -109,7 +109,7 @@ export const CREDIT_LABELS: Record<CreditTransactionType, string> = {
 };
 
 /* ------------------------------------------------------------------
- * Looker Credits are now the only in-app currency. Every bounty, chip-in,
+ * Credits are now the only in-app currency. Every bounty, chip-in,
  * tip and reward payout is denominated in whole credits; dollars appear
  * only when buying credits by card or cashing credits out to a bank.
  * ------------------------------------------------------------------ */
@@ -132,10 +132,10 @@ export const usdToCredits = (usd: number) => Math.round(usd * CREDITS_PER_USD);
 export const formatCredits = (credits: number) =>
   `${Math.round(Number.isFinite(credits) ? credits : 0).toLocaleString()} Credits`;
 
-/** Spelled-out form for sentences, e.g. "120 Looker Credits". */
+/** Spelled-out form for sentences, e.g. "120 Credits". */
 export const formatCreditWords = (credits: number) => {
   const n = Math.round(Number.isFinite(credits) ? credits : 0);
-  return `${n.toLocaleString()} Looker Credit${n === 1 ? "" : "s"}`;
+  return `${n.toLocaleString()} Credit${n === 1 ? "" : "s"}`;
 };
 
 /** Cash equivalent, e.g. "$12.00". */

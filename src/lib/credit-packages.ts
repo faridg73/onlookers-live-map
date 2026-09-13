@@ -1,4 +1,4 @@
-/** Buyable Looker Credits packs. Price ids match the checkout catalogue. */
+/** Buyable Credits packs. Price ids match the checkout catalogue. */
 export type CreditPackage = {
   id: string;
   priceId: string;

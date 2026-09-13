@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-/** Standard bystander thank-you for great footage, in Looker Credits. */
+/** Standard bystander thank-you for great footage, in Credits. */
 export const MICRO_TIP = 2;
 
 /** Moves a small tip from the viewer's wallet to the reporter who filmed the clip. */
