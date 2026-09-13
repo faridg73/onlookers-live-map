@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock, MapPin, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { HunterBadge } from "@/components/HunterBadge";
+import { TrustBadge } from "@/components/TrustBadge";
+import { TipCreditsButton } from "@/components/TipCreditsButton";
+import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
 import {
   PIN_CREDIT_OPTIONS,
