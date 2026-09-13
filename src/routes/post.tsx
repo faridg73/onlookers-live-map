@@ -6,6 +6,7 @@ import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
+import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
@@ -47,8 +48,10 @@ function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
+  const titleRef = useRef<HTMLInputElement>(null);
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
+  const noteRef = useRef<HTMLTextAreaElement>(null);
   const [bounty, setBounty] = useState(10);
   // The picked 3x3 tile plus its sub-option; a sub-option may re-map the
   // category that actually gets stored (e.g. Events → Sports game).
@@ -58,6 +61,7 @@ function PostScreen() {
   const category: CategoryId = subOption?.category ?? tile;
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [moderationOpen, setModerationOpen] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
@@ -88,7 +92,7 @@ function PostScreen() {
       return;
     }
     if (!isRequestAllowed(title, note, place)) {
-      toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
+      setModerationOpen(true);
       return;
     }
     // Catch an empty wallet before posting, so the deposit never fails mid-flow.
@@ -135,7 +139,12 @@ function PostScreen() {
       });
       navigate({ to: "/feed" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not post the request.");
+      const msg = error instanceof Error ? error.message : "";
+      if (msg === BLOCKED_REQUEST_MESSAGE) {
+        setModerationOpen(true);
+      } else {
+        toast.error(msg || "Could not post the request.");
+      }
     } finally {
       setPosting(false);
     }
