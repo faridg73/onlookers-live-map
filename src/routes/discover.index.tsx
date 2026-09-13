@@ -71,6 +71,17 @@ function DiscoverHome() {
         <AreaPicker />
       </div>
 
+      <Link
+        to="/discover/trending"
+        className="mt-3 flex items-center justify-between gap-3 rounded-2xl border-2 border-signal/50 bg-signal/10 px-4 py-3"
+      >
+        <span className="inline-flex items-center gap-2 text-sm font-extrabold text-foreground">
+          <Flame className="size-4 text-signal" aria-hidden /> Trending feeds & live events
+        </span>
+        <ChevronRight className="size-4 text-signal" aria-hidden />
+      </Link>
+
+
       <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-1">
         {(
           [
