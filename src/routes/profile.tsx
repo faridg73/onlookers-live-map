@@ -21,9 +21,9 @@ import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { EarningsWallet } from "@/components/EarningsWallet";
-import { CoinWalletCard } from "@/components/CoinWalletCard";
-import { BuyCoinsCard } from "@/components/BuyCoinsCard";
-import { CoinPayoutDashboard } from "@/components/CoinPayoutDashboard";
+import { CreditWalletCard } from "@/components/CreditWalletCard";
+import { BuyCreditsCard } from "@/components/BuyCreditsCard";
+import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 
@@ -47,16 +47,16 @@ export const Route = createFileRoute("/profile")({
 });
 
 const STATS = [
-  { icon: Wallet, label: "Earned", value: "2,480 LC" },
+  { icon: Wallet, label: "Earned", value: "2,480 Credits" },
   { icon: Camera, label: "Shots sent", value: "37" },
   { icon: Star, label: "Rating", value: "4.9" },
 ];
 
 const ACTIVITY = [
-  { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 LC bounty · 12 min ago" },
-  { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "150 LC bounty · 1 hr ago" },
-  { icon: Camera, text: "Sent a live shot of the night market", meta: "+60 LC bounty · 2 hrs ago" },
-  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+200 LC bounty · yesterday" },
+  { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 Credits bounty · 12 min ago" },
+  { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "150 Credits bounty · 1 hr ago" },
+  { icon: Camera, text: "Sent a live shot of the night market", meta: "+60 Credits bounty · 2 hrs ago" },
+  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
 ];
 
 function ProfileScreen() {
@@ -93,11 +93,11 @@ function ProfileScreen() {
 
       <EarningsWallet />
 
-      <CoinWalletCard />
+      <CreditWalletCard />
 
-      <BuyCoinsCard />
+      <BuyCreditsCard />
 
-      <CoinPayoutDashboard />
+      <CreditPayoutDashboard />
 
       <Link
         to="/payout-history"

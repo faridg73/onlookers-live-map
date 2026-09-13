@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { formatCoins } from "@/lib/coins";
+import { formatCredits } from "@/lib/credits";
 import { Crown, Trophy } from "lucide-react";
 import { fetchTopReporters, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export function Leaderboard({
                 </p>
               </div>
               <span className="font-display text-lg text-signal">
-                {formatCoins(r.total_earned)}
+                {formatCredits(r.total_earned)}
               </span>
             </li>
           ))}

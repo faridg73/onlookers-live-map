@@ -2,7 +2,7 @@ import { Eye, MapPin, Camera, MessageCircle, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
-import { formatCoins } from "@/lib/coins";
+import { formatCredits } from "@/lib/credits";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { BoostBounty } from "@/components/BoostBounty";
@@ -72,7 +72,7 @@ export function RequestCard({
           </div>
           <div className="shrink-0 text-right">
             <div className="font-display text-2xl font-extrabold leading-none text-signal">
-              {formatCoins(pool)}
+              {formatCredits(pool)}
             </div>
             {!done && <div className="mt-2"><ExpiryCountdown minutesLeft={request.expiresInMin} /></div>}
           </div>
@@ -126,10 +126,10 @@ export function RequestCard({
 
         <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-3 py-2 text-center">
           <div className="font-display text-2xl font-extrabold leading-none tabular-nums text-signal">
-            {formatCoins(pool)}
+            {formatCredits(pool)}
           </div>
           <div className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-signal">
-            {boosted > 0 ? `+${boosted} LC boosted` : "bounty"}
+            {boosted > 0 ? `+${boosted} Credits boosted` : "bounty"}
           </div>
         </div>
       </div>
@@ -222,7 +222,7 @@ export function RequestCard({
                   const balance = await refundBounty(requestId);
                   remove(request.id);
                   toast.success("Request cancelled", {
-                    description: `${request.bounty} LC refunded — wallet balance ${Math.round(balance)} LC.`,
+                    description: `${request.bounty} Credits refunded — wallet balance ${Math.round(balance)} Credits.`,
                   });
                 } catch (error) {
                   toast.error(error instanceof Error ? error.message : "Could not cancel.");

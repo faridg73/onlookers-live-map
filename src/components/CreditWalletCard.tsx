@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, Coins, Loader2 } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Coins as Credits, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  COIN_LABELS,
-  fetchCoinWallet,
-  listCoinTransactions,
-  type CoinLedgerEntry,
-  type CoinWallet,
-} from "@/lib/coins";
+  CREDIT_LABELS,
+  fetchCreditWallet,
+  listCreditTransactions,
+  type CreditLedgerEntry,
+  type CreditWallet,
+} from "@/lib/credits";
 
 const when = (iso: string) => {
   const diff = Date.now() - new Date(iso).getTime();
@@ -20,19 +20,19 @@ const when = (iso: string) => {
   return new Date(iso).toLocaleDateString();
 };
 
-/** Looker Coins balance plus a feed of incoming and outgoing coin movement. */
-export function CoinWalletCard() {
-  const [wallet, setWallet] = useState<CoinWallet | null>(null);
-  const [ledger, setLedger] = useState<CoinLedgerEntry[]>([]);
+/** Looker Credits balance plus a feed of incoming and outgoing credit movement. */
+export function CreditWalletCard() {
+  const [wallet, setWallet] = useState<CreditWallet | null>(null);
+  const [ledger, setLedger] = useState<CreditLedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
-      const next = await fetchCoinWallet();
+      const next = await fetchCreditWallet();
       setWallet(next);
-      setLedger(next ? await listCoinTransactions(next.id) : []);
+      setLedger(next ? await listCreditTransactions(next.id) : []);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not load your coins");
+      toast.error(error instanceof Error ? error.message : "Could not load your credits");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ export function CoinWalletCard() {
   if (loading) {
     return (
       <div className="mt-6 flex items-center gap-2 rounded-2xl border border-border bg-surface-raised p-4 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading Looker Coins…
+        <Loader2 className="size-4 animate-spin" /> Loading Looker Credits…
       </div>
     );
   }
@@ -63,17 +63,17 @@ export function CoinWalletCard() {
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-          Looker Coins
+          Looker Credits
         </span>
-        <Coins className="size-4 text-live" />
+        <Credits className="size-4 text-live" />
       </div>
 
       <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-display text-4xl text-foreground">{wallet.coinBalance}</span>
-        <span className="text-sm text-muted-foreground">coins</span>
+        <span className="font-display text-4xl text-foreground">{wallet.creditBalance}</span>
+        <span className="text-sm text-muted-foreground">credits</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Send coins to onlookers who film for you — 20% platform fee applies to each transfer.
+        Send credits to onlookers who film for you — 20% platform fee applies to each transfer.
       </p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -96,7 +96,7 @@ export function CoinWalletCard() {
 
         {ledger.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
-            No coin movement yet. Tips and bounty payouts will show up here.
+            No credit movement yet. Tips and bounty payouts will show up here.
           </p>
         ) : (
           <ul className="space-y-2">
@@ -120,11 +120,11 @@ export function CoinWalletCard() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-foreground">
-                      {COIN_LABELS[entry.type]}
+                      {CREDIT_LABELS[entry.type]}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {when(entry.createdAt)}
-                      {!incoming && entry.amountFee > 0 ? ` · ${entry.amountFee} coin fee` : ""}
+                      {!incoming && entry.amountFee > 0 ? ` · ${entry.amountFee} credit fee` : ""}
                     </p>
                   </div>
                   <span

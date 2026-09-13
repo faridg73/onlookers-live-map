@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { HandCoins, ShieldCheck } from "lucide-react";
+import { HandCredits, ShieldCheck } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BoostBounty } from "@/components/BoostBounty";
 import { InstantSnippetButton } from "@/components/InstantSnippetButton";
@@ -86,7 +86,7 @@ export function BountyDetailsDialog({
             <div className="mt-2 rounded-2xl border border-border bg-surface-raised p-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-foreground">
-                  <HandCoins className="size-3.5 text-signal" />
+                  <HandCredits className="size-3.5 text-signal" />
                   {pooled > 0 ? `Co-funded pool: $${pool}` : `Bounty: $${pool}`}
                 </span>
                 <BoostBounty requestId={request.id} />

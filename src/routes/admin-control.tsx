@@ -11,7 +11,7 @@ import {
   TriangleAlert,
   Undo2,
 } from "lucide-react";
-import { coinsToUsdValue } from "@/lib/coins";
+import { creditsToUsdValue } from "@/lib/credits";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/admin-control")({
 });
 
 const money = (n: number) => `$${n.toFixed(2)}`;
-const coins = (n: number) => `${Math.round(n).toLocaleString()} LC`;
+const credits = (n: number) => `${Math.round(n).toLocaleString()} Credits`;
 const when = (iso: string) => new Date(iso).toLocaleString();
 
 type Tab = "moderation" | "cashouts" | "metrics";
@@ -288,15 +288,15 @@ function ControlCenter() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-foreground">{row.display_name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {row.coins_redeemed > 0 ? `${row.coins_redeemed} coins redeemed · ` : ""}
-                      {row.coin_balance} coins on hand · {when(row.created_at)}
+                      {row.credits_redeemed > 0 ? `${row.credits_redeemed} credits redeemed · ` : ""}
+                      {row.credit_balance} credits on hand · {when(row.created_at)}
                     </p>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{row.destination}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-base font-black text-foreground">{coins(row.amount)}</p>
+                    <p className="text-base font-black text-foreground">{credits(row.amount)}</p>
                     <p className="text-[0.62rem] font-bold text-muted-foreground">
-                      {money(coinsToUsdValue(Math.round(row.amount)))} cash
+                      {money(creditsToUsdValue(Math.round(row.amount)))} cash
                     </p>
                     <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                       {row.status}
@@ -337,10 +337,10 @@ function ControlCenter() {
         </section>
       ) : (
         <section className="grid grid-cols-2 gap-3">
-          <Metric label="Gross processed" value={coins(metrics?.gross_usd ?? 0)} icon={BadgeDollarSign} />
-          <Metric label="Platform cut" value={coins(metrics?.platform_cut_usd ?? 0)} icon={Gauge} />
+          <Metric label="Gross processed" value={credits(metrics?.gross_usd ?? 0)} icon={BadgeDollarSign} />
+          <Metric label="Platform cut" value={credits(metrics?.platform_cut_usd ?? 0)} icon={Gauge} />
           <Metric label="Active pins" value={String(metrics?.active_pins ?? 0)} icon={MapPin} />
-          <Metric label="Cash-outs pending" value={coins(metrics?.pending_payouts_usd ?? 0)} icon={BadgeDollarSign} />
+          <Metric label="Cash-outs pending" value={credits(metrics?.pending_payouts_usd ?? 0)} icon={BadgeDollarSign} />
           <Metric label="Clips expired" value={String(metrics?.expired_clips ?? 0)} icon={TriangleAlert} />
         </section>
       )}

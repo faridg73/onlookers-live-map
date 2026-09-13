@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
-import { usdToCoins } from "@/lib/coins";
+import { usdToCredits } from "@/lib/credits";
 import type { Database } from "@/integrations/supabase/types";
 
 let cached: ReturnType<typeof createClient<Database>> | null = null;
@@ -35,7 +35,7 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
     _user_id: userId,
     _session_id: session["id"],
     // Card top-ups are priced in dollars but credited at the shared fixed rate.
-    _amount: usdToCoins(amount),
+    _amount: usdToCredits(amount),
     _environment: env,
   });
 
@@ -52,46 +52,46 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
   console.log("[webhook] wallet credited", { session: session["id"], userId, amount, fresh: data });
 }
 
-/** Adds a bought Looker Coins pack to the buyer's wallet exactly once. */
-async function creditCoinPurchase(session: Record<string, any>, env: StripeEnv) {
+/** Adds a bought Looker Credits pack to the buyer's wallet exactly once. */
+async function creditCreditPurchase(session: Record<string, any>, env: StripeEnv) {
   const meta = session["metadata"] ?? {};
   const userId = meta.userId ?? session["client_reference_id"];
-  const coins = Number(meta.coins ?? 0);
+  const credits = Number(meta.credits ?? 0);
   const packageId = String(meta.packageId ?? "unknown");
 
-  if (!userId || !(coins > 0)) {
-    console.error("[webhook] coin purchase missing user or coins", {
+  if (!userId || !(credits > 0)) {
+    console.error("[webhook] credit purchase missing user or credits", {
       session: session["id"],
       userId,
-      coins,
+      credits,
     });
     return;
   }
 
-  const { data, error } = await getSupabase().rpc("credit_coin_purchase", {
+  const { data, error } = await getSupabase().rpc("credit_credit_purchase", {
     _user_id: userId,
     _session_id: session["id"],
     _package_id: packageId,
-    _coins: Math.round(coins),
+    _credits: Math.round(credits),
     _amount_cents: Number(session["amount_total"] ?? 0),
     _environment: env,
   });
 
   if (error) {
-    console.error("[webhook] credit_coin_purchase failed", {
+    console.error("[webhook] credit_credit_purchase failed", {
       session: session["id"],
       userId,
-      coins,
+      credits,
       message: error.message,
     });
     throw new Error(error.message);
   }
-  console.log("[webhook] coins credited", { session: session["id"], userId, coins, fresh: data });
+  console.log("[webhook] credits credited", { session: session["id"], userId, credits, fresh: data });
 }
 
-/** Routes a settled checkout to the right wallet: money top-up or coin pack. */
+/** Routes a settled checkout to the right wallet: money top-up or credit pack. */
 async function fulfil(session: Record<string, any>, env: StripeEnv) {
-  if (session["metadata"]?.kind === "coin_purchase") await creditCoinPurchase(session, env);
+  if (session["metadata"]?.kind === "credit_purchase") await creditCreditPurchase(session, env);
   else await creditTopUp(session, env);
 }
 

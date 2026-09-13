@@ -1,18 +1,18 @@
 import type { LiveRequest } from "@/lib/onlooker";
 
-/** Coin value where a bounty becomes a glowing gold pin. */
-export const GOLD_BOUNTY_COINS = 200;
+/** Credit value where a bounty becomes a glowing gold pin. */
+export const GOLD_BOUNTY_CREDITS = 200;
 
 export type BountyTier = "standard" | "medium" | "gold";
 
-/** Which visual theme a pin uses, based on its total coin bounty. */
-export function bountyTier(coins: number): BountyTier {
-  if (coins >= GOLD_BOUNTY_COINS) return "gold";
-  if (coins >= 4) return "medium";
+/** Which visual theme a pin uses, based on its total credit bounty. */
+export function bountyTier(credits: number): BountyTier {
+  if (credits >= GOLD_BOUNTY_CREDITS) return "gold";
+  if (credits >= 4) return "medium";
   return "standard";
 }
 
-export const isGoldBounty = (coins: number) => bountyTier(coins) === "gold";
+export const isGoldBounty = (credits: number) => bountyTier(credits) === "gold";
 
 /** Simple placeholder glyph for a category, used on the small standard pins. */
 export function categoryGlyph(category: LiveRequest["category"] | null | undefined): string {
@@ -34,6 +34,6 @@ export function categoryGlyph(category: LiveRequest["category"] | null | undefin
 
 export const TIER_LABELS: Record<BountyTier, string> = {
   standard: "Standard view",
-  medium: "Coin bounty",
+  medium: "Credit bounty",
   gold: "Gold bounty",
 };

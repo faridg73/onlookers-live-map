@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Coins, LocateFixed, Share2 } from "lucide-react";
+import { Coins as Credits, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
@@ -245,7 +245,7 @@ export function MapCanvas({
           );
         })}
 
-      {/* pins — theme changes with the total coin bounty */}
+      {/* pins — theme changes with the total credit bounty */}
       {ready &&
         requests.map((r) => {
           const pixel = toPixel(requestMapPosition(r));
@@ -266,7 +266,7 @@ export function MapCanvas({
               }}
               className="absolute -translate-x-1/2 -translate-y-full"
               style={{ left: pixel.left, top: pixel.top }}
-              aria-label={`${TIER_LABELS[tier]}: ${pool} coins at ${r.place}`}
+              aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
                 {/* gold pins keep a soft pulsing halo ring */}
@@ -340,7 +340,7 @@ export function MapCanvas({
                             }
                     }
                   >
-                    {/* silver coin for medium bounties, gold coin badge for gold */}
+                    {/* silver credit for medium bounties, gold credit badge for gold */}
                     <span
                       className={cn(
                         "flex items-center justify-center rounded-full border",
@@ -359,7 +359,7 @@ export function MapCanvas({
                       }}
                       aria-hidden
                     >
-                      <Coins className={tier === "gold" ? "size-4" : "size-2.5"} />
+                      <Credits className={tier === "gold" ? "size-4" : "size-2.5"} />
                     </span>
                     {pool}
                   </span>

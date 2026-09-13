@@ -152,15 +152,15 @@ export type PayoutQueueRow = {
   user_id: string;
   display_name: string;
   amount: number;
-  coins_redeemed: number;
-  coin_balance: number;
+  credits_redeemed: number;
+  credit_balance: number;
   destination: string;
   status: string;
   stripe_transfer_id: string | null;
   created_at: string;
 };
 
-/** Cash-out queue with each hunter's coin balance (admins only). */
+/** Cash-out queue with each hunter's credit balance (admins only). */
 export async function listPayoutQueue(): Promise<PayoutQueueRow[]> {
   const { data, error } = await supabase.rpc("admin_payout_queue");
   if (error) throw error;

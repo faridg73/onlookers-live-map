@@ -46,7 +46,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Credits.`);
       return;
     }
     if (permissionNeeded && !permissionOk) {
@@ -82,7 +82,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         dbId: locked.id,
       });
       toast.success("Request is live", {
-        description: `${bounty} LC locked from your coin wallet until it's fulfilled.`,
+        description: `${bounty} Credits locked from your credit wallet until it's fulfilled.`,
       });
       setTitle("");
       setPlace("");
@@ -211,7 +211,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
             }
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Post request — lock ${Number.isFinite(bounty) ? bounty : 0} LC`}
+            {posting ? "Locking bounty…" : `Post request — lock ${Number.isFinite(bounty) ? bounty : 0} Credits`}
           </button>
         </form>
       </DialogContent>

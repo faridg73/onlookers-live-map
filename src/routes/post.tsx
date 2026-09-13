@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Coins, Info, ShieldCheck, Timer } from "lucide-react";
+import { ChevronDown, Coins as Credits, Info, ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
@@ -13,7 +13,7 @@ import { CategoryPicker } from "@/components/CategoryPicker";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { formatCoinCash, formatCoins } from "@/lib/coins";
+import { formatCreditCash, formatCredits } from "@/lib/credits";
 import {
   categoryById,
   generateAccessCode,
@@ -86,7 +86,7 @@ function PostScreen() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Credits.`);
       return;
     }
     if (note.trim().length < 10) {
@@ -109,11 +109,11 @@ function PostScreen() {
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < total) {
-      toast.error(`You have ${Math.round(funds)} LC in your wallet`, {
-        description: `Buy Looker Coins to lock a ${total} LC bounty${
+      toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
+        description: `Buy Looker Credits to lock a ${total} Credits bounty${
           tip > 0 ? " including your tip" : ""
         }.`,
-        action: { label: "Buy coins", onClick: () => void navigate({ to: "/profile" }) },
+        action: { label: "Buy credits", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
     }
@@ -133,7 +133,7 @@ function PostScreen() {
       setBalance(locked.balance);
       const focus = subOption ? `Focus: ${subOption.label}` : "";
       const tipLine =
-        tip > 0 ? `Includes a ${tip} LC tip from the requester's coin wallet.` : "";
+        tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "";
       const details = [focus, note.trim(), tipLine].filter(Boolean).join("\n");
       addRequest({
         title: title.trim(),
@@ -148,8 +148,8 @@ function PostScreen() {
       });
       const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `${total} LC held in escrow${
-          tip > 0 ? ` (including a ${tip} LC tip)` : ""
+        description: `${total} Credits held in escrow${
+          tip > 0 ? ` (including a ${tip} Credits tip)` : ""
         }. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });
@@ -320,7 +320,7 @@ function PostScreen() {
         </label>
 
         <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">05</span> · Looker Coin reward</span>
+          <span className={sectionLabel}><span className="text-signal">05</span> · Looker Credit reward</span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
           <p className="flex items-start gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
@@ -360,7 +360,7 @@ function PostScreen() {
             <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
             <span>
               If no Bounty Hunter claims this request in time, it expires automatically, disappears
-              from the live map, and your {total} LC goes straight back
+              from the live map, and your {total} Credits goes straight back
               to your wallet.
             </span>
           </p>
@@ -368,8 +368,8 @@ function PostScreen() {
 
         <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-20 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><Coins className="size-4 text-signal" />Total escrow</span>
-            <span className="font-display text-lg font-extrabold text-signal">{formatCoins(total)} · {formatCoinCash(total)}</span>
+            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><Credits className="size-4 text-signal" />Total escrow</span>
+            <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
           </div>
           <Button
             type="submit"
@@ -382,7 +382,7 @@ function PostScreen() {
             }
             className="h-14 w-full rounded-md bg-signal text-base font-extrabold uppercase tracking-[0.12em] text-signal-foreground shadow-lg hover:bg-signal/90"
           >
-            {posting ? "Locking bounty…" : `Go live — lock ${formatCoins(total)}`}
+            {posting ? "Locking bounty…" : `Go live — lock ${formatCredits(total)}`}
           </Button>
           <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
             Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital

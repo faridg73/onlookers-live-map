@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Camera, Coins, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Camera, Coins as Credits, Loader2, MapPin, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -13,7 +13,7 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown } from "@/components/ExpiryCountdown";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { bountyTier } from "@/lib/bounty-tiers";
-import { PLATFORM_FEE_RATE } from "@/lib/coins";
+import { PLATFORM_FEE_RATE } from "@/lib/credits";
 import { uploadBountyVideo } from "@/lib/bounty-videos";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { isClosed } from "@/lib/onlooker-store";
@@ -31,7 +31,7 @@ export function BountyBottomSheet({
   onClaim,
 }: {
   request: LiveRequest | null;
-  /** Total coin bounty including chip-ins. */
+  /** Total credit bounty including chip-ins. */
   pool: number;
   distanceLabel?: string | undefined;
   onClose: () => void;
@@ -113,11 +113,11 @@ export function BountyBottomSheet({
             You earn
           </span>
           <span className="flex items-center gap-2 font-display text-3xl text-live">
-            <Coins className="size-6" /> {payout}
+            <Credits className="size-6" /> {payout}
           </span>
         </div>
         <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
-          {pool} coin bounty · {payout} Looker Coins paid to you once the requester approves your
+          {pool} credit bounty · {payout} Looker Credits paid to you once the requester approves your
           clip.
         </p>
 

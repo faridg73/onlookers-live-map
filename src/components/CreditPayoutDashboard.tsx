@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Banknote, Coins, Landmark, Loader2 } from "lucide-react";
+import { Banknote, Coins as Credits, Landmark, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { fetchCoinWallet } from "@/lib/coins";
+import { fetchCreditWallet } from "@/lib/credits";
 import {
-  COINS_PER_USD,
-  MIN_CASHOUT_COINS,
+  CREDITS_PER_USD,
+  MIN_CASHOUT_CREDITS,
   PAYOUT_STATUS_LABELS,
-  coinsToUsd,
-  listCoinPayouts,
-  requestCoinCashout,
+  creditsToUsd,
+  listCreditPayouts,
+  requestCreditCashout,
   type PayoutRequestRow,
-} from "@/lib/coin-cashout";
+} from "@/lib/credit-cashout";
 import { getPayoutStatus, startPayoutOnboarding } from "@/lib/payouts.functions";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -23,12 +23,12 @@ const STATUS_STYLES: Record<string, string> = {
   failed: "bg-urgent/15 text-urgent",
 };
 
-/** Payout Dashboard: turn earned Looker Coins into real money in the bank. */
-export function CoinPayoutDashboard() {
+/** Payout Dashboard: turn earned Looker Credits into real money in the bank. */
+export function CreditPayoutDashboard() {
   const loadStatus = useServerFn(getPayoutStatus);
   const beginOnboarding = useServerFn(startPayoutOnboarding);
 
-  const [coins, setCoins] = useState<number | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
   const [bank, setBank] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
   const [payouts, setPayouts] = useState<PayoutRequestRow[]>([]);
   const [amount, setAmount] = useState("");
@@ -36,10 +36,10 @@ export function CoinPayoutDashboard() {
 
   const refresh = useCallback(async () => {
     try {
-      const wallet = await fetchCoinWallet();
-      setCoins(wallet?.coinBalance ?? null);
+      const wallet = await fetchCreditWallet();
+      setCredits(wallet?.creditBalance ?? null);
       if (!wallet) return;
-      setPayouts(await listCoinPayouts());
+      setPayouts(await listCreditPayouts());
       try {
         const status = await loadStatus();
         setBank({ connected: status.connected, payoutsEnabled: status.payoutsEnabled });
@@ -73,20 +73,20 @@ export function CoinPayoutDashboard() {
     }
   }
 
-  async function cashOutCoins() {
+  async function cashOutCredits() {
     const value = Math.round(Number(amount));
-    if (!Number.isFinite(value) || value < MIN_CASHOUT_COINS) {
-      toast.error(`Minimum cash out is ${MIN_CASHOUT_COINS} Looker Coins ($10.00)`);
+    if (!Number.isFinite(value) || value < MIN_CASHOUT_CREDITS) {
+      toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Looker Credits ($10.00)`);
       return;
     }
-    if (coins !== null && value > coins) {
-      toast.error("Insufficient Coins");
+    if (credits !== null && value > credits) {
+      toast.error("Insufficient Credits");
       return;
     }
     setBusy(true);
     try {
-      await requestCoinCashout(value);
-      toast.success(`Cash out requested — $${coinsToUsd(value).toFixed(2)} is on the way.`);
+      await requestCreditCashout(value);
+      toast.success(`Cash out requested — $${creditsToUsd(value).toFixed(2)} is on the way.`);
       setAmount("");
       await refresh();
     } catch (error) {
@@ -96,9 +96,9 @@ export function CoinPayoutDashboard() {
     }
   }
 
-  if (coins === null) return null;
+  if (credits === null) return null;
 
-  const canCashOut = coins >= MIN_CASHOUT_COINS;
+  const canCashOut = credits >= MIN_CASHOUT_CREDITS;
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
@@ -114,15 +114,15 @@ export function CoinPayoutDashboard() {
 
       <div className="mt-2 flex items-end gap-3">
         <span className="flex items-center gap-2 font-display text-4xl text-foreground">
-          <Coins className="size-6 text-live" />
-          {coins}
+          <Credits className="size-6 text-live" />
+          {credits}
         </span>
         <span className="pb-1 text-sm font-semibold text-muted-foreground">
-          ≈ ${coinsToUsd(coins).toFixed(2)} cash
+          ≈ ${creditsToUsd(credits).toFixed(2)} cash
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {COINS_PER_USD} Looker Coins = $1.00 USD. Cash out from {MIN_CASHOUT_COINS} coins ($10.00).
+        {CREDITS_PER_USD} Looker Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
       </p>
 
       {bank?.payoutsEnabled ? (
@@ -132,12 +132,12 @@ export function CoinPayoutDashboard() {
               inputMode="numeric"
               value={amount}
               onChange={(event) => setAmount(event.target.value.replace(/[^0-9]/g, ""))}
-              placeholder={`Coins (min ${MIN_CASHOUT_COINS})`}
+              placeholder={`Credits (min ${MIN_CASHOUT_CREDITS})`}
               className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-live"
             />
             <button
               type="button"
-              onClick={() => void cashOutCoins()}
+              onClick={() => void cashOutCredits()}
               disabled={busy || !canCashOut}
               className="flex items-center gap-2 rounded-xl bg-live px-4 py-2 text-sm font-bold text-black disabled:opacity-60"
             >
@@ -145,14 +145,14 @@ export function CoinPayoutDashboard() {
               Cash Out
             </button>
           </div>
-          {amount && Number(amount) >= MIN_CASHOUT_COINS && (
+          {amount && Number(amount) >= MIN_CASHOUT_CREDITS && (
             <p className="mt-2 text-xs font-semibold text-live">
-              You&apos;ll receive ${coinsToUsd(Number(amount)).toFixed(2)} in your bank.
+              You&apos;ll receive ${creditsToUsd(Number(amount)).toFixed(2)} in your bank.
             </p>
           )}
           {!canCashOut && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Earn {MIN_CASHOUT_COINS - coins} more coins to unlock your first cash out.
+              Earn {MIN_CASHOUT_CREDITS - credits} more credits to unlock your first cash out.
             </p>
           )}
         </>
@@ -182,7 +182,7 @@ export function CoinPayoutDashboard() {
                   ${payout.cashAmountUsd.toFixed(2)}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {payout.coinsRedeemed} coins ·{" "}
+                  {payout.creditsRedeemed} credits ·{" "}
                   {new Date(payout.createdAt).toLocaleDateString()}
                 </span>
               </span>

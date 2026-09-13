@@ -1,5 +1,5 @@
-import { Coins } from "lucide-react";
-import { formatCoinCash, formatCoins } from "@/lib/coins";
+import { Coins as Credits } from "lucide-react";
+import { formatCreditCash, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";
 
 const TIPS = [0, 4, 8, 20];
@@ -43,7 +43,7 @@ export function BountyTipPicker({
               <span className="block">{amount === 0 ? "None" : `+${amount}`}</span>
               {amount > 0 && (
                 <span className="mt-0.5 block text-[0.6rem] font-bold opacity-70">
-                  {formatCoinCash(amount)}
+                  {formatCreditCash(amount)}
                 </span>
               )}
             </button>
@@ -57,7 +57,7 @@ export function BountyTipPicker({
           custom ? "border-signal" : "border-border",
         )}
       >
-        <Coins className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
+        <Credits className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
         <input
           type="number"
           inputMode="decimal"
@@ -65,25 +65,25 @@ export function BountyTipPicker({
           step="1"
           value={Number.isFinite(value) ? value : ""}
           onChange={(e) => onChange(Math.max(0, Math.round(Number(e.target.value) || 0)))}
-          placeholder="Custom tip in coins"
+          placeholder="Custom tip in credits"
           className="w-full bg-transparent font-display text-xl font-extrabold tabular-nums outline-none"
           aria-label="Custom tip amount"
         />
       </div>
 
       <p className="flex items-start gap-2 text-xs font-medium text-foreground/75">
-        <Coins className="mt-0.5 size-4 shrink-0 text-signal" />
+        <Credits className="mt-0.5 size-4 shrink-0 text-signal" />
         <span>
-          Optional tip in Looker Coins from your wallet. It rides along with the reward, shows as
+          Optional tip in Looker Credits from your wallet. It rides along with the reward, shows as
           a higher payout on the map, and is refunded with the bounty if nobody claims it.
           {value > 0 && (
             <span className="mt-1 block font-extrabold text-signal">
-              Total held: {formatCoins(total)} · {formatCoinCash(total)}
+              Total held: {formatCredits(total)} · {formatCreditCash(total)}
             </span>
           )}
           {shortFall && (
             <span className="mt-1 block font-extrabold text-live">
-              Your wallet has {formatCoins(balance ?? 0)} — lower the tip or buy coins.
+              Your wallet has {formatCredits(balance ?? 0)} — lower the tip or buy credits.
             </span>
           )}
         </span>
