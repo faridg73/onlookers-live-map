@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Flame } from "lucide-react";
+import { Flame, Ticket } from "lucide-react";
 import { AreaPicker } from "@/components/AreaPicker";
 import { TrendingCard } from "@/components/TrendingCard";
+import { EventCard } from "@/components/EventCard";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
+import { useLiveEvents } from "@/hooks/use-live-events";
 import { discoveryGroupBySlug } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
+
 
 export const Route = createFileRoute("/discover/trending")({
   head: () => ({
@@ -52,6 +55,12 @@ function TrendingScreen() {
   const concerts = usePlaceList(group, "concerts", area, { maxResults: 8 });
   const fights = usePlaceList(group, "fights", area, { maxResults: 8 });
   const gatherings = usePlaceList(group, "festivals", area, { maxResults: 8 });
+  const { events, loading: eventsLoading } = useLiveEvents(area, {
+    radiusMiles: 50,
+    weekendOnly: true,
+    size: 12,
+  });
+
 
   const buckets = [sports, concerts, fights, gatherings];
   const loading = buckets.some((b) => b.loading);
@@ -129,6 +138,36 @@ function TrendingScreen() {
           </button>
         ))}
       </div>
+
+      {(eventsLoading || events.length > 0) && (
+        <section className="mt-5">
+          <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
+            <Ticket className="size-4 text-signal" aria-hidden /> Live events this weekend
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Real games, concerts and shows on sale around {area.label}.
+          </p>
+
+          <div className="mt-3 space-y-3">
+            {eventsLoading && events.length === 0
+              ? [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 animate-pulse rounded-2xl border border-border bg-surface"
+                  />
+                ))
+              : events.map((event) => (
+                  <EventCard key={event.id} event={event} liveCount={liveNear(event.name)} />
+                ))}
+          </div>
+
+          <p className="mt-2 text-[0.62rem] text-muted-foreground">
+            Event listings and ticket links provided by Ticketmaster.
+          </p>
+        </section>
+      )}
+
+
 
       <div className="mt-4 space-y-3">
         {items.map((item) => (
