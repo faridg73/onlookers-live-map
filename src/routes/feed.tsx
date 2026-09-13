@@ -234,6 +234,7 @@ function FeedScreen() {
           sub={sub}
           onSubChange={setSub}
           includeAll
+          counts={categoryCounts}
         />
       </div>
 
