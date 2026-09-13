@@ -182,8 +182,10 @@ function PostScreen() {
       setMinutes(60);
       setTile("community");
     }
-    const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
-    setVenueQuery(query);
+    if (!spot) {
+      const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
+      setVenueQuery(query);
+    }
     setStep(2);
   };
 
