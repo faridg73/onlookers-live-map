@@ -45,7 +45,7 @@ export const savePushToken = createServerFn({ method: "POST" })
 export const removePushToken = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ token: z.string().min(1) }).parse(data))
-  .handler(async ({ data, context }): Promise<{ ok: boolean; error?: string }>> {
+  .handler(async ({ data, context }): Promise<{ ok: boolean; error?: string }> => {
     const userId = context.userId;
     if (!userId) return { ok: false, error: "Not signed in." };
 
