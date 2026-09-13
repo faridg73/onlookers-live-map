@@ -68,7 +68,15 @@ export function VideoRecorder({
           })
           .catch(() => undefined);
       } catch {
+        if (!alive) return;
         setSwitching(false);
+        // A failed flip keeps the camera that already works instead of closing.
+        if (streamRef.current) {
+          setReady(true);
+          toast.error("This device only has one camera available.");
+          setFacing((current) => (current === "environment" ? "user" : "environment"));
+          return;
+        }
         toast.error("Camera access was blocked. Allow the camera to record a clip.");
         onClose();
       }
