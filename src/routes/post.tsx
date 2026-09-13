@@ -601,7 +601,7 @@ function PostScreen() {
                           setTile("community");
                         }
                       }}
-                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left ${action === id ? "border-signal bg-signal/10" : ""}`}
+                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left transition-all ${action === id ? "border-signal bg-signal/10 shadow-lg shadow-signal/10" : ""}`}
                     >
                       <Icon className="mt-0.5 size-5 shrink-0 text-signal" />
                       <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
