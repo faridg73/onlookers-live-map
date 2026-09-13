@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { sendTestAlertText } from "@/lib/sms.functions";
 import { toast } from "sonner";
 import { Bell, Mail, MapPin, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,30 @@ export function AlertSettingsCard() {
   const { user } = useAuth();
   const [prefs, setPrefs] = useState<AlertPreferences>(DEFAULT_ALERT_PREFERENCES);
   const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [smsState, setSmsState] = useState<{ ok: boolean; message: string } | null>(null);
+  const sendTestText = useServerFn(sendTestAlertText);
+
+  const sendTest = async () => {
+    setTesting(true);
+    setSmsState(null);
+    try {
+      await saveAlertPreferences(prefs);
+      const result = await sendTestText({ data: { phone: prefs.phone } });
+      setSmsState(
+        result.ok
+          ? { ok: true, message: "Test text sent — check your phone." }
+          : { ok: false, message: result.error ?? "Could not send that text." },
+      );
+    } catch (error) {
+      setSmsState({
+        ok: false,
+        message: error instanceof Error ? error.message : "Could not send that text.",
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -47,7 +73,7 @@ export function AlertSettingsCard() {
   const rows: { key: "push_enabled" | "sms_enabled" | "email_enabled"; label: string; hint: string; icon: typeof Bell }[] =
     [
       { key: "push_enabled", label: "In-app alerts", icon: Bell, hint: "Pops up the moment a bounty lands nearby" },
-      { key: "sms_enabled", label: "Text message", icon: MessageSquare, hint: "Needs a texting service connected" },
+      { key: "sms_enabled", label: "Text message", icon: MessageSquare, hint: "Texts your phone with the place, payout and claim link" },
       { key: "email_enabled", label: "Email", icon: Mail, hint: "Starts once your sending address is verified" },
     ];
 
@@ -76,14 +102,33 @@ export function AlertSettingsCard() {
       </div>
 
       {prefs.sms_enabled && (
-        <Input
-          className="mt-3"
-          type="tel"
-          inputMode="tel"
-          placeholder="Mobile number for texts"
-          value={prefs.phone}
-          onChange={(e) => set("phone", e.target.value)}
-        />
+        <div className="mt-3 space-y-2">
+          <Input
+            type="tel"
+            inputMode="tel"
+            placeholder="Mobile number for texts, e.g. (213) 555-0134"
+            value={prefs.phone}
+            onChange={(e) => set("phone", e.target.value)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 w-full rounded-xl font-bold"
+            disabled={testing || prefs.phone.trim().length < 5}
+            onClick={() => void sendTest()}
+          >
+            {testing ? "Texting you…" : "Send a test text"}
+          </Button>
+          {smsState && (
+            <p
+              className={`text-[0.7rem] ${
+                smsState.ok ? "text-signal" : "text-destructive"
+              }`}
+            >
+              {smsState.message}
+            </p>
+          )}
+        </div>
       )}
 
       <p className="mt-5 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
