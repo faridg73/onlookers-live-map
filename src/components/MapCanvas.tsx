@@ -59,6 +59,13 @@ export function MapCanvas({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
+          // Keep Google's own place, business and transit labels visible so the
+          // map reads like a real street map as people zoom in and out.
+          styles: [
+            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "poi.business", elementType: "labels", stylers: [{ visibility: "on" }] },
+            { featureType: "transit", elementType: "labels", stylers: [{ visibility: "on" }] },
+          ],
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
