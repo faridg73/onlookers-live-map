@@ -34,21 +34,36 @@ const LIVE_WINDOWS = [
  * Posts a bounty for one venue: either a 5-minute live stream inside the next
  * hour or two, or a pre-recorded clip with a hard delivery deadline.
  */
-export function VenueBountyDialog({ venue, children }: { venue: Venue; children: ReactNode }) {
+export function VenueBountyDialog({
+  venue,
+  children,
+  defaultTitle,
+  defaultNote,
+}: {
+  venue: Venue;
+  children: ReactNode;
+  /** Pre-filled request title, e.g. the event name tapped in Trending. */
+  defaultTitle?: string;
+  /** Pre-filled camera instructions for that event. */
+  defaultNote?: string;
+}) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("live");
   const [minutes, setMinutes] = useState(120);
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
+  const [title, setTitle] = useState(defaultTitle ?? "");
+  const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(10);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    if (open) void readWalletBalance().then(setBalance);
-  }, [open]);
+    if (!open) return;
+    void readWalletBalance().then(setBalance);
+    if (defaultTitle) setTitle(defaultTitle);
+    if (defaultNote) setNote(defaultNote);
+  }, [open, defaultTitle, defaultNote]);
 
   function pickMode(next: Mode) {
     setMode(next);

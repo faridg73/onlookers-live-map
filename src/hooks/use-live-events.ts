@@ -1,31 +1,32 @@
 import { useEffect, useState } from "react";
-import { fetchLiveEvents, type LiveEvent } from "@/lib/ticketmaster.functions";
+import { fetchTrendingEvents, type LiveEvent } from "@/lib/events.functions";
 import type { DiscoveryArea } from "@/hooks/use-discovery-area";
 
 type Options = {
   radiusMiles?: number;
   weekendOnly?: boolean;
   size?: number;
-  keyword?: string;
+  /** "major" = arena scale, "local" = neighbourhood pop-ups, "all" = both. */
+  scope?: "all" | "major" | "local";
 };
 
-/** Ticketed events happening around the area the person is browsing. */
+/** Live events happening around the area the person is browsing. */
 export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
-  const { radiusMiles = 50, weekendOnly = true, size = 20, keyword } = options;
+  const { radiusMiles = 50, weekendOnly = true, size = 20, scope = "all" } = options;
   const [events, setEvents] = useState<LiveEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    void fetchLiveEvents({
+    void fetchTrendingEvents({
       data: {
         latitude: area.latitude,
         longitude: area.longitude,
         radiusMiles,
         weekendOnly,
         size,
-        ...(keyword ? { keyword } : {}),
+        scope,
       },
     })
       .then((result) => {
@@ -40,7 +41,7 @@ export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
     return () => {
       cancelled = true;
     };
-  }, [area.latitude, area.longitude, radiusMiles, weekendOnly, size, keyword]);
+  }, [area.latitude, area.longitude, radiusMiles, weekendOnly, size, scope]);
 
   return { events, loading };
 }
