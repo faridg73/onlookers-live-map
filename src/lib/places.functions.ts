@@ -62,6 +62,7 @@ function toDiscovered(raw: RawPlace): DiscoveredPlace[] {
       primaryType: raw.primaryTypeDisplayName?.text ?? null,
       rating: typeof raw.rating === "number" ? raw.rating : null,
       ratingCount: typeof raw.userRatingCount === "number" ? raw.userRatingCount : null,
+      photoName: raw.photos?.[0]?.name ?? null,
     },
   ];
 }
