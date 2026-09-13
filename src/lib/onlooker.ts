@@ -63,12 +63,12 @@ export const CATEGORIES: Category[] = [
     { id: "airport", label: "Airport lines" },
     { id: "closure", label: "Closures & detours" },
   ] },
-  { id: "events", label: "Events & Concerts", short: "Events", emoji: "\u{1F3AB}", hint: "e.g. Crowd size at the gate, stage view from the back, merch line length.", subs: [
-    { id: "concert", label: "Concert" },
-    { id: "sports", label: "Sports game", category: "sports" },
-    { id: "art", label: "Art & exhibits", category: "art" },
-    { id: "festival", label: "Festival & fair" },
-    { id: "gate", label: "Gate & entry line" },
+  { id: "events", label: "Events & Venues", short: "Events", emoji: "\u{1F3AB}", hint: "e.g. How long the entry line is, how full the lot is, and the tailgate scene outside the gates.", subs: [
+    { id: "lines", label: "Line Lengths" },
+    { id: "parking", label: "Parking Availability" },
+    { id: "merch", label: "Merch Truck Stock" },
+    { id: "tailgate", label: "Tailgate Hype" },
+    { id: "rideshare", label: "Rideshare Wait Times" },
   ] },
   { id: "parking", label: "Parking", short: "Parking", emoji: "\u{1F17F}\u{FE0F}", hint: "e.g. Wide shot of the lot, how many spots are open, and the posted hourly rate.", subs: [
     { id: "street", label: "Street parking" },
