@@ -32,7 +32,19 @@ export function CommunityPostCard({
 }) {
   const [watching, setWatching] = useState(false);
   const [boosting, setBoosting] = useState(false);
+  const [trust, setTrust] = useState<TrustStats | null>(null);
   const def = categoryDef(post.category);
+
+  useEffect(() => {
+    let alive = true;
+    void fetchTrustStatsCached(post.userId).then((s) => {
+      if (alive) setTrust(s);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [post.userId]);
+
   const left = timeLeftLabel(post.expiresAt);
   const pinned = isPinned(post);
 
