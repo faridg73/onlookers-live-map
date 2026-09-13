@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { uploadMedia } from "@/lib/media-upload";
 
 /** The community categories that open the Discover hub. */
 export type CommunityCategory =
