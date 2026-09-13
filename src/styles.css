@@ -162,6 +162,31 @@
   --cat-community: oklch(0.78 0.17 170);
   --cat-markets: oklch(0.82 0.16 75);
   --urgent: oklch(0.7 0.2 30);
+  --discover-friends: linear-gradient(145deg, oklch(0.78 0.19 130), oklch(0.2 0.06 150) 52%, oklch(0.08 0 0));
+  --discover-meetups: linear-gradient(145deg, oklch(0.75 0.17 165), oklch(0.22 0.08 210) 50%, oklch(0.08 0 0));
+  --discover-tutorials: linear-gradient(145deg, oklch(0.82 0.17 85), oklch(0.32 0.09 45) 50%, oklch(0.08 0 0));
+  --discover-language: linear-gradient(145deg, oklch(0.78 0.15 220), oklch(0.28 0.1 260) 50%, oklch(0.08 0 0));
+  --discover-culture: linear-gradient(145deg, oklch(0.72 0.19 20), oklch(0.3 0.12 330) 50%, oklch(0.08 0 0));
+}
+
+@utility discover-cover-friends {
+  background: var(--discover-friends);
+}
+
+@utility discover-cover-meetups {
+  background: var(--discover-meetups);
+}
+
+@utility discover-cover-tutorials {
+  background: var(--discover-tutorials);
+}
+
+@utility discover-cover-language {
+  background: var(--discover-language);
+}
+
+@utility discover-cover-culture {
+  background: var(--discover-culture);
 }
 
 @layer base {

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Clock, MapPin, Pin, Radio, Trash2 } from "lucide-react";
+import { BadgeCheck, Clock, MapPin, Pin, Radio, Target, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
-import { HunterBadge } from "@/components/HunterBadge";
-import { TrustBadge } from "@/components/TrustBadge";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
+import { Button } from "@/components/ui/button";
+import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
 import {
@@ -34,6 +34,8 @@ export function CommunityPostCard({
   const [boosting, setBoosting] = useState(false);
   const [trust, setTrust] = useState<TrustStats | null>(null);
   const def = categoryDef(post.category);
+  const visual = COMMUNITY_VISUALS[post.category];
+  const CategoryIcon = visual.icon;
 
   useEffect(() => {
     let alive = true;
@@ -49,30 +51,43 @@ export function CommunityPostCard({
   const pinned = isPinned(post);
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-border bg-surface">
-      <div
-        className={`relative w-full ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"}`}
-        style={mediaUrl ? undefined : { background: def.gradient }}
-      >
+    <article className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-xl shadow-background/40">
+      <div className={`relative w-full overflow-hidden ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"} ${mediaUrl ? "" : visual.coverClass}`}>
         {mediaUrl && (
           <img
             src={mediaUrl}
             alt={`Photo shared with ${post.title}`}
             loading="lazy"
-            className="size-full object-cover"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none"
           />
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-signal">
-          {def.label}
+        {!mediaUrl && (
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+            <CategoryIcon className="size-20 text-foreground/20" strokeWidth={1.3} />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/35" />
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-foreground/15 bg-background/75 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-md">
+          <CategoryIcon className="size-3.5 text-signal" /> {def.label}
         </span>
         {pinned && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase text-signal-foreground">
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase text-signal-foreground">
             <Pin className="size-3" /> Boosted
           </span>
         )}
+        {!pinned && trust?.verified && (
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase text-foreground backdrop-blur-md">
+            <BadgeCheck className="size-3.5 text-signal" /> Verified local
+          </span>
+        )}
         {post.isFlash && left && (
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full bg-black/75 px-2.5 py-1 text-[0.7rem] font-extrabold text-signal">
-            <Clock className="size-3.5" /> {left}
+          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2.5 py-1 text-[0.7rem] font-extrabold text-signal-foreground shadow-lg">
+            <Clock className="size-3.5" /> Flash Meetup · {left}
+          </span>
+        )}
+        {watching && (
+          <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-md bg-live px-2.5 py-1 text-[0.7rem] font-extrabold text-background shadow-lg">
+            <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> Live stream active
           </span>
         )}
       </div>
@@ -89,12 +104,13 @@ export function CommunityPostCard({
           )}
           <span className="inline-flex items-center gap-1.5">
             {post.authorName}
-            <HunterBadge level={post.hunterLevel} />
           </span>
+          {trust && (
+            <span className="inline-flex items-center gap-1 font-bold text-foreground">
+              <Target className="size-3.5 text-signal" /> {trust.completionRate}% reputation
+            </span>
+          )}
         </div>
-
-        {trust && <TrustBadge stats={trust} className="mt-2" />}
-
 
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -111,26 +127,31 @@ export function CommunityPostCard({
 
         <div className="mt-4 flex flex-wrap gap-2">
           {!isMine && (
-            <button
+            <Button
               type="button"
               onClick={() => setWatching((v) => !v)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+              size="sm"
+              className="rounded-lg text-xs font-extrabold uppercase tracking-[0.12em]"
             >
               <Radio className="size-4" /> {watching ? "Hide" : "Watch live"}
-            </button>
+            </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
           {isMine && (
             <>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setBoosting((v) => !v)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-signal/60 bg-signal/10 px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-signal"
+                className="rounded-lg border-signal/60 bg-signal/10 text-xs font-bold uppercase tracking-[0.12em] text-signal"
               >
                 <Pin className="size-4" /> Boost
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
                 aria-label="Delete post"
                 onClick={() => {
                   void deleteCommunityPost(post.id)
@@ -142,10 +163,10 @@ export function CommunityPostCard({
                       toast.error(err instanceof Error ? err.message : "Couldn't remove that."),
                     );
                 }}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground"
+                className="rounded-lg text-muted-foreground"
               >
                 <Trash2 className="size-4" />
-              </button>
+              </Button>
             </>
           )}
           <ShareArtifactButton
@@ -167,9 +188,10 @@ export function CommunityPostCard({
             </p>
             <div className="mt-2 flex gap-2">
               {PIN_CREDIT_OPTIONS.map((c) => (
-                <button
+                <Button
                   key={c}
                   type="button"
+                  variant="outline"
                   onClick={() => {
                     void pinCommunityPost(post.id, c)
                       .then(() => {
@@ -181,10 +203,10 @@ export function CommunityPostCard({
                         toast.error(err instanceof Error ? err.message : "Couldn't boost that."),
                       );
                   }}
-                  className="flex-1 rounded-xl border border-signal/60 px-2 py-2 text-xs font-bold text-signal"
+                  className="flex-1 rounded-lg border-signal/60 px-2 text-xs font-bold text-signal"
                 >
                   {formatCredits(c)}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

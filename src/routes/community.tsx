@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
+import { Compass, Map as MapIcon, Plus, Radio, Rows3, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/BottomNav";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
+import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import {
   COMMUNITY_CATEGORIES,
   communityMediaUrls,
@@ -84,12 +87,13 @@ function CommunityHub() {
 
   return (
     <main className="min-h-dvh bg-background pb-28">
-      <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)]">
+      <div className="mx-auto w-full max-w-5xl">
+      <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
           <Compass className="size-4" /> Discover
         </p>
-        <h1 className="mt-1 text-2xl font-extrabold text-foreground">
-          People, meetups and live lessons near you
+        <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-foreground sm:text-4xl">
+          See what your city is doing now
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Tap a lane, filter by tag, or open the map to see what is happening right now.
@@ -102,22 +106,27 @@ function CommunityHub() {
         </Link>
       </header>
 
-      <div className="mt-5 flex gap-2 overflow-x-auto px-5 pb-1">
-        <button
+      <section aria-label="Discover categories" className="mt-6">
+        <div className="mb-3 flex items-center justify-between px-5 sm:px-8">
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.14em] text-foreground">Explore by vibe</h2>
+          <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => {
             setCategory("all");
             setTag(null);
           }}
-          className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-bold ${
-            category === "all"
-              ? "border-signal bg-signal text-signal-foreground"
-              : "border-border text-muted-foreground"
-          }`}
+          className={category === "all" ? "text-signal" : "text-muted-foreground"}
         >
           Everything
-        </button>
-        {COMMUNITY_CATEGORIES.map((c) => (
+        </Button>
+        </div>
+        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:px-8">
+        {COMMUNITY_CATEGORIES.map((c) => {
+          const visual = COMMUNITY_VISUALS[c.id];
+          const Icon = visual.icon;
+          return (
           <button
             key={c.id}
             type="button"
@@ -125,91 +134,105 @@ function CommunityHub() {
               setCategory(c.id);
               setTag(null);
             }}
-            className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-bold ${
-              category === c.id
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border text-muted-foreground"
-            }`}
+            aria-pressed={category === c.id}
+            className={`group relative h-32 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
           >
-            {c.label}
+            <img src={visual.image} alt="" width={1024} height={640} loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none" />
+            <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+            <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
+              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
+              <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground/75">{c.blurb}</small></span>
+            </span>
           </button>
-        ))}
-      </div>
+        )})}
+        </div>
+      </section>
 
-      <div className="mt-2 flex flex-wrap gap-1.5 px-5">
+      <div className="mt-2 flex gap-1.5 overflow-x-auto px-5 pb-1 sm:px-8">
         {tagChoices.map((t) => (
-          <button
+          <Button
             key={t}
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setTag(tag === t ? null : t)}
-            className={`rounded-full border px-2.5 py-1 text-[0.68rem] font-semibold ${
-              tag === t ? "border-signal text-signal" : "border-border text-muted-foreground"
+            className={`h-7 shrink-0 rounded-full px-2.5 text-[0.68rem] font-semibold ${
+              tag === t ? "border-signal bg-signal/10 text-signal" : "text-muted-foreground"
             }`}
           >
             #{t}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-between px-5">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
         <div className="flex rounded-full border border-border p-0.5">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setView("feed")}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+            className={`rounded-full text-xs font-bold ${
               view === "feed" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
             }`}
           >
             <Rows3 className="size-3.5" /> Feed
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={() => setView("map")}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
+            className={`rounded-full text-xs font-bold ${
               view === "map" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
             }`}
           >
             <MapIcon className="size-3.5" /> Map
-          </button>
+          </Button>
         </div>
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => {
               setLiveFirst(true);
               setComposing(true);
             }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-signal/10 px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal"
+            className="rounded-full border-signal/60 bg-signal/10 text-xs font-extrabold uppercase tracking-[0.1em] text-signal"
           >
             <Radio className="size-4" /> Start live stream
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="sm"
             onClick={() => {
               setLiveFirst(false);
               setComposing(true);
             }}
-            className="inline-flex items-center gap-1.5 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+            className="rounded-full px-4 text-xs font-extrabold uppercase tracking-[0.1em]"
           >
             <Plus className="size-4" /> Post
-          </button>
+          </Button>
         </div>
       </div>
 
       {view === "map" ? (
-        <div className="mt-4 px-5">
+        <div className="mt-5 px-5 sm:px-8">
           <GlobalFeedMap />
         </div>
       ) : (
-        <section className="mt-4 space-y-4 px-5">
+        <section className="mt-5 space-y-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
           {!loading && visible.length === 0 && (
-            <div className="rounded-3xl border border-dashed border-border p-6 text-center">
-              <p className="text-sm font-bold text-foreground">Nothing here yet</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Be first — post a walk, a lesson or a flash meetup and it shows up instantly.
-              </p>
-            </div>
+            <DiscoverStarterCards
+              onStart={(starterCategory) => {
+                setCategory(starterCategory);
+                setTag(null);
+                setLiveFirst(false);
+                setComposing(true);
+              }}
+            />
           )}
           {visible.map((post) => (
             <CommunityPostCard
@@ -232,6 +255,7 @@ function CommunityHub() {
         initialCamera={liveFirst}
         {...(category !== "all" ? { initialCategory: category } : {})}
       />
+      </div>
 
       <BottomNav />
     </main>
