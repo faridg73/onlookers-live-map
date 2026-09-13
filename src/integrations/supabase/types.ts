@@ -468,6 +468,7 @@ export type Database = {
           email: string
           id: string
           name: string
+          reason_code: string
           status: string
           updated_at: string
         }
@@ -478,6 +479,7 @@ export type Database = {
           email: string
           id?: string
           name: string
+          reason_code?: string
           status?: string
           updated_at?: string
         }
@@ -488,6 +490,7 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          reason_code?: string
           status?: string
           updated_at?: string
         }
