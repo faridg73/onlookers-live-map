@@ -178,7 +178,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
             className="inline-flex items-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
           >
             {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <Coins className="size-3.5" />}
-            Micro-Tip Hunter ${MICRO_TIP.toFixed(2)}
+            Micro-Tip Hunter {MICRO_TIP} LC
           </button>
         </div>
       </div>

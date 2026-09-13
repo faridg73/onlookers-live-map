@@ -342,7 +342,7 @@ function PostScreen() {
             <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
             <span>
               If no Bounty Hunter claims this request in time, it expires automatically, disappears
-              from the live map, and your ${total} goes straight back
+              from the live map, and your {total} LC goes straight back
               to your wallet.
             </span>
           </p>
@@ -360,7 +360,7 @@ function PostScreen() {
             }
             className="w-full rounded-2xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Go live — lock $${total}`}
+            {posting ? "Locking bounty…" : `Go live — lock ${total} LC`}
           </button>
           <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
             Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital

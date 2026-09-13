@@ -96,7 +96,7 @@ export function VenueBountyDialog({
     setBalance(funds);
     if (funds !== null && funds < bounty) {
       toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
-        description: `Add funds to lock a $${bounty} bounty.`,
+        description: `Buy Looker Coins to lock a ${bounty} LC bounty.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
@@ -132,7 +132,7 @@ export function VenueBountyDialog({
         expiresInMin: minutes,
       });
       toast.success("Bounty is live", {
-        description: `$${bounty} held in escrow · ${windowLabel}`,
+        description: `${bounty} LC held in escrow · ${windowLabel}`,
       });
       setOpen(false);
       setTitle("");
