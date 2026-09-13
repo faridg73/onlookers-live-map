@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { formatCoins } from "@/lib/coins";
 import { Crown, Trophy } from "lucide-react";
 import { fetchTopReporters, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";

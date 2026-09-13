@@ -81,7 +81,7 @@ function PostScreen() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
       return;
     }
     if (note.trim().length < 10) {
@@ -104,9 +104,11 @@ function PostScreen() {
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < total) {
-      toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
-        description: `Add funds to lock a $${total} bounty${tip > 0 ? " including your tip" : ""}.`,
-        action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
+      toast.error(`You have ${Math.round(funds)} LC in your wallet`, {
+        description: `Buy Looker Coins to lock a ${total} LC bounty${
+          tip > 0 ? " including your tip" : ""
+        }.`,
+        action: { label: "Buy coins", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
     }
@@ -125,7 +127,8 @@ function PostScreen() {
       });
       setBalance(locked.balance);
       const focus = subOption ? `Focus: ${subOption.label}` : "";
-      const tipLine = tip > 0 ? `Includes a $${tip} tip from the requester's Bounty Wallet.` : "";
+      const tipLine =
+        tip > 0 ? `Includes a ${tip} LC tip from the requester's coin wallet.` : "";
       const details = [focus, note.trim(), tipLine].filter(Boolean).join("\n");
       addRequest({
         title: title.trim(),
@@ -140,8 +143,8 @@ function PostScreen() {
       });
       const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `$${total} held in escrow${
-          tip > 0 ? ` (including a $${tip} tip)` : ""
+        description: `${total} LC held in escrow${
+          tip > 0 ? ` (including a ${tip} LC tip)` : ""
         }. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });

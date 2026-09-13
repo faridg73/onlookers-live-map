@@ -338,8 +338,8 @@ export function BountyVideoDialog({
                   </div>
                   {v.accepted_at ? (
                     <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
-                      <BadgeDollarSign className="size-3.5" /> Accepted · $
-                      {Number(v.payout_amount).toFixed(2)} paid to the reporter
+                      <Coins className="size-3.5" /> Accepted ·{" "}
+                      {formatCoins(Number(v.payout_amount))} paid to the reporter
                     </p>
                   ) : (
                     v.uploader_id !== user.id && (
@@ -355,8 +355,8 @@ export function BountyVideoDialog({
                           </>
                         ) : (
                           <>
-                            <BadgeDollarSign className="size-3.5" /> Accept & pay $
-                            {Number(v.bounty_amount).toFixed(2)}
+                            <Coins className="size-3.5" /> Accept &amp; pay{" "}
+                            {formatCoins(Number(v.bounty_amount))}
                           </>
                         )}
                       </button>
