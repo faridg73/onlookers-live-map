@@ -249,9 +249,10 @@ function CommunityHub() {
         </div>
         <ScrollableLane
           className="-mx-5 sm:-mx-8"
-          innerClassName="snap-x snap-mandatory gap-3 px-5 pb-2 sm:px-8"
+          innerClassName="snap-x snap-mandatory gap-3 px-5 pb-2 [scroll-padding-left:1.25rem] sm:px-8 sm:[scroll-padding-left:2rem]"
           ariaLabel="Category cards"
         >
+
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
             const Icon = visual.icon;
