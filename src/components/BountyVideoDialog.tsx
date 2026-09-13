@@ -161,7 +161,7 @@ export function BountyVideoDialog({
           </div>
         ) : (
           <>
-            <div className="space-y-3">
+            <div className="space-y-3" onDrop={blockFileDrop} onDragOver={blockFileDrop} onPaste={blockFilePaste}>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -169,30 +169,31 @@ export function BountyVideoDialog({
                 placeholder="Add a note for the requester (optional)"
                 className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
               />
-              <input
-                ref={inputRef}
-                type="file"
-                accept="video/*"
-                capture="environment"
-                onChange={onFile}
-                className="hidden"
-              />
               <button
                 type="button"
                 disabled={uploading || closed}
-                onClick={() => inputRef.current?.click()}
+                onClick={() => setCapturing(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="size-4 animate-spin" /> Uploading…
+                    <Loader2 className="size-4 animate-spin" /> Sending…
                   </>
                 ) : (
                   <>
-                    <Upload className="size-4" /> {closed ? "Submissions closed" : "Record or upload video"}
+                    <Camera className="size-4" /> {closed ? "Submissions closed" : "Film live video"}
                   </>
                 )}
               </button>
+              <p className="text-center text-[0.68rem] text-muted-foreground">
+                Live camera captures only — gallery videos and screenshots can't be submitted.
+              </p>
+              {capturing && !closed && (
+                <VideoRecorder
+                  onClose={() => setCapturing(false)}
+                  onRecorded={(file) => void onCaptured(file)}
+                />
+              )}
             </div>
 
             <div className="mt-2 space-y-3">
