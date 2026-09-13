@@ -39,3 +39,14 @@ export function responseLabel(minutes: number) {
   const hours = minutes / 60;
   return `${hours < 10 ? hours.toFixed(1) : Math.round(hours)} hr average`;
 }
+
+const trustCache = new Map<string, Promise<TrustStats | null>>();
+
+/** Same as fetchTrustStats but shared across cards so one member is fetched once. */
+export function fetchTrustStatsCached(userId: string): Promise<TrustStats | null> {
+  const hit = trustCache.get(userId);
+  if (hit) return hit;
+  const p = fetchTrustStats(userId).catch(() => null);
+  trustCache.set(userId, p);
+  return p;
+}

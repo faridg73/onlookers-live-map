@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock, MapPin, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { HunterBadge } from "@/components/HunterBadge";
+import { TrustBadge } from "@/components/TrustBadge";
+import { TipCreditsButton } from "@/components/TipCreditsButton";
+import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
 import {
   PIN_CREDIT_OPTIONS,
@@ -29,7 +32,19 @@ export function CommunityPostCard({
 }) {
   const [watching, setWatching] = useState(false);
   const [boosting, setBoosting] = useState(false);
+  const [trust, setTrust] = useState<TrustStats | null>(null);
   const def = categoryDef(post.category);
+
+  useEffect(() => {
+    let alive = true;
+    void fetchTrustStatsCached(post.userId).then((s) => {
+      if (alive) setTrust(s);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [post.userId]);
+
   const left = timeLeftLabel(post.expiresAt);
   const pinned = isPinned(post);
 
@@ -78,6 +93,9 @@ export function CommunityPostCard({
           </span>
         </div>
 
+        {trust && <TrustBadge stats={trust} className="mt-2" />}
+
+
         {post.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {post.tags.map((t) => (
@@ -101,6 +119,7 @@ export function CommunityPostCard({
               <Radio className="size-4" /> {watching ? "Hide" : "Watch live"}
             </button>
           )}
+          {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
           {isMine && (
             <>
               <button

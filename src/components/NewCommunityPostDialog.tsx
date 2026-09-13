@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Camera, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { VideoRecorder } from "@/components/VideoRecorder";
@@ -20,11 +20,14 @@ export function NewCommunityPostDialog({
   onOpenChange,
   onPosted,
   initialCategory,
+  initialCamera,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPosted: () => void;
   initialCategory?: CommunityCategory;
+  /** Opens the live camera as soon as the sheet appears (Start Live Stream flow). */
+  initialCamera?: boolean;
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "friends");
   const [title, setTitle] = useState("");
@@ -38,6 +41,10 @@ export function NewCommunityPostDialog({
   const [busy, setBusy] = useState(false);
 
   const def = categoryDef(category);
+
+  useEffect(() => {
+    if (open && initialCamera) setCamera(true);
+  }, [open, initialCamera]);
 
   if (!open) return null;
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Compass, Map as MapIcon, Plus, Rows3 } from "lucide-react";
+import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/BottomNav";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
@@ -45,6 +45,7 @@ function CommunityHub() {
   const [tag, setTag] = useState<string | null>(null);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
+  const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -171,13 +172,28 @@ function CommunityHub() {
             <MapIcon className="size-3.5" /> Map
           </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setComposing(true)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
-        >
-          <Plus className="size-4" /> Post
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setLiveFirst(true);
+              setComposing(true);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-signal/10 px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal"
+          >
+            <Radio className="size-4" /> Start live stream
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setLiveFirst(false);
+              setComposing(true);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+          >
+            <Plus className="size-4" /> Post
+          </button>
+        </div>
       </div>
 
       {view === "map" ? (
@@ -213,6 +229,7 @@ function CommunityHub() {
         open={composing}
         onOpenChange={setComposing}
         onPosted={() => void load()}
+        initialCamera={liveFirst}
         {...(category !== "all" ? { initialCategory: category } : {})}
       />
 
