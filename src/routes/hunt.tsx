@@ -5,6 +5,8 @@ import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
 import { RecentActivityFeed } from "@/components/RecentActivityFeed";
+import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
@@ -163,8 +165,11 @@ function HuntScreen() {
         <div className="space-y-3">
           {list.map(({ request, payout, left, miles }) => (
             <div key={request.id}>
-              <div className="flex items-center justify-between px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
-                <span className="text-signal">Earn ${payout}</span>
+              <div className="flex items-center justify-between gap-2 px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
+                <span className="flex items-center gap-2">
+                  <span className="text-signal">Earn ${payout}</span>
+                  <UrgencyBadge minutesLeft={left} bounty={payout} compact />
+                </span>
                 <span className="flex items-center gap-2 text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="size-3" aria-hidden /> {left} min left
@@ -188,13 +193,17 @@ function HuntScreen() {
           {list.length === 0 && (
             <div className="space-y-4">
               <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No open bounties right now. Check back in a few minutes.
+                No open bounties right now. Watch the archive while you wait.
               </p>
+              <RecentCapturesFeed blurb="Finished streams from hunters near you — still watchable." />
               <RecentActivityFeed />
             </div>
           )}
           {list.length > 0 && nearby === 0 && position && (
-            <RecentActivityFeed />
+            <div className="space-y-4">
+              <RecentCapturesFeed blurb="Nothing live in your radius — here's what already wrapped." />
+              <RecentActivityFeed />
+            </div>
           )}
         </div>
       </div>
