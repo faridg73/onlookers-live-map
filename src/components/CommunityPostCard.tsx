@@ -202,7 +202,6 @@ export function CommunityPostCard({
             </>
           )}
           <ShareArtifactButton
-            label="Card"
             artifact={{
               kind: post.isFlash ? "meetup" : "discovery",
               title: post.title,
