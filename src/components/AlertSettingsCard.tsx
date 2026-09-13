@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTestAlertText } from "@/lib/sms.functions";
+import { savePushToken, removePushToken } from "@/lib/push.functions";
 import { toast } from "sonner";
-import { Bell, Mail, MapPin, MessageSquare } from "lucide-react";
+import { Bell, BellOff, BellRing, Mail, MapPin, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +15,7 @@ import {
   saveAlertPreferences,
   type AlertPreferences,
 } from "@/lib/alerts";
+import { disablePush, enablePush, pushConfigured } from "@/lib/push-notifications";
 
 /**
  * Bounty Radar settings: how far away someone wants to hear about new bounties
