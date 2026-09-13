@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Map, Radio, PlusSquare, UserRound, Compass, MessageCircle, Users } from "lucide-react";
+import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users } from "lucide-react";
 import { useChatAlerts } from "@/hooks/use-chat-alerts";
 import { ChatInbox } from "@/components/ChatInbox";
 
@@ -9,7 +9,7 @@ const items = [
   { to: "/community", label: "Discover", icon: Compass, exact: false },
   { to: "/discover", label: "Venues", icon: Users, exact: false },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
-  { to: "/post", label: "Post", icon: PlusSquare, exact: false },
+  { to: "/post", label: "+ Post", icon: Plus, exact: false, primary: true },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
 ] as const;
 
@@ -24,10 +24,14 @@ export function BottomNav() {
     <>
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 backdrop-blur-xl">
         <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pb-[env(safe-area-inset-bottom)]">
-          {items.map(({ to, label, icon: Icon, exact }) => (
+          {items.map(({ to, label, icon: Icon, exact, ...item }) => (
             <li key={to} className="flex-1">
-              <Link to={to} activeOptions={{ exact }} className={linkClass}>
-                <span className="relative">
+              <Link
+                to={to}
+                activeOptions={{ exact }}
+                className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
+              >
+                <span className={`relative ${"primary" in item ? "grid size-8 place-items-center rounded-full bg-signal text-signal-foreground" : ""}`}>
                   <Icon className="size-5" strokeWidth={1.75} />
                 </span>
                 {label}

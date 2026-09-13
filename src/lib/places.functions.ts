@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/lib/auth-attacher";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
@@ -39,6 +41,13 @@ type RawPlace = {
 const DISCOVERY_FIELDS =
   "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount,places.photos";
 
+const venueSearchSchema = z.object({
+  query: z.string().trim().min(2).max(120),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  maxResults: z.number().int().min(1).max(8).default(6),
+});
+
 
 function credentials() {
   const lovableKey = process.env["LOVABLE_API_KEY"];
@@ -66,6 +75,51 @@ function toDiscovered(raw: RawPlace): DiscoveredPlace[] {
     },
   ];
 }
+
+/** Bounded, authenticated text search for the app-owned request venue picker. */
+export const searchRequestVenues = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((data: unknown) => venueSearchSchema.parse(data))
+  .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+    const creds = credentials();
+    if (!creds) throw new Error("Venue search is not configured.");
+    const hasBias = typeof data.latitude === "number" && typeof data.longitude === "number";
+    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${creds.lovableKey}`,
+        "X-Connection-Api-Key": creds.mapsKey,
+        "Content-Type": "application/json",
+        "X-Goog-FieldMask": DISCOVERY_FIELDS,
+      },
+      body: JSON.stringify({
+        textQuery: data.query,
+        pageSize: data.maxResults,
+        ...(hasBias
+          ? {
+              locationBias: {
+                circle: {
+                  center: { latitude: data.latitude, longitude: data.longitude },
+                  radius: 40000,
+                },
+              },
+            }
+          : {}),
+      }),
+    });
+    if (response.status === 403) {
+      const body = await response.text();
+      console.error(`[places] request venue search denied [403]: ${body}`);
+      throw new Error("Venue search was denied. Check the Google Maps server key restrictions.");
+    }
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(`[places] request venue search failed [${response.status}]: ${body}`);
+      throw new Error(`Venue search failed [${response.status}]: ${body}`);
+    }
+    const payload = (await response.json()) as { places?: RawPlace[] };
+    return (payload.places ?? []).flatMap(toDiscovered);
+  });
 
 const categorySchema = z.object({
   latitude: z.number().min(-90).max(90),

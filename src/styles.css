@@ -114,31 +114,31 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0 0 0); /* #000000 pitch black */
-  --foreground: oklch(0.985 0 0);
-  --surface: oklch(0.178 0 0); /* #0F0F0F charcoal */
-  --surface-raised: oklch(0.23 0 0);
+  --background: oklch(0.14479 0 0); /* #0A0A0A true dark slate */
+  --foreground: oklch(1 0 0); /* #FFFFFF */
+  --surface: oklch(0.19125 0 0); /* #141414 elevated surface */
+  --surface-raised: oklch(0.19125 0 0);
   --map: oklch(0.96 0.01 250);
-  --signal: oklch(0.912 0.262 124); /* #CCFF00 neon lime */
+  --signal: oklch(0.93071 0.22858 123.09); /* #CCFF00 neon lime */
   --signal-foreground: oklch(0.14 0.03 124);
   --live: oklch(0.79 0.16 165);
-  --card: oklch(0.178 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.178 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.912 0.262 124);
+  --card: oklch(0.19125 0 0);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.19125 0 0);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.93071 0.22858 123.09);
   --primary-foreground: oklch(0.14 0.03 124);
-  --secondary: oklch(0.23 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.23 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.23 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.19125 0 0);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.26862 0 0);
+  --muted-foreground: oklch(0.71366 0.01918 261.325); /* #9CA3AF */
+  --accent: oklch(0.26862 0 0);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.62 0.21 25);
   --destructive-foreground: oklch(0.98 0.005 250);
-  --border: oklch(0.27 0 0);
-  --input: oklch(0.27 0 0);
-  --ring: oklch(0.912 0.262 124);
+  --border: oklch(0.26862 0 0); /* #262626 */
+  --input: oklch(0.26862 0 0);
+  --ring: oklch(0.93071 0.22858 123.09);
 
   /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
   --pin-standard: oklch(0.62 0.16 255);

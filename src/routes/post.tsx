@@ -1,19 +1,38 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown, CoinsIcon, Info, ShieldCheck, Timer } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  Building2,
+  ChevronDown,
+  CoinsIcon,
+  GraduationCap,
+  Info,
+  MapPin,
+  Radio,
+  Search,
+  ShieldCheck,
+  Store,
+  Trees,
+  Users,
+  Video,
+  X,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
+
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
-import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
-import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
-import { useOnlooker } from "@/lib/onlooker-store";
-import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
-import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { CategoryPicker } from "@/components/CategoryPicker";
+import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
+import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCredits } from "@/lib/credits";
+import { requestCurrentPosition } from "@/lib/geolocation";
+import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   categoryById,
   generateAccessCode,
@@ -23,6 +42,13 @@ import {
   subOptionById,
   type CategoryId,
 } from "@/lib/onlooker";
+import { useOnlooker } from "@/lib/onlooker-store";
+import { searchRequestVenues, type DiscoveredPlace } from "@/lib/places.functions";
+import {
+  parseRequestIntent,
+  VENUE_QUICK_SEARCHES,
+  type RequestAction,
+} from "@/lib/request-intent";
 
 export const Route = createFileRoute("/post")({
   head: () => ({
@@ -30,13 +56,12 @@ export const Route = createFileRoute("/post")({
       { title: "Post a Live Request — Onlooker" },
       {
         name: "description",
-        content:
-          "Describe the place, set a bounty, and nearby onlookers will send back a live photo in minutes.",
+        content: "Describe what you need, choose the exact place, and post a secure live request.",
       },
       { property: "og:title", content: "Post a Live Request — Onlooker" },
       {
         property: "og:description",
-        content: "Describe a place, set a bounty, get a live photo back in minutes.",
+        content: "Describe what you need, choose the exact place, and post a secure live request.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -45,43 +70,126 @@ export const Route = createFileRoute("/post")({
   component: PostScreen,
 });
 
-const DEADLINES: { minutes: number; label: string }[] = [
+const DEADLINES = [
   { minutes: 15, label: "15 min" },
   { minutes: 30, label: "30 min" },
   { minutes: 60, label: "1 hour" },
   { minutes: 1440, label: "24 hours" },
+] as const;
+
+const VENUE_FILTERS = [
+  { label: "Malls & retail", query: "shopping malls and department stores", icon: Store },
+  { label: "Parks & outdoors", query: "parks trailheads beaches recreation centers", icon: Trees },
+  { label: "Schools & colleges", query: "high schools community colleges universities", icon: GraduationCap },
+  { label: "Community hubs", query: "libraries civic centers public plazas", icon: Building2 },
+] as const;
+
+const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
+  { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
+  { id: "clip", label: "Request Video Clip", copy: "Receive a short live-captured video", icon: Video },
+  { id: "meetup", label: "Flash Meetup", copy: "Create a time-sensitive community request", icon: Zap },
 ];
 
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
+  const searchVenues = useServerFn(searchRequestVenues);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [prompt, setPrompt] = useState("");
+  const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
   const [place, setPlace] = useState("");
+  const [venueQuery, setVenueQuery] = useState("");
+  const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
+  const [venueBusy, setVenueBusy] = useState(false);
+  const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [spot, setSpot] = useState<PickedLocation | null>(null);
+  const [action, setAction] = useState<RequestAction>("clip");
   const [note, setNote] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
   const [bounty, setBounty] = useState(20);
-  // The picked category plus its sub-option; a sub-option may re-map the
-  // category that actually gets stored (e.g. Events → Sports game).
-  const [tile, setTile] = useState<CategoryId>("food");
+  const [tip, setTip] = useState(0);
+  const [minutes, setMinutes] = useState(60);
+  const [tile, setTile] = useState<CategoryId>("events");
   const [sub, setSub] = useState<string | null>(null);
-  const subOption = subOptionById(tile, sub);
-  const category: CategoryId = subOption?.category ?? tile;
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [moderationOpen, setModerationOpen] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
+  const [accessCode, setAccessCode] = useState("");
+  const subOption = subOptionById(tile, sub);
+  const category: CategoryId = subOption?.category ?? tile;
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
-  const [accessCode, setAccessCode] = useState("");
-  const [spot, setSpot] = useState<PickedLocation | null>(null);
-  const [minutes, setMinutes] = useState(60);
-  const [tip, setTip] = useState(0);
   const total = (Number.isFinite(bounty) ? bounty : 0) + (Number.isFinite(tip) ? tip : 0);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
   }, []);
+
+  useEffect(() => {
+    if (step !== 2 || venueQuery.trim().length < 2) return;
+    let active = true;
+    const timer = window.setTimeout(() => {
+      setVenueBusy(true);
+      void searchVenues({
+        data: {
+          query: venueQuery.trim(),
+          maxResults: 6,
+          ...(searchOrigin ?? {}),
+        },
+      })
+        .then((rows) => {
+          if (active) setVenueResults(rows);
+        })
+        .catch((error: unknown) => {
+          if (active) toast.error(error instanceof Error ? error.message : "Venue search failed.");
+        })
+        .finally(() => {
+          if (active) setVenueBusy(false);
+        });
+    }, 400);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [searchOrigin, searchVenues, step, venueQuery]);
+
+  const continueFromPrompt = () => {
+    if (prompt.trim().length < 8) {
+      toast.error("Describe the live view you want in one short sentence.");
+      return;
+    }
+    setAction(parsed.action);
+    setTitle(parsed.title.slice(0, 120));
+    setNote(parsed.instructions);
+    if (parsed.action === "live") setMinutes(15);
+    if (parsed.action === "meetup") {
+      setMinutes(60);
+      setTile("community");
+    }
+    const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
+    setVenueQuery(query);
+    setStep(2);
+  };
+
+  const chooseVenue = (venue: DiscoveredPlace) => {
+    const formatted = venue.address ? `${venue.name}, ${venue.address}` : venue.name;
+    setPlace(formatted);
+    setVenueQuery(venue.name);
+    setSpot({ latitude: venue.latitude, longitude: venue.longitude, formatted });
+  };
+
+  const locateForSearch = async () => {
+    try {
+      const position = await requestCurrentPosition();
+      setSearchOrigin({ latitude: position.coords.latitude, longitude: position.coords.longitude });
+      toast.success("Nearby venue suggestions are now local to you.");
+    } catch {
+      toast.error("Allow location access to prioritize venues near you.");
+    }
+  };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -105,23 +213,29 @@ function PostScreen() {
       setModerationOpen(true);
       return;
     }
-    // Catch an empty wallet before posting, so the deposit never fails mid-flow.
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < total) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
-        description: `Buy Credits to lock a ${total} Credits bounty${
-          tip > 0 ? " including your tip" : ""
-        }.`,
+        description: `Buy Credits to lock a ${total} Credits bounty${tip > 0 ? " including your tip" : ""}.`,
         action: { label: "Buy credits", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
     }
     setPosting(true);
     try {
+      const actionLabel = ACTIONS.find((item) => item.id === action)?.label ?? "Request Video Clip";
+      const detailLines = [
+        `Format: ${actionLabel}`,
+        parsed.durationMinutes ? `Requested capture: ${parsed.durationMinutes} minutes` : "",
+        subOption ? `Focus: ${subOption.label}` : "",
+        note.trim(),
+        tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
+      ].filter(Boolean);
+      const details = detailLines.join("\n");
       const locked = await lockBounty({
         prompt: title.trim(),
-        details: note.trim(),
+        details,
         locationName: place.trim(),
         bounty: total,
         category,
@@ -131,10 +245,6 @@ function PostScreen() {
         minutes,
       });
       setBalance(locked.balance);
-      const focus = subOption ? `Focus: ${subOption.label}` : "";
-      const tipLine =
-        tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "";
-      const details = [focus, note.trim(), tipLine].filter(Boolean).join("\n");
       addRequest({
         title: title.trim(),
         place: place.trim(),
@@ -146,269 +256,256 @@ function PostScreen() {
         dbId: locked.id,
         expiresInMin: minutes,
       });
-      const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
+      const deadlineLabel = DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `${total} Credits held in escrow${
-          tip > 0 ? ` (including a ${tip} Credits tip)` : ""
-        }. Expires in ${deadlineLabel} if nobody claims it.`,
+        description: `${total} Credits held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
       });
-      navigate({ to: "/feed" });
+      await navigate({ to: "/feed" });
     } catch (error) {
-      const msg = error instanceof Error ? error.message : "";
-      if (msg === BLOCKED_REQUEST_MESSAGE) {
-        setModerationOpen(true);
-      } else {
-        toast.error(msg || "Could not post the request.");
-      }
+      const message = error instanceof Error ? error.message : "";
+      if (message === BLOCKED_REQUEST_MESSAGE) setModerationOpen(true);
+      else toast.error(message || "Could not post the request.");
     } finally {
       setPosting(false);
     }
   }
 
-  const sectionLabel =
-    "text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75";
-  const section = "border-t border-border py-5";
-
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-32 pt-6 sm:px-6">
-      <div className="border-l-4 border-signal pl-4">
-      <h1 className="font-display text-3xl font-extrabold text-foreground sm:text-4xl">
-        Post a Live Request
-      </h1>
-      <p className="mt-1.5 text-sm font-semibold text-foreground/70">
-        Pin the exact spot, describe the live view, and offer a reward to someone already nearby.
-      </p>
-      </div>
-
-      <form onSubmit={submit} className="mt-5">
-        <label className={`block space-y-2 border-t-0 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">01</span> · Bounty title</span>
-          <input
-            ref={titleRef}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            maxLength={120}
-            placeholder="e.g., How long is the entry line at Section A?"
-            className="field"
-          />
-          <span className="block text-xs font-medium text-foreground/70">
-            One short line about a real place — a line, a seat view, a queue — people see on the
-            map and in the feed.
-          </span>
-        </label>
-
-        <div className={`space-y-3 ${section}`}>
-          <label className="block space-y-2">
-            <span className={sectionLabel}><span className="text-signal">02</span> · Exact location</span>
-            <input
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-              required
-              placeholder="Search a stadium, gate, section or street corner"
-              className="field"
-            />
-          </label>
-          <LocationPreviewMap
-            address={place}
-            onPick={(next) => {
-              setSpot(next);
-              if (next.formatted !== "Dropped pin") setPlace(next.formatted);
-            }}
-          />
-          <p className="text-xs font-medium text-foreground/70">
-            No street address? Tap the map or drag the pin to lock the exact coordinates.
-            {spot && (
-              <span className="mt-1 block font-bold text-signal">
-                Pin locked: {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
-              </span>
-            )}
-          </p>
-        </div>
-
-        <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">03</span> · Category &amp; focus</span>
-          <CategoryPicker
-            value={tile}
-            onChange={(id) => setTile(id as CategoryId)}
-            sub={sub}
-            onSubChange={setSub}
-          />
-          <Collapsible>
-            <CollapsibleTrigger className="group flex w-full items-center gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-left text-xs font-bold text-foreground">
-              <Info className="size-4 shrink-0 text-signal" />
-              <span className="flex-1">Privacy &amp; Guidelines</span>
-              <ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 border-l-2 border-border bg-surface px-3 py-3 text-xs font-medium text-foreground/75">
-              <p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />{VENUE_EXTERIOR_DISCLAIMER}</p>
-              {needsPublicSpacesNotice(tile) && (
-                <p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>
-              )}
-              <p>Film only what the requester asks for in lawful public areas. Never capture private conversations, screens, tickets, or restricted performances.</p>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        {permissionNeeded && (
-          <label className="flex gap-3 border-l-2 border-signal bg-surface-raised p-4">
-            <input
-              type="checkbox"
-              checked={permissionOk}
-              onChange={(e) => setPermissionOk(e.target.checked)}
-              className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
-            />
-            <span className="text-xs font-medium text-foreground/75">
-              I confirm I have permission from the seller, listing agent or property manager to have
-              this property photographed or filmed, and that the onlooker may only capture areas
-              open to the public or that access has been authorised.
-            </span>
-          </label>
-        )}
-
-        {codeNeeded && (
-          <div className="space-y-2 border-l-2 border-signal bg-surface-raised p-4">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-signal">
-              Private access passcode
-            </span>
-            <div className="flex gap-2">
-              <input
-                value={accessCode}
-                onChange={(e) => setAccessCode(e.target.value)}
-                maxLength={40}
-                placeholder="e.g. 481902 or BLUEGATE"
-                className="field flex-1"
-              />
-              <Button
-                type="button"
-                onClick={() => setAccessCode(generateAccessCode())}
-                variant="outline"
-                className="shrink-0 border-signal/50 text-xs font-semibold uppercase tracking-[0.12em] text-signal"
-              >
-                Generate
-              </Button>
+    <main className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="post-wizard-title"
+        className="absolute inset-x-0 bottom-0 top-3 flex flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl sm:inset-x-[max(1rem,calc(50%-28rem))] sm:bottom-5 sm:top-5 sm:rounded-2xl"
+      >
+        <header className="shrink-0 border-b border-border bg-surface px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[0.65rem] font-extrabold uppercase text-signal">Step {step} of 3</p>
+              <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
+                {step === 1 ? "What do you want to see?" : step === 2 ? "Where should they go?" : "How should it happen?"}
+              </h1>
             </div>
-            <p className="text-xs font-medium text-foreground/70">
-              Stays hidden until someone claims the bounty. They can quote it on site to prove the
-              owner, agent or manager authorised the visit.
-            </p>
+            <Button type="button" variant="ghost" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })}>
+              <X className="size-5" />
+            </Button>
           </div>
-        )}
-
-        <label className={`block space-y-2 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">04</span> · Specific camera instructions</span>
-          <textarea
-            ref={noteRef}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            rows={4}
-            required
-            minLength={10}
-            placeholder="e.g., What is the view from Seat 12? Ask for entry lines, crowd atmosphere, tailgates or street views — filmed on location, in public spaces only."
-            className="field resize-none"
-          />
-          <span className="block text-xs font-medium text-foreground/70">
-            {note.trim().length < 10
-              ? "Add at least one clear sentence about the physical spot — the line, the view, the crowd — so the hunter knows exactly what to capture."
-              : `Great — this is what they'll see for ${
-                  subOption
-                    ? `${categoryById(category)?.label.toLowerCase()} — ${subOption.label.toLowerCase()}`
-                    : categoryById(category)?.label.toLowerCase()
-                }.`}
-            {categoryById(category)?.hint && ` Example: ${categoryById(category)?.hint}`}
-          </span>
-        </label>
-
-        <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">05</span> · Credit reward</span>
-          <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
-          <p className="flex items-start gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
-            <span>
-              Your payment is held securely in escrow. Funds are only released to the Bounty Hunter
-              once you review and approve their video.
-            </span>
-          </p>
-        </div>
-
-        <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">06</span> · Bonus tip (optional)</span>
-          <BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} />
-        </div>
-
-        <div className={`space-y-3 ${section}`}>
-          <span className={sectionLabel}><span className="text-signal">07</span> · Request deadline</span>
-          <div className="grid grid-cols-4 gap-2">
-            {DEADLINES.map(({ minutes: m, label }) => (
-              <Button
-                key={m}
-                type="button"
-                onClick={() => setMinutes(m)}
-                aria-pressed={minutes === m}
-                variant="outline"
-                className={`h-12 rounded-md border-2 px-1 text-center text-sm font-extrabold transition-all ${
-                  minutes === m
-                    ? "border-signal bg-signal text-signal-foreground"
-                    : "border-border bg-surface-raised text-foreground hover:border-signal/60"
-                }`}
-              >
-                {label}
-              </Button>
+          <div className="mt-3 grid grid-cols-3 gap-1.5" aria-label={`Step ${step} of 3`}>
+            {[1, 2, 3].map((item) => (
+              <span key={item} className={`h-1 rounded-full ${item <= step ? "bg-signal" : "bg-border"}`} />
             ))}
           </div>
-          <p className="flex items-start gap-2 text-xs font-medium text-foreground/70">
-            <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
-            <span>
-              If no Bounty Hunter claims this request in time, it expires automatically, disappears
-              from the live map, and your {total} Credits goes straight back
-              to your wallet.
-            </span>
-          </p>
-        </div>
+        </header>
 
-        <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-20 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><CoinsIcon className="size-4 text-signal" />Total escrow</span>
-            <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
+        <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
+            {step === 1 && (
+              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+                <div className="rounded-lg border border-border bg-background p-3 focus-within:border-signal">
+                  <div className="flex items-start gap-3">
+                    <Search className="mt-1 size-5 shrink-0 text-signal" />
+                    <textarea
+                      value={prompt}
+                      onChange={(event) => setPrompt(event.target.value)}
+                      rows={4}
+                      autoFocus
+                      placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
+                      className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {[
+                      "Show me the line at South Coast Plaza",
+                      "I want a 5-minute clip of Fashion Island",
+                      "Flash meetup at Orange Coast College",
+                    ].map((example) => (
+                      <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
+                        {example}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                {prompt.trim().length >= 8 && (
+                  <div className="rounded-lg border border-border bg-background p-4">
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Understood</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-signal px-3 py-1 text-xs font-extrabold text-signal-foreground">
+                        {ACTIONS.find((item) => item.id === parsed.action)?.label}
+                      </span>
+                      {parsed.durationMinutes && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.durationMinutes} min</span>}
+                      {parsed.venue && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.venue}</span>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3.5 size-4 text-signal" />
+                  <input value={venueQuery} onChange={(event) => setVenueQuery(event.target.value)} placeholder="Search a mall, park, school, library…" className="field pl-10" autoFocus />
+                  {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {VENUE_FILTERS.map(({ label, query, icon: Icon }) => (
+                    <Button key={label} type="button" variant="outline" onClick={() => setVenueQuery(`${query} near me`)} className="h-auto justify-start gap-2 py-3 text-left">
+                      <Icon className="size-4 text-signal" /> {label}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {VENUE_QUICK_SEARCHES.map((venue) => (
+                    <Button key={venue.label} type="button" variant="secondary" size="sm" onClick={() => setVenueQuery(venue.query)} className="shrink-0">
+                      {venue.label}
+                    </Button>
+                  ))}
+                </div>
+                <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
+                  <MapPin className="size-4" /> Prioritize places near me
+                </Button>
+                {venueResults.length > 0 && (
+                  <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background">
+                    {venueResults.map((venue) => (
+                      <Button key={venue.id} type="button" variant="ghost" onClick={() => chooseVenue(venue)} className="h-auto w-full justify-start rounded-none px-3 py-3 text-left">
+                        <MapPin className="mr-3 size-4 shrink-0 text-signal" />
+                        <span className="min-w-0">
+                          <span className="block truncate font-bold text-foreground">{venue.name}</span>
+                          <span className="block truncate text-xs text-muted-foreground">{venue.address ?? venue.primaryType ?? "Public place"}</span>
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                <LocationPreviewMap
+                  address={place || venueQuery}
+                  selectedLocation={spot}
+                  onPick={(next) => {
+                    setSpot(next);
+                    setPlace(next.formatted);
+                  }}
+                />
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {ACTIONS.map(({ id, label, copy, icon: Icon }) => (
+                    <Button
+                      key={id}
+                      type="button"
+                      variant="outline"
+                      aria-pressed={action === id}
+                      onClick={() => {
+                        setAction(id);
+                        if (id === "live") setMinutes(15);
+                        if (id === "meetup") {
+                          setMinutes(60);
+                          setTile("community");
+                        }
+                      }}
+                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left ${action === id ? "border-signal bg-signal/10" : ""}`}
+                    >
+                      <Icon className="mt-0.5 size-5 shrink-0 text-signal" />
+                      <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
+                    </Button>
+                  ))}
+                </div>
+
+                <label className="block space-y-2">
+                  <span className="text-xs font-bold uppercase text-muted-foreground">Request title</span>
+                  <input ref={titleRef} value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={120} className="field" />
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-xs font-bold uppercase text-muted-foreground">Camera instructions</span>
+                  <textarea ref={noteRef} value={note} onChange={(event) => setNote(event.target.value)} rows={3} required minLength={10} className="field resize-none" />
+                </label>
+
+                <Collapsible>
+                  <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-left text-sm font-bold text-foreground">
+                    <Info className="size-4 text-signal" /><span className="flex-1">Category, privacy & access</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-3 space-y-4">
+                    <CategoryPicker value={tile} onChange={(id) => setTile(id as CategoryId)} sub={sub} onSubChange={setSub} />
+                    <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
+                      <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
+                      {needsPublicSpacesNotice(tile) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
+                    </div>
+                    {permissionNeeded && (
+                      <label className="flex gap-3 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
+                        <input type="checkbox" checked={permissionOk} onChange={(event) => setPermissionOk(event.target.checked)} className="mt-0.5 size-4 accent-[var(--signal)]" />
+                        I confirm I have permission to have this property photographed or filmed.
+                      </label>
+                    )}
+                    {codeNeeded && (
+                      <div className="flex gap-2">
+                        <input value={accessCode} onChange={(event) => setAccessCode(event.target.value)} maxLength={40} placeholder="Private access passcode" className="field" />
+                        <Button type="button" variant="outline" onClick={() => setAccessCode(generateAccessCode())}>Generate</Button>
+                      </div>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Reward</p>
+                  <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                </div>
+                <Collapsible>
+                  <CollapsibleTrigger className="group flex w-full items-center gap-2 text-sm font-bold text-muted-foreground">
+                    <CoinsIcon className="size-4 text-signal" /><span className="flex-1 text-left">Add an optional tip</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-3"><BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} /></CollapsibleContent>
+                </Collapsible>
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Request deadline</p>
+                  <div className="mt-3 grid grid-cols-4 gap-2">
+                    {DEADLINES.map((deadline) => (
+                      <Button key={deadline.minutes} type="button" variant="outline" aria-pressed={minutes === deadline.minutes} onClick={() => setMinutes(deadline.minutes)} className={minutes === deadline.minutes ? "border-signal bg-signal text-signal-foreground" : ""}>
+                        {deadline.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                <p className="flex gap-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
+                  <ShieldCheck className="size-4 shrink-0 text-signal" />Your payment is held securely in escrow and released only after you approve the live capture.
+                </p>
+              </div>
+            )}
           </div>
-          <Button
-            type="submit"
-            disabled={
-              posting ||
-              bounty < MIN_BOUNTY ||
-              note.trim().length < 10 ||
-              (permissionNeeded && !permissionOk) ||
-              (codeNeeded && accessCode.trim().length < 4)
-            }
-            className="h-14 w-full rounded-md bg-signal text-base font-extrabold uppercase tracking-[0.12em] text-signal-foreground shadow-lg hover:bg-signal/90"
-          >
-            {posting ? "Locking bounty…" : `Go live — lock ${formatCredits(total)}`}
-          </Button>
-          <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
-            Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital
-            screen captures are strictly prohibited.
-          </p>
-        </div>
-      </form>
+
+          <footer className="shrink-0 border-t border-border bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6">
+            {step === 3 && (
+              <div className="mb-3 flex items-center justify-between gap-3 text-sm">
+                <span className="font-bold text-muted-foreground">Total escrow</span>
+                <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
+              </div>
+            )}
+            <div className="flex gap-2">
+              {step > 1 && <Button type="button" variant="outline" size="icon" aria-label="Previous step" onClick={() => setStep((step - 1) as 1 | 2)}><ArrowLeft className="size-5" /></Button>}
+              {step === 1 && <Button type="button" onClick={continueFromPrompt} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Find the place</Button>}
+              {step === 2 && <Button type="button" disabled={!spot || !place.trim()} onClick={() => setStep(3)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Use this location</Button>}
+              {step === 3 && <Button type="submit" disabled={posting || bounty < MIN_BOUNTY || note.trim().length < 10 || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Post request · ${formatCredits(total)}`}</Button>}
+            </div>
+          </footer>
+        </form>
+      </section>
 
       <ContentModerationAlertModal
         open={moderationOpen}
         onOpenChange={setModerationOpen}
         onEditRequest={() => {
           setModerationOpen(false);
-          // Focus the first offending field after Radix returns focus from the
-          // closing dialog, so the user lands back in the form, not on body.
           window.setTimeout(() => {
-            const titleHasForbidden = !isRequestAllowed(title, "", "");
-            const noteHasForbidden = !isRequestAllowed("", note, "");
-            if (noteHasForbidden && !titleHasForbidden) {
-              noteRef.current?.focus();
-            } else {
-              titleRef.current?.focus();
-            }
+            setStep(3);
+            if (!isRequestAllowed("", note, "") && isRequestAllowed(title, "", "")) noteRef.current?.focus();
+            else titleRef.current?.focus();
           }, 50);
         }}
       />
-    </div>
+    </main>
   );
 }
