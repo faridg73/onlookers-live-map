@@ -165,7 +165,7 @@ function CommunityHub() {
     return haystack.includes(needle);
   }, []);
 
-  const { rows: visible, fallback } = useMemo(() => {
+  const visible = useMemo(() => {
     const limit = here ? radiusMilesFor(radius) : null;
     const sort = (list: Array<{ post: CommunityPost; miles: number | null }>) =>
       [...list].sort((a, b) => {
@@ -184,11 +184,8 @@ function CommunityHub() {
     const inLane = inRange.filter(({ post }) => category === "all" || post.category === category);
     const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
 
-    // Never dead-end on an empty subcategory: relax the tag, then the lane.
-    if (exact.length > 0) return { rows: sort(exact), fallback: null as null | "tag" | "lane" };
-    if (tag && inLane.length > 0) return { rows: sort(inLane), fallback: "tag" as const };
-    if (category !== "all" && inRange.length > 0) return { rows: sort(inRange), fallback: "lane" as const };
-    return { rows: [] as typeof inRange, fallback: null as null | "tag" | "lane" };
+    // Subcategory pills are strict: never substitute sibling or unrelated posts.
+    return sort(exact);
   }, [posts, category, tag, radius, here, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
@@ -391,25 +388,7 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && fallback && (
-            <p
-              className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-xs text-muted-foreground"
-              role="status"
-            >
-              {fallback === "tag" ? (
-                <>
-                  No posts tagged <strong className="text-foreground">#{tag}</strong> yet — showing
-                  everything in {categoryDef(category as CommunityCategory).label} instead.
-                </>
-              ) : (
-                <>
-                  No {categoryDef(category as CommunityCategory).label} posts nearby yet — showing
-                  everything else close to you.
-                </>
-              )}
-            </p>
-          )}
-          {!loading && category !== "all" && (visible.length === 0 || Boolean(fallback)) && (
+          {!loading && category !== "all" && visible.length === 0 && (
             <CategoryExampleCards
               category={category}
               tag={tag}
