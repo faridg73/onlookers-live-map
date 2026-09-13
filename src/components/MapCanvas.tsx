@@ -138,6 +138,38 @@ export function MapCanvas({
     }
   }, [ready, centerOn]);
 
+  // Business names for whatever is on screen, refreshed after panning stops.
+  useEffect(() => {
+    if (!ready) return;
+    const timer = window.setTimeout(() => {
+      const m = map.current;
+      const center = m?.getCenter();
+      const zoom = m?.getZoom();
+      const bounds = m?.getBounds();
+      if (!center || typeof zoom !== "number" || !bounds) return;
+      if (zoom < 15) {
+        setPlaces([]);
+        lastPlaceKey.current = "";
+        return;
+      }
+      const lat = center.lat();
+      const lng = center.lng();
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const spanMeters = Math.max(
+        200,
+        Math.min(3000, ((ne.lat() - sw.lat()) * 111_000) / 2),
+      );
+      const key = `${lat.toFixed(3)}:${lng.toFixed(3)}:${Math.round(spanMeters / 100)}`;
+      if (key === lastPlaceKey.current) return;
+      lastPlaceKey.current = key;
+      void fetchNearbyPlaces({ data: { latitude: lat, longitude: lng, radiusMeters: spanMeters } })
+        .then(setPlaces)
+        .catch((error) => console.error("[Onlooker map] nearby places failed", error));
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [ready, tick]);
+
   const toPixel = (position: google.maps.LatLngLiteral): Pixel | null => {
     const projection = overlay.current?.getProjection();
     if (!projection) return null;
