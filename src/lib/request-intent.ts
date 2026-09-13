@@ -29,7 +29,7 @@ export function parseRequestIntent(prompt: string): ParsedRequestIntent {
   const lower = clean.toLowerCase();
   const durationMatch = lower.match(/\b(\d{1,3})\s*(?:-|\s)?(minute|min|hour|hr)s?\b/);
   const durationMinutes = durationMatch
-    ? Math.min(180, Number(durationMatch[1]) * (/hour|hr/.test(durationMatch[2]) ? 60 : 1))
+    ? Math.min(180, Number(durationMatch[1]) * (/hour|hr/.test(durationMatch[2] ?? "") ? 60 : 1))
     : null;
   const action: RequestAction = /flash\s*(?:meetup|meet)|meet\s*up/.test(lower)
     ? "meetup"
