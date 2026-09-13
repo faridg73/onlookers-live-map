@@ -22,70 +22,110 @@ function appOrigin(): string {
   return "https://onlookerlive.com";
 }
 
+/** Finds or creates the buyer's payment customer, tagged with their user id. */
+async function resolveCustomer(
+  stripe: ReturnType<typeof createStripeClient>,
+  options: { userId: string; email?: string | undefined },
+): Promise<string | undefined> {
+  if (!/^[a-zA-Z0-9_-]+$/.test(options.userId)) return undefined;
+
+  const found = await stripe.customers.search({
+    query: `metadata['userId']:'${options.userId}'`,
+    limit: 1,
+  });
+  if (found.data.length) return found.data[0]!.id;
+
+  if (options.email) {
+    const existing = await stripe.customers.list({ email: options.email, limit: 1 });
+    const customer = existing.data[0];
+    if (customer) {
+      if (customer.metadata?.["userId"] !== options.userId) {
+        await stripe.customers.update(customer.id, {
+          metadata: { ...customer.metadata, userId: options.userId },
+        });
+      }
+      return customer.id;
+    }
+  }
+
+  const created = await stripe.customers.create({
+    ...(options.email ? { email: options.email } : {}),
+    metadata: { userId: options.userId },
+  });
+  return created.id;
+}
+
 /**
- * Card checkout for a Credits pack. Credits are only added to the wallet by
- * the payment webhook, once the charge really settles.
+ * Embedded checkout for a Credits pack. Apple Pay, Google Pay, Link and cards
+ * are all offered by the hosted payment form. Credits are only added to the
+ * wallet by the payment webhook, once the charge really settles.
  */
 export const startCreditPurchase = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: { packageId: string }) =>
     z.object({ packageId: z.string().min(3).max(60) }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<{ url?: string; error?: string }> => {
-    const pack = creditPackageById(data.packageId);
-    if (!pack) return { error: "That credit pack is no longer available." };
+  .handler(
+    async ({ data, context }): Promise<{ clientSecret?: string; error?: string }> => {
+      const pack = creditPackageById(data.packageId);
+      if (!pack) return { error: "That credit pack is no longer available." };
 
-    const env = resolveStripeEnvForHost(requestHost());
-    const userId = context.userId;
+      const env = resolveStripeEnvForHost(requestHost());
+      const userId = context.userId;
 
-    try {
-      const stripe = createStripeClient(env);
-      const origin = appOrigin();
+      try {
+        const stripe = createStripeClient(env);
+        const origin = appOrigin();
 
-      const prices = await stripe.prices.list({ lookup_keys: [pack.priceId], limit: 1 });
-      const price = prices.data[0];
+        const prices = await stripe.prices.list({ lookup_keys: [pack.priceId], limit: 1 });
+        const price = prices.data[0];
 
-      const metadata = {
-        userId,
-        kind: "credit_purchase",
-        packageId: pack.id,
-        credits: String(pack.credits),
-      };
+        const email = (context.claims as { email?: string } | undefined)?.email;
+        const customerId = await resolveCustomer(stripe, { userId, email });
 
-      const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        client_reference_id: userId,
-        metadata,
-        payment_intent_data: {
-          description: `${pack.name} — ${pack.credits} Credits`,
+        const metadata = {
+          userId,
+          kind: "credit_purchase",
+          packageId: pack.id,
+          credits: String(pack.credits),
+        };
+
+        const session = await stripe.checkout.sessions.create({
+          mode: "payment",
+          ui_mode: "embedded_page",
+          client_reference_id: userId,
           metadata,
-        },
-        line_items: [
-          price
-            ? { quantity: 1, price: price.id }
-            : {
-                quantity: 1,
-                price_data: {
-                  currency: "usd",
-                  unit_amount: pack.priceCents,
-                  product_data: {
-                    name: `${pack.name} — ${pack.credits} Credits`,
-                    description: pack.blurb,
+          ...(customerId ? { customer: customerId } : {}),
+          payment_intent_data: {
+            description: `${pack.name} — ${pack.credits} Credits`,
+            metadata,
+          },
+          line_items: [
+            price
+              ? { quantity: 1, price: price.id }
+              : {
+                  quantity: 1,
+                  price_data: {
+                    currency: "usd",
+                    unit_amount: pack.priceCents,
+                    product_data: {
+                      name: `${pack.name} — ${pack.credits} Credits`,
+                      description: pack.blurb,
+                    },
                   },
                 },
-              },
-        ],
-        success_url: `${origin}/profile?credits=success`,
-        cancel_url: `${origin}/profile?credits=cancelled`,
-      });
+          ],
+          return_url: `${origin}/profile?credits=success&session_id={CHECKOUT_SESSION_ID}`,
+        });
 
-      if (!session.url) {
-        return { error: "Stripe did not return a payment page. Please try again." };
+        if (!session.client_secret) {
+          return { error: "The payment form could not be opened. Please try again." };
+        }
+        return { clientSecret: session.client_secret };
+      } catch (error) {
+        const message = getStripeErrorMessage(error);
+        console.error("[credits] checkout failed", { env, userId, pack: pack.id, message });
+        return { error: message };
       }
-      return { url: session.url };
-    } catch (error) {
-      const message = getStripeErrorMessage(error);
-      console.error("[credits] checkout failed", { env, userId, pack: pack.id, message });
-      return { error: message };
-    }
-  });
+    },
+  );

@@ -1,26 +1,12 @@
 import { useState } from "react";
-import { CoinsIcon, Loader2, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { Apple, CoinsIcon, CreditCard, Sparkles } from "lucide-react";
 
-import { CREDIT_PACKAGES, formatPackPrice } from "@/lib/credit-packages";
-import { startCreditPurchase } from "@/lib/credits.functions";
+import { CREDIT_PACKAGES, formatPackPrice, type CreditPackage } from "@/lib/credit-packages";
+import { CreditCheckoutSheet } from "@/components/CreditCheckoutSheet";
 
-/** Buy Credits — three fixed packs that open card checkout. */
+/** Buy Credits — fixed 4:1 tiers that open the express payment sheet. */
 export function BuyCreditsCard() {
-  const [busy, setBusy] = useState<string | null>(null);
-
-  async function buy(packageId: string) {
-    setBusy(packageId);
-    try {
-      const result = await startCreditPurchase({ data: { packageId } });
-      if (result.error) throw new Error(result.error);
-      if (result.url) window.location.href = result.url;
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not open checkout");
-    } finally {
-      setBusy(null);
-    }
-  }
+  const [pack, setPack] = useState<CreditPackage | null>(null);
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
@@ -31,45 +17,41 @@ export function BuyCreditsCard() {
         <CoinsIcon className="size-4 text-live" />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
-        Credits fund your live view requests and tips. They land in your wallet as soon as the payment
-        clears.
+        4 Credits per $1. Credits fund your live view requests and tips, and land in your wallet as
+        soon as the payment clears.
       </p>
 
-      <div className="mt-4 space-y-2">
-        {CREDIT_PACKAGES.map((pack) => (
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        {CREDIT_PACKAGES.map((tier) => (
           <button
-            key={pack.id}
+            key={tier.id}
             type="button"
-            disabled={busy !== null}
-            onClick={() => void buy(pack.id)}
-            className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${
-              pack.badge
-                ? "border-live bg-live/10"
-                : "border-border bg-surface hover:border-live/50"
-            } disabled:opacity-60`}
+            onClick={() => setPack(tier)}
+            className={`rounded-xl border px-3 py-3 text-left transition ${
+              tier.badge
+                ? "border-signal bg-signal/10"
+                : "border-border bg-surface hover:border-signal/50"
+            }`}
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-semibold text-foreground">{pack.name}</span>
-                {pack.badge && (
-                  <span className="flex items-center gap-1 rounded-full bg-live px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black">
-                    <Sparkles className="size-3" /> {pack.badge}
-                  </span>
-                )}
-              </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{pack.blurb}</p>
-              <p className="mt-1 font-display text-base text-live">{pack.credits} credits</p>
-            </div>
-            <span className="shrink-0 font-display text-lg text-foreground">
-              {busy === pack.id ? (
-                <Loader2 className="size-5 animate-spin" />
-              ) : (
-                formatPackPrice(pack.priceCents)
-              )}
-            </span>
+            {tier.badge && (
+              <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-signal px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] text-signal-foreground">
+                <Sparkles className="size-2.5" /> {tier.badge}
+              </span>
+            )}
+            <p className="font-display text-lg text-foreground">{tier.credits} credits</p>
+            <p className="text-sm font-semibold text-live">{formatPackPrice(tier.priceCents)}</p>
+            <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">{tier.blurb}</p>
           </button>
         ))}
       </div>
+
+      <p className="mt-3 flex items-center gap-2 text-[0.7rem] text-muted-foreground">
+        <Apple className="size-3.5" />
+        <CreditCard className="size-3.5" />
+        Apple Pay, Google Pay, Link and cards accepted.
+      </p>
+
+      {pack && <CreditCheckoutSheet pack={pack} onClose={() => setPack(null)} />}
     </div>
   );
 }

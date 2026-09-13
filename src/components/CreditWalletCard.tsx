@@ -40,6 +40,10 @@ export function CreditWalletCard() {
 
   useEffect(() => {
     void refresh();
+    // Lets the checkout return flow pull in a freshly topped-up balance.
+    const onRefresh = () => void refresh();
+    window.addEventListener("onlooker:credits-refresh", onRefresh);
+    return () => window.removeEventListener("onlooker:credits-refresh", onRefresh);
   }, [refresh]);
 
   if (loading) {

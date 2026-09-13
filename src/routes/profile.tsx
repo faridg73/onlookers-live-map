@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -67,6 +68,31 @@ const ACTIVITY = [
 function ProfileScreen() {
   const { requests } = useOnlooker();
   const mine = requests.filter((r) => r.requester === "you");
+
+  // Coming back from checkout: confirm the payment and pull the new balance in.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("credits");
+    if (!status) return;
+
+    window.history.replaceState({}, "", window.location.pathname);
+
+    if (status === "cancelled") {
+      toast("Checkout cancelled — no charge was made.");
+      return;
+    }
+    if (status !== "success") return;
+
+    toast.success("Payment received — adding your Credits…");
+    const timers = [0, 1500, 4000, 8000].map((delay) =>
+      window.setTimeout(
+        () => window.dispatchEvent(new Event("onlooker:credits-refresh")),
+        delay,
+      ),
+    );
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, []);
+
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
