@@ -28,13 +28,12 @@ export function ContentModerationAlertModal({
           </div>
           <DialogHeader className="mt-4 space-y-3">
             <DialogTitle className="text-xl font-bold text-slate-900">
-              Request Requirements Notice
+              Request Blocked
             </DialogTitle>
             <DialogDescription className="text-sm leading-relaxed text-slate-600">
-              To comply with copyright laws and platform terms, Onlooker Live does not permit
-              requests targeting third-party digital apps, ticket feeds, or screen captures. Please
-              modify your request to focus entirely on physical, real-world venue logistics (like
-              crowd sizes, line lengths, or seat views).
+              To protect creator rights, Onlooker Live cannot fulfill requests to record
+              third-party apps, digital ticket feeds, or live broadcasts. Please update your
+              request to ask for a physical view (e.g., line lengths, crowd sizes, or seat views).
             </DialogDescription>
           </DialogHeader>
           <p className="mt-4 text-xs text-slate-500">

@@ -17,7 +17,7 @@ export const FORBIDDEN_TERMS = [
 ] as const;
 
 export const BLOCKED_REQUEST_MESSAGE =
-  "Request Blocked: To protect intellectual property, Onlooker Live cannot fulfill requests to record third-party apps, digital ticket feeds, or live broadcasts. Please update your request to ask for a physical, real-world view (e.g., line lengths, crowd sizes, or seat views).";
+  "Request Blocked: To protect creator rights, Onlooker Live cannot fulfill requests to record third-party apps, digital ticket feeds, or live broadcasts. Please update your request to ask for a physical view (e.g., line lengths, crowd sizes, or seat views).";
 
 /** Normalises punctuation and spacing so "screen-record!!" still matches. */
 function normalise(text: string) {
