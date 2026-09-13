@@ -24,10 +24,14 @@ function readableCategory(category: string | null, prompt: string): string {
   return prompt.slice(0, 60);
 }
 
-/** Sends one high-urgency push per device token, if push delivery is configured. */
+/**
+ * Sends one high-urgency push per device token, if push delivery is configured.
+ * Flash-priority alerts are marked time-sensitive so they break through Focus
+ * modes and stay pinned on the lock screen until the person acts on them.
+ */
 async function sendPush(
   tokens: string[],
-  payload: { title: string; body: string; path: string },
+  payload: { title: string; body: string; path: string; flash?: boolean },
 ): Promise<number> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   const connectionKey = process.env["FIREBASE_MESSAGING_API_KEY"];
