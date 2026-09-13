@@ -162,6 +162,11 @@ export function VideoRecorder({
     canvas.height = video.videoHeight || 720;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    // The selfie preview is mirrored, so the still is flipped to match it.
+    if (facing === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob(
       (blob) => {
