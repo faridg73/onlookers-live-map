@@ -8,6 +8,7 @@ import {
   Gavel,
   Headphones,
   HelpCircle,
+  Info,
   MessageSquare,
   PlusSquare,
   Radio,

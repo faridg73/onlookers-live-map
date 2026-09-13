@@ -41,6 +41,17 @@ export function OnboardingWalkthrough() {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
 
+  // Manual replay from the profile guide button.
+  useEffect(() => {
+    if (!user) return;
+    const onReplay = () => {
+      setStep(0);
+      setOpen(true);
+    };
+    window.addEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
+    return () => window.removeEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
+  }, [user]);
+
   useEffect(() => {
     let alive = true;
     if (!user) {
