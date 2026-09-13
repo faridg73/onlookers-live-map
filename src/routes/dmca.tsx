@@ -70,7 +70,14 @@ function DmcaPage() {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Onlooker Live is built around user-generated views of public spaces — crowds, streets,
           tailgates, and venue surroundings. If you believe content on Onlooker Live infringes your
-          copyright, tell us below and our team will review it promptly.
+          copyright, tell us below and our team will review it promptly. Read our{" "}
+          <a
+            href="/copyright"
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
+            DMCA &amp; Copyright Policy
+          </a>{" "}
+          first.
         </p>
 
         {done ? (
