@@ -123,6 +123,9 @@ function PostScreen() {
   const [moderationOpen, setModerationOpen] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
   const [accessCode, setAccessCode] = useState("");
+  const [recent, setRecent] = useState<RecentPlace[]>([]);
+  const [gpsBusy, setGpsBusy] = useState(false);
+  const voice = useVoiceInput((text) => setPrompt(text));
   const subOption = subOptionById(tile, sub);
   const category: CategoryId = subOption?.category ?? tile;
   const permissionNeeded = needsPermissionConfirmation(category);
@@ -131,7 +134,12 @@ function PostScreen() {
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
+    setRecent(readRecentPlaces());
   }, []);
+
+  useEffect(() => {
+    if (voice.error) toast.error(voice.error);
+  }, [voice.error]);
 
   useEffect(() => {
     if (step !== 2 || venueQuery.trim().length < 2) return;
