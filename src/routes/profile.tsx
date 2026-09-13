@@ -23,6 +23,7 @@ import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { CashOutCard } from "@/components/CashOutCard";
 import { EarningsWallet } from "@/components/EarningsWallet";
 import { AddFundsCard } from "@/components/AddFundsCard";
+import { CoinWalletCard } from "@/components/CoinWalletCard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 
