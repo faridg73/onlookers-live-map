@@ -44,9 +44,12 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
+type RadiusChoice = number | "global";
+
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
-  const [filter, setFilter] = useState<RequestStatus | "all">("all");
+  const [filter, setFilter] = useState<RequestStatus | "all">("open");
+  const [radiusChoice, setRadiusChoice] = useState<RadiusChoice>(5);
   const [cat, setCat] = useState<CategoryId | "all">("all");
   const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
