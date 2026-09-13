@@ -78,6 +78,48 @@ export function AlertSettingsCard() {
     }
   };
 
+  const togglePush = async () => {
+    if (!pushConfigured()) {
+      toast.error("Push notifications are not configured for this build yet.");
+      return;
+    }
+    setPushState((s) => ({ ...s, loading: true }));
+    try {
+      if (pushState.registered) {
+        await disablePush();
+        setPushState({ loading: false, registered: false, message: "Phone push disabled on this device." });
+        toast.success("Push notifications disabled");
+        return;
+      }
+
+      const result = await enablePush();
+      if (result.status === "registered") {
+        const saved = await saveToken({ data: { token: result.token, platform: "web" } });
+        if (saved.ok) {
+          setPushState({ loading: false, registered: true, message: "Phone push is active — you'll get bounty alerts even when the app is closed." });
+          toast.success("Push notifications enabled");
+        } else {
+          setPushState({ loading: false, registered: true, message: "Permission granted, but the token could not be saved." });
+          toast.error(saved.error ?? "Could not save push token");
+        }
+      } else if (result.status === "denied") {
+        setPushState({ loading: false, registered: false, message: "Permission was denied. Enable notifications in your browser/site settings to try again." });
+        toast.error("Notification permission denied");
+      } else if (result.status === "open-in-new-tab") {
+        setPushState({ loading: false, registered: false, message: "Open the app in its own tab (not the Lovable preview iframe) to allow notification permission." });
+        toast("Open Onlooker in its own tab to enable push alerts", { icon: "🔔" });
+      } else if (result.status === "unsupported") {
+        setPushState({ loading: false, registered: false, message: "This browser/device does not support Firebase push notifications." });
+        toast.error("Push not supported on this device");
+      } else {
+        setPushState({ loading: false, registered: false, message: "Push setup is incomplete." });
+      }
+    } catch (error) {
+      setPushState({ loading: false, registered: false, message: error instanceof Error ? error.message : "Could not set up push notifications." });
+      toast.error(error instanceof Error ? error.message : "Push setup failed");
+    }
+  };
+
   const rows: { key: "push_enabled" | "sms_enabled" | "email_enabled"; label: string; hint: string; icon: typeof Bell }[] =
     [
       { key: "push_enabled", label: "In-app alerts", icon: Bell, hint: "Pops up the moment a bounty lands nearby" },
