@@ -1,6 +1,6 @@
 import { CalendarDays, ExternalLink, MapPin, Radio, Ticket, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
-import type { LiveEvent } from "@/lib/ticketmaster.functions";
+import type { LiveEvent } from "@/lib/events.functions";
 import type { Venue } from "@/lib/venues";
 
 type Props = {
@@ -8,15 +8,21 @@ type Props = {
   liveCount: number;
 };
 
+const SOURCE_LABEL: Record<LiveEvent["source"], string> = {
+  ticketmaster: "Ticketmaster",
+  seatgeek: "SeatGeek",
+  eventbrite: "Eventbrite",
+};
+
 function eventVenue(event: LiveEvent): Venue | null {
   if (event.latitude === null || event.longitude === null) return null;
   return {
-    slug: `tm-${event.id}`,
+    slug: event.id,
     name: event.venueName ? `${event.name} — ${event.venueName}` : event.name,
     area: event.city ?? event.venueName ?? "Event venue",
-    blurb: `${event.segment ?? "Live event"}${event.genre ? ` · ${event.genre}` : ""} — ask for a live look from inside or outside the gates.`,
+    blurb: `${event.category ?? "Live event"} — ask for a live look from inside or outside the gates.`,
     emoji: "\u{1F3DF}\u{FE0F}",
-    category: "events",
+    category: event.scope === "local" ? "events" : "events",
     latitude: event.latitude,
     longitude: event.longitude,
     match: [event.name.toLowerCase(), (event.venueName ?? "").toLowerCase()].filter(Boolean),
@@ -36,10 +42,19 @@ function whenLabel(event: LiveEvent) {
   });
 }
 
-/** One live ticketed event with its thumbnail, tag, bounty count and CTAs. */
+/** One live event with its thumbnail, tag, bounty count and CTAs. */
 export function EventCard({ event, liveCount }: Props) {
   const venue = eventVenue(event);
-  const tag = event.genre ?? event.segment ?? "Live event";
+  const tag = event.category ?? (event.scope === "local" ? "Community" : "Live event");
+  const when = whenLabel(event);
+  const prefillNote = [
+    `Event: ${event.name}`,
+    event.venueName ? `Venue: ${event.venueName}${event.city ? `, ${event.city}` : ""}` : null,
+    `When: ${when}`,
+    "Pan across the crowd and the stage/field, then hold steady on the main action.",
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-surface">
@@ -65,15 +80,20 @@ export function EventCard({ event, liveCount }: Props) {
               {tag}
             </span>
             <span className="rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-              Tickets on sale
+              {SOURCE_LABEL[event.source]}
             </span>
+            {event.priceFrom !== null ? (
+              <span className="rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                From ${Math.round(event.priceFrom)}
+              </span>
+            ) : null}
           </div>
 
           <p className="mt-1 line-clamp-2 text-sm font-bold text-foreground">{event.name}</p>
 
           <p className="mt-0.5 flex items-center gap-1 truncate text-[0.68rem] text-muted-foreground">
             <CalendarDays className="size-3 shrink-0" aria-hidden />
-            <span className="truncate">{whenLabel(event)}</span>
+            <span className="truncate">{when}</span>
           </p>
           <p className="mt-0.5 flex items-center gap-1 truncate text-[0.68rem] text-muted-foreground">
             <MapPin className="size-3 shrink-0" aria-hidden />
@@ -94,7 +114,7 @@ export function EventCard({ event, liveCount }: Props) {
 
       <div className="grid grid-cols-2 border-t border-border">
         {venue ? (
-          <VenueBountyDialog venue={venue}>
+          <VenueBountyDialog venue={venue} defaultTitle={event.name} defaultNote={prefillNote}>
             <button
               type="button"
               className="flex items-center justify-center gap-2 bg-signal/10 py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/20"
