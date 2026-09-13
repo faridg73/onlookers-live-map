@@ -61,7 +61,7 @@ function CommunityHub() {
   const [here, setHere] = useState<MapPosition | null>(null);
   const [locating, setLocating] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [radius, setRadius] = useState<RadiusChoiceId>("tight");
+  const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
 
   const { unit, formatDistance } = useDistanceUnit(here);
