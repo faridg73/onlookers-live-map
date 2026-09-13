@@ -359,8 +359,71 @@ function PostScreen() {
                       placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
                       className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                     />
+                    <Button
+                      type="button"
+                      variant={voice.listening ? "default" : "outline"}
+                      size="icon"
+                      aria-pressed={voice.listening}
+                      aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
+                      title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
+                      onClick={voice.toggle}
+                      disabled={!voice.supported}
+                      className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
+                    >
+                      {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
+                    </Button>
                   </div>
+                  {voice.listening && (
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
+                  )}
                 </div>
+
+                {(recent.length > 0 || true) && (
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
+                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => void useCurrentSpot()}
+                        disabled={gpsBusy}
+                        className="shrink-0 gap-1.5"
+                      >
+                        <MapPin className="size-3.5 text-signal" />
+                        {gpsBusy ? "Locating…" : "My location"}
+                      </Button>
+                      {recent.map((entry) => (
+                        <Button
+                          key={`${entry.latitude},${entry.longitude}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => chooseRecent(entry)}
+                          className="shrink-0 gap-1.5"
+                        >
+                          <MapPin className="size-3.5 text-signal" />
+                          {entry.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(spot || parsed.venue) && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Pin preview</p>
+                    <LocationPreviewMap
+                      compact
+                      address={place || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
+                      selectedLocation={spot}
+                      onPick={(next) => {
+                        setSpot(next);
+                        setPlace(next.formatted);
+                      }}
+                    />
+                  </div>
+                )}
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
                   <div className="mt-2 flex flex-wrap gap-2">
