@@ -1049,6 +1049,27 @@ export type Database = {
         }
         Relationships: []
       }
+      service_tokens: {
+        Row: {
+          created_at: string
+          name: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       support_tickets: {
         Row: {
           created_at: string
