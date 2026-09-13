@@ -79,6 +79,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         requester_id: context.userId,
         prompt: data.prompt,
         location_name: data.locationName,
+        details: data.details ?? "",
         bounty_amount: data.bounty,
         latitude: data.latitude,
         longitude: data.longitude,
