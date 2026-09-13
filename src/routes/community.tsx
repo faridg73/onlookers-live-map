@@ -3,6 +3,8 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import { ScrollableLane } from "@/components/ScrollableLane";
+
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import {
