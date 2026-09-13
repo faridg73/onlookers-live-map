@@ -166,9 +166,48 @@ function FeedScreen() {
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        <span className="text-signal">${pot}</span> in open bounties within {radius} {unit} of you.
-      </p>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <p className="text-sm text-muted-foreground">
+          <span className="text-signal">${pot}</span> in open bounties{" "}
+          {radiusChoice === "global" ? "worldwide" : `within ${radiusLabel} of you`}.
+        </p>
+        <div
+          className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
+          role="group"
+          aria-label="Search radius"
+        >
+          {radiusOptions.map((o) => (
+            <button
+              key={o.label}
+              type="button"
+              onClick={() => setRadiusChoice(o.miles)}
+              aria-pressed={radiusChoice === o.miles}
+              className={
+                "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+                (radiusChoice === o.miles
+                  ? "bg-signal text-signal-foreground"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {o.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setRadiusChoice("global")}
+            aria-pressed={radiusChoice === "global"}
+            className={
+              "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (radiusChoice === "global"
+                ? "bg-signal text-signal-foreground"
+                : "text-muted-foreground hover:text-foreground")
+            }
+          >
+            Global
+          </button>
+        </div>
+      </div>
+
 
       {!userPosition && (
         <button
