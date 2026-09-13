@@ -112,6 +112,7 @@ export function VenueBountyDialog({
     try {
       const locked = await lockBounty({
         prompt: title.trim(),
+        details: note.trim(),
         locationName: `${venue.name}, ${venue.area}`,
         bounty,
         category: venue.category,
