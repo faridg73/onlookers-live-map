@@ -295,6 +295,11 @@ function PostScreen() {
         </div>
 
         <div className={`space-y-2.5 ${card}`}>
+          <span className={sectionLabel}>6 · Bounty Wallet tip (optional)</span>
+          <BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} />
+        </div>
+
+        <div className={`space-y-2.5 ${card}`}>
           <span className={sectionLabel}>6 · Request deadline</span>
           <div className="grid grid-cols-4 gap-2">
             {DEADLINES.map(({ minutes: m, label }) => (
