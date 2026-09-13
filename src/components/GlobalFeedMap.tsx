@@ -14,7 +14,12 @@ import { REGIONAL_CENTER } from "@/lib/onlooker";
  * Worldwide map of clips that requesters already paid for. Travellers can watch
  * them and send the reporter a small thank-you tip.
  */
-export function GlobalFeedMap() {
+export function GlobalFeedMap({
+  focus,
+}: {
+  /** Optional spot to centre on, sent from a Discover card. */
+  focus?: { lat: number; lng: number; label: string } | null;
+}) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const holder = useRef<HTMLDivElement | null>(null);
