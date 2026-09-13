@@ -7,6 +7,7 @@ export type MyProfile = {
   avatar_url: string | null;
   terms_accepted_at: string | null;
   onboarded: boolean;
+  onboarding_completed: boolean;
 };
 
 const TERMS_KEY = "onlooker.terms-accepted";
