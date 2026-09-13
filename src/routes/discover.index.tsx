@@ -182,7 +182,8 @@ function DiscoverHome() {
                     No event venues found around {area.label} yet — try another city.
                   </p>
                 )}
-              </div>
+              </ScrollableLane>
+
             </section>
           )}
 
