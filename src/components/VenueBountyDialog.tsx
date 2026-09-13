@@ -52,8 +52,8 @@ export function VenueBountyDialog({
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("live");
   const [minutes, setMinutes] = useState(120);
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
+  const [title, setTitle] = useState(defaultTitle ?? "");
+  const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(10);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
