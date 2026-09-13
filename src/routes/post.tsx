@@ -595,7 +595,7 @@ function PostScreen() {
                             setCustomCapture(false);
                             applyCapture(option.minutes);
                           }}
-                          className={`h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground" : "bg-surface-raised"}`}
+                          className={`h-11 rounded-full text-xs font-extrabold ${on ? "border-signal [&]:bg-signal [&]:text-signal-foreground" : "bg-surface-raised"}`}
                         >
                           {option.minutes === null && <Radio className="size-3.5" />}
                           {option.label}
@@ -610,7 +610,7 @@ function PostScreen() {
                         setCustomCapture(true);
                         applyCapture(capture ?? 10);
                       }}
-                      className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal bg-signal text-signal-foreground" : "bg-surface-raised"}`}
+                      className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal [&]:bg-signal [&]:text-signal-foreground" : "bg-surface-raised"}`}
                     >
                       Custom
                     </Button>
