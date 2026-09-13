@@ -21,6 +21,8 @@ export type DiscoveredPlace = {
   primaryType: string | null;
   rating: number | null;
   ratingCount: number | null;
+  /** Google photo resource name, used to load a thumbnail. */
+  photoName: string | null;
 };
 
 type RawPlace = {
@@ -31,10 +33,12 @@ type RawPlace = {
   location?: { latitude?: number; longitude?: number };
   rating?: number;
   userRatingCount?: number;
+  photos?: Array<{ name?: string }>;
 };
 
 const DISCOVERY_FIELDS =
-  "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount";
+  "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount,places.photos";
+
 
 function credentials() {
   const lovableKey = process.env["LOVABLE_API_KEY"];
