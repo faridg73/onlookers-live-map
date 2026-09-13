@@ -5,6 +5,7 @@ import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
 import { useBoosts } from "@/lib/boosts-store";
 import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
