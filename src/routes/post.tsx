@@ -218,6 +218,10 @@ function PostScreen() {
             sub={sub}
             onSubChange={setSub}
           />
+          <p className="flex items-start gap-2 rounded-xl border border-live/40 bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />
+            <span>{VENUE_EXTERIOR_DISCLAIMER}</span>
+          </p>
         </div>
 
         {permissionNeeded && (
