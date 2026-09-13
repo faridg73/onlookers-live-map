@@ -29,6 +29,8 @@ import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 import { StreakCard } from "@/components/StreakCard";
+import { toast } from "sonner";
+import { replayOnboarding } from "@/lib/profile";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -159,6 +161,20 @@ function ProfileScreen() {
 
       <h2 className="mt-8 font-display text-lg text-foreground">Support &amp; legal</h2>
       <div className="mt-3 space-y-2">
+        <button
+          type="button"
+          onClick={() => {
+            replayOnboarding().catch((err: unknown) =>
+              toast.error(err instanceof Error ? err.message : "Could not open the guide."),
+            );
+          }}
+          className="flex w-full items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Info className="size-4 text-signal" /> How It Works — app guide
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </button>
         <Link
           to="/contact"
           className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
