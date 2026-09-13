@@ -113,7 +113,7 @@ export function BountyBottomSheet({
             You earn
           </span>
           <span className="flex items-center gap-2 font-display text-3xl text-live">
-            <Credits className="size-6" /> {payout}
+            <CoinsIcon className="size-6" /> {payout}
           </span>
         </div>
         <p className="mt-1.5 text-[0.7rem] text-muted-foreground">

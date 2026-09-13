@@ -31,7 +31,7 @@ export async function fetchCreditWallet(): Promise<CreditWallet | null> {
   if (ensureError) throw new Error(ensureError.message);
 
   const { data, error } = await supabase
-    .from("user_wallets")
+    .from("user_credit_wallets")
     .select("id, credit_balance, updated_at")
     .eq("user_id", auth.user.id)
     .maybeSingle();

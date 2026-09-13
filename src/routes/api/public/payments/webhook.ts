@@ -68,17 +68,17 @@ async function creditCreditPurchase(session: Record<string, any>, env: StripeEnv
     return;
   }
 
-  const { data, error } = await getSupabase().rpc("credit_credit_purchase", {
+  const { data, error } = await getSupabase().rpc("credit_purchase", {
     _user_id: userId,
     _session_id: session["id"],
     _package_id: packageId,
-    _credits: Math.round(credits),
+    _coins: Math.round(credits),
     _amount_cents: Number(session["amount_total"] ?? 0),
     _environment: env,
   });
 
   if (error) {
-    console.error("[webhook] credit_credit_purchase failed", {
+    console.error("[webhook] credit_purchase failed", {
       session: session["id"],
       userId,
       credits,

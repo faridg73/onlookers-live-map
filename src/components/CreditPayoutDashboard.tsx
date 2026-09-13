@@ -114,7 +114,7 @@ export function CreditPayoutDashboard() {
 
       <div className="mt-2 flex items-end gap-3">
         <span className="flex items-center gap-2 font-display text-4xl text-foreground">
-          <Credits className="size-6 text-live" />
+          <CoinsIcon className="size-6 text-live" />
           {credits}
         </span>
         <span className="pb-1 text-sm font-semibold text-muted-foreground">

@@ -194,7 +194,7 @@ function MapScreen() {
                 : { color: "var(--pin-gold)" }
             }
           >
-            <Credits className="size-3.5" /> High Bounties
+            <CoinsIcon className="size-3.5" /> High Bounties
           </button>
         </div>
       </header>

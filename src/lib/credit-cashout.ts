@@ -47,7 +47,7 @@ export async function listCreditPayouts(limit = 20): Promise<PayoutRequestRow[]>
  */
 export async function requestCreditCashout(credits: number): Promise<string> {
   const { data, error } = await supabase.rpc("request_credit_cashout", {
-    _credits: Math.round(credits),
+    _coins: Math.round(credits),
   });
   if (error) {
     if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { HandCredits } from "lucide-react";
+import { HandCoins } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
@@ -91,7 +91,7 @@ export function LiveReactions({ videoId }: { videoId: string }) {
           disabled={tipping}
           className="ml-auto inline-flex items-center gap-1 rounded-full bg-signal px-3 py-2 text-[0.66rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-60"
         >
-          <HandCredits className="size-3.5" aria-hidden /> Tip {MICRO_TIP} Credits
+          <HandCoins className="size-3.5" aria-hidden /> Tip {MICRO_TIP} Credits
         </button>
       </div>
     </>

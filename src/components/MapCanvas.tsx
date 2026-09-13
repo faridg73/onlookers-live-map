@@ -359,7 +359,7 @@ export function MapCanvas({
                       }}
                       aria-hidden
                     >
-                      <Credits className={tier === "gold" ? "size-4" : "size-2.5"} />
+                      <CoinsIcon className={tier === "gold" ? "size-4" : "size-2.5"} />
                     </span>
                     {pool}
                   </span>

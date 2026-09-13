@@ -339,7 +339,7 @@ export function BountyVideoDialog({
                   </div>
                   {v.accepted_at ? (
                     <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
-                      <Credits className="size-3.5" /> Accepted ·{" "}
+                      <CoinsIcon className="size-3.5" /> Accepted ·{" "}
                       {formatCredits(Number(v.payout_amount))} paid to the reporter
                     </p>
                   ) : (
@@ -356,7 +356,7 @@ export function BountyVideoDialog({
                           </>
                         ) : (
                           <>
-                            <Credits className="size-3.5" /> Accept &amp; pay{" "}
+                            <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
                             {formatCredits(Number(v.bounty_amount))}
                           </>
                         )}

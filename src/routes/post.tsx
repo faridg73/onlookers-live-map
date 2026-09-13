@@ -368,7 +368,7 @@ function PostScreen() {
 
         <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-20 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><Credits className="size-4 text-signal" />Total escrow</span>
+            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><CoinsIcon className="size-4 text-signal" />Total escrow</span>
             <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
           </div>
           <Button

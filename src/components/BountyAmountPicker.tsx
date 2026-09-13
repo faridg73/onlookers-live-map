@@ -78,7 +78,7 @@ export function BountyAmountPicker({
           custom ? "border-signal bg-surface-raised" : "border-border bg-surface-raised",
         )}
       >
-        <Credits className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
+        <CoinsIcon className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
         <input
           type="number"
           inputMode="decimal"

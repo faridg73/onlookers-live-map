@@ -164,7 +164,7 @@ export type PayoutQueueRow = {
 export async function listPayoutQueue(): Promise<PayoutQueueRow[]> {
   const { data, error } = await supabase.rpc("admin_payout_queue");
   if (error) throw error;
-  return ((data ?? []) as PayoutQueueRow[]).map((row) => ({
+  return ((data ?? []) as unknown as PayoutQueueRow[]).map((row) => ({
     ...row,
     amount: Number(row.amount),
   }));

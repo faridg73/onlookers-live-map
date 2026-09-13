@@ -65,7 +65,7 @@ export function CreditWalletCard() {
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
           Looker Credits
         </span>
-        <Credits className="size-4 text-live" />
+        <CoinsIcon className="size-4 text-live" />
       </div>
 
       <div className="mt-2 flex items-baseline gap-2">

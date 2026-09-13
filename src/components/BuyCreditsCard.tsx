@@ -28,7 +28,7 @@ export function BuyCreditsCard() {
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
           Buy Looker Credits
         </span>
-        <Credits className="size-4 text-live" />
+        <CoinsIcon className="size-4 text-live" />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Credits fund your live view requests and tips. They land in your wallet as soon as the payment
