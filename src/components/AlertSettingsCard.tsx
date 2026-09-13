@@ -76,14 +76,33 @@ export function AlertSettingsCard() {
       </div>
 
       {prefs.sms_enabled && (
-        <Input
-          className="mt-3"
-          type="tel"
-          inputMode="tel"
-          placeholder="Mobile number for texts"
-          value={prefs.phone}
-          onChange={(e) => set("phone", e.target.value)}
-        />
+        <div className="mt-3 space-y-2">
+          <Input
+            type="tel"
+            inputMode="tel"
+            placeholder="Mobile number for texts, e.g. (213) 555-0134"
+            value={prefs.phone}
+            onChange={(e) => set("phone", e.target.value)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 w-full rounded-xl font-bold"
+            disabled={testing || prefs.phone.trim().length < 5}
+            onClick={() => void sendTest()}
+          >
+            {testing ? "Texting you…" : "Send a test text"}
+          </Button>
+          {smsState && (
+            <p
+              className={`text-[0.7rem] ${
+                smsState.ok ? "text-signal" : "text-destructive"
+              }`}
+            >
+              {smsState.message}
+            </p>
+          )}
+        </div>
       )}
 
       <p className="mt-5 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">

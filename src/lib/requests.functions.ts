@@ -89,6 +89,15 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       });
     }
 
+    // Text the nearby onlookers who asked for text alerts. A texting problem
+    // must never stop a paid request from going live.
+    try {
+      const { textNearbyHunters } = await import("@/lib/sms.functions");
+      await textNearbyHunters(row.id, context.userId);
+    } catch (smsError) {
+      console.error("[sms] nearby dispatch failed", smsError);
+    }
+
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("wallet_balance")
