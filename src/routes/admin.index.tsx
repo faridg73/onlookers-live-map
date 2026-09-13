@@ -15,6 +15,7 @@ import {
   type ModerationFlag,
 } from "@/lib/admin";
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
+import { moderationReasonLabel } from "@/lib/moderation-reasons";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -318,6 +319,9 @@ function AdminDashboard() {
                   {notice.status}
                 </span>
               </div>
+              <span className="mt-2 inline-flex rounded-full border border-border px-2.5 py-1 text-[0.65rem] font-semibold text-foreground">
+                {moderationReasonLabel(notice.reason_code)}
+              </span>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {notice.email} · {new Date(notice.created_at).toLocaleString()}
               </p>

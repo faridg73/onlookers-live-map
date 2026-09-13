@@ -1,10 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { MODERATION_REASONS } from "@/lib/moderation-reasons";
+
+const reasonCodes = MODERATION_REASONS.map((reason) => reason.code) as [
+  (typeof MODERATION_REASONS)[number]["code"],
+  ...(typeof MODERATION_REASONS)[number]["code"][],
+];
 
 const dmcaSchema = z.object({
   name: z.string().trim().min(1, { message: "Name is required" }).max(100),
   email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
   contentUrl: z.string().trim().url({ message: "Enter a valid content URL" }).max(500),
+  reasonCode: z.enum(reasonCodes),
   description: z
     .string()
     .trim()
@@ -30,6 +37,7 @@ export const submitDmcaNotice = createServerFn({ method: "POST" })
         name: data.name,
         email: data.email,
         content_url: data.contentUrl,
+        reason_code: data.reasonCode,
         description: data.description,
         status: "open",
       })
@@ -47,6 +55,7 @@ export const submitDmcaNotice = createServerFn({ method: "POST" })
           name: data.name,
           email: data.email,
           contentUrl: data.contentUrl,
+          reasonCode: data.reasonCode,
           description: data.description,
           noticeId: row.id,
         },

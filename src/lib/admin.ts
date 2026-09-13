@@ -81,6 +81,7 @@ export type DmcaNotice = {
   email: string;
   content_url: string;
   description: string;
+  reason_code: string;
   status: string;
   created_at: string;
 };
@@ -89,7 +90,7 @@ export type DmcaNotice = {
 export async function listDmcaNotices(): Promise<DmcaNotice[]> {
   const { data, error } = await supabase
     .from("dmca_notices")
-    .select("id, name, email, content_url, description, status, created_at")
+    .select("id, name, email, content_url, description, reason_code, status, created_at")
     .order("created_at", { ascending: false })
     .limit(100);
   if (error) throw error;

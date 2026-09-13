@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Footer } from "@/components/Footer";
 import { submitDmcaNotice } from "@/lib/dmca.functions";
+import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
 
 export const Route = createFileRoute("/dmca")({
   head: () => ({
@@ -34,6 +35,7 @@ function DmcaPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [contentUrl, setContentUrl] = useState("");
+  const [reasonCode, setReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
   const [description, setDescription] = useState("");
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -43,7 +45,7 @@ function DmcaPage() {
     setSending(true);
     try {
       const result = await submitDmcaNotice({
-        data: { name, email, contentUrl, description },
+        data: { name, email, contentUrl, reasonCode, description },
       });
       if (!result.success) throw new Error(result.error ?? "Submission failed.");
       setDone(true);
@@ -102,6 +104,24 @@ function DmcaPage() {
                 placeholder="Full legal name"
                 className={field}
               />
+            </label>
+
+            <label className="block space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Reason for report
+              </span>
+              <select
+                value={reasonCode}
+                onChange={(event) => setReasonCode(event.target.value as ModerationReasonCode)}
+                className={field}
+              >
+                {MODERATION_REASONS.map((reason) => (
+                  <option key={reason.code} value={reason.code}>{reason.label}</option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground">
+                {MODERATION_REASONS.find((reason) => reason.code === reasonCode)?.description}
+              </p>
             </label>
 
             <label className="block space-y-1.5">
