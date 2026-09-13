@@ -64,7 +64,7 @@ function CommunityHub() {
   const [radius, setRadius] = useState<RadiusChoiceId>("tight");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
 
-  const unit = useDistanceUnit(here);
+  const { unit, formatDistance } = useDistanceUnit(here);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -119,13 +119,7 @@ function CommunityHub() {
     [here],
   );
 
-  const label = useCallback(
-    (miles: number) =>
-      unit === "mi"
-        ? `${miles < 10 ? miles.toFixed(1) : Math.round(miles)} mi away`
-        : `${miles * 1.60934 < 10 ? (miles * 1.60934).toFixed(1) : Math.round(miles * 1.60934)} km away`,
-    [unit],
-  );
+  const label = useCallback((miles: number) => `${formatDistance(miles)} away`, [formatDistance]);
 
   const visible = useMemo(() => {
     const limit = here ? radiusMilesFor(radius) : null;
@@ -330,7 +324,7 @@ function CommunityHub() {
             />
           )}
           {featured.map(renderCard)}
-          <div className="columns-1 gap-4 [column-fill:_balance] xs:columns-2 sm:columns-2 lg:columns-3">
+          <div className="columns-1 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
             {rest.map(renderCard)}
           </div>
         </section>
