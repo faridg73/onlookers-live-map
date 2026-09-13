@@ -187,6 +187,10 @@ export function BountyVideoDialog({
               </button>
               <p className="text-center text-[0.68rem] text-muted-foreground">
                 Live camera captures only — gallery videos and screenshots can't be submitted.
+                Film the crowd, street, tailgate, or venue surroundings.
+              </p>
+              <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
+                {PUBLIC_SPACES_DISCLAIMER}
               </p>
               {capturing && !closed && (
                 <VideoRecorder
