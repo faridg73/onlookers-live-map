@@ -3,6 +3,7 @@ import { Camera, Circle, Loader2, Square, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
+import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 
 /**
  * In-app camera for chat clips. Recording stops on its own at 60 seconds and
@@ -155,6 +156,10 @@ export function VideoRecorder({
       </div>
 
       <video ref={videoRef} muted playsInline className="min-h-0 flex-1 object-cover" />
+
+      <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
+        {PUBLIC_SPACES_DISCLAIMER}
+      </p>
 
       <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         {saving ? (
