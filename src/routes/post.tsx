@@ -473,9 +473,34 @@ function PostScreen() {
                     </Button>
                   ))}
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
-                  <MapPin className="size-4" /> Prioritize places near me
-                </Button>
+                {recent.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
+                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                      {recent.map((entry) => (
+                        <Button
+                          key={`${entry.latitude},${entry.longitude}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => chooseRecent(entry)}
+                          className="shrink-0 gap-1.5"
+                        >
+                          <MapPin className="size-3.5 text-signal" />
+                          {entry.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
+                    <MapPin className="size-4" /> Prioritize places near me
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" disabled={gpsBusy} onClick={() => void useCurrentSpot()} className="gap-2 text-signal">
+                    <MapPin className="size-4" /> {gpsBusy ? "Locating…" : "Pin my current location"}
+                  </Button>
+                </div>
                 {venueResults.length > 0 && (
                   <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background">
                     {venueResults.map((venue) => (
