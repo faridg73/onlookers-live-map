@@ -9,6 +9,8 @@ import {
   GraduationCap,
   Info,
   MapPin,
+  Mic,
+  MicOff,
   Radio,
   Search,
   ShieldCheck,
@@ -43,6 +45,9 @@ import {
   type CategoryId,
 } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
+import { useVoiceInput } from "@/lib/use-voice-input";
+import { reverseGeocode } from "@/lib/geocode.functions";
 import { searchRequestVenues, type DiscoveredPlace } from "@/lib/places.functions";
 import {
   parseRequestIntent,
