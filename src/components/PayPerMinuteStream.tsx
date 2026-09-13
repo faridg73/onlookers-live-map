@@ -61,7 +61,11 @@ export function PayPerMinuteStream({
   const join = async () => {
     setBusy(true);
     try {
-      const id = await startStreamSession({ hostId, creditsPerMinute: rate, postId });
+      const id = await startStreamSession({
+        hostId,
+        creditsPerMinute: rate,
+        postId: postId ?? null,
+      });
       setSessionId(id);
       setMeter(await billStreamMinute(id));
       timer.current = setInterval(() => {
