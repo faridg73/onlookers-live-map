@@ -13,6 +13,7 @@ import {
   Radio,
   Shield,
   Star,
+  Users,
   Wallet,
 } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
@@ -26,6 +27,7 @@ import { BuyCreditsCard } from "@/components/BuyCreditsCard";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
+import { StreakCard } from "@/components/StreakCard";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -87,6 +89,8 @@ function ProfileScreen() {
         ))}
       </div>
 
+      <StreakCard />
+
       <HunterStatusCard />
 
       <AlertSettingsCard />
@@ -98,6 +102,16 @@ function ProfileScreen() {
       <BuyCreditsCard />
 
       <CreditPayoutDashboard />
+
+      <Link
+        to="/pools"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <Users className="size-4 text-signal" /> Group Pools — fund a bounty together
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </Link>
 
       <Link
         to="/payout-history"

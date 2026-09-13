@@ -24,10 +24,14 @@ function readableCategory(category: string | null, prompt: string): string {
   return prompt.slice(0, 60);
 }
 
-/** Sends one high-urgency push per device token, if push delivery is configured. */
+/**
+ * Sends one high-urgency push per device token, if push delivery is configured.
+ * Flash-priority alerts are marked time-sensitive so they break through Focus
+ * modes and stay pinned on the lock screen until the person acts on them.
+ */
 async function sendPush(
   tokens: string[],
-  payload: { title: string; body: string; path: string },
+  payload: { title: string; body: string; path: string; flash?: boolean },
 ): Promise<number> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   const connectionKey = process.env["FIREBASE_MESSAGING_API_KEY"];
@@ -47,10 +51,40 @@ async function sendPush(
           message: {
             token,
             notification: { title: payload.title, body: payload.body },
-            data: { path: payload.path, urgency: "high" },
-            android: { priority: "HIGH", notification: { channel_id: "bounties" } },
-            apns: { headers: { "apns-priority": "10" } },
-            webpush: { fcm_options: { link: `${SITE_URL}${payload.path}` } },
+            data: {
+              path: payload.path,
+              urgency: payload.flash ? "flash" : "high",
+              // Consumed by the native shell to start a lock-screen Live Activity.
+              live_activity: payload.flash ? "bounty_flash" : "bounty_nearby",
+            },
+            android: {
+              priority: "HIGH",
+              notification: {
+                channel_id: payload.flash ? "bounties_flash" : "bounties",
+                visibility: "PUBLIC",
+                sticky: Boolean(payload.flash),
+                notification_priority: "PRIORITY_MAX",
+                tag: payload.flash ? "bounty_flash" : "bounty_nearby",
+              },
+            },
+            apns: {
+              headers: {
+                "apns-priority": "10",
+                ...(payload.flash ? { "apns-push-type": "alert" } : {}),
+              },
+              payload: {
+                aps: {
+                  sound: "default",
+                  "interruption-level": payload.flash ? "time-sensitive" : "active",
+                  "relevance-score": payload.flash ? 1 : 0.5,
+                },
+              },
+            },
+            webpush: {
+              headers: { Urgency: "high" },
+              notification: { requireInteraction: Boolean(payload.flash) },
+              fcm_options: { link: `${SITE_URL}${payload.path}` },
+            },
           },
         }),
       });
@@ -108,7 +142,9 @@ export async function notifyLocalOnlookersOfBounty(
   const userIds = (nearby ?? []).map((row) => row.user_id).filter((id) => id !== requesterId);
   if (userIds.length === 0) return { nearby: 0, pushed: 0 };
 
-  const title = "🚨 New Bounty Near You!";
+  // Big bounties get the flash treatment: pinned, time-sensitive lock-screen alert.
+  const flash = gross >= 80;
+  const title = flash ? "⚡ FLASH BOUNTY NEAR YOU!" : "🚨 New Bounty Near You!";
   const body = `Someone wants a live view of the ${readableCategory(
     request.category,
     request.prompt,
@@ -131,7 +167,7 @@ export async function notifyLocalOnlookersOfBounty(
 
   const pushed = await sendPush(
     (tokens ?? []).map((row) => row.token),
-    { title, body, path },
+    { title, body, path, flash },
   );
 
   console.log("[geo-alert] dispatched", { requestId, nearby: userIds.length, pushed });

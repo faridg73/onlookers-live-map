@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Play, Share2, Video } from "lucide-react";
 import { shareBountyVideo } from "@/lib/share";
+import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { toast } from "sonner";
 import { formatCredits } from "@/lib/credits";
 import { supabase } from "@/integrations/supabase/client";
@@ -115,6 +116,17 @@ export function MyBountyVideos() {
                 >
                   <Share2 className="size-3.5" /> Share
                 </button>
+                <ShareArtifactButton
+                  label="Card"
+                  className="rounded-full px-3 py-1.5"
+                  artifact={{
+                    kind: "bounty",
+                    title: v.request_title || "Live view capture",
+                    place: v.request_place ?? "",
+                    credits: Number(v.payout_amount ?? v.bounty_amount ?? 0),
+                    note: "Captured live on Onlooker Live.",
+                  }}
+                />
               </div>
               {playing?.id === v.id && (
                 <video
