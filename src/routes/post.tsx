@@ -520,6 +520,7 @@ function PostScreen() {
                   onPick={(next) => {
                     setSpot(next);
                     setPlace(next.formatted);
+                    setRecent(rememberRecentPlace(next));
                   }}
                 />
               </div>
