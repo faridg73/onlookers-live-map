@@ -349,15 +349,17 @@ function PostScreen() {
         onOpenChange={setModerationOpen}
         onEditRequest={() => {
           setModerationOpen(false);
-          // Focus the first offending field. If the title is empty or the note
-          // contains the flagged text, prefer the note; otherwise start with title.
-          const titleHasForbidden = !isRequestAllowed(title, "", "");
-          const noteHasForbidden = !isRequestAllowed("", note, "");
-          if (noteHasForbidden && !titleHasForbidden) {
-            noteRef.current?.focus();
-          } else {
-            titleRef.current?.focus();
-          }
+          // Focus the first offending field after Radix returns focus from the
+          // closing dialog, so the user lands back in the form, not on body.
+          window.setTimeout(() => {
+            const titleHasForbidden = !isRequestAllowed(title, "", "");
+            const noteHasForbidden = !isRequestAllowed("", note, "");
+            if (noteHasForbidden && !titleHasForbidden) {
+              noteRef.current?.focus();
+            } else {
+              titleRef.current?.focus();
+            }
+          }, 50);
         }}
       />
     </div>
