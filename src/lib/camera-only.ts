@@ -8,6 +8,10 @@ export const CAMERA_ONLY_MESSAGE =
 export const PUBLIC_SPACES_DISCLAIMER =
   "Must be public spaces only. Do not record copyrighted stage shows, performances, or game broadcasts.";
 
+/** Shown on every request template — venue exteriors and logistics only. */
+export const VENUE_EXTERIOR_DISCLAIMER =
+  "Onlooker Live protects creator rights. Requests targeting live musical performances or internal ticketing platforms are automatically rejected. Keep your camera focused on public property, venue lines, and pre-show atmosphere.";
+
 /** Blocks dragged-in files (gallery, desktop, other apps) with the standard notice. */
 export function blockFileDrop(event: React.DragEvent) {
   if (event.dataTransfer?.types?.includes("Files")) {
