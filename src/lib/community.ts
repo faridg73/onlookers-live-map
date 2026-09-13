@@ -7,7 +7,10 @@ export type CommunityCategory =
   | "meetups"
   | "tutorials"
   | "language"
-  | "culture";
+  | "culture"
+  | "realestate"
+  | "markets"
+  | "events";
 
 export type CommunityCategoryDef = {
   id: CommunityCategory;
@@ -103,6 +106,57 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
       {
         title: "Festival from the inside",
         body: "Streaming the procession from the good side of the street.",
+      },
+    ],
+  },
+  {
+    id: "realestate",
+    label: "Real Estate",
+    blurb: "Open houses and rentals, seen live",
+    gradient: "linear-gradient(135deg,#9CE0FF 0%,#0F0F0F 72%)",
+    tags: ["open house", "rental", "walkthrough", "neighborhood", "new build", "for sale"],
+    iceBreakers: [
+      {
+        title: "Open house walkthrough at 2pm",
+        body: "Streaming room by room from the open house — ask me to point the camera anywhere.",
+      },
+      {
+        title: "Is this street actually quiet?",
+        body: "Standing outside the rental now. I'll show the block, the parking and the noise.",
+      },
+    ],
+  },
+  {
+    id: "markets",
+    label: "Local Markets",
+    blurb: "Stalls, food trucks and pop-ups",
+    gradient: "linear-gradient(135deg,#FFE066 0%,#0F0F0F 72%)",
+    tags: ["farmers market", "food trucks", "pop-up", "flea market", "block party", "cash only"],
+    iceBreakers: [
+      {
+        title: "Farmers market, live from the stalls",
+        body: "Walking the rows now — tell me what to check the price on.",
+      },
+      {
+        title: "Food truck lot tonight",
+        body: "Five trucks up, showing the lines and what people are eating.",
+      },
+    ],
+  },
+  {
+    id: "events",
+    label: "Events & Performances",
+    blurb: "Shows, buskers and big nights out",
+    gradient: "linear-gradient(135deg,#FF9E6B 0%,#0F0F0F 72%)",
+    tags: ["live music", "buskers", "festival", "sports", "theatre", "free entry"],
+    iceBreakers: [
+      {
+        title: "Busker on the main plaza right now",
+        body: "Great set, decent crowd — streaming a few minutes from the footpath.",
+      },
+      {
+        title: "Gate lines before kickoff",
+        body: "Showing how long the entry queue is and where the short gate is.",
       },
     ],
   },
