@@ -192,6 +192,40 @@ function PostScreen() {
     setPlace(formatted);
     setVenueQuery(venue.name);
     setSpot({ latitude: venue.latitude, longitude: venue.longitude, formatted });
+    setRecent(
+      rememberRecentPlace({
+        formatted,
+        latitude: venue.latitude,
+        longitude: venue.longitude,
+        label: venue.name,
+      }),
+    );
+  };
+
+  const chooseRecent = (entry: RecentPlace) => {
+    setPlace(entry.formatted);
+    setVenueQuery(entry.label);
+    setSpot({ latitude: entry.latitude, longitude: entry.longitude, formatted: entry.formatted });
+    setRecent(rememberRecentPlace(entry));
+  };
+
+  const useCurrentSpot = async () => {
+    setGpsBusy(true);
+    try {
+      const position = await requestCurrentPosition();
+      const { latitude, longitude } = position.coords;
+      setSearchOrigin({ latitude, longitude });
+      const found = await reverseGeocode({ data: { latitude, longitude } }).catch(() => null);
+      const formatted = found?.formatted ?? "My current location";
+      setPlace(formatted);
+      setVenueQuery(formatted);
+      setSpot({ latitude, longitude, formatted });
+      setRecent(rememberRecentPlace({ formatted, latitude, longitude }));
+    } catch {
+      toast.error("Allow location access to use your current spot.");
+    } finally {
+      setGpsBusy(false);
+    }
   };
 
   const locateForSearch = async () => {
