@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   CATEGORIES,
   categoryById,
@@ -54,10 +55,15 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       toast.error("Add a 6-digit code or word the onlooker can quote on site.");
       return;
     }
+    if (!isRequestAllowed(title, note, place)) {
+      toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
+      return;
+    }
     setPosting(true);
     try {
       const locked = await lockBounty({
         prompt: title.trim(),
+        details: note.trim(),
         locationName: place.trim(),
         bounty,
         category,

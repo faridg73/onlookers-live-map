@@ -370,6 +370,39 @@ export type Database = {
           },
         ]
       }
+      moderation_flags: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          matched_terms: string[]
+          reviewed: boolean
+          source: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string
+          id?: string
+          matched_terms?: string[]
+          reviewed?: boolean
+          source?: string
+          title?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          matched_terms?: string[]
+          reviewed?: boolean
+          source?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string

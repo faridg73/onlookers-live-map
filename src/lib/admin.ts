@@ -55,6 +55,26 @@ export async function listAllPayoutRequests(): Promise<AdminPayout[]> {
   }));
 }
 
+export type ModerationFlag = {
+  id: string;
+  user_id: string | null;
+  title: string;
+  details: string;
+  matched_terms: string[];
+  created_at: string;
+};
+
+/** Requests the content filter blocked, newest first (admins and moderators only). */
+export async function listModerationFlags(): Promise<ModerationFlag[]> {
+  const { data, error } = await supabase
+    .from("moderation_flags")
+    .select("id, user_id, title, details, matched_terms, created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data ?? []) as ModerationFlag[];
+}
+
 /** Approve (mark paid) or deny (return the money) a payout request. */
 export async function resolvePayout(payoutId: string, approve: boolean, note = "") {
   const { error } = await supabase.rpc("resolve_payout", {

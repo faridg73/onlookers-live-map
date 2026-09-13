@@ -37,6 +37,8 @@ export type LockedBounty = { id: string; balance: number };
 /** Posts the request and locks its exact bounty out of the wallet. */
 export async function lockBounty(input: {
   prompt: string;
+  /** Camera instructions, checked by the content filter before publishing. */
+  details?: string | null;
   locationName: string;
   bounty: number;
   category?: string | null;

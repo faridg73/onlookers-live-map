@@ -3,12 +3,15 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
+import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
 
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
 export const MIN_BOUNTY = 5;
 
 const createSchema = z.object({
   prompt: z.string().trim().min(3).max(300),
+  /** Camera instructions, scanned by the content filter (not stored here). */
+  details: z.string().trim().max(2000).nullable().optional(),
   locationName: z.string().trim().min(2).max(160),
   bounty: z.number().finite().min(MIN_BOUNTY).max(5000),
   category: z.string().trim().max(40).nullable().optional(),
@@ -40,6 +43,21 @@ export const createBountyRequest = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => createSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ id: string; balance: number }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Content filter runs before any money moves: requests to film screens,
+    // ticket barcodes or broadcasts never reach the map, and each attempt is
+    // logged for a moderator to look at.
+    const matched = findForbiddenTerms(data.prompt, data.details, data.locationName);
+    if (matched.length > 0) {
+      await supabaseAdmin.from("moderation_flags").insert({
+        user_id: context.userId,
+        title: data.prompt,
+        details: data.details ?? "",
+        matched_terms: matched,
+        source: "request",
+      });
+      throw new Error(BLOCKED_REQUEST_MESSAGE);
+    }
 
     // The escrow trigger debits the wallet in the same transaction, so check the
     // balance up front and fail with a message people can act on.
