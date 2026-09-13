@@ -217,11 +217,11 @@ export type Database = {
           },
         ]
       }
-      coin_purchases: {
+      credit_purchases: {
         Row: {
           amount_cents: number
-          coins: number
           created_at: string
+          credits: number
           environment: string
           id: string
           package_id: string
@@ -230,8 +230,8 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
-          coins: number
           created_at?: string
+          credits: number
           environment?: string
           id?: string
           package_id: string
@@ -240,8 +240,8 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
-          coins?: number
           created_at?: string
+          credits?: number
           environment?: string
           id?: string
           package_id?: string
@@ -250,7 +250,7 @@ export type Database = {
         }
         Relationships: []
       }
-      coin_transactions: {
+      credit_transactions: {
         Row: {
           amount_gross: number
           amount_net: number
@@ -289,7 +289,7 @@ export type Database = {
             foreignKeyName: "coin_transactions_receiver_wallet_id_fkey"
             columns: ["receiver_wallet_id"]
             isOneToOne: false
-            referencedRelation: "user_wallets"
+            referencedRelation: "user_credit_wallets"
             referencedColumns: ["id"]
           },
           {
@@ -303,7 +303,7 @@ export type Database = {
             foreignKeyName: "coin_transactions_sender_wallet_id_fkey"
             columns: ["sender_wallet_id"]
             isOneToOne: false
-            referencedRelation: "user_wallets"
+            referencedRelation: "user_credit_wallets"
             referencedColumns: ["id"]
           },
         ]
@@ -675,8 +675,8 @@ export type Database = {
         Row: {
           amount: number
           cash_amount_usd: number
-          coins_redeemed: number
           created_at: string
+          credits_redeemed: number
           destination: string
           id: string
           note: string
@@ -688,8 +688,8 @@ export type Database = {
         Insert: {
           amount: number
           cash_amount_usd?: number
-          coins_redeemed?: number
           created_at?: string
+          credits_redeemed?: number
           destination: string
           id?: string
           note?: string
@@ -701,8 +701,8 @@ export type Database = {
         Update: {
           amount?: number
           cash_amount_usd?: number
-          coins_redeemed?: number
           created_at?: string
+          credits_redeemed?: number
           destination?: string
           id?: string
           note?: string
@@ -1139,6 +1139,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credit_wallets: {
+        Row: {
+          created_at: string
+          credit_balance: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credit_balance?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credit_balance?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1156,30 +1180,6 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_wallets: {
-        Row: {
-          coin_balance: number
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          coin_balance?: number
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          coin_balance?: number
-          created_at?: string
-          id?: string
-          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1471,6 +1471,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      credit_purchase: {
+        Args: {
+          _amount_cents: number
+          _coins: number
+          _environment?: string
+          _package_id: string
+          _session_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       credit_topup: {
         Args: {
           _amount: number
@@ -1485,6 +1496,7 @@ export type Database = {
         Returns: boolean
       }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
+      ensure_credit_wallet: { Args: { _user_id?: string }; Returns: string }
       expire_stale_media: { Args: never; Returns: Json }
       explore_clips: {
         Args: { _limit?: number; _offset?: number }
@@ -1619,6 +1631,7 @@ export type Database = {
       }
       request_cashout: { Args: { _amount: number }; Returns: string }
       request_coin_cashout: { Args: { _coins: number }; Returns: string }
+      request_credit_cashout: { Args: { _coins: number }; Returns: string }
       request_earnings_payout: {
         Args: { _amount: number; _destination: string }
         Returns: string
@@ -1639,6 +1652,20 @@ export type Database = {
       settle_escrows: { Args: never; Returns: Json }
       submit_instant_snippet: { Args: { _video_id: string }; Returns: number }
       tip_coins: {
+        Args: {
+          _amount: number
+          _receiver_id: string
+          _request_id?: string
+          _transaction_type?: string
+        }
+        Returns: {
+          amount_net: number
+          amount_platform_fee: number
+          sender_balance: number
+          transaction_id: string
+        }[]
+      }
+      tip_credits: {
         Args: {
           _amount: number
           _receiver_id: string
