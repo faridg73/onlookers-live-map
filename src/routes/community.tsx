@@ -137,7 +137,7 @@ function CommunityHub() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .forEach((post) => {
         const url = post.mediaPath ? media[post.mediaPath] : undefined;
-        if (!previews[post.category] && looksLikeVideo(url)) previews[post.category] = url;
+        if (url && !previews[post.category] && looksLikeVideo(url)) previews[post.category] = url;
       });
     return previews;
   }, [media, posts]);
