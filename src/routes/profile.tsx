@@ -133,6 +133,16 @@ function ProfileScreen() {
       <CreditPayoutDashboard />
 
       <Link
+        to="/balance"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-live/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <Wallet className="size-4 text-live" /> Balance — credits, purchases and cash out
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </Link>
+
+      <Link
         to="/pools"
         className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
       >
