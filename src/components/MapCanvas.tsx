@@ -226,6 +226,24 @@ export function MapCanvas({
         </div>
       )}
 
+      {/* nearby business names */}
+      {ready &&
+        places.map((place) => {
+          const pixel = toPixel({ lat: place.latitude, lng: place.longitude });
+          if (!pixel) return null;
+          return (
+            <span
+              key={place.id}
+              className="pointer-events-none absolute flex max-w-[8.5rem] -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-surface/85 px-2 py-0.5 text-[0.6rem] font-bold leading-tight text-foreground shadow-sm backdrop-blur"
+              style={{ left: pixel.left, top: pixel.top }}
+              title={place.primaryType ? `${place.name} · ${place.primaryType}` : place.name}
+            >
+              <span className="size-1.5 shrink-0 rounded-full bg-signal" />
+              <span className="truncate">{place.name}</span>
+            </span>
+          );
+        })}
+
       {/* pins */}
       {ready &&
         requests.map((r) => {
