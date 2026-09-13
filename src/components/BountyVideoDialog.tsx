@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
+import { shareClipToSocials } from "@/lib/share-clip";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -49,7 +50,29 @@ export function BountyVideoDialog({
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [capturing, setCapturing] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [shareLabel, setShareLabel] = useState("");
+  const [justSent, setJustSent] = useState<BountyVideo | null>(null);
   const closed = isClosed(request);
+
+  async function shareClip(video: BountyVideo) {
+    setSharingId(video.id);
+    setShareLabel("Preparing…");
+    try {
+      const result = await shareClipToSocials(video, setShareLabel);
+      if (result === "downloaded") {
+        toast.success("Watermarked clip saved — post it with the copied hashtags.");
+      } else {
+        toast.success("Shared with Onlooker Live branding.");
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
+      toast.error(err instanceof Error ? err.message : "Couldn't prepare that clip.");
+    } finally {
+      setSharingId(null);
+      setShareLabel("");
+    }
+  }
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -76,8 +99,12 @@ export function BountyVideoDialog({
     try {
       await uploadBountyVideo({ file, request, note });
       setNote("");
+      const rows = await listVideosForRequest(request.id, request.dbId ?? null);
+      setVideos(rows);
+      setThumbs(await thumbnailUrls(rows));
+      const mine = rows.find((row) => row.uploader_id === user?.id);
+      if (mine) setJustSent(mine);
       toast.success("Live capture sent to this bounty.");
-      await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Sending that capture failed.");
     } finally {
@@ -200,6 +227,40 @@ export function BountyVideoDialog({
               )}
             </div>
 
+            {justSent && (
+              <div className="mt-2 rounded-2xl border border-signal/40 bg-surface p-4 text-center">
+                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-signal">
+                  <CheckCircle2 className="size-4" /> Your live clip is in!
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Share it with Onlooker Live branding and viral hashtags to bring in more fans.
+                </p>
+                <button
+                  type="button"
+                  disabled={sharingId === justSent.id}
+                  onClick={() => void shareClip(justSent)}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                >
+                  {sharingId === justSent.id ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin" /> {shareLabel || "Preparing…"}
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="size-3.5" /> Share to TikTok / Instagram Reels
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setJustSent(null)}
+                  className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Not now
+                </button>
+              </div>
+            )}
+
             <div className="mt-2 space-y-3">
               {loading && (
                 <p className="text-center text-sm text-muted-foreground">Loading videos…</p>
@@ -249,14 +310,30 @@ export function BountyVideoDialog({
                       <Share2 className="size-4" />
                     </button>
                     {v.uploader_id === user.id && (
-                      <button
-                        type="button"
-                        aria-label="Delete video"
-                        onClick={() => void remove(v)}
-                        className="text-muted-foreground transition-colors hover:text-destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          aria-label="Share to TikTok / Instagram Reels"
+                          title="Share to TikTok / Instagram Reels"
+                          disabled={sharingId === v.id}
+                          onClick={() => void shareClip(v)}
+                          className="text-muted-foreground transition-colors hover:text-signal disabled:opacity-50"
+                        >
+                          {sharingId === v.id ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <Share2 className="size-4" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Delete video"
+                          onClick={() => void remove(v)}
+                          className="text-muted-foreground transition-colors hover:text-destructive"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </>
                     )}
                   </div>
                   {v.accepted_at ? (
