@@ -215,3 +215,43 @@ export const fetchNearbyPlaces = createServerFn({ method: "POST" })
       ];
     });
   });
+
+const photoSchema = z.object({
+  photoNames: z.array(z.string().min(5).max(600)).min(1).max(16),
+  maxWidthPx: z.number().int().min(120).max(1200).default(480),
+});
+
+/**
+ * Short-lived thumbnail URLs for place photos, keyed by photo resource name.
+ * Google's media endpoint is called server-side so the key stays private.
+ */
+export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => photoSchema.parse(data))
+  .handler(async ({ data }): Promise<Record<string, string>> => {
+    const creds = credentials();
+    if (!creds) return {};
+
+    const entries = await Promise.all(
+      data.photoNames.map(async (photoName) => {
+        try {
+          const response = await fetch(
+            `${GATEWAY_URL}/places/v1/${photoName}/media?maxWidthPx=${data.maxWidthPx}&skipHttpRedirect=true`,
+            {
+              headers: {
+                Authorization: `Bearer ${creds.lovableKey}`,
+                "X-Connection-Api-Key": creds.mapsKey,
+              },
+            },
+          );
+          if (!response.ok) return null;
+          const payload = (await response.json()) as { photoUri?: string };
+          return payload.photoUri ? ([photoName, payload.photoUri] as const) : null;
+        } catch (error) {
+          console.error("[places] photo lookup failed", error);
+          return null;
+        }
+      }),
+    );
+
+    return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => !!entry));
+  });
