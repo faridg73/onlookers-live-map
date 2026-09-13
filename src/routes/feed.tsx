@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { CategoryPicker, type CategoryPickerValue } from "@/components/CategoryPicker";
+import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import { useOnlooker } from "@/lib/onlooker-store";
 import {
   CATEGORIES,
@@ -345,6 +346,9 @@ function FeedScreen() {
                 : `Expand to ${radiusOptions.find((o) => o.miles === nextWiderRadius)?.label}`}
             </button>
           </div>
+        )}
+        {list.length === 0 && (
+          <RecentCapturesFeed blurb="Nothing live nearby — watch captures that already wrapped." />
         )}
       </div>
     </div>

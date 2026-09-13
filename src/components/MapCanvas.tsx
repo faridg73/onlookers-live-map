@@ -4,6 +4,7 @@ import { CoinsIcon, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
@@ -269,6 +270,19 @@ export function MapCanvas({
               aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
+                {/* bounties running out of time pulse hard so they can't be missed */}
+                {!closed && r.status === "open" && r.expiresInMin <= 20 && (
+                  <>
+                    <span
+                      className="absolute bottom-0 size-20 animate-ping-slow rounded-full motion-reduce:animate-none"
+                      style={{ backgroundColor: "color-mix(in oklch, var(--urgent) 30%, transparent)" }}
+                    />
+                    <span
+                      className="absolute bottom-1 size-14 rounded-full border-2"
+                      style={{ borderColor: "color-mix(in oklch, var(--urgent) 70%, transparent)" }}
+                    />
+                  </>
+                )}
                 {/* gold pins keep a soft pulsing halo ring */}
                 {tier === "gold" && !closed && (
                   <>
@@ -373,6 +387,11 @@ export function MapCanvas({
                 {!closed && r.bounty >= HIGH_BOUNTY && (
                   <span className="mt-1">
                     <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />
+                  </span>
+                )}
+                {!closed && r.status === "open" && (
+                  <span className="mt-1">
+                    <UrgencyBadge minutesLeft={r.expiresInMin} bounty={pool} compact />
                   </span>
                 )}
                 <span

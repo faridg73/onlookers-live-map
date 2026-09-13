@@ -15,6 +15,7 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { cn } from "@/lib/utils";
 
 
@@ -78,7 +79,12 @@ export function RequestCard({
             <div className="font-display text-2xl font-extrabold leading-none text-signal">
               {formatCredits(pool)}
             </div>
-            {!done && <div className="mt-2"><ExpiryCountdown minutesLeft={request.expiresInMin} /></div>}
+            {!done && (
+              <div className="mt-2 flex flex-col items-end gap-1">
+                <ExpiryCountdown minutesLeft={request.expiresInMin} />
+                <UrgencyBadge minutesLeft={request.expiresInMin} bounty={pool} compact />
+              </div>
+            )}
           </div>
         </div>
 
@@ -156,6 +162,9 @@ export function RequestCard({
         <CategoryBadge category={request.category} />
         {!done && (
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
+        )}
+        {!done && request.status === "open" && (
+          <UrgencyBadge minutesLeft={request.expiresInMin} bounty={pool} />
         )}
         {!done && pool >= HIGH_BOUNTY && (
           <span className="rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
