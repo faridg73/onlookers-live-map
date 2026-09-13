@@ -223,10 +223,7 @@ export async function uploadCommunityPhoto(file: File) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to add a photo.");
   const path = `${auth.user.id}/community/${crypto.randomUUID()}.jpg`;
-  const { error } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type || "image/jpeg", upsert: false });
-  if (error) throw new Error(error.message);
+  await uploadMedia({ bucket: BUCKET, path, file, contentType: file.type || "image/jpeg" });
   return path;
 }
 
