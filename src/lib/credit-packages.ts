@@ -42,9 +42,9 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     id: "credits_pack_200",
     priceId: "credits_pack_200_usd",
     name: "Insider",
-    credits: 200,
+    credits: 225,
     priceCents: 5000,
-    blurb: "Best for teams and heavy weekly requesters.",
+    blurb: "200 credits plus 25 bonus credits free.",
     badge: "Best Value",
   },
 ];
