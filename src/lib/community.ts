@@ -117,12 +117,12 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     tags: ["open houses", "home renovations", "commercial sites", "neighborhood tours"],
     iceBreakers: [
       {
-        title: "Open house walkthrough at 2pm",
-        body: "Streaming room by room from the open house — ask me to point the camera anywhere.",
+        title: "Open house walkthrough this afternoon",
+        body: "Streaming room by room — ask me to check the light, storage or any finish up close.",
       },
       {
-        title: "Is this street actually quiet?",
-        body: "Standing outside the rental now. I'll show the block, the parking and the noise.",
+        title: "Renovation progress check",
+        body: "Walking through the latest work, materials and details that are still being completed.",
       },
     ],
   },
@@ -134,12 +134,12 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     tags: ["flea markets", "garage sales", "street vendors", "antique fairs"],
     iceBreakers: [
       {
-        title: "Farmers market, live from the stalls",
-        body: "Walking the rows now — tell me what to check the price on.",
+        title: "Flea market finds, live from the tables",
+        body: "Walking the rows now — tell me what you want inspected or priced.",
       },
       {
-        title: "Food truck lot tonight",
-        body: "Five trucks up, showing the lines and what people are eating.",
+        title: "Neighborhood garage sale walkthrough",
+        body: "Showing furniture, books and household finds while they are still available.",
       },
     ],
   },
@@ -151,12 +151,12 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     tags: ["live music", "street buskers", "festivals", "spontaneous gatherings"],
     iceBreakers: [
       {
-        title: "Busker on the main plaza right now",
+        title: "Street busker on the main plaza right now",
         body: "Great set, decent crowd — streaming a few minutes from the footpath.",
       },
       {
-        title: "Gate lines before kickoff",
-        body: "Showing how long the entry queue is and where the short gate is.",
+        title: "Festival opening before the crowd arrives",
+        body: "Showing stages, food lines and the easiest path through the grounds.",
       },
     ],
   },
