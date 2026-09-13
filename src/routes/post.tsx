@@ -578,6 +578,64 @@ function PostScreen() {
                       <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
                     </Button>
                   ))}
+                 </div>
+
+                <div className="rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Format &amp; length</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {CAPTURE_OPTIONS.map((option) => {
+                      const on = !customCapture && capture === option.minutes;
+                      return (
+                        <Button
+                          key={option.id}
+                          type="button"
+                          variant="outline"
+                          aria-pressed={on}
+                          onClick={() => {
+                            setCustomCapture(false);
+                            applyCapture(option.minutes);
+                          }}
+                          className={`h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground" : "bg-surface-raised"}`}
+                        >
+                          {option.minutes === null && <Radio className="size-3.5" />}
+                          {option.label}
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-pressed={customCapture}
+                      onClick={() => {
+                        setCustomCapture(true);
+                        applyCapture(capture ?? 10);
+                      }}
+                      className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal bg-signal text-signal-foreground" : "bg-surface-raised"}`}
+                    >
+                      Custom
+                    </Button>
+                  </div>
+                  {customCapture && (
+                    <label className="mt-3 flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={1}
+                        max={MAX_CAPTURE_MINUTES}
+                        value={capture ?? 10}
+                        onChange={(event) => {
+                          const next = Number(event.target.value);
+                          if (!Number.isFinite(next)) return;
+                          applyCapture(Math.max(1, Math.min(MAX_CAPTURE_MINUTES, Math.round(next))));
+                        }}
+                        className="field w-24"
+                      />
+                      <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
+                    </label>
+                  )}
+                  <p className="mt-3 text-xs font-medium text-muted-foreground">
+                    {captureDurationLabel(capture)} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
+                    {capture === null && " — the onlooker streams until you end the session."}
+                  </p>
                 </div>
 
                 <label className="block space-y-2">
