@@ -73,7 +73,7 @@ export function AlertSettingsCard() {
   const rows: { key: "push_enabled" | "sms_enabled" | "email_enabled"; label: string; hint: string; icon: typeof Bell }[] =
     [
       { key: "push_enabled", label: "In-app alerts", icon: Bell, hint: "Pops up the moment a bounty lands nearby" },
-      { key: "sms_enabled", label: "Text message", icon: MessageSquare, hint: "Needs a texting service connected" },
+      { key: "sms_enabled", label: "Text message", icon: MessageSquare, hint: "Texts your phone with the place, payout and claim link" },
       { key: "email_enabled", label: "Email", icon: Mail, hint: "Starts once your sending address is verified" },
     ];
 
