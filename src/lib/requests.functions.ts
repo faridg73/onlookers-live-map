@@ -10,7 +10,7 @@ export const MIN_BOUNTY = 20;
 
 const createSchema = z.object({
   prompt: z.string().trim().min(3).max(300),
-  /** Camera instructions, scanned by the content filter (not stored here). */
+  /** Camera instructions and capture format, stored with the request. */
   details: z.string().trim().max(2000).nullable().optional(),
   locationName: z.string().trim().min(2).max(160),
   bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
