@@ -171,6 +171,56 @@ export function BountyDetailsDialog({
         </DialogContent>
       </Dialog>
 
+      {/* Availability check — confirms the hunter sees it live right now. */}
+      <AlertDialog open={availabilityPrompt} onOpenChange={setAvailabilityPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Radar className="size-5 text-signal" />
+              Is this request still active and available?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              We just verified this bounty is still open. Confirm you can head there and capture it
+              live right now.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Not now</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setAvailabilityPrompt(false);
+                setConfirming(true);
+              }}
+            >
+              Yes, I'm on it!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clean notice when the creator closed it or it already expired. */}
+      <AlertDialog
+        open={unavailableReason !== null}
+        onOpenChange={(next) => {
+          if (!next) setUnavailableReason(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <CircleOff className="size-5 text-destructive" />
+              No longer available
+            </AlertDialogTitle>
+            <AlertDialogDescription>{unavailableReason}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setUnavailableReason(null)}>
+              Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent>
           <AlertDialogHeader>
