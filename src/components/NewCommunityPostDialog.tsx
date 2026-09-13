@@ -43,8 +43,13 @@ export function NewCommunityPostDialog({
   const def = categoryDef(category);
 
   useEffect(() => {
-    if (open && initialCamera) setCamera(true);
-  }, [open, initialCamera]);
+    if (!open) return;
+    if (initialCategory) {
+      setCategory(initialCategory);
+      setTags([]);
+    }
+    if (initialCamera) setCamera(true);
+  }, [open, initialCamera, initialCategory]);
 
   if (!open) return null;
 
