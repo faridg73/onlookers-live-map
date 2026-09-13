@@ -55,6 +55,12 @@ function TrendingScreen() {
   const concerts = usePlaceList(group, "concerts", area, { maxResults: 8 });
   const fights = usePlaceList(group, "fights", area, { maxResults: 8 });
   const gatherings = usePlaceList(group, "festivals", area, { maxResults: 8 });
+  const { events, loading: eventsLoading } = useLiveEvents(area, {
+    radiusMiles: 50,
+    weekendOnly: true,
+    size: 12,
+  });
+
 
   const buckets = [sports, concerts, fights, gatherings];
   const loading = buckets.some((b) => b.loading);
