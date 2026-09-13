@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Camera, ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
+import { ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
-import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
@@ -213,14 +212,6 @@ function MapScreen() {
         onClose={() => select(null)}
       />
 
-      <NewRequestDialog>
-        <button
-          className="absolute bottom-[6.25rem] right-4 z-30 flex size-14 items-center justify-center rounded-2xl bg-signal text-signal-foreground shadow-[0_14px_40px_-10px_oklch(0.78_0.17_82/0.7)] transition-transform active:scale-95"
-          aria-label="Create a new live photo request"
-        >
-          <Camera className="size-6" strokeWidth={2} />
-        </button>
-      </NewRequestDialog>
     </div>
   );
 }

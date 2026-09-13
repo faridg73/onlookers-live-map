@@ -12,6 +12,7 @@ export type PickedLocation = { latitude: number; longitude: number; formatted: s
 
 type Props = {
   address: string;
+  selectedLocation?: PickedLocation | null;
   onPick?: (location: PickedLocation) => void;
 };
 
@@ -20,7 +21,7 @@ const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(maximum, Math.max(minimum, value));
 
 /** Full location picker using the same Google street map behavior as discovery. */
-export function LocationPreviewMap({ address, onPick }: Props) {
+export function LocationPreviewMap({ address, selectedLocation, onPick }: Props) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.Marker | null>(null);
@@ -108,6 +109,14 @@ export function LocationPreviewMap({ address, onPick }: Props) {
 
   useEffect(() => {
     if (!ready) return;
+    if (selectedLocation) {
+      const position = { lat: selectedLocation.latitude, lng: selectedLocation.longitude };
+      map.current?.panTo(position);
+      map.current?.setZoom(17);
+      marker.current?.setPosition(position);
+      setPinned(selectedLocation);
+      return;
+    }
     const query = address.trim();
     if (query.length < 4) return;
     const timer = window.setTimeout(async () => {
@@ -125,7 +134,7 @@ export function LocationPreviewMap({ address, onPick }: Props) {
       pick.current?.(found);
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [address, ready]);
+  }, [address, ready, selectedLocation]);
 
   const zoomBy = (delta: number) => {
     const current = map.current?.getZoom();
