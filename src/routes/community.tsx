@@ -325,9 +325,26 @@ function CommunityHub() {
         <section className="mt-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
           {!loading && visible.length === 0 && here && radiusMilesFor(radius) !== null && (
-            <p className="mb-4 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              Nothing posted this close yet. Widen the radius, or be the first to post here.
-            </p>
+            <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Nothing posted this close yet.
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => {
+                  if (radius === "tight") {
+                    changeRadius("near");
+                  } else {
+                    setLiveFirst(false);
+                    setComposing(true);
+                  }
+                }}
+                className="mt-4 rounded-full bg-signal px-5 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground hover:bg-signal/90"
+              >
+                {radius === "tight" ? "Expand Radius to 5mi" : "Be the First to Post"}
+              </Button>
+            </div>
           )}
           {!loading && posts.length === 0 && (
             <DiscoverStarterCards
