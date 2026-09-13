@@ -73,8 +73,8 @@ export async function createPool(input: {
     _place: input.place,
     _goal_credits: Math.round(input.goalCredits),
     _kind: input.kind,
-    _latitude: input.latitude ?? null,
-    _longitude: input.longitude ?? null,
+    ...(typeof input.latitude === "number" ? { _latitude: input.latitude } : {}),
+    ...(typeof input.longitude === "number" ? { _longitude: input.longitude } : {}),
     _hours: input.hours ?? 24,
   });
   if (error) throw new Error(error.message);
