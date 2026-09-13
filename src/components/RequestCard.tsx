@@ -163,6 +163,9 @@ export function RequestCard({
         {!done && (
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
         )}
+        {!done && request.status === "open" && (
+          <UrgencyBadge minutesLeft={request.expiresInMin} bounty={pool} />
+        )}
         {!done && pool >= HIGH_BOUNTY && (
           <span className="rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
             High bounty
