@@ -14,6 +14,8 @@ type Props = {
   address: string;
   selectedLocation?: PickedLocation | null;
   onPick?: (location: PickedLocation) => void;
+  /** Small interactive thumbnail variant for inline previews. */
+  compact?: boolean;
 };
 
 const FALLBACK = { lat: 34.0522, lng: -118.2437 };
