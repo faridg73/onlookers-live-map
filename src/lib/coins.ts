@@ -86,7 +86,7 @@ export async function tipCoins(options: {
     _receiver_id: options.receiverId,
     _amount: Math.round(options.amount),
     _transaction_type: options.type ?? "direct_tip",
-    _request_id: options.requestId ?? undefined,
+    ...(options.requestId ? { _request_id: options.requestId } : {}),
   });
 
   if (error) {
