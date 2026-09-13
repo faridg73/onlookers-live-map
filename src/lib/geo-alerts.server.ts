@@ -142,7 +142,9 @@ export async function notifyLocalOnlookersOfBounty(
   const userIds = (nearby ?? []).map((row) => row.user_id).filter((id) => id !== requesterId);
   if (userIds.length === 0) return { nearby: 0, pushed: 0 };
 
-  const title = "🚨 New Bounty Near You!";
+  // Big bounties get the flash treatment: pinned, time-sensitive lock-screen alert.
+  const flash = gross >= 80;
+  const title = flash ? "⚡ FLASH BOUNTY NEAR YOU!" : "🚨 New Bounty Near You!";
   const body = `Someone wants a live view of the ${readableCategory(
     request.category,
     request.prompt,
