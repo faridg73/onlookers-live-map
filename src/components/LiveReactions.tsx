@@ -3,6 +3,7 @@ import { HandCoins } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
+import { formatCoinCash } from "@/lib/coins";
 
 const REACTIONS = ["\u{1F525}", "\u{2764}\u{FE0F}", "\u{1F440}", "\u{1F62E}"] as const;
 
@@ -49,7 +50,7 @@ export function LiveReactions({ videoId }: { videoId: string }) {
     try {
       await tipHunter(videoId);
       react("\u{1F4B0}");
-      toast.success(`Sent $${MICRO_TIP.toFixed(2)} to the reporter.`);
+      toast.success(`Sent ${MICRO_TIP} LC (${formatCoinCash(MICRO_TIP)}) to the reporter.`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "That tip could not be sent.");
     } finally {
@@ -90,7 +91,7 @@ export function LiveReactions({ videoId }: { videoId: string }) {
           disabled={tipping}
           className="ml-auto inline-flex items-center gap-1 rounded-full bg-signal px-3 py-2 text-[0.66rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-60"
         >
-          <HandCoins className="size-3.5" aria-hidden /> Tip ${MICRO_TIP.toFixed(2)}
+          <HandCoins className="size-3.5" aria-hidden /> Tip {MICRO_TIP} LC
         </button>
       </div>
     </>
