@@ -101,7 +101,7 @@ const VENUE_FILTERS = [
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
   { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
   { id: "clip", label: "Request Video Clip", copy: "Receive a short live-captured video", icon: Video },
-  { id: "meetup", label: "Flash Meetup", copy: "Create a time-sensitive community request", icon: Zap },
+  { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
 
 function PostScreen() {
