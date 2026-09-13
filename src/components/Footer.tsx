@@ -52,10 +52,10 @@ export function Footer() {
             © {new Date().getFullYear()} Onlooker. All rights reserved.
           </p>
           <a
-            href="mailto:support@onlooker.app"
+            href="mailto:support@onlookerlive.com"
             className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
           >
-            support@onlooker.app
+            support@onlookerlive.com
           </a>
         </div>
       </div>

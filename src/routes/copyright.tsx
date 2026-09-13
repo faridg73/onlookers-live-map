@@ -97,10 +97,10 @@ function CopyrightPage() {
         <p>
           Please deliver all infringement notifications to our Designated Agent at:{" "}
           <a
-            href="mailto:support@onlooker.app?subject=DMCA%20Takedown%20Notice"
+            href="mailto:support@onlookerlive.com?subject=DMCA%20Takedown%20Notice"
             className="font-semibold text-foreground underline underline-offset-4"
           >
-            support@onlooker.app
+            support@onlookerlive.com
           </a>{" "}
           (Subject Line: DMCA Takedown Notice).
         </p>
@@ -111,10 +111,10 @@ function CopyrightPage() {
           If you believe that your content was removed or disabled by mistake or misidentification, you
           may file a counter-notification with us by sending a written communication to{" "}
           <a
-            href="mailto:support@onlooker.app"
+            href="mailto:support@onlookerlive.com"
             className="font-semibold text-foreground underline underline-offset-4"
           >
-            support@onlooker.app
+            support@onlookerlive.com
           </a>
           . Your counter-notification must include your physical or electronic signature,
           identification of the material that was removed, and a statement under penalty of perjury
