@@ -24,9 +24,6 @@ import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { EarningsWallet } from "@/components/EarningsWallet";
-import { CreditWalletCard } from "@/components/CreditWalletCard";
-import { BuyCreditsCard } from "@/components/BuyCreditsCard";
-import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 import { StreakCard } from "@/components/StreakCard";
@@ -120,27 +117,25 @@ function ProfileScreen() {
 
       <StreakCard />
 
+      <Link
+        to="/balance"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-live bg-live/10 px-4 py-3 text-sm text-foreground hover:bg-live/15"
+      >
+        <span className="flex items-center gap-3">
+          <Wallet className="size-5 text-live" />
+          <span className="flex flex-col">
+            <span className="font-semibold">Balance &amp; Cashout</span>
+            <span className="text-xs text-muted-foreground">Credits, purchases and bank payout</span>
+          </span>
+        </span>
+        <ChevronRight className="size-4 text-live" />
+      </Link>
+
       <HunterStatusCard />
 
       <AlertSettingsCard />
 
       <EarningsWallet />
-
-      <CreditWalletCard />
-
-      <BuyCreditsCard />
-
-      <CreditPayoutDashboard />
-
-      <Link
-        to="/balance"
-        className="mt-6 flex items-center justify-between rounded-2xl border border-live/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
-      >
-        <span className="flex items-center gap-3">
-          <Wallet className="size-4 text-live" /> Balance — credits, purchases and cash out
-        </span>
-        <ChevronRight className="size-4 text-muted-foreground" />
-      </Link>
 
       <Link
         to="/pools"
