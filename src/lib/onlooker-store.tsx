@@ -87,8 +87,31 @@ if (!existingStoreContext) {
 }
 
 export function OnlookerProvider({ children }: { children: ReactNode }) {
-  const [requests, setRequests] = useState<LiveRequest[]>(() => SEED_REQUESTS.map(withDeadline));
+  const [requests, setRequests] = useState<LiveRequest[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Every live request anyone posted, refreshed so nearby onlookers see new
+  // bounties without reloading. Saved rows replace their local placeholder.
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { readActiveRequests } = await import("./bounty-escrow");
+      const rows = await readActiveRequests();
+      if (!active) return;
+      setRequests((prev) => {
+        const saved = rows.map(fromRow);
+        const savedIds = new Set(saved.map((r) => r.dbId));
+        const localOnly = prev.filter((r) => !r.dbId || !savedIds.has(r.dbId));
+        return [...saved, ...localOnly.filter((r) => !r.dbId)].map(withDeadline);
+      });
+    };
+    void load();
+    const t = setInterval(() => void load(), 30_000);
+    return () => {
+      active = false;
+      clearInterval(t);
+    };
+  }, []);
 
   // Live feel: watcher counts drift upward over time.
   useEffect(() => {
