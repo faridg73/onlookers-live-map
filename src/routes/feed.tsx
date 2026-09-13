@@ -103,6 +103,11 @@ function FeedScreen() {
       ? "Global"
       : (radiusOptions.find((o) => o.miles === radiusChoice)?.label ?? `${radiusChoice} ${unit}`);
 
+  const nextWiderRadius: RadiusChoice =
+    radiusChoice === "global"
+      ? "global"
+      : (radiusOptions.find((o) => o.miles > radiusChoice)?.miles ?? "global");
+
   const withinRadius = (r: (typeof requests)[number]) => {
     if (radiusChoice === "global" || !userPosition) return true;
     return distanceMiles(userPosition, requestMapPosition(r)) <= radiusChoice;
