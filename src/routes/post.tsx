@@ -472,7 +472,7 @@ function PostScreen() {
                     {[
                       "Show me the line at South Coast Plaza",
                       "I want a 5-minute clip of Fashion Island",
-                      "Flash meetup at Orange Coast College",
+                      "Spontaneous meetup at Orange Coast College",
                     ].map((example) => (
                       <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
                         {example}
