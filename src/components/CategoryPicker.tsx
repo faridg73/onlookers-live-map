@@ -20,6 +20,7 @@ export function CategoryPicker({
   onSubChange,
   includeAll = false,
   allLabel = "All types",
+  counts,
 }: {
   value: CategoryPickerValue;
   onChange: (id: CategoryPickerValue) => void;
@@ -27,6 +28,8 @@ export function CategoryPicker({
   onSubChange: (subId: string | null) => void;
   includeAll?: boolean;
   allLabel?: string;
+  /** Active request counts per category, rendered as a badge on each tile. */
+  counts?: Partial<Record<CategoryId, number>>;
 }) {
   const subs: SubOption[] = value === "all" ? [] : subOptionsFor(value);
 
