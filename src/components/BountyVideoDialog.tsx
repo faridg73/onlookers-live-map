@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { BadgeDollarSign, Loader2, Play, Share2, Trash2, Upload, Video } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { BadgeDollarSign, Camera, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { VideoRecorder } from "@/components/VideoRecorder";
+import { blockFileDrop, blockFilePaste } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -46,7 +48,7 @@ export function BountyVideoDialog({
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [capturing, setCapturing] = useState(false);
   const closed = isClosed(request);
 
   const refresh = useCallback(async () => {
@@ -68,18 +70,16 @@ export function BountyVideoDialog({
     if (open && user) void refresh();
   }, [open, user, refresh]);
 
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
+  /** Only clips filmed inside the app get here — there is no gallery path. */
+  async function onCaptured(file: File) {
     setUploading(true);
     try {
       await uploadBountyVideo({ file, request, note });
       setNote("");
-      toast.success("Video uploaded and saved to this bounty.");
+      toast.success("Live capture sent to this bounty.");
       await refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed.");
+      toast.error(err instanceof Error ? err.message : "Sending that capture failed.");
     } finally {
       setUploading(false);
     }
@@ -161,7 +161,7 @@ export function BountyVideoDialog({
           </div>
         ) : (
           <>
-            <div className="space-y-3">
+            <div className="space-y-3" onDrop={blockFileDrop} onDragOver={blockFileDrop} onPaste={blockFilePaste}>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -169,30 +169,31 @@ export function BountyVideoDialog({
                 placeholder="Add a note for the requester (optional)"
                 className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
               />
-              <input
-                ref={inputRef}
-                type="file"
-                accept="video/*"
-                capture="environment"
-                onChange={onFile}
-                className="hidden"
-              />
               <button
                 type="button"
                 disabled={uploading || closed}
-                onClick={() => inputRef.current?.click()}
+                onClick={() => setCapturing(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="size-4 animate-spin" /> Uploading…
+                    <Loader2 className="size-4 animate-spin" /> Sending…
                   </>
                 ) : (
                   <>
-                    <Upload className="size-4" /> {closed ? "Submissions closed" : "Record or upload video"}
+                    <Camera className="size-4" /> {closed ? "Submissions closed" : "Film live video"}
                   </>
                 )}
               </button>
+              <p className="text-center text-[0.68rem] text-muted-foreground">
+                Live camera captures only — gallery videos and screenshots can't be submitted.
+              </p>
+              {capturing && !closed && (
+                <VideoRecorder
+                  onClose={() => setCapturing(false)}
+                  onRecorded={(file) => void onCaptured(file)}
+                />
+              )}
             </div>
 
             <div className="mt-2 space-y-3">

@@ -1,19 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Circle, Loader2, Square, X } from "lucide-react";
+import { Camera, Circle, Loader2, Square, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
 
 /**
  * In-app camera for chat clips. Recording stops on its own at 60 seconds and
- * records at a modest bitrate so uploads stay quick.
+ * records at a modest bitrate so uploads stay quick. It is the only way media
+ * enters Onlooker Live — nothing can come from the photo gallery.
  */
 export function VideoRecorder({
   onClose,
   onRecorded,
+  onPhoto,
 }: {
   onClose: () => void;
   onRecorded: (file: File) => void;
+  /** When provided, a shutter button grabs a still frame from the live camera. */
+  onPhoto?: (file: File) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -78,7 +82,7 @@ export function VideoRecorder({
     const candidates = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
     const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported(type));
     if (!mimeType) {
-      toast.error("This browser can't record video. Attach a file instead.");
+      toast.error("This device can't record video in the app. Try the built-in browser camera.");
       return;
     }
     chunksRef.current = [];
@@ -105,6 +109,30 @@ export function VideoRecorder({
     setRecording(true);
   }
 
+  /** Grab a still frame straight off the live camera feed. */
+  function snapshot() {
+    const video = videoRef.current;
+    if (!video || !onPhoto) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          toast.error("Couldn't capture that photo. Try again.");
+          return;
+        }
+        onPhoto(new File([blob], `photo-${Date.now()}.jpg`, { type: "image/jpeg" }));
+        onClose();
+      },
+      "image/jpeg",
+      0.85,
+    );
+  }
+
   const remaining = Math.max(0, MAX_CLIP_SECONDS - seconds);
 
   return (
@@ -128,7 +156,7 @@ export function VideoRecorder({
 
       <video ref={videoRef} muted playsInline className="min-h-0 flex-1 object-cover" />
 
-      <div className="flex items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+      <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         {saving ? (
           <Loader2 className="size-8 animate-spin text-white" />
         ) : recording ? (
@@ -141,15 +169,28 @@ export function VideoRecorder({
             <Square className="size-6" />
           </button>
         ) : (
-          <button
-            type="button"
-            aria-label="Start recording"
-            disabled={!ready}
-            onClick={start}
-            className="inline-flex size-16 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-50"
-          >
-            <Circle className="size-6" />
-          </button>
+          <>
+            {onPhoto && (
+              <button
+                type="button"
+                aria-label="Take a live photo"
+                disabled={!ready}
+                onClick={snapshot}
+                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
+              >
+                <Camera className="size-5" />
+              </button>
+            )}
+            <button
+              type="button"
+              aria-label="Start recording"
+              disabled={!ready}
+              onClick={start}
+              className="inline-flex size-16 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-50"
+            >
+              <Circle className="size-6" />
+            </button>
+          </>
         )}
       </div>
     </div>

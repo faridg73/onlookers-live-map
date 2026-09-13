@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, Video, X } from "lucide-react";
+import { Camera, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Confetti } from "@/components/Confetti";
 import { VideoRecorder } from "@/components/VideoRecorder";
@@ -9,6 +9,7 @@ import { uploadChatAttachment } from "@/lib/chat";
 import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { CHAT_SAFETY_NOTE, maskContactInfo } from "@/lib/chat-safety";
+import { blockFileDrop, blockFilePaste } from "@/lib/camera-only";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {
@@ -43,7 +44,7 @@ export function BountyChat({
   const [celebrate, setCelebrate] = useState(false);
   const [recording, setRecording] = useState(false);
   const [preparing, setPreparing] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  
   const endRef = useRef<HTMLDivElement>(null);
   const lastApproval = useRef<string | null>(null);
   const settled = useRef(false);
@@ -96,20 +97,6 @@ export function BountyChat({
     }
   }
 
-  function pickFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    if (file.size > 200 * 1024 * 1024) {
-      toast.error("That file is larger than 200 MB.");
-      return;
-    }
-    if (file.type.startsWith("video/")) {
-      void prepareVideo(file);
-      return;
-    }
-    attach(file);
-  }
 
   function clearPending() {
     setPending((prev) => {
@@ -238,6 +225,7 @@ export function BountyChat({
         <VideoRecorder
           onClose={() => setRecording(false)}
           onRecorded={(file) => void prepareVideo(file)}
+          onPhoto={(file) => attach(file)}
         />
       )}
 
@@ -277,31 +265,21 @@ export function BountyChat({
         <Lock className="mt-0.5 size-3 shrink-0 text-signal" aria-hidden />
         <span>{CHAT_SAFETY_NOTE}</span>
       </p>
-      <form onSubmit={submit} className="mt-2 flex items-center gap-2">
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*,video/*"
-          onChange={pickFile}
-          className="hidden"
-        />
+      <form
+        onSubmit={submit}
+        onDrop={blockFileDrop}
+        onDragOver={blockFileDrop}
+        onPaste={blockFilePaste}
+        className="mt-2 flex items-center gap-2"
+      >
         <button
           type="button"
-          aria-label="Attach a photo or clip"
-          disabled={preparing}
-          onClick={() => fileRef.current?.click()}
-          className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
-        >
-          {preparing ? <Loader2 className="size-4 animate-spin" /> : <ImagePlus className="size-4" />}
-        </button>
-        <button
-          type="button"
-          aria-label={`Record a clip up to ${MAX_CLIP_SECONDS} seconds`}
+          aria-label={`Open the camera — live capture up to ${MAX_CLIP_SECONDS} seconds`}
           disabled={preparing}
           onClick={() => setRecording(true)}
           className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground disabled:opacity-50"
         >
-          <Video className="size-4" />
+          {preparing ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
         </button>
         <input
           value={draft}
