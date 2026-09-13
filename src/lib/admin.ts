@@ -75,6 +75,27 @@ export async function listModerationFlags(): Promise<ModerationFlag[]> {
   return (data ?? []) as ModerationFlag[];
 }
 
+export type DmcaNotice = {
+  id: string;
+  name: string;
+  email: string;
+  content_url: string;
+  description: string;
+  status: string;
+  created_at: string;
+};
+
+/** DMCA / infringement reports, newest first (admins and moderators only). */
+export async function listDmcaNotices(): Promise<DmcaNotice[]> {
+  const { data, error } = await supabase
+    .from("dmca_notices")
+    .select("id, name, email, content_url, description, status, created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data ?? []) as DmcaNotice[];
+}
+
 /** Approve (mark paid) or deny (return the money) a payout request. */
 export async function resolvePayout(payoutId: string, approve: boolean, note = "") {
   const { error } = await supabase.rpc("resolve_payout", {
