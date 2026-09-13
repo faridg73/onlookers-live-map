@@ -80,6 +80,19 @@ export function CategoryPicker({
                   : undefined
               }
             >
+              {count !== undefined && (
+                <span
+                  className={cn(
+                    "absolute right-1 top-1 min-w-[1.15rem] rounded-full px-1 py-[1px] text-[0.6rem] font-extrabold leading-tight",
+                    count > 0
+                      ? "bg-signal text-signal-foreground"
+                      : "bg-surface text-muted-foreground",
+                  )}
+                  aria-label={`${count} active requests`}
+                >
+                  {count}
+                </span>
+              )}
               <span
                 className="flex size-8 items-center justify-center rounded-md text-base"
                 style={{
