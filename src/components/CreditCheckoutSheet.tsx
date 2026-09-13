@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 import { formatPackPrice, type CreditPackage } from "@/lib/credit-packages";
 import { startCreditPurchase } from "@/lib/credits.functions";
@@ -17,14 +17,36 @@ export function CreditCheckoutSheet({
   pack: CreditPackage;
   onClose: () => void;
 }) {
-  const fetchClientSecret = useCallback(async () => {
-    const result = await startCreditPurchase({ data: { packageId: pack.id } });
-    if (result.error) throw new Error(result.error);
-    if (!result.clientSecret) throw new Error("The payment form could not be opened.");
-    return result.clientSecret;
-  }, [pack.id]);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret]);
+  useEffect(() => {
+    let live = true;
+    setClientSecret(null);
+    setError(null);
+
+    void (async () => {
+      try {
+        const result = await startCreditPurchase({ data: { packageId: pack.id } });
+        if (!live) return;
+        if (result.error) throw new Error(result.error);
+        if (!result.clientSecret) throw new Error("The payment form could not be opened.");
+        setClientSecret(result.clientSecret);
+      } catch (cause) {
+        if (!live) return;
+        const message = cause instanceof Error ? cause.message : "Could not open checkout";
+        setError(
+          message.toLowerCase().includes("unauthorized")
+            ? "Please sign in to buy Credits."
+            : message,
+        );
+      }
+    })();
+
+    return () => {
+      live = false;
+    };
+  }, [pack.id]);
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/80 backdrop-blur-sm sm:items-center">
@@ -37,9 +59,7 @@ export function CreditCheckoutSheet({
             <p className="truncate text-sm font-semibold text-foreground">
               {pack.credits} Credits — {formatPackPrice(pack.priceCents)}
             </p>
-            <p className="text-xs text-muted-foreground">
-              Apple Pay, Google Pay, Link or card
-            </p>
+            <p className="text-xs text-muted-foreground">Apple Pay, Google Pay, Link or card</p>
           </div>
           <button
             type="button"
@@ -52,9 +72,26 @@ export function CreditCheckoutSheet({
         </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-3">
-          <EmbeddedCheckoutProvider stripe={getStripe()} options={options}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
+          {error ? (
+            <div className="px-3 py-8 text-center">
+              <p className="text-sm text-foreground">{error}</p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="mt-4 rounded-full bg-signal px-4 py-2 text-sm font-semibold text-signal-foreground"
+              >
+                Close
+              </button>
+            </div>
+          ) : clientSecret ? (
+            <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+              <EmbeddedCheckout />
+            </EmbeddedCheckoutProvider>
+          ) : (
+            <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Opening secure checkout…
+            </div>
+          )}
         </div>
       </div>
     </div>
