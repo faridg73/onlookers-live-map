@@ -59,6 +59,9 @@ type NewRequest = {
   instructions?: string;
   accessCode?: string | undefined;
   dbId?: string;
+  /** True pin so distances are right the moment the request is posted. */
+  lat?: number | undefined;
+  lng?: number | undefined;
   /** Minutes until the bounty expires by itself; defaults to one hour. */
   expiresInMin?: number;
 };
