@@ -12,13 +12,22 @@ export const Route = createFileRoute("/api/public/media/lifecycle")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["MEDIA_LIFECYCLE_SECRET"];
         const provided = request.headers.get("x-lifecycle-secret") ?? "";
-        if (!secret || provided !== secret) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        if (!provided) return new Response("Unauthorized", { status: 401 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        const envSecret = process.env["MEDIA_LIFECYCLE_SECRET"] ?? "";
+        let allowed = envSecret.length > 0 && provided === envSecret;
+        if (!allowed) {
+          const { data: tokenRow } = await supabaseAdmin
+            .from("service_tokens")
+            .select("token")
+            .eq("name", "media_lifecycle")
+            .maybeSingle();
+          allowed = Boolean(tokenRow?.token) && provided === tokenRow!.token;
+        }
+        if (!allowed) return new Response("Unauthorized", { status: 401 });
 
         // 1. Mark expired clips + requests and enqueue their files.
         const { data: swept, error: sweepError } = await supabaseAdmin.rpc("expire_stale_media");
