@@ -8,7 +8,37 @@ import {
   type Context,
   type ReactNode,
 } from "react";
-import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
+import { CATEGORIES, type CategoryId, type LiveRequest } from "./onlooker";
+import type { ActiveRequestRow } from "./requests.functions";
+
+const CATEGORY_IDS = new Set<string>(CATEGORIES.map((c) => c.id));
+
+/** Turns a saved request row into the shape the map, feed and cards expect. */
+function fromRow(row: ActiveRequestRow): LiveRequest {
+  const expiresAt = new Date(row.expiresAt).getTime();
+  const createdAt = new Date(row.createdAt).getTime();
+  return {
+    id: `db-${row.id}`,
+    dbId: row.id,
+    title: row.prompt,
+    place: row.locationName,
+    note: row.details,
+    instructions: row.details,
+    bounty: row.bounty,
+    category: row.category && CATEGORY_IDS.has(row.category) ? (row.category as CategoryId) : undefined,
+    status: "open",
+    minutesAgo: Math.max(0, Math.round((Date.now() - createdAt) / 60_000)),
+    watchers: 1,
+    responses: 0,
+    expiresInMin: Math.max(0, Math.round((expiresAt - createdAt) / 60_000)),
+    expiresAt,
+    requester: row.mine ? "you" : "an onlooker nearby",
+    lat: row.latitude,
+    lng: row.longitude,
+    x: 500,
+    y: 500,
+  };
+}
 
 /** Stamps an absolute deadline so the timer keeps running across re-renders. */
 function withDeadline(r: LiveRequest): LiveRequest {
