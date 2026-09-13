@@ -67,6 +67,58 @@ export const Route = createFileRoute("/api/public/media/lifecycle")({
           purged += items.length;
         }
 
+        // 3. Record that the expired clip rows no longer point at live files.
+        if (purged > 0) {
+          await supabaseAdmin
+            .from("bounty_videos")
+            .update({ purged_at: new Date().toISOString() })
+            .not("expired_at", "is", null)
+            .is("purged_at", null);
+        }
+
+        return Response.json({ error: sweepError.message }, { status: 500 });
+        }
+
+        // 2. Purge the queued storage objects, bucket by bucket.
+        const { data: queued, error: queueError } = await supabaseAdmin
+          .from("media_purge_queue")
+          .select("id, bucket, path")
+          .is("purged_at", null)
+          .limit(500);
+        if (queueError) {
+          console.error("media purge queue read failed", queueError);
+          return Response.json({ error: queueError.message }, { status: 500 });
+        }
+
+        const rows = queued ?? [];
+        const byBucket = new Map<string, { id: string; path: string }[]>();
+        for (const row of rows) {
+          const list = byBucket.get(row.bucket) ?? [];
+          list.push({ id: row.id, path: row.path });
+          byBucket.set(row.bucket, list);
+        }
+
+        let purged = 0;
+        for (const [bucket, items] of byBucket) {
+          const { error } = await supabaseAdmin.storage
+            .from(bucket)
+            .remove(items.map((item) => item.path));
+          const ids = items.map((item) => item.id);
+          if (error) {
+            console.error(`storage purge failed for ${bucket}`, error);
+            await supabaseAdmin
+              .from("media_purge_queue")
+              .update({ error_message: error.message })
+              .in("id", ids);
+            continue;
+          }
+          await supabaseAdmin
+            .from("media_purge_queue")
+            .update({ purged_at: new Date().toISOString(), error_message: "" })
+            .in("id", ids);
+          purged += items.length;
+        }
+
         // 3. Record that the clip rows no longer point at live files.
         const purgedVideoIds = [
           ...new Set(
@@ -84,7 +136,7 @@ export const Route = createFileRoute("/api/public/media/lifecycle")({
             .is("purged_at", null);
         }
 
-        return Response.json({ swept, purged, folders: purgedVideoIds.length });
+        return Response.json({ swept, purged, queued: rows.length });
       },
     },
   },

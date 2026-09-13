@@ -32,6 +32,7 @@ import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
 import { Route as DiscoverTrendingRouteImport } from './routes/discover.trending'
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
+import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
@@ -150,6 +151,11 @@ const DiscoverGroupVenueRoute = DiscoverGroupVenueRouteImport.update({
   path: '/discover/$group/$venue',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMediaLifecycleRoute = ApiPublicMediaLifecycleRouteImport.update({
+  id: '/api/public/media/lifecycle',
+  path: '/api/public/media/lifecycle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/discover': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -242,6 +250,7 @@ export interface FileRoutesById {
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/discover/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/discover'
     | '/discover/$group/$venue'
     | '/discover/$group'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   id:
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/discover/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   DiscoverIndexRoute: typeof DiscoverIndexRoute
   DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
+  ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -520,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverGroupVenueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/media/lifecycle': {
+      id: '/api/public/media/lifecycle'
+      path: '/api/public/media/lifecycle'
+      fullPath: '/api/public/media/lifecycle'
+      preLoaderRoute: typeof ApiPublicMediaLifecycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -561,6 +581,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverIndexRoute: DiscoverIndexRoute,
   DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
+  ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
