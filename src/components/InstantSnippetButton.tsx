@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { uploadBountyVideo } from "@/lib/bounty-videos";
+import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import {
   SNIPPET_SECONDS,
   feetAway,
@@ -168,7 +169,12 @@ export function InstantSnippetButton({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            What to film: {request.title}
+            What to film: {request.title} — crowd atmosphere, street views, or the scene around
+            the venue.
+          </p>
+
+          <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[0.7rem] font-medium leading-snug text-amber-300">
+            {PUBLIC_SPACES_DISCLAIMER}
           </p>
 
           {phase === "ready" && (

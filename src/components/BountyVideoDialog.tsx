@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { BadgeDollarSign, Camera, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
 import { VideoRecorder } from "@/components/VideoRecorder";
-import { blockFileDrop, blockFilePaste } from "@/lib/camera-only";
+import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -187,6 +187,10 @@ export function BountyVideoDialog({
               </button>
               <p className="text-center text-[0.68rem] text-muted-foreground">
                 Live camera captures only — gallery videos and screenshots can't be submitted.
+                Film the crowd, street, tailgate, or venue surroundings.
+              </p>
+              <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
+                {PUBLIC_SPACES_DISCLAIMER}
               </p>
               {capturing && !closed && (
                 <VideoRecorder
