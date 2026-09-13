@@ -170,6 +170,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       expiresInMin: input.expiresInMin ?? 60,
       expiresAt: Date.now() + (input.expiresInMin ?? 60) * 60_000,
       requester: "you",
+      lat: input.lat,
+      lng: input.lng,
       x: 300 + Math.random() * 400,
       y: 300 + Math.random() * 300,
     };
