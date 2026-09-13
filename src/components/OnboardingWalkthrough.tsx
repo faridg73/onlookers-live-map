@@ -76,10 +76,9 @@ export function OnboardingWalkthrough() {
   const finish = useCallback(async () => {
     setBusy(true);
     try {
-      await markOnboardingCompleted();
+      // Signed-out viewers can replay the guide too — nothing to persist.
+      await markOnboardingCompleted().catch(() => undefined);
       setOpen(false);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save. Try again.");
     } finally {
       setBusy(false);
     }

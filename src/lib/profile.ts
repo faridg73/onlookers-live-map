@@ -98,13 +98,13 @@ export const REPLAY_ONBOARDING_EVENT = "onlooker:replay-onboarding";
 export async function replayOnboarding() {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
-  if (!user) throw new Error("You must be signed in.");
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ onboarding_completed: false })
-    .eq("id", user.id);
-  if (error) throw error;
+  if (user) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ onboarding_completed: false })
+      .eq("id", user.id);
+    if (error) throw error;
+  }
 
   window.dispatchEvent(new CustomEvent(REPLAY_ONBOARDING_EVENT));
 }
