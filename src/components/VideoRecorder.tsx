@@ -28,35 +28,70 @@ export function VideoRecorder({
   const [seconds, setSeconds] = useState(0);
   const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  /** Which lens is live. "user" is the selfie camera and previews mirrored. */
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [switching, setSwitching] = useState(false);
+  const [multiCamera, setMultiCamera] = useState(false);
 
   useEffect(() => {
     let alive = true;
     void (async () => {
       try {
+        // Ask for 720p in the natural orientation of whichever lens is active so
+        // the preview and the recorded clip keep the same aspect ratio.
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: {
+            facingMode: { ideal: facing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            aspectRatio: { ideal: 16 / 9 },
+          },
           audio: true,
         });
         if (!alive) {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
+        streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
         }
         setReady(true);
+        setSwitching(false);
+        void navigator.mediaDevices
+          .enumerateDevices()
+          .then((devices) => {
+            if (!alive) return;
+            setMultiCamera(devices.filter((d) => d.kind === "videoinput").length > 1);
+          })
+          .catch(() => undefined);
       } catch {
+        setSwitching(false);
         toast.error("Camera access was blocked. Allow the camera to record a clip.");
         onClose();
       }
     })();
     return () => {
       alive = false;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
     };
-  }, [onClose]);
+  }, [facing, onClose]);
+
+  // Release the camera when the recorder closes.
+  useEffect(
+    () => () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    },
+    [],
+  );
+
+  const flipCamera = useCallback(() => {
+    if (recording) return;
+    setSwitching(true);
+    setReady(false);
+    setFacing((current) => (current === "environment" ? "user" : "environment"));
+  }, [recording]);
 
   const stop = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
