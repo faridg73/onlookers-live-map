@@ -42,6 +42,7 @@ function AdminDashboard() {
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [payouts, setPayouts] = useState<AdminPayout[]>([]);
   const [disputes, setDisputes] = useState<DisputeCase[]>([]);
+  const [flags, setFlags] = useState<ModerationFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
 
