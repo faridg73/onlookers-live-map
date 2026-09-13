@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgeDollarSign, Gavel, Loader2, ShieldCheck } from "lucide-react";
+import { BadgeDollarSign, Gavel, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
-import { isAdmin, listAllPayoutRequests, resolvePayout, type AdminPayout } from "@/lib/admin";
+import {
+  isAdmin,
+  listAllPayoutRequests,
+  listModerationFlags,
+  resolvePayout,
+  type AdminPayout,
+  type ModerationFlag,
+} from "@/lib/admin";
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
 
 export const Route = createFileRoute("/admin/")({
