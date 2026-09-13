@@ -1665,9 +1665,9 @@ export type Database = {
         Args: never
         Returns: {
           amount: number
-          coin_balance: number
-          coins_redeemed: number
           created_at: string
+          credit_balance: number
+          credits_redeemed: number
           destination: string
           display_name: string
           id: string
@@ -1759,7 +1759,7 @@ export type Database = {
       }
       end_stream_session: { Args: { _session_id: string }; Returns: boolean }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
-      ensure_credit_wallet: { Args: { _user_id?: string }; Returns: string }
+      ensure_credit_wallet: { Args: { _user_id: string }; Returns: string }
       expire_stale_media: { Args: never; Returns: Json }
       explore_clips: {
         Args: { _limit?: number; _offset?: number }
