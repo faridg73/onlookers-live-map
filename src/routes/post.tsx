@@ -255,7 +255,7 @@ function PostScreen() {
             rows={4}
             required
             minLength={10}
-            placeholder="Tell the hunter exactly what to film, which direction to pan, or what details to focus on."
+            placeholder="Ask for crowd atmosphere, line lengths, tailgates, or street views — public spaces only, never the stage show or game itself."
             className="field resize-none"
           />
           <span className="block text-xs font-medium text-foreground/70">
