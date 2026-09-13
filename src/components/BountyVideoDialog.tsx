@@ -310,14 +310,30 @@ export function BountyVideoDialog({
                       <Share2 className="size-4" />
                     </button>
                     {v.uploader_id === user.id && (
-                      <button
-                        type="button"
-                        aria-label="Delete video"
-                        onClick={() => void remove(v)}
-                        className="text-muted-foreground transition-colors hover:text-destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          aria-label="Share to TikTok / Instagram Reels"
+                          title="Share to TikTok / Instagram Reels"
+                          disabled={sharingId === v.id}
+                          onClick={() => void shareClip(v)}
+                          className="text-muted-foreground transition-colors hover:text-signal disabled:opacity-50"
+                        >
+                          {sharingId === v.id ? (
+                            <Loader2 className="size-4 animate-spin" />
+                          ) : (
+                            <Share2 className="size-4" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Delete video"
+                          onClick={() => void remove(v)}
+                          className="text-muted-foreground transition-colors hover:text-destructive"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </>
                     )}
                   </div>
                   {v.accepted_at ? (
