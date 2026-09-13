@@ -26,11 +26,14 @@ export type DiscoveryGroup = {
   category: CategoryId;
   includedTypes: string[];
   subs: DiscoverySub[];
+  /** Curated groups used when live place lookups return nothing. */
+  fallbackGroups: string[];
 };
 
 export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   {
     slug: "events",
+    fallbackGroups: ["entertainment", "happening"],
     name: "Trending events & live sports",
     short: "Events",
     tagline: "Stadium nights, fight cards, concerts and big gatherings",
@@ -47,6 +50,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "malls",
+    fallbackGroups: ["malls"],
     name: "Shopping malls",
     short: "Malls",
     tagline: "Food courts, queues and stock checks",
@@ -63,6 +67,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "food",
+    fallbackGroups: ["malls", "neighborhoods"],
     name: "Food & drink",
     short: "Food",
     tagline: "Wait times, patios and what the line looks like",
@@ -79,6 +84,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "nightlife",
+    fallbackGroups: ["nightlife"],
     name: "Nightlife",
     short: "Nightlife",
     tagline: "Door lines, crowd size and the vibe right now",
@@ -95,6 +101,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "transit",
+    fallbackGroups: ["transit", "traffic"],
     name: "Airports & transit",
     short: "Transit",
     tagline: "Security lines, platforms and pickup lanes",
@@ -111,6 +118,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "landmarks",
+    fallbackGroups: ["landmarks"],
     name: "Landmarks & museums",
     short: "Landmarks",
     tagline: "Views, entry queues and photo spots",
@@ -127,6 +135,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
   },
   {
     slug: "scenic",
+    fallbackGroups: ["scenic"],
     name: "Parks & coastline",
     short: "Outdoors",
     tagline: "Surf, trails, sunsets and how packed it is",
