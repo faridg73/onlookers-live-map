@@ -4,6 +4,7 @@ import { Camera, ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "luci
 import { MapCanvas } from "@/components/MapCanvas";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
@@ -137,7 +138,8 @@ function MapScreen() {
                       className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 text-left"
                     >
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                         <LivePulseBadge compact className="mb-1" />
+                         <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
                         <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
                           <span className="truncate">{request.place}</span>

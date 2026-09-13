@@ -14,6 +14,7 @@ import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { cn } from "@/lib/utils";
 
 
@@ -47,16 +48,19 @@ export function RequestCard({
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <div className="min-w-0">
             <div className="flex min-w-0 items-center gap-2">
-              <span
-                className={cn(
-                  "shrink-0 rounded-md px-2 py-1 text-[0.62rem] font-extrabold uppercase",
-                  request.status === "open" && "bg-live text-background",
-                  request.status === "claimed" && "bg-signal text-signal-foreground",
-                  done && "bg-surface-raised text-muted-foreground",
-                )}
-              >
-                {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
-              </span>
+              {request.status === "open" && !done ? (
+                <LivePulseBadge compact />
+              ) : (
+                <span
+                  className={cn(
+                    "shrink-0 rounded-md px-2 py-1 text-[0.62rem] font-extrabold uppercase",
+                    request.status === "claimed" && "bg-signal text-signal-foreground",
+                    done && "bg-surface-raised text-muted-foreground",
+                  )}
+                >
+                  {expired ? "Expired" : done ? "Closed" : "Claimed"}
+                </span>
+              )}
               <CategoryBadge category={request.category} compact />
             </div>
             <h3 className="mt-2 truncate font-display text-base font-bold text-foreground">
@@ -135,17 +139,20 @@ export function RequestCard({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span
-          className={cn(
-            "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em]",
-            expired && "border-border bg-surface-raised text-muted-foreground",
-            !expired && done && "border-border bg-foreground text-background",
-            request.status === "claimed" && !done && "border-signal bg-signal font-extrabold text-signal-foreground",
-            request.status === "open" && !done && "border-live bg-live font-extrabold text-background",
-          )}
-        >
-          {expired ? "Expired" : done ? "Closed" : request.status === "claimed" ? "Claimed" : "Active"}
-        </span>
+        {request.status === "open" && !done ? (
+          <LivePulseBadge />
+        ) : (
+          <span
+            className={cn(
+              "rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em]",
+              expired && "border-border bg-surface-raised text-muted-foreground",
+              !expired && done && "border-border bg-foreground text-background",
+              request.status === "claimed" && !done && "border-signal bg-signal font-extrabold text-signal-foreground",
+            )}
+          >
+            {expired ? "Expired" : done ? "Closed" : "Claimed"}
+          </span>
+        )}
         <CategoryBadge category={request.category} />
         {!done && (
           <ExpiryCountdown minutesLeft={request.expiresInMin} highlight={pool >= HIGH_BOUNTY} />
