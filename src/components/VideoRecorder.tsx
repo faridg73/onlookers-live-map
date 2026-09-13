@@ -169,15 +169,28 @@ export function VideoRecorder({
             <Square className="size-6" />
           </button>
         ) : (
-          <button
-            type="button"
-            aria-label="Start recording"
-            disabled={!ready}
-            onClick={start}
-            className="inline-flex size-16 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-50"
-          >
-            <Circle className="size-6" />
-          </button>
+          <>
+            {onPhoto && (
+              <button
+                type="button"
+                aria-label="Take a live photo"
+                disabled={!ready}
+                onClick={snapshot}
+                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
+              >
+                <Camera className="size-5" />
+              </button>
+            )}
+            <button
+              type="button"
+              aria-label="Start recording"
+              disabled={!ready}
+              onClick={start}
+              className="inline-flex size-16 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-50"
+            >
+              <Circle className="size-6" />
+            </button>
+          </>
         )}
       </div>
     </div>
