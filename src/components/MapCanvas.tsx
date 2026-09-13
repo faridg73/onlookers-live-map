@@ -244,7 +244,7 @@ export function MapCanvas({
           );
         })}
 
-      {/* pins */}
+      {/* pins — theme changes with the total coin bounty */}
       {ready &&
         requests.map((r) => {
           const pixel = toPixel(requestMapPosition(r));
@@ -252,6 +252,9 @@ export function MapCanvas({
           const isSel = r.id === selectedId;
           const pooled = boostOf(r.id);
           const pool = r.bounty + pooled;
+          const tier = bountyTier(pool);
+          const closed = isClosed(r);
+
           return (
             <button
               key={r.id}
@@ -262,51 +265,126 @@ export function MapCanvas({
               }}
               className="absolute -translate-x-1/2 -translate-y-full"
               style={{ left: pixel.left, top: pixel.top }}
+              aria-label={`${TIER_LABELS[tier]}: ${pool} coins at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
-                {r.status === "open" && (
+                {/* gold pins keep a soft pulsing halo ring */}
+                {tier === "gold" && !closed && (
+                  <>
+                    <span
+                      className="absolute bottom-0 size-16 animate-ping-slow rounded-full"
+                      style={{ backgroundColor: "color-mix(in oklch, var(--pin-gold) 28%, transparent)" }}
+                    />
+                    <span
+                      className="absolute bottom-1 size-12 rounded-full border-2"
+                      style={{ borderColor: "color-mix(in oklch, var(--pin-gold) 65%, transparent)" }}
+                    />
+                  </>
+                )}
+                {tier === "medium" && r.status === "open" && (
                   <span
-                    className="absolute bottom-0 size-8 animate-ping-slow rounded-full"
-                    style={{
-                      backgroundColor:
-                        r.bounty >= HIGH_BOUNTY && r.expiresInMin <= 15
-                          ? "color-mix(in oklch, var(--urgent) 30%, transparent)"
-                          : "color-mix(in oklch, var(--live) 25%, transparent)",
-                    }}
+                    className="absolute bottom-0 size-9 animate-ping-slow rounded-full"
+                    style={{ backgroundColor: "color-mix(in oklch, var(--pin-medium) 22%, transparent)" }}
                   />
                 )}
-                {!isClosed(r) && (
+
+                {tier !== "standard" && !closed && (
                   <span className="mb-1">
                     <CategoryBadge category={r.category} compact />
                   </span>
                 )}
-                <span
-                  className={cn(
-                    "relative rounded-full border-2 px-3 py-1.5 font-display text-base font-extrabold tracking-tight tabular-nums shadow-lg",
-                    isClosed(r)
-                      ? "border-border bg-surface text-muted-foreground"
-                      : isSel
-                        ? "border-signal bg-signal text-signal-foreground"
-                        : "border-signal bg-surface text-signal",
-                  )}
-                >
-                  ${pool}
-                </span>
-                {pooled > 0 && !isClosed(r) && (
+
+                {tier === "standard" ? (
+                  /* subtle blue pin with a plain category glyph */
+                  <span
+                    className={cn(
+                      "relative flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.62rem] font-bold shadow",
+                      closed ? "border-border bg-surface text-muted-foreground" : "text-white",
+                    )}
+                    style={
+                      closed
+                        ? undefined
+                        : {
+                            borderColor: "color-mix(in oklch, var(--pin-standard) 70%, black)",
+                            backgroundColor: "color-mix(in oklch, var(--pin-standard) 82%, black)",
+                          }
+                    }
+                  >
+                    <span aria-hidden>{categoryGlyph(r.category)}</span>
+                    {isSel && <span className="tabular-nums">{r.place.slice(0, 12)}</span>}
+                  </span>
+                ) : (
+                  <span
+                    className={cn(
+                      "relative flex items-center gap-1.5 rounded-full border-2 font-display font-extrabold tracking-tight tabular-nums shadow-lg",
+                      tier === "gold" ? "px-4 py-2 text-xl" : "px-3 py-1.5 text-base",
+                      closed && "border-border bg-surface text-muted-foreground",
+                    )}
+                    style={
+                      closed
+                        ? undefined
+                        : tier === "gold"
+                          ? {
+                              borderColor: "color-mix(in oklch, var(--pin-gold) 75%, black)",
+                              backgroundColor: "var(--pin-gold)",
+                              color: "oklch(0.2 0.03 92)",
+                              boxShadow: "0 0 26px -4px color-mix(in oklch, var(--pin-gold) 70%, transparent)",
+                            }
+                          : {
+                              borderColor: "color-mix(in oklch, var(--pin-medium) 70%, black)",
+                              backgroundColor: isSel
+                                ? "var(--pin-medium)"
+                                : "color-mix(in oklch, var(--pin-medium) 18%, var(--surface))",
+                              color: isSel ? "oklch(0.2 0.03 55)" : "var(--pin-medium)",
+                            }
+                    }
+                  >
+                    {/* silver coin for medium bounties, gold coin badge for gold */}
+                    <span
+                      className={cn(
+                        "flex items-center justify-center rounded-full border",
+                        tier === "gold"
+                          ? "absolute -right-2 -top-2 size-7 animate-pulse shadow-lg"
+                          : "size-4",
+                      )}
+                      style={{
+                        borderColor:
+                          tier === "gold"
+                            ? "oklch(0.45 0.09 92)"
+                            : "color-mix(in oklch, var(--pin-silver) 60%, black)",
+                        backgroundColor:
+                          tier === "gold" ? "var(--pin-gold)" : "var(--pin-silver)",
+                        color: tier === "gold" ? "oklch(0.28 0.06 92)" : "oklch(0.3 0.01 260)",
+                      }}
+                      aria-hidden
+                    >
+                      <Coins className={tier === "gold" ? "size-4" : "size-2.5"} />
+                    </span>
+                    {pool}
+                  </span>
+                )}
+
+                {pooled > 0 && !closed && (
                   <span className="mt-1 rounded-full bg-signal px-2 py-0.5 text-[0.58rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground shadow">
                     Co-funded pool
                   </span>
                 )}
-                {!isClosed(r) && r.bounty >= HIGH_BOUNTY && (
+                {!closed && r.bounty >= HIGH_BOUNTY && (
                   <span className="mt-1">
                     <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />
                   </span>
                 )}
                 <span
-                  className={cn(
-                    "size-1.5 rotate-45 -translate-y-[3px]",
-                    isClosed(r) ? "bg-border" : "bg-signal",
-                  )}
+                  className={cn("size-1.5 rotate-45 -translate-y-[3px]")}
+                  style={{
+                    backgroundColor: closed
+                      ? "var(--border)"
+                      : tier === "gold"
+                        ? "var(--pin-gold)"
+                        : tier === "medium"
+                          ? "var(--pin-medium)"
+                          : "var(--pin-standard)",
+                  }}
                 />
                 <span
                   role="button"
