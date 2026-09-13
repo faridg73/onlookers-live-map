@@ -20,11 +20,14 @@ export function NewCommunityPostDialog({
   onOpenChange,
   onPosted,
   initialCategory,
+  initialCamera,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPosted: () => void;
   initialCategory?: CommunityCategory;
+  /** Opens the live camera as soon as the sheet appears (Start Live Stream flow). */
+  initialCamera?: boolean;
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "friends");
   const [title, setTitle] = useState("");
