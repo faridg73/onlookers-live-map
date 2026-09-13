@@ -49,12 +49,14 @@ function AdminDashboard() {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [rows, cases] = await Promise.all([
+      const [rows, cases, blocked] = await Promise.all([
         listAllPayoutRequests().catch(() => [] as AdminPayout[]),
         listDisputes().catch(() => [] as DisputeCase[]),
+        listModerationFlags().catch(() => [] as ModerationFlag[]),
       ]);
       setPayouts(rows);
       setDisputes(cases);
+      setFlags(blocked);
     } finally {
       setLoading(false);
     }
