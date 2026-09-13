@@ -229,6 +229,7 @@ function CommunityHub() {
         open={composing}
         onOpenChange={setComposing}
         onPosted={() => void load()}
+        initialCamera={liveFirst}
         {...(category !== "all" ? { initialCategory: category } : {})}
       />
 
