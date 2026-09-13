@@ -167,7 +167,7 @@ export async function notifyLocalOnlookersOfBounty(
 
   const pushed = await sendPush(
     (tokens ?? []).map((row) => row.token),
-    { title, body, path },
+    { title, body, path, flash },
   );
 
   console.log("[geo-alert] dispatched", { requestId, nearby: userIds.length, pushed });
