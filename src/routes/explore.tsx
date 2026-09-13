@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { LiveReactions } from "@/components/LiveReactions";
+import { LoopingPreview } from "@/components/LoopingPreview";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -160,9 +161,11 @@ function ClipCard({ clip }: { clip: ExploreClip }) {
             aria-label={`Play ${clip.title}`}
             className="group size-full"
           >
-            {clip.thumbUrl ? (
-              <img src={clip.thumbUrl} alt={clip.title} loading="lazy" className="size-full object-cover" />
-            ) : null}
+            <LoopingPreview
+              videoUrl={clip.videoUrl}
+              imageUrl={clip.thumbUrl}
+              alt={`Preview of ${clip.title}`}
+            />
             <span className="absolute inset-0 flex items-center justify-center">
               <span className="flex size-14 items-center justify-center rounded-full bg-signal text-signal-foreground transition-transform group-hover:scale-105">
                 <Play className="size-6" />
