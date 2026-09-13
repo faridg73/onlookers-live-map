@@ -139,6 +139,36 @@ function TrendingScreen() {
         ))}
       </div>
 
+      {(eventsLoading || events.length > 0) && (
+        <section className="mt-5">
+          <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
+            <Ticket className="size-4 text-signal" aria-hidden /> Live events this weekend
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Real games, concerts and shows on sale around {area.label}.
+          </p>
+
+          <div className="mt-3 space-y-3">
+            {eventsLoading && events.length === 0
+              ? [0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 animate-pulse rounded-2xl border border-border bg-surface"
+                  />
+                ))
+              : events.map((event) => (
+                  <EventCard key={event.id} event={event} liveCount={liveNear(event.name)} />
+                ))}
+          </div>
+
+          <p className="mt-2 text-[0.62rem] text-muted-foreground">
+            Event listings and ticket links provided by Ticketmaster.
+          </p>
+        </section>
+      )}
+
+
+
       <div className="mt-4 space-y-3">
         {items.map((item) => (
           <TrendingCard
