@@ -1,9 +1,10 @@
 /// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LocateFixed, Share2 } from "lucide-react";
+import { Coins, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
 import { useBoosts } from "@/lib/boosts-store";
