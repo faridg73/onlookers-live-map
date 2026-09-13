@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.enforce_request_content_moderation() FROM PUBLIC, anon, authenticated;
