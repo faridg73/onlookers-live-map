@@ -1,8 +1,10 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LoopingPreview } from "@/components/LoopingPreview";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { categoryDef, type CommunityCategory } from "@/lib/community";
 import { exampleSeeds } from "@/lib/community-examples";
+import { communityTopicVisual } from "@/lib/community-topic-visuals";
 
 /**
  * Editorial starter stories for a lane that has no real posts nearby yet.
@@ -36,18 +38,19 @@ export function CategoryExampleCards({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {seeds.map((seed) => (
+        {seeds.map((seed) => {
+          const topicVisual = communityTopicVisual(category, seed.tag);
+          return (
           <article
             key={seed.id}
             className="overflow-hidden rounded-xl border border-border bg-surface"
           >
             <div className={`relative aspect-[16/9] overflow-hidden ${visual.coverClass}`}>
-              <img
-                src={visual.image}
-                alt=""
-                loading="lazy"
-                className="size-full scale-110 object-cover opacity-80"
-                style={{ objectPosition: seed.imagePosition }}
+              <LoopingPreview
+                imageUrl={topicVisual?.image ?? visual.image}
+                alt={topicVisual?.alt ?? `${def.label} starter idea`}
+                icon={Icon}
+                coverClass={visual.coverClass}
               />
               <span className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-transparent" />
               <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
@@ -70,7 +73,8 @@ export function CategoryExampleCards({
               </Button>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
