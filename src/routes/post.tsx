@@ -187,6 +187,8 @@ function PostScreen() {
     setTitle(parsed.title.slice(0, 120));
     setNote(parsed.instructions);
     if (parsed.action === "live") setMinutes(15);
+    setCustomCapture(false);
+    applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
     if (parsed.action === "meetup") {
       setMinutes(60);
       setTile("community");
