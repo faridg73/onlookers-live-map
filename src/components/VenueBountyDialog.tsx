@@ -55,7 +55,7 @@ export function VenueBountyDialog({
   const [minutes, setMinutes] = useState(120);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
-  const [bounty, setBounty] = useState(10);
+  const [bounty, setBounty] = useState(20);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
 
@@ -95,7 +95,7 @@ export function VenueBountyDialog({
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < bounty) {
-      toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
+      toast.error(`You have ${Math.round(funds)} LC in your wallet`, {
         description: `Buy Looker Coins to lock a ${bounty} LC bounty.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
@@ -105,7 +105,7 @@ export function VenueBountyDialog({
     const header =
       mode === "live"
         ? `Live: 5-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: pre-recorded video from ${venue.name}, delivered within ${windowLabel.toLowerCase()}.`;
+        : `Clip: live-captured video from ${venue.name}, delivered within ${windowLabel.toLowerCase()}.`;
     const details = `${header}\n${note.trim()}`;
 
     setPosting(true);
