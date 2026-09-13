@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Clock, DollarSign, Navigation, Radio } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { HunterEarningBanner } from "@/components/HunterEarningBanner";
+import { RecentActivityFeed } from "@/components/RecentActivityFeed";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
@@ -155,36 +157,46 @@ function HuntScreen() {
         ))}
       </div>
 
-      <div className="mt-4 space-y-3">
-        {list.map(({ request, payout, left, miles }) => (
-          <div key={request.id}>
-            <div className="flex items-center justify-between px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
-              <span className="text-signal">Earn ${payout}</span>
-              <span className="flex items-center gap-2 text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Clock className="size-3" aria-hidden /> {left} min left
-                </span>
-                {miles !== null && (
+      <div className="mt-5 space-y-4">
+        <HunterEarningBanner />
+
+        <div className="space-y-3">
+          {list.map(({ request, payout, left, miles }) => (
+            <div key={request.id}>
+              <div className="flex items-center justify-between px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
+                <span className="text-signal">Earn ${payout}</span>
+                <span className="flex items-center gap-2 text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Navigation className="size-3" aria-hidden /> {formatDistance(miles)}
+                    <Clock className="size-3" aria-hidden /> {left} min left
                   </span>
-                )}
-              </span>
+                  {miles !== null && (
+                    <span className="flex items-center gap-1">
+                      <Navigation className="size-3" aria-hidden /> {formatDistance(miles)}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <BountyDetailsDialog request={request} onClaim={claim}>
+                <RequestCard
+                  request={request}
+                  compact
+                  distanceLabel={miles !== null ? formatDistance(miles) : undefined}
+                />
+              </BountyDetailsDialog>
             </div>
-            <BountyDetailsDialog request={request} onClaim={claim}>
-              <RequestCard
-                request={request}
-                compact
-                distanceLabel={miles !== null ? formatDistance(miles) : undefined}
-              />
-            </BountyDetailsDialog>
-          </div>
-        ))}
-        {list.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No open bounties right now. Check back in a few minutes.
-          </p>
-        )}
+          ))}
+          {list.length === 0 && (
+            <div className="space-y-4">
+              <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                No open bounties right now. Check back in a few minutes.
+              </p>
+              <RecentActivityFeed />
+            </div>
+          )}
+          {list.length > 0 && nearby === 0 && position && (
+            <RecentActivityFeed />
+          )}
+        </div>
       </div>
     </div>
   );
