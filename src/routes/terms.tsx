@@ -132,6 +132,38 @@ function TermsPage() {
         </p>
       </Section>
 
+      <Section title="User-Generated Content and Real-World Platform Utility">
+        <p>
+          <strong className="text-foreground">Physical-Capture Restriction.</strong> Onlooker Live
+          is strictly a platform designed to crowdsource real-time, real-world visual logistics of
+          physical locations (e.g., foot-traffic density, entry-line lengths, parking availability,
+          and stadium seat configurations). You agree that you will only fulfill requests and post
+          content captured through your device&apos;s physical, outward-facing camera lens looking at
+          physical space.
+        </p>
+        <p>
+          <strong className="text-foreground">
+            Prohibition on Digital Screen Captures and Third-Party Platforms.
+          </strong>{" "}
+          You are explicitly prohibited from recording, streaming, snapshotting, uploading, or
+          transmitting any content that captures digital displays, software user interfaces, or
+          mobile applications owned by third parties. This includes, but is not limited to,
+          ticketing platforms, digital ticket barcodes, QR codes, live broadcast feeds, or
+          proprietary streaming interfaces (such as Ticketmaster, StubHub, Live Nation, or
+          equivalent services).
+        </p>
+        <p>
+          <strong className="text-foreground">Indemnification &amp; Liability for Breach.</strong>{" "}
+          Onlooker Live employs automated keyword filters and technical restrictions to block digital
+          application recordings. Circumvention of these safeguards constitutes a material breach of
+          these Terms. You agree to indemnify, defend, and hold harmless Onlooker Live, its
+          parents, subsidiaries, and affiliates from any claims, liabilities, losses, damages,
+          costs, or expenses (including reasonable attorneys&apos; fees) arising out of or related to
+          your distribution of unauthorized third-party digital property or copyrighted material on
+          the platform.
+        </p>
+      </Section>
+
       <Link
         to="/auth"
         className="mt-10 inline-block rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground"
