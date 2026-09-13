@@ -103,6 +103,16 @@ function ProfileScreen() {
       <CreditPayoutDashboard />
 
       <Link
+        to="/pools"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <Users className="size-4 text-signal" /> Group Pools — fund a bounty together
+        </span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </Link>
+
+      <Link
         to="/payout-history"
         className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
       >
