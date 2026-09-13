@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { supabase } from "@/integrations/supabase/client";
+
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { CategoryPicker } from "@/components/CategoryPicker";
@@ -115,6 +117,7 @@ function PostScreen() {
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [action, setAction] = useState<RequestAction>("clip");
