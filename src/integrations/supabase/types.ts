@@ -540,6 +540,7 @@ export type Database = {
           dispute_reason: string | null
           disputed_at: string | null
           id: string
+          reason_code: string | null
           request_id: string
           requester_id: string
           reserved_until: string | null
@@ -554,6 +555,7 @@ export type Database = {
           dispute_reason?: string | null
           disputed_at?: string | null
           id?: string
+          reason_code?: string | null
           request_id: string
           requester_id: string
           reserved_until?: string | null
@@ -568,6 +570,7 @@ export type Database = {
           dispute_reason?: string | null
           disputed_at?: string | null
           id?: string
+          reason_code?: string | null
           request_id?: string
           requester_id?: string
           reserved_until?: string | null
@@ -1759,10 +1762,12 @@ export type Database = {
         }
         Returns: boolean
       }
-      dispute_bounty: {
-        Args: { _reason: string; _request_id: string }
-        Returns: boolean
-      }
+      dispute_bounty:
+        | { Args: { _reason: string; _request_id: string }; Returns: boolean }
+        | {
+            Args: { _reason: string; _reason_code: string; _request_id: string }
+            Returns: boolean
+          }
       end_stream_session: { Args: { _session_id: string }; Returns: boolean }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
       ensure_credit_wallet: { Args: { _user_id: string }; Returns: string }
@@ -1839,6 +1844,23 @@ export type Database = {
           is_moderator: boolean
           location_name: string
           prompt: string
+          request_id: string
+          requester_id: string
+          spotter_id: string
+          status: string
+        }[]
+      }
+      list_disputes_with_reasons: {
+        Args: never
+        Returns: {
+          amount: number
+          dispute_reason: string
+          disputed_at: string
+          evidence_count: number
+          is_moderator: boolean
+          location_name: string
+          prompt: string
+          reason_code: string
           request_id: string
           requester_id: string
           spotter_id: string
