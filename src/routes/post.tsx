@@ -558,7 +558,15 @@ function PostScreen() {
                       aria-pressed={action === id}
                       onClick={() => {
                         setAction(id);
-                        if (id === "live") setMinutes(15);
+                        if (id === "live") {
+                          setMinutes(15);
+                          setCustomCapture(false);
+                          applyCapture(null, id);
+                        }
+                        if (id === "clip" && capture === null) {
+                          setCustomCapture(false);
+                          applyCapture(5, id);
+                        }
                         if (id === "meetup") {
                           setMinutes(60);
                           setTile("community");
