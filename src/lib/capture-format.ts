@@ -34,7 +34,7 @@ export function suggestedBountyForCapture(minutes: CaptureDuration): number {
 }
 
 /** Human label used in cards, escrow notes and hunter instructions. */
-export function captureDurationLabel(minutes: CaptureDuration): string {
+export function captureDurationLabel(minutes: CaptureDuration, live = false): string {
   if (minutes === null) return "Continuous live feed";
-  return `${minutes} min clip`;
+  return live ? `${minutes} min live session` : `${minutes} min clip`;
 }
