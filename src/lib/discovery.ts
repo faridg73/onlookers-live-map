@@ -150,6 +150,40 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
       { id: "views", label: "Lookouts", includedTypes: ["tourist_attraction"] },
     ],
   },
+  {
+    slug: "performances",
+    fallbackGroups: ["scenic", "landmarks"],
+    name: "Street & park performances",
+    short: "Performances",
+    tagline: "Buskers, local musicians, park shows and pop-up art",
+    emoji: "\u{1F3B8}",
+    art: "from-orange-500/30 to-rose-500/20",
+    category: "street",
+    includedTypes: ["tourist_attraction", "park", "performing_arts_theater"],
+    subs: [
+      { id: "buskers", label: "Busker spots", includedTypes: ["tourist_attraction"] },
+      { id: "parks", label: "Park shows", includedTypes: ["park"] },
+      { id: "arts", label: "Pop-up art", includedTypes: ["art_gallery"] },
+      { id: "plazas", label: "Plazas & squares", includedTypes: ["tourist_attraction"] },
+    ],
+  },
+  {
+    slug: "markets",
+    fallbackGroups: ["food", "malls"],
+    name: "Local markets & pop-ups",
+    short: "Markets",
+    tagline: "Farmers markets, food trucks and block parties",
+    emoji: "\u{1F3EA}",
+    art: "from-lime-500/30 to-amber-500/20",
+    category: "markets",
+    includedTypes: ["market", "meal_takeaway"],
+    subs: [
+      { id: "farmers", label: "Farmers markets", includedTypes: ["market"] },
+      { id: "foodtrucks", label: "Food trucks", includedTypes: ["meal_takeaway"] },
+      { id: "groceries", label: "Fresh groceries", includedTypes: ["grocery_store"] },
+      { id: "fleamarkets", label: "Flea markets", includedTypes: ["market"] },
+    ],
+  },
 ];
 
 export function discoveryGroupBySlug(slug?: string) {
