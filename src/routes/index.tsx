@@ -137,7 +137,8 @@ function MapScreen() {
                       className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 text-left"
                     >
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                         <LivePulseBadge compact className="mb-1" />
+                         <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
                         <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
                           <span className="truncate">{request.place}</span>

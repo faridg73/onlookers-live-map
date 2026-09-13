@@ -14,6 +14,7 @@ import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { cn } from "@/lib/utils";
 
 
