@@ -158,6 +158,9 @@
   --cat-realestate: oklch(0.8 0.14 85);
   --cat-art: oklch(0.74 0.17 305);
   --cat-sports: oklch(0.79 0.18 135);
+  --cat-street: oklch(0.78 0.18 25);
+  --cat-community: oklch(0.78 0.17 170);
+  --cat-markets: oklch(0.82 0.16 75);
   --urgent: oklch(0.7 0.2 30);
 }
 

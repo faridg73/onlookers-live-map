@@ -4,7 +4,7 @@ import { ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
-import { VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
+import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
@@ -16,6 +16,7 @@ import {
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
+  needsPublicSpacesNotice,
   subOptionById,
   type CategoryId,
 } from "@/lib/onlooker";
@@ -222,6 +223,12 @@ function PostScreen() {
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />
             <span>{VENUE_EXTERIOR_DISCLAIMER}</span>
           </p>
+          {needsPublicSpacesNotice(tile) && (
+            <p className="flex items-start gap-2 rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
+              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
+              <span>{PUBLIC_HAPPENINGS_DISCLAIMER}</span>
+            </p>
+          )}
         </div>
 
         {permissionNeeded && (

@@ -12,6 +12,13 @@ export const PUBLIC_SPACES_DISCLAIMER =
 export const VENUE_EXTERIOR_DISCLAIMER =
   "Onlooker Live protects creator rights. Requests targeting live musical performances or internal ticketing platforms are automatically rejected. Keep your camera focused on public property, venue lines, and pre-show atmosphere.";
 
+/**
+ * Extra guardrail for the spontaneous-happening categories (street & park
+ * performances, community rescues, local markets & pop-ups).
+ */
+export const PUBLIC_HAPPENINGS_DISCLAIMER =
+  "Public spaces only: bounties and broadcasts in this category must be captured on open streets, parks and public squares where no one has an expectation of privacy. Never film on private property, inside homes, or confidential emergency-response activity — those requests are removed.";
+
 /** Blocks dragged-in files (gallery, desktop, other apps) with the standard notice. */
 export function blockFileDrop(event: React.DragEvent) {
   if (event.dataTransfer?.types?.includes("Files")) {

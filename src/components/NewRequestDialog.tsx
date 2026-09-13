@@ -18,8 +18,10 @@ import {
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
+  needsPublicSpacesNotice,
   type CategoryId,
 } from "@/lib/onlooker";
+import { PUBLIC_HAPPENINGS_DISCLAIMER } from "@/lib/camera-only";
 
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
@@ -145,6 +147,11 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               ))}
             </div>
           </Field>
+          {needsPublicSpacesNotice(category) && (
+            <p className="rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
+              {PUBLIC_HAPPENINGS_DISCLAIMER}
+            </p>
+          )}
           {permissionNeeded && (
             <label className="flex gap-3 rounded-xl border border-signal/40 bg-surface-raised p-3">
               <input
