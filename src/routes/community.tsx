@@ -349,7 +349,7 @@ function CommunityHub() {
       ) : (
         <section className="mt-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
-          {!loading && visible.length === 0 && here && radiusMilesFor(radius) !== null && (
+          {!loading && visible.length === 0 && category === "all" && here && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.
