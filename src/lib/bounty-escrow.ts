@@ -3,7 +3,9 @@ import {
   createBountyRequest,
   getBountyAccessCode,
   getWalletBalance,
+  listActiveRequests,
   settleExpiredBounties,
+  type ActiveRequestRow,
 } from "@/lib/requests.functions";
 
 export const MIN_BOUNTY = 20;
@@ -83,5 +85,15 @@ export async function refundExpiredBounties() {
     await settleExpiredBounties();
   } catch {
     // Never let the background sweep break the map.
+  }
+}
+
+/** Every live request on the platform, so the map and feed are shared. */
+export async function readActiveRequests(): Promise<ActiveRequestRow[]> {
+  try {
+    if (!(await isSignedIn())) return [];
+    return await listActiveRequests();
+  } catch {
+    return [];
   }
 }
