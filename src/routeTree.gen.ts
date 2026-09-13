@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as ExploreRouteImport } from './routes/explore'
@@ -47,6 +48,11 @@ const AuthRoute = AuthRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CopyrightRoute = CopyrightRouteImport.update({
+  id: '/copyright',
+  path: '/copyright',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisputesRoute = DisputesRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/explore': typeof ExploreRoute
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contact'
+    | '/copyright'
     | '/disputes'
     | '/dmca'
     | '/explore'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contact'
+    | '/copyright'
     | '/disputes'
     | '/dmca'
     | '/explore'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/contact'
+    | '/copyright'
     | '/disputes'
     | '/dmca'
     | '/explore'
@@ -321,6 +333,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  CopyrightRoute: typeof CopyrightRoute
   DisputesRoute: typeof DisputesRoute
   DmcaRoute: typeof DmcaRoute
   ExploreRoute: typeof ExploreRoute
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/copyright': {
+      id: '/copyright'
+      path: '/copyright'
+      fullPath: '/copyright'
+      preLoaderRoute: typeof CopyrightRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disputes': {
@@ -521,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  CopyrightRoute: CopyrightRoute,
   DisputesRoute: DisputesRoute,
   DmcaRoute: DmcaRoute,
   ExploreRoute: ExploreRoute,

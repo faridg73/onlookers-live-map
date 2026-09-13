@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { MessageSquare, Gavel, HelpCircle, FileText, Shield, ShieldAlert } from "lucide-react";
+import {
+  MessageSquare,
+  Gavel,
+  HelpCircle,
+  FileText,
+  Shield,
+  ShieldAlert,
+  Copyright,
+} from "lucide-react";
 
 const LINKS = [
   { to: "/faq", label: "FAQ", icon: HelpCircle },
@@ -7,7 +15,8 @@ const LINKS = [
   { to: "/disputes", label: "Disputes", icon: Gavel },
   { to: "/terms", label: "Terms", icon: FileText },
   { to: "/privacy", label: "Privacy", icon: Shield },
-  { to: "/dmca", label: "DMCA / Report Infringement", icon: ShieldAlert },
+  { to: "/dmca", label: "DMCA / Report", icon: ShieldAlert },
+  { to: "/copyright", label: "Copyright Policy", icon: Copyright },
 ];
 
 export function Footer() {
