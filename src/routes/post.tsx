@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyTipPicker } from "@/components/BountyTipPicker";
+import { VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
@@ -68,6 +70,8 @@ function PostScreen() {
   const [accessCode, setAccessCode] = useState("");
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [minutes, setMinutes] = useState(60);
+  const [tip, setTip] = useState(0);
+  const total = (Number.isFinite(bounty) ? bounty : 0) + (Number.isFinite(tip) ? tip : 0);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -98,9 +102,9 @@ function PostScreen() {
     // Catch an empty wallet before posting, so the deposit never fails mid-flow.
     const funds = await readWalletBalance();
     setBalance(funds);
-    if (funds !== null && funds < bounty) {
+    if (funds !== null && funds < total) {
       toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
-        description: `Add funds to lock a $${bounty} bounty.`,
+        description: `Add funds to lock a $${total} bounty${tip > 0 ? " including your tip" : ""}.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
@@ -111,7 +115,7 @@ function PostScreen() {
         prompt: title.trim(),
         details: note.trim(),
         locationName: place.trim(),
-        bounty,
+        bounty: total,
         category,
         accessCode: codeNeeded ? accessCode.trim() : null,
         latitude: spot?.latitude,
@@ -119,14 +123,14 @@ function PostScreen() {
         minutes,
       });
       setBalance(locked.balance);
-      const details = subOption
-        ? `Focus: ${subOption.label}${note.trim() ? `\n${note.trim()}` : ""}`
-        : note.trim();
+      const focus = subOption ? `Focus: ${subOption.label}` : "";
+      const tipLine = tip > 0 ? `Includes a $${tip} tip from the requester's Bounty Wallet.` : "";
+      const details = [focus, note.trim(), tipLine].filter(Boolean).join("\n");
       addRequest({
         title: title.trim(),
         place: place.trim(),
         note: details,
-        bounty,
+        bounty: total,
         category,
         instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
@@ -135,7 +139,9 @@ function PostScreen() {
       });
       const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `$${bounty} held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
+        description: `$${total} held in escrow${
+          tip > 0 ? ` (including a $${tip} tip)` : ""
+        }. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });
     } catch (error) {
@@ -212,6 +218,10 @@ function PostScreen() {
             sub={sub}
             onSubChange={setSub}
           />
+          <p className="flex items-start gap-2 rounded-xl border border-live/40 bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />
+            <span>{VENUE_EXTERIOR_DISCLAIMER}</span>
+          </p>
         </div>
 
         {permissionNeeded && (
@@ -295,7 +305,12 @@ function PostScreen() {
         </div>
 
         <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>6 · Request deadline</span>
+          <span className={sectionLabel}>6 · Bounty Wallet tip (optional)</span>
+          <BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} />
+        </div>
+
+        <div className={`space-y-2.5 ${card}`}>
+          <span className={sectionLabel}>7 · Request deadline</span>
           <div className="grid grid-cols-4 gap-2">
             {DEADLINES.map(({ minutes: m, label }) => (
               <button
@@ -317,7 +332,7 @@ function PostScreen() {
             <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
             <span>
               If no Bounty Hunter claims this request in time, it expires automatically, disappears
-              from the live map, and your ${Number.isFinite(bounty) ? bounty : 0} goes straight back
+              from the live map, and your ${total} goes straight back
               to your wallet.
             </span>
           </p>
@@ -335,7 +350,7 @@ function PostScreen() {
             }
             className="w-full rounded-2xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
+            {posting ? "Locking bounty…" : `Go live — lock $${total}`}
           </button>
           <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
             Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital
