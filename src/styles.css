@@ -167,6 +167,9 @@
   --discover-tutorials: linear-gradient(145deg, oklch(0.82 0.17 85), oklch(0.32 0.09 45) 50%, oklch(0.08 0 0));
   --discover-language: linear-gradient(145deg, oklch(0.78 0.15 220), oklch(0.28 0.1 260) 50%, oklch(0.08 0 0));
   --discover-culture: linear-gradient(145deg, oklch(0.72 0.19 20), oklch(0.3 0.12 330) 50%, oklch(0.08 0 0));
+  --discover-realestate: linear-gradient(145deg, oklch(0.82 0.13 215), oklch(0.26 0.07 240) 50%, oklch(0.08 0 0));
+  --discover-markets: linear-gradient(145deg, oklch(0.88 0.16 95), oklch(0.3 0.1 65) 50%, oklch(0.08 0 0));
+  --discover-events: linear-gradient(145deg, oklch(0.8 0.17 45), oklch(0.28 0.11 15) 50%, oklch(0.08 0 0));
 }
 
 @utility discover-cover-friends {
@@ -187,6 +190,18 @@
 
 @utility discover-cover-culture {
   background: var(--discover-culture);
+}
+
+@utility discover-cover-realestate {
+  background: var(--discover-realestate);
+}
+
+@utility discover-cover-markets {
+  background: var(--discover-markets);
+}
+
+@utility discover-cover-events {
+  background: var(--discover-events);
 }
 
 @layer base {

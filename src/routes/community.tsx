@@ -19,12 +19,14 @@ import { distanceMiles, type MapPosition } from "@/lib/onlooker";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import {
   COMMUNITY_CATEGORIES,
+  categoryDef,
   communityMediaUrls,
   isPinned,
   listCommunityPosts,
   type CommunityCategory,
   type CommunityPost,
 } from "@/lib/community";
+import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -137,21 +139,44 @@ function CommunityHub() {
 
   const label = useCallback((miles: number) => `${formatDistance(miles)} away`, [formatDistance]);
 
-  const visible = useMemo(() => {
+  /**
+   * A tag behaves as a subcategory: match it against the post's own tags, its
+   * lane tags and its words, so a chip like "language exchange" still finds
+   * posts that only mention it in the title or body.
+   */
+  const matchesTag = useCallback((post: CommunityPost, wanted: string) => {
+    const needle = wanted.trim().toLowerCase();
+    if (!needle) return true;
+    if (post.tags.some((t) => t.toLowerCase() === needle)) return true;
+    const haystack = `${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`.toLowerCase();
+    return haystack.includes(needle);
+  }, []);
+
+  const { rows: visible, fallback } = useMemo(() => {
     const limit = here ? radiusMilesFor(radius) : null;
-    const rows = posts
-      .filter((p) => (category === "all" || p.category === category) && (!tag || p.tags.includes(tag)))
+    const sort = (list: Array<{ post: CommunityPost; miles: number | null }>) =>
+      [...list].sort((a, b) => {
+        const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
+        if (pinDiff !== 0) return pinDiff;
+        if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
+        if (a.miles !== null) return -1;
+        if (b.miles !== null) return 1;
+        return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
+      });
+
+    const inRange = posts
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
-    return rows.sort((a, b) => {
-      const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
-      if (pinDiff !== 0) return pinDiff;
-      if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
-      if (a.miles !== null) return -1;
-      if (b.miles !== null) return 1;
-      return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
-    });
-  }, [posts, category, tag, radius, here, distanceFor]);
+
+    const inLane = inRange.filter(({ post }) => category === "all" || post.category === category);
+    const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
+
+    // Never dead-end on an empty subcategory: relax the tag, then the lane.
+    if (exact.length > 0) return { rows: sort(exact), fallback: null as null | "tag" | "lane" };
+    if (tag && inLane.length > 0) return { rows: sort(inLane), fallback: "tag" as const };
+    if (category !== "all" && inRange.length > 0) return { rows: sort(inRange), fallback: "lane" as const };
+    return { rows: [] as typeof inRange, fallback: null as null | "tag" | "lane" };
+  }, [posts, category, tag, radius, here, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
@@ -324,7 +349,7 @@ function CommunityHub() {
       ) : (
         <section className="mt-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
-          {!loading && visible.length === 0 && here && radiusMilesFor(radius) !== null && (
+          {!loading && visible.length === 0 && category === "all" && here && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.
@@ -346,7 +371,36 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && posts.length === 0 && (
+          {!loading && fallback && (
+            <p
+              className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-xs text-muted-foreground"
+              role="status"
+            >
+              {fallback === "tag" ? (
+                <>
+                  No posts tagged <strong className="text-foreground">#{tag}</strong> yet — showing
+                  everything in {categoryDef(category as CommunityCategory).label} instead.
+                </>
+              ) : (
+                <>
+                  No {categoryDef(category as CommunityCategory).label} posts nearby yet — showing
+                  everything else close to you.
+                </>
+              )}
+            </p>
+          )}
+          {!loading && category !== "all" && (visible.length === 0 || Boolean(fallback)) && (
+            <CategoryExampleCards
+              category={category}
+              tag={tag}
+              onStart={(exampleCategory) => {
+                setCategory(exampleCategory);
+                setLiveFirst(false);
+                setComposing(true);
+              }}
+            />
+          )}
+          {!loading && category === "all" && posts.length === 0 && (
             <DiscoverStarterCards
               onStart={(starterCategory) => {
                 setCategory(starterCategory);
