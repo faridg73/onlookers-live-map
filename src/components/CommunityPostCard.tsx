@@ -59,20 +59,13 @@ export function CommunityPostCard({
 
   return (
     <article className="group mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface shadow-lg shadow-background/40">
-      <div className={`relative w-full overflow-hidden ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"} ${mediaUrl ? "" : visual.coverClass}`}>
-        {mediaUrl && (
-          <img
-            src={mediaUrl}
-            alt={`Photo shared with ${post.title}`}
-            loading="lazy"
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none"
-          />
-        )}
-        {!mediaUrl && (
-          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-            <CategoryIcon className="size-16 text-foreground/20" strokeWidth={1.3} />
-          </div>
-        )}
+      <div className={`relative w-full overflow-hidden ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"}`}>
+        <LoopingPreview
+          {...(looksLikeVideo(mediaUrl) ? { videoUrl: mediaUrl } : { imageUrl: mediaUrl })}
+          alt={`Media shared with ${post.title}`}
+          icon={CategoryIcon}
+          coverClass={visual.coverClass}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/35" />
         <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-foreground backdrop-blur-md">
           <CategoryIcon className="size-3 text-signal" /> {def.label}

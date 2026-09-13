@@ -61,6 +61,26 @@
   --animate-rise: rise 0.24s ease-out;
   --animate-confetti: confetti 2s linear forwards;
   --animate-float-up: float-up 1.8s ease-out forwards;
+  --animate-shimmer: shimmer 2.6s ease-in-out infinite;
+  --animate-slow-pan: slow-pan 18s ease-in-out infinite alternate;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes slow-pan {
+  from {
+    transform: scale(1.04) translate3d(-1%, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(1%, -1%, 0);
+  }
 }
 
 @keyframes float-up {
