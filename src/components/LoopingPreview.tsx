@@ -21,6 +21,7 @@ export function LoopingPreview({
   coverClass,
   className,
   rounded,
+  previewDuration = 4,
 }: {
   /** Looping clip source — plays muted while visible. */
   videoUrl?: string | null | undefined;
@@ -32,6 +33,8 @@ export function LoopingPreview({
   coverClass?: string;
   className?: string;
   rounded?: string;
+  /** Length of the silent micro-preview loop, in seconds. */
+  previewDuration?: number;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const video = useRef<HTMLVideoElement | null>(null);
@@ -55,11 +58,31 @@ export function LoopingPreview({
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (visible && !reduced) {
+      node.currentTime = 0;
       void node.play().catch(() => {});
     } else {
       node.pause();
     }
   }, [visible, videoUrl]);
+
+  useEffect(() => {
+    const node = video.current;
+    if (!node) return;
+    const loopPreview = () => {
+      const loopAt = Number.isFinite(node.duration)
+        ? Math.min(previewDuration, node.duration)
+        : previewDuration;
+      if (node.currentTime < loopAt) return;
+      node.currentTime = 0;
+      if (visible) void node.play().catch(() => {});
+    };
+    node.addEventListener("timeupdate", loopPreview);
+    node.addEventListener("ended", loopPreview);
+    return () => {
+      node.removeEventListener("timeupdate", loopPreview);
+      node.removeEventListener("ended", loopPreview);
+    };
+  }, [previewDuration, visible, videoUrl]);
 
   const hasVideo = Boolean(videoUrl);
   const hasImage = Boolean(imageUrl);
@@ -80,7 +103,6 @@ export function LoopingPreview({
           src={videoUrl ?? undefined}
           {...(imageUrl ? { poster: imageUrl } : {})}
           muted
-          loop
           playsInline
           preload="metadata"
           aria-label={alt}

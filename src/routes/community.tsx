@@ -3,7 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
-import { LoopingPreview } from "@/components/LoopingPreview";
+import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import {
   CommunityFeedFilters,
@@ -131,6 +131,17 @@ function CommunityHub() {
     return [...new Set(source)].slice(0, 14);
   }, [category]);
 
+  const categoryPreviews = useMemo(() => {
+    const previews: Partial<Record<CommunityCategory, string>> = {};
+    [...posts]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .forEach((post) => {
+        const url = post.mediaPath ? media[post.mediaPath] : undefined;
+        if (url && !previews[post.category] && looksLikeVideo(url)) previews[post.category] = url;
+      });
+    return previews;
+  }, [media, posts]);
+
   const distanceFor = useCallback(
     (post: CommunityPost) => {
       if (!here || post.latitude === null || post.longitude === null) return null;
@@ -241,6 +252,7 @@ function CommunityHub() {
         {COMMUNITY_CATEGORIES.map((c) => {
           const visual = COMMUNITY_VISUALS[c.id];
           const Icon = visual.icon;
+          const previewUrl = categoryPreviews[c.id];
           return (
           <button
             key={c.id}
@@ -252,7 +264,13 @@ function CommunityHub() {
             aria-pressed={category === c.id}
             className={`group relative h-32 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
           >
-            <LoopingPreview imageUrl={visual.image} alt="" icon={Icon} coverClass={visual.coverClass} />
+            <LoopingPreview
+              videoUrl={previewUrl}
+              imageUrl={previewUrl ? undefined : visual.image}
+              alt={previewUrl ? `Live preview for ${c.label}` : `${c.label} category`}
+              icon={Icon}
+              coverClass={visual.coverClass}
+            />
             <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
             <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
               <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
