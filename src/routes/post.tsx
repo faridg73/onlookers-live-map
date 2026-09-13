@@ -116,6 +116,8 @@ function PostScreen() {
   const [bounty, setBounty] = useState(20);
   const [tip, setTip] = useState(0);
   const [minutes, setMinutes] = useState(60);
+  const [capture, setCapture] = useState<CaptureDuration>(5);
+  const [customCapture, setCustomCapture] = useState(false);
   const [tile, setTile] = useState<CategoryId>("events");
   const [sub, setSub] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
