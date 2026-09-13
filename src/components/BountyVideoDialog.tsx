@@ -227,6 +227,40 @@ export function BountyVideoDialog({
               )}
             </div>
 
+            {justSent && (
+              <div className="mt-2 rounded-2xl border border-signal/40 bg-surface p-4 text-center">
+                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-signal">
+                  <CheckCircle2 className="size-4" /> Your live clip is in!
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Share it with Onlooker Live branding and viral hashtags to bring in more fans.
+                </p>
+                <button
+                  type="button"
+                  disabled={sharingId === justSent.id}
+                  onClick={() => void shareClip(justSent)}
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                >
+                  {sharingId === justSent.id ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin" /> {shareLabel || "Preparing…"}
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="size-3.5" /> Share to TikTok / Instagram Reels
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setJustSent(null)}
+                  className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Not now
+                </button>
+              </div>
+            )}
+
             <div className="mt-2 space-y-3">
               {loading && (
                 <p className="text-center text-sm text-muted-foreground">Loading videos…</p>
