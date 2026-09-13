@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Circle, Loader2, Square, X } from "lucide-react";
+import { Camera, Circle, Loader2, SwitchCamera, Square, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
@@ -28,35 +28,78 @@ export function VideoRecorder({
   const [seconds, setSeconds] = useState(0);
   const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
+  /** Which lens is live. "user" is the selfie camera and previews mirrored. */
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [switching, setSwitching] = useState(false);
+  const [multiCamera, setMultiCamera] = useState(false);
 
   useEffect(() => {
     let alive = true;
     void (async () => {
       try {
+        // Ask for 720p in the natural orientation of whichever lens is active so
+        // the preview and the recorded clip keep the same aspect ratio.
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: {
+            facingMode: { ideal: facing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            aspectRatio: { ideal: 16 / 9 },
+          },
           audio: true,
         });
         if (!alive) {
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
+        streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
         }
         setReady(true);
+        setSwitching(false);
+        void navigator.mediaDevices
+          .enumerateDevices()
+          .then((devices) => {
+            if (!alive) return;
+            setMultiCamera(devices.filter((d) => d.kind === "videoinput").length > 1);
+          })
+          .catch(() => undefined);
       } catch {
+        if (!alive) return;
+        setSwitching(false);
+        // A failed flip keeps the camera that already works instead of closing.
+        if (streamRef.current) {
+          setReady(true);
+          toast.error("This device only has one camera available.");
+          setFacing((current) => (current === "environment" ? "user" : "environment"));
+          return;
+        }
         toast.error("Camera access was blocked. Allow the camera to record a clip.");
         onClose();
       }
     })();
     return () => {
       alive = false;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
     };
-  }, [onClose]);
+  }, [facing, onClose]);
+
+  // Release the camera when the recorder closes.
+  useEffect(
+    () => () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    },
+    [],
+  );
+
+  const flipCamera = useCallback(() => {
+    if (recording) return;
+    setSwitching(true);
+    setReady(false);
+    setFacing((current) => (current === "environment" ? "user" : "environment"));
+  }, [recording]);
 
   const stop = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
@@ -119,6 +162,11 @@ export function VideoRecorder({
     canvas.height = video.videoHeight || 720;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    // The selfie preview is mirrored, so the still is flipped to match it.
+    if (facing === "user") {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob(
       (blob) => {
@@ -155,7 +203,21 @@ export function VideoRecorder({
         </button>
       </div>
 
-      <video ref={videoRef} muted playsInline className="min-h-0 flex-1 object-cover" />
+      <div className="relative min-h-0 flex-1">
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          className={`size-full object-cover transition-opacity duration-200 ${
+            switching ? "opacity-0" : "opacity-100"
+          } ${facing === "user" ? "-scale-x-100" : ""}`}
+        />
+        {switching && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-white/80" />
+          </div>
+        )}
+      </div>
 
       <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
         {PUBLIC_SPACES_DISCLAIMER}
@@ -195,6 +257,17 @@ export function VideoRecorder({
             >
               <Circle className="size-6" />
             </button>
+            {multiCamera && (
+              <button
+                type="button"
+                aria-label={facing === "environment" ? "Switch to front camera" : "Switch to rear camera"}
+                disabled={switching}
+                onClick={flipCamera}
+                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
+              >
+                <SwitchCamera className="size-5" />
+              </button>
+            )}
           </>
         )}
       </div>
