@@ -8,7 +8,37 @@ import {
   type Context,
   type ReactNode,
 } from "react";
-import { SEED_REQUESTS, type CategoryId, type LiveRequest } from "./onlooker";
+import { CATEGORIES, type CategoryId, type LiveRequest } from "./onlooker";
+import type { ActiveRequestRow } from "./requests.functions";
+
+const CATEGORY_IDS = new Set<string>(CATEGORIES.map((c) => c.id));
+
+/** Turns a saved request row into the shape the map, feed and cards expect. */
+function fromRow(row: ActiveRequestRow): LiveRequest {
+  const expiresAt = new Date(row.expiresAt).getTime();
+  const createdAt = new Date(row.createdAt).getTime();
+  return {
+    id: `db-${row.id}`,
+    dbId: row.id,
+    title: row.prompt,
+    place: row.locationName,
+    note: row.details,
+    instructions: row.details,
+    bounty: row.bounty,
+    category: row.category && CATEGORY_IDS.has(row.category) ? (row.category as CategoryId) : undefined,
+    status: "open",
+    minutesAgo: Math.max(0, Math.round((Date.now() - createdAt) / 60_000)),
+    watchers: 1,
+    responses: 0,
+    expiresInMin: Math.max(0, Math.round((expiresAt - createdAt) / 60_000)),
+    expiresAt,
+    requester: row.mine ? "you" : "an onlooker nearby",
+    lat: row.latitude,
+    lng: row.longitude,
+    x: 500,
+    y: 500,
+  };
+}
 
 /** Stamps an absolute deadline so the timer keeps running across re-renders. */
 function withDeadline(r: LiveRequest): LiveRequest {
@@ -29,6 +59,9 @@ type NewRequest = {
   instructions?: string;
   accessCode?: string | undefined;
   dbId?: string;
+  /** True pin so distances are right the moment the request is posted. */
+  lat?: number | undefined;
+  lng?: number | undefined;
   /** Minutes until the bounty expires by itself; defaults to one hour. */
   expiresInMin?: number;
 };
@@ -57,8 +90,30 @@ if (!existingStoreContext) {
 }
 
 export function OnlookerProvider({ children }: { children: ReactNode }) {
-  const [requests, setRequests] = useState<LiveRequest[]>(() => SEED_REQUESTS.map(withDeadline));
+  const [requests, setRequests] = useState<LiveRequest[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Every live request anyone posted, refreshed so nearby onlookers see new
+  // bounties without reloading. Saved rows replace their local placeholder.
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { readActiveRequests } = await import("./bounty-escrow");
+      const rows = await readActiveRequests();
+      if (!active) return;
+      setRequests((prev) => {
+        const saved = rows.map(fromRow);
+        const localOnly = prev.filter((r) => !r.dbId);
+        return [...saved, ...localOnly].map(withDeadline);
+      });
+    };
+    void load();
+    const t = setInterval(() => void load(), 30_000);
+    return () => {
+      active = false;
+      clearInterval(t);
+    };
+  }, []);
 
   // Live feel: watcher counts drift upward over time.
   useEffect(() => {
@@ -115,6 +170,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       expiresInMin: input.expiresInMin ?? 60,
       expiresAt: Date.now() + (input.expiresInMin ?? 60) * 60_000,
       requester: "you",
+      lat: input.lat,
+      lng: input.lng,
       x: 300 + Math.random() * 400,
       y: 300 + Math.random() * 300,
     };

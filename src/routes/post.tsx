@@ -344,6 +344,8 @@ function PostScreen() {
         instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
+        lat: spot?.latitude,
+        lng: spot?.longitude,
         expiresInMin: minutes,
       });
       const deadlineLabel = DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`;

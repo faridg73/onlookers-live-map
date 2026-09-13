@@ -1195,6 +1195,7 @@ export type Database = {
           category: string | null
           checklist: string[]
           created_at: string
+          details: string
           expires_at: string
           id: string
           latitude: number
@@ -1210,6 +1211,7 @@ export type Database = {
           category?: string | null
           checklist?: string[]
           created_at?: string
+          details?: string
           expires_at?: string
           id?: string
           latitude: number
@@ -1225,6 +1227,7 @@ export type Database = {
           category?: string | null
           checklist?: string[]
           created_at?: string
+          details?: string
           expires_at?: string
           id?: string
           latitude?: number

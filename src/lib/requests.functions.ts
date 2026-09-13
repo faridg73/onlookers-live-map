@@ -10,7 +10,7 @@ export const MIN_BOUNTY = 20;
 
 const createSchema = z.object({
   prompt: z.string().trim().min(3).max(300),
-  /** Camera instructions, scanned by the content filter (not stored here). */
+  /** Camera instructions and capture format, stored with the request. */
   details: z.string().trim().max(2000).nullable().optional(),
   locationName: z.string().trim().min(2).max(160),
   bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
@@ -79,6 +79,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         requester_id: context.userId,
         prompt: data.prompt,
         location_name: data.locationName,
+        details: data.details ?? "",
         bounty_amount: data.bounty,
         latitude: data.latitude,
         longitude: data.longitude,
@@ -191,4 +192,54 @@ export const settleExpiredBounties = createServerFn({ method: "POST" })
   .handler(async (): Promise<void> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("settle_escrows");
+  });
+
+export type ActiveRequestRow = {
+  id: string;
+  requesterId: string;
+  prompt: string;
+  details: string;
+  locationName: string;
+  bounty: number;
+  category: string | null;
+  latitude: number;
+  longitude: number;
+  expiresAt: string;
+  createdAt: string;
+  mine: boolean;
+};
+
+/**
+ * Every live request anyone posted, so the map and feed show real bounties
+ * instead of one browser's memory. RLS limits this to open, unexpired rows.
+ */
+export const listActiveRequests = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ActiveRequestRow[]> => {
+    const { data, error } = await context.supabase
+      .from("requests")
+      .select(
+        "id, requester_id, prompt, details, location_name, bounty_amount, category, latitude, longitude, expires_at, created_at, status",
+      )
+      .eq("status", "open")
+      .gt("expires_at", new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    if (error) throw new Error(error.message);
+
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      requesterId: row.requester_id,
+      prompt: row.prompt,
+      details: row.details ?? "",
+      locationName: row.location_name,
+      bounty: Number(row.bounty_amount),
+      category: row.category ?? null,
+      latitude: Number(row.latitude),
+      longitude: Number(row.longitude),
+      expiresAt: row.expires_at,
+      createdAt: row.created_at,
+      mine: row.requester_id === context.userId,
+    }));
   });
