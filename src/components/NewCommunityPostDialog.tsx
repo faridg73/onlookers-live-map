@@ -42,6 +42,10 @@ export function NewCommunityPostDialog({
 
   const def = categoryDef(category);
 
+  useEffect(() => {
+    if (open && initialCamera) setCamera(true);
+  }, [open, initialCamera]);
+
   if (!open) return null;
 
   const submit = async () => {
