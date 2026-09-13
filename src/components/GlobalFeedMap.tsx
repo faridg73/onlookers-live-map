@@ -14,7 +14,12 @@ import { REGIONAL_CENTER } from "@/lib/onlooker";
  * Worldwide map of clips that requesters already paid for. Travellers can watch
  * them and send the reporter a small thank-you tip.
  */
-export function GlobalFeedMap() {
+export function GlobalFeedMap({
+  focus,
+}: {
+  /** Optional spot to centre on, sent from a Discover card. */
+  focus?: { lat: number; lng: number; label: string } | null;
+}) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const holder = useRef<HTMLDivElement | null>(null);
@@ -50,6 +55,25 @@ export function GlobalFeedMap() {
     () => (clips ?? []).filter((c) => c.latitude !== null && c.longitude !== null),
     [clips],
   );
+
+  // A Discover card asked us to show its exact spot: centre there and mark it.
+  const focusMarker = useRef<google.maps.Marker | null>(null);
+  useEffect(() => {
+    if (!focus || !map.current) return;
+    map.current.setCenter({ lat: focus.lat, lng: focus.lng });
+    map.current.setZoom(15);
+    focusMarker.current?.setMap(null);
+    focusMarker.current = new google.maps.Marker({
+      map: map.current,
+      position: { lat: focus.lat, lng: focus.lng },
+      title: focus.label,
+      animation: google.maps.Animation.DROP,
+    });
+    return () => {
+      focusMarker.current?.setMap(null);
+      focusMarker.current = null;
+    };
+  }, [focus]);
 
   // Draw one marker per located clip.
   useEffect(() => {

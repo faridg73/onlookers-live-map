@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { BadgeCheck, Clock, MapPin, Pin, Radio, Target, Trash2 } from "lucide-react";
+import { BadgeCheck, Clock, MapPin, Navigation, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
+import { HunterBadge } from "@/components/HunterBadge";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
@@ -18,16 +19,20 @@ import {
   type CommunityPost,
 } from "@/lib/community";
 
-/** One media-rich Discover card: photo or gradient, countdown, boost, live view. */
+/** One media-rich Discover card: photo or gradient, author identity, quick actions. */
 export function CommunityPostCard({
   post,
   mediaUrl,
   isMine,
+  distanceLabel,
+  onShowOnMap,
   onChanged,
 }: {
   post: CommunityPost;
   mediaUrl?: string;
   isMine: boolean;
+  distanceLabel?: string;
+  onShowOnMap?: () => void;
   onChanged: () => void;
 }) {
   const [watching, setWatching] = useState(false);
@@ -49,9 +54,11 @@ export function CommunityPostCard({
 
   const left = timeLeftLabel(post.expiresAt);
   const pinned = isPinned(post);
+  const initial = post.authorName.trim().charAt(0).toUpperCase() || "O";
+  const handle = `@${post.authorName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "onlooker"}`;
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-xl shadow-background/40">
+    <article className="group mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface shadow-lg shadow-background/40">
       <div className={`relative w-full overflow-hidden ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"} ${mediaUrl ? "" : visual.coverClass}`}>
         {mediaUrl && (
           <img
@@ -63,61 +70,75 @@ export function CommunityPostCard({
         )}
         {!mediaUrl && (
           <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
-            <CategoryIcon className="size-20 text-foreground/20" strokeWidth={1.3} />
+            <CategoryIcon className="size-16 text-foreground/20" strokeWidth={1.3} />
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/35" />
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-foreground/15 bg-background/75 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-md">
-          <CategoryIcon className="size-3.5 text-signal" /> {def.label}
+        <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-foreground backdrop-blur-md">
+          <CategoryIcon className="size-3 text-signal" /> {def.label}
         </span>
         {pinned && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md bg-signal px-2.5 py-1 text-[0.65rem] font-extrabold uppercase text-signal-foreground">
+          <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-md bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold uppercase text-signal-foreground">
             <Pin className="size-3" /> Boosted
           </span>
         )}
-        {!pinned && trust?.verified && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase text-foreground backdrop-blur-md">
-            <BadgeCheck className="size-3.5 text-signal" /> Verified local
-          </span>
-        )}
         {post.isFlash && left && (
-          <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2.5 py-1 text-[0.7rem] font-extrabold text-signal-foreground shadow-lg">
-            <Clock className="size-3.5" /> Flash Meetup · {left}
+          <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 rounded-md bg-signal px-2 py-0.5 text-[0.65rem] font-extrabold text-signal-foreground shadow-lg">
+            <Clock className="size-3" /> {left}
           </span>
         )}
         {watching && (
-          <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-md bg-live px-2.5 py-1 text-[0.7rem] font-extrabold text-background shadow-lg">
-            <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> Live stream active
+          <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md bg-live px-2 py-0.5 text-[0.65rem] font-extrabold text-background shadow-lg">
+            <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> Live
           </span>
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="text-base font-extrabold text-foreground">{post.title}</h3>
-        {post.body && <p className="mt-1 text-sm text-muted-foreground">{post.body}</p>}
-
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          {post.place && (
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3.5" /> {post.place}
+      <div className="p-3.5">
+        <div className="flex items-center gap-2">
+          {post.authorAvatar ? (
+            <img
+              src={post.authorAvatar}
+              alt={`${post.authorName} profile photo`}
+              loading="lazy"
+              className="size-8 shrink-0 rounded-full border border-border object-cover"
+            />
+          ) : (
+            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-surface-raised text-xs font-extrabold text-signal">
+              {initial}
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5">
-            {post.authorName}
-          </span>
-          {trust && (
-            <span className="inline-flex items-center gap-1 font-bold text-foreground">
-              <Target className="size-3.5 text-signal" /> {trust.completionRate}% reputation
+          <span className="min-w-0">
+            <span className="flex items-center gap-1 text-xs font-extrabold text-foreground">
+              <span className="truncate">{post.authorName}</span>
+              {trust?.verified && <BadgeCheck className="size-3.5 shrink-0 text-signal" />}
             </span>
+            <span className="block truncate text-[0.65rem] text-muted-foreground">{handle}</span>
+          </span>
+          <HunterBadge level={post.hunterLevel} showLevel={false} className="ml-auto shrink-0" />
+        </div>
+
+        <h3 className="mt-2.5 text-sm font-extrabold leading-snug text-foreground">{post.title}</h3>
+        {post.body && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{post.body}</p>}
+
+        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.68rem] text-muted-foreground">
+          {post.place && (
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <MapPin className="size-3" /> <span className="truncate">{post.place}</span>
+            </span>
+          )}
+          {distanceLabel && <span className="font-bold text-signal">{distanceLabel}</span>}
+          {trust && trust.totalClaims > 0 && (
+            <span className="font-bold text-foreground">{trust.completionRate}% rep</span>
           )}
         </div>
 
         {post.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {post.tags.map((t) => (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {post.tags.slice(0, 2).map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-border px-2 py-0.5 text-[0.68rem] text-muted-foreground"
+                className="rounded-full border border-border px-2 py-0.5 text-[0.62rem] text-muted-foreground"
               >
                 #{t}
               </span>
@@ -125,15 +146,26 @@ export function CommunityPostCard({
           </div>
         )}
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {onShowOnMap && post.latitude !== null && post.longitude !== null && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onShowOnMap}
+              className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+            >
+              <Navigation className="size-3.5" /> Map pin
+            </Button>
+          )}
           {!isMine && (
             <Button
               type="button"
               onClick={() => setWatching((v) => !v)}
               size="sm"
-              className="rounded-lg text-xs font-extrabold uppercase tracking-[0.12em]"
+              className="h-8 rounded-lg px-2.5 text-[0.65rem] font-extrabold uppercase tracking-[0.08em]"
             >
-              <Radio className="size-4" /> {watching ? "Hide" : "Watch live"}
+              <Radio className="size-3.5" /> {watching ? "Hide" : "Join live"}
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
@@ -144,9 +176,9 @@ export function CommunityPostCard({
                 variant="outline"
                 size="sm"
                 onClick={() => setBoosting((v) => !v)}
-                className="rounded-lg border-signal/60 bg-signal/10 text-xs font-bold uppercase tracking-[0.12em] text-signal"
+                className="h-8 rounded-lg border-signal/60 bg-signal/10 px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-signal"
               >
-                <Pin className="size-4" /> Boost
+                <Pin className="size-3.5" /> Boost
               </Button>
               <Button
                 type="button"
@@ -163,9 +195,9 @@ export function CommunityPostCard({
                       toast.error(err instanceof Error ? err.message : "Couldn't remove that."),
                     );
                 }}
-                className="rounded-lg text-muted-foreground"
+                className="size-8 rounded-lg text-muted-foreground"
               >
-                <Trash2 className="size-4" />
+                <Trash2 className="size-3.5" />
               </Button>
             </>
           )}
