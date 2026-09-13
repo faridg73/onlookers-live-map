@@ -7,9 +7,11 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   isAdmin,
   listAllPayoutRequests,
+  listDmcaNotices,
   listModerationFlags,
   resolvePayout,
   type AdminPayout,
+  type DmcaNotice,
   type ModerationFlag,
 } from "@/lib/admin";
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
@@ -43,20 +45,23 @@ function AdminDashboard() {
   const [payouts, setPayouts] = useState<AdminPayout[]>([]);
   const [disputes, setDisputes] = useState<DisputeCase[]>([]);
   const [flags, setFlags] = useState<ModerationFlag[]>([]);
+  const [notices, setNotices] = useState<DmcaNotice[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [rows, cases, blocked] = await Promise.all([
+      const [rows, cases, blocked, dmca] = await Promise.all([
         listAllPayoutRequests().catch(() => [] as AdminPayout[]),
         listDisputes().catch(() => [] as DisputeCase[]),
         listModerationFlags().catch(() => [] as ModerationFlag[]),
+        listDmcaNotices().catch(() => [] as DmcaNotice[]),
       ]);
       setPayouts(rows);
       setDisputes(cases);
       setFlags(blocked);
+      setNotices(dmca);
     } finally {
       setLoading(false);
     }
@@ -277,6 +282,45 @@ function AdminDashboard() {
                   </span>
                 ))}
               </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+          <ShieldAlert className="size-4 text-signal" /> DMCA / infringement reports
+        </h2>
+
+        {!loading && notices.length === 0 && (
+          <p className="mt-3 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            No infringement reports yet.
+          </p>
+        )}
+
+        <div className="mt-3 space-y-3">
+          {notices.map((notice) => (
+            <article key={notice.id} className="rounded-2xl border border-border bg-surface p-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-display text-base text-foreground">{notice.name}</p>
+                <span className="rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold uppercase text-urgent">
+                  {notice.status}
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {notice.email} · {new Date(notice.created_at).toLocaleString()}
+              </p>
+              <a
+                href={notice.content_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 block break-all text-xs text-signal underline underline-offset-2"
+              >
+                {notice.content_url}
+              </a>
+              <p className="mt-2 rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
+                {notice.description}
+              </p>
             </article>
           ))}
         </div>
