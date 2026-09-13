@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Camera, ChevronDown, Coins as Credits, Layers, MapPin, Navigation } from "lucide-react";
+import { Camera, ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";

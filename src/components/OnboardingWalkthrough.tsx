@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, Camera, Coins as Credits, MapPin } from "lucide-react";
+import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, markOnboardingCompleted } from "@/lib/profile";
@@ -19,7 +19,7 @@ const SLIDES = [
     title: "Request a Bounty",
     body: "Can't find parking or want to check the merch line? Drop a credit bounty and get an onlooker on the ground to show you live video proof.",
     art: creditsArt,
-    icon: Coins as Credits,
+    icon: CoinsIcon,
     alt: "Illustration of a glowing Looker Credit token with orbiting credits",
   },
   {

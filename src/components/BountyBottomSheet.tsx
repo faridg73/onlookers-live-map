@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Camera, Coins as Credits, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Camera, CoinsIcon, Loader2, MapPin, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import {

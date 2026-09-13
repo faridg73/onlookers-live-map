@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Coins as Credits, Loader2, Sparkles } from "lucide-react";
+import { CoinsIcon, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { CREDIT_PACKAGES, formatPackPrice } from "@/lib/credit-packages";

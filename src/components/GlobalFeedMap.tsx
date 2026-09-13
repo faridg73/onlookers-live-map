@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Coins as Credits, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
+import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";

@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Coins as Credits, LocateFixed, Share2 } from "lucide-react";
+import { CoinsIcon, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";

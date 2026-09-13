@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Coins as Credits, Info, ShieldCheck, Timer } from "lucide-react";
+import { ChevronDown, CoinsIcon, Info, ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";

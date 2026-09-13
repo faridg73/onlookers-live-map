@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, Coins as Credits, Loader2 } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, CoinsIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {

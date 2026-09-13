@@ -1,4 +1,4 @@
-import { Coins as Credits, Flame, Zap } from "lucide-react";
+import { CoinsIcon, Flame, Zap } from "lucide-react";
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCreditWords, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";
