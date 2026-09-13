@@ -103,6 +103,22 @@ function CommunityHub() {
     locate();
   }, [locate]);
 
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("onlooker_discover_radius");
+      if (saved === "tight" || saved === "near" || saved === "city" || saved === "any") {
+        setRadius(saved);
+      }
+    } catch {}
+  }, []);
+
+  const changeRadius = useCallback((id: RadiusChoiceId) => {
+    setRadius(id);
+    try {
+      window.localStorage.setItem("onlooker_discover_radius", id);
+    } catch {}
+  }, []);
+
   const tagChoices = useMemo(() => {
     const source =
       category === "all"
