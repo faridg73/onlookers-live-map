@@ -4,6 +4,7 @@ import { Camera, ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "luci
 import { MapCanvas } from "@/components/MapCanvas";
 import { NewRequestDialog } from "@/components/NewRequestDialog";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
