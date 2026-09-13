@@ -119,6 +119,7 @@ export function CommunityPostCard({
               <Radio className="size-4" /> {watching ? "Hide" : "Watch live"}
             </button>
           )}
+          {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
           {isMine && (
             <>
               <button
