@@ -151,6 +151,55 @@ export function AlertSettingsCard() {
         ))}
       </div>
 
+      <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              {pushState.registered ? (
+                <BellRing className="size-4 text-signal" />
+              ) : (
+                <Bell className="size-4 text-muted-foreground" />
+              )}{" "}
+              Phone push alerts
+            </p>
+            <p className="mt-0.5 text-[0.7rem] text-muted-foreground">
+              {pushState.registered
+                ? "You'll get bounty alerts even when the app is closed."
+                : "Wake your phone when a bounty drops nearby — even with the app closed."}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant={pushState.registered ? "outline" : "default"}
+            size="sm"
+            className="h-9 shrink-0 rounded-xl font-bold"
+            disabled={pushState.loading}
+            onClick={() => void togglePush()}
+          >
+            {pushState.loading ? (
+              "Working…"
+            ) : pushState.registered ? (
+              <>
+                <BellOff className="mr-1.5 size-4" /> Disable
+              </>
+            ) : (
+              <>
+                <Bell className="mr-1.5 size-4" /> Enable
+              </>
+            )}
+          </Button>
+        </div>
+        {pushState.message && (
+          <p
+            className={`mt-2 text-[0.7rem] ${
+              pushState.registered ? "text-signal" : "text-muted-foreground"
+            }`}
+          >
+            {pushState.message}
+          </p>
+        )}
+      </div>
+
       {prefs.sms_enabled && (
         <div className="mt-3 space-y-2">
           <Input
