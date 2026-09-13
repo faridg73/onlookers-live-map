@@ -27,6 +27,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
+import { Route as DiscoverTrendingRouteImport } from './routes/discover.trending'
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -121,6 +122,11 @@ const DiscoverIndexRoute = DiscoverIndexRouteImport.update({
   path: '/discover/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverTrendingRoute = DiscoverTrendingRouteImport.update({
+  id: '/discover/trending',
+  path: '/discover/trending',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverGroupIndexRoute = DiscoverGroupIndexRouteImport.update({
   id: '/discover/$group/',
   path: '/discover/$group/',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/discover/trending': typeof DiscoverTrendingRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/discover/trending': typeof DiscoverTrendingRoute
   '/admin': typeof AdminIndexRoute
   '/discover': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
+  '/discover/trending': typeof DiscoverTrendingRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/discover/trending'
     | '/admin/'
     | '/discover/'
     | '/discover/$group/$venue'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/discover/trending'
     | '/admin'
     | '/discover'
     | '/discover/$group/$venue'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/disputes'
     | '/b/$id'
+    | '/discover/trending'
     | '/admin/'
     | '/discover/'
     | '/discover/$group/$venue'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
+  DiscoverTrendingRoute: typeof DiscoverTrendingRoute
   AdminIndexRoute: typeof AdminIndexRoute
   DiscoverIndexRoute: typeof DiscoverIndexRoute
   DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
@@ -432,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover/trending': {
+      id: '/discover/trending'
+      path: '/discover/trending'
+      fullPath: '/discover/trending'
+      preLoaderRoute: typeof DiscoverTrendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover/$group/': {
       id: '/discover/$group/'
       path: '/discover/$group'
@@ -473,6 +493,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
+  DiscoverTrendingRoute: DiscoverTrendingRoute,
   AdminIndexRoute: AdminIndexRoute,
   DiscoverIndexRoute: DiscoverIndexRoute,
   DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,

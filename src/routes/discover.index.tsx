@@ -124,8 +124,7 @@ function DiscoverHome() {
                   </p>
                 </div>
                 <Link
-                  to="/discover/$group"
-                  params={{ group: eventsGroup.slug }}
+                  to="/discover/trending"
                   className="shrink-0 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal"
                 >
                   See all
