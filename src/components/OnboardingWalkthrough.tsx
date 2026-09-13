@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
-import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, markOnboardingCompleted, REPLAY_ONBOARDING_EVENT } from "@/lib/profile";
 import browseArt from "@/assets/onboarding-browse.png";
@@ -41,16 +40,15 @@ export function OnboardingWalkthrough() {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
 
-  // Manual replay from the profile guide button.
+  // Manual replay from the profile guide button — works signed out too.
   useEffect(() => {
-    if (!user) return;
     const onReplay = () => {
       setStep(0);
       setOpen(true);
     };
     window.addEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
     return () => window.removeEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     let alive = true;
