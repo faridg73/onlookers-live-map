@@ -53,6 +53,10 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-pin-standard: var(--pin-standard);
+  --color-pin-medium: var(--pin-medium);
+  --color-pin-silver: var(--pin-silver);
+  --color-pin-gold: var(--pin-gold);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
   --animate-confetti: confetti 2s linear forwards;
@@ -135,6 +139,12 @@
   --border: oklch(0.27 0 0);
   --input: oklch(0.27 0 0);
   --ring: oklch(0.912 0.262 124);
+
+  /* Bounty pin tiers: standard (no coins), medium (1-49), gold (50+) */
+  --pin-standard: oklch(0.62 0.16 255);
+  --pin-medium: oklch(0.75 0.19 55);
+  --pin-silver: oklch(0.86 0.01 260);
+  --pin-gold: oklch(0.85 0.16 92);
 
   /* Category hues used by the colour-coded request badges */
   --cat-food: oklch(0.78 0.17 55);
