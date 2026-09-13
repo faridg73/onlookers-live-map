@@ -14,6 +14,8 @@ type Props = {
   address: string;
   selectedLocation?: PickedLocation | null;
   onPick?: (location: PickedLocation) => void;
+  /** Small interactive thumbnail variant for inline previews. */
+  compact?: boolean;
 };
 
 const FALLBACK = { lat: 34.0522, lng: -118.2437 };
@@ -21,7 +23,7 @@ const clamp = (value: number, minimum: number, maximum: number) =>
   Math.min(maximum, Math.max(minimum, value));
 
 /** Full location picker using the same Google street map behavior as discovery. */
-export function LocationPreviewMap({ address, selectedLocation, onPick }: Props) {
+export function LocationPreviewMap({ address, selectedLocation, onPick, compact = false }: Props) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.Marker | null>(null);
@@ -165,7 +167,10 @@ export function LocationPreviewMap({ address, selectedLocation, onPick }: Props)
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface">
-      <div className="relative h-[18rem] w-full sm:h-[22rem]" onTouchStart={(event) => event.stopPropagation()}>
+      <div
+        className={`relative w-full ${compact ? "h-[10rem] sm:h-[12rem]" : "h-[18rem] sm:h-[22rem]"}`}
+        onTouchStart={(event) => event.stopPropagation()}
+      >
         <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
         <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
           <div className="overflow-hidden rounded-md border border-border bg-surface/90 shadow-lg backdrop-blur">
@@ -188,7 +193,7 @@ export function LocationPreviewMap({ address, selectedLocation, onPick }: Props)
             {status ?? pinned?.formatted ?? "Search above, tap the map, or drag the pin to the exact spot."}
           </p>
         </div>
-        {places.length > 0 && (
+        {!compact && places.length > 0 && (
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Nearby places">
             {places.map((place) => (
               <button

@@ -9,6 +9,8 @@ import {
   GraduationCap,
   Info,
   MapPin,
+  Mic,
+  MicOff,
   Radio,
   Search,
   ShieldCheck,
@@ -43,6 +45,9 @@ import {
   type CategoryId,
 } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
+import { useVoiceInput } from "@/lib/use-voice-input";
+import { reverseGeocode } from "@/lib/geocode.functions";
 import { searchRequestVenues, type DiscoveredPlace } from "@/lib/places.functions";
 import {
   parseRequestIntent,
@@ -118,6 +123,9 @@ function PostScreen() {
   const [moderationOpen, setModerationOpen] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
   const [accessCode, setAccessCode] = useState("");
+  const [recent, setRecent] = useState<RecentPlace[]>([]);
+  const [gpsBusy, setGpsBusy] = useState(false);
+  const voice = useVoiceInput((text) => setPrompt(text));
   const subOption = subOptionById(tile, sub);
   const category: CategoryId = subOption?.category ?? tile;
   const permissionNeeded = needsPermissionConfirmation(category);
@@ -126,7 +134,12 @@ function PostScreen() {
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
+    setRecent(readRecentPlaces());
   }, []);
+
+  useEffect(() => {
+    if (voice.error) toast.error(voice.error);
+  }, [voice.error]);
 
   useEffect(() => {
     if (step !== 2 || venueQuery.trim().length < 2) return;
@@ -169,8 +182,10 @@ function PostScreen() {
       setMinutes(60);
       setTile("community");
     }
-    const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
-    setVenueQuery(query);
+    if (!spot) {
+      const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
+      setVenueQuery(query);
+    }
     setStep(2);
   };
 
@@ -179,6 +194,40 @@ function PostScreen() {
     setPlace(formatted);
     setVenueQuery(venue.name);
     setSpot({ latitude: venue.latitude, longitude: venue.longitude, formatted });
+    setRecent(
+      rememberRecentPlace({
+        formatted,
+        latitude: venue.latitude,
+        longitude: venue.longitude,
+        label: venue.name,
+      }),
+    );
+  };
+
+  const chooseRecent = (entry: RecentPlace) => {
+    setPlace(entry.formatted);
+    setVenueQuery(entry.label);
+    setSpot({ latitude: entry.latitude, longitude: entry.longitude, formatted: entry.formatted });
+    setRecent(rememberRecentPlace(entry));
+  };
+
+  const useCurrentSpot = async () => {
+    setGpsBusy(true);
+    try {
+      const position = await requestCurrentPosition();
+      const { latitude, longitude } = position.coords;
+      setSearchOrigin({ latitude, longitude });
+      const found = await reverseGeocode({ data: { latitude, longitude } }).catch(() => null);
+      const formatted = found?.formatted ?? "My current location";
+      setPlace(formatted);
+      setVenueQuery(formatted);
+      setSpot({ latitude, longitude, formatted });
+      setRecent(rememberRecentPlace({ formatted, latitude, longitude }));
+    } catch {
+      toast.error("Allow location access to use your current spot.");
+    } finally {
+      setGpsBusy(false);
+    }
   };
 
   const locateForSearch = async () => {
@@ -312,8 +361,70 @@ function PostScreen() {
                       placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
                       className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                     />
+                    <Button
+                      type="button"
+                      variant={voice.listening ? "default" : "outline"}
+                      size="icon"
+                      aria-pressed={voice.listening}
+                      aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
+                      title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
+                      onClick={voice.toggle}
+                      disabled={!voice.supported}
+                      className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
+                    >
+                      {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
+                    </Button>
                   </div>
+                  {voice.listening && (
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
+                  )}
                 </div>
+
+                <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
+                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => void useCurrentSpot()}
+                        disabled={gpsBusy}
+                        className="shrink-0 gap-1.5"
+                      >
+                        <MapPin className="size-3.5 text-signal" />
+                        {gpsBusy ? "Locating…" : "My location"}
+                      </Button>
+                      {recent.map((entry) => (
+                        <Button
+                          key={`${entry.latitude},${entry.longitude}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => chooseRecent(entry)}
+                          className="shrink-0 gap-1.5"
+                        >
+                          <MapPin className="size-3.5 text-signal" />
+                          {entry.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+
+                {(spot || parsed.venue) && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Pin preview</p>
+                    <LocationPreviewMap
+                      compact
+                      address={place || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
+                      selectedLocation={spot}
+                      onPick={(next) => {
+                        setSpot(next);
+                        setPlace(next.formatted);
+                      }}
+                    />
+                  </div>
+                )}
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -364,9 +475,34 @@ function PostScreen() {
                     </Button>
                   ))}
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
-                  <MapPin className="size-4" /> Prioritize places near me
-                </Button>
+                {recent.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
+                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                      {recent.map((entry) => (
+                        <Button
+                          key={`${entry.latitude},${entry.longitude}`}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => chooseRecent(entry)}
+                          className="shrink-0 gap-1.5"
+                        >
+                          <MapPin className="size-3.5 text-signal" />
+                          {entry.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
+                    <MapPin className="size-4" /> Prioritize places near me
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" disabled={gpsBusy} onClick={() => void useCurrentSpot()} className="gap-2 text-signal">
+                    <MapPin className="size-4" /> {gpsBusy ? "Locating…" : "Pin my current location"}
+                  </Button>
+                </div>
                 {venueResults.length > 0 && (
                   <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background">
                     {venueResults.map((venue) => (
@@ -386,6 +522,7 @@ function PostScreen() {
                   onPick={(next) => {
                     setSpot(next);
                     setPlace(next.formatted);
+                    setRecent(rememberRecentPlace(next));
                   }}
                 />
               </div>
