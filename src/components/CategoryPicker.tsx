@@ -20,6 +20,7 @@ export function CategoryPicker({
   onSubChange,
   includeAll = false,
   allLabel = "All types",
+  counts,
 }: {
   value: CategoryPickerValue;
   onChange: (id: CategoryPickerValue) => void;
@@ -27,6 +28,8 @@ export function CategoryPicker({
   onSubChange: (subId: string | null) => void;
   includeAll?: boolean;
   allLabel?: string;
+  /** Active request counts per category, rendered as a badge on each tile. */
+  counts?: Partial<Record<CategoryId, number>>;
 }) {
   const subs: SubOption[] = value === "all" ? [] : subOptionsFor(value);
 
@@ -57,6 +60,7 @@ export function CategoryPicker({
         {PRIMARY_CATEGORIES.map((c) => {
           const on = value === c.id;
           const hue = `var(--cat-${c.id})`;
+          const count = counts?.[c.id];
           return (
             <button
               key={c.id}
@@ -64,7 +68,7 @@ export function CategoryPicker({
               onClick={() => select(c.id)}
               aria-pressed={on}
               className={cn(
-                "flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
+                "relative flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
                 on ? "shadow-[0_10px_28px_-16px_black]" : "border-border bg-surface-raised",
               )}
               style={
@@ -76,6 +80,19 @@ export function CategoryPicker({
                   : undefined
               }
             >
+              {count !== undefined && (
+                <span
+                  className={cn(
+                    "absolute right-1 top-1 min-w-[1.15rem] rounded-full px-1 py-[1px] text-[0.6rem] font-extrabold leading-tight",
+                    count > 0
+                      ? "bg-signal text-signal-foreground"
+                      : "bg-surface text-muted-foreground",
+                  )}
+                  aria-label={`${count} active requests`}
+                >
+                  {count}
+                </span>
+              )}
               <span
                 className="flex size-8 items-center justify-center rounded-md text-base"
                 style={{

@@ -44,9 +44,12 @@ const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [
   { key: "expired", label: "Expired" },
 ];
 
+type RadiusChoice = number | "global";
+
 function FeedScreen() {
   const { requests, claim } = useOnlooker();
-  const [filter, setFilter] = useState<RequestStatus | "all">("all");
+  const [filter, setFilter] = useState<RequestStatus | "all">("open");
+  const [radiusChoice, setRadiusChoice] = useState<RadiusChoice>(5);
   const [cat, setCat] = useState<CategoryId | "all">("all");
   const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -70,24 +73,87 @@ function FeedScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Radius choices are offered in the viewer's own unit; we always filter in miles.
+  const radiusOptions = useMemo(
+    () =>
+      unit === "mi"
+        ? [
+            { label: "5 mi", miles: 5 },
+            { label: "15 mi", miles: 15 },
+            { label: "25 mi", miles: 25 },
+          ]
+        : [
+            { label: "10 km", miles: 10 / 1.609344 },
+            { label: "25 km", miles: 25 / 1.609344 },
+            { label: "50 km", miles: 50 / 1.609344 },
+          ],
+    [unit],
+  );
+
+  useEffect(() => {
+    setRadiusChoice((current) =>
+      current === "global" || radiusOptions.some((o) => o.miles === current)
+        ? current
+        : (radiusOptions[0]?.miles ?? 5),
+    );
+  }, [radiusOptions]);
+
+  const radiusLabel =
+    radiusChoice === "global"
+      ? "Global"
+      : (radiusOptions.find((o) => o.miles === radiusChoice)?.label ?? `${radiusChoice} ${unit}`);
+
+  const nextWiderRadius: RadiusChoice =
+    radiusChoice === "global"
+      ? "global"
+      : (radiusOptions.find((o) => o.miles > radiusChoice)?.miles ?? "global");
+
+  const withinRadius = (r: (typeof requests)[number]) => {
+    if (radiusChoice === "global" || !userPosition) return true;
+    return distanceMiles(userPosition, requestMapPosition(r)) <= radiusChoice;
+  };
+
+  // Status, keyword and radius filters shared by both the list and the tile counters.
+  const inScope = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return requests.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (!withinRadius(r)) return false;
+      if (!q) return true;
+      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+      return `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`
+        .toLowerCase()
+        .includes(q);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requests, filter, query, radiusChoice, userPosition]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Partial<Record<CategoryId, number>> = {};
+    for (const c of CATEGORIES) counts[c.id] = 0;
+    for (const r of inScope) {
+      if (r.category && counts[r.category as CategoryId] !== undefined) {
+        counts[r.category as CategoryId] = (counts[r.category as CategoryId] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [inScope]);
+
   // Closest bounties first (like Google Local results); unknown distances go last.
   // Category tiles, sub-options and typed keyword all filter in real time.
   const list = useMemo(() => {
-    const q = query.trim().toLowerCase();
     const subOption = cat === "all" ? undefined : subOptionById(cat, sub);
-    const filtered = requests.filter((r) => {
-      if (filter !== "all" && r.status !== filter) return false;
-      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
-      const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
-      if (cat !== "all") {
-        // A sub-option may point at its own stored category (Events → Sports).
-        const wanted = subOption?.category ?? cat;
-        if (r.category !== wanted) return false;
-        if (subOption && !subOption.category && !haystack.includes(subOption.label.toLowerCase())) {
-          return false;
-        }
+    const filtered = inScope.filter((r) => {
+      if (cat === "all") return true;
+      // A sub-option may point at its own stored category (Events → Sports).
+      const wanted = subOption?.category ?? cat;
+      if (r.category !== wanted) return false;
+      if (subOption && !subOption.category) {
+        const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+        const haystack =
+          `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
+        if (!haystack.includes(subOption.label.toLowerCase())) return false;
       }
-      if (q && !haystack.includes(q)) return false;
       return true;
     });
     if (!userPosition) return filtered;
@@ -96,18 +162,57 @@ function FeedScreen() {
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [requests, filter, cat, query, userPosition]);
+  }, [inScope, cat, sub, userPosition]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
     userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
-  const pot = requests.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
+  const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        <span className="text-signal">${pot}</span> in open bounties within {radius} {unit} of you.
-      </p>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <p className="text-sm text-muted-foreground">
+          <span className="text-signal">${pot}</span> in open bounties{" "}
+          {radiusChoice === "global" ? "worldwide" : `within ${radiusLabel} of you`}.
+        </p>
+        <div
+          className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
+          role="group"
+          aria-label="Search radius"
+        >
+          {radiusOptions.map((o) => (
+            <button
+              key={o.label}
+              type="button"
+              onClick={() => setRadiusChoice(o.miles)}
+              aria-pressed={radiusChoice === o.miles}
+              className={
+                "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+                (radiusChoice === o.miles
+                  ? "bg-signal text-signal-foreground"
+                  : "text-muted-foreground hover:text-foreground")
+              }
+            >
+              {o.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setRadiusChoice("global")}
+            aria-pressed={radiusChoice === "global"}
+            className={
+              "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (radiusChoice === "global"
+                ? "bg-signal text-signal-foreground"
+                : "text-muted-foreground hover:text-foreground")
+            }
+          >
+            Global
+          </button>
+        </div>
+      </div>
+
 
       {!userPosition && (
         <button
@@ -134,6 +239,7 @@ function FeedScreen() {
           sub={sub}
           onSubChange={setSub}
           includeAll
+          counts={categoryCounts}
         />
       </div>
 
@@ -184,10 +290,24 @@ function FeedScreen() {
           </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No live requests match — try another category, or check back as new bounties go live
-            near you.
-          </p>
+          <div className="rounded-2xl border border-dashed border-border p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              {radiusChoice === "global"
+                ? "No live requests match — try another category, or check back as new bounties go live."
+                : `Nothing open within ${radiusLabel} of you right now.`}
+            </p>
+            {radiusChoice !== "global" && (
+              <button
+                type="button"
+                onClick={() => setRadiusChoice(nextWiderRadius)}
+                className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
+              >
+                {nextWiderRadius === "global"
+                  ? "Search globally"
+                  : `Expand to ${radiusOptions.find((o) => o.miles === nextWiderRadius)?.label}`}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
