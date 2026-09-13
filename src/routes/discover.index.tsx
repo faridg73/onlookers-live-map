@@ -142,7 +142,7 @@ function DiscoverHome() {
                 </Link>
               </div>
 
-              <div className="mt-3 -mx-4 flex gap-3 overflow-x-auto px-4 pb-2">
+              <ScrollableLane className="mt-3 -mx-4" innerClassName="gap-3 px-4 pb-2" ariaLabel="Trending events and live sports">
                 {eventsLoading && eventPlaces.length === 0
                   ? [0, 1, 2].map((i) => (
                       <div
