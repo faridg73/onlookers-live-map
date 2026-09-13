@@ -59,8 +59,11 @@ export function VenueBountyDialog({
   const [posting, setPosting] = useState(false);
 
   useEffect(() => {
-    if (open) void readWalletBalance().then(setBalance);
-  }, [open]);
+    if (!open) return;
+    void readWalletBalance().then(setBalance);
+    if (defaultTitle) setTitle(defaultTitle);
+    if (defaultNote) setNote(defaultNote);
+  }, [open, defaultTitle, defaultNote]);
 
   function pickMode(next: Mode) {
     setMode(next);
