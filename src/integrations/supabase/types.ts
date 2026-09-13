@@ -265,6 +265,72 @@ export type Database = {
           },
         ]
       }
+      community_posts: {
+        Row: {
+          aspect: string
+          body: string
+          category: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_flash: boolean
+          latitude: number | null
+          longitude: number | null
+          media_path: string | null
+          media_url: string | null
+          pinned_credits: number
+          pinned_until: string | null
+          place: string
+          tags: string[]
+          title: string
+          updated_at: string
+          user_id: string
+          view_count: number
+        }
+        Insert: {
+          aspect?: string
+          body?: string
+          category: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_flash?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          media_path?: string | null
+          media_url?: string | null
+          pinned_credits?: number
+          pinned_until?: string | null
+          place?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+          view_count?: number
+        }
+        Update: {
+          aspect?: string
+          body?: string
+          category?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_flash?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          media_path?: string | null
+          media_url?: string | null
+          pinned_credits?: number
+          pinned_until?: string | null
+          place?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       credit_purchases: {
         Row: {
           amount_cents: number
@@ -1192,6 +1258,62 @@ export type Database = {
         }
         Relationships: []
       }
+      stream_sessions: {
+        Row: {
+          created_at: string
+          credits_earned: number
+          credits_per_minute: number
+          credits_spent: number
+          ended_at: string | null
+          host_id: string
+          id: string
+          minutes_billed: number
+          post_id: string | null
+          started_at: string
+          status: string
+          updated_at: string
+          viewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_earned?: number
+          credits_per_minute?: number
+          credits_spent?: number
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          minutes_billed?: number
+          post_id?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          viewer_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_earned?: number
+          credits_per_minute?: number
+          credits_spent?: number
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          minutes_billed?: number
+          post_id?: string | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stream_sessions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_tickets: {
         Row: {
           created_at: string
@@ -1560,6 +1682,14 @@ export type Database = {
         Returns: number
       }
       award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
+      bill_stream_minute: {
+        Args: { _session_id: string }
+        Returns: {
+          credits_spent: number
+          host_earned: number
+          minutes_billed: number
+        }[]
+      }
       build_alias: { Args: { _user_id: string }; Returns: string }
       can_chat_on_request: {
         Args: { _request_key: string; _user_id: string }
@@ -1627,6 +1757,7 @@ export type Database = {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
       }
+      end_stream_session: { Args: { _session_id: string }; Returns: boolean }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
       ensure_credit_wallet: { Args: { _user_id?: string }; Returns: string }
       expire_stale_media: { Args: never; Returns: Json }
@@ -1724,6 +1855,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      pin_community_post: {
+        Args: { _credits: number; _hours?: number; _post_id: string }
+        Returns: string
+      }
       platform_metrics: {
         Args: never
         Returns: {
@@ -1793,6 +1928,14 @@ export type Database = {
         Returns: boolean
       }
       settle_escrows: { Args: never; Returns: Json }
+      start_stream_session: {
+        Args: {
+          _credits_per_minute?: number
+          _host_id: string
+          _post_id?: string
+        }
+        Returns: string
+      }
       submit_instant_snippet: { Args: { _video_id: string }; Returns: number }
       tip_coins: {
         Args: {
