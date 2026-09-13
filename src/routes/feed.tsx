@@ -199,11 +199,7 @@ function FeedScreen() {
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
-          <span className="text-signal">${pot}</span> in open bounties{" "}
-          {radiusChoice === "custom"
-            ? `within ${radiusLabel} of you`
-            : `within ${radiusLabel} of you`}
-          .
+          <span className="text-signal">${pot}</span> in open bounties within {radiusLabel} of you.
         </p>
         <div
           className="flex items-center gap-1 rounded-full border border-border bg-surface p-1"
