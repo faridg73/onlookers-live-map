@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
-import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-import { fetchMyProfile, markOnboardingCompleted } from "@/lib/profile";
+import { fetchMyProfile, markOnboardingCompleted, REPLAY_ONBOARDING_EVENT } from "@/lib/profile";
 import browseArt from "@/assets/onboarding-browse.png";
 import creditsArt from "@/assets/onboarding-credits.png";
 import captureArt from "@/assets/onboarding-capture.png";
@@ -41,6 +40,16 @@ export function OnboardingWalkthrough() {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
 
+  // Manual replay from the profile guide button — works signed out too.
+  useEffect(() => {
+    const onReplay = () => {
+      setStep(0);
+      setOpen(true);
+    };
+    window.addEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
+    return () => window.removeEventListener(REPLAY_ONBOARDING_EVENT, onReplay);
+  }, []);
+
   useEffect(() => {
     let alive = true;
     if (!user) {
@@ -65,10 +74,9 @@ export function OnboardingWalkthrough() {
   const finish = useCallback(async () => {
     setBusy(true);
     try {
-      await markOnboardingCompleted();
+      // Signed-out viewers can replay the guide too — nothing to persist.
+      await markOnboardingCompleted().catch(() => undefined);
       setOpen(false);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save. Try again.");
     } finally {
       setBusy(false);
     }
