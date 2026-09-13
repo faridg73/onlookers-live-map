@@ -1897,6 +1897,13 @@ export type Database = {
           platform_cut_usd: number
         }[]
       }
+      pool_backer_counts: {
+        Args: { _pool_ids: string[] }
+        Returns: {
+          backer_count: number
+          pool_id: string
+        }[]
+      }
       public_profile_card: {
         Args: { _user_id: string }
         Returns: {
