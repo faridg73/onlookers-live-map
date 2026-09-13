@@ -369,7 +369,36 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && posts.length === 0 && (
+          {!loading && fallback && (
+            <p
+              className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-xs text-muted-foreground"
+              role="status"
+            >
+              {fallback === "tag" ? (
+                <>
+                  No posts tagged <strong className="text-foreground">#{tag}</strong> yet — showing
+                  everything in {categoryDef(category as CommunityCategory).label} instead.
+                </>
+              ) : (
+                <>
+                  No {categoryDef(category as CommunityCategory).label} posts nearby yet — showing
+                  everything else close to you.
+                </>
+              )}
+            </p>
+          )}
+          {!loading && category !== "all" && (visible.length === 0 || Boolean(fallback)) && (
+            <CategoryExampleCards
+              category={category}
+              tag={tag}
+              onStart={(exampleCategory) => {
+                setCategory(exampleCategory);
+                setLiveFirst(false);
+                setComposing(true);
+              }}
+            />
+          )}
+          {!loading && category === "all" && posts.length === 0 && (
             <DiscoverStarterCards
               onStart={(starterCategory) => {
                 setCategory(starterCategory);
