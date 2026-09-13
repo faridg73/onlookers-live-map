@@ -88,6 +88,8 @@ function ProfileScreen() {
         ))}
       </div>
 
+      <StreakCard />
+
       <HunterStatusCard />
 
       <AlertSettingsCard />
