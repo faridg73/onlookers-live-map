@@ -257,6 +257,17 @@ export function VideoRecorder({
             >
               <Circle className="size-6" />
             </button>
+            {multiCamera && (
+              <button
+                type="button"
+                aria-label={facing === "environment" ? "Switch to front camera" : "Switch to rear camera"}
+                disabled={switching}
+                onClick={flipCamera}
+                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
+              >
+                <SwitchCamera className="size-5" />
+              </button>
+            )}
           </>
         )}
       </div>
