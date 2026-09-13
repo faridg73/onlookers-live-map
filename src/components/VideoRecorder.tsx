@@ -109,6 +109,30 @@ export function VideoRecorder({
     setRecording(true);
   }
 
+  /** Grab a still frame straight off the live camera feed. */
+  function snapshot() {
+    const video = videoRef.current;
+    if (!video || !onPhoto) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 1280;
+    canvas.height = video.videoHeight || 720;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          toast.error("Couldn't capture that photo. Try again.");
+          return;
+        }
+        onPhoto(new File([blob], `photo-${Date.now()}.jpg`, { type: "image/jpeg" }));
+        onClose();
+      },
+      "image/jpeg",
+      0.85,
+    );
+  }
+
   const remaining = Math.max(0, MAX_CLIP_SECONDS - seconds);
 
   return (
@@ -132,7 +156,7 @@ export function VideoRecorder({
 
       <video ref={videoRef} muted playsInline className="min-h-0 flex-1 object-cover" />
 
-      <div className="flex items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+      <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         {saving ? (
           <Loader2 className="size-8 animate-spin text-white" />
         ) : recording ? (
