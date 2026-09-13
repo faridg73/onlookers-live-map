@@ -807,6 +807,7 @@ export type Database = {
           hunter_level: number
           id: string
           is_incognito: boolean
+          legacy_usd_balance: number
           onboarded: boolean
           onboarding_completed: boolean
           rating: number
@@ -826,6 +827,7 @@ export type Database = {
           hunter_level?: number
           id: string
           is_incognito?: boolean
+          legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
           rating?: number
@@ -845,6 +847,7 @@ export type Database = {
           hunter_level?: number
           id?: string
           is_incognito?: boolean
+          legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
           rating?: number
@@ -1293,6 +1296,9 @@ export type Database = {
         Row: {
           available_balance: number
           created_at: string
+          legacy_usd_available: number
+          legacy_usd_lifetime: number
+          legacy_usd_pending: number
           lifetime_earnings: number
           pending_balance: number
           updated_at: string
@@ -1301,6 +1307,9 @@ export type Database = {
         Insert: {
           available_balance?: number
           created_at?: string
+          legacy_usd_available?: number
+          legacy_usd_lifetime?: number
+          legacy_usd_pending?: number
           lifetime_earnings?: number
           pending_balance?: number
           updated_at?: string
@@ -1309,6 +1318,9 @@ export type Database = {
         Update: {
           available_balance?: number
           created_at?: string
+          legacy_usd_available?: number
+          legacy_usd_lifetime?: number
+          legacy_usd_pending?: number
           lifetime_earnings?: number
           pending_balance?: number
           updated_at?: string
