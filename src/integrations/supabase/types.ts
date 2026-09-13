@@ -74,6 +74,54 @@ export type Database = {
         }
         Relationships: []
       }
+      bounty_pools: {
+        Row: {
+          created_at: string
+          creator_id: string
+          expires_at: string | null
+          goal_credits: number
+          id: string
+          kind: string
+          latitude: number | null
+          longitude: number | null
+          place: string
+          pooled_credits: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          expires_at?: string | null
+          goal_credits: number
+          id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          place?: string
+          pooled_credits?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          expires_at?: string | null
+          goal_credits?: number
+          id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          place?: string
+          pooled_credits?: number
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bounty_videos: {
         Row: {
           accepted_at: string | null
@@ -376,6 +424,42 @@ export type Database = {
           name?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      engagement_streaks: {
+        Row: {
+          boost_passes: number
+          created_at: string
+          current_streak: number
+          last_active_on: string | null
+          longest_streak: number
+          reward_credits_total: number
+          total_days: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_passes?: number
+          created_at?: string
+          current_streak?: number
+          last_active_on?: string | null
+          longest_streak?: number
+          reward_credits_total?: number
+          total_days?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_passes?: number
+          created_at?: string
+          current_streak?: number
+          last_active_on?: string | null
+          longest_streak?: number
+          reward_credits_total?: number
+          total_days?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -744,6 +828,38 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pool_contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          pool_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          pool_id: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          pool_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_contributions_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_pools"
             referencedColumns: ["id"]
           },
         ]
@@ -1460,6 +1576,22 @@ export type Database = {
         }[]
       }
       close_expired_requests: { Args: never; Returns: number }
+      contribute_to_pool: {
+        Args: { _amount: number; _pool_id: string }
+        Returns: number
+      }
+      create_bounty_pool: {
+        Args: {
+          _goal_credits: number
+          _hours?: number
+          _kind: string
+          _latitude?: number
+          _longitude?: number
+          _place: string
+          _title: string
+        }
+        Returns: string
+      }
       credit_coin_purchase: {
         Args: {
           _amount_cents: number
@@ -1623,6 +1755,17 @@ export type Database = {
           expires_at: string
           id: string
           location_name: string
+        }[]
+      }
+      record_daily_engagement: {
+        Args: never
+        Returns: {
+          already_checked_in: boolean
+          awarded_credits: number
+          awarded_pass: boolean
+          boost_passes: number
+          current_streak: number
+          longest_streak: number
         }[]
       }
       reject_proof: {
