@@ -61,8 +61,12 @@ function GroupScreen() {
         keywords.some((k) => `${r.place} ${r.title}`.toLowerCase().includes(k)),
     ).length;
 
-  // Curated spots are the safety net when Places has nothing for this area.
-  const fallback = !loading && places.length === 0 ? (curated?.venues ?? []) : [];
+  // Curated spots are the safety net when live place lookups return nothing.
+  const fallback =
+    !loading && places.length === 0
+      ? (curated?.venues ??
+        (group?.fallbackGroups ?? []).flatMap((s) => groupBySlug(s)?.venues ?? []))
+      : [];
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
