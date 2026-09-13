@@ -101,7 +101,7 @@ const VENUE_FILTERS = [
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
   { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
   { id: "clip", label: "Request Video Clip", copy: "Receive a short live-captured video", icon: Video },
-  { id: "meetup", label: "Flash Meetup", copy: "Create a time-sensitive community request", icon: Zap },
+  { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
 
 function PostScreen() {
@@ -472,7 +472,7 @@ function PostScreen() {
                     {[
                       "Show me the line at South Coast Plaza",
                       "I want a 5-minute clip of Fashion Island",
-                      "Flash meetup at Orange Coast College",
+                      "Spontaneous meetup at Orange Coast College",
                     ].map((example) => (
                       <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
                         {example}
@@ -601,7 +601,7 @@ function PostScreen() {
                           setTile("community");
                         }
                       }}
-                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left ${action === id ? "border-signal bg-signal/10" : ""}`}
+                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left transition-all ${action === id ? "border-signal bg-signal/10 shadow-lg shadow-signal/10" : ""}`}
                     >
                       <Icon className="mt-0.5 size-5 shrink-0 text-signal" />
                       <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
