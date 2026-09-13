@@ -100,9 +100,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       setRequests((prev) => {
         const saved = rows.map(fromRow);
-        const savedIds = new Set(saved.map((r) => r.dbId));
-        const localOnly = prev.filter((r) => !r.dbId || !savedIds.has(r.dbId));
-        return [...saved, ...localOnly.filter((r) => !r.dbId)].map(withDeadline);
+        const localOnly = prev.filter((r) => !r.dbId);
+        return [...saved, ...localOnly].map(withDeadline);
       });
     };
     void load();
