@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminControlRouteImport } from './routes/admin-control'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CopyrightRouteImport } from './routes/copyright'
@@ -32,12 +33,18 @@ import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
 import { Route as DiscoverTrendingRouteImport } from './routes/discover.trending'
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
+import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminControlRoute = AdminControlRouteImport.update({
+  id: '/admin-control',
+  path: '/admin-control',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -150,6 +157,11 @@ const DiscoverGroupVenueRoute = DiscoverGroupVenueRouteImport.update({
   path: '/discover/$group/$venue',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMediaLifecycleRoute = ApiPublicMediaLifecycleRouteImport.update({
+  id: '/api/public/media/lifecycle',
+  path: '/api/public/media/lifecycle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -165,6 +177,7 @@ const LovableEmailTransactionalPreviewRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
@@ -187,11 +200,13 @@ export interface FileRoutesByFullPath {
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
@@ -214,12 +229,14 @@ export interface FileRoutesByTo {
   '/discover': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin-control': typeof AdminControlRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
@@ -242,6 +259,7 @@ export interface FileRoutesById {
   '/discover/': typeof DiscoverIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
+  '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -249,6 +267,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin-control'
     | '/auth'
     | '/contact'
     | '/copyright'
@@ -271,11 +290,13 @@ export interface FileRouteTypes {
     | '/discover/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin-control'
     | '/auth'
     | '/contact'
     | '/copyright'
@@ -298,11 +319,13 @@ export interface FileRouteTypes {
     | '/discover'
     | '/discover/$group/$venue'
     | '/discover/$group'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
+    | '/admin-control'
     | '/auth'
     | '/contact'
     | '/copyright'
@@ -325,12 +348,14 @@ export interface FileRouteTypes {
     | '/discover/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
+    | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminControlRoute: typeof AdminControlRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   CopyrightRoute: typeof CopyrightRoute
@@ -353,6 +378,7 @@ export interface RootRouteChildren {
   DiscoverIndexRoute: typeof DiscoverIndexRoute
   DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
+  ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -364,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-control': {
+      id: '/admin-control'
+      path: '/admin-control'
+      fullPath: '/admin-control'
+      preLoaderRoute: typeof AdminControlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -520,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverGroupVenueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/media/lifecycle': {
+      id: '/api/public/media/lifecycle'
+      path: '/api/public/media/lifecycle'
+      fullPath: '/api/public/media/lifecycle'
+      preLoaderRoute: typeof ApiPublicMediaLifecycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -539,6 +579,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminControlRoute: AdminControlRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   CopyrightRoute: CopyrightRoute,
@@ -561,6 +602,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverIndexRoute: DiscoverIndexRoute,
   DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
+  ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

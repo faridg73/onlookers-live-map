@@ -81,11 +81,13 @@ export type Database = {
           bounty_amount: number
           created_at: string
           duration_seconds: number | null
+          expired_at: string | null
           id: string
           is_instant: boolean
           is_public: boolean
           note: string
           payout_amount: number
+          purged_at: string | null
           request_id: string
           request_place: string
           request_title: string
@@ -101,11 +103,13 @@ export type Database = {
           bounty_amount?: number
           created_at?: string
           duration_seconds?: number | null
+          expired_at?: string | null
           id?: string
           is_instant?: boolean
           is_public?: boolean
           note?: string
           payout_amount?: number
+          purged_at?: string | null
           request_id: string
           request_place?: string
           request_title?: string
@@ -121,11 +125,13 @@ export type Database = {
           bounty_amount?: number
           created_at?: string
           duration_seconds?: number | null
+          expired_at?: string | null
           id?: string
           is_instant?: boolean
           is_public?: boolean
           note?: string
           payout_amount?: number
+          purged_at?: string | null
           request_id?: string
           request_place?: string
           request_title?: string
@@ -450,6 +456,39 @@ export type Database = {
         }
         Relationships: []
       }
+      media_purge_queue: {
+        Row: {
+          bucket: string
+          created_at: string
+          error_message: string
+          id: string
+          path: string
+          purged_at: string | null
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          error_message?: string
+          id?: string
+          path: string
+          purged_at?: string | null
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          error_message?: string
+          id?: string
+          path?: string
+          purged_at?: string | null
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: []
+      }
       media_uploads: {
         Row: {
           captured_at: string
@@ -761,6 +800,7 @@ export type Database = {
         Row: {
           alias: string | null
           avatar_url: string | null
+          banned_at: string | null
           created_at: string
           display_name: string
           full_name: string
@@ -772,11 +812,13 @@ export type Database = {
           terms_accepted_at: string | null
           updated_at: string
           wallet_balance: number
+          warning_count: number
           xp: number
         }
         Insert: {
           alias?: string | null
           avatar_url?: string | null
+          banned_at?: string | null
           created_at?: string
           display_name?: string
           full_name?: string
@@ -788,11 +830,13 @@ export type Database = {
           terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
+          warning_count?: number
           xp?: number
         }
         Update: {
           alias?: string | null
           avatar_url?: string | null
+          banned_at?: string | null
           created_at?: string
           display_name?: string
           full_name?: string
@@ -804,6 +848,7 @@ export type Database = {
           terms_accepted_at?: string | null
           updated_at?: string
           wallet_balance?: number
+          warning_count?: number
           xp?: number
         }
         Relationships: []
@@ -1000,6 +1045,27 @@ export type Database = {
           prompt?: string
           requester_id?: string
           status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_tokens: {
+        Row: {
+          created_at: string
+          name: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          token?: string
           updated_at?: string
         }
         Relationships: []
@@ -1324,6 +1390,44 @@ export type Database = {
         }
         Returns: number
       }
+      admin_ban_user: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: boolean
+      }
+      admin_moderation_log: {
+        Args: { _limit?: number }
+        Returns: {
+          banned_at: string
+          created_at: string
+          details: string
+          display_name: string
+          id: string
+          matched_terms: string[]
+          title: string
+          user_id: string
+          warning_count: number
+        }[]
+      }
+      admin_payout_queue: {
+        Args: never
+        Returns: {
+          amount: number
+          coin_balance: number
+          coins_redeemed: number
+          created_at: string
+          destination: string
+          display_name: string
+          id: string
+          status: string
+          stripe_transfer_id: string
+          user_id: string
+        }[]
+      }
+      admin_unban_user: { Args: { _user_id: string }; Returns: boolean }
+      admin_warn_user: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: number
+      }
       award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
       build_alias: { Args: { _user_id: string }; Returns: string }
       can_chat_on_request: {
@@ -1366,6 +1470,7 @@ export type Database = {
         Returns: boolean
       }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
+      expire_stale_media: { Args: never; Returns: Json }
       explore_clips: {
         Args: { _limit?: number; _offset?: number }
         Returns: {
@@ -1458,6 +1563,16 @@ export type Database = {
         Returns: {
           distance_miles: number
           user_id: string
+        }[]
+      }
+      platform_metrics: {
+        Args: never
+        Returns: {
+          active_pins: number
+          expired_clips: number
+          gross_usd: number
+          pending_payouts_usd: number
+          platform_cut_usd: number
         }[]
       }
       public_profile_card: {

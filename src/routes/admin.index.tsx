@@ -137,6 +137,17 @@ function AdminDashboard() {
         </div>
       </header>
 
+      <Link
+        to="/admin-control"
+        className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-surface-raised px-4 py-3 text-sm font-bold text-foreground"
+      >
+        Open control center
+        <span className="text-xs font-semibold text-muted-foreground">
+          Moderation · cash-outs · metrics
+        </span>
+      </Link>
+
+
       {loading && <p className="mt-8 text-center text-sm text-muted-foreground">Loading…</p>}
 
       <section className="mt-8">
