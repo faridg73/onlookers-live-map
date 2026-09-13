@@ -23,9 +23,9 @@ export function LoopingPreview({
   rounded,
 }: {
   /** Looping clip source — plays muted while visible. */
-  videoUrl?: string | null;
+  videoUrl?: string | null | undefined;
   /** Still image; used as the poster when a clip is present. */
-  imageUrl?: string | null;
+  imageUrl?: string | null | undefined;
   alt: string;
   icon?: ComponentType<{ className?: string; strokeWidth?: number }>;
   /** Gradient utility class used when there is no real media. */
