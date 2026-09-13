@@ -174,7 +174,10 @@ function areaFromAddress(address: string) {
 
 /** Turns a live Places result into the venue shape the bounty flow expects. */
 export function venueFromPlace(place: DiscoveredPlace, group: DiscoveryGroup): Venue {
-  const words = place.name.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 3);
+  const words = place.name
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word: string) => word.length > 3);
   return {
     slug: placeSlug(place.id),
     name: place.name,
