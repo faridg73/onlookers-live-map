@@ -22,6 +22,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
+import { Route as PoolsRouteImport } from './routes/pools'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -100,6 +101,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
 const PayoutHistoryRoute = PayoutHistoryRouteImport.update({
   id: '/payout-history',
   path: '/payout-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoolsRoute = PoolsRouteImport.update({
+  id: '/pools',
+  path: '/pools',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostRoute = PostRouteImport.update({
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pools'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pools'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pools'
     | '/post'
     | '/privacy'
     | '/profile'
@@ -367,6 +379,7 @@ export interface RootRouteChildren {
   HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
+  PoolsRoute: typeof PoolsRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
@@ -474,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/payout-history'
       fullPath: '/payout-history'
       preLoaderRoute: typeof PayoutHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pools': {
+      id: '/pools'
+      path: '/pools'
+      fullPath: '/pools'
+      preLoaderRoute: typeof PoolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post': {
@@ -591,6 +611,7 @@ const rootRouteChildren: RootRouteChildren = {
   HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
+  PoolsRoute: PoolsRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
