@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, Coins, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { formatCoins } from "@/lib/coins";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";

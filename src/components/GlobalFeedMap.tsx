@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
+import { formatCoins } from "@/lib/coins";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 
 /**

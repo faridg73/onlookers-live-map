@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { BadgeCheck, Loader2, MessageSquare, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { BountyChat } from "@/components/BountyChat";
+import { formatCoinWords } from "@/lib/coins";
 import {
   AlertDialog,
   AlertDialogAction,
