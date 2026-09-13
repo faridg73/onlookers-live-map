@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   MessageSquare,
@@ -8,6 +9,7 @@ import {
   ShieldAlert,
   Copyright,
 } from "lucide-react";
+import { DmcaReportModal } from "@/components/DmcaReportModal";
 
 const LINKS = [
   { to: "/faq", label: "FAQ", icon: HelpCircle },
@@ -15,11 +17,12 @@ const LINKS = [
   { to: "/disputes", label: "Disputes", icon: Gavel },
   { to: "/terms", label: "Terms", icon: FileText },
   { to: "/privacy", label: "Privacy", icon: Shield },
-  { to: "/dmca", label: "DMCA / Report", icon: ShieldAlert },
   { to: "/copyright", label: "Copyright Policy", icon: Copyright },
-];
+] as const;
 
 export function Footer() {
+  const [dmcaOpen, setDmcaOpen] = useState(false);
+
   return (
     <footer className="border-t border-border bg-surface px-4 py-8">
       <div className="mx-auto max-w-lg">
@@ -34,6 +37,14 @@ export function Footer() {
               {label}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => setDmcaOpen(true)}
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+          >
+            <ShieldAlert className="size-4 text-signal" />
+            DMCA / Report Infringement
+          </button>
         </nav>
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
@@ -48,6 +59,8 @@ export function Footer() {
           </a>
         </div>
       </div>
+
+      <DmcaReportModal open={dmcaOpen} onOpenChange={setDmcaOpen} />
     </footer>
   );
 }
