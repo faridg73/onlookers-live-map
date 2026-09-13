@@ -5,8 +5,7 @@ import { categoryDef, type CommunityCategory } from "@/lib/community";
 import { exampleSeeds } from "@/lib/community-examples";
 
 /**
- * Placeholder ideas for a lane that has no real posts nearby yet. Covers use the
- * lane's own gradient — no stand-in photos or invented authors.
+ * Editorial starter stories for a lane that has no real posts nearby yet.
  */
 export function CategoryExampleCards({
   category,
@@ -27,26 +26,32 @@ export function CategoryExampleCards({
       <div className="flex items-end justify-between gap-3">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
-            <Sparkles className="size-4" /> Ideas for {def.label}
+            <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
           </p>
           <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
-            Nothing posted here yet — start one
+            Stories waiting to happen
           </h2>
         </div>
-        <span className="shrink-0 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-          Examples
-        </span>
+        <span className="shrink-0 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">Starter feed</span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {seeds.map((seed) => (
           <article
             key={seed.id}
-            className="overflow-hidden rounded-2xl border border-dashed border-border bg-surface"
+            className="overflow-hidden rounded-xl border border-border bg-surface"
           >
-            <div className={`relative aspect-[16/9] ${visual.coverClass}`}>
-              <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-foreground/15 bg-background/70 px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-md">
-                <Icon className="size-3.5 text-signal" /> Example
+            <div className={`relative aspect-[16/9] overflow-hidden ${visual.coverClass}`}>
+              <img
+                src={visual.image}
+                alt=""
+                loading="lazy"
+                className="size-full scale-110 object-cover opacity-80"
+                style={{ objectPosition: seed.imagePosition }}
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-transparent" />
+              <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
+                <Icon className="size-3.5" /> {seed.kicker}
               </span>
               <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2 py-0.5 text-[0.62rem] font-bold text-foreground backdrop-blur-md">
                 #{seed.tag}
@@ -61,7 +66,7 @@ export function CategoryExampleCards({
                 onClick={() => onStart(category)}
                 className="mt-3 h-auto p-0 text-xs font-bold text-signal hover:bg-transparent hover:text-signal"
               >
-                Post this <ArrowRight className="size-3.5" />
+                 Start a post <ArrowRight className="size-3.5" />
               </Button>
             </div>
           </article>
