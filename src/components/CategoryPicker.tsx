@@ -60,6 +60,7 @@ export function CategoryPicker({
         {PRIMARY_CATEGORIES.map((c) => {
           const on = value === c.id;
           const hue = `var(--cat-${c.id})`;
+          const count = counts?.[c.id];
           return (
             <button
               key={c.id}
@@ -67,7 +68,7 @@ export function CategoryPicker({
               onClick={() => select(c.id)}
               aria-pressed={on}
               className={cn(
-                "flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
+                "relative flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
                 on ? "shadow-[0_10px_28px_-16px_black]" : "border-border bg-surface-raised",
               )}
               style={
