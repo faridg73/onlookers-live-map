@@ -48,7 +48,7 @@ export function BountyVideoDialog({
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [capturing, setCapturing] = useState(false);
   const closed = isClosed(request);
 
   const refresh = useCallback(async () => {
@@ -70,18 +70,16 @@ export function BountyVideoDialog({
     if (open && user) void refresh();
   }, [open, user, refresh]);
 
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
+  /** Only clips filmed inside the app get here — there is no gallery path. */
+  async function onCaptured(file: File) {
     setUploading(true);
     try {
       await uploadBountyVideo({ file, request, note });
       setNote("");
-      toast.success("Video uploaded and saved to this bounty.");
+      toast.success("Live capture sent to this bounty.");
       await refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed.");
+      toast.error(err instanceof Error ? err.message : "Sending that capture failed.");
     } finally {
       setUploading(false);
     }
