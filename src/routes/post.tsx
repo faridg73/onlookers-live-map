@@ -317,7 +317,7 @@ function PostScreen() {
       const actionLabel = ACTIONS.find((item) => item.id === action)?.label ?? "Request Video Clip";
       const detailLines = [
         `Format: ${actionLabel}`,
-        `Requested capture: ${captureDurationLabel(capture)}`,
+        `Requested capture: ${captureDurationLabel(capture, action === "live")}`,
         subOption ? `Focus: ${subOption.label}` : "",
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
@@ -637,7 +637,7 @@ function PostScreen() {
                       aria-pressed={customCapture}
                       onClick={() => {
                         setCustomCapture(true);
-                        applyCapture(capture ?? 10);
+                        applyCapture(capture ?? 10, action, true);
                       }}
                       className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`}
                     >
@@ -654,7 +654,7 @@ function PostScreen() {
                         onChange={(event) => {
                           const next = Number(event.target.value);
                           if (!Number.isFinite(next)) return;
-                          applyCapture(Math.max(1, Math.min(MAX_CAPTURE_MINUTES, Math.round(next))));
+                          applyCapture(Math.max(1, Math.min(MAX_CAPTURE_MINUTES, Math.round(next))), action, true);
                         }}
                         className="field w-24"
                       />
@@ -662,7 +662,7 @@ function PostScreen() {
                     </label>
                   )}
                   <p className="mt-3 text-xs font-medium text-muted-foreground">
-                    {captureDurationLabel(capture)} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
+                    {captureDurationLabel(capture, action === "live")} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
                     {capture === null && " — the onlooker streams until you end the session."}
                   </p>
                 </div>
