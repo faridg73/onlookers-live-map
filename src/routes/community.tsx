@@ -3,6 +3,8 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import { LoopingPreview } from "@/components/LoopingPreview";
+import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import {
   CommunityFeedFilters,
   radiusMilesFor,
@@ -414,6 +416,15 @@ function CommunityHub() {
           <div className="columns-1 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
             {rest.map(renderCard)}
           </div>
+          {/* Live activity is thin here — fall back to the evergreen clip archive. */}
+          {!loading && visible.length < 3 && (
+            <div className="mt-6">
+              <RecentCapturesFeed
+                title="Recent captures"
+                blurb="Quiet nearby right now — here are streams that already wrapped."
+              />
+            </div>
+          )}
         </section>
       )}
 
