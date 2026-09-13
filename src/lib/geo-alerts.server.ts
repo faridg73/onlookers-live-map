@@ -51,10 +51,40 @@ async function sendPush(
           message: {
             token,
             notification: { title: payload.title, body: payload.body },
-            data: { path: payload.path, urgency: "high" },
-            android: { priority: "HIGH", notification: { channel_id: "bounties" } },
-            apns: { headers: { "apns-priority": "10" } },
-            webpush: { fcm_options: { link: `${SITE_URL}${payload.path}` } },
+            data: {
+              path: payload.path,
+              urgency: payload.flash ? "flash" : "high",
+              // Consumed by the native shell to start a lock-screen Live Activity.
+              live_activity: payload.flash ? "bounty_flash" : "bounty_nearby",
+            },
+            android: {
+              priority: "HIGH",
+              notification: {
+                channel_id: payload.flash ? "bounties_flash" : "bounties",
+                visibility: "PUBLIC",
+                sticky: Boolean(payload.flash),
+                notification_priority: "PRIORITY_MAX",
+                tag: payload.flash ? "bounty_flash" : "bounty_nearby",
+              },
+            },
+            apns: {
+              headers: {
+                "apns-priority": "10",
+                ...(payload.flash ? { "apns-push-type": "alert" } : {}),
+              },
+              payload: {
+                aps: {
+                  sound: "default",
+                  "interruption-level": payload.flash ? "time-sensitive" : "active",
+                  "relevance-score": payload.flash ? 1 : 0.5,
+                },
+              },
+            },
+            webpush: {
+              headers: { Urgency: "high" },
+              notification: { requireInteraction: Boolean(payload.flash) },
+              fcm_options: { link: `${SITE_URL}${payload.path}` },
+            },
           },
         }),
       });
