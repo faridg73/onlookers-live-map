@@ -217,6 +217,9 @@ export type LiveRequest = {
   /** map coordinates in the 0-1000 city space */
   x: number;
   y: number;
+  /** True pin of a saved request, used instead of the 0-1000 city space */
+  lat?: number | undefined;
+  lng?: number | undefined;
 };
 
 export type MapPosition = { lat: number; lng: number };
@@ -224,8 +227,16 @@ export type MapPosition = { lat: number; lng: number };
 export const REGIONAL_CENTER: MapPosition = { lat: 34.0522, lng: -118.2437 };
 const REGION_SPAN = 0.3;
 
-/** Turn a stored 0-1000 map-space point back into real coordinates. */
-export function requestMapPosition(request: Pick<LiveRequest, "x" | "y">): MapPosition {
+/**
+ * Real coordinates for a request. Saved requests carry their true pin, so those
+ * win; the mock 0-1000 city space is only a fallback for local-only entries.
+ */
+export function requestMapPosition(
+  request: Pick<LiveRequest, "x" | "y"> & { lat?: number | undefined; lng?: number | undefined },
+): MapPosition {
+  if (typeof request.lat === "number" && typeof request.lng === "number" && (request.lat !== 0 || request.lng !== 0)) {
+    return { lat: request.lat, lng: request.lng };
+  }
   const clampedX = Math.min(1000, Math.max(0, request.x));
   const clampedY = Math.min(1000, Math.max(0, request.y));
   return {
