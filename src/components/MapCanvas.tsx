@@ -269,6 +269,19 @@ export function MapCanvas({
               aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
+                {/* bounties running out of time pulse hard so they can't be missed */}
+                {!closed && r.status === "open" && r.expiresInMin <= 20 && (
+                  <>
+                    <span
+                      className="absolute bottom-0 size-20 animate-ping-slow rounded-full motion-reduce:animate-none"
+                      style={{ backgroundColor: "color-mix(in oklch, var(--urgent) 30%, transparent)" }}
+                    />
+                    <span
+                      className="absolute bottom-1 size-14 rounded-full border-2"
+                      style={{ borderColor: "color-mix(in oklch, var(--urgent) 70%, transparent)" }}
+                    />
+                  </>
+                )}
                 {/* gold pins keep a soft pulsing halo ring */}
                 {tier === "gold" && !closed && (
                   <>
