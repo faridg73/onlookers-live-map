@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, Loader2, Lock, MessageCircle, Send, Sparkles, Video, X } from "lucide-react";
+import { Camera, Loader2, Lock, MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Confetti } from "@/components/Confetti";
 import { VideoRecorder } from "@/components/VideoRecorder";
@@ -9,6 +9,7 @@ import { uploadChatAttachment } from "@/lib/chat";
 import { compressVideo, MAX_CLIP_SECONDS, videoDuration } from "@/lib/video-compress";
 import { isApprovalMessage, isSystemMessage } from "@/lib/chat-review";
 import { CHAT_SAFETY_NOTE, maskContactInfo } from "@/lib/chat-safety";
+import { blockFileDrop, blockFilePaste } from "@/lib/camera-only";
 import { cn } from "@/lib/utils";
 
 function timeLabel(iso: string) {

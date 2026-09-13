@@ -82,7 +82,7 @@ export function VideoRecorder({
     const candidates = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
     const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported(type));
     if (!mimeType) {
-      toast.error("This browser can't record video. Attach a file instead.");
+      toast.error("This device can't record video in the app. Try the built-in browser camera.");
       return;
     }
     chunksRef.current = [];
