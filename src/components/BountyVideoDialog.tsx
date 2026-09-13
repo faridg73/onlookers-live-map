@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, Loader2, Play, Share2, Trash2, Video } from "lucide-react";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { shareBountyVideo } from "@/lib/share";
+import { shareClipToSocials } from "@/lib/share-clip";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -49,7 +50,29 @@ export function BountyVideoDialog({
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [capturing, setCapturing] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [shareLabel, setShareLabel] = useState("");
+  const [justSent, setJustSent] = useState<BountyVideo | null>(null);
   const closed = isClosed(request);
+
+  async function shareClip(video: BountyVideo) {
+    setSharingId(video.id);
+    setShareLabel("Preparing…");
+    try {
+      const result = await shareClipToSocials(video, setShareLabel);
+      if (result === "downloaded") {
+        toast.success("Watermarked clip saved — post it with the copied hashtags.");
+      } else {
+        toast.success("Shared with Onlooker Live branding.");
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
+      toast.error(err instanceof Error ? err.message : "Couldn't prepare that clip.");
+    } finally {
+      setSharingId(null);
+      setShareLabel("");
+    }
+  }
 
   const refresh = useCallback(async () => {
     setLoading(true);
