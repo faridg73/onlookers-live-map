@@ -102,9 +102,9 @@ function PostScreen() {
     // Catch an empty wallet before posting, so the deposit never fails mid-flow.
     const funds = await readWalletBalance();
     setBalance(funds);
-    if (funds !== null && funds < bounty) {
+    if (funds !== null && funds < total) {
       toast.error(`You have $${funds.toFixed(2)} in your wallet`, {
-        description: `Add funds to lock a $${bounty} bounty.`,
+        description: `Add funds to lock a $${total} bounty${tip > 0 ? " including your tip" : ""}.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
@@ -115,7 +115,7 @@ function PostScreen() {
         prompt: title.trim(),
         details: note.trim(),
         locationName: place.trim(),
-        bounty,
+        bounty: total,
         category,
         accessCode: codeNeeded ? accessCode.trim() : null,
         latitude: spot?.latitude,
@@ -123,14 +123,14 @@ function PostScreen() {
         minutes,
       });
       setBalance(locked.balance);
-      const details = subOption
-        ? `Focus: ${subOption.label}${note.trim() ? `\n${note.trim()}` : ""}`
-        : note.trim();
+      const focus = subOption ? `Focus: ${subOption.label}` : "";
+      const tipLine = tip > 0 ? `Includes a $${tip} tip from the requester's Bounty Wallet.` : "";
+      const details = [focus, note.trim(), tipLine].filter(Boolean).join("\n");
       addRequest({
         title: title.trim(),
         place: place.trim(),
         note: details,
-        bounty,
+        bounty: total,
         category,
         instructions: details,
         accessCode: codeNeeded ? accessCode.trim() : undefined,
@@ -139,7 +139,9 @@ function PostScreen() {
       });
       const deadlineLabel = DEADLINES.find((d) => d.minutes === minutes)?.label ?? `${minutes} min`;
       toast.success("Request is live", {
-        description: `$${bounty} held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
+        description: `$${total} held in escrow${
+          tip > 0 ? ` (including a $${tip} tip)` : ""
+        }. Expires in ${deadlineLabel} if nobody claims it.`,
       });
       navigate({ to: "/feed" });
     } catch (error) {
