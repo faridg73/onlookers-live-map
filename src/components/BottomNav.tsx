@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users } from "lucide-react";
+import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users, Wallet } from "lucide-react";
 import { useChatAlerts } from "@/hooks/use-chat-alerts";
 import { ChatInbox } from "@/components/ChatInbox";
 
@@ -10,6 +10,7 @@ const items = [
   { to: "/discover", label: "Venues", icon: Users, exact: false },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
   { to: "/post", label: "+ Post", icon: Plus, exact: false, primary: true },
+  { to: "/balance", label: "Balance", icon: Wallet, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },
 ] as const;
 
