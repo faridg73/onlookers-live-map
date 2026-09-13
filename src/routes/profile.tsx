@@ -94,6 +94,8 @@ function ProfileScreen() {
 
       <EarningsWallet />
 
+      <CoinWalletCard />
+
       <CashOutCard />
 
       <Link
