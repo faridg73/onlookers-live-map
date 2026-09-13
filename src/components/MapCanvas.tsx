@@ -4,6 +4,7 @@ import { CoinsIcon, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
+import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
@@ -386,6 +387,11 @@ export function MapCanvas({
                 {!closed && r.bounty >= HIGH_BOUNTY && (
                   <span className="mt-1">
                     <ExpiryCountdown minutesLeft={r.expiresInMin} highlight />
+                  </span>
+                )}
+                {!closed && r.status === "open" && (
+                  <span className="mt-1">
+                    <UrgencyBadge minutesLeft={r.expiresInMin} bounty={pool} compact />
                   </span>
                 )}
                 <span
