@@ -86,6 +86,10 @@ function PostScreen() {
       toast.error("Add a 6-digit code or word the onlooker can quote on site.");
       return;
     }
+    if (!isRequestAllowed(title, note, place)) {
+      toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
+      return;
+    }
     // Catch an empty wallet before posting, so the deposit never fails mid-flow.
     const funds = await readWalletBalance();
     setBalance(funds);
@@ -100,6 +104,7 @@ function PostScreen() {
     try {
       const locked = await lockBounty({
         prompt: title.trim(),
+        details: note.trim(),
         locationName: place.trim(),
         bounty,
         category,

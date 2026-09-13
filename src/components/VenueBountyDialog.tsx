@@ -14,6 +14,7 @@ import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { categoryById } from "@/lib/onlooker";
+import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import type { Venue } from "@/lib/venues";
 
 type Mode = "live" | "clip";
@@ -85,6 +86,10 @@ export function VenueBountyDialog({
     }
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      return;
+    }
+    if (!isRequestAllowed(title, note, venue.name)) {
+      toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
     }
     const funds = await readWalletBalance();
