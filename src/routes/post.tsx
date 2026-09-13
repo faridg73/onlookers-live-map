@@ -306,7 +306,7 @@ function PostScreen() {
         </div>
 
         <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>6 · Request deadline</span>
+          <span className={sectionLabel}>7 · Request deadline</span>
           <div className="grid grid-cols-4 gap-2">
             {DEADLINES.map(({ minutes: m, label }) => (
               <button
@@ -328,7 +328,7 @@ function PostScreen() {
             <Timer className="mt-0.5 size-4 shrink-0 text-signal" />
             <span>
               If no Bounty Hunter claims this request in time, it expires automatically, disappears
-              from the live map, and your ${Number.isFinite(bounty) ? bounty : 0} goes straight back
+              from the live map, and your ${total} goes straight back
               to your wallet.
             </span>
           </p>
@@ -346,7 +346,7 @@ function PostScreen() {
             }
             className="w-full rounded-2xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Go live — lock $${Number.isFinite(bounty) ? bounty : 0}`}
+            {posting ? "Locking bounty…" : `Go live — lock $${total}`}
           </button>
           <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
             Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital
