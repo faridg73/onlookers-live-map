@@ -116,6 +116,15 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       console.error("[sms] nearby dispatch failed", smsError);
     }
 
+    // Wake up onlookers standing within 1.5 miles of the pin. An alert problem
+    // must never stop a paid request from going live either.
+    try {
+      const { notifyLocalOnlookersOfBounty } = await import("@/lib/geo-alerts.server");
+      await notifyLocalOnlookersOfBounty(row.id, context.userId);
+    } catch (alertError) {
+      console.error("[geo-alert] nearby dispatch failed", alertError);
+    }
+
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("wallet_balance")

@@ -35,6 +35,7 @@ export function BountyDetailsDialog({
   children,
   userPosition = null,
   openOnMount = false,
+  autoSnap = false,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
@@ -43,6 +44,8 @@ export function BountyDetailsDialog({
   userPosition?: MapPosition | null;
   /** Opens straight away — used when arriving from a nearby-bounty alert link. */
   openOnMount?: boolean;
+  /** Arrives from a nearby-bounty push: opens the instant camera right away. */
+  autoSnap?: boolean;
 }) {
   const [open, setOpen] = useState(openOnMount);
   const [confirming, setConfirming] = useState(false);
@@ -94,7 +97,7 @@ export function BountyDetailsDialog({
             </div>
           )}
 
-          <InstantSnippetButton request={request} userPosition={userPosition} />
+          <InstantSnippetButton request={request} userPosition={userPosition} autoStart={autoSnap} />
 
           <Button
             type="button"

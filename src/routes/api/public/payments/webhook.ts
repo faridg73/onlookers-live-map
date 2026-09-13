@@ -50,6 +50,49 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
   console.log("[webhook] wallet credited", { session: session["id"], userId, amount, fresh: data });
 }
 
+/** Adds a bought Looker Coins pack to the buyer's wallet exactly once. */
+async function creditCoinPurchase(session: Record<string, any>, env: StripeEnv) {
+  const meta = session["metadata"] ?? {};
+  const userId = meta.userId ?? session["client_reference_id"];
+  const coins = Number(meta.coins ?? 0);
+  const packageId = String(meta.packageId ?? "unknown");
+
+  if (!userId || !(coins > 0)) {
+    console.error("[webhook] coin purchase missing user or coins", {
+      session: session["id"],
+      userId,
+      coins,
+    });
+    return;
+  }
+
+  const { data, error } = await getSupabase().rpc("credit_coin_purchase", {
+    _user_id: userId,
+    _session_id: session["id"],
+    _package_id: packageId,
+    _coins: Math.round(coins),
+    _amount_cents: Number(session["amount_total"] ?? 0),
+    _environment: env,
+  });
+
+  if (error) {
+    console.error("[webhook] credit_coin_purchase failed", {
+      session: session["id"],
+      userId,
+      coins,
+      message: error.message,
+    });
+    throw new Error(error.message);
+  }
+  console.log("[webhook] coins credited", { session: session["id"], userId, coins, fresh: data });
+}
+
+/** Routes a settled checkout to the right wallet: money top-up or coin pack. */
+async function fulfil(session: Record<string, any>, env: StripeEnv) {
+  if (session["metadata"]?.kind === "coin_purchase") await creditCoinPurchase(session, env);
+  else await creditTopUp(session, env);
+}
+
 async function handleWebhook(request: Request, env: StripeEnv) {
   const event = await verifyWebhook(request, env);
   console.log("[webhook] event", { type: event.type, env });
@@ -57,12 +100,12 @@ async function handleWebhook(request: Request, env: StripeEnv) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Record<string, any>;
-      if (session["payment_status"] !== "unpaid") await creditTopUp(session, env);
+      if (session["payment_status"] !== "unpaid") await fulfil(session, env);
       else console.log("[webhook] payment still settling", { session: session["id"] });
       break;
     }
     case "checkout.session.async_payment_succeeded":
-      await creditTopUp(event.data.object as Record<string, any>, env);
+      await fulfil(event.data.object as Record<string, any>, env);
       break;
     case "checkout.session.async_payment_failed":
       console.warn("[webhook] delayed payment failed", {

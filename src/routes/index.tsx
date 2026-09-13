@@ -13,8 +13,11 @@ import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { b?: string | undefined } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { b?: string | undefined; snap?: string | undefined } => ({
     b: typeof search["b"] === "string" ? search["b"] : undefined,
+    snap: search["snap"] === "1" ? "1" : undefined,
   }),
   head: () => ({
     meta: [
@@ -38,7 +41,7 @@ export const Route = createFileRoute("/")({
 
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
-  const { b } = Route.useSearch();
+  const { b, snap } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [nearbyOpen, setNearbyOpen] = useState(false);
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
@@ -165,6 +168,7 @@ function MapScreen() {
               onClaim={claim}
               userPosition={userPosition}
               openOnMount={b === selected.id}
+              autoSnap={snap === "1" && b === selected.id}
             >
               <RequestCard
                 request={selected}
