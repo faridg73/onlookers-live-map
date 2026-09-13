@@ -1,4 +1,4 @@
 # Roadmap
 
-- [ ] Fix live 500 on /community (Discover page fails on published site)
-- [ ] Restore Browse/venues tab in bottom nav; Discover gets its own separate entry
+- [x] Fix live error on /community (Realtime channel reuse crashed the page for signed-in users)
+- [x] Restore Browse tab in bottom nav; community hub now has its own "Meet" tab
