@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from "react";
-import { HandCoins, ShieldCheck } from "lucide-react";
+import { CircleOff, HandCoins, Radar, ShieldCheck } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BoostBounty } from "@/components/BoostBounty";
 import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
+import { supabase } from "@/integrations/supabase/client";
 import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,11 +50,62 @@ export function BountyDetailsDialog({
 }) {
   const [open, setOpen] = useState(openOnMount);
   const [confirming, setConfirming] = useState(false);
+  const [availabilityPrompt, setAvailabilityPrompt] = useState(false);
+  const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
+  const [checking, setChecking] = useState(false);
   const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
   const pooled = boostOf(request.id);
   const pool = request.bounty + pooled;
+
+  /**
+   * Availability gate: re-verify the bounty is still open right now (locally,
+   * and against the live database record when one exists) before the hunter
+   * commits. Closed or expired bounties show a clean notice instead.
+   */
+  async function beginClaim() {
+    setChecking(true);
+    try {
+      const expiredNow =
+        request.status === "expired" ||
+        (request.expiresAt !== undefined && request.expiresAt <= Date.now());
+
+      if (isClosed(request) || request.status !== "open" || expiredNow) {
+        setUnavailableReason(
+          expiredNow
+            ? "This request has expired and is no longer accepting live captures."
+            : "The requester has already closed this request, so it is no longer available.",
+        );
+        return;
+      }
+
+      if (request.dbId) {
+        const { data } = await supabase
+          .from("requests")
+          .select("status, expires_at")
+          .eq("id", request.dbId)
+          .maybeSingle();
+        if (data) {
+          const dbExpired = new Date(data.expires_at).getTime() <= Date.now();
+          if (data.status !== "open" || dbExpired) {
+            setUnavailableReason(
+              dbExpired
+                ? "This request has expired and is no longer accepting live captures."
+                : data.status === "claimed"
+                  ? "Another onlooker has already claimed this request."
+                  : "The requester has already closed this request, so it is no longer available.",
+            );
+            return;
+          }
+        }
+      }
+
+      setAvailabilityPrompt(true);
+    } finally {
+      setChecking(false);
+    }
+  }
 
   return (
     <>
@@ -101,21 +153,73 @@ export function BountyDetailsDialog({
 
           <Button
             type="button"
-            disabled={!claimable}
+            disabled={!claimable || checking}
             className="mt-2 h-12 w-full rounded-xl font-bold"
-            onClick={() => setConfirming(true)}
+            onClick={() => void beginClaim()}
           >
             <ShieldCheck className="mr-2 size-4" />
-            {request.status === "expired"
-              ? "Expired"
-              : done
-                ? "Closed"
-                : request.status === "claimed"
-                  ? "Already claimed"
-                  : "Claim this bounty"}
+            {checking
+              ? "Checking availability…"
+              : request.status === "expired"
+                ? "Expired"
+                : done
+                  ? "Closed"
+                  : request.status === "claimed"
+                    ? "Already claimed"
+                    : "Claim this bounty"}
           </Button>
         </DialogContent>
       </Dialog>
+
+      {/* Availability check — confirms the hunter sees it live right now. */}
+      <AlertDialog open={availabilityPrompt} onOpenChange={setAvailabilityPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Radar className="size-5 text-signal" />
+              Is this request still active and available?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              We just verified this bounty is still open. Confirm you can head there and capture it
+              live right now.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Not now</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setAvailabilityPrompt(false);
+                setConfirming(true);
+              }}
+            >
+              Yes, I'm on it!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clean notice when the creator closed it or it already expired. */}
+      <AlertDialog
+        open={unavailableReason !== null}
+        onOpenChange={(next) => {
+          if (!next) setUnavailableReason(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <CircleOff className="size-5 text-destructive" />
+              No longer available
+            </AlertDialogTitle>
+            <AlertDialogDescription>{unavailableReason}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setUnavailableReason(null)}>
+              Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent>
