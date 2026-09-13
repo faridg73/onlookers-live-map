@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -36,10 +37,17 @@ export function ContentModerationAlertModal({
               crowd sizes, line lengths, or seat views).
             </DialogDescription>
           </DialogHeader>
+          <p className="mt-4 text-xs text-slate-500">
+            Enforced under{" "}
+            <Link to="/terms" className="underline hover:text-slate-700">
+              Section 7 of our Terms of Service
+            </Link>
+            .
+          </p>
           <button
             type="button"
             onClick={onEditRequest}
-            className="mt-6 w-full rounded-xl bg-slate-900 py-3.5 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
+            className="mt-4 w-full rounded-xl bg-slate-900 py-3.5 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2"
           >
             Edit Request
           </button>
