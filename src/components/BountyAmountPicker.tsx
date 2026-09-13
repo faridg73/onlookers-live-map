@@ -4,10 +4,10 @@ import { formatCoinCash, formatCoinWords, formatCoins } from "@/lib/coins";
 import { cn } from "@/lib/utils";
 
 const PRESETS: { amount: number; tag?: string; icon?: "popular" | "fast" }[] = [
-  { amount: 50 },
-  { amount: 100, tag: "Popular", icon: "popular" },
-  { amount: 200, tag: "Fastest", icon: "fast" },
-  { amount: 400 },
+  { amount: 20 },
+  { amount: 40, tag: "Popular", icon: "popular" },
+  { amount: 80, tag: "Fastest", icon: "fast" },
+  { amount: 160 },
 ];
 
 /** Preset bounty chips plus a custom amount box with a minimum. */
@@ -63,6 +63,9 @@ export function BountyAmountPicker({
               </span>
               <span className="mt-0.5 block text-[0.55rem] font-bold uppercase tracking-[0.14em] opacity-70">
                 LC
+              </span>
+              <span className="mt-1 block text-[0.62rem] font-extrabold tabular-nums opacity-80">
+                {formatCoinCash(amount)}
               </span>
             </button>
           );

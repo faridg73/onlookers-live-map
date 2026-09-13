@@ -29,7 +29,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
-  const [bounty, setBounty] = useState(10);
+  const [bounty, setBounty] = useState(20);
   const [category, setCategory] = useState<CategoryId>("food");
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
@@ -46,7 +46,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
     if (bounty < MIN_BOUNTY) {
-      toast.error(`Bounties start at $${MIN_BOUNTY}.`);
+      toast.error(`Bounties start at ${MIN_BOUNTY} Looker Coins.`);
       return;
     }
     if (permissionNeeded && !permissionOk) {
@@ -87,7 +87,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       setTitle("");
       setPlace("");
       setNote("");
-      setBounty(10);
+      setBounty(20);
       setAccessCode("");
       setPermissionOk(false);
       setOpen(false);
@@ -211,7 +211,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
             }
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Post request — lock $${Number.isFinite(bounty) ? bounty : 0}`}
+            {posting ? "Locking bounty…" : `Post request — lock ${Number.isFinite(bounty) ? bounty : 0} LC`}
           </button>
         </form>
       </DialogContent>

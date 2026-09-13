@@ -11,6 +11,7 @@ import {
   TriangleAlert,
   Undo2,
 } from "lucide-react";
+import { coinsToUsdValue } from "@/lib/coins";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -295,7 +296,7 @@ function ControlCenter() {
                   <div className="shrink-0 text-right">
                     <p className="text-base font-black text-foreground">{coins(row.amount)}</p>
                     <p className="text-[0.62rem] font-bold text-muted-foreground">
-                      {money(Math.round(row.amount) / 10)} cash
+                      {money(coinsToUsdValue(Math.round(row.amount)))} cash
                     </p>
                     <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                       {row.status}

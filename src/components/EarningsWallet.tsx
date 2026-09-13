@@ -32,14 +32,14 @@ export function EarningsWallet() {
   if (!balance) return null;
 
   async function submit() {
-    if (balance!.available <= 0) {
+    if (!balance || balance.available <= 0) {
       toast.error("You have nothing available to pay out yet.");
       return;
     }
     setBusy(true);
     try {
-      await requestEarningsPayout(balance!.available);
-      toast.success(`Payout request for ${money(balance!.available)} sent for review.`);
+      await requestEarningsPayout(balance.available);
+      toast.success(`Payout request for ${money(balance.available)} sent for review.`);
       await refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not file the payout request");

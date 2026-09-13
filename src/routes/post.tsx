@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ShieldCheck, Timer } from "lucide-react";
+import { ChevronDown, Coins, Info, ShieldCheck, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
@@ -11,6 +11,9 @@ import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { formatCoinCash, formatCoins } from "@/lib/coins";
 import {
   categoryById,
   generateAccessCode,
@@ -35,6 +38,8 @@ export const Route = createFileRoute("/post")({
         property: "og:description",
         content: "Describe a place, set a bounty, get a live photo back in minutes.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PostScreen,
@@ -55,8 +60,8 @@ function PostScreen() {
   const [place, setPlace] = useState("");
   const [note, setNote] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
-  const [bounty, setBounty] = useState(10);
-  // The picked 3x3 tile plus its sub-option; a sub-option may re-map the
+  const [bounty, setBounty] = useState(20);
+  // The picked category plus its sub-option; a sub-option may re-map the
   // category that actually gets stored (e.g. Events → Sports game).
   const [tile, setTile] = useState<CategoryId>("food");
   const [sub, setSub] = useState<string | null>(null);
@@ -162,21 +167,22 @@ function PostScreen() {
 
   const sectionLabel =
     "text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-foreground/75";
-  const card = "rounded-2xl border border-border bg-surface p-4 shadow-sm";
+  const section = "border-t border-border py-5";
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-32 pt-6">
-      <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
-        Request a video
+    <div className="mx-auto max-w-2xl px-4 pb-32 pt-6 sm:px-6">
+      <div className="border-l-4 border-signal pl-4">
+      <h1 className="font-display text-3xl font-extrabold text-foreground sm:text-4xl">
+        Post a Live Request
       </h1>
       <p className="mt-1.5 text-sm font-semibold text-foreground/70">
-        Drop a pin, say exactly what to film, and set the reward. The higher the bounty, the faster
-        someone walks over.
+        Pin the exact spot, describe the live view, and offer a reward to someone already nearby.
       </p>
+      </div>
 
-      <form onSubmit={submit} className="mt-5 space-y-3">
-        <label className={`block space-y-2 ${card}`}>
-          <span className={sectionLabel}>1 · Bounty title</span>
+      <form onSubmit={submit} className="mt-5">
+        <label className={`block space-y-2 border-t-0 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">01</span> · Bounty title</span>
           <input
             ref={titleRef}
             value={title}
@@ -192,9 +198,9 @@ function PostScreen() {
           </span>
         </label>
 
-        <div className={`space-y-2 ${card}`}>
+        <div className={`space-y-3 ${section}`}>
           <label className="block space-y-2">
-            <span className={sectionLabel}>2 · Exact location</span>
+            <span className={sectionLabel}><span className="text-signal">02</span> · Exact location</span>
             <input
               value={place}
               onChange={(e) => setPlace(e.target.value)}
@@ -203,7 +209,13 @@ function PostScreen() {
               className="field"
             />
           </label>
-          <LocationPreviewMap address={place} onPick={setSpot} />
+          <LocationPreviewMap
+            address={place}
+            onPick={(next) => {
+              setSpot(next);
+              if (next.formatted !== "Dropped pin") setPlace(next.formatted);
+            }}
+          />
           <p className="text-xs font-medium text-foreground/70">
             No street address? Tap the map or drag the pin to lock the exact coordinates.
             {spot && (
@@ -214,28 +226,32 @@ function PostScreen() {
           </p>
         </div>
 
-        <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>3 · Category</span>
+        <div className={`space-y-3 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">03</span> · Category &amp; focus</span>
           <CategoryPicker
             value={tile}
             onChange={(id) => setTile(id as CategoryId)}
             sub={sub}
             onSubChange={setSub}
           />
-          <p className="flex items-start gap-2 rounded-xl border border-live/40 bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
-            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />
-            <span>{VENUE_EXTERIOR_DISCLAIMER}</span>
-          </p>
-          {needsPublicSpacesNotice(tile) && (
-            <p className="flex items-start gap-2 rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
-              <span>{PUBLIC_HAPPENINGS_DISCLAIMER}</span>
-            </p>
-          )}
+          <Collapsible>
+            <CollapsibleTrigger className="group flex w-full items-center gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-left text-xs font-bold text-foreground">
+              <Info className="size-4 shrink-0 text-signal" />
+              <span className="flex-1">Privacy &amp; Guidelines</span>
+              <ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-2 border-l-2 border-border bg-surface px-3 py-3 text-xs font-medium text-foreground/75">
+              <p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-live" />{VENUE_EXTERIOR_DISCLAIMER}</p>
+              {needsPublicSpacesNotice(tile) && (
+                <p className="flex gap-2"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>
+              )}
+              <p>Film only what the requester asks for in lawful public areas. Never capture private conversations, screens, tickets, or restricted performances.</p>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
 
         {permissionNeeded && (
-          <label className="flex gap-3 rounded-2xl border border-signal/40 bg-surface p-4">
+          <label className="flex gap-3 border-l-2 border-signal bg-surface-raised p-4">
             <input
               type="checkbox"
               checked={permissionOk}
@@ -251,7 +267,7 @@ function PostScreen() {
         )}
 
         {codeNeeded && (
-          <div className="space-y-2 rounded-2xl border border-signal/40 bg-surface p-4">
+          <div className="space-y-2 border-l-2 border-signal bg-surface-raised p-4">
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-signal">
               Private access passcode
             </span>
@@ -263,13 +279,14 @@ function PostScreen() {
                 placeholder="e.g. 481902 or BLUEGATE"
                 className="field flex-1"
               />
-              <button
+              <Button
                 type="button"
                 onClick={() => setAccessCode(generateAccessCode())}
-                className="shrink-0 rounded-xl border border-signal/50 px-3 text-xs font-semibold uppercase tracking-[0.12em] text-signal"
+                variant="outline"
+                className="shrink-0 border-signal/50 text-xs font-semibold uppercase tracking-[0.12em] text-signal"
               >
                 Generate
-              </button>
+              </Button>
             </div>
             <p className="text-xs font-medium text-foreground/70">
               Stays hidden until someone claims the bounty. They can quote it on site to prove the
@@ -278,8 +295,8 @@ function PostScreen() {
           </div>
         )}
 
-        <label className={`block space-y-2 ${card}`}>
-          <span className={sectionLabel}>4 · Specific camera instructions</span>
+        <label className={`block space-y-2 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">04</span> · Specific camera instructions</span>
           <textarea
             ref={noteRef}
             value={note}
@@ -302,10 +319,10 @@ function PostScreen() {
           </span>
         </label>
 
-        <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>5 · Reward</span>
+        <div className={`space-y-3 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">05</span> · Looker Coin reward</span>
           <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
-          <p className="flex items-start gap-2 rounded-xl border border-signal/30 bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
+          <p className="flex items-start gap-2 border-l-2 border-signal bg-surface-raised px-3 py-2.5 text-xs font-medium text-foreground/80">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-signal" />
             <span>
               Your payment is held securely in escrow. Funds are only released to the Bounty Hunter
@@ -314,28 +331,29 @@ function PostScreen() {
           </p>
         </div>
 
-        <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>6 · Bounty Wallet tip (optional)</span>
+        <div className={`space-y-3 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">06</span> · Bonus tip (optional)</span>
           <BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} />
         </div>
 
-        <div className={`space-y-2.5 ${card}`}>
-          <span className={sectionLabel}>7 · Request deadline</span>
+        <div className={`space-y-3 ${section}`}>
+          <span className={sectionLabel}><span className="text-signal">07</span> · Request deadline</span>
           <div className="grid grid-cols-4 gap-2">
             {DEADLINES.map(({ minutes: m, label }) => (
-              <button
+              <Button
                 key={m}
                 type="button"
                 onClick={() => setMinutes(m)}
                 aria-pressed={minutes === m}
-                className={`rounded-2xl border-2 py-3 text-center text-sm font-extrabold transition-all ${
+                variant="outline"
+                className={`h-12 rounded-md border-2 px-1 text-center text-sm font-extrabold transition-all ${
                   minutes === m
                     ? "border-signal bg-signal text-signal-foreground"
                     : "border-border bg-surface-raised text-foreground hover:border-signal/60"
                 }`}
               >
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
           <p className="flex items-start gap-2 text-xs font-medium text-foreground/70">
@@ -348,8 +366,12 @@ function PostScreen() {
           </p>
         </div>
 
-        <div className="pt-1">
-          <button
+        <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-20 -mx-4 border-t border-border bg-background/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pt-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2 text-xs font-bold text-muted-foreground"><Coins className="size-4 text-signal" />Total escrow</span>
+            <span className="font-display text-lg font-extrabold text-signal">{formatCoins(total)} · {formatCoinCash(total)}</span>
+          </div>
+          <Button
             type="submit"
             disabled={
               posting ||
@@ -358,10 +380,10 @@ function PostScreen() {
               (permissionNeeded && !permissionOk) ||
               (codeNeeded && accessCode.trim().length < 4)
             }
-            className="w-full rounded-2xl bg-signal py-4 text-base font-extrabold uppercase tracking-[0.16em] text-signal-foreground shadow-lg transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="h-14 w-full rounded-md bg-signal text-base font-extrabold uppercase tracking-[0.12em] text-signal-foreground shadow-lg hover:bg-signal/90"
           >
-            {posting ? "Locking bounty…" : `Go live — lock ${total} LC`}
-          </button>
+            {posting ? "Locking bounty…" : `Go live — lock ${formatCoins(total)}`}
+          </Button>
           <p className="mt-3 text-center text-[0.7rem] font-medium leading-relaxed text-muted-foreground">
             Onlooker Live is for capturing physical event logistics and venue atmospheres. Digital
             screen captures are strictly prohibited.

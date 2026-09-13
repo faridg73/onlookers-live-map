@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
+import { usdToCoins } from "@/lib/coins";
 import type { Database } from "@/integrations/supabase/types";
 
 let cached: ReturnType<typeof createClient<Database>> | null = null;
@@ -33,8 +34,8 @@ async function creditTopUp(session: Record<string, any>, env: StripeEnv) {
   const { data, error } = await getSupabase().rpc("credit_topup", {
     _user_id: userId,
     _session_id: session["id"],
-    // Card top-ups are priced in dollars but credited as Looker Coins (10 LC = $1.00).
-    _amount: Math.round(amount * 10),
+    // Card top-ups are priced in dollars but credited at the shared fixed rate.
+    _amount: usdToCoins(amount),
     _environment: env,
   });
 

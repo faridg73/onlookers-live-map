@@ -1,13 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import { COINS_PER_USD, coinsToUsdValue } from "@/lib/coins";
 
-/** Fixed conversion: 10 Looker Coins = $1.00 USD. */
-export const COINS_PER_USD = 10;
+export { COINS_PER_USD };
 
-/** Cash out is only allowed from 100 coins ($10.00) up. */
-export const MIN_CASHOUT_COINS = 100;
+/** Cash out is only allowed from 40 coins ($10.00) up. */
+export const MIN_CASHOUT_COINS = 40;
 
-export const coinsToUsd = (coins: number) =>
-  Math.round((coins / COINS_PER_USD) * 100) / 100;
+export const coinsToUsd = coinsToUsdValue;
 
 export type PayoutRequestRow = {
   id: string;

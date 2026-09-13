@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export const BOOST_AMOUNTS = [10, 20, 50] as const;
+export const BOOST_AMOUNTS = [4, 8, 20] as const;
 
 export type BoostTotals = Record<string, number>;
 
