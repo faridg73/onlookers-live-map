@@ -73,24 +73,82 @@ function FeedScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Radius choices are offered in the viewer's own unit; we always filter in miles.
+  const radiusOptions = useMemo(
+    () =>
+      unit === "mi"
+        ? [
+            { label: "5 mi", miles: 5 },
+            { label: "15 mi", miles: 15 },
+            { label: "25 mi", miles: 25 },
+          ]
+        : [
+            { label: "10 km", miles: 10 / 1.609344 },
+            { label: "25 km", miles: 25 / 1.609344 },
+            { label: "50 km", miles: 50 / 1.609344 },
+          ],
+    [unit],
+  );
+
+  useEffect(() => {
+    setRadiusChoice((current) =>
+      current === "global" || radiusOptions.some((o) => o.miles === current)
+        ? current
+        : radiusOptions[0].miles,
+    );
+  }, [radiusOptions]);
+
+  const radiusLabel =
+    radiusChoice === "global"
+      ? "Global"
+      : (radiusOptions.find((o) => o.miles === radiusChoice)?.label ?? `${radiusChoice} ${unit}`);
+
+  const withinRadius = (r: (typeof requests)[number]) => {
+    if (radiusChoice === "global" || !userPosition) return true;
+    return distanceMiles(userPosition, requestMapPosition(r)) <= radiusChoice;
+  };
+
+  // Status, keyword and radius filters shared by both the list and the tile counters.
+  const inScope = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return requests.filter((r) => {
+      if (filter !== "all" && r.status !== filter) return false;
+      if (!withinRadius(r)) return false;
+      if (!q) return true;
+      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+      return `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`
+        .toLowerCase()
+        .includes(q);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requests, filter, query, radiusChoice, userPosition]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Partial<Record<CategoryId, number>> = {};
+    for (const c of CATEGORIES) counts[c.id] = 0;
+    for (const r of inScope) {
+      if (r.category && counts[r.category as CategoryId] !== undefined) {
+        counts[r.category as CategoryId] = (counts[r.category as CategoryId] ?? 0) + 1;
+      }
+    }
+    return counts;
+  }, [inScope]);
+
   // Closest bounties first (like Google Local results); unknown distances go last.
   // Category tiles, sub-options and typed keyword all filter in real time.
   const list = useMemo(() => {
-    const q = query.trim().toLowerCase();
     const subOption = cat === "all" ? undefined : subOptionById(cat, sub);
-    const filtered = requests.filter((r) => {
-      if (filter !== "all" && r.status !== filter) return false;
-      const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
-      const haystack = `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
-      if (cat !== "all") {
-        // A sub-option may point at its own stored category (Events → Sports).
-        const wanted = subOption?.category ?? cat;
-        if (r.category !== wanted) return false;
-        if (subOption && !subOption.category && !haystack.includes(subOption.label.toLowerCase())) {
-          return false;
-        }
+    const filtered = inScope.filter((r) => {
+      if (cat === "all") return true;
+      // A sub-option may point at its own stored category (Events → Sports).
+      const wanted = subOption?.category ?? cat;
+      if (r.category !== wanted) return false;
+      if (subOption && !subOption.category) {
+        const catLabel = (CATEGORIES.find((c) => c.id === r.category)?.label ?? "").toLowerCase();
+        const haystack =
+          `${r.title} ${r.place} ${r.note} ${r.instructions ?? ""} ${r.category ?? ""} ${catLabel}`.toLowerCase();
+        if (!haystack.includes(subOption.label.toLowerCase())) return false;
       }
-      if (q && !haystack.includes(q)) return false;
       return true;
     });
     if (!userPosition) return filtered;
@@ -99,11 +157,11 @@ function FeedScreen() {
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [requests, filter, cat, query, userPosition]);
+  }, [inScope, cat, sub, userPosition]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
     userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
-  const pot = requests.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
+  const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
