@@ -211,6 +211,64 @@ export type Database = {
           },
         ]
       }
+      coin_transactions: {
+        Row: {
+          amount_gross: number
+          amount_net: number
+          amount_platform_fee: number
+          created_at: string
+          id: string
+          receiver_wallet_id: string | null
+          request_id: string | null
+          sender_wallet_id: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount_gross: number
+          amount_net: number
+          amount_platform_fee?: number
+          created_at?: string
+          id?: string
+          receiver_wallet_id?: string | null
+          request_id?: string | null
+          sender_wallet_id?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount_gross?: number
+          amount_net?: number
+          amount_platform_fee?: number
+          created_at?: string
+          id?: string
+          receiver_wallet_id?: string | null
+          request_id?: string | null
+          sender_wallet_id?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_transactions_receiver_wallet_id_fkey"
+            columns: ["receiver_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "user_wallets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coin_transactions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coin_transactions_sender_wallet_id_fkey"
+            columns: ["sender_wallet_id"]
+            isOneToOne: false
+            referencedRelation: "user_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispute_evidence: {
         Row: {
           author_id: string
@@ -961,6 +1019,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_wallets: {
+        Row: {
+          coin_balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coin_balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coin_balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       video_comments: {
         Row: {
           body: string
@@ -1183,6 +1265,7 @@ export type Database = {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
       }
+      ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
       explore_clips: {
         Args: { _limit?: number; _offset?: number }
         Returns: {
@@ -1312,6 +1395,20 @@ export type Database = {
       }
       settle_escrows: { Args: never; Returns: Json }
       submit_instant_snippet: { Args: { _video_id: string }; Returns: number }
+      tip_coins: {
+        Args: {
+          _amount: number
+          _receiver_id: string
+          _request_id?: string
+          _transaction_type?: string
+        }
+        Returns: {
+          amount_net: number
+          amount_platform_fee: number
+          sender_balance: number
+          transaction_id: string
+        }[]
+      }
       tip_hunter: {
         Args: { _amount: number; _video_id: string }
         Returns: number
