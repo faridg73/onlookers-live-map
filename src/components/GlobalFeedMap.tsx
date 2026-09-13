@@ -51,6 +51,25 @@ export function GlobalFeedMap() {
     [clips],
   );
 
+  // A Discover card asked us to show its exact spot: centre there and mark it.
+  const focusMarker = useRef<google.maps.Marker | null>(null);
+  useEffect(() => {
+    if (!focus || !map.current) return;
+    map.current.setCenter({ lat: focus.lat, lng: focus.lng });
+    map.current.setZoom(15);
+    focusMarker.current?.setMap(null);
+    focusMarker.current = new google.maps.Marker({
+      map: map.current,
+      position: { lat: focus.lat, lng: focus.lng },
+      title: focus.label,
+      animation: google.maps.Animation.DROP,
+    });
+    return () => {
+      focusMarker.current?.setMap(null);
+      focusMarker.current = null;
+    };
+  }, [focus]);
+
   // Draw one marker per located clip.
   useEffect(() => {
     if (!map.current || pinned.length === 0) return;
