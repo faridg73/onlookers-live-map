@@ -143,7 +143,7 @@ function FeedScreen() {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by keyword, place, or type..."
+          placeholder="Search a venue, gate, section, or place..."
           aria-label="Search bounties"
           className="h-10 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
         />
@@ -185,7 +185,8 @@ function FeedScreen() {
         ))}
         {list.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            Nothing here yet.
+            No live requests match — try another category, or check back as new bounties go live
+            near you.
           </p>
         )}
       </div>

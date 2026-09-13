@@ -74,6 +74,10 @@ export function ProfileSetup() {
         <p className="mt-1 text-sm text-muted-foreground">
           Requesters and onlookers see this when you post or fulfil a bounty.
         </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Onlooker is about real places: requesters pay for live, on-the-ground views of venues,
+          lines, seats and streets near you.
+        </p>
 
         <div className="mt-5 space-y-3">
           <input
