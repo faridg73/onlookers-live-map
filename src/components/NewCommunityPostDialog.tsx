@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Camera, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { VideoRecorder } from "@/components/VideoRecorder";
