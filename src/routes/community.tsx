@@ -93,6 +93,12 @@ function CommunityHub() {
         <p className="mt-1 text-sm text-muted-foreground">
           Tap a lane, filter by tag, or open the map to see what is happening right now.
         </p>
+        <Link
+          to="/discover"
+          className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.14em] text-signal"
+        >
+          Browse venues & events →
+        </Link>
       </header>
 
       <div className="mt-5 flex gap-2 overflow-x-auto px-5 pb-1">
