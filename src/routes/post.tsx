@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { supabase } from "@/integrations/supabase/client";
+
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { CategoryPicker } from "@/components/CategoryPicker";
@@ -115,6 +117,7 @@ function PostScreen() {
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [action, setAction] = useState<RequestAction>("clip");
@@ -151,7 +154,26 @@ function PostScreen() {
   }, [voice.error]);
 
   useEffect(() => {
-    if (step !== 2 || venueQuery.trim().length < 2) return;
+    let active = true;
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active) setSignedIn(Boolean(data.session));
+      })
+      .catch(() => {
+        if (active) setSignedIn(false);
+      });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session));
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (step !== 2 || !signedIn || venueQuery.trim().length < 2) return;
     let active = true;
     const timer = window.setTimeout(() => {
       setVenueBusy(true);
@@ -478,8 +500,15 @@ function PostScreen() {
                 <div className="relative">
                   <Search className="absolute left-3 top-3.5 size-4 text-signal" />
                   <input value={venueQuery} onChange={(event) => setVenueQuery(event.target.value)} placeholder="Search a mall, park, school, library…" className="field pl-10" autoFocus />
-                  {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
+                   {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
                 </div>
+                {signedIn === false && (
+                  <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
+                    <ShieldCheck className="size-4 shrink-0 text-signal" />
+                    <span className="flex-1">Sign in to search places by name. You can still drop a pin on the map or use your current location.</span>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   {VENUE_FILTERS.map(({ label, query, icon: Icon }) => (
                     <Button key={label} type="button" variant="outline" onClick={() => setVenueQuery(`${query} near me`)} className="h-auto justify-start gap-2 py-3 text-left">
