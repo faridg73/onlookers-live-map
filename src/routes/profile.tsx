@@ -262,6 +262,16 @@ function ProfileScreen() {
           </span>
           <ChevronRight className="size-4 text-muted-foreground" />
         </button>
+        <button
+          type="button"
+          onClick={() => setAboutOpen(true)}
+          className="flex w-full items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Building2 className="size-4 text-signal" /> About Us
+          </span>
+          <ChevronRight className="size-4 text-muted-foreground" />
+        </button>
         <Link
           to="/contact"
           className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
