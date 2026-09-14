@@ -10,6 +10,7 @@ import {
   Headphones,
   HelpCircle,
   Info,
+  LogOut,
   MessageSquare,
   PlusSquare,
   Radio,
