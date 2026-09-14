@@ -158,7 +158,9 @@ function AuthScreen() {
       }
     } catch (err) {
       human.reset();
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
