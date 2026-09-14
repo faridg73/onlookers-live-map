@@ -41,6 +41,8 @@ function AuthScreen() {
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
@@ -53,18 +55,67 @@ function AuthScreen() {
     await clearPreviousAuthState();
   }
 
+  /** Turns raw auth failures into plain-language messages people can act on. */
+  function describeAuthError(err: unknown): string {
+    const raw = err instanceof Error ? err.message : "";
+    const code =
+      typeof err === "object" && err !== null && "code" in err
+        ? String((err as { code?: unknown }).code ?? "")
+        : "";
+    const text = `${code} ${raw}`.toLowerCase();
+    if (text.includes("email_not_confirmed") || text.includes("email not confirmed")) {
+      setNeedsEmailConfirm(true);
+      return "Confirm your email address first — check your inbox for the verification link we sent.";
+    }
+    if (text.includes("invalid login") || text.includes("invalid_credentials")) {
+      return "That email or password is incorrect. Check them and try again.";
+    }
+    if (text.includes("user already registered") || text.includes("already_exists")) {
+      return "An account already exists for that email. Try signing in instead.";
+    }
+    if (text.includes("too many") || text.includes("rate limit")) {
+      return "Too many attempts. Please wait a minute and try again.";
+    }
+    return raw || "Something went wrong. Please try again.";
+  }
+
+  /** Sends a fresh confirmation link when someone never received the first one. */
+  async function resendConfirmation() {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      toast.success("Verification email sent — check your inbox.");
+      setFormError(null);
+    } catch (err) {
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
+    setNeedsEmailConfirm(false);
     if (!accepted) {
+      setFormError("You must accept the Terms of Service to continue.");
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
     if (!human.ready) {
-      toast.error(
+      const message =
         mode === "signup"
           ? "Finish the quick human check before creating your account."
-          : "Just a moment — finishing the security check.",
-      );
+          : "Just a moment — finishing the security check.";
+      setFormError(message);
+      toast.error(message);
       return;
     }
     setBusy(true);
@@ -92,6 +143,13 @@ function AuthScreen() {
           await clearPreviousAuthState();
           throw new Error("The signed-in account did not match. Please try again.");
         }
+        if (!authenticatedUser.email_confirmed_at) {
+          await clearPreviousAuthState();
+          setNeedsEmailConfirm(true);
+          throw new Error(
+            "Confirm your email address first — check your inbox for the verification link we sent.",
+          );
+        }
         await supabase.rpc("claim_verified_phone");
         await queryClient.cancelQueries();
         queryClient.clear();
@@ -100,7 +158,9 @@ function AuthScreen() {
       }
     } catch (err) {
       human.reset();
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -130,10 +190,20 @@ function AuthScreen() {
         queryClient.clear();
         await navigate({ to: "/profile", replace: true });
       } else {
-        toast.success("Number confirmed. Check your email to finish activating your account.");
+        setMode("signin");
+        setNeedsEmailConfirm(true);
+        setFormError(
+          "Number confirmed. We emailed a verification link to " +
+            email +
+            " — open it to activate your account, then sign in.",
+        );
+        toast.success("Check your email for the verification link.");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      setVerifying(false);
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -256,6 +326,25 @@ function AuthScreen() {
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
         {human.widget}
+        {formError ? (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            <p>{formError}</p>
+            {needsEmailConfirm ? (
+              <button
+                type="button"
+                onClick={() => void resendConfirmation()}
+                disabled={busy || !email}
+                className="mt-2 text-sm font-semibold text-foreground underline underline-offset-4 disabled:opacity-50"
+              >
+                Resend verification email
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         <button
           type="submit"
           disabled={busy || !accepted || !human.ready}
