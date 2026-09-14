@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { TrendingViewRequests } from "@/components/TrendingViewRequests";
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
