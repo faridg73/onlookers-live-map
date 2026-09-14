@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Banknote, CoinsIcon, Landmark, Loader2 } from "lucide-react";
+import { Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { fetchCreditWallet } from "@/lib/credits";
@@ -13,7 +13,11 @@ import {
   requestCreditCashout,
   type PayoutRequestRow,
 } from "@/lib/credit-cashout";
-import { getPayoutStatus, startPayoutOnboarding } from "@/lib/payouts.functions";
+import {
+  getPayoutStatus,
+  openPayoutAccount,
+  startPayoutOnboarding,
+} from "@/lib/payouts.functions";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-signal/15 text-signal",
