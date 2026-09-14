@@ -33,6 +33,7 @@ import { replayOnboarding } from "@/lib/profile";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { CreatorVerificationCard } from "@/components/CreatorVerificationCard";
 import { fetchMyVerification } from "@/lib/verification";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
