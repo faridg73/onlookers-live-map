@@ -131,10 +131,13 @@ export function VenueBountyDialog({
       return;
     }
 
+    const startNote = scheduledStart
+      ? ` Recording starts ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}.`
+      : "";
     const header =
       mode === "live"
-        ? `Live: 5-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.`;
+        ? `Live: ${durationMin}-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
+        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.${startNote}`;
     const details = `${header}\n${note.trim()}`;
     // The store still wants a countdown; derive one from the calendar pick.
     const effectiveMinutes = isCustom
@@ -153,7 +156,10 @@ export function VenueBountyDialog({
         longitude: venue.longitude,
         minutes: effectiveMinutes,
         customDeadlineAt: isCustom ? customDeadline.toISOString() : null,
+        durationMinutes: mode === "live" ? durationMin : 5,
         bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
+        scheduledStartAt:
+          mode === "clip" && scheduledStart ? scheduledStart.toISOString() : null,
       });
       setBalance(locked.balance);
       addRequest({
