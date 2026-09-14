@@ -37,6 +37,11 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     lng: row.longitude,
     x: 500,
     y: 500,
+    bountyTier: row.bountyTier ?? undefined,
+    bountyType: row.bountyType,
+    captureMinutes: row.captureMinutes,
+    scheduledStartAt: row.scheduledStartAt ?? undefined,
+    weatherMultiplier: row.weatherMultiplier,
   };
 }
 
