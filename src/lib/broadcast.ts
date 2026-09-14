@@ -1,5 +1,6 @@
 import { createCommunityPost, type CommunityCategory } from "@/lib/community";
 import { fetchTrustStats } from "@/lib/trust";
+import { fetchMyVerification } from "@/lib/verification";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
