@@ -79,7 +79,15 @@ export type PlaceSuggestion = {
 /** Live city/state autocomplete suggestions for the filter bar search. */
 export const autocompletePlaces = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
-    z.object({ input: safeQuery(120, 2), sessionToken: z.string().uuid() }).parse(data),
+    z
+      .object({
+        input: safeQuery(120, 2),
+        sessionToken: z.string().uuid(),
+        // "areas" keeps results to cities/regions; "all" also returns landmarks,
+        // venues and street addresses.
+        scope: z.enum(["areas", "all"]).optional(),
+      })
+      .parse(data),
   )
   .handler(async ({ data }): Promise<PlaceSuggestion[]> => {
     await enforceRateLimit(RATE_LIMITS.geocode);
@@ -96,7 +104,15 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
       body: JSON.stringify({
         input: data.input,
         sessionToken: data.sessionToken,
-        includedPrimaryTypes: ["locality", "administrative_area_level_1", "administrative_area_level_2"],
+        ...(data.scope === "all"
+          ? {}
+          : {
+              includedPrimaryTypes: [
+                "locality",
+                "administrative_area_level_1",
+                "administrative_area_level_2",
+              ],
+            }),
       }),
     });
 

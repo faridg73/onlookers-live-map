@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { TrendingViewRequests } from "@/components/TrendingViewRequests";
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
@@ -58,6 +60,10 @@ function FeedScreen() {
   const [cat, setCat] = useState<CategoryId | "all">("all");
   const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const [placeQuery, setPlaceQuery] = useState("");
+  // A place picked from the search dropdown re-centres the feed's radius filter.
+  const [area, setArea] = useState<{ label: string; lat: number; lng: number } | null>(null);
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, formatDistance } = useDistanceUnit(userPosition);
 
@@ -117,9 +123,13 @@ function FeedScreen() {
     return next ?? "custom";
   }, [radiusChoice, radiusOptions]);
 
+  // Distances are measured from the searched area when one is chosen, otherwise
+  // from the viewer's own position.
+  const center: MapPosition | null = area ? { lat: area.lat, lng: area.lng } : userPosition;
+
   const withinRadius = (r: (typeof requests)[number]) => {
-    if (!userPosition) return true;
-    return distanceMiles(userPosition, requestMapPosition(r)) <= effectiveRadiusMiles;
+    if (!center) return true;
+    return distanceMiles(center, requestMapPosition(r)) <= effectiveRadiusMiles;
   };
 
   // Status, keyword and radius filters shared by both the list and the tile counters.
@@ -135,7 +145,7 @@ function FeedScreen() {
         .includes(q);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requests, filter, query, radiusChoice, customMiles, userPosition]);
+  }, [requests, filter, query, radiusChoice, customMiles, center]);
 
   const categoryCounts = useMemo(() => {
     const counts: Partial<Record<CategoryId, number>> = {};
@@ -165,16 +175,16 @@ function FeedScreen() {
       }
       return true;
     });
-    if (!userPosition) return filtered;
-    const from = userPosition;
+    if (!center) return filtered;
+    const from = center;
     return [...filtered].sort(
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [inScope, cat, sub, userPosition]);
+  }, [inScope, cat, sub, center]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
-    userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
+    center ? formatDistance(distanceMiles(center, requestMapPosition(r))) : undefined;
   const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   const displayCustom = Math.round(unit === "mi" ? customMiles : customMiles * 1.609344);
@@ -302,6 +312,38 @@ function FeedScreen() {
           >
             Clear
           </button>
+        )}
+      </div>
+
+      {/* Jump the feed to any city, venue, landmark or address. */}
+      <div className="mt-3">
+        <PlaceSearchInput
+          placeholder="Filter by city, venue, landmark or address"
+          onQueryChange={setPlaceQuery}
+          onPick={(place) => {
+            setPlaceQuery("");
+            setArea({ label: place.formatted, lat: place.latitude, lng: place.longitude });
+          }}
+        />
+        {area && (
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-signal/50 bg-signal/10 px-3 py-2">
+            <p className="truncate text-xs font-bold text-foreground">
+              Showing requests near {area.label}
+            </p>
+            <button
+              type="button"
+              onClick={() => setArea(null)}
+              className="shrink-0 text-[0.65rem] font-extrabold uppercase text-signal"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+        {!area && query.trim().length === 0 && placeQuery.trim().length === 0 && (
+          <TrendingViewRequests
+            className="mt-3"
+            onOpen={(request) => navigate({ to: "/", search: { b: request.id } })}
+          />
         )}
       </div>
 

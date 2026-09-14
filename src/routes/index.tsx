@@ -14,10 +14,10 @@ import { distanceMiles, requestMapPosition, type LiveRequest, type MapPosition }
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
-import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Globe2, Search, X } from "lucide-react";
-import { geocodeAddress } from "@/lib/geocode.functions";
+
+import { Globe2, X } from "lucide-react";
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { TrendingViewRequests } from "@/components/TrendingViewRequests";
 import { namePin, type ViewPin } from "@/lib/request-a-view";
 import { RequestViewPinDialog } from "@/components/RequestViewPinDialog";
 
@@ -60,7 +60,6 @@ function MapScreen() {
   const [pin, setPin] = useState<ViewPin | null>(null);
   const [naming, setNaming] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searching, setSearching] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
 
   const dropPin = useCallback((position: MapPosition) => {
@@ -79,26 +78,6 @@ function MapScreen() {
       .finally(() => setNaming(false));
   }, [select]);
 
-  const searchPlace = useCallback(async () => {
-    const address = searchText.trim();
-    if (address.length < 3) {
-      toast.error("Type a place, city or address to jump there.");
-      return;
-    }
-    setSearching(true);
-    try {
-      const found = await geocodeAddress({ data: { address } });
-      if (!found) {
-        toast.error("We couldn't find that place — try adding a city or country.");
-        return;
-      }
-      setCenterTarget({ lat: found.latitude, lng: found.longitude, zoom: 15 });
-    } catch {
-      toast.error("Place search is unavailable right now.");
-    } finally {
-      setSearching(false);
-    }
-  }, [searchText]);
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
@@ -257,8 +236,29 @@ function MapScreen() {
           </button>
         </div>
 
-        {/* Request a view: search anywhere, then tap the map to drop a pin. */}
+        {/* Live place search: type a few letters, pick a suggestion, jump there. */}
         <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg space-y-2">
+          <div className="rounded-xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
+            <PlaceSearchInput
+              onQueryChange={setSearchText}
+              onPick={(place) => {
+                setSearchText("");
+                setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+              }}
+            />
+            {searchText.trim().length === 0 && (
+              <TrendingViewRequests
+                className="mt-2"
+                onOpen={(request) => {
+                  select(request.id);
+                  if (typeof request.lat === "number" && typeof request.lng === "number") {
+                    setCenterTarget({ lat: request.lat, lng: request.lng, zoom: 14 });
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => {
@@ -278,33 +278,9 @@ function MapScreen() {
           </button>
 
           {pinMode && (
-            <div className="space-y-2 rounded-lg border-2 border-signal/40 bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
-              <div className="flex gap-2">
-                <Input
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void searchPlace();
-                    }
-                  }}
-                  placeholder="Search any city, address or landmark"
-                  className="h-10 rounded-lg border-2 border-border bg-surface font-bold"
-                />
-                <Button
-                  type="button"
-                  onClick={() => void searchPlace()}
-                  disabled={searching}
-                  className="h-10 shrink-0 bg-signal px-3 font-extrabold text-signal-foreground"
-                >
-                  <Search className="size-4" />
-                </Button>
-              </div>
-              <p className="px-1 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal">
-                Now tap anywhere on the map to drop your pin
-              </p>
-            </div>
+            <p className="rounded-lg border-2 border-signal/40 bg-surface/95 px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal shadow-lg backdrop-blur-xl">
+              Now tap anywhere on the map to drop your pin
+            </p>
           )}
         </div>
       </header>

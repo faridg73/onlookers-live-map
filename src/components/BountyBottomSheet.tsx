@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
+import { BountyNoteDetails } from "@/components/BountyNoteDetails";
 import { ExpiryCountdown } from "@/components/ExpiryCountdown";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { bountyTier } from "@/lib/bounty-tiers";
@@ -142,11 +143,7 @@ export function BountyBottomSheet({
 
         <BountyBriefBadges request={request} />
 
-        {request.note && (
-          <p className="mt-3 rounded-2xl border border-border bg-surface-raised p-3 text-sm leading-relaxed text-foreground/85">
-            {request.note}
-          </p>
-        )}
+        {request.note && <BountyNoteDetails note={request.note} className="mt-3" />}
 
         <div className="mt-4 flex items-center justify-between rounded-2xl border border-border bg-surface-raised px-4 py-3">
           <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
