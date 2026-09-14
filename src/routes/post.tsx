@@ -30,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
+import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
