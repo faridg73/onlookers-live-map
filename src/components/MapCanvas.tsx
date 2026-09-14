@@ -100,7 +100,14 @@ export function MapCanvas({
         ov.setMap(map.current);
         overlay.current = ov;
         map.current.addListener("bounds_changed", () => setTick((t) => t + 1));
-        map.current.addListener("click", () => onSelect(null));
+        map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
+          const at = event.latLng;
+          if (pinModeRef.current && at) {
+            onMapPinRef.current?.({ lat: at.lat(), lng: at.lng() });
+            return;
+          }
+          onSelect(null);
+        });
         setReady(true);
       })
       .catch((error) => {
