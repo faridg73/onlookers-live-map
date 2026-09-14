@@ -79,26 +79,6 @@ function MapScreen() {
       .finally(() => setNaming(false));
   }, [select]);
 
-  const searchPlace = useCallback(async () => {
-    const address = searchText.trim();
-    if (address.length < 3) {
-      toast.error("Type a place, city or address to jump there.");
-      return;
-    }
-    setSearching(true);
-    try {
-      const found = await geocodeAddress({ data: { address } });
-      if (!found) {
-        toast.error("We couldn't find that place — try adding a city or country.");
-        return;
-      }
-      setCenterTarget({ lat: found.latitude, lng: found.longitude, zoom: 15 });
-    } catch {
-      toast.error("Place search is unavailable right now.");
-    } finally {
-      setSearching(false);
-    }
-  }, [searchText]);
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
