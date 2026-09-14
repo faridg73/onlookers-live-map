@@ -1,0 +1,1 @@
+GRANT UPDATE ON TABLE public.profiles TO authenticated;
