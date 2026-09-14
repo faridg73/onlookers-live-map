@@ -200,6 +200,8 @@ function MapScreen() {
         </div>
       </header>
 
+      <FlashBountyButton variant="map" />
+
       <BountyBottomSheet
         request={selected}
         pool={selected ? poolOf(selected) : 0}

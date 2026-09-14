@@ -27,13 +27,13 @@ export function BottomNav() {
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 backdrop-blur-xl">
         <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pb-[env(safe-area-inset-bottom)]">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
-            <>
+            <Fragment key={to}>
               {to === "/post" && (
-                <li key="flash" className="flex-1">
+                <li className="flex-1">
                   <FlashBountyButton variant="nav" />
                 </li>
               )}
-              <li key={to} className="flex-1">
+              <li className="flex-1">
                 <Link
                   to={to}
                   activeOptions={{ exact }}
@@ -45,7 +45,7 @@ export function BottomNav() {
                   {label}
                 </Link>
               </li>
-            </>
+            </Fragment>
           ))}
           <li className="flex-1">
             <button
