@@ -79,6 +79,9 @@ export function MapCanvas({
         map.current = new maps.Map(holder.current, {
           center: REGIONAL_CENTER,
           zoom: 13,
+          // Zoom out far enough to reach any country, so a pin can be dropped
+          // anywhere in the world.
+          minZoom: 2,
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
