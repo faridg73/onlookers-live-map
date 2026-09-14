@@ -31,6 +31,7 @@ const STATUS_STYLES: Record<string, string> = {
 export function CreditPayoutDashboard() {
   const loadStatus = useServerFn(getPayoutStatus);
   const beginOnboarding = useServerFn(startPayoutOnboarding);
+  const openConnectedAccount = useServerFn(openPayoutAccount);
 
   const [credits, setCredits] = useState<number | null>(null);
   const [bank, setBank] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
@@ -72,6 +73,24 @@ export function CreditPayoutDashboard() {
       toast.info("Bank setup opened in a new tab. Come back here when you're done.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not open bank setup");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function openAccount() {
+    setBusy(true);
+    try {
+      const result = await openConnectedAccount();
+      if (result.error || !result.url)
+        throw new Error(result.error ?? "Could not open your payout account");
+      const opened = window.open(result.url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        if (window.top && window.top !== window.self) window.top.location.href = result.url;
+        else window.location.href = result.url;
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not open your payout account");
     } finally {
       setBusy(false);
     }
