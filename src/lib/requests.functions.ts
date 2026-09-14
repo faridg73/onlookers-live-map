@@ -22,6 +22,14 @@ const createSchema = z.object({
   minutes: z.number().int().min(15).max(1440).default(60),
   latitude: z.number().min(-90).max(90).default(0),
   longitude: z.number().min(-180).max(180).default(0),
+  /** Exact calendar deadline picked in the form; overrides `minutes` when set. */
+  customDeadlineAt: z.string().datetime({ offset: true }).nullable().optional(),
+  /** Requested live stream / recording length in minutes. */
+  durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
+  /** 'live_stream' or 'pre_recorded_clip'. */
+  bountyType: z.enum(["live_stream", "pre_recorded_clip"]).nullable().optional(),
+  /** When a pre-recorded clip's recording should start. */
+  scheduledStartAt: z.string().datetime({ offset: true }).nullable().optional(),
   /** Cloudflare Turnstile token proving a person posted this request. */
   captchaToken: z.string().max(4000).nullable().optional(),
 });
