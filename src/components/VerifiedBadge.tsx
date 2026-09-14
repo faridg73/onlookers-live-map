@@ -30,11 +30,12 @@ export function VerifiedBadge({
   }
 
   return (
-    <BadgeCheck
-      role="img"
-      aria-label={title}
-      title={title}
-      className={cn("size-4 shrink-0 text-signal", className)}
-    />
+    <span title={title} className="inline-flex shrink-0 items-center">
+      <BadgeCheck
+        role="img"
+        aria-label={title}
+        className={cn("size-4 shrink-0 text-signal", className)}
+      />
+    </span>
   );
 }
