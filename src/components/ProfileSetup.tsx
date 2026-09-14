@@ -5,6 +5,8 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useHumanCheck } from "@/components/HumanCheck";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   SECURITY_QUESTIONS,
   completeMyProfile,
@@ -41,6 +43,8 @@ export function ProfileSetup() {
   const navigate = useNavigate();
   const router = useRouter();
   const queryClient = useQueryClient();
+  // Visible bot challenge in front of the onboarding details.
+  const human = useHumanCheck("profile-setup");
 
   useEffect(() => {
     let alive = true;
@@ -139,8 +143,21 @@ export function ProfileSetup() {
       return;
     }
 
+    if (!human.ready) {
+      toast.error("Complete the human check to continue.");
+      return;
+    }
+
     setBusy(true);
     try {
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: "profile-setup" },
+      });
+      if (!check.ok) {
+        human.reset();
+        throw new Error("The human check didn't pass. Please try again.");
+      }
+
       // Bind strictly to the account that is signed in right now — never a
       // leftover session from an earlier login on this device.
       const { data: fresh, error: sessionError } = await supabase.auth.getUser();
@@ -304,9 +321,17 @@ export function ProfileSetup() {
           ))}
         </div>
 
+        <div className="mt-5">{human.widget}</div>
+
+        {human.required && !human.token && (
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Tick the box so we know you&rsquo;re a real person.
+          </p>
+        )}
+
         <button
           type="submit"
-          disabled={busy || uploading}
+          disabled={busy || uploading || !human.ready}
           className="mt-5 w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Saving…" : "Save and continue"}

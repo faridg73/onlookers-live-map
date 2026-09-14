@@ -24,8 +24,8 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
-  // Silent bot challenge so nobody can script the text-message trigger.
-  const human = useHumanCheck("sms-code", { discreet: true });
+  // Visible tick-box challenge: nobody can script the text-message trigger.
+  const human = useHumanCheck("sms-code");
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
@@ -48,6 +48,8 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
       setStep("code");
       setCode("");
       setSeconds(45);
+      // Each tick is single-use, so ask again before another text goes out.
+      human.reset();
       toast.success(resend ? "New code sent." : `Code sent to ${result.phone}.`);
     } catch (err) {
       human.reset();
@@ -75,7 +77,6 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
 
   return (
     <div className="mt-6 rounded-3xl border border-border bg-surface p-5">
-      {human.widget}
       {step === "number" ? (
         <>
           <h2 className="font-display text-xl tracking-tight text-foreground">
@@ -102,9 +103,15 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               placeholder="(555) 123-4567"
               className="w-full rounded-2xl border border-border bg-surface-raised px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
             />
+            {human.widget}
+            {human.required && !human.token && (
+              <p className="text-xs text-muted-foreground">
+                Tick the box above so we know you&rsquo;re a real person.
+              </p>
+            )}
             <button
               type="submit"
-              disabled={busy || phone.trim().length < 7}
+              disabled={busy || phone.trim().length < 7 || !human.ready}
               className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
             >
               {busy ? "Sending…" : "Text me a code"}
@@ -149,6 +156,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               {busy ? "Checking…" : "Confirm number"}
             </button>
           </form>
+          {seconds <= 0 && <div className="mt-4">{human.widget}</div>}
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
             <button
               type="button"
@@ -159,7 +167,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
             </button>
             <button
               type="button"
-              disabled={busy || seconds > 0}
+              disabled={busy || seconds > 0 || !human.ready}
               onClick={() => void send(true)}
               className="underline-offset-4 hover:underline disabled:opacity-50"
             >
