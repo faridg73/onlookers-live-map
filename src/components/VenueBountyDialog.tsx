@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { CalendarIcon, Radio, ShieldCheck, Timer, Video } from "lucide-react";
@@ -33,6 +33,9 @@ const LIVE_WINDOWS = [
   { minutes: 120, label: "Within 2 hours" },
 ];
 
+/** Live stream lengths a requester can ask for. */
+const LIVE_DURATIONS = [5, 10, 15, 20, 30];
+
 /**
  * Posts a bounty for one venue: either a 5-minute live stream inside the next
  * hour or two, or a pre-recorded clip with a hard delivery deadline.
@@ -57,6 +60,9 @@ export function VenueBountyDialog({
   const [minutes, setMinutes] = useState(120);
   const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
+  const [durationMin, setDurationMin] = useState(5);
+  const [scheduledStart, setScheduledStart] = useState<Date | null>(null);
+  const [startOpen, setStartOpen] = useState(false);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(20);
@@ -74,6 +80,7 @@ export function VenueBountyDialog({
     setMode(next);
     setMinutes(next === "live" ? 120 : 60);
     setCustomDeadline(null);
+    setScheduledStart(null);
   }
 
   /** True when the requester picked an exact calendar deadline. */
@@ -106,6 +113,14 @@ export function VenueBountyDialog({
       toast.error("Pick a deadline in the future.");
       return;
     }
+    if (mode === "clip" && scheduledStart && scheduledStart.getTime() <= Date.now()) {
+      toast.error("Pick a recording start time in the future.");
+      return;
+    }
+    if (mode === "live" && !LIVE_DURATIONS.includes(durationMin)) {
+      toast.error("Pick how long the live stream should run.");
+      return;
+    }
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < bounty) {
@@ -116,10 +131,13 @@ export function VenueBountyDialog({
       return;
     }
 
+    const startNote = scheduledStart
+      ? ` Recording starts ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}.`
+      : "";
     const header =
       mode === "live"
-        ? `Live: 5-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.`;
+        ? `Live: ${durationMin}-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
+        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.${startNote}`;
     const details = `${header}\n${note.trim()}`;
     // The store still wants a countdown; derive one from the calendar pick.
     const effectiveMinutes = isCustom
@@ -138,7 +156,10 @@ export function VenueBountyDialog({
         longitude: venue.longitude,
         minutes: effectiveMinutes,
         customDeadlineAt: isCustom ? customDeadline.toISOString() : null,
+        durationMinutes: mode === "live" ? durationMin : 5,
         bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
+        scheduledStartAt:
+          mode === "clip" && scheduledStart ? scheduledStart.toISOString() : null,
       });
       setBalance(locked.balance);
       addRequest({
@@ -158,6 +179,8 @@ export function VenueBountyDialog({
       setTitle("");
       setNote("");
       setCustomDeadline(null);
+      setScheduledStart(null);
+      setDurationMin(5);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
@@ -188,8 +211,8 @@ export function VenueBountyDialog({
           <div className="flex gap-2">
             <button type="button" onClick={() => pickMode("live")} aria-pressed={mode === "live"} className={modeCard(mode === "live")}>
               <Radio className="size-4 text-signal" />
-              <p className="mt-1.5 text-sm font-extrabold text-foreground">5-min live stream</p>
-              <p className="text-xs text-muted-foreground">Watch it happen, starting soon</p>
+              <p className="mt-1.5 text-sm font-extrabold text-foreground">Live stream</p>
+              <p className="text-xs text-muted-foreground">Watch it happen in real time — you pick the length</p>
             </button>
             <button type="button" onClick={() => pickMode("clip")} aria-pressed={mode === "clip"} className={modeCard(mode === "clip")}>
               <Video className="size-4 text-signal" />
@@ -272,6 +295,56 @@ export function VenueBountyDialog({
             </p>
           </div>
 
+          {mode === "live" ? (
+            <div className="space-y-2">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                Stream length
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {LIVE_DURATIONS.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setDurationMin(d)}
+                    aria-pressed={durationMin === d}
+                    className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                      durationMin === d
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-border bg-surface-raised text-foreground hover:border-signal/60"
+                    }`}
+                  >
+                    {d} min
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                Recording start (optional)
+              </span>
+              <button
+                type="button"
+                onClick={() => setStartOpen(true)}
+                className="flex w-full items-center gap-2 rounded-xl border-2 border-border bg-surface-raised px-3 py-2.5 text-left text-sm font-extrabold text-foreground transition-colors hover:border-signal/60"
+              >
+                <CalendarIcon className="size-4 shrink-0 text-signal" />
+                {scheduledStart
+                  ? format(scheduledStart, "EEE, MMM d 'at' h:mm a")
+                  : "Pick when the recording should start"}
+              </button>
+              {scheduledStart && (
+                <button
+                  type="button"
+                  onClick={() => setScheduledStart(null)}
+                  className="text-xs font-semibold text-muted-foreground underline underline-offset-2"
+                >
+                  Clear start time — onlooker records as soon as claimed
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
               Reward
@@ -298,10 +371,23 @@ export function VenueBountyDialog({
       <CustomDeadlinePicker
         open={customOpen}
         value={customDeadline}
+        title="Custom deadline"
+        description="Pick the exact date and time the clip is due."
         onOpenChange={setCustomOpen}
         onPick={(date) => {
           setCustomDeadline(date);
           setCustomOpen(false);
+        }}
+      />
+      <CustomDeadlinePicker
+        open={startOpen}
+        value={scheduledStart}
+        title="Recording start"
+        description="Pick the exact date and time the onlooker should start recording."
+        onOpenChange={setStartOpen}
+        onPick={(date) => {
+          setScheduledStart(date);
+          setStartOpen(false);
         }}
       />
     </Dialog>
@@ -312,36 +398,37 @@ export function VenueBountyDialog({
 function CustomDeadlinePicker({
   open,
   value,
+  title,
+  description,
   onOpenChange,
   onPick,
 }: {
   open: boolean;
   value: Date | null;
+  title: string;
+  description: string;
   onOpenChange: (open: boolean) => void;
   onPick: (date: Date) => void;
 }) {
   const now = new Date();
-  const [day, setDay] = useState<Date | undefined>(value ?? now);
-  const [hour, setHour] = useState(value ? value.getHours() : (now.getHours() + 1) % 24);
+  const [day, setDay] = useState<Date | undefined>(value ?? undefined);
+  const [hour, setHour] = useState(value?.getHours() ?? 18);
   const [minute, setMinute] = useState(value ? value.getMinutes() : 0);
 
-  useEffect(() => {
-    if (!open) return;
-    const base = value ?? new Date();
-    setDay(value ?? new Date());
-    setHour(value ? base.getHours() : (new Date().getHours() + 1) % 24);
-    setMinute(value ? base.getMinutes() : 0);
-  }, [open, value]);
-
-  const picked = day ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute) : null;
-  const valid = picked !== null && picked.getTime() > Date.now();
+  const picked = useMemo(() => {
+    if (!day) return null;
+    const d = new Date(day);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }, [day, hour, minute]);
+  const valid = Boolean(picked && picked.getTime() > Date.now());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="max-w-sm rounded-3xl border-border bg-card p-5">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Custom deadline</DialogTitle>
-          <DialogDescription>Pick the exact date and time the clip is due.</DialogDescription>
+          <DialogTitle className="font-display text-xl">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div className="flex justify-center">
           <Calendar
