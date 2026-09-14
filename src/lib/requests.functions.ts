@@ -22,6 +22,14 @@ const createSchema = z.object({
   minutes: z.number().int().min(15).max(1440).default(60),
   latitude: z.number().min(-90).max(90).default(0),
   longitude: z.number().min(-180).max(180).default(0),
+  /** Exact calendar deadline picked in the form; overrides `minutes` when set. */
+  customDeadlineAt: z.string().datetime({ offset: true }).nullable().optional(),
+  /** Requested live stream / recording length in minutes. */
+  durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
+  /** 'live_stream' or 'pre_recorded_clip'. */
+  bountyType: z.enum(["live_stream", "pre_recorded_clip"]).nullable().optional(),
+  /** When a pre-recorded clip's recording should start. */
+  scheduledStartAt: z.string().datetime({ offset: true }).nullable().optional(),
   /** Cloudflare Turnstile token proving a person posted this request. */
   captchaToken: z.string().max(4000).nullable().optional(),
 });
@@ -82,6 +90,16 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       );
     }
 
+    // A custom calendar deadline wins over the quick-select countdown.
+    let expiresAt = new Date(Date.now() + data.minutes * 60_000);
+    if (data.customDeadlineAt) {
+      const custom = new Date(data.customDeadlineAt);
+      if (Number.isNaN(custom.getTime()) || custom.getTime() <= Date.now()) {
+        throw new Error("Pick a deadline in the future.");
+      }
+      expiresAt = custom;
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("requests")
       .insert({
@@ -93,7 +111,11 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         latitude: data.latitude,
         longitude: data.longitude,
         category: data.category ?? null,
-        expires_at: new Date(Date.now() + data.minutes * 60_000).toISOString(),
+        expires_at: expiresAt.toISOString(),
+        custom_deadline_at: data.customDeadlineAt ?? null,
+        duration_minutes: data.durationMinutes ?? 5,
+        bounty_type: data.bountyType ?? "live_stream",
+        scheduled_start_at: data.scheduledStartAt ?? null,
       })
       .select("id")
       .single();

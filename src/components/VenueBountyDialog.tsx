@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Radio, ShieldCheck, Timer, Video } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, Radio, ShieldCheck, Timer, Video } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
@@ -53,6 +55,8 @@ export function VenueBountyDialog({
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("live");
   const [minutes, setMinutes] = useState(120);
+  const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(20);
@@ -69,10 +73,16 @@ export function VenueBountyDialog({
   function pickMode(next: Mode) {
     setMode(next);
     setMinutes(next === "live" ? 120 : 60);
+    setCustomDeadline(null);
   }
 
+  /** True when the requester picked an exact calendar deadline. */
+  const isCustom = customDeadline !== null;
+
   const windows = mode === "live" ? LIVE_WINDOWS : CLIP_DEADLINES;
-  const windowLabel = windows.find((w) => w.minutes === minutes)?.label ?? `${minutes} min`;
+  const windowLabel = isCustom
+    ? `by ${format(customDeadline, "EEE, MMM d 'at' h:mm a")}`
+    : (windows.find((w) => w.minutes === minutes)?.label ?? `${minutes} min`);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,6 +102,10 @@ export function VenueBountyDialog({
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
     }
+    if (isCustom && customDeadline.getTime() <= Date.now()) {
+      toast.error("Pick a deadline in the future.");
+      return;
+    }
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < bounty) {
@@ -105,8 +119,12 @@ export function VenueBountyDialog({
     const header =
       mode === "live"
         ? `Live: 5-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: live-captured video from ${venue.name}, delivered within ${windowLabel.toLowerCase()}.`;
+        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.`;
     const details = `${header}\n${note.trim()}`;
+    // The store still wants a countdown; derive one from the calendar pick.
+    const effectiveMinutes = isCustom
+      ? Math.max(15, Math.round((customDeadline.getTime() - Date.now()) / 60_000))
+      : minutes;
 
     setPosting(true);
     try {
@@ -118,7 +136,9 @@ export function VenueBountyDialog({
         category: venue.category,
         latitude: venue.latitude,
         longitude: venue.longitude,
-        minutes,
+        minutes: effectiveMinutes,
+        customDeadlineAt: isCustom ? customDeadline.toISOString() : null,
+        bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
       });
       setBalance(locked.balance);
       addRequest({
@@ -129,7 +149,7 @@ export function VenueBountyDialog({
         category: venue.category,
         instructions: details,
         dbId: locked.id,
-        expiresInMin: minutes,
+        expiresInMin: effectiveMinutes,
       });
       toast.success("Bounty is live", {
         description: `${bounty} Credits held in escrow · ${windowLabel}`,
@@ -137,6 +157,7 @@ export function VenueBountyDialog({
       setOpen(false);
       setTitle("");
       setNote("");
+      setCustomDeadline(null);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
@@ -210,15 +231,18 @@ export function VenueBountyDialog({
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
               {mode === "live" ? "Start window" : "Delivery deadline"}
             </span>
-            <div className={`grid gap-2 ${mode === "live" ? "grid-cols-2" : "grid-cols-4"}`}>
+            <div className="flex flex-wrap gap-2">
               {windows.map(({ minutes: m, label }) => (
                 <button
                   key={m}
                   type="button"
-                  onClick={() => setMinutes(m)}
-                  aria-pressed={minutes === m}
-                  className={`rounded-xl border-2 py-2.5 text-center text-sm font-extrabold transition-colors ${
-                    minutes === m
+                  onClick={() => {
+                    setMinutes(m);
+                    setCustomDeadline(null);
+                  }}
+                  aria-pressed={!isCustom && minutes === m}
+                  className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                    !isCustom && minutes === m
                       ? "border-signal bg-signal text-signal-foreground"
                       : "border-border bg-surface-raised text-foreground hover:border-signal/60"
                   }`}
@@ -226,6 +250,18 @@ export function VenueBountyDialog({
                   {label}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setCustomOpen(true)}
+                aria-pressed={isCustom}
+                className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                  isCustom
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface-raised text-foreground hover:border-signal/60"
+                }`}
+              >
+                {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+              </button>
             </div>
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Timer className="mt-0.5 size-3.5 shrink-0 text-signal" />
@@ -257,6 +293,101 @@ export function VenueBountyDialog({
             {posting ? "Locking bounty…" : `Lock ${Number.isFinite(bounty) ? bounty : 0} Credits`}
           </button>
         </form>
+      </DialogContent>
+
+      <CustomDeadlinePicker
+        open={customOpen}
+        value={customDeadline}
+        onOpenChange={setCustomOpen}
+        onPick={(date) => {
+          setCustomDeadline(date);
+          setCustomOpen(false);
+        }}
+      />
+    </Dialog>
+  );
+}
+
+/** Exact calendar date + hour/minute picker behind the "Custom" deadline pill. */
+function CustomDeadlinePicker({
+  open,
+  value,
+  onOpenChange,
+  onPick,
+}: {
+  open: boolean;
+  value: Date | null;
+  onOpenChange: (open: boolean) => void;
+  onPick: (date: Date) => void;
+}) {
+  const now = new Date();
+  const [day, setDay] = useState<Date | undefined>(value ?? now);
+  const [hour, setHour] = useState(value ? value.getHours() : (now.getHours() + 1) % 24);
+  const [minute, setMinute] = useState(value ? value.getMinutes() : 0);
+
+  useEffect(() => {
+    if (!open) return;
+    const base = value ?? new Date();
+    setDay(value ?? new Date());
+    setHour(value ? base.getHours() : (new Date().getHours() + 1) % 24);
+    setMinute(value ? base.getMinutes() : 0);
+  }, [open, value]);
+
+  const picked = day ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute) : null;
+  const valid = picked !== null && picked.getTime() > Date.now();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Custom deadline</DialogTitle>
+          <DialogDescription>Pick the exact date and time the clip is due.</DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center">
+          <Calendar
+            mode="single"
+            selected={day}
+            onSelect={setDay}
+            disabled={(date) => date < new Date(now.getFullYear(), now.getMonth(), now.getDate())}
+            initialFocus
+            className="pointer-events-auto p-3"
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2">
+          <CalendarIcon className="size-4 text-signal" />
+          <select
+            value={hour}
+            onChange={(e) => setHour(Number(e.target.value))}
+            aria-label="Hour"
+            className="field w-auto"
+          >
+            {Array.from({ length: 24 }, (_, h) => (
+              <option key={h} value={h}>
+                {h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`}
+              </option>
+            ))}
+          </select>
+          <select
+            value={minute}
+            onChange={(e) => setMinute(Number(e.target.value))}
+            aria-label="Minute"
+            className="field w-auto"
+          >
+            {[0, 15, 30, 45].map((m) => (
+              <option key={m} value={m}>
+                {String(m).padStart(2, "0")}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="button"
+          disabled={!valid}
+          onClick={() => picked && onPick(picked)}
+          className="w-full rounded-2xl bg-signal py-3 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
+        >
+          {valid && picked ? `Set deadline — ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
+        </button>
       </DialogContent>
     </Dialog>
   );

@@ -49,6 +49,14 @@ export async function lockBounty(input: {
   longitude?: number | undefined;
   /** Minutes until the request expires and the deposit is swept back. */
   minutes?: number;
+  /** Exact calendar deadline; overrides `minutes` on the server when set. */
+  customDeadlineAt?: string | null;
+  /** Live stream / recording length in minutes. */
+  durationMinutes?: number | null;
+  /** 'live_stream' or 'pre_recorded_clip'. */
+  bountyType?: "live_stream" | "pre_recorded_clip" | null;
+  /** When a pre-recorded clip's recording should start. */
+  scheduledStartAt?: string | null;
   /** Human-check token from the posting form. */
   captchaToken?: string | null;
 }): Promise<LockedBounty> {
