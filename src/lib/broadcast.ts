@@ -1,0 +1,82 @@
+import { createCommunityPost, type CommunityCategory } from "@/lib/community";
+import { fetchTrustStats } from "@/lib/trust";
+import { supabase } from "@/integrations/supabase/client";
+
+/**
+ * Free Social Broadcast.
+ *
+ * A verified creator can go live for their followers and anyone nearby with no
+ * credits and no escrow. The broadcast lives on Discover as a short-lived
+ * flash post so it drops off the feed when the stream is over.
+ */
+
+/** How long a free broadcast stays on the feed, in hours. */
+export const BROADCAST_WINDOWS = [
+  { hours: 0.5, label: "30 min" },
+  { hours: 1, label: "1 hour" },
+  { hours: 3, label: "3 hours" },
+] as const;
+
+/** Level at which a creator can broadcast for free without a track record badge. */
+export const BROADCAST_MIN_LEVEL = 2;
+
+export type BroadcastEligibility = {
+  signedIn: boolean;
+  allowed: boolean;
+  level: number;
+  completed: number;
+  /** Plain-language reason when broadcasting is not open yet. */
+  reason: string;
+};
+
+/** Checks whether the signed-in person can stream for free. */
+export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) {
+    return {
+      signedIn: false,
+      allowed: false,
+      level: 0,
+      completed: 0,
+      reason: "Sign in to start a free broadcast.",
+    };
+  }
+  const trust = await fetchTrustStats(auth.user.id).catch(() => null);
+  const level = trust?.hunterLevel ?? 1;
+  const completed = trust?.completedClaims ?? 0;
+  const allowed = Boolean(trust?.verified) || level >= BROADCAST_MIN_LEVEL;
+  return {
+    signedIn: true,
+    allowed,
+    level,
+    completed,
+    reason: allowed
+      ? ""
+      : "Free broadcasting opens once you're a verified creator — deliver a couple of paid captures to unlock it.",
+  };
+}
+
+/** Publishes a free live broadcast to Discover and the nearby feed. */
+export function startFreeBroadcast(input: {
+  category: CommunityCategory;
+  title: string;
+  body: string;
+  place: string;
+  hours: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  mediaPath?: string | null;
+}): Promise<string> {
+  return createCommunityPost({
+    category: input.category,
+    title: input.title,
+    body: input.body,
+    place: input.place,
+    tags: ["live", "free broadcast"],
+    mediaPath: input.mediaPath ?? null,
+    isFlash: true,
+    flashHours: input.hours,
+    latitude: input.latitude ?? null,
+    longitude: input.longitude ?? null,
+  });
+}
