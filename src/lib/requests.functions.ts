@@ -291,5 +291,10 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       expiresAt: row.expires_at,
       createdAt: row.created_at,
       mine: row.requester_id === context.userId,
+      bountyTier: row.bounty_tier ?? "standard",
+      bountyType: row.bounty_type ?? "live_stream",
+      captureMinutes: Number(row.custom_duration_minutes ?? row.duration_minutes ?? 5),
+      scheduledStartAt: row.scheduled_start_at ?? null,
+      weatherMultiplier: Number(row.weather_multiplier ?? 1),
     }));
   });
