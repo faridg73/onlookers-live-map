@@ -1228,10 +1228,13 @@ export type Database = {
       requests: {
         Row: {
           bounty_amount: number
+          bounty_type: string
           category: string | null
           checklist: string[]
           created_at: string
+          custom_deadline_at: string | null
           details: string
+          duration_minutes: number
           expires_at: string
           id: string
           latitude: number
@@ -1239,15 +1242,19 @@ export type Database = {
           longitude: number
           prompt: string
           requester_id: string
+          scheduled_start_at: string | null
           status: Database["public"]["Enums"]["request_status"]
           updated_at: string
         }
         Insert: {
           bounty_amount?: number
+          bounty_type?: string
           category?: string | null
           checklist?: string[]
           created_at?: string
+          custom_deadline_at?: string | null
           details?: string
+          duration_minutes?: number
           expires_at?: string
           id?: string
           latitude: number
@@ -1255,15 +1262,19 @@ export type Database = {
           longitude: number
           prompt: string
           requester_id: string
+          scheduled_start_at?: string | null
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
         }
         Update: {
           bounty_amount?: number
+          bounty_type?: string
           category?: string | null
           checklist?: string[]
           created_at?: string
+          custom_deadline_at?: string | null
           details?: string
+          duration_minutes?: number
           expires_at?: string
           id?: string
           latitude?: number
@@ -1271,6 +1282,7 @@ export type Database = {
           longitude?: number
           prompt?: string
           requester_id?: string
+          scheduled_start_at?: string | null
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
         }
