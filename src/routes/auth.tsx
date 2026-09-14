@@ -114,6 +114,28 @@ function AuthScreen() {
     if (result.error) toast.error(result.error.message);
   }
 
+  if (verifying) {
+    return (
+      <div className="mx-auto max-w-md px-4 pb-28 pt-10">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
+          One last check
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Almost there — confirm your mobile number and we&rsquo;ll finish setting up{" "}
+          <span className="font-semibold text-foreground">{email}</span>.
+        </p>
+        <PhoneVerification
+          email={email}
+          onVerified={(phone) => void createAccount(phone)}
+          onCancel={() => {
+            setVerifying(false);
+            human.reset();
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-md px-4 pb-28 pt-10">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
