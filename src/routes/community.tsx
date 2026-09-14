@@ -9,6 +9,7 @@ import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import {
   CommunityFeedFilters,
+  RADIUS_CHOICES,
   radiusMilesFor,
   type RadiusChoiceId,
 } from "@/components/CommunityFeedFilters";
@@ -91,8 +92,9 @@ function CommunityHub() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("onlooker_discover_radius");
-      if (RADIUS_CHOICES.some((choice) => choice.id === saved)) {
-        setRadius(saved);
+      const savedChoice = RADIUS_CHOICES.find((choice) => choice.id === saved);
+      if (savedChoice) {
+        setRadius(savedChoice.id);
       }
     } catch {}
   }, []);
