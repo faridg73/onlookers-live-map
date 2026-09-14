@@ -26,7 +26,7 @@ export const acceptBountyAndGoLive = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }): Promise<{ sessionId: string }> => {
-    await enforceRateLimit(RATE_LIMITS.createRequest, context.userId);
+    await enforceRateLimit(RATE_LIMITS.acceptBounty, context.userId);
     await assertHuman(data.captchaToken, "accept-bounty");
 
     const { data: sessionId, error } = await context.supabase.rpc("accept_bounty_and_go_live", {
