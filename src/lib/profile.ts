@@ -138,7 +138,7 @@ export async function fetchMyProfile(): Promise<MyProfile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded, onboarding_completed")
+    .select(PROFILE_COLUMNS)
     .eq("id", user.id)
     .maybeSingle();
   if (error) throw error;
@@ -154,32 +154,52 @@ export async function fetchMyProfile(): Promise<MyProfile | null> {
   const { data: created, error: insertError } = await supabase
     .from("profiles")
     .insert(seed)
-    .select("id, display_name, full_name, avatar_url, terms_accepted_at, onboarded, onboarding_completed")
+    .select(PROFILE_COLUMNS)
     .single();
   if (insertError) throw insertError;
   return created as MyProfile;
 }
 
 export async function completeMyProfile(input: {
-  display_name: string;
-  full_name: string;
+  username: string;
+  legal_first_name: string;
+  legal_last_name: string;
   avatar_url?: string | null;
+  security_answers?: SecurityAnswers;
 }) {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) throw new Error("You must be signed in.");
 
+  const username = sanitizeText(input.username, { maxLength: 24 }).trim();
+  const first = sanitizeText(input.legal_first_name, { maxLength: 60 }).trim();
+  const last = sanitizeText(input.legal_last_name, { maxLength: 60 }).trim();
+
+  const problem = usernameProblem(username);
+  if (problem) throw new Error(problem);
+  if (!(await isUsernameAvailable(username))) throw new Error("That username is already claimed.");
+
   const { error } = await supabase
     .from("profiles")
     .update({
-      display_name: input.display_name.trim(),
-      full_name: input.full_name.trim(),
+      username,
+      legal_first_name: first,
+      legal_last_name: last,
+      display_name: username,
+      full_name: `${first} ${last}`.trim(),
       avatar_url: input.avatar_url ?? null,
       onboarded: true,
       terms_accepted_at: readRememberedTerms() ?? new Date().toISOString(),
     })
     .eq("id", user.id);
-  if (error) throw error;
+  if (error) {
+    if (error.code === "23505" || /duplicate key/i.test(error.message)) {
+      throw new Error("That username is already claimed.");
+    }
+    throw error;
+  }
+
+  if (input.security_answers) await saveSecurityAnswers(input.security_answers);
 }
 
 export async function markOnboardingCompleted() {
