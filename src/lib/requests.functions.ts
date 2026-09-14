@@ -247,6 +247,16 @@ export type ActiveRequestRow = {
   expiresAt: string;
   createdAt: string;
   mine: boolean;
+  /** Reward tier the requester picked: standard, fast_catch or priority_hunt. */
+  bountyTier: string | null;
+  /** 'live_stream' or 'pre_recorded_clip'. */
+  bountyType: string;
+  /** Capture length in minutes the onlooker is being asked to film. */
+  captureMinutes: number;
+  /** When a pre-recorded clip should start filming, when scheduled. */
+  scheduledStartAt: string | null;
+  /** Filming-conditions premium already priced into the bounty. */
+  weatherMultiplier: number;
 };
 
 /**
@@ -259,7 +269,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("requests")
       .select(
-        "id, requester_id, prompt, details, location_name, bounty_amount, category, latitude, longitude, expires_at, created_at, status",
+        "id, requester_id, prompt, details, location_name, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier",
       )
       .eq("status", "open")
       .gt("expires_at", new Date().toISOString())
@@ -281,5 +291,10 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       expiresAt: row.expires_at,
       createdAt: row.created_at,
       mine: row.requester_id === context.userId,
+      bountyTier: row.bounty_tier ?? "standard",
+      bountyType: row.bounty_type ?? "live_stream",
+      captureMinutes: Number(row.custom_duration_minutes ?? row.duration_minutes ?? 5),
+      scheduledStartAt: row.scheduled_start_at ?? null,
+      weatherMultiplier: Number(row.weather_multiplier ?? 1),
     }));
   });

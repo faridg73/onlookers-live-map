@@ -15,6 +15,7 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
 import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
+import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +75,7 @@ export function RequestCard({
             {distanceLabel && (
               <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
             )}
+            <BountyBriefBadges request={request} compact />
           </div>
           <div className="shrink-0 text-right">
             <div className="font-display text-2xl font-extrabold leading-none text-signal">
@@ -172,6 +174,8 @@ export function RequestCard({
           </span>
         )}
       </div>
+
+      <BountyBriefBadges request={request} />
 
       {expired && (
         <p className="mt-3 rounded-xl border border-border bg-surface-raised px-3 py-2 text-xs text-muted-foreground">

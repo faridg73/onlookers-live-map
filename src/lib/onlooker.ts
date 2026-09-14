@@ -220,6 +220,16 @@ export type LiveRequest = {
   /** True pin of a saved request, used instead of the 0-1000 city space */
   lat?: number | undefined;
   lng?: number | undefined;
+  /** Reward tier: standard, fast_catch or priority_hunt */
+  bountyTier?: string | undefined;
+  /** 'live_stream' or 'pre_recorded_clip' */
+  bountyType?: string | undefined;
+  /** How many minutes of footage the requester asked for */
+  captureMinutes?: number | undefined;
+  /** ISO time a pre-recorded clip should start filming */
+  scheduledStartAt?: string | undefined;
+  /** Filming-conditions premium already priced in, 1 = clear */
+  weatherMultiplier?: number | undefined;
 };
 
 export type MapPosition = { lat: number; lng: number };
