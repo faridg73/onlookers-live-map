@@ -41,6 +41,8 @@ function AuthScreen() {
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
