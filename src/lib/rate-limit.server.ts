@@ -35,6 +35,8 @@ export const RATE_LIMITS = {
   placesSearch: { bucket: "places-search", limit: 120, windowSeconds: 300 },
   /** New bounty requests per member. */
   createRequest: { bucket: "create-request", limit: 15, windowSeconds: 3600 },
+  /** Bounty acceptances per member. */
+  acceptBounty: { bucket: "accept-bounty", limit: 30, windowSeconds: 3600 },
   /** Credit checkout sessions per member. */
   checkout: { bucket: "checkout", limit: 10, windowSeconds: 900 },
 } as const satisfies Record<string, RateLimitRule>;
