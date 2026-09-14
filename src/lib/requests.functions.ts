@@ -90,6 +90,16 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       );
     }
 
+    // A custom calendar deadline wins over the quick-select countdown.
+    let expiresAt = new Date(Date.now() + data.minutes * 60_000);
+    if (data.customDeadlineAt) {
+      const custom = new Date(data.customDeadlineAt);
+      if (Number.isNaN(custom.getTime()) || custom.getTime() <= Date.now()) {
+        throw new Error("Pick a deadline in the future.");
+      }
+      expiresAt = custom;
+    }
+
     const { data: row, error } = await supabaseAdmin
       .from("requests")
       .insert({
@@ -101,7 +111,11 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         latitude: data.latitude,
         longitude: data.longitude,
         category: data.category ?? null,
-        expires_at: new Date(Date.now() + data.minutes * 60_000).toISOString(),
+        expires_at: expiresAt.toISOString(),
+        custom_deadline_at: data.customDeadlineAt ?? null,
+        duration_minutes: data.durationMinutes ?? 5,
+        bounty_type: data.bountyType ?? "live_stream",
+        scheduled_start_at: data.scheduledStartAt ?? null,
       })
       .select("id")
       .single();
