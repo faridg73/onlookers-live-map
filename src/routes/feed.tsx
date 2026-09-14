@@ -123,9 +123,13 @@ function FeedScreen() {
     return next ?? "custom";
   }, [radiusChoice, radiusOptions]);
 
+  // Distances are measured from the searched area when one is chosen, otherwise
+  // from the viewer's own position.
+  const center: MapPosition | null = area ? { lat: area.lat, lng: area.lng } : userPosition;
+
   const withinRadius = (r: (typeof requests)[number]) => {
-    if (!userPosition) return true;
-    return distanceMiles(userPosition, requestMapPosition(r)) <= effectiveRadiusMiles;
+    if (!center) return true;
+    return distanceMiles(center, requestMapPosition(r)) <= effectiveRadiusMiles;
   };
 
   // Status, keyword and radius filters shared by both the list and the tile counters.
