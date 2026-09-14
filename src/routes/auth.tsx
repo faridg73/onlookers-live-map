@@ -55,18 +55,67 @@ function AuthScreen() {
     await clearPreviousAuthState();
   }
 
+  /** Turns raw auth failures into plain-language messages people can act on. */
+  function describeAuthError(err: unknown): string {
+    const raw = err instanceof Error ? err.message : "";
+    const code =
+      typeof err === "object" && err !== null && "code" in err
+        ? String((err as { code?: unknown }).code ?? "")
+        : "";
+    const text = `${code} ${raw}`.toLowerCase();
+    if (text.includes("email_not_confirmed") || text.includes("email not confirmed")) {
+      setNeedsEmailConfirm(true);
+      return "Confirm your email address first — check your inbox for the verification link we sent.";
+    }
+    if (text.includes("invalid login") || text.includes("invalid_credentials")) {
+      return "That email or password is incorrect. Check them and try again.";
+    }
+    if (text.includes("user already registered") || text.includes("already_exists")) {
+      return "An account already exists for that email. Try signing in instead.";
+    }
+    if (text.includes("too many") || text.includes("rate limit")) {
+      return "Too many attempts. Please wait a minute and try again.";
+    }
+    return raw || "Something went wrong. Please try again.";
+  }
+
+  /** Sends a fresh confirmation link when someone never received the first one. */
+  async function resendConfirmation() {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      toast.success("Verification email sent — check your inbox.");
+      setFormError(null);
+    } catch (err) {
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
+    setNeedsEmailConfirm(false);
     if (!accepted) {
+      setFormError("You must accept the Terms of Service to continue.");
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
     if (!human.ready) {
-      toast.error(
+      const message =
         mode === "signup"
           ? "Finish the quick human check before creating your account."
-          : "Just a moment — finishing the security check.",
-      );
+          : "Just a moment — finishing the security check.";
+      setFormError(message);
+      toast.error(message);
       return;
     }
     setBusy(true);
