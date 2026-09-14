@@ -97,10 +97,11 @@ export async function uploadAvatarFile(file: File): Promise<string> {
   return signed.signedUrl;
 }
 
-export async function saveSecurityAnswers(answers: SecurityAnswers) {
+export async function saveSecurityAnswers(answers: SecurityAnswers, expectedUserId?: string) {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) throw new Error("You must be signed in.");
+  if (expectedUserId && user.id !== expectedUserId) throw new Error("Your session changed. Please sign in again.");
 
   const rows = Object.entries(answers)
     .filter(([, value]) => Boolean(value))
@@ -131,10 +132,11 @@ export function readRememberedTerms(): string | null {
   }
 }
 
-export async function fetchMyProfile(): Promise<MyProfile | null> {
+export async function fetchMyProfile(expectedUserId?: string): Promise<MyProfile | null> {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) return null;
+  if (expectedUserId && user.id !== expectedUserId) return null;
 
   const { data, error } = await supabase
     .from("profiles")
@@ -161,6 +163,7 @@ export async function fetchMyProfile(): Promise<MyProfile | null> {
 }
 
 export async function completeMyProfile(input: {
+  expectedUserId: string;
   username: string;
   legal_first_name: string;
   legal_last_name: string;
@@ -170,6 +173,7 @@ export async function completeMyProfile(input: {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) throw new Error("You must be signed in.");
+  if (user.id !== input.expectedUserId) throw new Error("Your session changed. Please sign in again.");
 
   const username = sanitizeText(input.username, { maxLength: 24 }).trim();
   const first = sanitizeText(input.legal_first_name, { maxLength: 60 }).trim();
@@ -199,7 +203,7 @@ export async function completeMyProfile(input: {
     throw error;
   }
 
-  if (input.security_answers) await saveSecurityAnswers(input.security_answers);
+  if (input.security_answers) await saveSecurityAnswers(input.security_answers, input.expectedUserId);
 }
 
 export async function markOnboardingCompleted() {

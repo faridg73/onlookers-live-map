@@ -18,6 +18,7 @@ import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { ProfileSetup } from "../components/ProfileSetup";
 import { OnboardingWalkthrough } from "../components/OnboardingWalkthrough";
+import { AuthProvider } from "@/hooks/use-auth";
 
 function NotFoundComponent() {
   return (
@@ -136,17 +137,19 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <OnlookerProvider>
-        <BoostProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <Footer />
-          <BottomNav />
-          <ProfileSetup />
-          <OnboardingWalkthrough />
-          <Toaster position="top-center" />
-        </BoostProvider>
-      </OnlookerProvider>
+      <AuthProvider>
+        <OnlookerProvider>
+          <BoostProvider>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <Footer />
+            <BottomNav />
+            <ProfileSetup />
+            <OnboardingWalkthrough />
+            <Toaster position="top-center" />
+          </BoostProvider>
+        </OnlookerProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

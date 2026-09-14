@@ -6,9 +6,10 @@ export type VerificationStatus = {
 };
 
 /** Verification state for the signed-in creator, or null when nobody is signed in. */
-export async function fetchMyVerification(): Promise<VerificationStatus | null> {
+export async function fetchMyVerification(expectedUserId?: string): Promise<VerificationStatus | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
+  if (expectedUserId && auth.user.id !== expectedUserId) return null;
   const { data, error } = await supabase
     .from("profiles")
     .select("is_verified, verification_requested_at")

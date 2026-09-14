@@ -34,6 +34,9 @@ import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { CreatorVerificationCard } from "@/components/CreatorVerificationCard";
 import { fetchMyVerification } from "@/lib/verification";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { fetchMyProfile, type MyProfile } from "@/lib/profile";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -69,27 +72,40 @@ const ACTIVITY = [
 
 function ProfileScreen() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { requests } = useOnlooker();
   const mine = requests.filter((r) => r.requester === "you");
   const [verified, setVerified] = useState(false);
+  const [profile, setProfile] = useState<MyProfile | null>(null);
 
   useEffect(() => {
     let active = true;
-    fetchMyVerification().then((status) => {
+    if (!user) {
+      setVerified(false);
+      setProfile(null);
+      return;
+    }
+    const userId = user.id;
+    Promise.all([fetchMyVerification(userId), fetchMyProfile(userId)]).then(([status, nextProfile]) => {
+      if (!active || nextProfile?.id !== userId) return;
       if (active) setVerified(Boolean(status?.isVerified));
+      setProfile(nextProfile);
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [user?.id]);
 
   async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error("Could not sign out. Please try again.");
       return;
     }
-    navigate({ to: "/auth" });
+    navigate({ to: "/auth", replace: true });
   }
 
   // Coming back from checkout: confirm the payment and pull the new balance in.
@@ -121,11 +137,11 @@ function ProfileScreen() {
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
       <div className="flex items-center gap-4">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-signal font-display text-2xl text-signal-foreground">
-          FR
+          {(profile?.display_name ?? user?.email ?? "ON").slice(0, 2).toUpperCase()}
         </div>
         <div>
           <h1 className="flex items-center gap-2 font-display text-2xl tracking-tight text-foreground">
-            fred
+            {profile?.display_name ?? user?.email?.split("@")[0] ?? "Onlooker"}
             {verified && <VerifiedBadge className="size-5" />}
           </h1>
           <p className="text-sm text-muted-foreground">Onlooker since 2025 · Harbor District</p>
