@@ -41,10 +41,14 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
       reason: "Sign in to start a free broadcast.",
     };
   }
-  const trust = await fetchTrustStats(auth.user.id).catch(() => null);
+  const [trust, verification] = await Promise.all([
+    fetchTrustStats(auth.user.id).catch(() => null),
+    fetchMyVerification().catch(() => null),
+  ]);
   const level = trust?.hunterLevel ?? 1;
   const completed = trust?.completedClaims ?? 0;
-  const allowed = Boolean(trust?.verified) || level >= BROADCAST_MIN_LEVEL;
+  const allowed =
+    Boolean(verification?.isVerified) || Boolean(trust?.verified) || level >= BROADCAST_MIN_LEVEL;
   return {
     signedIn: true,
     allowed,
@@ -52,7 +56,9 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
     completed,
     reason: allowed
       ? ""
-      : "Free broadcasting opens once you're a verified creator — deliver a couple of paid captures to unlock it.",
+      : verification?.requestedAt
+        ? "Your creator verification is in review — free broadcasting unlocks once it's approved."
+        : "Free broadcasting opens once you're a verified creator — apply on your profile, or deliver a couple of paid captures to unlock it.",
   };
 }
 
