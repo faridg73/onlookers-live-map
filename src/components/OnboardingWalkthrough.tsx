@@ -56,7 +56,7 @@ export function OnboardingWalkthrough() {
       setOpen(false);
       return;
     }
-    fetchMyProfile()
+    fetchMyProfile(user.id)
       .then((profile) => {
         if (!alive || !profile) return;
         // Only after the profile setup gate is done, and only once.
@@ -69,7 +69,7 @@ export function OnboardingWalkthrough() {
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user?.id]);
 
   const finish = useCallback(async () => {
     setBusy(true);

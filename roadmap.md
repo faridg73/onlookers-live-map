@@ -11,3 +11,4 @@
 - [x] Add live city/state autocomplete dropdown to the Discover filter bar
 - [x] Verify Turnstile checkbox renders on onlookerlive.com (confirmed live on /auth)
 - [x] Show the Turnstile checkbox in the Discover post window before submission
+- [x] Replace stale login routing with verified account handoff and user-ID-scoped profile loading

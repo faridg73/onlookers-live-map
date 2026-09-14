@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { useAuth } from "@/hooks/use-auth";
 import { rememberTermsAcceptance } from "@/lib/profile";
+import { clearPreviousAuthState, requireExactAuthenticatedUser } from "@/lib/auth-session";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthScreen() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,10 +46,6 @@ function AuthScreen() {
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
     discreet: mode === "signin",
   });
-
-  useEffect(() => {
-    if (user) navigate({ to: "/profile" });
-  }, [user, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -65,7 +62,6 @@ function AuthScreen() {
       return;
     }
     setBusy(true);
-    rememberTermsAcceptance();
     try {
       const allowed = await checkAuthAttempt({ data: { email, mode } });
       if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
@@ -77,10 +73,15 @@ function AuthScreen() {
         // Numbers are confirmed by text before the account is created.
         setVerifying(true);
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        void supabase.rpc("claim_verified_phone");
+        await clearPreviousAuthState();
+        rememberTermsAcceptance();
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error || !data.user) throw error ?? new Error("Sign-in did not return an account.");
+        const exactUser = await requireExactAuthenticatedUser(data.user.id);
+        await supabase.rpc("claim_verified_phone");
+        queryClient.clear();
         toast.success("Welcome back.");
+        await navigate({ to: "/profile", replace: true });
       }
     } catch (err) {
       human.reset();
@@ -94,20 +95,23 @@ function AuthScreen() {
   async function createAccount(phone: string) {
     setBusy(true);
     try {
-      // Clear any session already cached on this device so the new account is
-      // never mixed with a previous login.
-      const { data: existing } = await supabase.auth.getSession();
-      if (existing.session) await supabase.auth.signOut();
-
-      const { error } = await supabase.auth.signUp({
+      await clearPreviousAuthState();
+      rememberTermsAcceptance();
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: window.location.origin, data: { phone } },
       });
       if (error) throw error;
       setVerifying(false);
-      void supabase.rpc("claim_verified_phone");
-      toast.success("Number confirmed. Check your email to finish activating your account.");
+      if (data.session && data.user) {
+        await requireExactAuthenticatedUser(data.user.id);
+        await supabase.rpc("claim_verified_phone");
+        queryClient.clear();
+        await navigate({ to: "/profile", replace: true });
+      } else {
+        toast.success("Number confirmed. Check your email to finish activating your account.");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -120,6 +124,7 @@ function AuthScreen() {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
+    await clearPreviousAuthState();
     rememberTermsAcceptance();
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,

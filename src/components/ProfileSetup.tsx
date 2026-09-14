@@ -55,7 +55,7 @@ export function ProfileSetup() {
     setNameState({ kind: "idle" });
     if (!user) return;
     const signedInId = user.id;
-    fetchMyProfile()
+    fetchMyProfile(signedInId)
       .then((profile) => {
         if (!alive || !profile) return;
         // Guard against a stale fetch that resolved for a different account.
@@ -152,6 +152,7 @@ export function ProfileSetup() {
       }
 
       await completeMyProfile({
+        expectedUserId: fresh.user.id,
         username: username.trim(),
         legal_first_name: firstName,
         legal_last_name: lastName,
