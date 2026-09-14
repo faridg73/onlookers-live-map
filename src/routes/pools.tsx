@@ -264,9 +264,45 @@ function PoolsScreen() {
                 ))}
               </div>
               {errors.goal && <p className="text-xs text-destructive">{errors.goal}</p>}
+
+              <div>
+                <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  Your starter chip-in
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {POOL_CHIP_IN_AMOUNTS.map((amount) => (
+                    <button
+                      key={amount}
+                      type="button"
+                      onClick={() => setStarter(amount)}
+                      className={`rounded-xl border px-2 py-2 text-center text-sm font-bold ${
+                        starter === amount
+                          ? "border-signal bg-signal/15 text-signal"
+                          : "border-border text-foreground"
+                      } ${balance !== null && balance < amount ? "opacity-40" : ""}`}
+                    >
+                      {amount}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  You put the first {starter} Credits behind your own pool as @
+                  {identity?.username ?? "onlooker"}.
+                </p>
+                {balance !== null && balance < starter && (
+                  <p className="mt-1 text-xs text-destructive">
+                    You have {balance} Credits — top up before opening this pool.
+                  </p>
+                )}
+              </div>
+
               <div>{human.widget}</div>
               <div className="flex gap-2">
-                <Button onClick={submit} disabled={submitting} className="flex-1">
+                <Button
+                  onClick={submit}
+                  disabled={submitting || balance === null || balance < starter}
+                  className="flex-1"
+                >
                   {submitting ? "Opening…" : "Open the pool"}
                 </Button>
                 <Button variant="ghost" onClick={() => setCreating(false)}>
