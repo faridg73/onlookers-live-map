@@ -175,14 +175,23 @@ export function BountyBottomSheet({
           </div>
         ) : (
           <>
+            {wantsLive && claimable && <div className="mt-4">{human.widget}</div>}
             <button
               type="button"
-              disabled={!claimable}
+              disabled={!claimable || accepting}
               onClick={accept}
               className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-live font-display text-base font-extrabold uppercase tracking-[0.1em] text-black disabled:opacity-50"
             >
-              <Camera className="size-5" />
-              {claimable ? "Accept & Open Camera" : closed ? "Closed" : "Already claimed"}
+              {wantsLive ? <Radio className="size-5" /> : <Camera className="size-5" />}
+              {!claimable
+                ? closed
+                  ? "Closed"
+                  : "Already claimed"
+                : accepting
+                  ? "Starting your live session…"
+                  : wantsLive
+                    ? "Go live for this bounty"
+                    : "Accept & Open Camera"}
             </button>
             <p className="mt-2 flex items-start gap-2 text-[0.7rem] text-muted-foreground">
               <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-live" />
