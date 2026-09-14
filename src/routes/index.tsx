@@ -257,8 +257,29 @@ function MapScreen() {
           </button>
         </div>
 
-        {/* Request a view: search anywhere, then tap the map to drop a pin. */}
+        {/* Live place search: type a few letters, pick a suggestion, jump there. */}
         <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg space-y-2">
+          <div className="rounded-xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
+            <PlaceSearchInput
+              onQueryChange={setSearchText}
+              onPick={(place) => {
+                setSearchText("");
+                setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+              }}
+            />
+            {searchText.trim().length === 0 && (
+              <TrendingViewRequests
+                className="mt-2"
+                onOpen={(request) => {
+                  select(request.id);
+                  if (typeof request.lat === "number" && typeof request.lng === "number") {
+                    setCenterTarget({ lat: request.lat, lng: request.lng, zoom: 14 });
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => {
