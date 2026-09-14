@@ -119,8 +119,12 @@ export function VenueBountyDialog({
     const header =
       mode === "live"
         ? `Live: 5-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: live-captured video from ${venue.name}, delivered within ${windowLabel.toLowerCase()}.`;
+        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.`;
     const details = `${header}\n${note.trim()}`;
+    // The store still wants a countdown; derive one from the calendar pick.
+    const effectiveMinutes = isCustom
+      ? Math.max(15, Math.round((customDeadline.getTime() - Date.now()) / 60_000))
+      : minutes;
 
     setPosting(true);
     try {
@@ -132,7 +136,9 @@ export function VenueBountyDialog({
         category: venue.category,
         latitude: venue.latitude,
         longitude: venue.longitude,
-        minutes,
+        minutes: effectiveMinutes,
+        customDeadlineAt: isCustom ? customDeadline.toISOString() : null,
+        bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
       });
       setBalance(locked.balance);
       addRequest({
@@ -143,7 +149,7 @@ export function VenueBountyDialog({
         category: venue.category,
         instructions: details,
         dbId: locked.id,
-        expiresInMin: minutes,
+        expiresInMin: effectiveMinutes,
       });
       toast.success("Bounty is live", {
         description: `${bounty} Credits held in escrow · ${windowLabel}`,
@@ -151,6 +157,7 @@ export function VenueBountyDialog({
       setOpen(false);
       setTitle("");
       setNote("");
+      setCustomDeadline(null);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
