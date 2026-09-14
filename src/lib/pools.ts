@@ -1,4 +1,56 @@
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeText } from "@/lib/sanitize";
+
+/** The signed-in person as shown on the pools page. */
+export type PoolIdentity = {
+  userId: string;
+  username: string;
+  avatarUrl: string | null;
+  hunterLevel: number;
+  isVerified: boolean;
+};
+
+/** Reads the identity of the signed-in member, bound strictly to their own id. */
+export async function fetchPoolIdentity(expectedUserId: string): Promise<PoolIdentity | null> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user || auth.user.id !== expectedUserId) return null;
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url, hunter_level, is_verified")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return {
+    userId: data.id,
+    username: data.username ?? data.display_name ?? "onlooker",
+    avatarUrl: data.avatar_url ?? null,
+    hunterLevel: data.hunter_level ?? 1,
+    isVerified: Boolean(data.is_verified),
+  };
+}
+
+export type PoolFormErrors = { title?: string; place?: string; goal?: string };
+
+export const POOL_GOAL_MIN = 20;
+export const POOL_GOAL_MAX = 5000;
+
+/** Field-by-field checks run before a pool is opened. */
+export function poolFormErrors(input: {
+  title: string;
+  place: string;
+  goalCredits: number;
+}): PoolFormErrors {
+  const errors: PoolFormErrors = {};
+  const title = sanitizeText(input.title, { maxLength: 90 }).trim();
+  const place = sanitizeText(input.place, { maxLength: 120 }).trim();
+  if (title.length < 6) errors.title = "Say what should happen — at least 6 characters.";
+  if (place.length < 3) errors.place = "Add where this should happen, e.g. Soldier Field, Chicago.";
+  if (!Number.isFinite(input.goalCredits) || input.goalCredits < POOL_GOAL_MIN)
+    errors.goal = `Pick a goal of at least ${POOL_GOAL_MIN} Credits.`;
+  else if (input.goalCredits > POOL_GOAL_MAX)
+    errors.goal = `Keep the goal under ${POOL_GOAL_MAX} Credits.`;
+  return errors;
+}
 
 /** A community-funded bounty or sponsored flash meetup. */
 export type BountyPool = {
