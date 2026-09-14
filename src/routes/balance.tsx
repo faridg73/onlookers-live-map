@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { CreditWalletCard } from "@/components/CreditWalletCard";
 import { BuyCreditsCard } from "@/components/BuyCreditsCard";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
+import { MyEarningsCard } from "@/components/MyEarningsCard";
 import { creditPackageById } from "@/lib/credit-packages";
 
 export const Route = createFileRoute("/balance")({
@@ -155,6 +156,7 @@ function BalanceScreen() {
           </div>
 
           <BuyCreditsCard />
+          <MyEarningsCard />
           <CreditPayoutDashboard />
         </>
       )}
