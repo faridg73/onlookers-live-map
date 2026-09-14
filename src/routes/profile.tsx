@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
+  Building2,
   Camera,
   ChevronRight,
   Clock,
@@ -19,6 +20,13 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { RequestCard } from "@/components/RequestCard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
