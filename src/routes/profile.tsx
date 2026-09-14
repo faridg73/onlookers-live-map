@@ -87,7 +87,7 @@ function ProfileScreen() {
       return;
     }
     const userId = user.id;
-    Promise.all([fetchMyVerification(), fetchMyProfile(userId)]).then(([status, nextProfile]) => {
+    Promise.all([fetchMyVerification(userId), fetchMyProfile(userId)]).then(([status, nextProfile]) => {
       if (!active || nextProfile?.id !== userId) return;
       if (active) setVerified(Boolean(status?.isVerified));
       setProfile(nextProfile);

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,7 +77,7 @@ function AuthScreen() {
         rememberTermsAcceptance();
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error || !data.user) throw error ?? new Error("Sign-in did not return an account.");
-        const exactUser = await requireExactAuthenticatedUser(data.user.id);
+        await requireExactAuthenticatedUser(data.user.id);
         await supabase.rpc("claim_verified_phone");
         queryClient.clear();
         toast.success("Welcome back.");
