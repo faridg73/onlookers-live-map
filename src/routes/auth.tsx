@@ -47,6 +47,12 @@ function AuthScreen() {
     discreet: mode === "signin",
   });
 
+  async function beginAccountSwitch() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await clearPreviousAuthState();
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!accepted) {
@@ -71,16 +77,23 @@ function AuthScreen() {
       if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
       if (mode === "signup") {
         // Numbers are confirmed by text before the account is created.
-        await clearPreviousAuthState();
+        await beginAccountSwitch();
         rememberTermsAcceptance();
         setVerifying(true);
       } else {
-        await clearPreviousAuthState();
+        await beginAccountSwitch();
         rememberTermsAcceptance();
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error || !data.user) throw error ?? new Error("Sign-in did not return an account.");
-        await requireExactAuthenticatedUser(data.user.id);
+        if (error || !data.session || !data.user) {
+          throw error ?? new Error("Sign-in did not return a fresh session.");
+        }
+        const authenticatedUser = await requireExactAuthenticatedUser(data.session);
+        if (authenticatedUser.id !== data.user.id) {
+          await clearPreviousAuthState();
+          throw new Error("The signed-in account did not match. Please try again.");
+        }
         await supabase.rpc("claim_verified_phone");
+        await queryClient.cancelQueries();
         queryClient.clear();
         toast.success("Welcome back.");
         await navigate({ to: "/profile", replace: true });
@@ -97,7 +110,7 @@ function AuthScreen() {
   async function createAccount(phone: string) {
     setBusy(true);
     try {
-      await clearPreviousAuthState();
+      await beginAccountSwitch();
       rememberTermsAcceptance();
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -107,8 +120,13 @@ function AuthScreen() {
       if (error) throw error;
       setVerifying(false);
       if (data.session && data.user) {
-        await requireExactAuthenticatedUser(data.user.id);
+        const authenticatedUser = await requireExactAuthenticatedUser(data.session);
+        if (authenticatedUser.id !== data.user.id) {
+          await clearPreviousAuthState();
+          throw new Error("The new account did not match. Please sign in again.");
+        }
         await supabase.rpc("claim_verified_phone");
+        await queryClient.cancelQueries();
         queryClient.clear();
         await navigate({ to: "/profile", replace: true });
       } else {
@@ -126,12 +144,21 @@ function AuthScreen() {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
-    await clearPreviousAuthState();
-    rememberTermsAcceptance();
-    const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) toast.error(result.error.message);
+    try {
+      await beginAccountSwitch();
+      rememberTermsAcceptance();
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (!result.redirected) {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) throw new Error("Social sign-in did not return a fresh session.");
+        await requireExactAuthenticatedUser(data.session);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
+    }
   }
 
   if (verifying) {

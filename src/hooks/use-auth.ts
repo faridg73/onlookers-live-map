@@ -25,11 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     };
 
-    const refreshVerifiedUser = async (expectedId?: string) => {
+    const refreshVerifiedUser = async (session?: { access_token: string; user: User }) => {
       const version = ++requestVersion.current;
-      const { data, error } = await supabase.auth.getUser();
+      const { data, error } = session
+        ? await supabase.auth.getUser(session.access_token)
+        : await supabase.auth.getUser();
       if (!alive || version !== requestVersion.current) return;
-      const verified = !error && data.user && (!expectedId || data.user.id === expectedId)
+      const verified = !error && data.user && (!session || data.user.id === session.user.id)
         ? data.user
         : null;
       applyUser(verified);
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       if (event === "SIGNED_IN" || event === "USER_UPDATED" || event === "INITIAL_SESSION") {
-        void refreshVerifiedUser(session?.user.id);
+        void refreshVerifiedUser(session ?? undefined);
       }
     });
 
