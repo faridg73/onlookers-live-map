@@ -39,8 +39,11 @@ declare global {
 
 let scriptPromise: Promise<TurnstileApi> | null = null;
 
-function isLovablePreviewHost() {
-  return typeof window !== "undefined" && window.location.hostname.startsWith("id-preview--");
+function isTestingHost() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.location.hostname === "localhost" || window.location.hostname.startsWith("id-preview--")
+  );
 }
 
 function loadTurnstile(): Promise<TurnstileApi> {
@@ -82,7 +85,7 @@ export function useHumanCheck(action: string): {
   // When the widget can't run at all — hostname not allowed on this domain, a
   // blocked script, a network hiccup — we must never trap a real person behind
   // a disabled button. We stand down and let the form through.
-  const [unavailable, setUnavailable] = useState(isLovablePreviewHost);
+  const [unavailable, setUnavailable] = useState(isTestingHost);
   const required = Boolean(siteKey) && !isError && !unavailable;
 
   const reset = useCallback(() => {
