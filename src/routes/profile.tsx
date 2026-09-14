@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
   Camera,
@@ -10,6 +10,7 @@ import {
   Headphones,
   HelpCircle,
   Info,
+  LogOut,
   MessageSquare,
   PlusSquare,
   Radio,
@@ -32,6 +33,7 @@ import { replayOnboarding } from "@/lib/profile";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { CreatorVerificationCard } from "@/components/CreatorVerificationCard";
 import { fetchMyVerification } from "@/lib/verification";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -66,6 +68,7 @@ const ACTIVITY = [
 ];
 
 function ProfileScreen() {
+  const navigate = useNavigate();
   const { requests } = useOnlooker();
   const mine = requests.filter((r) => r.requester === "you");
   const [verified, setVerified] = useState(false);
@@ -79,6 +82,15 @@ function ProfileScreen() {
       active = false;
     };
   }, []);
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Could not sign out. Please try again.");
+      return;
+    }
+    navigate({ to: "/auth" });
+  }
 
   // Coming back from checkout: confirm the payment and pull the new balance in.
   useEffect(() => {
@@ -270,6 +282,20 @@ function ProfileScreen() {
           </span>
           <ChevronRight className="size-4 text-muted-foreground" />
         </Link>
+      </div>
+
+      <h2 className="mt-8 font-display text-lg text-foreground">Account</h2>
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex w-full items-center justify-between rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-foreground hover:bg-destructive/15"
+        >
+          <span className="flex items-center gap-3">
+            <LogOut className="size-4 text-destructive" /> Log out
+          </span>
+          <ChevronRight className="size-4 text-destructive" />
+        </button>
       </div>
     </div>
   );
