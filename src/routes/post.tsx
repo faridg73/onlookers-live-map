@@ -1,10 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { format } from "date-fns";
 import {
   ArrowLeft,
   Building2,
+  CalendarClock,
   ChevronDown,
+  CloudRain,
   CoinsIcon,
   GraduationCap,
   Info,
@@ -14,9 +17,9 @@ import {
   Radio,
   Search,
   ShieldCheck,
+  Smartphone,
   Store,
   Trees,
-  Users,
   Video,
   X,
   Zap,
@@ -26,14 +29,22 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { CategoryPicker } from "@/components/CategoryPicker";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
+import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
+import {
+  BOUNTY_TIERS,
+  WEATHER_CONDITIONS,
+  quoteBounty,
+  type BountyTierId,
+} from "@/lib/bounty-pricing";
 import { formatCreditCash, formatCredits } from "@/lib/credits";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
@@ -45,7 +56,6 @@ import {
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
-  categoryById,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
@@ -104,6 +114,19 @@ const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typ
   { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
 
+/** How the requester wants the shot framed. */
+const CAMERA_ANGLES = [
+  { id: "wide", label: "Wide establishing" },
+  { id: "close", label: "Close-up detail" },
+  { id: "walk", label: "Walkthrough" },
+  { id: "crowd", label: "Crowd / people flow" },
+] as const;
+
+const ORIENTATIONS = [
+  { id: "vertical", label: "Vertical" },
+  { id: "horizontal", label: "Horizontal" },
+] as const;
+
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
@@ -126,8 +149,16 @@ function PostScreen() {
   const [bounty, setBounty] = useState(20);
   const [tip, setTip] = useState(0);
   const [minutes, setMinutes] = useState(60);
+  const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
+  const [deadlineOpen, setDeadlineOpen] = useState(false);
+  const [scheduledStart, setScheduledStart] = useState<Date | null>(null);
+  const [startOpen, setStartOpen] = useState(false);
   const [capture, setCapture] = useState<CaptureDuration>(5);
   const [customCapture, setCustomCapture] = useState(false);
+  const [angle, setAngle] = useState<string>("wide");
+  const [orientation, setOrientation] = useState<string>("vertical");
+  const [tier, setTier] = useState<BountyTierId>("standard");
+  const [weather, setWeather] = useState(1);
   const [tile, setTile] = useState<CategoryId>("events");
   const [sub, setSub] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
@@ -142,7 +173,30 @@ function PostScreen() {
   const category: CategoryId = subOption?.category ?? tile;
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
-  const total = (Number.isFinite(bounty) ? bounty : 0) + (Number.isFinite(tip) ? tip : 0);
+
+  /** Minutes from now until the hunter is due, used for the urgency premium. */
+  const minutesUntilDue = useMemo(() => {
+    const target = customDeadline
+      ? customDeadline.getTime()
+      : action === "clip" && scheduledStart
+        ? scheduledStart.getTime()
+        : Date.now() + minutes * 60_000;
+    return Math.round((target - Date.now()) / 60_000);
+  }, [action, customDeadline, minutes, scheduledStart]);
+
+  const quote = useMemo(
+    () =>
+      quoteBounty({
+        tier,
+        customBase: Number.isFinite(bounty) ? bounty : 0,
+        durationMinutes: capture ?? 30,
+        minutesUntilDue,
+        weatherMultiplier: weather,
+      }),
+    [bounty, capture, minutesUntilDue, tier, weather],
+  );
+
+  const total = quote.total + (Number.isFinite(tip) ? tip : 0);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -163,17 +217,17 @@ function PostScreen() {
       .catch(() => {
         if (active) setSignedIn(false);
       });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authSub } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(Boolean(session));
     });
     return () => {
       active = false;
-      sub.subscription.unsubscribe();
+      authSub.subscription.unsubscribe();
     };
   }, []);
 
   useEffect(() => {
-    if (step !== 2 || !signedIn || venueQuery.trim().length < 2) return;
+    if (step !== 1 || !signedIn || venueQuery.trim().length < 2) return;
     let active = true;
     const timer = window.setTimeout(() => {
       setVenueBusy(true);
@@ -198,7 +252,7 @@ function PostScreen() {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [searchOrigin, searchVenues, step, venueQuery]);
+  }, [searchOrigin, searchVenues, signedIn, step, venueQuery]);
 
   /** Locks in a capture length and scales the reward up to match it. */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
@@ -213,9 +267,13 @@ function PostScreen() {
       toast.error("Describe the live view you want in one short sentence.");
       return;
     }
+    if (!spot || !place.trim()) {
+      toast.error("Pick the exact place — search a venue, tap the map, or use your location.");
+      return;
+    }
     setAction(parsed.action);
-    setTitle(parsed.title.slice(0, 120));
-    setNote(parsed.instructions);
+    setTitle((current) => current || parsed.title.slice(0, 120));
+    setNote((current) => current || parsed.instructions);
     if (parsed.action === "live") setMinutes(15);
     setCustomCapture(false);
     applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
@@ -223,11 +281,27 @@ function PostScreen() {
       setMinutes(60);
       setTile("community");
     }
-    if (!spot) {
-      const query = [parsed.venue, parsed.locationContext].filter(Boolean).join(" at ") || prompt;
-      setVenueQuery(query);
-    }
     setStep(2);
+  };
+
+  const continueFromDetails = () => {
+    if (title.trim().length < 4) {
+      toast.error("Give the request a short title.");
+      return;
+    }
+    if (note.trim().length < 10) {
+      toast.error("Tell the hunter exactly what to film.");
+      return;
+    }
+    if (action === "clip" && scheduledStart && scheduledStart.getTime() <= Date.now()) {
+      toast.error("Pick a recording start time in the future.");
+      return;
+    }
+    if (capture !== null && (capture < 1 || capture > MAX_CAPTURE_MINUTES)) {
+      toast.error(`Pick a capture length between 1 and ${MAX_CAPTURE_MINUTES} minutes.`);
+      return;
+    }
+    setStep(3);
   };
 
   const chooseVenue = (venue: DiscoveredPlace) => {
@@ -271,24 +345,18 @@ function PostScreen() {
     }
   };
 
-  const locateForSearch = async () => {
-    try {
-      const position = await requestCurrentPosition();
-      setSearchOrigin({ latitude: position.coords.latitude, longitude: position.coords.longitude });
-      toast.success("Nearby venue suggestions are now local to you.");
-    } catch {
-      toast.error("Allow location access to prioritize venues near you.");
-    }
-  };
-
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (bounty < MIN_BOUNTY) {
+    if (total < MIN_BOUNTY) {
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
     if (note.trim().length < 10) {
       toast.error("Tell the hunter exactly what to film before going live.");
+      return;
+    }
+    if (customDeadline && customDeadline.getTime() <= Date.now()) {
+      toast.error("Pick a deadline in the future.");
       return;
     }
     if (permissionNeeded && !permissionOk) {
@@ -315,9 +383,13 @@ function PostScreen() {
     setPosting(true);
     try {
       const actionLabel = ACTIONS.find((item) => item.id === action)?.label ?? "Request Video Clip";
+      const angleLabel = CAMERA_ANGLES.find((item) => item.id === angle)?.label ?? "Wide establishing";
+      const orientationLabel = ORIENTATIONS.find((item) => item.id === orientation)?.label ?? "Vertical";
       const detailLines = [
         `Format: ${actionLabel}`,
         `Requested capture: ${captureDurationLabel(capture, action === "live")}`,
+        `Camera: ${angleLabel} · ${orientationLabel}`,
+        scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
         subOption ? `Focus: ${subOption.label}` : "",
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
@@ -333,6 +405,13 @@ function PostScreen() {
         latitude: spot?.latitude,
         longitude: spot?.longitude,
         minutes,
+        customDeadlineAt: customDeadline ? customDeadline.toISOString() : null,
+        durationMinutes: capture ?? null,
+        bountyType: action === "clip" ? "pre_recorded_clip" : "live_stream",
+        scheduledStartAt: scheduledStart ? scheduledStart.toISOString() : null,
+        customDurationMinutes: customCapture ? capture : null,
+        weatherMultiplier: weather,
+        bountyTier: tier,
       });
       setBalance(locked.balance);
       addRequest({
@@ -346,11 +425,15 @@ function PostScreen() {
         dbId: locked.id,
         lat: spot?.latitude,
         lng: spot?.longitude,
-        expiresInMin: minutes,
+        expiresInMin: customDeadline
+          ? Math.max(1, Math.round((customDeadline.getTime() - Date.now()) / 60_000))
+          : minutes,
       });
-      const deadlineLabel = DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`;
+      const deadlineLabel = customDeadline
+        ? format(customDeadline, "MMM d, h:mm a")
+        : (DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`);
       toast.success("Request is live", {
-        description: `${total} Credits held in escrow. Expires in ${deadlineLabel} if nobody claims it.`,
+        description: `${total} Credits held in escrow. Expires ${customDeadline ? "at" : "in"} ${deadlineLabel} if nobody claims it.`,
       });
       await navigate({ to: "/feed" });
     } catch (error) {
@@ -361,6 +444,9 @@ function PostScreen() {
       setPosting(false);
     }
   }
+
+  const pill = (on: boolean) =>
+    `h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`;
 
   return (
     <main className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm">
@@ -375,7 +461,7 @@ function PostScreen() {
             <div>
               <p className="text-[0.65rem] font-extrabold uppercase text-signal">Step {step} of 3</p>
               <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
-                {step === 1 ? "What do you want to see?" : step === 2 ? "Where should they go?" : "How should it happen?"}
+                {step === 1 ? "What and where?" : step === 2 ? "How should it be captured?" : "Reward & escrow"}
               </h1>
             </div>
             <Button type="button" variant="ghost" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })}>
@@ -424,51 +510,6 @@ function PostScreen() {
                 </div>
 
                 <div>
-                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
-                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => void useCurrentSpot()}
-                        disabled={gpsBusy}
-                        className="shrink-0 gap-1.5"
-                      >
-                        <MapPin className="size-3.5 text-signal" />
-                        {gpsBusy ? "Locating…" : "My location"}
-                      </Button>
-                      {recent.map((entry) => (
-                        <Button
-                          key={`${entry.latitude},${entry.longitude}`}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => chooseRecent(entry)}
-                          className="shrink-0 gap-1.5"
-                        >
-                          <MapPin className="size-3.5 text-signal" />
-                          {entry.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-
-                {(spot || parsed.venue) && (
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold uppercase text-muted-foreground">Pin preview</p>
-                    <LocationPreviewMap
-                      compact
-                      address={place || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
-                      selectedLocation={spot}
-                      onPick={(next) => {
-                        setSpot(next);
-                        setPlace(next.formatted);
-                      }}
-                    />
-                  </div>
-                )}
-                <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {[
@@ -482,6 +523,7 @@ function PostScreen() {
                     ))}
                   </div>
                 </div>
+
                 {prompt.trim().length >= 8 && (
                   <div className="rounded-lg border border-border bg-background p-4">
                     <p className="text-xs font-bold uppercase text-muted-foreground">Understood</p>
@@ -494,15 +536,16 @@ function PostScreen() {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
 
-            {step === 2 && (
-              <div className="mx-auto max-w-2xl animate-rise space-y-5">
                 <div className="relative">
                   <Search className="absolute left-3 top-3.5 size-4 text-signal" />
-                  <input value={venueQuery} onChange={(event) => setVenueQuery(event.target.value)} placeholder="Search a mall, park, school, library…" className="field pl-10" autoFocus />
-                   {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
+                  <input
+                    value={venueQuery}
+                    onChange={(event) => setVenueQuery(event.target.value)}
+                    placeholder="Search a mall, park, school, library…"
+                    className="field pl-10"
+                  />
+                  {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
                 </div>
                 {signedIn === false && (
                   <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
@@ -525,33 +568,34 @@ function PostScreen() {
                     </Button>
                   ))}
                 </div>
-                {recent.length > 0 && (
-                  <div>
-                    <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
-                    <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-                      {recent.map((entry) => (
-                        <Button
-                          key={`${entry.latitude},${entry.longitude}`}
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => chooseRecent(entry)}
-                          className="shrink-0 gap-1.5"
-                        >
-                          <MapPin className="size-3.5 text-signal" />
-                          {entry.label}
-                        </Button>
-                      ))}
-                    </div>
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
+                  <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => void useCurrentSpot()}
+                      disabled={gpsBusy}
+                      className="shrink-0 gap-1.5"
+                    >
+                      <MapPin className="size-3.5 text-signal" />
+                      {gpsBusy ? "Locating…" : "My location"}
+                    </Button>
+                    {recent.map((entry) => (
+                      <Button
+                        key={`${entry.latitude},${entry.longitude}`}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => chooseRecent(entry)}
+                        className="shrink-0 gap-1.5"
+                      >
+                        <MapPin className="size-3.5 text-signal" />
+                        {entry.label}
+                      </Button>
+                    ))}
                   </div>
-                )}
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="ghost" size="sm" onClick={() => void locateForSearch()} className="gap-2 text-signal">
-                    <MapPin className="size-4" /> Prioritize places near me
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" disabled={gpsBusy} onClick={() => void useCurrentSpot()} className="gap-2 text-signal">
-                    <MapPin className="size-4" /> {gpsBusy ? "Locating…" : "Pin my current location"}
-                  </Button>
                 </div>
                 {venueResults.length > 0 && (
                   <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-background">
@@ -567,7 +611,7 @@ function PostScreen() {
                   </div>
                 )}
                 <LocationPreviewMap
-                  address={place || venueQuery}
+                  address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
                   selectedLocation={spot}
                   onPick={(next) => {
                     setSpot(next);
@@ -578,7 +622,7 @@ function PostScreen() {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 2 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
                 <div className="grid gap-2 sm:grid-cols-3">
                   {ACTIONS.map(({ id, label, copy, icon: Icon }) => (
@@ -592,6 +636,7 @@ function PostScreen() {
                         if (id === "live") {
                           setMinutes(15);
                           setCustomCapture(false);
+                          setScheduledStart(null);
                           applyCapture(null, id);
                         }
                         if (id === "clip" && capture === null) {
@@ -600,6 +645,7 @@ function PostScreen() {
                         }
                         if (id === "meetup") {
                           setMinutes(60);
+                          setScheduledStart(null);
                           setTile("community");
                         }
                       }}
@@ -609,10 +655,19 @@ function PostScreen() {
                       <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
                     </Button>
                   ))}
-                 </div>
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Category & focus</p>
+                  <div className="mt-3">
+                    <CategoryPicker value={tile} onChange={(id) => setTile(id as CategoryId)} sub={sub} onSubChange={setSub} />
+                  </div>
+                </div>
 
                 <div className="rounded-xl border border-border bg-background p-3">
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Format &amp; length</p>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    {action === "live" ? "Stream length" : "Clip length"}
+                  </p>
                   <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
                     {CAPTURE_OPTIONS.map((option) => {
                       const on = !customCapture && capture === option.minutes;
@@ -626,7 +681,7 @@ function PostScreen() {
                             setCustomCapture(false);
                             applyCapture(option.minutes);
                           }}
-                          className={`h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`}
+                          className={pill(on)}
                         >
                           {option.minutes === null && <Radio className="size-3.5" />}
                           {option.label}
@@ -641,7 +696,7 @@ function PostScreen() {
                         setCustomCapture(true);
                         applyCapture(capture ?? 10, action, true);
                       }}
-                      className={`h-11 rounded-full text-xs font-extrabold ${customCapture ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`}
+                      className={pill(customCapture)}
                     >
                       Custom
                     </Button>
@@ -669,6 +724,57 @@ function PostScreen() {
                   </p>
                 </div>
 
+                {action === "clip" && (
+                  <div className="rounded-xl border border-border bg-background p-3">
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Scheduled start window (optional)</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Button type="button" variant="outline" onClick={() => setStartOpen(true)} className="gap-2">
+                        <CalendarClock className="size-4 text-signal" />
+                        {scheduledStart ? format(scheduledStart, "EEE, MMM d 'at' h:mm a") : "Pick a start time"}
+                      </Button>
+                      {scheduledStart && (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setScheduledStart(null)} className="text-signal">
+                          Clear start time
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Camera angle</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {CAMERA_ANGLES.map((option) => (
+                      <Button
+                        key={option.id}
+                        type="button"
+                        variant="outline"
+                        aria-pressed={angle === option.id}
+                        onClick={() => setAngle(option.id)}
+                        className={`${pill(angle === option.id)} whitespace-normal`}
+                      >
+                        {option.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-xs font-bold uppercase text-muted-foreground">Orientation</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {ORIENTATIONS.map((option) => (
+                      <Button
+                        key={option.id}
+                        type="button"
+                        variant="outline"
+                        aria-pressed={orientation === option.id}
+                        onClick={() => setOrientation(option.id)}
+                        className={`${pill(orientation === option.id)} gap-2`}
+                      >
+                        <Smartphone className={`size-3.5 ${option.id === "horizontal" ? "rotate-90" : ""}`} />
+                        {option.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
                 <label className="block space-y-2">
                   <span className="text-xs font-bold uppercase text-muted-foreground">Request title</span>
                   <input ref={titleRef} value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={120} className="field" />
@@ -680,10 +786,9 @@ function PostScreen() {
 
                 <Collapsible>
                   <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-left text-sm font-bold text-foreground">
-                    <Info className="size-4 text-signal" /><span className="flex-1">Category, privacy & access</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+                    <Info className="size-4 text-signal" /><span className="flex-1">Privacy & access</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-4">
-                    <CategoryPicker value={tile} onChange={(id) => setTile(id as CategoryId)} sub={sub} onSubChange={setSub} />
                     <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
                       <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
                       {needsPublicSpacesNotice(tile) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
@@ -702,27 +807,109 @@ function PostScreen() {
                     )}
                   </CollapsibleContent>
                 </Collapsible>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Reward tier</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {BOUNTY_TIERS.map((option) => (
+                      <Button
+                        key={option.id}
+                        type="button"
+                        variant="outline"
+                        aria-pressed={tier === option.id}
+                        onClick={() => setTier(option.id)}
+                        className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
+                      >
+                        <Zap className="mt-0.5 size-4 shrink-0 text-signal" />
+                        <span>
+                          <span className="block font-extrabold text-foreground">{option.label}</span>
+                          <span className="mt-1 block text-xs font-medium text-muted-foreground">
+                            {option.baseCredits ? `${option.baseCredits} Credits · ${option.blurb}` : option.blurb}
+                          </span>
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {tier === "standard" && (
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
+                    <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                  </div>
+                )}
 
                 <div>
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Reward</p>
-                  <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                  <p className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground">
+                    <CloudRain className="size-3.5 text-signal" /> Filming conditions
+                  </p>
+                  <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {WEATHER_CONDITIONS.map((condition) => (
+                      <Button
+                        key={condition.id}
+                        type="button"
+                        variant="outline"
+                        aria-pressed={weather === condition.multiplier}
+                        onClick={() => setWeather(condition.multiplier)}
+                        className={`${pill(weather === condition.multiplier)} h-auto whitespace-normal py-2`}
+                      >
+                        {condition.label}
+                        {condition.multiplier > 1 && ` +${Math.round((condition.multiplier - 1) * 100)}%`}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Request deadline</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                    {DEADLINES.map((deadline) => {
+                      const on = !customDeadline && minutes === deadline.minutes;
+                      return (
+                        <Button
+                          key={deadline.minutes}
+                          type="button"
+                          variant="outline"
+                          aria-pressed={on}
+                          onClick={() => {
+                            setCustomDeadline(null);
+                            setMinutes(deadline.minutes);
+                          }}
+                          className={pill(on)}
+                        >
+                          {deadline.label}
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-pressed={Boolean(customDeadline)}
+                      onClick={() => setDeadlineOpen(true)}
+                      className={`${pill(Boolean(customDeadline))} h-auto whitespace-normal py-2`}
+                    >
+                      {customDeadline ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+                    </Button>
+                  </div>
+                </div>
+
                 <Collapsible>
                   <CollapsibleTrigger className="group flex w-full items-center gap-2 text-sm font-bold text-muted-foreground">
                     <CoinsIcon className="size-4 text-signal" /><span className="flex-1 text-left">Add an optional tip</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3"><BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} /></CollapsibleContent>
                 </Collapsible>
-                <div>
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Request deadline</p>
-                  <div className="mt-3 grid grid-cols-4 gap-2">
-                    {DEADLINES.map((deadline) => (
-                      <Button key={deadline.minutes} type="button" variant="outline" aria-pressed={minutes === deadline.minutes} onClick={() => setMinutes(deadline.minutes)} className={minutes === deadline.minutes ? "border-signal bg-signal text-signal-foreground" : ""}>
-                        {deadline.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+
+                <BountyPriceBreakdown quote={quote} />
+                {tip > 0 && (
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Plus a {formatCredits(tip)} tip — {formatCredits(total)} leaves your wallet.
+                  </p>
+                )}
                 <p className="flex gap-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
                   <ShieldCheck className="size-4 shrink-0 text-signal" />Your payment is held securely in escrow and released only after you approve the live capture.
                 </p>
@@ -739,13 +926,38 @@ function PostScreen() {
             )}
             <div className="flex gap-2">
               {step > 1 && <Button type="button" variant="outline" size="icon" aria-label="Previous step" onClick={() => setStep((step - 1) as 1 | 2)}><ArrowLeft className="size-5" /></Button>}
-              {step === 1 && <Button type="button" onClick={continueFromPrompt} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Find the place</Button>}
-              {step === 2 && <Button type="button" disabled={!spot || !place.trim()} onClick={() => setStep(3)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Use this location</Button>}
-              {step === 3 && <Button type="submit" disabled={posting || bounty < MIN_BOUNTY || note.trim().length < 10 || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Post request · ${formatCredits(total)}`}</Button>}
+              {step === 1 && <Button type="button" onClick={continueFromPrompt} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Continue</Button>}
+              {step === 2 && <Button type="button" onClick={continueFromDetails} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Set the reward</Button>}
+              {step === 3 && <Button type="submit" disabled={posting || total < MIN_BOUNTY || note.trim().length < 10 || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
             </div>
           </footer>
         </form>
       </section>
+
+      <DeadlinePickerDialog
+        open={deadlineOpen}
+        value={customDeadline}
+        title="Custom deadline"
+        description="Pick the exact date and time the request is due."
+        confirmLabel="Set deadline"
+        onOpenChange={setDeadlineOpen}
+        onPick={(date) => {
+          setCustomDeadline(date);
+          setDeadlineOpen(false);
+        }}
+      />
+      <DeadlinePickerDialog
+        open={startOpen}
+        value={scheduledStart}
+        title="Recording start"
+        description="Pick the exact date and time the onlooker should start recording."
+        confirmLabel="Set start"
+        onOpenChange={setStartOpen}
+        onPick={(date) => {
+          setScheduledStart(date);
+          setStartOpen(false);
+        }}
+      />
 
       <ContentModerationAlertModal
         open={moderationOpen}
@@ -753,7 +965,7 @@ function PostScreen() {
         onEditRequest={() => {
           setModerationOpen(false);
           window.setTimeout(() => {
-            setStep(3);
+            setStep(2);
             if (!isRequestAllowed("", note, "") && isRequestAllowed(title, "", "")) noteRef.current?.focus();
             else titleRef.current?.focus();
           }, 50);
