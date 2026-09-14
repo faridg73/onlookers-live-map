@@ -14,7 +14,7 @@ import { distanceMiles, requestMapPosition, type LiveRequest, type MapPosition }
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
-import { toast } from "sonner";
+
 import { Globe2, X } from "lucide-react";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { TrendingViewRequests } from "@/components/TrendingViewRequests";
