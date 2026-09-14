@@ -11,12 +11,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   contributeToPool,
-  createPool,
   fetchPoolIdentity,
   listPools,
+  openPoolAsMember,
   poolFormErrors,
   POOL_CHIP_IN_AMOUNTS,
   POOL_GOAL_PRESETS,
+  POOL_STARTER_CREDITS,
   type BountyPool,
   type PoolFormErrors,
   type PoolIdentity,
@@ -56,6 +57,7 @@ function PoolsScreen() {
   const [place, setPlace] = useState("");
   const [goal, setGoal] = useState<number>(200);
   const [kind, setKind] = useState<"bounty" | "meetup">("bounty");
+  const [starter, setStarter] = useState<number>(POOL_STARTER_CREDITS);
   const [errors, setErrors] = useState<PoolFormErrors>({});
   const human = useHumanCheck("bounty-pool");
 
@@ -94,6 +96,20 @@ function PoolsScreen() {
       toast.error("Check the highlighted fields before opening your pool.");
       return;
     }
+    if (!user || !identity) {
+      toast.error("Sign in again — we couldn't confirm your account.");
+      return;
+    }
+    if (balance === null) {
+      toast.error("We're still loading your Credit balance — try again in a moment.");
+      return;
+    }
+    if (balance < starter) {
+      toast.error(
+        `Not enough Credits — opening this pool puts ${starter} behind it and you have ${balance}. Top up on your balance page.`,
+      );
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before opening a pool.");
       return;
@@ -104,8 +120,14 @@ function PoolsScreen() {
         data: { token: human.token ?? "", action: "bounty-pool" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-      await createPool({ title, place, goalCredits: goal, kind });
-      toast.success("Pool opened — share it so people chip in.");
+      await openPoolAsMember(user.id, {
+        title,
+        place,
+        goalCredits: goal,
+        kind,
+        starterCredits: starter,
+      });
+      toast.success(`Pool opened with ${starter} Credits behind it — share it so people chip in.`);
       setTitle("");
       setPlace("");
       setErrors({});
@@ -242,9 +264,45 @@ function PoolsScreen() {
                 ))}
               </div>
               {errors.goal && <p className="text-xs text-destructive">{errors.goal}</p>}
+
+              <div>
+                <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  Your starter chip-in
+                </p>
+                <div className="grid grid-cols-4 gap-2">
+                  {POOL_CHIP_IN_AMOUNTS.map((amount) => (
+                    <button
+                      key={amount}
+                      type="button"
+                      onClick={() => setStarter(amount)}
+                      className={`rounded-xl border px-2 py-2 text-center text-sm font-bold ${
+                        starter === amount
+                          ? "border-signal bg-signal/15 text-signal"
+                          : "border-border text-foreground"
+                      } ${balance !== null && balance < amount ? "opacity-40" : ""}`}
+                    >
+                      {amount}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  You put the first {starter} Credits behind your own pool as @
+                  {identity?.username ?? "onlooker"}.
+                </p>
+                {balance !== null && balance < starter && (
+                  <p className="mt-1 text-xs text-destructive">
+                    You have {balance} Credits — top up before opening this pool.
+                  </p>
+                )}
+              </div>
+
               <div>{human.widget}</div>
               <div className="flex gap-2">
-                <Button onClick={submit} disabled={submitting} className="flex-1">
+                <Button
+                  onClick={submit}
+                  disabled={submitting || balance === null || balance < starter}
+                  className="flex-1"
+                >
                   {submitting ? "Opening…" : "Open the pool"}
                 </Button>
                 <Button variant="ghost" onClick={() => setCreating(false)}>
