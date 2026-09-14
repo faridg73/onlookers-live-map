@@ -38,9 +38,17 @@ export function BuyCreditsCard() {
                 <Sparkles className="size-2.5" /> {tier.badge}
               </span>
             )}
-            <p className="font-display text-lg text-foreground">{tier.credits} credits</p>
+            <p className="font-display text-lg text-foreground">
+              {tier.credits.toLocaleString()} credits
+            </p>
             <p className="text-sm font-semibold text-live">{formatPackPrice(tier.priceCents)}</p>
-            <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">{tier.blurb}</p>
+            {tier.bonusCredits > 0 ? (
+              <p className="mt-1 text-[0.7rem] leading-snug text-signal">
+                +{tier.bonusCredits.toLocaleString()} bonus free
+              </p>
+            ) : (
+              <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">{tier.blurb}</p>
+            )}
           </button>
         ))}
       </div>
