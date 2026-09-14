@@ -283,6 +283,20 @@ function ProfileScreen() {
           <ChevronRight className="size-4 text-muted-foreground" />
         </Link>
       </div>
+
+      <h2 className="mt-8 font-display text-lg text-foreground">Account</h2>
+      <div className="mt-3">
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="flex w-full items-center justify-between rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-foreground hover:bg-destructive/15"
+        >
+          <span className="flex items-center gap-3">
+            <LogOut className="size-4 text-destructive" /> Log out
+          </span>
+          <ChevronRight className="size-4 text-destructive" />
+        </button>
+      </div>
     </div>
   );
 }
