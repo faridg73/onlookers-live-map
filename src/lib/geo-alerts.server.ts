@@ -118,7 +118,9 @@ export async function notifyLocalOnlookersOfBounty(
 
   const { data: request } = await supabaseAdmin
     .from("requests")
-    .select("id, prompt, category, bounty_amount, latitude, longitude, location_name")
+    .select(
+      "id, prompt, category, bounty_amount, latitude, longitude, location_name, bounty_tier, bounty_type, duration_minutes",
+    )
     .eq("id", requestId)
     .maybeSingle();
   if (!request) return { nearby: 0, pushed: 0 };
@@ -142,13 +144,25 @@ export async function notifyLocalOnlookersOfBounty(
   const userIds = (nearby ?? []).map((row) => row.user_id).filter((id) => id !== requesterId);
   if (userIds.length === 0) return { nearby: 0, pushed: 0 };
 
-  // Big bounties get the flash treatment: pinned, time-sensitive lock-screen alert.
-  const flash = gross >= 80;
-  const title = flash ? "⚡ FLASH BOUNTY NEAR YOU!" : "🚨 New Bounty Near You!";
-  const body = `Someone wants a live view of the ${readableCategory(
-    request.category,
-    request.prompt,
-  )} outside the venue! Fulfill it right now to earn ${net} Credits!`;
+  // Paid live-stream bounties and the premium tiers get the flash treatment:
+  // a pinned, time-sensitive lock-screen alert that names the spot to go to.
+  const spot = (request.location_name ?? "").trim();
+  const liveNow = (request.bounty_type ?? "live_stream") === "live_stream";
+  const premiumTier = request.bounty_tier === "fast_catch" || request.bounty_tier === "priority_hunt";
+  const flash = liveNow && (premiumTier || gross >= 80);
+  const title = flash
+    ? `⚡ Flash Bounty: Go Live at ${spot || "a spot near you"}`
+    : liveNow
+      ? `🚨 Go Live at ${spot || "a spot near you"}`
+      : `🚨 Clip wanted at ${spot || "a spot near you"}`;
+  const minutes = Number(request.duration_minutes ?? 0);
+  const ask = liveNow
+    ? `Start a ${minutes > 0 ? `${minutes}-minute ` : ""}live stream of the ${readableCategory(
+        request.category,
+        request.prompt,
+      )}`
+    : `Film the ${readableCategory(request.category, request.prompt)}`;
+  const body = `${ask} — ${net} Credits are already locked in escrow and pay out once your stream is verified.`;
   const path = `/?b=${request.id}&snap=1`;
 
   await supabaseAdmin.from("notifications").insert(
