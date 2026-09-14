@@ -48,6 +48,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    console.log("[FlashBountyButton] open changed to", open);
+  }, [open]);
   const [spot, setSpot] = useState<FlashSpot | null>(null);
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
