@@ -117,9 +117,11 @@ export async function createPool(input: {
   longitude?: number | null;
   hours?: number;
 }): Promise<string> {
+  const problems = Object.values(poolFormErrors(input));
+  if (problems.length > 0) throw new Error(problems[0]!);
   const { data, error } = await supabase.rpc("create_bounty_pool", {
-    _title: input.title,
-    _place: input.place,
+    _title: sanitizeText(input.title, { maxLength: 90 }).trim(),
+    _place: sanitizeText(input.place, { maxLength: 120 }).trim(),
     _goal_credits: Math.round(input.goalCredits),
     _kind: input.kind,
     ...(typeof input.latitude === "number" ? { _latitude: input.latitude } : {}),
