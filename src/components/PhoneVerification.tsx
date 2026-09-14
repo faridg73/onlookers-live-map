@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { confirmPhoneCode, sendPhoneCode } from "@/lib/phone-verify.functions";
+import { useHumanCheck } from "@/components/HumanCheck";
 
 const CODE_LENGTH = 6;
 
@@ -23,6 +24,8 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
+  // Silent bot challenge so nobody can script the text-message trigger.
+  const human = useHumanCheck("sms-code", { discreet: true });
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
@@ -37,7 +40,9 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   async function send(resend = false) {
     setBusy(true);
     try {
-      const result = await sendPhoneCode({ data: { phone, email } });
+      const result = await sendPhoneCode({
+        data: { phone, email, humanToken: human.token ?? undefined },
+      });
       if (!result.ok || !result.phone) throw new Error(result.error ?? "Could not send the code.");
       setSentTo(result.phone);
       setStep("code");
@@ -45,6 +50,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
       setSeconds(45);
       toast.success(resend ? "New code sent." : `Code sent to ${result.phone}.`);
     } catch (err) {
+      human.reset();
       toast.error(err instanceof Error ? err.message : "Could not send the code.");
     } finally {
       setBusy(false);
@@ -69,6 +75,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
 
   return (
     <div className="mt-6 rounded-3xl border border-border bg-surface p-5">
+      {human.widget}
       {step === "number" ? (
         <>
           <h2 className="font-display text-xl tracking-tight text-foreground">

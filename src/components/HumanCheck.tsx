@@ -68,7 +68,10 @@ function loadTurnstile(): Promise<TurnstileApi> {
  * Gives a form its human check: the widget to render, the token to send, and
  * whether the form is clear to submit.
  */
-export function useHumanCheck(action: string): {
+export function useHumanCheck(
+  action: string,
+  options: { discreet?: boolean } = {},
+): {
   token: string | null;
   required: boolean;
   ready: boolean;
@@ -100,6 +103,7 @@ export function useHumanCheck(action: string): {
     <TurnstileWidget
       siteKey={siteKey}
       action={action}
+      discreet={Boolean(options.discreet)}
       onToken={setToken}
       onWidget={setWidgetId}
       onUnavailable={() => setUnavailable(true)}
@@ -115,12 +119,15 @@ const GRACE_MS = 12000;
 function TurnstileWidget({
   siteKey,
   action,
+  discreet,
   onToken,
   onWidget,
   onUnavailable,
 }: {
   siteKey: string;
   action: string;
+  /** Runs the challenge in the background with no visible box. */
+  discreet: boolean;
   onToken: (token: string | null) => void;
   onWidget: (id: string | null) => void;
   onUnavailable: () => void;
@@ -147,8 +154,8 @@ function TurnstileWidget({
           sitekey: siteKey,
           action,
           theme: "dark",
-          size: "normal",
-          appearance: "always",
+          size: discreet ? "compact" : "normal",
+          appearance: discreet ? "interaction-only" : "always",
           callback: (value) => {
             solved.current = true;
             window.clearTimeout(timer);
@@ -168,9 +175,10 @@ function TurnstileWidget({
       if (id && typeof window !== "undefined") window.turnstile?.remove(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteKey, action]);
+  }, [siteKey, action, discreet]);
 
   if (failed) {
+    if (discreet) return null;
     return (
       <p className="text-xs text-muted-foreground">
         Skipping the human check on this device — you can carry on.
@@ -178,5 +186,5 @@ function TurnstileWidget({
     );
   }
 
-  return <div ref={holder} className="min-h-[65px]" />;
+  return <div ref={holder} className={discreet ? "" : "min-h-[65px]"} />;
 }
