@@ -5,6 +5,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { creditPackageById } from "@/lib/credit-packages";
+import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 import {
   createStripeClient,
   getStripeErrorMessage,
@@ -69,6 +70,9 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
     async ({ data, context }): Promise<{ clientSecret?: string; error?: string }> => {
       const pack = creditPackageById(data.packageId);
       if (!pack) return { error: "That credit pack is no longer available." };
+      if (!(await withinRateLimit(RATE_LIMITS.checkout, context.userId))) {
+        return { error: RATE_LIMITED_MESSAGE };
+      }
 
       const env = resolveStripeEnvForHost(requestHost());
       const userId = context.userId;
