@@ -38,6 +38,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [locateError, setLocateError] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
   const findSpot = () => {
     setLocating(true);
@@ -51,6 +52,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   useEffect(() => {
     if (!open) return;
     findSpot();
+    void isSignedIn().then(setSignedIn);
     void readWalletBalance().then(setBalance);
   }, [open]);
 
@@ -58,6 +60,14 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
   const post = async () => {
     if (!spot) return;
+    if (signedIn === false) {
+      setOpen(false);
+      toast.error("Sign in to post a flash bounty", {
+        description: "Your credits stay in escrow, so we need your account first.",
+      });
+      await navigate({ to: "/auth" });
+      return;
+    }
     setPosting(true);
     try {
       const locked = await postFlashBounty(spot);
