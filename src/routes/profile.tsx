@@ -332,6 +332,30 @@ function ProfileScreen() {
           <ChevronRight className="size-4 text-destructive" />
         </button>
       </div>
+
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl tracking-tight text-foreground">
+              About Onlooker Live
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Company mission and vision for Onlooker Live.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="text-foreground">
+              Onlooker Live is the next evolution of real-time mobile broadcasting—a hyper-local marketplace that connects immediate global curiosity with authentic human presence on the ground.
+            </p>
+            <p>
+              We believe the most compelling moments in the world aren't scripted; they are happening right now, around the corner or across an ocean. By combining intuitive geospatial discovery with a secure, transparent creator economy, Onlooker Live transforms everyday mobile streams into a trusted, on-demand window to the world.
+            </p>
+            <p>
+              Built for creators, valued by viewers, and designed for instant engagement, we are redefining how live media moves from the screen to the real world. Welcome to the live view network.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
