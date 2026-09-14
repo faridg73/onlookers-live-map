@@ -130,10 +130,12 @@ export async function notifyLocalOnlookersOfBounty(
 
   const net = gross - Math.floor(gross * CREDIT_FEE_RATE);
 
+  // Cast the wide net once, then keep only the people whose own alert distance
+  // covers this pin — someone set to 2 miles never hears about a 20-mile pin.
   const { data: nearby, error } = await supabaseAdmin.rpc("onlookers_within_radius", {
     _latitude: Number(request.latitude),
     _longitude: Number(request.longitude),
-    _radius_miles: GEOFENCE_RADIUS_MILES,
+    _radius_miles: OUTER_RADIUS_MILES,
     _exclude_user_id: requesterId,
   });
   if (error) {
@@ -141,8 +143,44 @@ export async function notifyLocalOnlookersOfBounty(
     return { nearby: 0, pushed: 0 };
   }
 
-  const userIds = (nearby ?? []).map((row) => row.user_id).filter((id) => id !== requesterId);
-  if (userIds.length === 0) return { nearby: 0, pushed: 0 };
+  const candidates = (nearby ?? []).filter((row) => row.user_id !== requesterId);
+  if (candidates.length === 0) return { nearby: 0, pushed: 0 };
+
+  const { data: prefs } = await supabaseAdmin
+    .from("alert_preferences")
+    .select("user_id, radius_miles")
+    .in(
+      "user_id",
+      candidates.map((row) => row.user_id),
+    );
+  const radiusOf = new Map<string, number>(
+    (prefs ?? []).map((row) => [row.user_id, Number(row.radius_miles)]),
+  );
+
+  const matched = candidates.filter(
+    (row) => Number(row.distance_miles) <= (radiusOf.get(row.user_id) ?? GEOFENCE_RADIUS_MILES),
+  );
+  if (matched.length === 0) return { nearby: 0, pushed: 0 };
+
+  // Verified broadcasters near the pin hear about it first.
+  const { data: verified } = await supabaseAdmin
+    .from("profiles")
+    .select("id, is_verified")
+    .in(
+      "id",
+      matched.map((row) => row.user_id),
+    );
+  const isVerified = new Set(
+    (verified ?? []).filter((row) => row.is_verified).map((row) => row.id),
+  );
+
+  const userIds = matched
+    .sort((a, b) => {
+      const rank = Number(isVerified.has(b.user_id)) - Number(isVerified.has(a.user_id));
+      if (rank !== 0) return rank;
+      return Number(a.distance_miles) - Number(b.distance_miles);
+    })
+    .map((row) => row.user_id);
 
   // Paid live-stream bounties and the premium tiers get the flash treatment:
   // a pinned, time-sensitive lock-screen alert that names the spot to go to.
