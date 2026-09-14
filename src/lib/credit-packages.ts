@@ -20,6 +20,38 @@ export type CreditPackage = {
 };
 
 export const CREDIT_PACKAGES: CreditPackage[] = [
+  // Entry-level packs
+  {
+    id: "credits_pack_20",
+    priceId: "credits_pack_20_usd",
+    name: "Starter",
+    baseCredits: 20,
+    bonusCredits: 0,
+    credits: 20,
+    priceCents: 500,
+    blurb: "Funds your first live view request.",
+  },
+  {
+    id: "credits_pack_40",
+    priceId: "credits_pack_40_usd",
+    name: "Event Pro",
+    baseCredits: 40,
+    bonusCredits: 0,
+    credits: 40,
+    priceCents: 1000,
+    blurb: "A full game day of line checks and seat views.",
+  },
+  {
+    id: "credits_pack_80",
+    priceId: "credits_pack_80_usd",
+    name: "Super Fan",
+    baseCredits: 80,
+    bonusCredits: 0,
+    credits: 80,
+    priceCents: 2000,
+    blurb: "For requesters who tip onlookers every week.",
+  },
+  // High-commitment packs with bonus credits
   {
     id: "credits_pack_500",
     priceId: "credits_pack_500_usd",
@@ -69,3 +101,13 @@ export const creditPackageById = (id: string): CreditPackage | undefined =>
   CREDIT_PACKAGES.find((pack) => pack.id === id);
 
 export const formatPackPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
+/** Custom-credit limits and pricing. */
+export const CUSTOM_CREDIT_MIN = 20;
+export const CUSTOM_CREDIT_MAX = 25000;
+export const CREDITS_PER_DOLLAR = 4;
+export const CENTS_PER_CREDIT = 25; // 4 credits = $1 → 1 credit = $0.25
+
+export function customCreditPriceCents(credits: number): number {
+  return Math.round(credits * CENTS_PER_CREDIT);
+}
