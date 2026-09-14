@@ -60,7 +60,6 @@ function MapScreen() {
   const [pin, setPin] = useState<ViewPin | null>(null);
   const [naming, setNaming] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [searching, setSearching] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
 
   const dropPin = useCallback((position: MapPosition) => {
