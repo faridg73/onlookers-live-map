@@ -298,11 +298,7 @@ function PoolsScreen() {
 
               <div>{human.widget}</div>
               <div className="flex gap-2">
-                <Button
-                  onClick={submit}
-                  disabled={submitting || balance === null || balance < starter}
-                  className="flex-1"
-                >
+                <Button onClick={() => void submit()} disabled={submitting} className="flex-1">
                   {submitting ? "Opening…" : "Open the pool"}
                 </Button>
                 <Button variant="ghost" onClick={() => setCreating(false)}>
