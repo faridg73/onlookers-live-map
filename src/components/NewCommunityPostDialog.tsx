@@ -93,6 +93,7 @@ export function NewCommunityPostDialog({
         data: { token: human.token ?? "", action: "community-post" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
+      const coords = await resolveCoords(place);
       await createCommunityPost({
         category,
         title,
@@ -102,6 +103,8 @@ export function NewCommunityPostDialog({
         mediaPath,
         isFlash: flash,
         flashHours: hours,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
       });
       toast.success(flash ? "Flash Meetup is live — the clock is running." : "Posted to Discover.");
       setTitle("");
