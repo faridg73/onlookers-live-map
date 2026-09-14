@@ -212,6 +212,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             console.log("[FlashBountyButton] nav click, setting open=true");
             setOpen(true);
           }}
+          onMouseDown={() => console.log("[FlashBountyButton] nav mousedown")}
           aria-label="Flash bounty — something is happening here now"
           className="group flex w-full flex-col items-center gap-1 py-3 text-[0.58rem] font-extrabold uppercase tracking-[0.08em] text-signal"
         >
