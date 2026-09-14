@@ -48,10 +48,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    console.log("[FlashBountyButton] open changed to", open);
-  }, [open]);
   const [spot, setSpot] = useState<FlashSpot | null>(null);
+
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
@@ -191,8 +189,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     }
   };
 
-  console.log("[FlashBountyButton] render variant=", variant, "open=", open);
   return (
+
     <>
       {variant === "map" ? (
         <button
@@ -211,14 +209,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       ) : (
         <button
           type="button"
-          onClick={() => {
-            console.log("[FlashBountyButton] nav click, setting open=true");
-            setOpen(true);
-          }}
-          onMouseDown={() => console.log("[FlashBountyButton] nav mousedown")}
+          onClick={() => setOpen(true)}
           aria-label="Flash bounty — something is happening here now"
           className="group flex w-full flex-col items-center gap-1 py-3 text-[0.58rem] font-extrabold uppercase tracking-[0.08em] text-signal"
         >
+
           <span className="grid size-8 place-items-center rounded-full bg-signal text-signal-foreground">
             <Zap className="size-5" strokeWidth={2.25} />
           </span>
