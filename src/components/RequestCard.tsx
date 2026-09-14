@@ -75,7 +75,7 @@ export function RequestCard({
             {distanceLabel && (
               <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
             )}
-            <BountyBriefBadges request={request} compact />}
+            <BountyBriefBadges request={request} compact />
           </div>
           <div className="shrink-0 text-right">
             <div className="font-display text-2xl font-extrabold leading-none text-signal">
