@@ -6,3 +6,5 @@
 - [x] Rebuild Post as a three-step conversational mobile wizard with venue suggestions and one deliberate nav entry
 - [x] Save posted requests with their brief and capture length, and show every nearby live request from the database (not local memory)
 - [x] Add unique topic artwork across Discover and fully populate Real Estate & Construction, Local Markets & Yard Sales, and Events & Performances
+- [x] Add visual scroll indicators to horizontal category carousels
+- [x] Fix database security warnings (revoked public EXECUTE on SECURITY DEFINER functions; tightened pool_contributions RLS; remaining signed-in warnings are intentional app-facing RPCs)

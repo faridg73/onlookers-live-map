@@ -3,6 +3,8 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import { ScrollableLane } from "@/components/ScrollableLane";
+
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import {
@@ -245,40 +247,53 @@ function CommunityHub() {
           Everything
         </Button>
         </div>
-        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 sm:px-8">
-        {COMMUNITY_CATEGORIES.map((c) => {
-          const visual = COMMUNITY_VISUALS[c.id];
-          const Icon = visual.icon;
-          const previewUrl = categoryPreviews[c.id];
-          return (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => {
-              setCategory(c.id);
-              setTag(null);
-            }}
-            aria-pressed={category === c.id}
-            className={`group relative h-32 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
-          >
-            <LoopingPreview
-              videoUrl={previewUrl}
-              imageUrl={previewUrl ? undefined : visual.image}
-              alt={previewUrl ? `Live preview for ${c.label}` : `${c.label} category`}
-              icon={Icon}
-              coverClass={visual.coverClass}
-            />
-            <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-            <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
-              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
-              <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground/75">{c.blurb}</small></span>
-            </span>
-          </button>
-        )})}
-        </div>
+        <ScrollableLane
+          className="-mx-5 sm:-mx-8"
+          innerClassName="snap-x snap-mandatory gap-3 px-5 pb-2 [scroll-padding-left:1.25rem] sm:px-8 sm:[scroll-padding-left:2rem]"
+          ariaLabel="Category cards"
+        >
+
+          {COMMUNITY_CATEGORIES.map((c) => {
+            const visual = COMMUNITY_VISUALS[c.id];
+            const Icon = visual.icon;
+            const previewUrl = categoryPreviews[c.id];
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setCategory(c.id);
+                  setTag(null);
+                }}
+                aria-pressed={category === c.id}
+                className={`group relative h-32 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
+              >
+                <LoopingPreview
+                  videoUrl={previewUrl}
+                  imageUrl={previewUrl ? undefined : visual.image}
+                  alt={previewUrl ? `Live preview for ${c.label}` : `${c.label} category`}
+                  icon={Icon}
+                  coverClass={visual.coverClass}
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
+                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground/75">{c.blurb}</small></span>
+                </span>
+              </button>
+            );
+          })}
+        </ScrollableLane>
+
       </section>
 
-      <div className="mt-2 flex gap-1.5 overflow-x-auto px-5 pb-1 sm:px-8">
+      <ScrollableLane
+        className="mt-2 -mx-5 sm:-mx-8"
+        innerClassName="gap-1.5 px-5 pb-1 sm:px-8"
+        ariaLabel="Subcategory filters"
+        arrows={false}
+        fade={false}
+      >
         {tagChoices.map((t) => (
           <Button
             key={t}
@@ -293,7 +308,8 @@ function CommunityHub() {
             #{t}
           </Button>
         ))}
-      </div>
+      </ScrollableLane>
+
 
       <div className="mt-4 px-5 sm:px-8">
         <CommunityFeedFilters

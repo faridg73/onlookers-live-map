@@ -2,6 +2,8 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
+import { ScrollableLane } from "@/components/ScrollableLane";
+
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { RadarAlerts } from "@/components/RadarAlerts";
@@ -142,7 +144,7 @@ function DiscoverHome() {
                 </Link>
               </div>
 
-              <div className="mt-3 -mx-4 flex gap-3 overflow-x-auto px-4 pb-2">
+              <ScrollableLane className="mt-3 -mx-4" innerClassName="gap-3 px-4 pb-2" ariaLabel="Trending events and live sports">
                 {eventsLoading && eventPlaces.length === 0
                   ? [0, 1, 2].map((i) => (
                       <div
@@ -182,7 +184,8 @@ function DiscoverHome() {
                     No event venues found around {area.label} yet — try another city.
                   </p>
                 )}
-              </div>
+              </ScrollableLane>
+
             </section>
           )}
 

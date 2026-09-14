@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Building2, LocateFixed, MapPin, Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ScrollableLane } from "@/components/ScrollableLane";
+
 import { geocodeAddress, reverseGeocode } from "@/lib/geocode.functions";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
@@ -194,7 +196,13 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
           </p>
         </div>
         {!compact && places.length > 0 && (
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Nearby places">
+          <ScrollableLane
+            className="mt-3"
+            innerClassName="gap-2 pb-1"
+            ariaLabel="Nearby places"
+            fadeClassName="from-surface via-surface/80 to-transparent"
+            arrowClassName="border-border bg-surface-raised/90 text-foreground hover:border-signal hover:text-signal"
+          >
             {places.map((place) => (
               <button
                 key={place.id}
@@ -211,8 +219,9 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
                 {place.name}
               </button>
             ))}
-          </div>
+          </ScrollableLane>
         )}
+
       </div>
     </div>
   );
