@@ -39,6 +39,13 @@ declare global {
 
 let scriptPromise: Promise<TurnstileApi> | null = null;
 
+function isTestingHost() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.location.hostname === "localhost" || window.location.hostname.startsWith("id-preview--")
+  );
+}
+
 function loadTurnstile(): Promise<TurnstileApi> {
   if (typeof window === "undefined") return Promise.reject(new Error("no window"));
   if (window.turnstile) return Promise.resolve(window.turnstile);
@@ -79,6 +86,9 @@ export function useHumanCheck(action: string): {
   // blocked script, a network hiccup — we must never trap a real person behind
   // a disabled button. We stand down and let the form through.
   const [unavailable, setUnavailable] = useState(false);
+  useEffect(() => {
+    if (isTestingHost()) setUnavailable(true);
+  }, []);
   const required = Boolean(siteKey) && !isError && !unavailable;
 
   const reset = useCallback(() => {
