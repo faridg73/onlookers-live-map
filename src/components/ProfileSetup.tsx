@@ -38,16 +38,28 @@ export function ProfileSetup() {
   const [nameState, setNameState] = useState<UsernameState>({ kind: "idle" });
   const [busy, setBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let alive = true;
-    if (!user) {
-      setOpen(false);
-      return;
-    }
+    // Always start from a blank form for whichever account is signed in now, so
+    // a previous session's details can never bleed into a brand-new account.
+    setOpen(false);
+    setUsername("");
+    setFirstName("");
+    setLastName("");
+    setAvatarUrl("");
+    setAnswers({});
+    setNameState({ kind: "idle" });
+    if (!user) return;
+    const signedInId = user.id;
     fetchMyProfile()
       .then((profile) => {
         if (!alive || !profile) return;
+        // Guard against a stale fetch that resolved for a different account.
+        if (profile.id !== signedInId) return;
         if (profile.onboarded) return;
         setUsername(profile.username ?? "");
         setFirstName(profile.legal_first_name ?? "");
@@ -61,7 +73,7 @@ export function ProfileSetup() {
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user?.id]);
 
   // Live availability check while typing, debounced so we don't hammer the DB.
   useEffect(() => {
