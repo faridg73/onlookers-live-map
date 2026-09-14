@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { z } from "zod";
 
 /**
@@ -7,41 +8,14 @@ import { z } from "zod";
  * is to keep plain text only: markup, scripts and control characters are
  * removed rather than escaped.
  *
- * Runs on the client (DOMPurify) and on the server (regex fallback, no DOM),
- * so the same rules apply on both sides of every submission.
+ * In the browser DOMPurify does the stripping; on the server (no DOM) an
+ * equivalent tag stripper runs, so both sides of a submission apply the rules.
  */
 
-/** Strips markup with DOMPurify in the browser; falls back to a tag stripper. */
-function stripMarkup(value: string): string {
-  if (typeof window !== "undefined" && typeof window.document !== "undefined") {
-    // Loaded lazily so the server bundle never touches the DOM build.
-    const purify = getPurify();
-    if (purify) {
-      return purify.sanitize(value, { ALLOWED_TAGS: [], ALLOWED_ATTR: [], KEEP_CONTENT: true });
-    }
-  }
-  return serverStrip(value);
-}
-
-let cachedPurify: { sanitize: (dirty: string, cfg: object) => string } | null | undefined;
-
-function getPurify() {
-  if (cachedPurify !== undefined) return cachedPurify;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = (globalThis as { __onlookerPurify?: unknown }).__onlookerPurify;
-    cachedPurify = (mod as typeof cachedPurify) ?? null;
-  } catch {
-    cachedPurify = null;
-  }
-  return cachedPurify;
-}
-
-/** Registers the DOMPurify instance once the browser bundle has loaded it. */
-export function registerPurify(instance: { sanitize: (dirty: string, cfg: object) => string }) {
-  cachedPurify = instance;
-  (globalThis as { __onlookerPurify?: unknown }).__onlookerPurify = instance;
-}
+const purifier =
+  typeof window !== "undefined" && typeof window.document !== "undefined"
+    ? DOMPurify(window)
+    : null;
 
 /** No-DOM stripper: removes tags, entities that rebuild tags, and bad schemes. */
 function serverStrip(value: string): string {
@@ -52,10 +26,20 @@ function serverStrip(value: string): string {
     .replace(/&#x?[0-9a-f]+;?/gi, " ");
 }
 
+function stripMarkup(value: string): string {
+  if (purifier?.sanitize) {
+    return purifier.sanitize(value, { ALLOWED_TAGS: [], ALLOWED_ATTR: [], KEEP_CONTENT: true });
+  }
+  return serverStrip(value);
+}
+
 /** Removes invisible control characters, zero-width joiners and BOM tricks. */
 function stripInvisible(value: string): string {
   // eslint-disable-next-line no-control-regex
-  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\uFEFF]/g, "");
+  return value.replace(
+    /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200F\u202A-\u202E\uFEFF]/g,
+    "",
+  );
 }
 
 /** Neutralises javascript:, data: and vbscript: URLs pasted into text. */
@@ -73,9 +57,7 @@ export type SanitizeOptions = {
 /** Cleans a single-line or multi-line field down to safe plain text. */
 export function sanitizeText(input: unknown, options: SanitizeOptions = {}): string {
   if (typeof input !== "string") return "";
-  let value = stripInvisible(input);
-  value = stripMarkup(value);
-  value = defuseSchemes(value);
+  let value = defuseSchemes(stripMarkup(stripInvisible(input)));
   value = value.replace(/\r\n?/g, "\n");
   value = options.multiline
     ? value
@@ -89,20 +71,6 @@ export function sanitizeText(input: unknown, options: SanitizeOptions = {}): str
     value = value.slice(0, options.maxLength).trim();
   }
   return value;
-}
-
-/** Cleans a whole form object's string fields in one call. */
-export function sanitizeFields<T extends Record<string, unknown>>(
-  values: T,
-  multilineKeys: ReadonlyArray<keyof T> = [],
-): T {
-  const out: Record<string, unknown> = { ...values };
-  for (const [key, value] of Object.entries(values)) {
-    if (typeof value === "string") {
-      out[key] = sanitizeText(value, { multiline: multilineKeys.includes(key as keyof T) });
-    }
-  }
-  return out as T;
 }
 
 /** Zod field for a short, single-line piece of user text. */
