@@ -2,7 +2,12 @@ import { quoteBounty, type BountyTierId } from "@/lib/bounty-pricing";
 import { lockBounty, type LockedBounty } from "@/lib/bounty-escrow";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { reverseGeocode } from "@/lib/geocode.functions";
-import { MIN_BOUNTY_CREDITS } from "@/lib/credits";
+
+/** Minimum credits a flash bounty can lock. Higher than the general minimum
+ *  because a spontaneous, time-sensitive alert needs enough reward to motivate
+ *  an onlooker to drop everything and start filming. */
+export const FLASH_MIN_BOUNTY_CREDITS = 40;
+
 
 /**
  * One-tap "Happening Here Now" bounty.
@@ -98,9 +103,13 @@ export function postFlashBounty(
 ): Promise<LockedBounty> {
   const resolved: FlashBountyOptions = {
     tierId: options.tierId ?? DEFAULT_FLASH_TIER,
-    customBase: Math.max(MIN_BOUNTY_CREDITS, Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE)),
+    customBase: Math.max(
+      FLASH_MIN_BOUNTY_CREDITS,
+      Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE),
+    ),
   };
   const quote = quoteFlashBounty(resolved);
+
 
   const details = [
     "Format: Go Live Now (flash bounty)",
