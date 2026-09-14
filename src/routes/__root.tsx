@@ -146,10 +146,14 @@ function RootComponent() {
           <BoostProvider>
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
-            <Footer />
-            <BottomNav />
-            <ProfileSetup />
-            <OnboardingWalkthrough />
+            {!embedded && (
+              <>
+                <Footer />
+                <BottomNav />
+                <ProfileSetup />
+                <OnboardingWalkthrough />
+              </>
+            )}
             <Toaster position="top-center" />
           </BoostProvider>
         </OnlookerProvider>
