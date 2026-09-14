@@ -80,6 +80,7 @@ export function VenueBountyDialog({
     setMode(next);
     setMinutes(next === "live" ? 120 : 60);
     setCustomDeadline(null);
+    setScheduledStart(null);
   }
 
   /** True when the requester picked an exact calendar deadline. */
@@ -110,6 +111,14 @@ export function VenueBountyDialog({
     }
     if (isCustom && customDeadline.getTime() <= Date.now()) {
       toast.error("Pick a deadline in the future.");
+      return;
+    }
+    if (mode === "clip" && scheduledStart && scheduledStart.getTime() <= Date.now()) {
+      toast.error("Pick a recording start time in the future.");
+      return;
+    }
+    if (mode === "live" && !LIVE_DURATIONS.includes(durationMin)) {
+      toast.error("Pick how long the live stream should run.");
       return;
     }
     const funds = await readWalletBalance();
