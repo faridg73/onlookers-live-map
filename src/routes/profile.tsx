@@ -83,6 +83,15 @@ function ProfileScreen() {
     };
   }, []);
 
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Could not sign out. Please try again.");
+      return;
+    }
+    navigate({ to: "/auth" });
+  }
+
   // Coming back from checkout: confirm the payment and pull the new balance in.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
