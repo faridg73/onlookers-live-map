@@ -150,7 +150,12 @@ function MapScreen() {
         selectedId={selectedId}
         onSelect={select}
         onUserPositionChange={setUserPosition}
+        pinMode={pinMode}
+        onMapPin={dropPin}
+        draftPin={draftPin}
+        centerTarget={centerTarget}
       />
+
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <button
