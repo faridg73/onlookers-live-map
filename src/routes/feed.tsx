@@ -145,7 +145,7 @@ function FeedScreen() {
         .includes(q);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requests, filter, query, radiusChoice, customMiles, userPosition]);
+  }, [requests, filter, query, radiusChoice, customMiles, center]);
 
   const categoryCounts = useMemo(() => {
     const counts: Partial<Record<CategoryId, number>> = {};
@@ -175,16 +175,16 @@ function FeedScreen() {
       }
       return true;
     });
-    if (!userPosition) return filtered;
-    const from = userPosition;
+    if (!center) return filtered;
+    const from = center;
     return [...filtered].sort(
       (a, b) =>
         distanceMiles(from, requestMapPosition(a)) - distanceMiles(from, requestMapPosition(b)),
     );
-  }, [inScope, cat, sub, userPosition]);
+  }, [inScope, cat, sub, center]);
 
   const distanceLabel = (r: (typeof requests)[number]) =>
-    userPosition ? formatDistance(distanceMiles(userPosition, requestMapPosition(r))) : undefined;
+    center ? formatDistance(distanceMiles(center, requestMapPosition(r))) : undefined;
   const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   const displayCustom = Math.round(unit === "mi" ? customMiles : customMiles * 1.609344);
