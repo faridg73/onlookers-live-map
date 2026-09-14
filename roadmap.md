@@ -9,4 +9,4 @@
 - [x] Add visual scroll indicators to horizontal category carousels
 - [x] Fix database security warnings (revoked public EXECUTE on SECURITY DEFINER functions; tightened pool_contributions RLS; remaining signed-in warnings are intentional app-facing RPCs)
 - [x] Add live city/state autocomplete dropdown to the Discover filter bar
-- [ ] Verify Turnstile checkbox renders on onlookerlive.com (domain was added to the widget earlier)
+- [x] Verify Turnstile checkbox renders on onlookerlive.com (confirmed live on /auth)
