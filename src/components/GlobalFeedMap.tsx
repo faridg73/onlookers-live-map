@@ -46,6 +46,7 @@ export function GlobalFeedMap({
           disableDefaultUI: true,
           gestureHandling: "greedy",
         });
+        setMapReady(true);
       })
       .catch(() => undefined);
     return () => {
