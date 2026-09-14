@@ -1,19 +1,27 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Users, PartyPopper, Target, Plus } from "lucide-react";
+import { Users, PartyPopper, Target, Plus, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
+import { HunterBadge } from "@/components/HunterBadge";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { useHumanCheck } from "@/components/HumanCheck";
 import { useAuth } from "@/hooks/use-auth";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   contributeToPool,
   createPool,
+  fetchPoolIdentity,
   listPools,
+  poolFormErrors,
   POOL_CHIP_IN_AMOUNTS,
   POOL_GOAL_PRESETS,
   type BountyPool,
+  type PoolFormErrors,
+  type PoolIdentity,
 } from "@/lib/pools";
-import { creditsToUsdValue } from "@/lib/credits";
+import { creditsToUsdValue, fetchCreditWallet, formatCreditCash } from "@/lib/credits";
 
 export const Route = createFileRoute("/pools")({
   head: () => ({
@@ -39,21 +47,35 @@ export const Route = createFileRoute("/pools")({
 function PoolsScreen() {
   const { user } = useAuth();
   const [pools, setPools] = useState<BountyPool[]>([]);
+  const [identity, setIdentity] = useState<PoolIdentity | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState("");
   const [goal, setGoal] = useState<number>(200);
   const [kind, setKind] = useState<"bounty" | "meetup">("bounty");
+  const [errors, setErrors] = useState<PoolFormErrors>({});
+  const human = useHumanCheck("bounty-pool");
 
   const load = useCallback(async () => {
     if (!user) {
       setPools([]);
+      setIdentity(null);
+      setBalance(null);
       setLoading(false);
       return;
     }
     try {
-      setPools(await listPools());
+      const [list, me, wallet] = await Promise.all([
+        listPools(),
+        fetchPoolIdentity(user.id),
+        fetchCreditWallet().catch(() => null),
+      ]);
+      setPools(list);
+      setIdentity(me);
+      setBalance(wallet?.creditBalance ?? null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't load the pools.");
     } finally {
@@ -66,23 +88,45 @@ function PoolsScreen() {
   }, [load]);
 
   const submit = async () => {
-    if (!title.trim()) {
-      toast.error("Give your pool a title.");
+    const found = poolFormErrors({ title, place, goalCredits: goal });
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      toast.error("Check the highlighted fields before opening your pool.");
       return;
     }
+    if (!human.ready) {
+      toast.error("Finish the quick human check before opening a pool.");
+      return;
+    }
+    setSubmitting(true);
     try {
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: "bounty-pool" },
+      });
+      if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       await createPool({ title, place, goalCredits: goal, kind });
       toast.success("Pool opened — share it so people chip in.");
       setTitle("");
       setPlace("");
+      setErrors({});
       setCreating(false);
+      human.reset();
       await load();
     } catch (err) {
+      human.reset();
       toast.error(err instanceof Error ? err.message : "Couldn't open that pool.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const chipIn = async (pool: BountyPool, amount: number) => {
+    if (balance !== null && balance < amount) {
+      toast.error(
+        `Not enough Credits — you have ${balance} and this chip-in needs ${amount}. Top up on your balance page.`,
+      );
+      return;
+    }
     try {
       const total = await contributeToPool(pool.id, amount);
       toast.success(`You chipped in ${amount} Credits — ${total} of ${pool.goalCredits} pooled.`);
@@ -91,6 +135,11 @@ function PoolsScreen() {
       toast.error(err instanceof Error ? err.message : "Couldn't chip in right now.");
     }
   };
+
+  const fieldClass = (bad?: string) =>
+    `w-full rounded-xl border bg-surface-raised px-3 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground ${
+      bad ? "border-destructive focus:border-destructive" : "border-border focus:border-signal"
+    }`;
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
@@ -105,20 +154,57 @@ function PoolsScreen() {
         </p>
       ) : (
         <>
+          <div className="mt-5 flex items-center gap-3 rounded-2xl border border-border bg-surface p-3">
+            {identity?.avatarUrl ? (
+              <img
+                src={identity.avatarUrl}
+                alt={`${identity.username}'s profile photo`}
+                className="size-11 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-raised font-display text-base text-signal">
+                {(identity?.username ?? "O").slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center gap-1 truncate text-sm font-bold text-foreground">
+                @{identity?.username ?? "onlooker"}
+                {identity?.isVerified && <VerifiedBadge />}
+              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                <HunterBadge level={identity?.hunterLevel ?? 1} />
+                <span className="inline-flex items-center gap-1 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  <Wallet className="size-3" />
+                  {balance === null ? "Wallet loading" : `${balance} Credits`}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {creating ? (
-            <div className="mt-5 space-y-3 rounded-2xl border border-signal/40 bg-surface p-4">
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="What should happen? e.g. Live view of the stadium gates"
-                className="w-full rounded-xl border border-border bg-surface-raised px-3 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-signal"
-              />
-              <input
-                value={place}
-                onChange={(e) => setPlace(e.target.value)}
-                placeholder="Where? e.g. Soldier Field, Chicago"
-                className="w-full rounded-xl border border-border bg-surface-raised px-3 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-signal"
-              />
+            <div className="mt-4 space-y-3 rounded-2xl border border-signal/40 bg-surface p-4">
+              <div>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="What should happen? e.g. Live view of the stadium gates"
+                  className={fieldClass(errors.title)}
+                />
+                {errors.title && (
+                  <p className="mt-1 text-xs text-destructive">{errors.title}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  value={place}
+                  onChange={(e) => setPlace(e.target.value)}
+                  placeholder="Where? e.g. Soldier Field, Chicago"
+                  className={fieldClass(errors.place)}
+                />
+                {errors.place && (
+                  <p className="mt-1 text-xs text-destructive">{errors.place}</p>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 {(["bounty", "meetup"] as const).map((k) => (
                   <button
@@ -150,14 +236,16 @@ function PoolsScreen() {
                   >
                     <div className="font-display text-base">{amount}</div>
                     <div className="text-[0.6rem] text-muted-foreground">
-                      {creditsToUsdValue(amount)}
+                      {formatCreditCash(amount)}
                     </div>
                   </button>
                 ))}
               </div>
+              {errors.goal && <p className="text-xs text-destructive">{errors.goal}</p>}
+              <div>{human.widget}</div>
               <div className="flex gap-2">
-                <Button onClick={submit} className="flex-1">
-                  Open the pool
+                <Button onClick={submit} disabled={submitting} className="flex-1">
+                  {submitting ? "Opening…" : "Open the pool"}
                 </Button>
                 <Button variant="ghost" onClick={() => setCreating(false)}>
                   Cancel
@@ -165,7 +253,7 @@ function PoolsScreen() {
               </div>
             </div>
           ) : (
-            <Button onClick={() => setCreating(true)} className="mt-5 w-full gap-2">
+            <Button onClick={() => setCreating(true)} className="mt-4 w-full gap-2">
               <Plus className="size-4" /> Start a pool
             </Button>
           )}
@@ -193,6 +281,9 @@ function PoolsScreen() {
                         <p className="truncate text-xs text-muted-foreground">
                           {pool.place || "Anywhere"} ·{" "}
                           {pool.kind === "meetup" ? "Flash meetup" : "Community bounty"}
+                          {identity && pool.creatorId === identity.userId
+                            ? ` · started by @${identity.username}`
+                            : ""}
                         </p>
                       </div>
                       <span className="shrink-0 rounded-full bg-signal/15 px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-signal">
@@ -207,7 +298,7 @@ function PoolsScreen() {
                       <span className="font-bold text-foreground">
                         {pool.pooledCredits} / {pool.goalCredits} Credits
                       </span>{" "}
-                      · {creditsToUsdValue(pool.pooledCredits)} ·{" "}
+                      · {formatCreditCash(pool.pooledCredits)} ·{" "}
                       <span className="inline-flex items-center gap-1">
                         <Users className="size-3" /> {pool.backers} backers
                       </span>
