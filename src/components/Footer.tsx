@@ -20,6 +20,50 @@ const LINKS = [
   { to: "/copyright", label: "Copyright Policy", icon: Copyright },
 ] as const;
 
+const SOCIAL_LINKS = [
+  {
+    label: "X (Twitter)",
+    href: "https://x.com/onlooker_live",
+    icon: XIcon,
+  },
+  {
+    label: "Instagram",
+    href: "https://instagram.com/onlooker_live",
+    icon: InstagramIcon,
+  },
+  {
+    label: "TikTok",
+    href: "https://tiktok.com/@onlooker_live",
+    icon: TikTokIcon,
+  },
+] as const;
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
+}
+
 export function Footer() {
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
@@ -47,9 +91,27 @@ export function Footer() {
           </button>
         </nav>
 
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
+          {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised text-muted-foreground transition-colors hover:border-signal/60 hover:text-signal"
+            >
+              <Icon className="size-5" />
+            </a>
+          ))}
+        </div>
+
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Onlooker. All rights reserved.
+          </p>
+          <p className="text-xs font-semibold tracking-wide text-signal">
+            #OnlookerLive
           </p>
           <a
             href="mailto:support@onlookerlive.com"
@@ -64,3 +126,4 @@ export function Footer() {
     </footer>
   );
 }
+
