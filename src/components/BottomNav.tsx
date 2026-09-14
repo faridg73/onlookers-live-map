@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users, Wallet } from "lucide-react";
 import { useChatAlerts } from "@/hooks/use-chat-alerts";
 import { ChatInbox } from "@/components/ChatInbox";
+import { FlashBountyButton } from "@/components/FlashBountyButton";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
@@ -26,18 +27,25 @@ export function BottomNav() {
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 backdrop-blur-xl">
         <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pb-[env(safe-area-inset-bottom)]">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
-            <li key={to} className="flex-1">
-              <Link
-                to={to}
-                activeOptions={{ exact }}
-                className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
-              >
-                <span className={`relative ${"primary" in item ? "grid size-8 place-items-center rounded-full bg-signal text-signal-foreground" : ""}`}>
-                  <Icon className="size-5" strokeWidth={1.75} />
-                </span>
-                {label}
-              </Link>
-            </li>
+            <Fragment key={to}>
+              {to === "/post" && (
+                <li className="flex-1">
+                  <FlashBountyButton variant="nav" />
+                </li>
+              )}
+              <li className="flex-1">
+                <Link
+                  to={to}
+                  activeOptions={{ exact }}
+                  className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
+                >
+                  <span className={`relative ${"primary" in item ? "grid size-8 place-items-center rounded-full bg-signal text-signal-foreground" : ""}`}>
+                    <Icon className="size-5" strokeWidth={1.75} />
+                  </span>
+                  {label}
+                </Link>
+              </li>
+            </Fragment>
           ))}
           <li className="flex-1">
             <button
