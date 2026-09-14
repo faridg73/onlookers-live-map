@@ -47,6 +47,12 @@ function AuthScreen() {
     discreet: mode === "signin",
   });
 
+  async function beginAccountSwitch() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await clearPreviousAuthState();
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!accepted) {
@@ -71,11 +77,11 @@ function AuthScreen() {
       if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
       if (mode === "signup") {
         // Numbers are confirmed by text before the account is created.
-        await clearPreviousAuthState();
+        await beginAccountSwitch();
         rememberTermsAcceptance();
         setVerifying(true);
       } else {
-        await clearPreviousAuthState();
+        await beginAccountSwitch();
         rememberTermsAcceptance();
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error || !data.session || !data.user) {
@@ -104,7 +110,7 @@ function AuthScreen() {
   async function createAccount(phone: string) {
     setBusy(true);
     try {
-      await clearPreviousAuthState();
+      await beginAccountSwitch();
       rememberTermsAcceptance();
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -138,12 +144,21 @@ function AuthScreen() {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
-    await clearPreviousAuthState();
-    rememberTermsAcceptance();
-    const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) toast.error(result.error.message);
+    try {
+      await beginAccountSwitch();
+      rememberTermsAcceptance();
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (!result.redirected) {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) throw new Error("Social sign-in did not return a fresh session.");
+        await requireExactAuthenticatedUser(data.session);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
+    }
   }
 
   if (verifying) {
