@@ -94,6 +94,11 @@ function AuthScreen() {
   async function createAccount(phone: string) {
     setBusy(true);
     try {
+      // Clear any session already cached on this device so the new account is
+      // never mixed with a previous login.
+      const { data: existing } = await supabase.auth.getSession();
+      if (existing.session) await supabase.auth.signOut();
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
