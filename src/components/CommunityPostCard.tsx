@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Clock, MapPin, Navigation, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
+import { ShareToSocialButton } from "@/components/ShareToSocialButton";
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
@@ -196,6 +197,18 @@ export function CommunityPostCard({
               </Button>
             </>
           )}
+          <ShareToSocialButton
+            subject={{
+              kind: "live",
+              id: post.id,
+              title: post.title,
+              place: post.place,
+              latitude: post.latitude,
+              longitude: post.longitude,
+            }}
+            label="Social"
+            className="h-8 px-2.5 py-0 text-[0.65rem]"
+          />
           <ShareArtifactButton
             artifact={{
               kind: post.isFlash ? "meetup" : "discovery",

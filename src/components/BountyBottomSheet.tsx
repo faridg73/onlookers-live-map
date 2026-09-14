@@ -3,6 +3,7 @@ import { Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-r
 import { toast } from "sonner";
 
 import { useHumanCheck } from "@/components/HumanCheck";
+import { ShareToSocialButton } from "@/components/ShareToSocialButton";
 import { acceptBountyAndGoLive } from "@/lib/bounty-live.functions";
 
 
@@ -193,6 +194,20 @@ export function BountyBottomSheet({
                     ? "Go live for this bounty"
                     : "Accept & Open Camera"}
             </button>
+            <div className="mt-3">
+              <ShareToSocialButton
+                subject={{
+                  kind: wantsLive ? "live" : "pin",
+                  id: request.dbId ?? request.id,
+                  title: request.title,
+                  place: request.place,
+                  credits: pool,
+                  latitude: request.lat ?? null,
+                  longitude: request.lng ?? null,
+                }}
+                className="w-full"
+              />
+            </div>
             <p className="mt-2 flex items-start gap-2 text-[0.7rem] text-muted-foreground">
               <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-live" />
               {PUBLIC_SPACES_DISCLAIMER}
