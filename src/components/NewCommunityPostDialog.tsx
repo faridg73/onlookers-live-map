@@ -255,6 +255,8 @@ export function NewCommunityPostDialog({
           )}
         </div>
 
+        <div className="mt-4">{human.widget}</div>
+
         <button
           type="button"
           disabled={busy}
