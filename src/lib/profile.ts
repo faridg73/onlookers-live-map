@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeText } from "@/lib/sanitize";
 
 export type MyProfile = {
   id: string;
@@ -8,7 +9,109 @@ export type MyProfile = {
   terms_accepted_at: string | null;
   onboarded: boolean;
   onboarding_completed: boolean;
+  username: string | null;
+  legal_first_name: string | null;
+  legal_last_name: string | null;
 };
+
+const PROFILE_COLUMNS =
+  "id, display_name, full_name, avatar_url, terms_accepted_at, onboarded, onboarding_completed, username, legal_first_name, legal_last_name";
+
+/** Pre-generated recovery questions with fixed answer options. */
+export const SECURITY_QUESTIONS = [
+  {
+    key: "first_pet",
+    label: "What kind of pet did you have first?",
+    options: ["Dog", "Cat", "Bird", "Fish", "Reptile", "Small mammal", "None"],
+  },
+  {
+    key: "home_region",
+    label: "Where did you grow up?",
+    options: [
+      "West Coast",
+      "Midwest",
+      "South",
+      "Northeast",
+      "Canada",
+      "Latin America",
+      "Europe",
+      "Asia",
+      "Africa",
+      "Oceania",
+    ],
+  },
+  {
+    key: "favourite_scene",
+    label: "Which place do you film most often?",
+    options: [
+      "Beach or waterfront",
+      "City street",
+      "Stadium or arena",
+      "Concert venue",
+      "Market",
+      "Park or trail",
+      "Airport or transit",
+    ],
+  },
+] as const;
+
+export type SecurityAnswers = Record<string, string>;
+
+/** Live check used while someone types a username. */
+export async function isUsernameAvailable(username: string): Promise<boolean> {
+  const clean = username.trim();
+  if (!clean) return false;
+  const { data, error } = await supabase.rpc("is_username_available", { _username: clean });
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export function usernameProblem(username: string): string | null {
+  const clean = username.trim();
+  if (clean.length < 3) return "At least 3 characters.";
+  if (clean.length > 24) return "24 characters or fewer.";
+  if (!/^[a-zA-Z0-9._]+$/.test(clean)) return "Letters, numbers, dots and underscores only.";
+  return null;
+}
+
+/** Uploads a chosen image to private cloud storage and returns a long-lived link. */
+export async function uploadAvatarFile(file: File): Promise<string> {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("You must be signed in.");
+  if (!file.type.startsWith("image/")) throw new Error("Choose an image file.");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Images must be under 5 MB.");
+
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const path = `${user.id}/avatar-${Date.now()}.${ext || "jpg"}`;
+
+  const { error } = await supabase.storage
+    .from("avatars")
+    .upload(path, file, { contentType: file.type, upsert: true });
+  if (error) throw error;
+
+  const { data: signed, error: signError } = await supabase.storage
+    .from("avatars")
+    .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
+  if (signError || !signed?.signedUrl) throw signError ?? new Error("Could not link your photo.");
+  return signed.signedUrl;
+}
+
+export async function saveSecurityAnswers(answers: SecurityAnswers) {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("You must be signed in.");
+
+  const rows = Object.entries(answers)
+    .filter(([, value]) => Boolean(value))
+    .map(([question_key, answer_key]) => ({ user_id: user.id, question_key, answer_key }));
+  if (rows.length === 0) return;
+
+  const { error } = await supabase
+    .from("profile_security_answers")
+    .upsert(rows, { onConflict: "user_id,question_key" });
+  if (error) throw error;
+}
 
 const TERMS_KEY = "onlooker.terms-accepted";
 
