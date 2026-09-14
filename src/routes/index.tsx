@@ -48,6 +48,52 @@ function MapScreen() {
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [nearbyOpen, setNearbyOpen] = useState(false);
   const [goldOnly, setGoldOnly] = useState(false);
+  // "Request a view": drop a pin anywhere in the world and fund a live stream.
+  const [pinMode, setPinMode] = useState(false);
+  const [draftPin, setDraftPin] = useState<MapPosition | null>(null);
+  const [pin, setPin] = useState<ViewPin | null>(null);
+  const [naming, setNaming] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
+
+  const dropPin = useCallback((position: MapPosition) => {
+    setDraftPin(position);
+    setNaming(true);
+    select(null);
+    void namePin(position.lat, position.lng)
+      .then(setPin)
+      .catch(() =>
+        setPin({
+          latitude: position.lat,
+          longitude: position.lng,
+          formatted: `Pin at ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`,
+        }),
+      )
+      .finally(() => setNaming(false));
+  }, [select]);
+
+  const searchPlace = useCallback(async () => {
+    const address = searchText.trim();
+    if (address.length < 3) {
+      toast.error("Type a place, city or address to jump there.");
+      return;
+    }
+    setSearching(true);
+    try {
+      const found = await geocodeAddress({ data: { address } });
+      if (!found) {
+        toast.error("We couldn't find that place — try adding a city or country.");
+        return;
+      }
+      setCenterTarget({ lat: found.latitude, lng: found.longitude, zoom: 15 });
+    } catch {
+      toast.error("Place search is unavailable right now.");
+    } finally {
+      setSearching(false);
+    }
+  }, [searchText]);
+
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
