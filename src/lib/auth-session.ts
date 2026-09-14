@@ -57,5 +57,6 @@ export async function requireExactAuthenticatedUser(session: Session): Promise<U
     await clearPreviousAuthState();
     throw new Error("We could not confirm the new account. Please sign in again.");
   }
+  supabase.auth.startAutoRefresh();
   return verified.user;
 }

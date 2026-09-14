@@ -29,18 +29,7 @@ export const lovable = {
       }
 
       try {
-        await supabase.auth.signOut({ scope: "local" });
-        const { data: sessionData, error: sessionError } = await supabase.auth.setSession(result.tokens);
-        if (sessionError || !sessionData.session) {
-          throw sessionError ?? new Error("Social sign-in did not return a fresh session.");
-        }
-        const { data: verified, error: verifyError } = await supabase.auth.getUser(
-          sessionData.session.access_token,
-        );
-        if (verifyError || !verified.user || verified.user.id !== sessionData.session.user.id) {
-          await supabase.auth.signOut({ scope: "local" });
-          throw new Error("We could not confirm the social sign-in account.");
-        }
+        await supabase.auth.setSession(result.tokens);
       } catch (e) {
         return { error: e instanceof Error ? e : new Error(String(e)) };
       }
