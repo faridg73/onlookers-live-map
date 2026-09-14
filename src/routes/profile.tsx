@@ -86,6 +86,7 @@ function ProfileScreen() {
   const mine = requests.filter((r) => r.requester === "you");
   const [verified, setVerified] = useState(false);
   const [profile, setProfile] = useState<MyProfile | null>(null);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
