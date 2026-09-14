@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { Camera, CoinsIcon, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+
+import { useHumanCheck } from "@/components/HumanCheck";
+import { acceptBountyAndGoLive } from "@/lib/bounty-live.functions";
+
 
 import {
   Sheet,
