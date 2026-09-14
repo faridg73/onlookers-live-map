@@ -293,6 +293,56 @@ export function VenueBountyDialog({
             </p>
           </div>
 
+          {mode === "live" ? (
+            <div className="space-y-2">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                Stream length
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {LIVE_DURATIONS.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setDurationMin(d)}
+                    aria-pressed={durationMin === d}
+                    className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                      durationMin === d
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-border bg-surface-raised text-foreground hover:border-signal/60"
+                    }`}
+                  >
+                    {d} min
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                Recording start (optional)
+              </span>
+              <button
+                type="button"
+                onClick={() => setStartOpen(true)}
+                className="flex w-full items-center gap-2 rounded-xl border-2 border-border bg-surface-raised px-3 py-2.5 text-left text-sm font-extrabold text-foreground transition-colors hover:border-signal/60"
+              >
+                <CalendarIcon className="size-4 shrink-0 text-signal" />
+                {scheduledStart
+                  ? format(scheduledStart, "EEE, MMM d 'at' h:mm a")
+                  : "Pick when the recording should start"}
+              </button>
+              {scheduledStart && (
+                <button
+                  type="button"
+                  onClick={() => setScheduledStart(null)}
+                  className="text-xs font-semibold text-muted-foreground underline underline-offset-2"
+                >
+                  Clear start time — onlooker records as soon as claimed
+                </button>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
               Reward
@@ -319,10 +369,23 @@ export function VenueBountyDialog({
       <CustomDeadlinePicker
         open={customOpen}
         value={customDeadline}
+        title="Custom deadline"
+        description="Pick the exact date and time the clip is due."
         onOpenChange={setCustomOpen}
         onPick={(date) => {
           setCustomDeadline(date);
           setCustomOpen(false);
+        }}
+      />
+      <CustomDeadlinePicker
+        open={startOpen}
+        value={scheduledStart}
+        title="Recording start"
+        description="Pick the exact date and time the onlooker should start recording."
+        onOpenChange={setStartOpen}
+        onPick={(date) => {
+          setScheduledStart(date);
+          setStartOpen(false);
         }}
       />
     </Dialog>
