@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
+
 /**
  * Cloudflare Turnstile: an almost-invisible human check in front of sign-up
  * and anything that creates public content. The site key is public and handed
@@ -35,6 +37,9 @@ export const verifyHumanCheck = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<HumanCheckResult> => {
     const secret = process.env["TURNSTILE_SECRET_KEY"];
     if (!secret) return { ok: true, configured: false };
+    if (!(await withinRateLimit(RATE_LIMITS.humanCheck))) {
+      return { ok: false, configured: true, reason: "too-many-attempts" };
+    }
     // No token means the widget could not run in that browser (blocked script,
     // hostname not allowed yet). Let the person through rather than trap them.
     if (!data.token) {

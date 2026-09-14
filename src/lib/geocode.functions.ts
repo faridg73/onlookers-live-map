@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
+import { safeQuery } from "@/lib/sanitize";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
 export type GeocodeResult = {
@@ -52,8 +55,11 @@ async function callGeocode(params: Record<string, string>): Promise<GeocodeResul
 
 /** Turns a typed address into coordinates for the mini preview map. */
 export const geocodeAddress = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => z.object({ address: z.string().trim().min(3).max(200) }).parse(data))
-  .handler(async ({ data }): Promise<GeocodeResult | null> => callGeocode({ address: data.address }));
+  .inputValidator((data: unknown) => z.object({ address: safeQuery(200, 3) }).parse(data))
+  .handler(async ({ data }): Promise<GeocodeResult | null> => {
+    await enforceRateLimit(RATE_LIMITS.geocode);
+    return callGeocode({ address: data.address });
+  });
 
 /** Turns a dropped pin back into a street address. */
 export const reverseGeocode = createServerFn({ method: "POST" })
@@ -61,6 +67,7 @@ export const reverseGeocode = createServerFn({ method: "POST" })
     z.object({ latitude: z.number().min(-90).max(90), longitude: z.number().min(-180).max(180) }).parse(data),
   )
   .handler(async ({ data }): Promise<GeocodeResult | null> => {
+    await enforceRateLimit(RATE_LIMITS.geocode);
     return callGeocode({ latlng: `${data.latitude},${data.longitude}` });
   });
 
@@ -72,9 +79,10 @@ export type PlaceSuggestion = {
 /** Live city/state autocomplete suggestions for the filter bar search. */
 export const autocompletePlaces = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
-    z.object({ input: z.string().trim().min(2).max(120), sessionToken: z.string().uuid() }).parse(data),
+    z.object({ input: safeQuery(120, 2), sessionToken: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data }): Promise<PlaceSuggestion[]> => {
+    await enforceRateLimit(RATE_LIMITS.geocode);
     const { lovableKey, mapsKey } = credentials();
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:autocomplete`, {
       method: "POST",

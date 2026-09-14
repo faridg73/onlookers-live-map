@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { MODERATION_REASONS } from "@/lib/moderation-reasons";
+import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 import { safeMultiline, safeText } from "@/lib/sanitize";
 
 const reasonCodes = MODERATION_REASONS.map((reason) => reason.code) as [
@@ -26,6 +27,9 @@ export type DmcaNoticeInput = z.infer<typeof dmcaSchema>;
 export const submitDmcaNotice = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => dmcaSchema.parse(data))
   .handler(async ({ data }): Promise<{ success: boolean; error?: string }> => {
+    if (!(await withinRateLimit(RATE_LIMITS.dmca))) {
+      return { success: false, error: RATE_LIMITED_MESSAGE };
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: row, error } = await supabaseAdmin

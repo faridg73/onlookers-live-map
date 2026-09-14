@@ -84,6 +84,31 @@ export function safeText(max: number, min = 0) {
     });
 }
 
+/**
+ * Cleans a search / place lookup phrase. On top of the normal cleaning this
+ * keeps only characters real place names use, so quotes, braces, backslashes
+ * and query operators can never reach a database filter or an outside API.
+ */
+export function sanitizeQuery(input: unknown, maxLength = 120): string {
+  const cleaned = sanitizeText(input, { maxLength: maxLength * 2 });
+  return cleaned
+    .replace(/[^\p{L}\p{N}\s,.'&/()#+-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+
+/** Zod field for a search box or location lookup. */
+export function safeQuery(max = 120, min = 2) {
+  return z
+    .string()
+    .max(max * 4, { message: "That search is too long." })
+    .transform((value) => sanitizeQuery(value, max))
+    .refine((value) => value.length >= min, {
+      message: `Please type at least ${min} characters.`,
+    });
+}
+
 /** Zod field for a longer, multi-line piece of user text. */
 export function safeMultiline(max: number, min = 0) {
   return z

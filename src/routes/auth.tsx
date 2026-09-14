@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { rememberTermsAcceptance } from "@/lib/profile";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
+import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -56,6 +57,8 @@ function AuthScreen() {
     setBusy(true);
     rememberTermsAcceptance();
     try {
+      const allowed = await checkAuthAttempt({ data: { email, mode } });
+      if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
       if (mode === "signup") {
         const check = await verifyHumanCheck({
           data: { token: human.token ?? "", action: "sign-up" },

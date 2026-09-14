@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeMultiline, safeText } from "@/lib/sanitize";
 import { assertHuman } from "@/lib/turnstile.functions";
 
@@ -49,6 +50,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Bots never get to lock credits or publish to the map.
+    await enforceRateLimit(RATE_LIMITS.createRequest, context.userId);
     await assertHuman(data.captchaToken, "create-bounty");
 
     // Content filter runs before any money moves: requests to film screens,
