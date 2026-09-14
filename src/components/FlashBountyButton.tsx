@@ -252,7 +252,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               <div className="grid grid-cols-3 gap-2">
                 {FLASH_TIERS.map((tier) => {
                   const active = selectedTier.id === tier.id;
-                  const credits = tier.baseCredits ?? computeFlashCredits({ tierId: tier.id, customBase: Math.max(0, Math.round(Number(customBase) || 0)) });
+                  const customAmount = Math.max(
+                    0,
+                    Math.round(Number(customBase) || 0),
+                  );
+                  const credits = tier.baseCredits ?? computeFlashCredits({
+                    tierId: tier.id,
+                    customBase: customAmount,
+                  });
+                  const display = tier.baseCredits
+                    ? credits.toLocaleString()
+                    : customAmount >= FLASH_MIN_BOUNTY_CREDITS
+                      ? customAmount.toLocaleString()
+                      : "Custom";
                   return (
                     <button
                       key={tier.id}
@@ -267,7 +279,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                     >
                       <span className="text-xs font-extrabold">{tier.label}</span>
                       <span className="font-display text-lg font-extrabold tabular-nums text-signal">
-                        {tier.baseCredits ? credits.toLocaleString() : "Custom"}
+                        {display}
                       </span>
                       <span className="text-[0.6rem] font-medium leading-tight opacity-80">
                         {tier.blurb}
@@ -275,6 +287,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                     </button>
                   );
                 })}
+
               </div>
             </div>
 
@@ -325,6 +338,15 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
               <div className="flex items-center justify-between">
+                <span className="text-sm font-extrabold text-foreground">Your balance</span>
+                <span className={cn(
+                  "font-display text-lg font-extrabold tabular-nums",
+                  short ? "text-destructive" : "text-signal",
+                )}>
+                  {balance === null ? "…" : formatCredits(Math.round(balance))}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-border pt-2">
                 <span className="text-sm font-extrabold text-foreground">Locked in escrow</span>
                 <span className="font-display text-lg font-extrabold tabular-nums text-signal">
                   {formatCredits(totalCredits)} · {formatCreditCash(totalCredits)}
@@ -344,11 +366,12 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               )}
             </div>
 
-            {short && (
+            {short && balance !== null && (
               <p className="text-xs font-bold text-destructive">
-                You have {formatCredits(Math.round(balance ?? 0))} — buy credits to post a flash bounty.
+                You need {formatCredits(Math.ceil(totalCredits - balance))} more to lock this flash bounty.
               </p>
             )}
+
 
             <div>{human.widget}</div>
 
