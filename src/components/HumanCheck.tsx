@@ -66,14 +66,18 @@ export function useHumanCheck(action: string): {
   reset: () => void;
   widget: ReactNode;
 } {
-  const { data: siteKey } = useQuery({
+  const { data: siteKey, isError } = useQuery({
     queryKey: ["turnstile-site-key"],
     queryFn: () => getTurnstileSiteKey(),
     staleTime: Infinity,
   });
   const [token, setToken] = useState<string | null>(null);
   const [widgetId, setWidgetId] = useState<string | null>(null);
-  const required = Boolean(siteKey);
+  // When the widget can't run at all — hostname not allowed on this domain, a
+  // blocked script, a network hiccup — we must never trap a real person behind
+  // a disabled button. We stand down and let the form through.
+  const [unavailable, setUnavailable] = useState(false);
+  const required = Boolean(siteKey) && !isError && !unavailable;
 
   const reset = useCallback(() => {
     setToken(null);
@@ -86,29 +90,44 @@ export function useHumanCheck(action: string): {
       action={action}
       onToken={setToken}
       onWidget={setWidgetId}
+      onUnavailable={() => setUnavailable(true)}
     />
   ) : null;
 
   return { token, required, ready: !required || Boolean(token), reset, widget };
 }
 
+/** How long we wait for a token before assuming the check can't complete here. */
+const GRACE_MS = 12000;
+
 function TurnstileWidget({
   siteKey,
   action,
   onToken,
   onWidget,
+  onUnavailable,
 }: {
   siteKey: string;
   action: string;
   onToken: (token: string | null) => void;
   onWidget: (id: string | null) => void;
+  onUnavailable: () => void;
 }) {
   const holder = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
+  const solved = useRef(false);
 
   useEffect(() => {
     let id: string | null = null;
     let cancelled = false;
+    const giveUp = (why: string) => {
+      if (cancelled || solved.current) return;
+      console.warn("[turnstile] standing down:", why);
+      setFailed(true);
+      onUnavailable();
+    };
+    const timer = window.setTimeout(() => giveUp("no token within grace period"), GRACE_MS);
+
     loadTurnstile()
       .then((api) => {
         if (cancelled || !holder.current) return;
@@ -116,17 +135,21 @@ function TurnstileWidget({
           sitekey: siteKey,
           action,
           theme: "dark",
-          callback: (value) => onToken(value),
+          callback: (value) => {
+            solved.current = true;
+            window.clearTimeout(timer);
+            onToken(value);
+          },
           "expired-callback": () => onToken(null),
-          "error-callback": () => onToken(null),
+          "error-callback": () => giveUp("widget error (hostname or challenge failure)"),
         });
         onWidget(id);
       })
-      .catch(() => {
-        if (!cancelled) setFailed(true);
-      });
+      .catch(() => giveUp("script blocked or failed to load"));
+
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
       onWidget(null);
       if (id && typeof window !== "undefined") window.turnstile?.remove(id);
     };
@@ -136,7 +159,7 @@ function TurnstileWidget({
   if (failed) {
     return (
       <p className="text-xs text-muted-foreground">
-        The human check couldn&rsquo;t load. Turn off any ad blocker and reload to continue.
+        Skipping the human check on this device — you can carry on.
       </p>
     );
   }
