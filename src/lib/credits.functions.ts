@@ -119,7 +119,6 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
       if (!resolved.ok) return { error: resolved.error };
       const pack = resolved.pack;
       if (!(await withinRateLimit(RATE_LIMITS.checkout, context.userId))) {
-      if (!(await withinRateLimit(RATE_LIMITS.checkout, context.userId))) {
         return { error: RATE_LIMITED_MESSAGE };
       }
 
