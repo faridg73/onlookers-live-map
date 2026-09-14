@@ -10,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { ExpiryCountdown } from "@/components/ExpiryCountdown";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { bountyTier } from "@/lib/bounty-tiers";
@@ -101,6 +102,8 @@ export function BountyBottomSheet({
             {distanceLabel && <span className="text-signal">· {distanceLabel} away</span>}
           </SheetDescription>
         </SheetHeader>
+
+        <BountyBriefBadges request={request} />
 
         {request.note && (
           <p className="mt-3 rounded-2xl border border-border bg-surface-raised p-3 text-sm leading-relaxed text-foreground/85">
