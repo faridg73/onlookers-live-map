@@ -322,6 +322,7 @@ export function ProfileSetup() {
         </div>
 
         <div className="mt-5">{human.widget}</div>
+
         {human.required && !human.token && (
           <p className="mt-1.5 text-xs text-muted-foreground">
             Tick the box so we know you&rsquo;re a real person.
