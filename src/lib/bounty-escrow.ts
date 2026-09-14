@@ -57,6 +57,12 @@ export async function lockBounty(input: {
   bountyType?: "live_stream" | "pre_recorded_clip" | null;
   /** When a pre-recorded clip's recording should start. */
   scheduledStartAt?: string | null;
+  /** Requester-typed capture length, when no preset pill was used. */
+  customDurationMinutes?: number | null;
+  /** Difficulty premium for filming conditions, 1.0 = clear. */
+  weatherMultiplier?: number | null;
+  /** Reward tier the requester picked. */
+  bountyTier?: "standard" | "fast_catch" | "priority_hunt" | null;
   /** Human-check token from the posting form. */
   captchaToken?: string | null;
 }): Promise<LockedBounty> {

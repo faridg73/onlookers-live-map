@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { CalendarIcon, Radio, ShieldCheck, Timer, Video } from "lucide-react";
+import { CalendarIcon, CloudRain, Radio, ShieldCheck, Timer, Video, Zap } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
+import {
+  BOUNTY_TIERS,
+  WEATHER_CONDITIONS,
+  quoteBounty,
+  tierById,
+  type BountyTierId,
+} from "@/lib/bounty-pricing";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { categoryById } from "@/lib/onlooker";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
@@ -37,8 +45,9 @@ const LIVE_WINDOWS = [
 const LIVE_DURATIONS = [5, 10, 15, 20, 30];
 
 /**
- * Posts a bounty for one venue: either a 5-minute live stream inside the next
- * hour or two, or a pre-recorded clip with a hard delivery deadline.
+ * Posts a bounty for one venue: either a live stream inside the next hour or
+ * two, or a pre-recorded clip with a hard delivery deadline. The credit cost is
+ * quoted line by line before any funds are locked in escrow.
  */
 export function VenueBountyDialog({
   venue,
@@ -61,8 +70,12 @@ export function VenueBountyDialog({
   const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
   const [durationMin, setDurationMin] = useState(5);
+  /** Set when the requester types their own capture length instead of a pill. */
+  const [customDuration, setCustomDuration] = useState<number | null>(null);
   const [scheduledStart, setScheduledStart] = useState<Date | null>(null);
   const [startOpen, setStartOpen] = useState(false);
+  const [tier, setTier] = useState<BountyTierId>("standard");
+  const [weather, setWeather] = useState(1);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(20);
@@ -91,6 +104,34 @@ export function VenueBountyDialog({
     ? `by ${format(customDeadline, "EEE, MMM d 'at' h:mm a")}`
     : (windows.find((w) => w.minutes === minutes)?.label ?? `${minutes} min`);
 
+  /** Length of the capture we are actually pricing. */
+  const captureMinutes = customDuration ?? durationMin;
+
+  /** Minutes from now until the deadline (or scheduled start) the hunter faces. */
+  const minutesUntilDue = useMemo(() => {
+    const target = isCustom
+      ? customDeadline.getTime()
+      : mode === "clip" && scheduledStart
+        ? scheduledStart.getTime()
+        : Date.now() + minutes * 60_000;
+    return Math.round((target - Date.now()) / 60_000);
+  }, [isCustom, customDeadline, mode, scheduledStart, minutes]);
+
+  const quote = useMemo(
+    () =>
+      quoteBounty({
+        tier,
+        customBase: bounty,
+        durationMinutes: captureMinutes,
+        minutesUntilDue,
+        weatherMultiplier: weather,
+      }),
+    [tier, bounty, captureMinutes, minutesUntilDue, weather],
+  );
+
+  /** What actually leaves the wallet. */
+  const total = quote.total;
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (title.trim().length < 4) {
@@ -101,7 +142,7 @@ export function VenueBountyDialog({
       toast.error("Say exactly what the hunter should capture.");
       return;
     }
-    if (bounty < MIN_BOUNTY) {
+    if (total < MIN_BOUNTY) {
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
@@ -117,15 +158,15 @@ export function VenueBountyDialog({
       toast.error("Pick a recording start time in the future.");
       return;
     }
-    if (mode === "live" && !LIVE_DURATIONS.includes(durationMin)) {
-      toast.error("Pick how long the live stream should run.");
+    if (captureMinutes < 1 || captureMinutes > 240) {
+      toast.error("Capture length must be between 1 and 240 minutes.");
       return;
     }
     const funds = await readWalletBalance();
     setBalance(funds);
-    if (funds !== null && funds < bounty) {
+    if (funds !== null && funds < total) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
-        description: `Buy Credits to lock a ${bounty} Credits bounty.`,
+        description: `Buy Credits to lock a ${total} Credits bounty.`,
         action: { label: "Top up", onClick: () => void navigate({ to: "/profile" }) },
       });
       return;
@@ -136,8 +177,8 @@ export function VenueBountyDialog({
       : "";
     const header =
       mode === "live"
-        ? `Live: ${durationMin}-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
-        : `Clip: live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.${startNote}`;
+        ? `Live: ${captureMinutes}-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
+        : `Clip: ${captureMinutes}-minute live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.${startNote}`;
     const details = `${header}\n${note.trim()}`;
     // The store still wants a countdown; derive one from the calendar pick.
     const effectiveMinutes = isCustom
@@ -150,13 +191,16 @@ export function VenueBountyDialog({
         prompt: title.trim(),
         details: note.trim(),
         locationName: `${venue.name}, ${venue.area}`,
-        bounty,
+        bounty: total,
         category: venue.category,
         latitude: venue.latitude,
         longitude: venue.longitude,
         minutes: effectiveMinutes,
         customDeadlineAt: isCustom ? customDeadline.toISOString() : null,
-        durationMinutes: mode === "live" ? durationMin : 5,
+        durationMinutes: captureMinutes,
+        customDurationMinutes: customDuration,
+        weatherMultiplier: weather,
+        bountyTier: tier,
         bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
         scheduledStartAt:
           mode === "clip" && scheduledStart ? scheduledStart.toISOString() : null,
@@ -166,14 +210,14 @@ export function VenueBountyDialog({
         title: title.trim(),
         place: `${venue.name}, ${venue.area}`,
         note: details,
-        bounty,
+        bounty: total,
         category: venue.category,
         instructions: details,
         dbId: locked.id,
         expiresInMin: effectiveMinutes,
       });
       toast.success("Bounty is live", {
-        description: `${bounty} Credits held in escrow · ${windowLabel}`,
+        description: `${total} Credits held in escrow · ${windowLabel}`,
       });
       setOpen(false);
       setTitle("");
@@ -181,6 +225,9 @@ export function VenueBountyDialog({
       setCustomDeadline(null);
       setScheduledStart(null);
       setDurationMin(5);
+      setCustomDuration(null);
+      setTier("standard");
+      setWeather(1);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
@@ -194,6 +241,13 @@ export function VenueBountyDialog({
       active
         ? "border-signal bg-signal/10"
         : "border-border bg-surface-raised hover:border-signal/50"
+    }`;
+
+  const pill = (active: boolean) =>
+    `flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+      active
+        ? "border-signal bg-signal text-signal-foreground"
+        : "border-border bg-surface-raised text-foreground hover:border-signal/60"
     }`;
 
   return (
@@ -264,11 +318,7 @@ export function VenueBountyDialog({
                     setCustomDeadline(null);
                   }}
                   aria-pressed={!isCustom && minutes === m}
-                  className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
-                    !isCustom && minutes === m
-                      ? "border-signal bg-signal text-signal-foreground"
-                      : "border-border bg-surface-raised text-foreground hover:border-signal/60"
-                  }`}
+                  className={pill(!isCustom && minutes === m)}
                 >
                   {label}
                 </button>
@@ -277,11 +327,7 @@ export function VenueBountyDialog({
                 type="button"
                 onClick={() => setCustomOpen(true)}
                 aria-pressed={isCustom}
-                className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
-                  isCustom
-                    ? "border-signal bg-signal text-signal-foreground"
-                    : "border-border bg-surface-raised text-foreground hover:border-signal/60"
-                }`}
+                className={pill(isCustom)}
               >
                 {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
               </button>
@@ -295,30 +341,51 @@ export function VenueBountyDialog({
             </p>
           </div>
 
-          {mode === "live" ? (
-            <div className="space-y-2">
-              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
-                Stream length
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {LIVE_DURATIONS.map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setDurationMin(d)}
-                    aria-pressed={durationMin === d}
-                    className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
-                      durationMin === d
-                        ? "border-signal bg-signal text-signal-foreground"
-                        : "border-border bg-surface-raised text-foreground hover:border-signal/60"
-                    }`}
-                  >
-                    {d} min
-                  </button>
-                ))}
-              </div>
+          <div className="space-y-2">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+              {mode === "live" ? "Stream length" : "Clip length"}
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {LIVE_DURATIONS.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => {
+                    setDurationMin(d);
+                    setCustomDuration(null);
+                  }}
+                  aria-pressed={customDuration === null && durationMin === d}
+                  className={pill(customDuration === null && durationMin === d)}
+                >
+                  {d} min
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCustomDuration(customDuration ?? durationMin)}
+                aria-pressed={customDuration !== null}
+                className={pill(customDuration !== null)}
+              >
+                Custom
+              </button>
             </div>
-          ) : (
+            {customDuration !== null && (
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input
+                  type="number"
+                  min={1}
+                  max={240}
+                  value={customDuration}
+                  onChange={(e) => setCustomDuration(Math.max(0, Number(e.target.value)) || 0)}
+                  aria-label="Custom capture length in minutes"
+                  className="field w-24"
+                />
+                <span>minutes (1–240)</span>
+              </label>
+            )}
+          </div>
+
+          {mode === "clip" && (
             <div className="space-y-2">
               <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
                 Recording start (optional)
@@ -346,24 +413,75 @@ export function VenueBountyDialog({
           )}
 
           <div className="space-y-2">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
-              Reward
+            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+              <Zap className="size-3.5 text-signal" />
+              Reward tier
             </span>
-            <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
-            <p className="flex items-start gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-signal" />
-              <span>
-                Held securely in escrow and only released once you review and approve the video.
-              </span>
-            </p>
+            <div className="flex flex-wrap gap-2">
+              {BOUNTY_TIERS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTier(t.id)}
+                  aria-pressed={tier === t.id}
+                  className={`${pill(tier === t.id)} min-w-[8rem] leading-tight`}
+                >
+                  {t.label}
+                  <span className="mt-0.5 block text-[0.65rem] font-semibold opacity-80">
+                    {t.baseCredits ? `${t.baseCredits} credits` : "Your amount"}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">{tierById(tier).blurb}</p>
           </div>
+
+          {tierById(tier).baseCredits === null && (
+            <div className="space-y-2">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                Base reward
+              </span>
+              <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+              <CloudRain className="size-3.5 text-signal" />
+              Filming conditions
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {WEATHER_CONDITIONS.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setWeather(c.multiplier)}
+                  aria-pressed={weather === c.multiplier}
+                  className={`${pill(weather === c.multiplier)} min-w-[7.5rem] leading-tight`}
+                >
+                  {c.label}
+                  <span className="mt-0.5 block text-[0.65rem] font-semibold opacity-80">
+                    {c.multiplier === 1 ? "no extra" : `+${Math.round((c.multiplier - 1) * 100)}%`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <BountyPriceBreakdown quote={quote} />
+          <p className="flex items-start gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-signal" />
+            <span>
+              Held securely in escrow and only released once you review and approve the video.
+            </span>
+          </p>
 
           <button
             type="submit"
-            disabled={posting || bounty < MIN_BOUNTY}
+            disabled={posting || total < MIN_BOUNTY}
             className="w-full rounded-2xl bg-signal py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Lock ${Number.isFinite(bounty) ? bounty : 0} Credits`}
+            {posting ? "Locking bounty…" : `Lock ${Number.isFinite(total) ? total : 0} Credits`}
           </button>
         </form>
       </DialogContent>
