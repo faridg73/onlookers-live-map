@@ -68,15 +68,57 @@ async function resolveCustomer(
  * are all offered by the hosted payment form. Credits are only added to the
  * wallet by the payment webhook, once the charge really settles.
  */
+const purchaseInputSchema = z
+  .object({
+    packageId: z.string().min(3).max(60).optional(),
+    customCredits: z.coerce.number().int().min(CUSTOM_CREDIT_MIN).max(CUSTOM_CREDIT_MAX).optional(),
+  })
+  .refine(
+    (data) => Boolean(data.packageId) !== Boolean(data.customCredits),
+    {
+      message: "Select a package or enter a custom credit amount, not both.",
+    },
+  );
+
+function resolvePackage(data: z.infer<typeof purchaseInputSchema>):
+  | { ok: true; pack: CreditPackage }
+  | { ok: false; error: string } {
+  if (data.packageId) {
+    const pack = creditPackageById(data.packageId);
+    if (!pack) return { ok: false, error: "That credit pack is no longer available." };
+    return { ok: true, pack };
+  }
+
+  if (!data.customCredits) {
+    return { ok: false, error: "Select a package or enter a custom credit amount." };
+  }
+
+  const credits = data.customCredits;
+  const priceCents = customCreditPriceCents(credits);
+  return {
+    ok: true,
+    pack: {
+      id: "custom",
+      priceId: "custom_credits_usd",
+      name: "Custom Credits",
+      baseCredits: credits,
+      bonusCredits: 0,
+      credits,
+      priceCents,
+      blurb: `${credits} custom credits at 4 per $1.`,
+    },
+  };
+}
+
 export const startCreditPurchase = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((input: { packageId: string }) =>
-    z.object({ packageId: z.string().min(3).max(60) }).parse(input),
-  )
+  .inputValidator((input) => purchaseInputSchema.parse(input))
   .handler(
     async ({ data, context }): Promise<{ clientSecret?: string; error?: string }> => {
-      const pack = creditPackageById(data.packageId);
-      if (!pack) return { error: "That credit pack is no longer available." };
+      const resolved = resolvePackage(data);
+      if (!resolved.ok) return { error: resolved.error };
+      const pack = resolved.pack;
+      if (!(await withinRateLimit(RATE_LIMITS.checkout, context.userId))) {
       if (!(await withinRateLimit(RATE_LIMITS.checkout, context.userId))) {
         return { error: RATE_LIMITED_MESSAGE };
       }
