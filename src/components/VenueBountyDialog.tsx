@@ -408,7 +408,22 @@ function CustomDeadlinePicker({
   onOpenChange: (open: boolean) => void;
   onPick: (date: Date) => void;
 }) {
-...
+  const now = new Date();
+  const [day, setDay] = useState<Date | undefined>(value ?? undefined);
+  const [hour, setHour] = useState(value?.getHours() ?? 18);
+  const [minute, setMinute] = useState(value ? value.getMinutes() : 0);
+
+  const picked = useMemo(() => {
+    if (!day) return null;
+    const d = new Date(day);
+    d.setHours(hour, minute, 0, 0);
+    return d;
+  }, [day, hour, minute]);
+  const valid = Boolean(picked && picked.getTime() > Date.now());
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm rounded-3xl border-border bg-card p-5">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
