@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { readWalletBalance } from "@/lib/bounty-escrow";
+import { isSignedIn, readWalletBalance } from "@/lib/bounty-escrow";
 import {
   FLASH_CREDITS,
   FLASH_DURATION_MINUTES,
