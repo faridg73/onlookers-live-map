@@ -190,10 +190,20 @@ function AuthScreen() {
         queryClient.clear();
         await navigate({ to: "/profile", replace: true });
       } else {
-        toast.success("Number confirmed. Check your email to finish activating your account.");
+        setMode("signin");
+        setNeedsEmailConfirm(true);
+        setFormError(
+          "Number confirmed. We emailed a verification link to " +
+            email +
+            " — open it to activate your account, then sign in.",
+        );
+        toast.success("Check your email for the verification link.");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      setVerifying(false);
+      const message = describeAuthError(err);
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
