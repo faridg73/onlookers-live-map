@@ -1074,6 +1074,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          hits: number
+          id: string
+          identifier: string
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          hits?: number
+          id?: string
+          identifier: string
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          hits?: number
+          id?: string
+          identifier?: string
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           created_at: string
@@ -1715,6 +1745,15 @@ export type Database = {
         }[]
       }
       close_expired_requests: { Args: never; Returns: number }
+      consume_rate_limit: {
+        Args: {
+          _bucket: string
+          _identifier: string
+          _limit: number
+          _window_seconds: number
+        }
+        Returns: boolean
+      }
       contribute_to_pool: {
         Args: { _amount: number; _pool_id: string }
         Returns: number
@@ -1902,6 +1941,28 @@ export type Database = {
         Returns: {
           backer_count: number
           pool_id: string
+        }[]
+      }
+      public_community_feed: {
+        Args: { _category?: string; _limit?: number }
+        Returns: {
+          aspect: string
+          author_name: string
+          body: string
+          category: string
+          created_at: string
+          expires_at: string
+          hunter_level: number
+          id: string
+          is_flash: boolean
+          latitude: number
+          longitude: number
+          media_path: string
+          pinned_credits: number
+          pinned_until: string
+          place: string
+          tags: string[]
+          title: string
         }[]
       }
       public_profile_card: {
