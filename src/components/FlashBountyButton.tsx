@@ -188,6 +188,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     }
   };
 
+  console.log("[FlashBountyButton] render variant=", variant, "open=", open);
   return (
     <>
       {variant === "map" ? (
