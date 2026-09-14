@@ -1399,8 +1399,10 @@ export type Database = {
           ended_at: string | null
           host_id: string
           id: string
+          kind: string
           minutes_billed: number
           post_id: string | null
+          request_id: string | null
           started_at: string
           status: string
           updated_at: string
@@ -1414,8 +1416,10 @@ export type Database = {
           ended_at?: string | null
           host_id: string
           id?: string
+          kind?: string
           minutes_billed?: number
           post_id?: string | null
+          request_id?: string | null
           started_at?: string
           status?: string
           updated_at?: string
@@ -1429,8 +1433,10 @@ export type Database = {
           ended_at?: string | null
           host_id?: string
           id?: string
+          kind?: string
           minutes_billed?: number
           post_id?: string | null
+          request_id?: string | null
           started_at?: string
           status?: string
           updated_at?: string
@@ -1442,6 +1448,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stream_sessions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1764,6 +1777,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_bounty_and_go_live: {
+        Args: { _request_id: string }
+        Returns: string
+      }
       accept_bounty_video: { Args: { _video_id: string }; Returns: number }
       adjust_wallet: {
         Args: {
