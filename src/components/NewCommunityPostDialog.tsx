@@ -11,7 +11,29 @@ import {
   uploadCommunityPhoto,
   type CommunityCategory,
 } from "@/lib/community";
+import { geocodeAddress } from "@/lib/geocode.functions";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
+
+/** Posts need coordinates or they never land on the map. Try the typed place, then the device. */
+async function resolveCoords(place: string): Promise<{ latitude: number; longitude: number } | null> {
+  const typed = place.trim();
+  if (typed.length >= 3) {
+    try {
+      const hit = await geocodeAddress({ data: { address: typed } });
+      if (hit) return { latitude: hit.latitude, longitude: hit.longitude };
+    } catch {
+      // fall through to the device position
+    }
+  }
+  if (typeof navigator === "undefined" || !navigator.geolocation) return null;
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      () => resolve(null),
+      { timeout: 8000 },
+    );
+  });
+}
 
 /**
  * Posting to Discover: pick a lane, tap an Ice-Breaker to fill the words in,
@@ -71,6 +93,7 @@ export function NewCommunityPostDialog({
         data: { token: human.token ?? "", action: "community-post" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
+      const coords = await resolveCoords(place);
       await createCommunityPost({
         category,
         title,
@@ -80,6 +103,8 @@ export function NewCommunityPostDialog({
         mediaPath,
         isFlash: flash,
         flashHours: hours,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
       });
       toast.success(flash ? "Flash Meetup is live — the clock is running." : "Posted to Discover.");
       setTitle("");

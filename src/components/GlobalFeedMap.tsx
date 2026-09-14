@@ -22,6 +22,8 @@ export function GlobalFeedMap({
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  // Flips once the map object exists, so a focus that arrived earlier still lands.
+  const [mapReady, setMapReady] = useState(false);
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
@@ -44,6 +46,7 @@ export function GlobalFeedMap({
           disableDefaultUI: true,
           gestureHandling: "greedy",
         });
+        setMapReady(true);
       })
       .catch(() => undefined);
     return () => {
@@ -73,7 +76,7 @@ export function GlobalFeedMap({
       focusMarker.current?.setMap(null);
       focusMarker.current = null;
     };
-  }, [focus]);
+  }, [focus, mapReady]);
 
   // Draw one marker per located clip.
   useEffect(() => {
@@ -88,14 +91,16 @@ export function GlobalFeedMap({
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;
     });
-    const bounds = new google.maps.LatLngBounds();
-    pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
-    map.current.fitBounds(bounds, 48);
+    if (!focus) {
+      const bounds = new google.maps.LatLngBounds();
+      pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
+      map.current.fitBounds(bounds, 48);
+    }
     return () => {
       markers.current.forEach((m) => m.setMap(null));
       markers.current = [];
     };
-  }, [pinned]);
+  }, [pinned, mapReady, focus]);
 
   const active = (clips ?? []).find((c) => c.id === activeId) ?? null;
 
