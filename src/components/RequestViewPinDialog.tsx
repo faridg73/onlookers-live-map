@@ -312,7 +312,7 @@ export function RequestViewPinDialog({
               </li>
               <li className="flex items-center gap-2">
                 <Radio className="size-3.5 text-signal" />
-                Refunded in full if nobody goes live in time
+                Refunded in full to your credit balance if nobody accepts in time
               </li>
             </ul>
 
