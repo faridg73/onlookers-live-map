@@ -11,9 +11,12 @@ import { AreaPicker } from "@/components/AreaPicker";
 import { DISCOVERY_GROUPS, discoveryGroupBySlug, placeSlug } from "@/lib/discovery";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
+import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
+import { PlacePhoto } from "@/components/PlacePhoto";
+import { discoveryImage } from "@/lib/discovery-visuals";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
@@ -50,6 +53,7 @@ function DiscoverHome() {
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
     maxResults: 8,
   });
+  const eventPhoto = usePlacePhotos(eventPlaces);
 
   const isWeekend = WEEKEND.includes(new Date().getDay());
   const selected = requests.find((r) => r.id === selectedId) ?? null;
@@ -159,23 +163,29 @@ function DiscoverHome() {
                           key={place.id}
                           to="/discover/$group/$venue"
                           params={{ group: eventsGroup.slug, venue: placeSlug(place.id) }}
-                          className="flex w-44 shrink-0 flex-col justify-between rounded-2xl border border-border bg-surface p-3 transition-colors hover:border-signal/60"
+                          className="w-44 shrink-0 overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-signal/60"
                         >
-                          <span className="text-2xl" aria-hidden>
-                            {eventsGroup.emoji}
-                          </span>
-                          <span className="mt-2 line-clamp-2 text-sm font-bold text-foreground">
-                            {place.name}
-                          </span>
-                          <span className="mt-1 truncate text-[0.68rem] text-muted-foreground">
-                            {place.primaryType ?? "Venue"}
-                            {place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}
-                          </span>
-                          {live > 0 && (
-                            <span className="mt-1 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-signal">
-                              {live} live now
+                          <div className="h-20 overflow-hidden bg-surface-raised">
+                            <PlacePhoto
+                              src={eventPhoto(place)}
+                              fallbackSrc={discoveryImage(eventsGroup.slug)}
+                              alt={`${place.name} venue`}
+                            />
+                          </div>
+                          <div className="p-3">
+                            <span className="line-clamp-2 text-sm font-bold text-foreground">
+                              {place.name}
                             </span>
-                          )}
+                            <span className="mt-1 block truncate text-[0.68rem] text-muted-foreground">
+                              {place.primaryType ?? "Venue"}
+                              {place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}
+                            </span>
+                            {live > 0 && (
+                              <span className="mt-1 block text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-signal">
+                                {live} live now
+                              </span>
+                            )}
+                          </div>
                         </Link>
                       );
                     })}
@@ -197,13 +207,14 @@ function DiscoverHome() {
                 params={{ group: group.slug }}
                 className="block overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-signal/60"
               >
-                <div
-                  className={`flex h-24 items-center justify-between bg-gradient-to-br px-5 ${group.art}`}
-                >
-                  <span className="text-4xl" aria-hidden>
-                    {group.emoji}
-                  </span>
-                  <span className="rounded-full bg-background/70 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground">
+                <div className="relative h-28 overflow-hidden">
+                  <PlacePhoto
+                    src={discoveryImage(group.slug)}
+                    fallbackSrc={discoveryImage(group.slug)}
+                    alt={`${group.name} near ${area.label}`}
+                  />
+                  <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+                  <span className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-sm">
                     Near {area.label.split(",")[0]}
                   </span>
                 </div>

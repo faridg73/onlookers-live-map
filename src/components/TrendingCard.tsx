@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Radio, Star, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
+import { PlacePhoto } from "@/components/PlacePhoto";
 import { venueFromPlace, placeSlug, type DiscoveryGroup } from "@/lib/discovery";
+import { discoveryImage } from "@/lib/discovery-visuals";
 import type { DiscoveredPlace } from "@/lib/places.functions";
 
 type Props = {
@@ -20,21 +22,12 @@ export function TrendingCard({ place, group, tag, photoUrl, liveCount, weekend }
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-surface">
       <div className="flex gap-3 p-3">
-        <div
-          className={`relative size-20 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br ${group.art}`}
-        >
-          {photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={`${place.name} in ${venue.area}`}
-              loading="lazy"
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="flex size-full items-center justify-center text-3xl" aria-hidden>
-              {group.emoji}
-            </span>
-          )}
+        <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
+          <PlacePhoto
+            src={photoUrl}
+            fallbackSrc={discoveryImage(group.slug)}
+            alt={`${place.name} in ${venue.area}`}
+          />
         </div>
 
         <div className="min-w-0 flex-1">
