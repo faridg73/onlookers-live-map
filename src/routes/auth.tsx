@@ -56,6 +56,8 @@ function AuthScreen() {
     setBusy(true);
     rememberTermsAcceptance();
     try {
+      const allowed = await checkAuthAttempt({ data: { email, mode } });
+      if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
       if (mode === "signup") {
         const check = await verifyHumanCheck({
           data: { token: human.token ?? "", action: "sign-up" },
