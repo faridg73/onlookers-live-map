@@ -132,6 +132,34 @@ export async function createPool(input: {
   return data as unknown as string;
 }
 
+/** The smallest starter chip-in the creator must put behind their own pool. */
+export const POOL_STARTER_CREDITS = 4;
+
+/**
+ * Opens a pool as the confirmed signed-in member and seeds it with their own
+ * starter chip-in, so a pool can never be opened by an unbound session.
+ */
+export async function openPoolAsMember(
+  expectedUserId: string,
+  input: {
+    title: string;
+    place: string;
+    goalCredits: number;
+    kind: "bounty" | "meetup";
+    starterCredits: number;
+    latitude?: number | null;
+    longitude?: number | null;
+    hours?: number;
+  },
+): Promise<{ poolId: string; pooled: number }> {
+  const identity = await fetchPoolIdentity(expectedUserId);
+  if (!identity) throw new Error("Sign in again — we couldn't confirm your account.");
+  const starter = Math.max(POOL_STARTER_CREDITS, Math.round(input.starterCredits));
+  const poolId = await createPool(input);
+  const pooled = await contributeToPool(poolId, starter);
+  return { poolId, pooled };
+}
+
 /** Chips Credits from the signed-in wallet into a pool; returns the new total. */
 export async function contributeToPool(poolId: string, amount: number): Promise<number> {
   const { data, error } = await supabase.rpc("contribute_to_pool", {
