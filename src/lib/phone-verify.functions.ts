@@ -11,12 +11,21 @@ import {
 const phoneInput = z.object({
   phone: z.string().trim().min(7).max(24),
   email: z.string().trim().toLowerCase().email().max(255),
+  humanToken: z.string().max(4000).optional(),
 });
 
 /** Sends a one-time code by text before an account is created. */
 export const sendPhoneCode = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => phoneInput.parse(data))
   .handler(async ({ data }): Promise<{ ok: boolean; phone?: string; error?: string }> => {
+    // Bots must clear the silent challenge before we spend an SMS.
+    const { assertHuman } = await import("@/lib/turnstile.functions");
+    try {
+      await assertHuman(data.humanToken, "sms-code");
+    } catch {
+      return { ok: false, error: "The security check didn't pass. Please try again." };
+    }
+
     const { normalizePhone } = await import("@/lib/sms.server");
     const number = normalizePhone(data.phone);
     if (!number) return { ok: false, error: "That mobile number does not look right." };

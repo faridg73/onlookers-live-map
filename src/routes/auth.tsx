@@ -40,7 +40,11 @@ function AuthScreen() {
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const human = useHumanCheck("sign-up");
+  // Sign-up shows the visible tick box; sign-in runs the same challenge
+  // silently so brute-force attempts get blocked without friction.
+  const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
+    discreet: mode === "signin",
+  });
 
   useEffect(() => {
     if (user) navigate({ to: "/profile" });
@@ -52,8 +56,12 @@ function AuthScreen() {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
-    if (mode === "signup" && !human.ready) {
-      toast.error("Finish the quick human check before creating your account.");
+    if (!human.ready) {
+      toast.error(
+        mode === "signup"
+          ? "Finish the quick human check before creating your account."
+          : "Just a moment — finishing the security check.",
+      );
       return;
     }
     setBusy(true);
@@ -61,11 +69,11 @@ function AuthScreen() {
     try {
       const allowed = await checkAuthAttempt({ data: { email, mode } });
       if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: mode === "signup" ? "sign-up" : "sign-in" },
+      });
+      if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
       if (mode === "signup") {
-        const check = await verifyHumanCheck({
-          data: { token: human.token ?? "", action: "sign-up" },
-        });
-        if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
         // Numbers are confirmed by text before the account is created.
         setVerifying(true);
       } else {
@@ -208,10 +216,10 @@ function AuthScreen() {
           placeholder="Password (8+ characters)"
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
-        {mode === "signup" && human.widget}
+        {human.widget}
         <button
           type="submit"
-          disabled={busy || !accepted || (mode === "signup" && !human.ready)}
+          disabled={busy || !accepted || !human.ready}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
