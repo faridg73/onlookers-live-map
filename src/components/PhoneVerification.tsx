@@ -48,6 +48,8 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
       setStep("code");
       setCode("");
       setSeconds(45);
+      // Each tick is single-use, so ask again before another text goes out.
+      human.reset();
       toast.success(resend ? "New code sent." : `Code sent to ${result.phone}.`);
     } catch (err) {
       human.reset();
@@ -75,7 +77,6 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
 
   return (
     <div className="mt-6 rounded-3xl border border-border bg-surface p-5">
-      {human.widget}
       {step === "number" ? (
         <>
           <h2 className="font-display text-xl tracking-tight text-foreground">
