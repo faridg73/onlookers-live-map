@@ -20,6 +20,7 @@ import {
   DEFAULT_CUSTOM_BASE,
   DEFAULT_FLASH_TIER,
   FLASH_DURATION_MINUTES,
+  FLASH_MIN_BOUNTY_CREDITS,
   FLASH_TIERS,
   FLASH_TITLE,
   FLASH_WINDOW_MINUTES,
@@ -33,8 +34,8 @@ import {
   CREDITS_PER_USD,
   formatCreditCash,
   formatCredits,
-  MIN_BOUNTY_CREDITS,
 } from "@/lib/credits";
+
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 
