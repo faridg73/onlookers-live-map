@@ -141,6 +141,16 @@ export function ProfileSetup() {
 
     setBusy(true);
     try {
+      // Bind strictly to the account that is signed in right now — never a
+      // leftover session from an earlier login on this device.
+      const { data: fresh, error: sessionError } = await supabase.auth.getUser();
+      if (sessionError || !fresh.user) {
+        throw new Error("Your session expired — please sign in again.");
+      }
+      if (user && fresh.user.id !== user.id) {
+        throw new Error("Your session changed — reload the page and try again.");
+      }
+
       await completeMyProfile({
         username: username.trim(),
         legal_first_name: firstName,
@@ -150,6 +160,12 @@ export function ProfileSetup() {
       });
       toast.success("Profile saved.");
       setOpen(false);
+      // Drop anything cached under the previous session, then land on this
+      // account's own dashboard.
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await router.invalidate();
+      await navigate({ to: "/profile", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile.");
     } finally {
