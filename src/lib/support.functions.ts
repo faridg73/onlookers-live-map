@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 import { safeMultiline, safeText } from "@/lib/sanitize";
 
 const ticketSchema = z.object({
@@ -19,6 +20,9 @@ export type SupportTicketInput = z.infer<typeof ticketSchema>;
 export const submitSupportTicket = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => ticketSchema.parse(data))
   .handler(async ({ data }): Promise<{ success: boolean; id?: string; error?: string }> => {
+    if (!(await withinRateLimit(RATE_LIMITS.support))) {
+      return { success: false, error: RATE_LIMITED_MESSAGE };
+    }
     const [{ supabase }, { supabaseAdmin }] = await Promise.all([
       import("@/integrations/supabase/client"),
       import("@/integrations/supabase/client.server"),
