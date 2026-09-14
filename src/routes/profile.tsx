@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -29,6 +29,9 @@ import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 import { StreakCard } from "@/components/StreakCard";
 import { toast } from "sonner";
 import { replayOnboarding } from "@/lib/profile";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { CreatorVerificationCard } from "@/components/CreatorVerificationCard";
+import { fetchMyVerification } from "@/lib/verification";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -65,6 +68,17 @@ const ACTIVITY = [
 function ProfileScreen() {
   const { requests } = useOnlooker();
   const mine = requests.filter((r) => r.requester === "you");
+  const [verified, setVerified] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetchMyVerification().then((status) => {
+      if (active) setVerified(Boolean(status?.isVerified));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Coming back from checkout: confirm the payment and pull the new balance in.
   useEffect(() => {
@@ -98,7 +112,10 @@ function ProfileScreen() {
           FR
         </div>
         <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground">fred</h1>
+          <h1 className="flex items-center gap-2 font-display text-2xl tracking-tight text-foreground">
+            fred
+            {verified && <VerifiedBadge className="size-5" />}
+          </h1>
           <p className="text-sm text-muted-foreground">Onlooker since 2025 · Harbor District</p>
         </div>
       </div>
@@ -132,6 +149,8 @@ function ProfileScreen() {
       </Link>
 
       <HunterStatusCard />
+
+      <CreatorVerificationCard />
 
       <AlertSettingsCard />
 

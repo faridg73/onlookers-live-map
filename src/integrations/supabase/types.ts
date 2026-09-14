@@ -995,12 +995,14 @@ export type Database = {
           hunter_level: number
           id: string
           is_incognito: boolean
+          is_verified: boolean
           legacy_usd_balance: number
           onboarded: boolean
           onboarding_completed: boolean
           rating: number
           terms_accepted_at: string | null
           updated_at: string
+          verification_requested_at: string | null
           wallet_balance: number
           warning_count: number
           xp: number
@@ -1015,12 +1017,14 @@ export type Database = {
           hunter_level?: number
           id: string
           is_incognito?: boolean
+          is_verified?: boolean
           legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
+          verification_requested_at?: string | null
           wallet_balance?: number
           warning_count?: number
           xp?: number
@@ -1035,12 +1039,14 @@ export type Database = {
           hunter_level?: number
           id?: string
           is_incognito?: boolean
+          is_verified?: boolean
           legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
+          verification_requested_at?: string | null
           wallet_balance?: number
           warning_count?: number
           xp?: number
@@ -1943,6 +1949,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      pending_verification_requests: {
+        Args: never
+        Returns: {
+          display_name: string
+          hunter_level: number
+          requested_at: string
+          user_id: string
+          xp: number
+        }[]
+      }
       pin_community_post: {
         Args: { _credits: number; _hours?: number; _post_id: string }
         Returns: string
@@ -1969,6 +1985,7 @@ export type Database = {
         Returns: {
           aspect: string
           author_name: string
+          author_verified: boolean
           body: string
           category: string
           created_at: string
@@ -1993,6 +2010,7 @@ export type Database = {
           display_name: string
           hunter_level: number
           is_incognito: boolean
+          is_verified: boolean
           xp: number
         }[]
       }
@@ -2026,6 +2044,7 @@ export type Database = {
       }
       request_cashout: { Args: { _amount: number }; Returns: string }
       request_coin_cashout: { Args: { _coins: number }; Returns: string }
+      request_creator_verification: { Args: never; Returns: string }
       request_credit_cashout: { Args: { _coins: number }; Returns: string }
       request_earnings_payout: {
         Args: { _amount: number; _destination: string }

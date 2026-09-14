@@ -194,6 +194,7 @@ export type CommunityPost = {
   authorName: string;
   authorAvatar: string | null;
   hunterLevel: number;
+  authorVerified: boolean;
 };
 
 const BUCKET = "chat-attachments";
@@ -238,6 +239,7 @@ async function listPublicCommunityPosts(
     authorName: r.author_name ?? "Onlooker",
     authorAvatar: null,
     hunterLevel: r.hunter_level ?? 1,
+    authorVerified: Boolean(r.author_verified),
   }));
 }
 
@@ -258,17 +260,18 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
 
   const rows = data ?? [];
   const authorIds = [...new Set(rows.map((r) => r.user_id))];
-  const authors = new Map<string, { name: string; avatar: string | null; level: number }>();
+  const authors = new Map<string, { name: string; avatar: string | null; level: number; verified: boolean }>();
   if (authorIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, display_name, avatar_url, hunter_level, is_incognito, alias")
+      .select("id, display_name, avatar_url, hunter_level, is_incognito, alias, is_verified")
       .in("id", authorIds);
     for (const p of profiles ?? []) {
       authors.set(p.id, {
         name: p.is_incognito ? (p.alias ?? "Onlooker") : (p.display_name ?? "Onlooker"),
         avatar: p.is_incognito ? null : (p.avatar_url ?? null),
         level: p.hunter_level ?? 1,
+        verified: Boolean(p.is_verified),
       });
     }
   }
@@ -293,6 +296,7 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
     authorName: authors.get(r.user_id)?.name ?? "Onlooker",
     authorAvatar: authors.get(r.user_id)?.avatar ?? null,
     hunterLevel: authors.get(r.user_id)?.level ?? 1,
+    authorVerified: authors.get(r.user_id)?.verified ?? false,
   }));
 
   return posts.sort((a, b) => {
