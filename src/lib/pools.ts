@@ -139,7 +139,8 @@ export async function contributeToPool(poolId: string, amount: number): Promise<
     _amount: Math.round(amount),
   });
   if (error) {
-    if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");
+    if (/insufficient credits/i.test(error.message))
+      throw new Error("Not enough Credits — top up your balance to chip in.");
     throw new Error(error.message);
   }
   return Number(data ?? 0);
