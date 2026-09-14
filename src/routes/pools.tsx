@@ -11,12 +11,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   contributeToPool,
-  createPool,
   fetchPoolIdentity,
   listPools,
+  openPoolAsMember,
   poolFormErrors,
   POOL_CHIP_IN_AMOUNTS,
   POOL_GOAL_PRESETS,
+  POOL_STARTER_CREDITS,
   type BountyPool,
   type PoolFormErrors,
   type PoolIdentity,
@@ -94,6 +95,20 @@ function PoolsScreen() {
       toast.error("Check the highlighted fields before opening your pool.");
       return;
     }
+    if (!user || !identity) {
+      toast.error("Sign in again — we couldn't confirm your account.");
+      return;
+    }
+    if (balance === null) {
+      toast.error("We're still loading your Credit balance — try again in a moment.");
+      return;
+    }
+    if (balance < starter) {
+      toast.error(
+        `Not enough Credits — opening this pool puts ${starter} behind it and you have ${balance}. Top up on your balance page.`,
+      );
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before opening a pool.");
       return;
@@ -104,8 +119,14 @@ function PoolsScreen() {
         data: { token: human.token ?? "", action: "bounty-pool" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-      await createPool({ title, place, goalCredits: goal, kind });
-      toast.success("Pool opened — share it so people chip in.");
+      await openPoolAsMember(user.id, {
+        title,
+        place,
+        goalCredits: goal,
+        kind,
+        starterCredits: starter,
+      });
+      toast.success(`Pool opened with ${starter} Credits behind it — share it so people chip in.`);
       setTitle("");
       setPlace("");
       setErrors({});
