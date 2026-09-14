@@ -6,8 +6,11 @@ import { discoveryGroupBySlug, placeSlug } from "@/lib/discovery";
 import { groupBySlug, isVenueOnToday } from "@/lib/venues";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
+import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
+import { PlacePhoto } from "@/components/PlacePhoto";
+import { discoveryImage } from "@/lib/discovery-visuals";
 
 export const Route = createFileRoute("/discover/$group/")({
   loader: ({ params }) => {
@@ -51,8 +54,8 @@ function GroupScreen() {
 
   const heading = group?.name ?? curated?.name ?? "Places";
   const tagline = group?.tagline ?? curated?.tagline ?? "";
-  const art = group?.art ?? curated?.art ?? "from-signal/30 to-sky-500/20";
-  const emoji = group?.emoji ?? curated?.emoji ?? "\u{1F4CD}";
+  const groupImage = discoveryImage(slug);
+  const photoOf = usePlacePhotos(places);
 
   const liveCount = (keywords: string[]) =>
     requests.filter(
@@ -130,11 +133,12 @@ function GroupScreen() {
               params={{ group: slug, venue: placeSlug(place.id) }}
               className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 transition-colors hover:border-signal/60"
             >
-              <span
-                className={`flex size-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl ${art}`}
-                aria-hidden
-              >
-                {emoji}
+              <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
+                <PlacePhoto
+                  src={photoOf(place)}
+                  fallbackSrc={groupImage}
+                  alt={`${place.name} in ${place.address ?? area.label}`}
+                />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-display text-base text-foreground">{place.name}</p>
@@ -170,11 +174,12 @@ function GroupScreen() {
             params={{ group: slug, venue: venue.slug }}
             className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 transition-colors hover:border-signal/60"
           >
-            <span
-              className={`flex size-16 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl ${art}`}
-              aria-hidden
-            >
-              {venue.emoji}
+            <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
+              <PlacePhoto
+                src={null}
+                fallbackSrc={groupImage}
+                alt={`${venue.name} in ${venue.area}`}
+              />
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-base text-foreground">{venue.name}</p>

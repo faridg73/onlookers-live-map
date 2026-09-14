@@ -7,6 +7,8 @@ import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
+import { PlacePhoto } from "@/components/PlacePhoto";
+import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { groupBySlug, venueBySlug, type Venue } from "@/lib/venues";
 import {
@@ -15,6 +17,7 @@ import {
   placeIdFromSlug,
   venueFromPlace,
 } from "@/lib/discovery";
+import { discoveryImage } from "@/lib/discovery-visuals";
 import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
 
 export const Route = createFileRoute("/discover/$group/$venue")({
@@ -63,6 +66,7 @@ function VenueScreen() {
   const { isWatched, toggle } = useRadar();
   const [place, setPlace] = useState<DiscoveredPlace | null>(null);
   const [loading, setLoading] = useState(Boolean(placeId));
+  const photoOf = usePlacePhotos(place ? [place] : []);
 
   useEffect(() => {
     if (!placeId) return;
@@ -84,7 +88,8 @@ function VenueScreen() {
   const group = dynamicGroup ?? DISCOVERY_GROUPS[0]!;
   const venue: Venue | null = curatedVenue ?? (place ? venueFromPlace(place, group) : null);
   const backLabel = dynamicGroup?.name ?? curatedGroup?.name ?? "All places";
-  const art = dynamicGroup?.art ?? curatedGroup?.art ?? "from-signal/30 to-sky-500/20";
+  const venuePhoto = place ? photoOf(place) : null;
+  const fallbackImage = discoveryImage(params.group);
 
   if (!venue) {
     return (
@@ -133,11 +138,13 @@ function VenueScreen() {
         ← {backLabel}
       </Link>
 
-      <div
-        className={`mt-3 flex h-28 items-center justify-center rounded-2xl bg-gradient-to-br text-5xl ${art}`}
-        aria-hidden
-      >
-        {venue.emoji}
+      <div className="mt-3 aspect-[16/7] overflow-hidden rounded-2xl bg-surface-raised">
+        <PlacePhoto
+          src={venuePhoto}
+          fallbackSrc={fallbackImage}
+          alt={`${venue.name} in ${venue.area}`}
+          eager
+        />
       </div>
 
       <h1 className="mt-4 font-display text-3xl tracking-tight text-foreground">{venue.name}</h1>
