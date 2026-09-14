@@ -299,33 +299,9 @@ function MapScreen() {
           </button>
 
           {pinMode && (
-            <div className="space-y-2 rounded-lg border-2 border-signal/40 bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
-              <div className="flex gap-2">
-                <Input
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      void searchPlace();
-                    }
-                  }}
-                  placeholder="Search any city, address or landmark"
-                  className="h-10 rounded-lg border-2 border-border bg-surface font-bold"
-                />
-                <Button
-                  type="button"
-                  onClick={() => void searchPlace()}
-                  disabled={searching}
-                  className="h-10 shrink-0 bg-signal px-3 font-extrabold text-signal-foreground"
-                >
-                  <Search className="size-4" />
-                </Button>
-              </div>
-              <p className="px-1 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal">
-                Now tap anywhere on the map to drop your pin
-              </p>
-            </div>
+            <p className="rounded-lg border-2 border-signal/40 bg-surface/95 px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal shadow-lg backdrop-blur-xl">
+              Now tap anywhere on the map to drop your pin
+            </p>
           )}
         </div>
       </header>
