@@ -71,6 +71,8 @@ function AuthScreen() {
       if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
       if (mode === "signup") {
         // Numbers are confirmed by text before the account is created.
+        await clearPreviousAuthState();
+        rememberTermsAcceptance();
         setVerifying(true);
       } else {
         await clearPreviousAuthState();
