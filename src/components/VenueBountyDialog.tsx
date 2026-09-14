@@ -211,8 +211,8 @@ export function VenueBountyDialog({
           <div className="flex gap-2">
             <button type="button" onClick={() => pickMode("live")} aria-pressed={mode === "live"} className={modeCard(mode === "live")}>
               <Radio className="size-4 text-signal" />
-              <p className="mt-1.5 text-sm font-extrabold text-foreground">5-min live stream</p>
-              <p className="text-xs text-muted-foreground">Watch it happen, starting soon</p>
+              <p className="mt-1.5 text-sm font-extrabold text-foreground">Live stream</p>
+              <p className="text-xs text-muted-foreground">Watch it happen in real time — you pick the length</p>
             </button>
             <button type="button" onClick={() => pickMode("clip")} aria-pressed={mode === "clip"} className={modeCard(mode === "clip")}>
               <Video className="size-4 text-signal" />
