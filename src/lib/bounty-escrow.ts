@@ -49,6 +49,8 @@ export async function lockBounty(input: {
   longitude?: number | undefined;
   /** Minutes until the request expires and the deposit is swept back. */
   minutes?: number;
+  /** Human-check token from the posting form. */
+  captchaToken?: string | null;
 }): Promise<LockedBounty> {
   try {
     const { minutes = 60, ...rest } = input;

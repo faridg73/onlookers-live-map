@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { safeMultiline, safeText } from "@/lib/sanitize";
+
 const ticketSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }).max(100),
+  name: safeText(100, 1),
   email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
-  subject: z.string().trim().min(1, { message: "Subject is required" }).max(200),
-  message: z.string().trim().min(10, { message: "Message must be at least 10 characters" }).max(2000),
+  subject: safeText(200, 1),
+  message: safeMultiline(2000, 10),
 });
 
 export type SupportTicketInput = z.infer<typeof ticketSchema>;

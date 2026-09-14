@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { useHumanCheck } from "@/components/HumanCheck";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import {
   Dialog,
@@ -37,6 +38,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
   const [accessCode, setAccessCode] = useState("");
+  const human = useHumanCheck("create-bounty");
 
   useEffect(() => {
     if (open) void readWalletBalance().then(setBalance);
@@ -57,6 +59,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       toast.error("Add a 6-digit code or word the onlooker can quote on site.");
       return;
     }
+    if (!human.ready) {
+      toast.error("Finish the quick human check before posting.");
+      return;
+    }
     if (!isRequestAllowed(title, note, place)) {
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
@@ -70,6 +76,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         bounty,
         category,
         accessCode: codeNeeded ? accessCode.trim() : null,
+        captchaToken: human.token,
       });
       addRequest({
         title: title.trim(),
@@ -90,8 +97,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       setBounty(20);
       setAccessCode("");
       setPermissionOk(false);
+      human.reset();
       setOpen(false);
     } catch (error) {
+      human.reset();
       toast.error(error instanceof Error ? error.message : "Could not post the request.");
     } finally {
       setPosting(false);
@@ -201,10 +210,12 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
           <Field label="Bounty">
             <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
           </Field>
+          {human.widget}
           <button
             type="submit"
             disabled={
               posting ||
+              !human.ready ||
               bounty < MIN_BOUNTY ||
               (permissionNeeded && !permissionOk) ||
               (codeNeeded && accessCode.trim().length < 4)

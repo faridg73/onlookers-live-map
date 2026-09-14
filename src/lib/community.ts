@@ -1,3 +1,4 @@
+import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 
@@ -307,10 +308,10 @@ export async function createCommunityPost(input: {
     .insert({
       user_id: auth.user.id,
       category: input.category,
-      title: input.title.trim(),
-      body: input.body.trim(),
-      place: input.place.trim(),
-      tags: input.tags,
+      title: sanitizeText(input.title, { maxLength: 160 }),
+      body: sanitizeText(input.body, { multiline: true, maxLength: 2000 }),
+      place: sanitizeText(input.place, { maxLength: 160 }),
+      tags: input.tags.map((tag) => sanitizeText(tag, { maxLength: 40 })).filter(Boolean),
       media_path: input.mediaPath ?? null,
       aspect: input.aspect ?? "16:9",
       is_flash: input.isFlash,

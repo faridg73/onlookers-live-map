@@ -1,3 +1,4 @@
+import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 import type { LiveRequest } from "@/lib/onlooker";
@@ -76,7 +77,7 @@ export async function sendMessage(
   const { error } = await supabase.from("request_messages").insert({
     request_key: key,
     sender_id: auth.user.id,
-    body: body.trim(),
+    body: sanitizeText(body, { multiline: true, maxLength: 2000 }),
     media_url: media?.path ?? null,
     media_type: media?.kind ?? null,
   });

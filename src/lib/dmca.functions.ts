@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { MODERATION_REASONS } from "@/lib/moderation-reasons";
+import { safeMultiline, safeText } from "@/lib/sanitize";
 
 const reasonCodes = MODERATION_REASONS.map((reason) => reason.code) as [
   (typeof MODERATION_REASONS)[number]["code"],
@@ -8,15 +9,11 @@ const reasonCodes = MODERATION_REASONS.map((reason) => reason.code) as [
 ];
 
 const dmcaSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }).max(100),
+  name: safeText(100, 1),
   email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
   contentUrl: z.string().trim().url({ message: "Enter a valid content URL" }).max(500),
   reasonCode: z.enum(reasonCodes),
-  description: z
-    .string()
-    .trim()
-    .min(20, { message: "Describe the infringing material (at least 20 characters)" })
-    .max(3000),
+  description: safeMultiline(3000, 20),
 });
 
 export type DmcaNoticeInput = z.infer<typeof dmcaSchema>;

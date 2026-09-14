@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 import { rememberTermsAcceptance } from "@/lib/profile";
+import { useHumanCheck } from "@/components/HumanCheck";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -35,6 +37,7 @@ function AuthScreen() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const human = useHumanCheck("sign-up");
 
   useEffect(() => {
     if (user) navigate({ to: "/profile" });
@@ -46,10 +49,18 @@ function AuthScreen() {
       toast.error("You must accept the Terms of Service to continue.");
       return;
     }
+    if (mode === "signup" && !human.ready) {
+      toast.error("Finish the quick human check before creating your account.");
+      return;
+    }
     setBusy(true);
     rememberTermsAcceptance();
     try {
       if (mode === "signup") {
+        const check = await verifyHumanCheck({
+          data: { token: human.token ?? "", action: "sign-up" },
+        });
+        if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -63,6 +74,7 @@ function AuthScreen() {
         toast.success("Welcome back.");
       }
     } catch (err) {
+      human.reset();
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setBusy(false);
@@ -153,9 +165,10 @@ function AuthScreen() {
           placeholder="Password (8+ characters)"
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
+        {mode === "signup" && human.widget}
         <button
           type="submit"
-          disabled={busy || !accepted}
+          disabled={busy || !accepted || (mode === "signup" && !human.ready)}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}

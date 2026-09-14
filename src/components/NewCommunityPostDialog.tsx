@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Camera, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { useHumanCheck } from "@/components/HumanCheck";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import {
   COMMUNITY_CATEGORIES,
@@ -10,6 +11,7 @@ import {
   uploadCommunityPhoto,
   type CommunityCategory,
 } from "@/lib/community";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 
 /**
  * Posting to Discover: pick a lane, tap an Ice-Breaker to fill the words in,
@@ -39,6 +41,7 @@ export function NewCommunityPostDialog({
   const [mediaPath, setMediaPath] = useState<string | null>(null);
   const [camera, setCamera] = useState(false);
   const [busy, setBusy] = useState(false);
+  const human = useHumanCheck("community-post");
 
   const def = categoryDef(category);
 
@@ -58,8 +61,16 @@ export function NewCommunityPostDialog({
       toast.error("Give your post a title people can read at a glance.");
       return;
     }
+    if (!human.ready) {
+      toast.error("Finish the quick human check before posting.");
+      return;
+    }
     setBusy(true);
     try {
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: "community-post" },
+      });
+      if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       await createCommunityPost({
         category,
         title,
@@ -77,9 +88,11 @@ export function NewCommunityPostDialog({
       setTags([]);
       setMediaPath(null);
       setFlash(false);
+      human.reset();
       onPosted();
       onOpenChange(false);
     } catch (err) {
+      human.reset();
       toast.error(err instanceof Error ? err.message : "Couldn't post that.");
     } finally {
       setBusy(false);
