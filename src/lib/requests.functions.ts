@@ -30,6 +30,12 @@ const createSchema = z.object({
   bountyType: z.enum(["live_stream", "pre_recorded_clip"]).nullable().optional(),
   /** When a pre-recorded clip's recording should start. */
   scheduledStartAt: z.string().datetime({ offset: true }).nullable().optional(),
+  /** Requester-typed capture length, when they didn't use a preset pill. */
+  customDurationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
+  /** Difficulty premium for filming conditions, 1.0 = clear. */
+  weatherMultiplier: z.number().min(1).max(3).nullable().optional(),
+  /** 'standard', 'fast_catch' or 'priority_hunt'. */
+  bountyTier: z.enum(["standard", "fast_catch", "priority_hunt"]).nullable().optional(),
   /** Cloudflare Turnstile token proving a person posted this request. */
   captchaToken: z.string().max(4000).nullable().optional(),
 });
