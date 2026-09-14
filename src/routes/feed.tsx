@@ -60,6 +60,10 @@ function FeedScreen() {
   const [cat, setCat] = useState<CategoryId | "all">("all");
   const [sub, setSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const [placeQuery, setPlaceQuery] = useState("");
+  // A place picked from the search dropdown re-centres the feed's radius filter.
+  const [area, setArea] = useState<{ label: string; lat: number; lng: number } | null>(null);
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const { unit, formatDistance } = useDistanceUnit(userPosition);
 
