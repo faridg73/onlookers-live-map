@@ -321,9 +321,16 @@ export function ProfileSetup() {
           ))}
         </div>
 
+        <div className="mt-5">{human.widget}</div>
+        {human.required && !human.token && (
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            Tick the box so we know you&rsquo;re a real person.
+          </p>
+        )}
+
         <button
           type="submit"
-          disabled={busy || uploading}
+          disabled={busy || uploading || !human.ready}
           className="mt-5 w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
         >
           {busy ? "Saving…" : "Save and continue"}
