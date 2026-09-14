@@ -95,12 +95,15 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       return;
     }
     const n = Number(customBase);
-    if (!Number.isFinite(n) || !Number.isInteger(n) || n < MIN_BOUNTY_CREDITS) {
-      setCustomError(`Enter a whole number of credits (minimum ${MIN_BOUNTY_CREDITS}).`);
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n < FLASH_MIN_BOUNTY_CREDITS) {
+      setCustomError(
+        `Enter a whole number of credits (minimum ${FLASH_MIN_BOUNTY_CREDITS}).`,
+      );
     } else {
       setCustomError(null);
     }
   }, [isCustom, customBase]);
+
 
   const short = balance !== null && balance < totalCredits;
   const canSubmit =
@@ -281,14 +284,14 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                   Custom amount
                 </label>
                 <div className="flex items-center gap-2">
-                  <Input
+                <Input
                     id="flash-custom-amount"
                     type="number"
-                    min={MIN_BOUNTY_CREDITS}
+                    min={FLASH_MIN_BOUNTY_CREDITS}
                     step={1}
                     value={customBase}
                     onChange={(e) => setCustomBase(e.target.value)}
-                    placeholder={`Minimum ${MIN_BOUNTY_CREDITS}`}
+                    placeholder={`Minimum ${FLASH_MIN_BOUNTY_CREDITS}`}
                     className={cn(
                       "h-11 rounded-xl border-2 bg-surface text-right font-display text-lg font-extrabold tabular-nums",
                       customError ? "border-destructive focus-visible:ring-destructive" : "border-border",
@@ -299,9 +302,13 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                 <p className="text-xs font-medium text-muted-foreground">
                   ≈ {formatCreditCash(Math.max(0, Math.round(Number(customBase) || 0)))} USD at {CREDITS_PER_USD} Credits per $1
                 </p>
+                <p className="text-xs font-medium text-signal">
+                  Minimum escrow: {FLASH_MIN_BOUNTY_CREDITS} Credits
+                </p>
                 {customError && (
                   <p className="text-xs font-bold text-destructive">{customError}</p>
                 )}
+
               </div>
             )}
 
