@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
+import { BountyNoteDetails } from "@/components/BountyNoteDetails";
 import { ExpiryCountdown } from "@/components/ExpiryCountdown";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { bountyTier } from "@/lib/bounty-tiers";

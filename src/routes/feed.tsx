@@ -305,6 +305,38 @@ function FeedScreen() {
         )}
       </div>
 
+      {/* Jump the feed to any city, venue, landmark or address. */}
+      <div className="mt-3">
+        <PlaceSearchInput
+          placeholder="Filter by city, venue, landmark or address"
+          onQueryChange={setPlaceQuery}
+          onPick={(place) => {
+            setPlaceQuery("");
+            setArea({ label: place.formatted, lat: place.latitude, lng: place.longitude });
+          }}
+        />
+        {area && (
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-signal/50 bg-signal/10 px-3 py-2">
+            <p className="truncate text-xs font-bold text-foreground">
+              Showing requests near {area.label}
+            </p>
+            <button
+              type="button"
+              onClick={() => setArea(null)}
+              className="shrink-0 text-[0.65rem] font-extrabold uppercase text-signal"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+        {!area && query.trim().length === 0 && placeQuery.trim().length === 0 && (
+          <TrendingViewRequests
+            className="mt-3"
+            onOpen={(request) => navigate({ to: "/", search: { b: request.id } })}
+          />
+        )}
+      </div>
+
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
       <div className="mt-2 grid grid-cols-5 gap-1.5">
         {FILTERS.map((f) => (
