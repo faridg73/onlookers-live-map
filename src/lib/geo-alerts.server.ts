@@ -118,7 +118,9 @@ export async function notifyLocalOnlookersOfBounty(
 
   const { data: request } = await supabaseAdmin
     .from("requests")
-    .select("id, prompt, category, bounty_amount, latitude, longitude, location_name")
+    .select(
+      "id, prompt, category, bounty_amount, latitude, longitude, location_name, bounty_tier, bounty_type, duration_minutes",
+    )
     .eq("id", requestId)
     .maybeSingle();
   if (!request) return { nearby: 0, pushed: 0 };
