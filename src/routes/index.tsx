@@ -270,7 +270,7 @@ function MapScreen() {
             className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.12em] shadow-lg transition-colors ${
               pinMode
                 ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface/95 text-foreground backdrop-blur-xl"
+                : "border-border bg-surface/95 text-cyan backdrop-blur-xl drop-shadow-[0_0_10px_var(--cyan-glow)]"
             }`}
           >
             {pinMode ? <X className="size-4" /> : <Globe2 className="size-4" />}

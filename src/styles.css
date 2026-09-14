@@ -53,6 +53,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-cyan: var(--cyan);
+  --color-cyan-glow: var(--cyan-glow);
   --color-pin-standard: var(--pin-standard);
   --color-pin-medium: var(--pin-medium);
   --color-pin-silver: var(--pin-silver);
@@ -141,6 +143,8 @@
   --map: oklch(0.96 0.01 250);
   --signal: oklch(0.93071 0.22858 123.09); /* #CCFF00 neon lime */
   --signal-foreground: oklch(0.14 0.03 124);
+  --cyan: oklch(0.75 0.18 195); /* electric cyan for high-visibility CTAs */
+  --cyan-glow: oklch(0.75 0.18 195 / 0.35);
   --live: oklch(0.79 0.16 165);
   --card: oklch(0.19125 0 0);
   --card-foreground: oklch(1 0 0);
