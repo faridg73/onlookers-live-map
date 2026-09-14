@@ -122,6 +122,9 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         duration_minutes: data.durationMinutes ?? 5,
         bounty_type: data.bountyType ?? "live_stream",
         scheduled_start_at: data.scheduledStartAt ?? null,
+        custom_duration_minutes: data.customDurationMinutes ?? null,
+        weather_multiplier: data.weatherMultiplier ?? 1,
+        bounty_tier: data.bountyTier ?? "standard",
       })
       .select("id")
       .single();
