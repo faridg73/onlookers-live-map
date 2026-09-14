@@ -104,7 +104,15 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
       body: JSON.stringify({
         input: data.input,
         sessionToken: data.sessionToken,
-        includedPrimaryTypes: ["locality", "administrative_area_level_1", "administrative_area_level_2"],
+        ...(data.scope === "all"
+          ? {}
+          : {
+              includedPrimaryTypes: [
+                "locality",
+                "administrative_area_level_1",
+                "administrative_area_level_2",
+              ],
+            }),
       }),
     });
 
