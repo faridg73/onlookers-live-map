@@ -34,6 +34,9 @@ import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as DiscoverIndexRouteImport } from './routes/discover.index'
 import { Route as DiscoverTrendingRouteImport } from './routes/discover.trending'
+import { Route as EmbedIndexRouteImport } from './routes/embed.index'
+import { Route as EmbedIdRouteImport } from './routes/embed.$id'
+import { Route as LiveIdRouteImport } from './routes/live.$id'
 import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group.index'
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
@@ -165,6 +168,21 @@ const DiscoverTrendingRoute = DiscoverTrendingRouteImport.update({
   path: '/discover/trending',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmbedIndexRoute = EmbedIndexRouteImport.update({
+  id: '/embed/',
+  path: '/embed/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbedIdRoute = EmbedIdRouteImport.update({
+  id: '/embed/$id',
+  path: '/embed/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveIdRoute = LiveIdRouteImport.update({
+  id: '/live/$id',
+  path: '/live/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiscoverGroupIndexRoute = DiscoverGroupIndexRouteImport.update({
   id: '/discover/$group/',
   path: '/discover/$group/',
@@ -217,8 +235,11 @@ export interface FileRoutesByFullPath {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
+  '/embed/$id': typeof EmbedIdRoute
+  '/live/$id': typeof LiveIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/embed/': typeof EmbedIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
@@ -249,8 +270,11 @@ export interface FileRoutesByTo {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
+  '/embed/$id': typeof EmbedIdRoute
+  '/live/$id': typeof LiveIdRoute
   '/admin': typeof AdminIndexRoute
   '/discover': typeof DiscoverIndexRoute
+  '/embed': typeof EmbedIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
@@ -282,8 +306,11 @@ export interface FileRoutesById {
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
+  '/embed/$id': typeof EmbedIdRoute
+  '/live/$id': typeof LiveIdRoute
   '/admin/': typeof AdminIndexRoute
   '/discover/': typeof DiscoverIndexRoute
+  '/embed/': typeof EmbedIndexRoute
   '/discover/$group/$venue': typeof DiscoverGroupVenueRoute
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
@@ -316,8 +343,11 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
+    | '/embed/$id'
+    | '/live/$id'
     | '/admin/'
     | '/discover/'
+    | '/embed/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
@@ -348,8 +378,11 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
+    | '/embed/$id'
+    | '/live/$id'
     | '/admin'
     | '/discover'
+    | '/embed'
     | '/discover/$group/$venue'
     | '/discover/$group'
     | '/api/public/media/lifecycle'
@@ -380,8 +413,11 @@ export interface FileRouteTypes {
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
+    | '/embed/$id'
+    | '/live/$id'
     | '/admin/'
     | '/discover/'
+    | '/embed/'
     | '/discover/$group/$venue'
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
@@ -413,8 +449,11 @@ export interface RootRouteChildren {
   AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
   DiscoverTrendingRoute: typeof DiscoverTrendingRoute
+  EmbedIdRoute: typeof EmbedIdRoute
+  LiveIdRoute: typeof LiveIdRoute
   AdminIndexRoute: typeof AdminIndexRoute
   DiscoverIndexRoute: typeof DiscoverIndexRoute
+  EmbedIndexRoute: typeof EmbedIndexRoute
   DiscoverGroupVenueRoute: typeof DiscoverGroupVenueRoute
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
@@ -599,6 +638,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiscoverTrendingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/embed/': {
+      id: '/embed/'
+      path: '/embed'
+      fullPath: '/embed/'
+      preLoaderRoute: typeof EmbedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/$id': {
+      id: '/embed/$id'
+      path: '/embed/$id'
+      fullPath: '/embed/$id'
+      preLoaderRoute: typeof EmbedIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/$id': {
+      id: '/live/$id'
+      path: '/live/$id'
+      fullPath: '/live/$id'
+      preLoaderRoute: typeof LiveIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/discover/$group/': {
       id: '/discover/$group/'
       path: '/discover/$group'
@@ -661,8 +721,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
   DiscoverTrendingRoute: DiscoverTrendingRoute,
+  EmbedIdRoute: EmbedIdRoute,
+  LiveIdRoute: LiveIdRoute,
   AdminIndexRoute: AdminIndexRoute,
   DiscoverIndexRoute: DiscoverIndexRoute,
+  EmbedIndexRoute: EmbedIndexRoute,
   DiscoverGroupVenueRoute: DiscoverGroupVenueRoute,
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
