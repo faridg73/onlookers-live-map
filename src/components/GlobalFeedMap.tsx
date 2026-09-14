@@ -22,6 +22,8 @@ export function GlobalFeedMap({
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  // Flips once the map object exists, so a focus that arrived earlier still lands.
+  const [mapReady, setMapReady] = useState(false);
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
