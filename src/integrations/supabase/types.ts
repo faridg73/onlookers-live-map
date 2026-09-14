@@ -1985,6 +1985,7 @@ export type Database = {
         Returns: {
           aspect: string
           author_name: string
+          author_verified: boolean
           body: string
           category: string
           created_at: string
