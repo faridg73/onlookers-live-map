@@ -156,6 +156,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               {busy ? "Checking…" : "Confirm number"}
             </button>
           </form>
+          {seconds <= 0 && <div className="mt-4">{human.widget}</div>}
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
             <button
               type="button"
@@ -166,7 +167,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
             </button>
             <button
               type="button"
-              disabled={busy || seconds > 0}
+              disabled={busy || seconds > 0 || !human.ready}
               onClick={() => void send(true)}
               className="underline-offset-4 hover:underline disabled:opacity-50"
             >
