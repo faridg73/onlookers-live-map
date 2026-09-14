@@ -25,11 +25,22 @@ export function MapCanvas({
   selectedId,
   onSelect,
   onUserPositionChange,
+  pinMode = false,
+  onMapPin,
+  draftPin = null,
+  centerTarget = null,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onUserPositionChange?: (position: MapPosition | null) => void;
+  /** While true, tapping anywhere on the world map drops a request pin. */
+  pinMode?: boolean;
+  onMapPin?: (position: MapPosition) => void;
+  /** The pin being funded right now, drawn until it is confirmed or dropped. */
+  draftPin?: MapPosition | null;
+  /** A place searched for in pin mode; the map flies there when it changes. */
+  centerTarget?: (MapPosition & { zoom?: number }) | null;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -44,6 +55,13 @@ export function MapCanvas({
   const [places, setPlaces] = useState<NearbyPlace[]>([]);
   const lastPlaceKey = useRef<string>("");
   const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
+
+  // Live values for the map's own click listener, which is registered once.
+  const pinModeRef = useRef(pinMode);
+  const onMapPinRef = useRef(onMapPin);
+  pinModeRef.current = pinMode;
+  onMapPinRef.current = onMapPin;
+
 
   // Own status tier colours the marker; incognito hides the precise dot.
   useEffect(() => {
@@ -61,6 +79,9 @@ export function MapCanvas({
         map.current = new maps.Map(holder.current, {
           center: REGIONAL_CENTER,
           zoom: 13,
+          // Zoom out far enough to reach any country, so a pin can be dropped
+          // anywhere in the world.
+          minZoom: 2,
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
@@ -79,7 +100,14 @@ export function MapCanvas({
         ov.setMap(map.current);
         overlay.current = ov;
         map.current.addListener("bounds_changed", () => setTick((t) => t + 1));
-        map.current.addListener("click", () => onSelect(null));
+        map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
+          const at = event.latLng;
+          if (pinModeRef.current && at) {
+            onMapPinRef.current?.({ lat: at.lat(), lng: at.lng() });
+            return;
+          }
+          onSelect(null);
+        });
         setReady(true);
       })
       .catch((error) => {
@@ -183,16 +211,44 @@ export function MapCanvas({
 
   const zoomBy = (delta: number) => {
     const z = map.current?.getZoom();
-    if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 3, 20));
+    if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 2, 20));
   };
+
+  // Searching for a place in pin mode flies the map there.
+  useEffect(() => {
+    if (!ready || !centerTarget || !map.current) return;
+    map.current.setCenter({ lat: centerTarget.lat, lng: centerTarget.lng });
+    map.current.setZoom(centerTarget.zoom ?? 14);
+  }, [ready, centerTarget]);
 
   // `tick` re-runs pixel math whenever the map moves.
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
+  const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
-      <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
+      <div
+        ref={holder}
+        className="absolute inset-0"
+        style={{ touchAction: "none", cursor: pinMode ? "crosshair" : "grab" }}
+      />
+
+      {/* the pin being funded right now */}
+      {draftPixel && (
+        <span
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-full"
+          style={{ left: draftPixel.left, top: draftPixel.top }}
+          aria-label="Pin you are funding"
+        >
+          <span className="flex flex-col items-center">
+            <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground shadow-lg">
+              Your pin
+            </span>
+            <span className="mt-0.5 size-2 rotate-45 bg-signal" />
+          </span>
+        </span>
+      )}
 
       {failed && (
         <div className="absolute inset-0 flex items-center justify-center px-6 text-center">

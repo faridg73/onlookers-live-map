@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { Camera, CoinsIcon, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+
+import { useHumanCheck } from "@/components/HumanCheck";
+import { acceptBountyAndGoLive } from "@/lib/bounty-live.functions";
+
 
 import {
   Sheet,
@@ -40,6 +44,8 @@ export function BountyBottomSheet({
 }) {
   const [capturing, setCapturing] = useState(false);
   const [sending, setSending] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const human = useHumanCheck("accept-bounty");
 
   if (!request) return null;
 
@@ -47,11 +53,41 @@ export function BountyBottomSheet({
   const payout = pool - Math.floor(pool * PLATFORM_FEE_RATE);
   const closed = isClosed(request);
   const claimable = !closed && request.status === "open";
+  /** Funded pins ask for a live stream; everything else takes a recorded clip. */
+  const wantsLive = request.bountyType === "live_stream";
+
+  async function goLive() {
+    const target = request!.dbId ?? request!.id;
+    if (!human.ready) {
+      toast.error("Finish the quick human check before you go live for this bounty.");
+      return;
+    }
+    setAccepting(true);
+    try {
+      await acceptBountyAndGoLive({ data: { requestId: target, captchaToken: human.token } });
+      human.reset();
+      onClaim?.(request!.id);
+      setCapturing(true);
+      toast.success("You're live for this bounty", {
+        description: `${payout} Credits are reserved for you — film the spot and send it in.`,
+      });
+    } catch (error) {
+      human.reset();
+      toast.error(error instanceof Error ? error.message : "Could not start this bounty stream.");
+    } finally {
+      setAccepting(false);
+    }
+  }
 
   function accept() {
+    if (wantsLive) {
+      void goLive();
+      return;
+    }
     onClaim?.(request!.id);
     setCapturing(true);
   }
+
 
   async function submit(file: File) {
     setSending(true);
@@ -139,14 +175,23 @@ export function BountyBottomSheet({
           </div>
         ) : (
           <>
+            {wantsLive && claimable && <div className="mt-4">{human.widget}</div>}
             <button
               type="button"
-              disabled={!claimable}
+              disabled={!claimable || accepting}
               onClick={accept}
               className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-live font-display text-base font-extrabold uppercase tracking-[0.1em] text-black disabled:opacity-50"
             >
-              <Camera className="size-5" />
-              {claimable ? "Accept & Open Camera" : closed ? "Closed" : "Already claimed"}
+              {wantsLive ? <Radio className="size-5" /> : <Camera className="size-5" />}
+              {!claimable
+                ? closed
+                  ? "Closed"
+                  : "Already claimed"
+                : accepting
+                  ? "Starting your live session…"
+                  : wantsLive
+                    ? "Go live for this bounty"
+                    : "Accept & Open Camera"}
             </button>
             <p className="mt-2 flex items-start gap-2 text-[0.7rem] text-muted-foreground">
               <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-live" />
