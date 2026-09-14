@@ -39,6 +39,7 @@ function AuthScreen() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const human = useHumanCheck("sign-up");
 
   useEffect(() => {
@@ -65,20 +66,36 @@ function AuthScreen() {
           data: { token: human.token ?? "", action: "sign-up" },
         });
         if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Check your email to confirm your account.");
+        // Numbers are confirmed by text before the account is created.
+        setVerifying(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        void supabase.rpc("claim_verified_phone");
         toast.success("Welcome back.");
       }
     } catch (err) {
       human.reset();
+      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Creates the account once the mobile number has been confirmed by text. */
+  async function createAccount(phone: string) {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin, data: { phone } },
+      });
+      if (error) throw error;
+      setVerifying(false);
+      void supabase.rpc("claim_verified_phone");
+      toast.success("Number confirmed. Check your email to finish activating your account.");
+    } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setBusy(false);
