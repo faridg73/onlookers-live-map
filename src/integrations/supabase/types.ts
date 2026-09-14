@@ -1008,6 +1008,33 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_security_answers: {
+        Row: {
+          answer_key: string
+          created_at: string
+          id: string
+          question_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_key: string
+          created_at?: string
+          id?: string
+          question_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_key?: string
+          created_at?: string
+          id?: string
+          question_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           alias: string | null
@@ -1021,6 +1048,8 @@ export type Database = {
           is_incognito: boolean
           is_verified: boolean
           legacy_usd_balance: number
+          legal_first_name: string | null
+          legal_last_name: string | null
           onboarded: boolean
           onboarding_completed: boolean
           phone: string | null
@@ -1028,6 +1057,7 @@ export type Database = {
           rating: number
           terms_accepted_at: string | null
           updated_at: string
+          username: string | null
           verification_requested_at: string | null
           wallet_balance: number
           warning_count: number
@@ -1045,6 +1075,8 @@ export type Database = {
           is_incognito?: boolean
           is_verified?: boolean
           legacy_usd_balance?: number
+          legal_first_name?: string | null
+          legal_last_name?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
           phone?: string | null
@@ -1052,6 +1084,7 @@ export type Database = {
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
+          username?: string | null
           verification_requested_at?: string | null
           wallet_balance?: number
           warning_count?: number
@@ -1069,6 +1102,8 @@ export type Database = {
           is_incognito?: boolean
           is_verified?: boolean
           legacy_usd_balance?: number
+          legal_first_name?: string | null
+          legal_last_name?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
           phone?: string | null
@@ -1076,6 +1111,7 @@ export type Database = {
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
+          username?: string | null
           verification_requested_at?: string | null
           wallet_balance?: number
           warning_count?: number
@@ -1937,6 +1973,7 @@ export type Database = {
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_username_available: { Args: { _username: string }; Returns: boolean }
       list_disputes: {
         Args: never
         Returns: {
