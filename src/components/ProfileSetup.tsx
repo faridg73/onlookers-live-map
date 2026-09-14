@@ -5,6 +5,8 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useHumanCheck } from "@/components/HumanCheck";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   SECURITY_QUESTIONS,
   completeMyProfile,
