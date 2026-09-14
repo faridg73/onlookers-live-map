@@ -91,14 +91,16 @@ export function GlobalFeedMap({
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;
     });
-    const bounds = new google.maps.LatLngBounds();
-    pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
-    map.current.fitBounds(bounds, 48);
+    if (!focus) {
+      const bounds = new google.maps.LatLngBounds();
+      pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
+      map.current.fitBounds(bounds, 48);
+    }
     return () => {
       markers.current.forEach((m) => m.setMap(null));
       markers.current = [];
     };
-  }, [pinned]);
+  }, [pinned, mapReady, focus]);
 
   const active = (clips ?? []).find((c) => c.id === activeId) ?? null;
 
