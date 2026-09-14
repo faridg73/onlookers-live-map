@@ -5,6 +5,7 @@ import { MapCanvas } from "@/components/MapCanvas";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
+import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
