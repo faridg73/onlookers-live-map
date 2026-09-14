@@ -19,6 +19,8 @@ type TurnstileApi = {
       sitekey: string;
       action?: string;
       theme?: "auto" | "light" | "dark";
+      size?: "normal" | "compact";
+      appearance?: "always" | "execute" | "interaction-only";
       callback: (token: string) => void;
       "expired-callback"?: () => void;
       "error-callback"?: () => void;
@@ -135,6 +137,8 @@ function TurnstileWidget({
           sitekey: siteKey,
           action,
           theme: "dark",
+          size: "normal",
+          appearance: "always",
           callback: (value) => {
             solved.current = true;
             window.clearTimeout(timer);
