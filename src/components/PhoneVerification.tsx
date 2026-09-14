@@ -24,8 +24,8 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
-  // Silent bot challenge so nobody can script the text-message trigger.
-  const human = useHumanCheck("sms-code", { discreet: true });
+  // Visible tick-box challenge: nobody can script the text-message trigger.
+  const human = useHumanCheck("sms-code");
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
@@ -102,9 +102,15 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               placeholder="(555) 123-4567"
               className="w-full rounded-2xl border border-border bg-surface-raised px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
             />
+            {human.widget}
+            {human.required && !human.token && (
+              <p className="text-xs text-muted-foreground">
+                Tick the box above so we know you&rsquo;re a real person.
+              </p>
+            )}
             <button
               type="submit"
-              disabled={busy || phone.trim().length < 7}
+              disabled={busy || phone.trim().length < 7 || !human.ready}
               className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
             >
               {busy ? "Sending…" : "Text me a code"}
