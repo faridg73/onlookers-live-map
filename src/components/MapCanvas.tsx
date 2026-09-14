@@ -211,16 +211,44 @@ export function MapCanvas({
 
   const zoomBy = (delta: number) => {
     const z = map.current?.getZoom();
-    if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 3, 20));
+    if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 2, 20));
   };
+
+  // Searching for a place in pin mode flies the map there.
+  useEffect(() => {
+    if (!ready || !centerTarget || !map.current) return;
+    map.current.setCenter({ lat: centerTarget.lat, lng: centerTarget.lng });
+    map.current.setZoom(centerTarget.zoom ?? 14);
+  }, [ready, centerTarget]);
 
   // `tick` re-runs pixel math whenever the map moves.
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
+  const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
-      <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
+      <div
+        ref={holder}
+        className="absolute inset-0"
+        style={{ touchAction: "none", cursor: pinMode ? "crosshair" : "grab" }}
+      />
+
+      {/* the pin being funded right now */}
+      {draftPixel && (
+        <span
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-full"
+          style={{ left: draftPixel.left, top: draftPixel.top }}
+          aria-label="Pin you are funding"
+        >
+          <span className="flex flex-col items-center">
+            <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground shadow-lg">
+              Your pin
+            </span>
+            <span className="mt-0.5 size-2 rotate-45 bg-signal" />
+          </span>
+        </span>
+      )}
 
       {failed && (
         <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
