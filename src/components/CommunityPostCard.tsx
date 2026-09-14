@@ -6,6 +6,7 @@ import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { HunterBadge } from "@/components/HunterBadge";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
@@ -105,7 +106,7 @@ export function CommunityPostCard({
           <span className="min-w-0">
             <span className="flex items-center gap-1 text-xs font-extrabold text-foreground">
               <span className="truncate">{post.authorName}</span>
-              {trust?.verified && <BadgeCheck className="size-3.5 shrink-0 text-signal" />}
+              {post.authorVerified && <VerifiedBadge className="size-3.5" />}
             </span>
             <span className="block truncate text-[0.65rem] text-muted-foreground">{handle}</span>
           </span>
@@ -242,6 +243,7 @@ export function CommunityPostCard({
             <PayPerMinuteStream
               hostId={post.userId}
               hostName={post.authorName}
+              hostVerified={post.authorVerified}
               postId={post.id}
               onClose={() => setWatching(false)}
             />

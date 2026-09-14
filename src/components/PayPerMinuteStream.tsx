@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Radio, Square } from "lucide-react";
 import { toast } from "sonner";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { formatCredits, formatCreditCash } from "@/lib/credits";
 import {
   DEFAULT_STREAM_RATE,
@@ -20,11 +21,13 @@ import {
 export function PayPerMinuteStream({
   hostId,
   hostName,
+  hostVerified = false,
   postId,
   onClose,
 }: {
   hostId: string;
   hostName: string;
+  hostVerified?: boolean;
   postId?: string | null;
   onClose: () => void;
 }) {
@@ -99,7 +102,9 @@ export function PayPerMinuteStream({
   if (!sessionId) {
     return (
       <div className="rounded-2xl border border-signal/40 bg-surface-raised p-4">
-        <p className="text-sm font-bold text-foreground">Watch {hostName} live</p>
+        <p className="flex items-center gap-1.5 text-sm font-bold text-foreground">
+          Watch {hostName} live {hostVerified && <VerifiedBadge className="size-3.5" />}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           You pay by the minute and can stop any time. {hostShare(rate)} of every{" "}
           {formatCredits(rate)} goes straight to the host.
@@ -135,7 +140,7 @@ export function PayPerMinuteStream({
   return (
     <div className="rounded-2xl border border-signal bg-black p-4">
       <p className="flex items-center gap-2 text-sm font-extrabold text-signal">
-        <span className="size-2 animate-pulse rounded-full bg-signal" /> LIVE with {hostName}
+        <span className="size-2 animate-pulse rounded-full bg-signal" /> LIVE with {hostName} {hostVerified && <VerifiedBadge className="size-3.5" />}
       </p>
       <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-surface-raised py-2">
