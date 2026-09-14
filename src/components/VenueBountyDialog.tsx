@@ -294,6 +294,101 @@ export function VenueBountyDialog({
           </button>
         </form>
       </DialogContent>
+
+      <CustomDeadlinePicker
+        open={customOpen}
+        value={customDeadline}
+        onOpenChange={setCustomOpen}
+        onPick={(date) => {
+          setCustomDeadline(date);
+          setCustomOpen(false);
+        }}
+      />
+    </Dialog>
+  );
+}
+
+/** Exact calendar date + hour/minute picker behind the "Custom" deadline pill. */
+function CustomDeadlinePicker({
+  open,
+  value,
+  onOpenChange,
+  onPick,
+}: {
+  open: boolean;
+  value: Date | null;
+  onOpenChange: (open: boolean) => void;
+  onPick: (date: Date) => void;
+}) {
+  const now = new Date();
+  const [day, setDay] = useState<Date | undefined>(value ?? now);
+  const [hour, setHour] = useState(value ? value.getHours() : (now.getHours() + 1) % 24);
+  const [minute, setMinute] = useState(value ? value.getMinutes() : 0);
+
+  useEffect(() => {
+    if (!open) return;
+    const base = value ?? new Date();
+    setDay(value ?? new Date());
+    setHour(value ? base.getHours() : (new Date().getHours() + 1) % 24);
+    setMinute(value ? base.getMinutes() : 0);
+  }, [open, value]);
+
+  const picked = day ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute) : null;
+  const valid = picked !== null && picked.getTime() > Date.now();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Custom deadline</DialogTitle>
+          <DialogDescription>Pick the exact date and time the clip is due.</DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center">
+          <Calendar
+            mode="single"
+            selected={day}
+            onSelect={setDay}
+            disabled={(date) => date < new Date(now.getFullYear(), now.getMonth(), now.getDate())}
+            initialFocus
+            className="pointer-events-auto p-3"
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2">
+          <CalendarIcon className="size-4 text-signal" />
+          <select
+            value={hour}
+            onChange={(e) => setHour(Number(e.target.value))}
+            aria-label="Hour"
+            className="field w-auto"
+          >
+            {Array.from({ length: 24 }, (_, h) => (
+              <option key={h} value={h}>
+                {h === 0 ? "12 AM" : h < 12 ? `${h} AM` : h === 12 ? "12 PM" : `${h - 12} PM`}
+              </option>
+            ))}
+          </select>
+          <select
+            value={minute}
+            onChange={(e) => setMinute(Number(e.target.value))}
+            aria-label="Minute"
+            className="field w-auto"
+          >
+            {[0, 15, 30, 45].map((m) => (
+              <option key={m} value={m}>
+                {String(m).padStart(2, "0")}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="button"
+          disabled={!valid}
+          onClick={() => picked && onPick(picked)}
+          className="w-full rounded-2xl bg-signal py-3 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
+        >
+          {valid && picked ? `Set deadline — ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
+        </button>
+      </DialogContent>
     </Dialog>
   );
 }
