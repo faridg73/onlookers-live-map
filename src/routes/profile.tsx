@@ -68,6 +68,7 @@ const ACTIVITY = [
 ];
 
 function ProfileScreen() {
+  const navigate = useNavigate();
   const { requests } = useOnlooker();
   const mine = requests.filter((r) => r.requester === "you");
   const [verified, setVerified] = useState(false);
