@@ -219,13 +219,13 @@ export const cancelBountyRequest = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("requests").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+    const { data: wallet } = await supabaseAdmin
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
 
-    return { balance: Number(profile?.wallet_balance ?? 0) };
+    return { balance: Number(wallet?.credit_balance ?? 0) };
   });
 
 /** Refunds deposits for any request that ran out of time unfulfilled. */
