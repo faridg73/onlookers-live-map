@@ -4,7 +4,14 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
-import { creditPackageById } from "@/lib/credit-packages";
+import {
+  creditPackageById,
+  CUSTOM_CREDIT_MAX,
+  CUSTOM_CREDIT_MIN,
+  customCreditPriceCents,
+  CENTS_PER_CREDIT,
+  type CreditPackage,
+} from "@/lib/credit-packages";
 import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 import {
   createStripeClient,
