@@ -18,9 +18,9 @@ import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
+import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { distanceMiles, type MapPosition } from "@/lib/onlooker";
-import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import {
   COMMUNITY_CATEGORIES,
   categoryDef,
@@ -64,13 +64,12 @@ function CommunityHub() {
   const [composing, setComposing] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [here, setHere] = useState<MapPosition | null>(null);
-  const [locating, setLocating] = useState(true);
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const { area, busy: locationBusy, error: locationError, useMyLocation, setCity } = useDiscoveryArea();
+  const center = useMemo<MapPosition>(() => ({ lat: area.latitude, lng: area.longitude }), [area]);
 
-  const { unit, formatDistance } = useDistanceUnit(here);
+  const { unit, formatDistance } = useDistanceUnit(center);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,30 +88,10 @@ function CommunityHub() {
     void load();
   }, [load]);
 
-  const locate = useCallback(() => {
-    setLocating(true);
-    setLocationError(null);
-    void requestCurrentPosition()
-      .then((position) => {
-        setHere({ lat: position.coords.latitude, lng: position.coords.longitude });
-      })
-      .catch((err: unknown) => {
-        setLocationError(
-          err instanceof GeolocationFailure ? err.message : "We couldn't find your location.",
-        );
-        setRadius("any");
-      })
-      .finally(() => setLocating(false));
-  }, []);
-
-  useEffect(() => {
-    locate();
-  }, [locate]);
-
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("onlooker_discover_radius");
-      if (saved === "tight" || saved === "near" || saved === "city" || saved === "any") {
+      if (RADIUS_CHOICES.some((choice) => choice.id === saved)) {
         setRadius(saved);
       }
     } catch {}
@@ -146,10 +125,10 @@ function CommunityHub() {
 
   const distanceFor = useCallback(
     (post: CommunityPost) => {
-      if (!here || post.latitude === null || post.longitude === null) return null;
-      return distanceMiles(here, { lat: post.latitude, lng: post.longitude });
+      if (post.latitude === null || post.longitude === null) return null;
+      return distanceMiles(center, { lat: post.latitude, lng: post.longitude });
     },
-    [here],
+    [center],
   );
 
   const label = useCallback((miles: number) => `${formatDistance(miles)} away`, [formatDistance]);
@@ -168,7 +147,7 @@ function CommunityHub() {
   }, []);
 
   const visible = useMemo(() => {
-    const limit = here ? radiusMilesFor(radius) : null;
+    const limit = radiusMilesFor(radius);
     const sort = (list: Array<{ post: CommunityPost; miles: number | null }>) =>
       [...list].sort((a, b) => {
         const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
@@ -188,7 +167,7 @@ function CommunityHub() {
 
     // Subcategory pills are strict: never substitute sibling or unrelated posts.
     return sort(exact);
-  }, [posts, category, tag, radius, here, distanceFor, matchesTag]);
+  }, [posts, category, tag, radius, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
@@ -316,10 +295,11 @@ function CommunityHub() {
           unit={unit}
           value={radius}
           onChange={changeRadius}
-          locating={locating}
-          hasLocation={Boolean(here)}
+          areaLabel={area.label}
+          locationBusy={locationBusy}
           locationError={locationError}
-          onRetryLocation={locate}
+          onUseMyLocation={useMyLocation}
+          onSearchArea={setCity}
         />
       </div>
 
@@ -382,7 +362,7 @@ function CommunityHub() {
       ) : (
         <section className="mt-5 px-5 sm:px-8">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
-          {!loading && visible.length === 0 && category === "all" && here && radiusMilesFor(radius) !== null && (
+          {!loading && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.
