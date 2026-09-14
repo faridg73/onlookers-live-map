@@ -131,6 +131,7 @@ function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const searchVenues = useServerFn(searchRequestVenues);
+  const [mode, setMode] = useState<"broadcast" | "bounty" | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
