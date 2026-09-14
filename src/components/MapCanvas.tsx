@@ -25,11 +25,22 @@ export function MapCanvas({
   selectedId,
   onSelect,
   onUserPositionChange,
+  pinMode = false,
+  onMapPin,
+  draftPin = null,
+  centerTarget = null,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onUserPositionChange?: (position: MapPosition | null) => void;
+  /** While true, tapping anywhere on the world map drops a request pin. */
+  pinMode?: boolean;
+  onMapPin?: (position: MapPosition) => void;
+  /** The pin being funded right now, drawn until it is confirmed or dropped. */
+  draftPin?: MapPosition | null;
+  /** A place searched for in pin mode; the map flies there when it changes. */
+  centerTarget?: (MapPosition & { zoom?: number }) | null;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
