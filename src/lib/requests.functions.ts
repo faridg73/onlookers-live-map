@@ -44,12 +44,14 @@ const createSchema = z.object({
 export const getWalletBalance = createServerFn({ method: "GET" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<number> => {
+    // The credit wallet is the same balance shown on /balance — never the
+    // legacy profile column, which can drift behind it.
     const { data } = await context.supabase
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
-    return Number(data?.wallet_balance ?? 0);
+    return Number(data?.credit_balance ?? 0);
   });
 
 /**
@@ -85,11 +87,11 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     // The escrow trigger debits the wallet in the same transaction, so check the
     // balance up front and fail with a message people can act on.
     const { data: current } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
-    const available = Number(current?.wallet_balance ?? 0);
+    const available = Number(current?.credit_balance ?? 0);
     if (available < data.bounty) {
       throw new Error(
         `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} Credits available — buy credits first.`,
