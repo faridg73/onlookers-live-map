@@ -213,7 +213,7 @@ async function listPublicCommunityPosts(
   category?: CommunityCategory,
 ): Promise<CommunityPost[]> {
   const { data, error } = await supabase.rpc("public_community_feed", {
-    _category: category ?? null,
+    ...(category ? { _category: category } : {}),
     _limit: 120,
   });
   if (error) throw new Error(error.message);
