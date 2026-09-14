@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { rememberTermsAcceptance } from "@/lib/profile";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
+import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
