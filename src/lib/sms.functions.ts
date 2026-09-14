@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
+import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 
 const SITE_URL = "https://onlookerlive.com";
 
@@ -85,8 +86,22 @@ export async function textNearbyHunters(requestId: string, skipUserId: string): 
  */
 export const sendTestAlertText = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ phone: z.string().min(5).max(32) }).parse(data))
-  .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        phone: z
+          .string()
+          .trim()
+          .min(5)
+          .max(32)
+          .regex(/^\+?[0-9 ()-]{5,32}$/, { message: "Enter a valid phone number." }),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: boolean; error?: string }> => {
+    if (!(await withinRateLimit(RATE_LIMITS.sms, context.userId))) {
+      return { ok: false, error: RATE_LIMITED_MESSAGE };
+    }
     const { sendSms } = await import("@/lib/sms.server");
     const result = await sendSms(
       data.phone,

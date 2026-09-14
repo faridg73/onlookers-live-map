@@ -82,7 +82,8 @@ function toDiscovered(raw: RawPlace): DiscoveredPlace[] {
 export const searchRequestVenues = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: unknown) => venueSearchSchema.parse(data))
-  .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+  .handler(async ({ data, context }): Promise<DiscoveredPlace[]> => {
+    await enforceRateLimit(RATE_LIMITS.placesSearch, context.userId);
     const creds = credentials();
     if (!creds) throw new Error("Venue search is not configured.");
     const hasBias = typeof data.latitude === "number" && typeof data.longitude === "number";
