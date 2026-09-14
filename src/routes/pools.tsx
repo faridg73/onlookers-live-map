@@ -21,7 +21,7 @@ import {
   type PoolFormErrors,
   type PoolIdentity,
 } from "@/lib/pools";
-import { creditsToUsdValue, fetchCreditWallet, formatCreditCash } from "@/lib/credits";
+import { fetchCreditWallet, formatCreditCash } from "@/lib/credits";
 
 export const Route = createFileRoute("/pools")({
   head: () => ({
