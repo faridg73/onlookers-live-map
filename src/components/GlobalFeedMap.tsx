@@ -76,7 +76,7 @@ export function GlobalFeedMap({
       focusMarker.current?.setMap(null);
       focusMarker.current = null;
     };
-  }, [focus]);
+  }, [focus, mapReady]);
 
   // Draw one marker per located clip.
   useEffect(() => {
