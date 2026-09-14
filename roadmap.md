@@ -13,3 +13,4 @@
 - [x] Show the Turnstile checkbox in the Discover post window before submission
 - [x] Replace stale login routing with verified account handoff and user-ID-scoped profile loading
 - [x] Enforce exact-token session isolation across password, registration, and social sign-in
+- [x] Add preset bounty tiers and a custom-amount input to the "Happening here now" Flash modal with live USD equivalent

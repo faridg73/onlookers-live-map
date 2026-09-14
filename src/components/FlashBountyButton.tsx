@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { MapPin, Radio, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -15,16 +16,27 @@ import { useHumanCheck } from "@/components/HumanCheck";
 import { isSignedIn, readWalletBalance } from "@/lib/bounty-escrow";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
-  FLASH_CREDITS,
+  computeFlashCredits,
+  DEFAULT_CUSTOM_BASE,
+  DEFAULT_FLASH_TIER,
   FLASH_DURATION_MINUTES,
+  FLASH_TIERS,
   FLASH_TITLE,
   FLASH_WINDOW_MINUTES,
   postFlashBounty,
+  quoteFlashBounty,
   readFlashSpot,
   type FlashSpot,
+  type FlashTierPreset,
 } from "@/lib/flash-bounty";
-import { formatCreditCash, formatCredits } from "@/lib/credits";
+import {
+  CREDITS_PER_USD,
+  formatCreditCash,
+  formatCredits,
+  MIN_BOUNTY_CREDITS,
+} from "@/lib/credits";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { cn } from "@/lib/utils";
 
 /**
  * One-tap flash bounty. Tapping it grabs the poster's GPS straight away and
@@ -41,7 +53,24 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [selectedTier, setSelectedTier] = useState<FlashTierPreset>(
+    FLASH_TIERS.find((t) => t.id === DEFAULT_FLASH_TIER) ?? FLASH_TIERS[1]!,
+  );
+  const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
+  const [customError, setCustomError] = useState<string | null>(null);
   const human = useHumanCheck("flash-bounty");
+
+  const options = useMemo(
+    () => ({
+      tierId: selectedTier.id,
+      customBase: selectedTier.baseCredits ?? Math.max(0, Math.round(Number(customBase) || 0)),
+    }),
+    [selectedTier, customBase],
+  );
+
+  const quote = useMemo(() => quoteFlashBounty(options), [options]);
+  const totalCredits = quote.total;
+  const isCustom = selectedTier.id === "standard";
 
   const findSpot = () => {
     setLocating(true);
@@ -59,7 +88,28 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     void readWalletBalance().then(setBalance);
   }, [open]);
 
-  const short = balance !== null && balance < FLASH_CREDITS;
+  useEffect(() => {
+    if (!isCustom) {
+      setCustomError(null);
+      return;
+    }
+    const n = Number(customBase);
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n < MIN_BOUNTY_CREDITS) {
+      setCustomError(`Enter a whole number of credits (minimum ${MIN_BOUNTY_CREDITS}).`);
+    } else {
+      setCustomError(null);
+    }
+  }, [isCustom, customBase]);
+
+  const short = balance !== null && balance < totalCredits;
+  const canSubmit =
+    !posting &&
+    !locating &&
+    spot !== null &&
+    balance !== null &&
+    balance >= totalCredits &&
+    human.ready &&
+    (!isCustom || customError === null);
 
   const post = async () => {
     if (signedIn === false) {
@@ -83,9 +133,15 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       toast.error("We're still loading your Credit balance — try again in a moment.");
       return;
     }
+    if (isCustom && customError) {
+      toast.error(customError);
+      return;
+    }
     if (short) {
       toast.error(
-        `Not enough Credits — a flash bounty locks ${formatCredits(FLASH_CREDITS)} and you have ${formatCredits(Math.round(balance))}. Buy credits to go live here.`,
+        `Not enough Credits — this flash bounty locks ${formatCredits(
+          totalCredits,
+        )} and you have ${formatCredits(Math.round(balance))}. Buy credits to go live here.`,
       );
       return;
     }
@@ -99,13 +155,13 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         data: { token: human.token ?? "", action: "flash-bounty" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-      const locked = await postFlashBounty(spot);
+      const locked = await postFlashBounty(spot, options);
       setBalance(locked.balance);
       addRequest({
         title: FLASH_TITLE,
         place: spot.formatted,
         note: `Live now — ${FLASH_DURATION_MINUTES} minute stream from this exact spot.`,
-        bounty: FLASH_CREDITS,
+        bounty: totalCredits,
         category: "events",
         dbId: locked.id,
         lat: spot.latitude,
@@ -115,7 +171,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       human.reset();
       setOpen(false);
       toast.success("Flash bounty is live", {
-        description: `Onlookers near you were alerted. ${formatCredits(FLASH_CREDITS)} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
+        description: `Onlookers near you were alerted. ${formatCredits(
+          totalCredits,
+        )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
       });
       await navigate({ to: "/feed" });
     } catch (error) {
@@ -167,7 +225,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="rounded-2xl border-2 border-border bg-surface-raised p-3">
               <p className="flex items-start gap-2 text-sm font-bold text-foreground">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-signal" />
@@ -183,10 +241,73 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               )}
             </div>
 
+            <div className="space-y-2">
+              <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                Choose bounty tier
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {FLASH_TIERS.map((tier) => {
+                  const active = selectedTier.id === tier.id;
+                  const credits = tier.baseCredits ?? computeFlashCredits({ tierId: tier.id, customBase: Math.max(0, Math.round(Number(customBase) || 0)) });
+                  return (
+                    <button
+                      key={tier.id}
+                      type="button"
+                      onClick={() => setSelectedTier(tier)}
+                      className={cn(
+                        "relative flex flex-col items-center gap-1 rounded-2xl border-2 p-3 text-left transition-colors",
+                        active
+                          ? "border-signal bg-signal/10 text-foreground"
+                          : "border-border bg-surface-raised text-muted-foreground hover:border-signal/50 hover:text-foreground",
+                      )}
+                    >
+                      <span className="text-xs font-extrabold">{tier.label}</span>
+                      <span className="font-display text-lg font-extrabold tabular-nums text-signal">
+                        {tier.baseCredits ? credits.toLocaleString() : "Custom"}
+                      </span>
+                      <span className="text-[0.6rem] font-medium leading-tight opacity-80">
+                        {tier.blurb}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {isCustom && (
+              <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+                <label htmlFor="flash-custom-amount" className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                  Custom amount
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="flash-custom-amount"
+                    type="number"
+                    min={MIN_BOUNTY_CREDITS}
+                    step={1}
+                    value={customBase}
+                    onChange={(e) => setCustomBase(e.target.value)}
+                    placeholder={`Minimum ${MIN_BOUNTY_CREDITS}`}
+                    className={cn(
+                      "h-11 rounded-xl border-2 bg-surface text-right font-display text-lg font-extrabold tabular-nums",
+                      customError ? "border-destructive focus-visible:ring-destructive" : "border-border",
+                    )}
+                  />
+                  <span className="shrink-0 text-sm font-bold text-muted-foreground">Credits</span>
+                </div>
+                <p className="text-xs font-medium text-muted-foreground">
+                  ≈ {formatCreditCash(Math.max(0, Math.round(Number(customBase) || 0)))} USD at {CREDITS_PER_USD} Credits per $1
+                </p>
+                {customError && (
+                  <p className="text-xs font-bold text-destructive">{customError}</p>
+                )}
+              </div>
+            )}
+
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Radio className="size-3.5 text-signal" />
-                Fast Catch tier — pushed to nearby onlookers first
+                {selectedTier.blurb}
               </li>
               <li className="flex items-center gap-2">
                 <Radio className="size-3.5 text-signal" />
@@ -194,11 +315,25 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               </li>
             </ul>
 
-            <div className="flex items-baseline justify-between rounded-2xl border-2 border-border bg-surface-raised p-3">
-              <span className="text-sm font-extrabold text-foreground">Locked in escrow</span>
-              <span className="font-display text-lg font-extrabold tabular-nums text-signal">
-                {formatCredits(FLASH_CREDITS)} · {formatCreditCash(FLASH_CREDITS)}
-              </span>
+            <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-extrabold text-foreground">Locked in escrow</span>
+                <span className="font-display text-lg font-extrabold tabular-nums text-signal">
+                  {formatCredits(totalCredits)} · {formatCreditCash(totalCredits)}
+                </span>
+              </div>
+              {quote.lines.length > 1 && (
+                <div className="space-y-1 border-t border-border pt-2">
+                  {quote.lines.map((line, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">{line.label}</span>
+                      <span className="font-bold tabular-nums text-foreground">
+                        {line.runningTotal.toLocaleString()} Credits
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {short && (
@@ -212,10 +347,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting}
+              disabled={!canSubmit}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
-              {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(FLASH_CREDITS)}`}
+              {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(totalCredits)}`}
             </Button>
             {short && (
               <Button
