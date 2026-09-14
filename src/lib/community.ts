@@ -204,8 +204,48 @@ function isPinned(post: { pinnedUntil: string | null }) {
   return Boolean(post.pinnedUntil && new Date(post.pinnedUntil).getTime() > Date.now());
 }
 
+/**
+ * Guests see a limited public feed: locations are rounded to roughly a mile and
+ * the poster's account id is left out, so nobody's live whereabouts is exposed
+ * to the open internet. Signed-in members get the exact detail.
+ */
+async function listPublicCommunityPosts(
+  category?: CommunityCategory,
+): Promise<CommunityPost[]> {
+  const { data, error } = await supabase.rpc("public_community_feed", {
+    _category: category ?? null,
+    _limit: 120,
+  });
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    userId: "",
+    category: r.category as CommunityCategory,
+    tags: r.tags ?? [],
+    title: r.title,
+    body: r.body ?? "",
+    place: r.place ?? "",
+    latitude: r.latitude,
+    longitude: r.longitude,
+    mediaPath: r.media_path,
+    aspect: r.aspect === "4:3" ? "4:3" : "16:9",
+    isFlash: r.is_flash,
+    expiresAt: r.expires_at,
+    pinnedUntil: r.pinned_until,
+    pinnedCredits: r.pinned_credits ?? 0,
+    createdAt: r.created_at,
+    authorName: r.author_name ?? "Onlooker",
+    authorAvatar: null,
+    hunterLevel: r.hunter_level ?? 1,
+  }));
+}
+
 /** Everything live on the Discover hub, pinned posts first, then newest. */
 export async function listCommunityPosts(category?: CommunityCategory): Promise<CommunityPost[]> {
+  const { data: auth } = await supabase.auth.getSession();
+  if (!auth.session) return listPublicCommunityPosts(category);
+
   let query = supabase
     .from("community_posts")
     .select(COLUMNS)
