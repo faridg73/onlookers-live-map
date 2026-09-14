@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users, Wallet } from "lucide-react";
 import { useChatAlerts } from "@/hooks/use-chat-alerts";
 import { ChatInbox } from "@/components/ChatInbox";
+import { FlashBountyButton } from "@/components/FlashBountyButton";
 
 const items = [
   { to: "/", label: "Map", icon: Map, exact: true },
