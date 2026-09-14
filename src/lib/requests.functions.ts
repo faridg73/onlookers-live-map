@@ -4,21 +4,25 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
+import { safeMultiline, safeText } from "@/lib/sanitize";
+import { assertHuman } from "@/lib/turnstile.functions";
 
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
 export const MIN_BOUNTY = 20;
 
 const createSchema = z.object({
-  prompt: z.string().trim().min(3).max(300),
+  prompt: safeText(300, 3),
   /** Camera instructions and capture format, stored with the request. */
-  details: z.string().trim().max(2000).nullable().optional(),
-  locationName: z.string().trim().min(2).max(160),
+  details: safeMultiline(2000).nullable().optional(),
+  locationName: safeText(160, 2),
   bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
   category: z.string().trim().max(40).nullable().optional(),
   accessCode: z.string().trim().min(4).max(40).nullable().optional(),
   minutes: z.number().int().min(15).max(1440).default(60),
   latitude: z.number().min(-90).max(90).default(0),
   longitude: z.number().min(-180).max(180).default(0),
+  /** Cloudflare Turnstile token proving a person posted this request. */
+  captchaToken: z.string().max(4000).nullable().optional(),
 });
 
 /** Current wallet balance for the signed-in requester. */
@@ -43,6 +47,9 @@ export const createBountyRequest = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => createSchema.parse(data))
   .handler(async ({ data, context }): Promise<{ id: string; balance: number }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Bots never get to lock credits or publish to the map.
+    await assertHuman(data.captchaToken, "create-bounty");
 
     // Content filter runs before any money moves: requests to film screens,
     // ticket barcodes or broadcasts never reach the map, and each attempt is

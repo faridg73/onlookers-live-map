@@ -1,3 +1,4 @@
+import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import {
   listClipComments,
@@ -28,7 +29,11 @@ export async function postClipComment(videoId: string, body: string) {
   if (!userId) throw new Error("Sign in to leave a comment.");
   const { error } = await supabase
     .from("video_comments")
-    .insert({ video_id: videoId, user_id: userId, body: body.trim() });
+    .insert({
+      video_id: videoId,
+      user_id: userId,
+      body: sanitizeText(body, { multiline: true, maxLength: 1000 }),
+    });
   if (error) throw new Error(error.message);
 }
 
@@ -39,6 +44,9 @@ export async function rateClip(videoId: string, score: number, note = "") {
   if (!userId) throw new Error("Sign in to leave a review.");
   const { error } = await supabase
     .from("video_reviews")
-    .upsert({ video_id: videoId, user_id: userId, score, note }, { onConflict: "video_id,user_id" });
+    .upsert(
+      { video_id: videoId, user_id: userId, score, note: sanitizeText(note, { maxLength: 600 }) },
+      { onConflict: "video_id,user_id" },
+    );
   if (error) throw new Error(error.message);
 }

@@ -1,3 +1,4 @@
+import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 import type { LiveRequest } from "@/lib/onlooker";
@@ -150,7 +151,7 @@ export async function uploadBountyVideo({
       request_title: request.title,
       request_place: request.place,
       bounty_amount: request.bounty,
-      note: note ?? "",
+      note: sanitizeText(note ?? "", { multiline: true, maxLength: 1000 }),
       storage_path: path,
       thumb_path: thumbPath,
       duration_seconds: durationSeconds ?? null,

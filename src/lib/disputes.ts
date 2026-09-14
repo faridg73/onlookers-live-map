@@ -1,3 +1,4 @@
+import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 
 export type DisputeCase = {
@@ -51,7 +52,12 @@ export async function addEvidence(requestId: string, body: string, role: string)
   if (!userId) throw new Error("Sign in to add evidence.");
   const { error } = await supabase
     .from("dispute_evidence")
-    .insert({ request_id: requestId, author_id: userId, body, role });
+    .insert({
+      request_id: requestId,
+      author_id: userId,
+      body: sanitizeText(body, { multiline: true, maxLength: 3000 }),
+      role,
+    });
   if (error) throw error;
 }
 
