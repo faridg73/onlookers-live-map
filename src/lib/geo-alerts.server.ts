@@ -191,11 +191,10 @@ export async function notifyLocalOnlookersOfBounty(
   const liveNow = (request.bounty_type ?? "live_stream") === "live_stream";
   const premiumTier = request.bounty_tier === "fast_catch" || request.bounty_tier === "priority_hunt";
   const flash = liveNow && (premiumTier || gross >= 80);
+  const where = spot || "a spot near you";
   const title = flash
-    ? `⚡ Flash Bounty: Go Live at ${spot || "a spot near you"}`
-    : liveNow
-      ? `🚨 Go Live at ${spot || "a spot near you"}`
-      : `🚨 Clip wanted at ${spot || "a spot near you"}`;
+    ? `⚡ Bounty Alert: ${where}`
+    : `Bounty Alert: ${where}`;
   const minutes = Number(request.duration_minutes ?? 0);
   const ask = liveNow
     ? `Start a ${minutes > 0 ? `${minutes}-minute ` : ""}live stream of the ${readableCategory(
