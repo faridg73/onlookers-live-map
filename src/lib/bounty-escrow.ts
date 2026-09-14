@@ -15,7 +15,7 @@ function message(error: unknown, fallback: string) {
 }
 
 /** Signed-out visitors must never hit the authenticated server functions. */
-async function isSignedIn() {
+export async function isSignedIn() {
   try {
     const { supabase } = await import("@/integrations/supabase/client");
     const { data } = await supabase.auth.getSession();
