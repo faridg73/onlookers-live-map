@@ -8,6 +8,7 @@ import { rememberTermsAcceptance } from "@/lib/profile";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
+import { PhoneVerification } from "@/components/PhoneVerification";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -38,6 +39,7 @@ function AuthScreen() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const human = useHumanCheck("sign-up");
 
   useEffect(() => {
@@ -64,20 +66,36 @@ function AuthScreen() {
           data: { token: human.token ?? "", action: "sign-up" },
         });
         if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Check your email to confirm your account.");
+        // Numbers are confirmed by text before the account is created.
+        setVerifying(true);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        void supabase.rpc("claim_verified_phone");
         toast.success("Welcome back.");
       }
     } catch (err) {
       human.reset();
+      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Creates the account once the mobile number has been confirmed by text. */
+  async function createAccount(phone: string) {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin, data: { phone } },
+      });
+      if (error) throw error;
+      setVerifying(false);
+      void supabase.rpc("claim_verified_phone");
+      toast.success("Number confirmed. Check your email to finish activating your account.");
+    } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setBusy(false);
@@ -94,6 +112,28 @@ function AuthScreen() {
       redirect_uri: window.location.origin,
     });
     if (result.error) toast.error(result.error.message);
+  }
+
+  if (verifying) {
+    return (
+      <div className="mx-auto max-w-md px-4 pb-28 pt-10">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
+          One last check
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Almost there — confirm your mobile number and we&rsquo;ll finish setting up{" "}
+          <span className="font-semibold text-foreground">{email}</span>.
+        </p>
+        <PhoneVerification
+          email={email}
+          onVerified={(phone) => void createAccount(phone)}
+          onCancel={() => {
+            setVerifying(false);
+            human.reset();
+          }}
+        />
+      </div>
+    );
   }
 
   return (

@@ -869,6 +869,30 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_verifications: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          phone: string
+          verified_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone: string
+          verified_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       platform_earnings: {
         Row: {
           created_at: string
@@ -999,6 +1023,8 @@ export type Database = {
           legacy_usd_balance: number
           onboarded: boolean
           onboarding_completed: boolean
+          phone: string | null
+          phone_verified_at: string | null
           rating: number
           terms_accepted_at: string | null
           updated_at: string
@@ -1021,6 +1047,8 @@ export type Database = {
           legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
+          phone?: string | null
+          phone_verified_at?: string | null
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
@@ -1043,6 +1071,8 @@ export type Database = {
           legacy_usd_balance?: number
           onboarded?: boolean
           onboarding_completed?: boolean
+          phone?: string | null
+          phone_verified_at?: string | null
           rating?: number
           terms_accepted_at?: string | null
           updated_at?: string
@@ -1769,6 +1799,13 @@ export type Database = {
         Args: { _request_key: string }
         Returns: {
           user_id: string
+        }[]
+      }
+      claim_verified_phone: {
+        Args: never
+        Returns: {
+          phone: string
+          verified_at: string
         }[]
       }
       close_expired_requests: { Args: never; Returns: number }
