@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Radio, ShieldCheck, Timer, Video } from "lucide-react";
+import { format } from "date-fns";
+import { CalendarIcon, Radio, ShieldCheck, Timer, Video } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { useOnlooker } from "@/lib/onlooker-store";
