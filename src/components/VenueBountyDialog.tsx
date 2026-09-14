@@ -55,6 +55,8 @@ export function VenueBountyDialog({
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("live");
   const [minutes, setMinutes] = useState(120);
+  const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(20);
@@ -71,10 +73,16 @@ export function VenueBountyDialog({
   function pickMode(next: Mode) {
     setMode(next);
     setMinutes(next === "live" ? 120 : 60);
+    setCustomDeadline(null);
   }
 
+  /** True when the requester picked an exact calendar deadline. */
+  const isCustom = customDeadline !== null;
+
   const windows = mode === "live" ? LIVE_WINDOWS : CLIP_DEADLINES;
-  const windowLabel = windows.find((w) => w.minutes === minutes)?.label ?? `${minutes} min`;
+  const windowLabel = isCustom
+    ? `by ${format(customDeadline, "EEE, MMM d 'at' h:mm a")}`
+    : (windows.find((w) => w.minutes === minutes)?.label ?? `${minutes} min`);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -92,6 +100,10 @@ export function VenueBountyDialog({
     }
     if (!isRequestAllowed(title, note, venue.name)) {
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
+      return;
+    }
+    if (isCustom && customDeadline.getTime() <= Date.now()) {
+      toast.error("Pick a deadline in the future.");
       return;
     }
     const funds = await readWalletBalance();
