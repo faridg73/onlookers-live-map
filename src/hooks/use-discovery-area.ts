@@ -142,5 +142,15 @@ export function useDiscoveryArea() {
     }
   }, []);
 
-  return { area, ready, busy, error, useMyLocation, setCity };
+  /** Applies an already-resolved place (from autocomplete) without geocoding. */
+  const applyPlace = useCallback((place: { latitude: number; longitude: number; formatted: string }) => {
+    write({
+      label: place.formatted ? shortLabel(place.formatted) : "Chosen area",
+      latitude: place.latitude,
+      longitude: place.longitude,
+    });
+    return true;
+  }, []);
+
+  return { area, ready, busy, error, useMyLocation, setCity, applyPlace };
 }
