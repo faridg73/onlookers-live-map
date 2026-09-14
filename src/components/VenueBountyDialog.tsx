@@ -231,15 +231,18 @@ export function VenueBountyDialog({
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
               {mode === "live" ? "Start window" : "Delivery deadline"}
             </span>
-            <div className={`grid gap-2 ${mode === "live" ? "grid-cols-2" : "grid-cols-4"}`}>
+            <div className="flex flex-wrap gap-2">
               {windows.map(({ minutes: m, label }) => (
                 <button
                   key={m}
                   type="button"
-                  onClick={() => setMinutes(m)}
-                  aria-pressed={minutes === m}
-                  className={`rounded-xl border-2 py-2.5 text-center text-sm font-extrabold transition-colors ${
-                    minutes === m
+                  onClick={() => {
+                    setMinutes(m);
+                    setCustomDeadline(null);
+                  }}
+                  aria-pressed={!isCustom && minutes === m}
+                  className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                    !isCustom && minutes === m
                       ? "border-signal bg-signal text-signal-foreground"
                       : "border-border bg-surface-raised text-foreground hover:border-signal/60"
                   }`}
@@ -247,6 +250,18 @@ export function VenueBountyDialog({
                   {label}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setCustomOpen(true)}
+                aria-pressed={isCustom}
+                className={`flex-1 rounded-xl border-2 px-3 py-2.5 text-center text-sm font-extrabold transition-colors ${
+                  isCustom
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface-raised text-foreground hover:border-signal/60"
+                }`}
+              >
+                {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+              </button>
             </div>
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Timer className="mt-0.5 size-3.5 shrink-0 text-signal" />
