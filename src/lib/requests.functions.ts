@@ -44,12 +44,14 @@ const createSchema = z.object({
 export const getWalletBalance = createServerFn({ method: "GET" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<number> => {
+    // The credit wallet is the same balance shown on /balance — never the
+    // legacy profile column, which can drift behind it.
     const { data } = await context.supabase
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
-    return Number(data?.wallet_balance ?? 0);
+    return Number(data?.credit_balance ?? 0);
   });
 
 /**
@@ -85,11 +87,11 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     // The escrow trigger debits the wallet in the same transaction, so check the
     // balance up front and fail with a message people can act on.
     const { data: current } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
-    const available = Number(current?.wallet_balance ?? 0);
+    const available = Number(current?.credit_balance ?? 0);
     if (available < data.bounty) {
       throw new Error(
         `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} Credits available — buy credits first.`,
@@ -166,13 +168,13 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       console.error("[geo-alert] nearby dispatch failed", alertError);
     }
 
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+    const { data: wallet } = await supabaseAdmin
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
 
-    return { id: row.id, balance: Number(profile?.wallet_balance ?? 0) };
+    return { id: row.id, balance: Number(wallet?.credit_balance ?? 0) };
   });
 
 /**
@@ -217,13 +219,13 @@ export const cancelBountyRequest = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("requests").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+    const { data: wallet } = await supabaseAdmin
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
 
-    return { balance: Number(profile?.wallet_balance ?? 0) };
+    return { balance: Number(wallet?.credit_balance ?? 0) };
   });
 
 /** Refunds deposits for any request that ran out of time unfulfilled. */
