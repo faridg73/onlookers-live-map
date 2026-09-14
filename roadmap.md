@@ -15,4 +15,4 @@
 - [x] Enforce exact-token session isolation across password, registration, and social sign-in
 - [x] Add preset bounty tiers and a custom-amount input to the "Happening here now" Flash modal with live USD equivalent
 
-- [ ] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
+- [x] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
