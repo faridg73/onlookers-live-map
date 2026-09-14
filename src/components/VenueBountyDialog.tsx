@@ -179,6 +179,8 @@ export function VenueBountyDialog({
       setTitle("");
       setNote("");
       setCustomDeadline(null);
+      setScheduledStart(null);
+      setDurationMin(5);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
