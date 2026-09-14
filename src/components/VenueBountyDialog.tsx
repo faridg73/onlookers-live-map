@@ -33,6 +33,9 @@ const LIVE_WINDOWS = [
   { minutes: 120, label: "Within 2 hours" },
 ];
 
+/** Live stream lengths a requester can ask for. */
+const LIVE_DURATIONS = [5, 10, 15, 20, 30];
+
 /**
  * Posts a bounty for one venue: either a 5-minute live stream inside the next
  * hour or two, or a pre-recorded clip with a hard delivery deadline.
@@ -57,6 +60,9 @@ export function VenueBountyDialog({
   const [minutes, setMinutes] = useState(120);
   const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
   const [customOpen, setCustomOpen] = useState(false);
+  const [durationMin, setDurationMin] = useState(5);
+  const [scheduledStart, setScheduledStart] = useState<Date | null>(null);
+  const [startOpen, setStartOpen] = useState(false);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
   const [bounty, setBounty] = useState(20);
