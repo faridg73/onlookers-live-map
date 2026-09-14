@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
+import { safeQuery } from "@/lib/sanitize";
+
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
 export type GeocodeResult = {
