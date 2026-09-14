@@ -256,9 +256,72 @@ function MapScreen() {
             <CoinsIcon className="size-3.5" /> High Bounties
           </button>
         </div>
+
+        {/* Request a view: search anywhere, then tap the map to drop a pin. */}
+        <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              setPinMode((on) => !on);
+              setDraftPin(null);
+              setPin(null);
+            }}
+            aria-pressed={pinMode}
+            className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.12em] shadow-lg transition-colors ${
+              pinMode
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface/95 text-foreground backdrop-blur-xl"
+            }`}
+          >
+            {pinMode ? <X className="size-4" /> : <Globe2 className="size-4" />}
+            {pinMode ? "Cancel pin drop" : "Request a view anywhere"}
+          </button>
+
+          {pinMode && (
+            <div className="space-y-2 rounded-lg border-2 border-signal/40 bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
+              <div className="flex gap-2">
+                <Input
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void searchPlace();
+                    }
+                  }}
+                  placeholder="Search any city, address or landmark"
+                  className="h-10 rounded-lg border-2 border-border bg-surface font-bold"
+                />
+                <Button
+                  type="button"
+                  onClick={() => void searchPlace()}
+                  disabled={searching}
+                  className="h-10 shrink-0 bg-signal px-3 font-extrabold text-signal-foreground"
+                >
+                  <Search className="size-4" />
+                </Button>
+              </div>
+              <p className="px-1 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal">
+                Now tap anywhere on the map to drop your pin
+              </p>
+            </div>
+          )}
+        </div>
       </header>
 
       <FlashBountyButton variant="map" />
+
+      <RequestViewPinDialog
+        pin={pin}
+        naming={naming}
+        onClose={() => {
+          setPin(null);
+          setNaming(false);
+          setDraftPin(null);
+          setPinMode(false);
+        }}
+      />
+
 
       <BountyBottomSheet
         request={selected}
