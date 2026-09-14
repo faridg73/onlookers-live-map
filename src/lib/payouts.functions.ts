@@ -253,3 +253,46 @@ export const cashOut = createServerFn({ method: "POST" })
       return { error: message };
     }
   });
+
+/**
+ * Opens the member's connected payout account (Stripe Express dashboard) so
+ * they can see the bank account, the transfer, and its arrival date.
+ */
+export const openPayoutAccount = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ url?: string; error?: string }> => {
+    const env = currentEnv();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: row } = await supabaseAdmin
+      .from("payout_accounts")
+      .select("stripe_account_id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    if (!row?.stripe_account_id) return { error: "No payout account connected yet." };
+
+    try {
+      const stripe = createStripeClient(env);
+      const link = await stripe.accounts.createLoginLink(row.stripe_account_id);
+      return { url: link.url };
+    } catch (error) {
+      // Some accounts only accept the hosted update flow — that works too.
+      try {
+        const link = await stripeV2Request<{ url: string }>(env, "POST", "/v2/core/account_links", {
+          account: row.stripe_account_id,
+          use_case: {
+            type: "account_update",
+            account_update: {
+              configurations: ["recipient"],
+              refresh_url: `${appOrigin()}/balance?payout=refresh`,
+              return_url: `${appOrigin()}/balance?payout=done`,
+            },
+          },
+        });
+        return { url: link.url };
+      } catch {
+        return { error: error instanceof Error ? error.message : getStripeErrorMessage(error) };
+      }
+    }
+  });
