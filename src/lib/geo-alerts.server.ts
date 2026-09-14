@@ -6,6 +6,9 @@ const SITE_URL = "https://onlookerlive.com";
 /** How far around the venue pin we wake up onlookers (1.5 miles ≈ 2.4 km). */
 export const GEOFENCE_RADIUS_MILES = 1.5;
 
+/** Widest ring we ever consider, before each person's own alert distance applies. */
+export const OUTER_RADIUS_MILES = 25;
+
 /** The 20% platform cut, matching the credit ledger. */
 export const CREDIT_FEE_RATE = 0.2;
 
