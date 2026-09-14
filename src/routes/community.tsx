@@ -67,7 +67,7 @@ function CommunityHub() {
   const [loading, setLoading] = useState(true);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
-  const { area, busy: locationBusy, error: locationError, useMyLocation, setCity } = useDiscoveryArea();
+  const { area, busy: locationBusy, error: locationError, useMyLocation, setCity, applyPlace } = useDiscoveryArea();
   const center = useMemo<MapPosition>(() => ({ lat: area.latitude, lng: area.longitude }), [area]);
 
   const { unit, formatDistance } = useDistanceUnit(center);
@@ -302,6 +302,7 @@ function CommunityHub() {
           locationError={locationError}
           onUseMyLocation={useMyLocation}
           onSearchArea={setCity}
+          onApplyPlace={applyPlace}
         />
       </div>
 
