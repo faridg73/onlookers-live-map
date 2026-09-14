@@ -989,13 +989,14 @@ function PostScreen() {
               </div>
             )}
             <div className="flex gap-2">
-              {step > 1 && <Button type="button" variant="outline" size="icon" aria-label="Previous step" onClick={() => setStep((step - 1) as 1 | 2)}><ArrowLeft className="size-5" /></Button>}
+              <Button type="button" variant="outline" size="icon" aria-label="Previous step" onClick={() => (step > 1 ? setStep((step - 1) as 1 | 2) : setMode(null))}><ArrowLeft className="size-5" /></Button>
               {step === 1 && <Button type="button" onClick={continueFromPrompt} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Continue</Button>}
               {step === 2 && <Button type="button" onClick={continueFromDetails} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Set the reward</Button>}
               {step === 3 && <Button type="submit" disabled={posting || total < MIN_BOUNTY || note.trim().length < 10 || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
             </div>
           </footer>
         </form>
+        )}
       </section>
 
       <DeadlinePickerDialog
