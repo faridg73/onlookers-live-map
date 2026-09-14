@@ -112,6 +112,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         lng: spot.longitude,
         expiresInMin: FLASH_WINDOW_MINUTES,
       });
+      human.reset();
       setOpen(false);
       toast.success("Flash bounty is live", {
         description: `Onlookers near you were alerted. ${formatCredits(FLASH_CREDITS)} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
@@ -206,10 +207,12 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               </p>
             )}
 
+            <div>{human.widget}</div>
+
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting || locating || !spot || short}
+              disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
               {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(FLASH_CREDITS)}`}
