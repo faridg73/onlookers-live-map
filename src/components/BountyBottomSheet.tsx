@@ -44,6 +44,8 @@ export function BountyBottomSheet({
 }) {
   const [capturing, setCapturing] = useState(false);
   const [sending, setSending] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const human = useHumanCheck("accept-bounty");
 
   if (!request) return null;
 
@@ -51,11 +53,41 @@ export function BountyBottomSheet({
   const payout = pool - Math.floor(pool * PLATFORM_FEE_RATE);
   const closed = isClosed(request);
   const claimable = !closed && request.status === "open";
+  /** Funded pins ask for a live stream; everything else takes a recorded clip. */
+  const wantsLive = request.bountyType === "live_stream";
+
+  async function goLive() {
+    const target = request!.dbId ?? request!.id;
+    if (!human.ready) {
+      toast.error("Finish the quick human check before you go live for this bounty.");
+      return;
+    }
+    setAccepting(true);
+    try {
+      await acceptBountyAndGoLive({ data: { requestId: target, captchaToken: human.token } });
+      human.reset();
+      onClaim?.(request!.id);
+      setCapturing(true);
+      toast.success("You're live for this bounty", {
+        description: `${payout} Credits are reserved for you — film the spot and send it in.`,
+      });
+    } catch (error) {
+      human.reset();
+      toast.error(error instanceof Error ? error.message : "Could not start this bounty stream.");
+    } finally {
+      setAccepting(false);
+    }
+  }
 
   function accept() {
+    if (wantsLive) {
+      void goLive();
+      return;
+    }
     onClaim?.(request!.id);
     setCapturing(true);
   }
+
 
   async function submit(file: File) {
     setSending(true);
