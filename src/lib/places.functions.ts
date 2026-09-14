@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
+import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
+import { safeQuery } from "@/lib/sanitize";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 
@@ -42,7 +44,7 @@ const DISCOVERY_FIELDS =
   "places.id,places.displayName,places.formattedAddress,places.location,places.primaryTypeDisplayName,places.rating,places.userRatingCount,places.photos";
 
 const venueSearchSchema = z.object({
-  query: z.string().trim().min(2).max(120),
+  query: safeQuery(120, 2),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   maxResults: z.number().int().min(1).max(8).default(6),
@@ -136,6 +138,7 @@ const categorySchema = z.object({
 export const searchPlacesByCategory = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => categorySchema.parse(data))
   .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+    await enforceRateLimit(RATE_LIMITS.placesSearch);
     const creds = credentials();
     if (!creds) return [];
 
