@@ -168,13 +168,13 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       console.error("[geo-alert] nearby dispatch failed", alertError);
     }
 
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", context.userId)
+    const { data: wallet } = await supabaseAdmin
+      .from("user_credit_wallets")
+      .select("credit_balance")
+      .eq("user_id", context.userId)
       .maybeSingle();
 
-    return { id: row.id, balance: Number(profile?.wallet_balance ?? 0) };
+    return { id: row.id, balance: Number(wallet?.credit_balance ?? 0) };
   });
 
 /**
