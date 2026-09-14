@@ -326,6 +326,25 @@ function AuthScreen() {
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
         {human.widget}
+        {formError ? (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            <p>{formError}</p>
+            {needsEmailConfirm ? (
+              <button
+                type="button"
+                onClick={() => void resendConfirmation()}
+                disabled={busy || !email}
+                className="mt-2 text-sm font-semibold text-foreground underline underline-offset-4 disabled:opacity-50"
+              >
+                Resend verification email
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         <button
           type="submit"
           disabled={busy || !accepted || !human.ready}
