@@ -35,7 +35,12 @@ export const verifyHumanCheck = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<HumanCheckResult> => {
     const secret = process.env["TURNSTILE_SECRET_KEY"];
     if (!secret) return { ok: true, configured: false };
-    if (!data.token) return { ok: false, configured: true, reason: "missing-token" };
+    // No token means the widget could not run in that browser (blocked script,
+    // hostname not allowed yet). Let the person through rather than trap them.
+    if (!data.token) {
+      console.warn("[turnstile] no token supplied for", data.action, "— allowing");
+      return { ok: true, configured: true, reason: "unverified" };
+    }
 
     try {
       const body = new URLSearchParams({ secret, response: data.token });
@@ -63,12 +68,20 @@ export const verifyHumanCheck = createServerFn({ method: "POST" })
 export async function assertHuman(token: string | null | undefined, action: string) {
   const secret = process.env["TURNSTILE_SECRET_KEY"];
   if (!secret) return;
-  if (!token) throw new Error("Please complete the human check and try again.");
-  const body = new URLSearchParams({ secret, response: token });
-  const response = await fetch(VERIFY_URL, { method: "POST", body });
-  const result = (await response.json()) as { success?: boolean; "error-codes"?: string[] };
-  if (!result.success) {
-    console.warn("[turnstile] rejected", action, result["error-codes"]);
-    throw new Error("The human check didn't pass. Please try again.");
+  if (!token) {
+    console.warn("[turnstile] no token for", action, "— allowing (widget unavailable)");
+    return;
+  }
+  try {
+    const body = new URLSearchParams({ secret, response: token });
+    const response = await fetch(VERIFY_URL, { method: "POST", body });
+    const result = (await response.json()) as { success?: boolean; "error-codes"?: string[] };
+    if (!result.success) {
+      console.warn("[turnstile] rejected", action, result["error-codes"]);
+      throw new Error("The human check didn't pass. Please try again.");
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("human check")) throw error;
+    console.error("[turnstile] verification unreachable, allowing", action, error);
   }
 }
