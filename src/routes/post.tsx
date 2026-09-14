@@ -459,21 +459,85 @@ function PostScreen() {
         <header className="shrink-0 border-b border-border bg-surface px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[0.65rem] font-extrabold uppercase text-signal">Step {step} of 3</p>
+              <p className="text-[0.65rem] font-extrabold uppercase text-signal">
+                {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
+              </p>
               <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
-                {step === 1 ? "What and where?" : step === 2 ? "How should it be captured?" : "Reward & escrow"}
+                {mode === null
+                  ? "Broadcast or bounty?"
+                  : mode === "broadcast"
+                    ? "Stream to your followers"
+                    : step === 1
+                      ? "What and where?"
+                      : step === 2
+                        ? "How should it be captured?"
+                        : "Reward & escrow"}
               </h1>
             </div>
             <Button type="button" variant="ghost" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })}>
               <X className="size-5" />
             </Button>
           </div>
-          <div className="mt-3 grid grid-cols-3 gap-1.5" aria-label={`Step ${step} of 3`}>
-            {[1, 2, 3].map((item) => (
-              <span key={item} className={`h-1 rounded-full ${item <= step ? "bg-signal" : "bg-border"}`} />
-            ))}
-          </div>
+          {mode === "bounty" && (
+            <div className="mt-3 grid grid-cols-3 gap-1.5" aria-label={`Step ${step} of 3`}>
+              {[1, 2, 3].map((item) => (
+                <span key={item} className={`h-1 rounded-full ${item <= step ? "bg-signal" : "bg-border"}`} />
+              ))}
+            </div>
+          )}
         </header>
+
+        {mode === null && (
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
+            <div className="mx-auto max-w-2xl animate-rise space-y-3">
+              <button
+                type="button"
+                onClick={() => setMode("broadcast")}
+                className="flex w-full items-start gap-3 rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-signal"
+              >
+                <Radio className="mt-0.5 size-6 shrink-0 text-signal" />
+                <span>
+                  <span className="block font-display text-lg font-extrabold text-foreground">
+                    Free social broadcast
+                  </span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    Verified creators stream to followers and people nearby. No credits, no escrow.
+                  </span>
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("bounty")}
+                className="flex w-full items-start gap-3 rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-signal"
+              >
+                <Zap className="mt-0.5 size-6 shrink-0 text-signal" />
+                <span>
+                  <span className="block font-display text-lg font-extrabold text-foreground">
+                    Paid flash bounty
+                  </span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    Ask someone standing there for a live look. Fast Catch (500), Priority Hunt (1000)
+                    or your own amount, held in escrow until you approve.
+                  </span>
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {mode === "broadcast" && (
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
+            <BroadcastComposer onSwitchToBounty={() => setMode("bounty")} />
+            <div className="mx-auto mt-5 max-w-2xl">
+              <Button type="button" variant="outline" className="w-full gap-2" onClick={() => setMode(null)}>
+                <ArrowLeft className="size-4" /> Back to broadcast options
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {mode === "bounty" && (
+
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
