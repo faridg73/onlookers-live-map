@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BadgeCheck, Clock, MapPin, Navigation, Pin, Radio, Trash2 } from "lucide-react";
+import { Clock, MapPin, Navigation, Pin, Radio, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";

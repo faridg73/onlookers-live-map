@@ -98,7 +98,10 @@ function ProfileScreen() {
           FR
         </div>
         <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground">fred</h1>
+          <h1 className="flex items-center gap-2 font-display text-2xl tracking-tight text-foreground">
+            fred
+            {verified && <VerifiedBadge className="size-5" />}
+          </h1>
           <p className="text-sm text-muted-foreground">Onlooker since 2025 · Harbor District</p>
         </div>
       </div>
