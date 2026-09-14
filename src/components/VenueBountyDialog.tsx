@@ -396,36 +396,22 @@ export function VenueBountyDialog({
 function CustomDeadlinePicker({
   open,
   value,
+  title,
+  description,
   onOpenChange,
   onPick,
 }: {
   open: boolean;
   value: Date | null;
+  title: string;
+  description: string;
   onOpenChange: (open: boolean) => void;
   onPick: (date: Date) => void;
 }) {
-  const now = new Date();
-  const [day, setDay] = useState<Date | undefined>(value ?? now);
-  const [hour, setHour] = useState(value ? value.getHours() : (now.getHours() + 1) % 24);
-  const [minute, setMinute] = useState(value ? value.getMinutes() : 0);
-
-  useEffect(() => {
-    if (!open) return;
-    const base = value ?? new Date();
-    setDay(value ?? new Date());
-    setHour(value ? base.getHours() : (new Date().getHours() + 1) % 24);
-    setMinute(value ? base.getMinutes() : 0);
-  }, [open, value]);
-
-  const picked = day ? new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour, minute) : null;
-  const valid = picked !== null && picked.getTime() > Date.now();
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-sm">
+...
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Custom deadline</DialogTitle>
-          <DialogDescription>Pick the exact date and time the clip is due.</DialogDescription>
+          <DialogTitle className="font-display text-xl">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <div className="flex justify-center">
           <Calendar
