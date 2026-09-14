@@ -43,6 +43,8 @@ export function ProfileSetup() {
   const navigate = useNavigate();
   const router = useRouter();
   const queryClient = useQueryClient();
+  // Visible bot challenge in front of the onboarding details.
+  const human = useHumanCheck("profile-setup");
 
   useEffect(() => {
     let alive = true;
@@ -141,8 +143,21 @@ export function ProfileSetup() {
       return;
     }
 
+    if (!human.ready) {
+      toast.error("Complete the human check to continue.");
+      return;
+    }
+
     setBusy(true);
     try {
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: "profile-setup" },
+      });
+      if (!check.ok) {
+        human.reset();
+        throw new Error("The human check didn't pass. Please try again.");
+      }
+
       // Bind strictly to the account that is signed in right now — never a
       // leftover session from an earlier login on this device.
       const { data: fresh, error: sessionError } = await supabase.auth.getUser();
