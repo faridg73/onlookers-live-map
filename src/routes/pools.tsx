@@ -57,6 +57,7 @@ function PoolsScreen() {
   const [place, setPlace] = useState("");
   const [goal, setGoal] = useState<number>(200);
   const [kind, setKind] = useState<"bounty" | "meetup">("bounty");
+  const [starter, setStarter] = useState<number>(POOL_STARTER_CREDITS);
   const [errors, setErrors] = useState<PoolFormErrors>({});
   const human = useHumanCheck("bounty-pool");
 
