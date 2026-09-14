@@ -143,6 +143,13 @@ function AuthScreen() {
           await clearPreviousAuthState();
           throw new Error("The signed-in account did not match. Please try again.");
         }
+        if (!authenticatedUser.email_confirmed_at) {
+          await clearPreviousAuthState();
+          setNeedsEmailConfirm(true);
+          throw new Error(
+            "Confirm your email address first — check your inbox for the verification link we sent.",
+          );
+        }
         await supabase.rpc("claim_verified_phone");
         await queryClient.cancelQueries();
         queryClient.clear();
