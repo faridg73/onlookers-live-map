@@ -11,7 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useHumanCheck } from "@/components/HumanCheck";
 import { isSignedIn, readWalletBalance } from "@/lib/bounty-escrow";
+import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
   FLASH_CREDITS,
   FLASH_DURATION_MINUTES,
@@ -39,6 +41,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const human = useHumanCheck("flash-bounty");
 
   const findSpot = () => {
     setLocating(true);
@@ -59,7 +62,6 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const short = balance !== null && balance < FLASH_CREDITS;
 
   const post = async () => {
-    if (!spot) return;
     if (signedIn === false) {
       setOpen(false);
       toast.error("Sign in to post a flash bounty", {
@@ -68,8 +70,35 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       await navigate({ to: "/auth" });
       return;
     }
+    if (!spot) {
+      toast.error(
+        locateError ??
+          (locating
+            ? "Still finding your exact spot — hang on a moment."
+            : "We couldn't pin your location. Tap Retry above."),
+      );
+      return;
+    }
+    if (balance === null) {
+      toast.error("We're still loading your Credit balance — try again in a moment.");
+      return;
+    }
+    if (short) {
+      toast.error(
+        `Not enough Credits — a flash bounty locks ${formatCredits(FLASH_CREDITS)} and you have ${formatCredits(Math.round(balance))}. Buy credits to go live here.`,
+      );
+      return;
+    }
+    if (!human.ready) {
+      toast.error("Finish the quick human check before going live.");
+      return;
+    }
     setPosting(true);
     try {
+      const check = await verifyHumanCheck({
+        data: { token: human.token ?? "", action: "flash-bounty" },
+      });
+      if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       const locked = await postFlashBounty(spot);
       setBalance(locked.balance);
       addRequest({
@@ -89,6 +118,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       });
       await navigate({ to: "/feed" });
     } catch (error) {
+      human.reset();
       toast.error(error instanceof Error ? error.message : "Could not post the flash bounty.");
     } finally {
       setPosting(false);
