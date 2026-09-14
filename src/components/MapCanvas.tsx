@@ -56,6 +56,13 @@ export function MapCanvas({
   const lastPlaceKey = useRef<string>("");
   const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
 
+  // Live values for the map's own click listener, which is registered once.
+  const pinModeRef = useRef(pinMode);
+  const onMapPinRef = useRef(onMapPin);
+  pinModeRef.current = pinMode;
+  onMapPinRef.current = onMapPin;
+
+
   // Own status tier colours the marker; incognito hides the precise dot.
   useEffect(() => {
     void fetchHunterStats().then((stats) =>
