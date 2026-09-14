@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
   SECURITY_QUESTIONS,
@@ -35,16 +38,28 @@ export function ProfileSetup() {
   const [nameState, setNameState] = useState<UsernameState>({ kind: "idle" });
   const [busy, setBusy] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     let alive = true;
-    if (!user) {
-      setOpen(false);
-      return;
-    }
+    // Always start from a blank form for whichever account is signed in now, so
+    // a previous session's details can never bleed into a brand-new account.
+    setOpen(false);
+    setUsername("");
+    setFirstName("");
+    setLastName("");
+    setAvatarUrl("");
+    setAnswers({});
+    setNameState({ kind: "idle" });
+    if (!user) return;
+    const signedInId = user.id;
     fetchMyProfile()
       .then((profile) => {
         if (!alive || !profile) return;
+        // Guard against a stale fetch that resolved for a different account.
+        if (profile.id !== signedInId) return;
         if (profile.onboarded) return;
         setUsername(profile.username ?? "");
         setFirstName(profile.legal_first_name ?? "");
@@ -58,7 +73,7 @@ export function ProfileSetup() {
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user?.id]);
 
   // Live availability check while typing, debounced so we don't hammer the DB.
   useEffect(() => {
@@ -126,6 +141,16 @@ export function ProfileSetup() {
 
     setBusy(true);
     try {
+      // Bind strictly to the account that is signed in right now — never a
+      // leftover session from an earlier login on this device.
+      const { data: fresh, error: sessionError } = await supabase.auth.getUser();
+      if (sessionError || !fresh.user) {
+        throw new Error("Your session expired — please sign in again.");
+      }
+      if (user && fresh.user.id !== user.id) {
+        throw new Error("Your session changed — reload the page and try again.");
+      }
+
       await completeMyProfile({
         username: username.trim(),
         legal_first_name: firstName,
@@ -135,6 +160,12 @@ export function ProfileSetup() {
       });
       toast.success("Profile saved.");
       setOpen(false);
+      // Drop anything cached under the previous session, then land on this
+      // account's own dashboard.
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await router.invalidate();
+      await navigate({ to: "/profile", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile.");
     } finally {
