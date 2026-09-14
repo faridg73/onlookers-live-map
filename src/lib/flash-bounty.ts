@@ -1,28 +1,80 @@
-import { quoteBounty } from "@/lib/bounty-pricing";
+import { quoteBounty, type BountyTierId } from "@/lib/bounty-pricing";
 import { lockBounty, type LockedBounty } from "@/lib/bounty-escrow";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { reverseGeocode } from "@/lib/geocode.functions";
+import { MIN_BOUNTY_CREDITS } from "@/lib/credits";
 
 /**
  * One-tap "Happening Here Now" bounty.
  *
  * Everything is fixed so a spontaneous event can be broadcast in a single tap:
- * the Fast Catch tier, a 5-minute live stream, a 15-minute window, and the
- * poster's own GPS pin. The tight window means the urgency premium applies, so
- * the quote below is exactly what gets locked in escrow.
+ * a 5-minute live stream, a 15-minute window, and the poster's own GPS pin.
+ * The requester now picks the reward tier (or types their own amount) and the
+ * tight window means the urgency premium applies transparently.
  */
-export const FLASH_TIER = "fast_catch" as const;
 export const FLASH_DURATION_MINUTES = 5;
 export const FLASH_WINDOW_MINUTES = 15;
 
-export const FLASH_QUOTE = quoteBounty({
-  tier: FLASH_TIER,
-  customBase: 0,
-  durationMinutes: FLASH_DURATION_MINUTES,
-  minutesUntilDue: FLASH_WINDOW_MINUTES,
-  weatherMultiplier: 1,
-});
+export const FLASH_TITLE = "Happening here now — go live";
 
+export type FlashTierPreset = {
+  id: BountyTierId;
+  label: string;
+  /** Fixed base credits, or null when the requester names their own amount. */
+  baseCredits: number | null;
+  blurb: string;
+};
+
+export const FLASH_TIERS: FlashTierPreset[] = [
+  {
+    id: "standard",
+    label: "Standard",
+    baseCredits: null,
+    blurb: "You set the reward",
+  },
+  {
+    id: "fast_catch",
+    label: "Fast Catch",
+    baseCredits: 500,
+    blurb: "Pushed to nearby onlookers first",
+  },
+  {
+    id: "priority_hunt",
+    label: "High Priority",
+    baseCredits: 1000,
+    blurb: "Top of every feed until claimed",
+  },
+];
+
+export const DEFAULT_FLASH_TIER: BountyTierId = "fast_catch";
+export const DEFAULT_CUSTOM_BASE = 100;
+
+export type FlashBountyOptions = {
+  tierId: BountyTierId;
+  customBase: number;
+};
+
+/** Builds the itemised quote for a flash bounty with the fixed duration/window. */
+export function quoteFlashBounty(options: FlashBountyOptions) {
+  return quoteBounty({
+    tier: options.tierId,
+    customBase: options.customBase,
+    durationMinutes: FLASH_DURATION_MINUTES,
+    minutesUntilDue: FLASH_WINDOW_MINUTES,
+    weatherMultiplier: 1,
+  });
+}
+
+/** Total credits that will be locked in escrow for the selected flash options. */
+export function computeFlashCredits(options: FlashBountyOptions): number {
+  return quoteFlashBounty(options).total;
+}
+
+/** The fixed legacy default (Fast Catch) for callers that don't pass options. */
+export const FLASH_QUOTE = quoteFlashBounty({
+  tierId: DEFAULT_FLASH_TIER,
+  customBase: DEFAULT_CUSTOM_BASE,
+});
 export const FLASH_CREDITS = FLASH_QUOTE.total;
 
 export type FlashSpot = { latitude: number; longitude: number; formatted: string };
@@ -39,10 +91,17 @@ export async function readFlashSpot(): Promise<FlashSpot> {
   };
 }
 
-export const FLASH_TITLE = "Happening here now — go live";
+/** Locks the flash bounty at the given pin with the requester's chosen tier/amount. */
+export function postFlashBounty(
+  spot: FlashSpot,
+  options: Partial<FlashBountyOptions> = {},
+): Promise<LockedBounty> {
+  const resolved: FlashBountyOptions = {
+    tierId: options.tierId ?? DEFAULT_FLASH_TIER,
+    customBase: Math.max(MIN_BOUNTY_CREDITS, Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE)),
+  };
+  const quote = quoteFlashBounty(resolved);
 
-/** Locks the fixed flash bounty at the given pin. */
-export function postFlashBounty(spot: FlashSpot): Promise<LockedBounty> {
   const details = [
     "Format: Go Live Now (flash bounty)",
     `Requested capture: ${FLASH_DURATION_MINUTES} min live session`,
@@ -54,7 +113,7 @@ export function postFlashBounty(spot: FlashSpot): Promise<LockedBounty> {
     prompt: FLASH_TITLE,
     details,
     locationName: spot.formatted,
-    bounty: FLASH_CREDITS,
+    bounty: quote.total,
     category: "events",
     latitude: spot.latitude,
     longitude: spot.longitude,
@@ -62,6 +121,6 @@ export function postFlashBounty(spot: FlashSpot): Promise<LockedBounty> {
     durationMinutes: FLASH_DURATION_MINUTES,
     bountyType: "live_stream",
     weatherMultiplier: 1,
-    bountyTier: FLASH_TIER,
+    bountyTier: resolved.tierId,
   });
 }
