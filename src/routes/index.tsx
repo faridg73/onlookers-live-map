@@ -4,11 +4,15 @@ import {
   BookOpen,
   ChevronDown,
   CircleDollarSign,
+  Compass,
   Map,
   Radio,
   Search,
+  ShieldCheck,
   Sparkles,
   Users,
+  Video,
+  X,
 } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
