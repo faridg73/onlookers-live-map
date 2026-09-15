@@ -55,6 +55,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [selectedTier, setSelectedTier] = useState<FlashTierPreset>(
