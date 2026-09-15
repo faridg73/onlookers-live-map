@@ -2028,6 +2028,14 @@ export type Database = {
         Args: { _request_key: string }
         Returns: number
       }
+      mark_creator_verified: {
+        Args: { _phone: string; _user_id: string }
+        Returns: {
+          is_verified: boolean
+          phone: string
+          phone_verified_at: string
+        }[]
+      }
       onlookers_within_radius: {
         Args: {
           _exclude_user_id?: string
