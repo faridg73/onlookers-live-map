@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [spot, setSpot] = useState<FlashSpot | null>(null);
+  const [locationQuery, setLocationQuery] = useState("");
 
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
@@ -78,7 +80,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     setLocating(true);
     setLocateError(null);
     void readFlashSpot()
-      .then(setSpot)
+      .then((nextSpot) => {
+        setSpot(nextSpot);
+        setLocationQuery(nextSpot.formatted);
+      })
       .catch(() => setLocateError("Allow location access so onlookers know where to come."))
       .finally(() => setLocating(false));
   };
@@ -197,6 +202,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Flash bounty — something is happening here now"
+          title="Instantly alerts nearby onlookers to go live at this exact spot."
           className="pointer-events-auto absolute bottom-28 right-4 z-30 flex flex-col items-center gap-1"
         >
           <span className="grid size-16 place-items-center rounded-full bg-signal text-signal-foreground shadow-xl shadow-signal/30 ring-4 ring-signal/25 transition-transform active:scale-95">
@@ -211,6 +217,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Flash bounty — something is happening here now"
+          title="Instantly alerts nearby onlookers to go live at this exact spot."
           className="group flex w-full flex-col items-center gap-1 py-3 text-[0.58rem] font-extrabold uppercase tracking-[0.08em] text-signal"
         >
 
@@ -228,16 +235,39 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               <Zap className="size-6 text-signal" /> Happening here now
             </DialogTitle>
             <DialogDescription>
-              One tap alerts every onlooker standing near you to go live from this exact spot.
+              Instantly alerts nearby onlookers to go live at this exact spot.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="rounded-2xl border-2 border-border bg-surface-raised p-3">
-              <p className="flex items-start gap-2 text-sm font-bold text-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-signal" />
-                {locating ? "Finding your exact spot…" : (spot?.formatted ?? "Location unavailable")}
-              </p>
+            <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+              <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                <MapPin className="size-4 shrink-0 text-signal" /> Location
+              </label>
+              <PlaceSearchInput
+                value={locationQuery}
+                placeholder={locating ? "Finding your exact spot…" : "Search an address or landmark"}
+                onQueryChange={(query) => {
+                  setLocationQuery(query);
+                  if (query.trim() !== spot?.formatted.trim()) {
+                    setSpot(null);
+                    setLocateError(
+                      query.trim()
+                        ? "Choose a matching place from the suggestions or press Enter to search."
+                        : "Enter an address, landmark, or location name.",
+                    );
+                  }
+                }}
+                onPick={(place) => {
+                  setSpot({
+                    latitude: place.latitude,
+                    longitude: place.longitude,
+                    formatted: place.formatted,
+                  });
+                  setLocationQuery(place.formatted);
+                  setLocateError(null);
+                }}
+              />
               {locateError && (
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="text-xs font-medium text-destructive">{locateError}</span>
@@ -245,6 +275,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                     Retry
                   </Button>
                 </div>
+              )}
+              {!locateError && spot && (
+                <p className="text-xs font-medium text-signal">Location ready</p>
               )}
             </div>
 
