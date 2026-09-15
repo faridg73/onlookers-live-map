@@ -14,6 +14,7 @@ import {
   Video,
   X,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 import { MapCanvas } from "@/components/MapCanvas";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { isGoldBounty } from "@/lib/bounty-tiers";
@@ -347,7 +348,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <button
         type="button"
