@@ -12,7 +12,7 @@ App details Play already expects:
 
 - Package name: `com.onlooker.app`
 - App name: Onlooker
-- Version: 1.0 (version code 2)
+- Version: 1.0 (version code 4)
 - New upload key SHA-256: `90:E7:A7:63:D5:FF:2C:6F:07:2A:05:65:53:03:49:49:FB:FE:6D:9F:07:DC:DB:AD:FC:AF:CD:AE:AA:C5:25:1D`
 
 ## Get the file Play is asking for (.aab)
