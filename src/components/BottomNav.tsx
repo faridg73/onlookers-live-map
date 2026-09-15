@@ -58,7 +58,7 @@ export function BottomNav() {
               aria-label={unread > 0 ? `Live Inbox, ${unread} unread messages` : "Live Inbox"}
               className={`${linkClass} w-full ${inboxOpen ? "text-signal" : ""}`}
             >
-              <span className="relative">
+              <span className="relative grid size-8 place-items-center rounded-full">
                 <MessageCircle className="size-5" strokeWidth={1.75} />
                 {unread > 0 && (
                   <span className="absolute -right-2 -top-1.5 min-w-4 rounded-full bg-destructive px-1 text-center text-[0.6rem] font-extrabold leading-4 text-destructive-foreground">
