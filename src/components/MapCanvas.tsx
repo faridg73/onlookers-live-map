@@ -7,7 +7,7 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
+
 import { useBoosts } from "@/lib/boosts-store";
 import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
