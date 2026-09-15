@@ -6,7 +6,7 @@ import { ChatInbox } from "@/components/ChatInbox";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 
 const items = [
-  { to: "/", label: "Map", icon: Map, exact: true },
+  { to: "/", label: "Home", icon: Map, exact: true },
   { to: "/community", label: "Discover", icon: Compass, exact: false },
   { to: "/discover", label: "Venues", icon: Users, exact: false },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
