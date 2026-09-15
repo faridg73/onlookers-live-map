@@ -363,12 +363,16 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-2">
-                <Radio className="size-3.5 text-signal" />
-                {selectedTier.blurb}
+                <Radar className="size-3.5 shrink-0 text-signal" />
+                <span>
+                  <span className="font-bold text-foreground">Priority Broadcast:</span> Pushed to nearby onlookers first
+                </span>
               </li>
               <li className="flex items-center gap-2">
-                <Radio className="size-3.5 text-signal" />
-                {FLASH_DURATION_MINUTES}-minute live stream, expires in {FLASH_WINDOW_MINUTES} minutes
+                <Timer className="size-3.5 shrink-0 text-signal" />
+                <span>
+                  <span className="font-bold text-foreground">Window:</span> {FLASH_DURATION_MINUTES}-minute live stream, expires in {FLASH_WINDOW_MINUTES} minutes
+                </span>
               </li>
             </ul>
 
