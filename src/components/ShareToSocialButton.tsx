@@ -78,12 +78,12 @@ export function ShareToSocialButton({
               key={target.id}
               type="button"
               onClick={() => void shareToPlatform(subject, target)}
-              className="rounded-xl border border-border bg-surface px-3 py-2.5 text-left transition-colors hover:border-signal/60"
+              className="overflow-hidden rounded-xl border border-border bg-surface px-3 py-2.5 text-left transition-colors hover:border-signal/60"
             >
-              <span className="block text-xs font-bold uppercase tracking-[0.1em] text-foreground">
+              <span className="block truncate text-xs font-bold uppercase tracking-[0.1em] text-foreground">
                 {target.label}
               </span>
-              <span className="mt-0.5 block text-[0.65rem] text-muted-foreground">
+              <span className="mt-0.5 block break-words text-[0.65rem] leading-snug text-muted-foreground">
                 {target.hint}
               </span>
             </button>
