@@ -8,6 +8,7 @@ import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { HunterBadge } from "@/components/HunterBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { FollowButton } from "@/components/FollowButton";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
@@ -112,6 +113,7 @@ export function CommunityPostCard({
             <span className="block truncate text-[0.65rem] text-muted-foreground">{handle}</span>
           </span>
           <HunterBadge level={post.hunterLevel} showLevel={false} className="ml-auto shrink-0" />
+          {!isMine && <FollowButton creatorId={post.userId} creatorName={post.authorName} />}
         </div>
 
         <h3 className="mt-2.5 text-sm font-extrabold leading-snug text-foreground">{post.title}</h3>
