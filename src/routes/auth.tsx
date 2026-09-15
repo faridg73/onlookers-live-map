@@ -55,6 +55,25 @@ function AuthScreen() {
     await clearPreviousAuthState();
   }
 
+  /**
+   * Strong-password rules checked before the account service is called, so
+   * people get instant, specific feedback instead of a generic rejection.
+   */
+  function describePasswordProblem(value: string): string | null {
+    if (value.length < 10) return "Use at least 10 characters for your password.";
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) {
+      return "Include both a small letter and a capital letter in your password.";
+    }
+    if (!/[0-9]/.test(value)) return "Include at least one number in your password.";
+    if (!/[^A-Za-z0-9]/.test(value)) {
+      return "Include at least one symbol, such as ! or ?, in your password.";
+    }
+    if (email && value.toLowerCase().includes(email.split("@")[0]?.toLowerCase() ?? "@@@")) {
+      return "Your password can't contain your email name.";
+    }
+    return null;
+  }
+
   /** Turns raw auth failures into plain-language messages people can act on. */
   function describeAuthError(err: unknown): string {
     const raw = err instanceof Error ? err.message : "";
