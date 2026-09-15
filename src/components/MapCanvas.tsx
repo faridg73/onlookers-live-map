@@ -1,5 +1,5 @@
 /// <reference types="google.maps" />
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CoinsIcon, LocateFixed, Share2 } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
@@ -7,6 +7,7 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
 import { useBoosts } from "@/lib/boosts-store";
 import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
@@ -51,6 +52,8 @@ export function MapCanvas({
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
+  const [places, setPlaces] = useState<NearbyPlace[]>([]);
+  const lastPlaceKey = useRef<string>("");
   const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
@@ -165,6 +168,38 @@ export function MapCanvas({
     }
   }, [ready, centerOn]);
 
+  // Business names for whatever is on screen, refreshed after panning stops.
+  useEffect(() => {
+    if (!ready) return;
+    const timer = window.setTimeout(() => {
+      const m = map.current;
+      const center = m?.getCenter();
+      const zoom = m?.getZoom();
+      const bounds = m?.getBounds();
+      if (!center || typeof zoom !== "number" || !bounds) return;
+      if (zoom < 15) {
+        setPlaces([]);
+        lastPlaceKey.current = "";
+        return;
+      }
+      const lat = center.lat();
+      const lng = center.lng();
+      const ne = bounds.getNorthEast();
+      const sw = bounds.getSouthWest();
+      const spanMeters = Math.max(
+        200,
+        Math.min(3000, ((ne.lat() - sw.lat()) * 111_000) / 2),
+      );
+      const key = `${lat.toFixed(3)}:${lng.toFixed(3)}:${Math.round(spanMeters / 100)}`;
+      if (key === lastPlaceKey.current) return;
+      lastPlaceKey.current = key;
+      void fetchNearbyPlaces({ data: { latitude: lat, longitude: lng, radiusMeters: spanMeters } })
+        .then(setPlaces)
+        .catch((error) => console.error("[Onlooker map] nearby places failed", error));
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [ready, tick]);
+
   const toPixel = (position: google.maps.LatLngLiteral): Pixel | null => {
     const projection = overlay.current?.getProjection();
     if (!projection) return null;
@@ -190,16 +225,6 @@ export function MapCanvas({
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
-  const curatedRequests = useMemo(() => {
-    const active = requests
-      .filter((request) => request.status === "open" && !isClosed(request))
-      .sort((a, b) => b.bounty + boostOf(b.id) - (a.bounty + boostOf(a.id)))
-      .slice(0, 12);
-    const selected = selectedId ? requests.find((request) => request.id === selectedId) : undefined;
-    return selected && !active.some((request) => request.id === selected.id)
-      ? [...active, selected]
-      : active;
-  }, [requests, selectedId, boostOf]);
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
@@ -259,9 +284,27 @@ export function MapCanvas({
         </div>
       )}
 
+      {/* nearby business names */}
+      {ready &&
+        places.map((place) => {
+          const pixel = toPixel({ lat: place.latitude, lng: place.longitude });
+          if (!pixel) return null;
+          return (
+            <span
+              key={place.id}
+              className="pointer-events-none absolute flex max-w-[8.5rem] -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-surface/85 px-2 py-0.5 text-[0.6rem] font-bold leading-tight text-foreground shadow-sm backdrop-blur"
+              style={{ left: pixel.left, top: pixel.top }}
+              title={place.primaryType ? `${place.name} · ${place.primaryType}` : place.name}
+            >
+              <span className="size-1.5 shrink-0 rounded-full bg-signal" />
+              <span className="truncate">{place.name}</span>
+            </span>
+          );
+        })}
+
       {/* pins — theme changes with the total credit bounty */}
       {ready &&
-        curatedRequests.map((r) => {
+        requests.map((r) => {
           const pixel = toPixel(requestMapPosition(r));
           if (!pixel) return null;
           const isSel = r.id === selectedId;
@@ -435,7 +478,7 @@ export function MapCanvas({
           );
         })}
 
-      <div className="absolute right-4 z-20 flex flex-col gap-2 top-[calc(env(safe-area-inset-top,0px)+9.5rem)]">
+      <div className="absolute right-4 z-40 flex flex-col gap-2 top-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
         <div className="grid grid-rows-2 overflow-hidden rounded-lg border border-border bg-surface/90 shadow-lg backdrop-blur">
           {[
             { label: "+", fn: () => zoomBy(1) },
