@@ -53,11 +53,11 @@ export function ShareToSocialButton({
           <Share2 className="size-4" /> {label}
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-h-[85vh] max-w-md overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {subject.kind === "live" && <Radio className="size-4 text-signal" />}
-            Share {subject.kind === "live" ? "this live stream" : "this pin"}
+            {subject.kind === "live" && <Radio className="size-4 shrink-0 text-signal" />}
+            <span className="break-words">Share {subject.kind === "live" ? "this live stream" : "this pin"}</span>
           </DialogTitle>
           <DialogDescription>
             Anywhere you paste this link it shows a preview card with the title, the location pin
@@ -65,8 +65,8 @@ export function ShareToSocialButton({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="rounded-2xl border border-border bg-surface-raised p-3">
-          <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface-raised p-3">
+          <p className="whitespace-pre-line break-words text-xs leading-relaxed text-muted-foreground">
             {shareCaption(subject)}
           </p>
           <p className="mt-2 break-all text-[0.65rem] text-signal/80">{shareLink(subject)}</p>
