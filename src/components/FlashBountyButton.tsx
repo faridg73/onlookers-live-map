@@ -140,7 +140,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       );
       return;
     }
-    if (balance === null) {
+    if (balance === null && balanceLoading) {
       toast.error("We're still loading your Credit balance — try again in a moment.");
       return;
     }
