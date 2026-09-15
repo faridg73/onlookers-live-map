@@ -51,7 +51,7 @@ export function BottomNav() {
             <button
               type="button"
               onClick={() => setInboxOpen(true)}
-              aria-label={unread > 0 ? `Inbox, ${unread} unread messages` : "Inbox"}
+              aria-label={unread > 0 ? `Live Inbox, ${unread} unread messages` : "Live Inbox"}
               className={`${linkClass} w-full ${inboxOpen ? "text-signal" : ""}`}
             >
               <span className="relative">
