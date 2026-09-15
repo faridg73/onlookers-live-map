@@ -1,10 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, CoinsIcon, MapPin, Navigation } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  CircleDollarSign,
+  Map,
+  Radio,
+  Search,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
-import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
-import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
@@ -14,12 +21,7 @@ import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
 
-import { Globe2, X } from "lucide-react";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
-import { TrendingViewRequests } from "@/components/TrendingViewRequests";
-import { namePin, type ViewPin } from "@/lib/request-a-view";
-import { RequestViewPinDialog } from "@/components/RequestViewPinDialog";
-import { MapTourOverlay } from "@/components/MapTourOverlay";
 
 export const Route = createFileRoute("/")({
   validateSearch: (
@@ -50,34 +52,12 @@ export const Route = createFileRoute("/")({
 
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
+  const navigate = useNavigate();
   const { b, snap } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const [nearbyOpen, setNearbyOpen] = useState(false);
-  const [goldOnly, setGoldOnly] = useState(false);
-  // "Request a view": drop a pin anywhere in the world and fund a live stream.
-  const [pinMode, setPinMode] = useState(false);
-  const [draftPin, setDraftPin] = useState<MapPosition | null>(null);
-  const [pin, setPin] = useState<ViewPin | null>(null);
-  const [naming, setNaming] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [exploreOpen, setExploreOpen] = useState(false);
+  const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
-
-  const dropPin = useCallback((position: MapPosition) => {
-    setDraftPin(position);
-    setNaming(true);
-    select(null);
-    void namePin(position.lat, position.lng)
-      .then(setPin)
-      .catch(() =>
-        setPin({
-          latitude: position.lat,
-          longitude: position.lng,
-          formatted: `Pin at ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`,
-        }),
-      )
-      .finally(() => setNaming(false));
-  }, [select]);
-
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
@@ -100,10 +80,19 @@ function MapScreen() {
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
-  // "High Bounties Only" hides everything but the pulsing 50+ credit gold pins.
+  // The Home sheet filters the live map immediately without changing the underlying request data.
   const visible = useMemo(
-    () => (goldOnly ? requests.filter((request) => isGoldBounty(poolOf(request))) : requests),
-    [requests, goldOnly, poolOf],
+    () =>
+      requests.filter((request) => {
+        if (mapFilter === "all") return true;
+        if (mapFilter === "high") return isGoldBounty(poolOf(request));
+        if (mapFilter === "live") {
+          return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+        }
+        if (!userPosition) return false;
+        return distanceMiles(userPosition, requestMapPosition(request)) <= radiusMiles;
+      }),
+    [requests, mapFilter, poolOf, radiusMiles, userPosition],
   );
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
@@ -129,185 +118,132 @@ function MapScreen() {
         selectedId={selectedId}
         onSelect={select}
         onUserPositionChange={setUserPosition}
-        pinMode={pinMode}
-        onMapPin={dropPin}
-        draftPin={draftPin}
         centerTarget={centerTarget}
       />
 
-
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        {/* Clean top bar: brand, nearby status, filter + nearby toggles */}
-        <div className="pointer-events-auto mx-auto flex w-full max-w-lg items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-xl">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-lg items-center gap-3 rounded-lg border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-xl">
           <img
             src="/icon-192.png"
             alt="Onlooker Live logo"
             className="size-8 rounded-lg object-cover"
           />
-          <button
-            type="button"
-            onClick={() => setNearbyOpen((open) => !open)}
-            aria-expanded={nearbyOpen}
-            className="min-w-0 flex-1 text-left"
-          >
+          <div className="min-w-0 flex-1">
             <h1 className="font-display text-base font-extrabold leading-none tracking-tight text-foreground">
               Onlooker
             </h1>
-            <p className="mt-0.5 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-live">
-              {nearbyLabel}
+            <p className="mt-0.5 truncate text-[0.65rem] font-bold text-muted-foreground">
+              Live eyes, anywhere
             </p>
-          </button>
-          <button
-            type="button"
-            onClick={() => setGoldOnly((g) => !g)}
-            aria-pressed={goldOnly}
-            aria-label={goldOnly ? "Show all bounties" : "Show high bounties only"}
-            className="rounded-lg border border-border p-2 transition-colors hover:bg-surface-raised"
-            style={
-              goldOnly
-                ? {
-                    backgroundColor: "var(--pin-gold)",
-                    borderColor: "var(--pin-gold)",
-                    color: "oklch(0.24 0.05 92)",
-                  }
-                : { color: "var(--pin-gold)" }
-            }
-          >
-            <CoinsIcon className="size-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setNearbyOpen((open) => !open)}
-            aria-expanded={nearbyOpen}
-            aria-label="Toggle nearby requests"
-            className="rounded-lg border border-border p-2 text-signal transition-colors hover:bg-surface-raised"
-          >
-            <ChevronDown className={`size-4 transition-transform ${nearbyOpen ? "rotate-180" : ""}`} />
-          </button>
+          </div>
         </div>
-
-        {nearbyOpen && (
-          <section className="pointer-events-auto mx-auto mt-2 max-h-[min(52dvh,28rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
-            {nearby.length > 0 ? (
-              <ul className="space-y-2">
-                {nearby.map(({ request, distance }) => (
-                  <li key={request.id} className="rounded-lg border border-border bg-surface-raised p-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        select(request.id);
-                        setNearbyOpen(false);
-                      }}
-                      className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-left"
-                    >
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                        <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="size-3 shrink-0" />
-                          <span className="truncate">{request.place}</span>
-                        </span>
-                        <span className="mt-0.5 block text-xs font-bold text-signal">
-                          {formatDistance(distance)} away
-                        </span>
-                      </span>
-                      <span className="shrink-0 text-right">
-                        <span className="block font-display text-base font-extrabold text-signal">
-                          {request.bounty} cr
-                        </span>
-                        <span className="flex items-center justify-end gap-1 text-[0.65rem] text-muted-foreground">
-                          <Navigation className="size-3" /> {formatDistance(distance)}
-                        </span>
-                      </span>
-                    </button>
-                    <BountyDetailsDialog request={request} onClaim={claim} userPosition={userPosition}>
-                      <Button type="button" variant="outline" className="mt-2 h-9 w-full rounded-lg text-xs font-bold">
-                        View details
-                      </Button>
-                    </BountyDetailsDialog>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-                {userPosition
-                  ? `No active bounties are currently available within ${radius} ${unit}.`
-                  : `Allow location access to see available bounties within ${radius} ${unit}.`}
-              </p>
-            )}
-          </section>
-        )}
-
-        {/* Streamlined search with trending suggestions */}
         <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg">
-          <div className="rounded-xl bg-surface/95 p-1 shadow-lg backdrop-blur-xl">
+          <div className="rounded-lg border border-border bg-surface/95 p-1 shadow-lg backdrop-blur-xl">
             <PlaceSearchInput
-              onQueryChange={setSearchText}
               onPick={(place) => {
-                setSearchText("");
                 setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
               }}
             />
           </div>
-          {searchText.trim().length === 0 && (
-            <TrendingViewRequests
-              className="mt-2"
-              onOpen={(request) => {
-                select(request.id);
-                if (typeof request.lat === "number" && typeof request.lng === "number") {
-                  setCenterTarget({ lat: request.lat, lng: request.lng, zoom: 14 });
-                }
-              }}
-            />
-          )}
         </div>
-
-        {pinMode && (
-          <p className="pointer-events-auto mx-auto mt-2 w-full max-w-lg rounded-xl border border-signal/40 bg-surface/95 px-3 py-2 text-center text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal shadow-lg backdrop-blur-xl">
-            Tap anywhere on the map to drop your pin
-          </p>
-        )}
       </header>
 
-      {/* Floating "Request a view anywhere" action */}
-      <button
-        type="button"
-        onClick={() => {
-          setPinMode((on) => !on);
-          setDraftPin(null);
-          setPin(null);
-        }}
-        aria-pressed={pinMode}
-        className="pointer-events-auto absolute bottom-28 left-4 z-30 flex flex-col items-center gap-1"
-      >
-        <span
-          className={`grid size-14 place-items-center rounded-full border-2 shadow-xl backdrop-blur-xl transition-transform active:scale-95 ${
-            pinMode
-              ? "border-signal bg-signal text-signal-foreground"
-              : "border-border bg-surface/95 text-cyan drop-shadow-[0_0_10px_var(--cyan-glow)]"
+      <section className="pointer-events-auto absolute inset-x-3 bottom-24 z-30 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setExploreOpen((open) => !open)}
+          aria-expanded={exploreOpen}
+          className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
+        >
+          <Search className="size-5 text-signal" />
+          <span className="min-w-0 flex-1 text-left text-sm font-extrabold">What would you like to see?</span>
+          <ChevronDown className={`size-4 transition-transform duration-300 ${exploreOpen ? "rotate-180" : ""}`} />
+        </Button>
+
+        <div
+          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+            exploreOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
           }`}
         >
-          {pinMode ? <X className="size-5" /> : <Globe2 className="size-5" />}
-        </span>
-        <span className="rounded-full bg-surface/90 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-cyan backdrop-blur">
-          {pinMode ? "Cancel" : "Request"}
-        </span>
-      </button>
+          <div className="min-h-0 overflow-hidden">
+            <div className="border-b border-border bg-surface-raised/80 p-3">
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setMapFilter("all")}
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                >
+                  <Map className="size-4" /> Local Bounty Map
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void navigate({ to: "/community" })}
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                >
+                  <Users className="size-4" /> Community Vibe
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => void navigate({ to: "/discover" })}
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                >
+                  <BookOpen className="size-4" /> Learning &amp; Guides
+                </Button>
+              </div>
+              <div className="mt-2 flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
+                {(
+                  [
+                    ["all", "All"],
+                    ["live", "Live now"],
+                    ["nearby", `Nearby ${nearby.length}`],
+                    ["high", "High bounty"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <Button
+                    key={key}
+                    type="button"
+                    size="sm"
+                    variant={mapFilter === key ? "default" : "outline"}
+                    onClick={() => setMapFilter(key)}
+                    className="h-8 shrink-0 rounded-full px-3 text-[0.68rem] font-bold"
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              <p className="mt-2 text-[0.65rem] text-muted-foreground" aria-live="polite">
+                {mapFilter === "nearby" && !userPosition
+                  ? `Allow location access to see requests within ${radius} ${unit}.`
+                  : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <FlashBountyButton variant="map" />
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => void navigate({ to: "/hunt" })}
+          className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
+        >
+          <Radio className="size-5 text-live" />
+          <span className="flex-1 text-left text-sm font-extrabold">Live Stream</span>
+          <Sparkles className="size-4 text-muted-foreground" />
+        </Button>
 
-      {/* First-visit tour: explains the concept to new visitors, once per device */}
-      <MapTourOverlay />
-
-      <RequestViewPinDialog
-        pin={pin}
-        naming={naming}
-        onClose={() => {
-          setPin(null);
-          setNaming(false);
-          setDraftPin(null);
-          setPinMode(false);
-        }}
-      />
+        <Button
+          type="button"
+          onClick={() => void navigate({ to: "/post" })}
+          className="h-14 w-full justify-start rounded-none bg-foreground px-4 text-background hover:bg-foreground/90"
+        >
+          <CircleDollarSign className="size-5" />
+          <span className="flex-1 text-left text-sm font-extrabold">Post a Bounty</span>
+        </Button>
+      </section>
 
 
       <BountyBottomSheet
@@ -321,7 +257,6 @@ function MapScreen() {
         onClaim={claim}
         onClose={() => select(null)}
       />
-
     </div>
   );
 }
