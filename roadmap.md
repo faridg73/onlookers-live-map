@@ -17,3 +17,4 @@
 
 - [x] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
 - [x] Make the Flash location editable with live place search and add concise alerting copy
+- [x] Reduce Map marker clutter with zoom-aware POI visibility and smart bounty clusters

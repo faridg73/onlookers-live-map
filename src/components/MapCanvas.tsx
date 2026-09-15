@@ -16,6 +16,12 @@ import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+const DETAIL_ZOOM = 14;
+const POI_ZOOM = 15;
+
+const HIDE_BASE_POIS: google.maps.MapTypeStyle[] = [
+  { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
+];
 
 type Pixel = { left: number; top: number };
 
@@ -48,6 +54,7 @@ export function MapCanvas({
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
+  const [zoom, setZoom] = useState(13);
   const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
@@ -88,6 +95,7 @@ export function MapCanvas({
           // Use Google's standard roadmap layer (the default Map option) without
           // custom styling overrides so the map looks familiar to everyone.
           mapTypeId: "roadmap",
+          styles: HIDE_BASE_POIS,
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
@@ -96,6 +104,12 @@ export function MapCanvas({
         ov.setMap(map.current);
         overlay.current = ov;
         map.current.addListener("bounds_changed", () => setTick((t) => t + 1));
+        map.current.addListener("zoom_changed", () => {
+          const nextZoom = map.current?.getZoom();
+          if (typeof nextZoom !== "number") return;
+          setZoom(nextZoom);
+          map.current?.setOptions({ styles: nextZoom >= POI_ZOOM ? [] : HIDE_BASE_POIS });
+        });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
           if (pinModeRef.current && at) {
@@ -173,7 +187,7 @@ export function MapCanvas({
       const zoom = m?.getZoom();
       const bounds = m?.getBounds();
       if (!center || typeof zoom !== "number" || !bounds) return;
-      if (zoom < 15) {
+      if (zoom < POI_ZOOM) {
         setPlaces([]);
         lastPlaceKey.current = "";
         return;
@@ -221,6 +235,56 @@ export function MapCanvas({
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
+  const requestMarkers = ready
+    ? requests.flatMap((request) => {
+        const pixel = toPixel(requestMapPosition(request));
+        return pixel ? [{ request, pixel }] : [];
+      })
+    : [];
+  const showAllRequests = zoom >= DETAIL_ZOOM;
+  const importantMarkers = showAllRequests
+    ? requestMarkers
+    : requestMarkers.filter(({ request }) => {
+        const total = request.bounty + boostOf(request.id);
+        const activeLive =
+          request.bountyType === "live_stream" &&
+          request.status === "claimed" &&
+          !isClosed(request);
+        return request.id === selectedId || activeLive || bountyTier(total) === "gold";
+      });
+  const importantIds = new Set(importantMarkers.map(({ request }) => request.id));
+  const clusterGrid = zoom <= 7 ? 150 : zoom <= 10 ? 120 : 96;
+  const ordinaryClusters = showAllRequests
+    ? []
+    : Array.from(
+        requestMarkers
+          .filter(({ request }) => !importantIds.has(request.id) && !isClosed(request))
+          .reduce(
+            (groups, marker) => {
+              const key = `${Math.floor(marker.pixel.left / clusterGrid)}:${Math.floor(marker.pixel.top / clusterGrid)}`;
+              const group = groups.get(key) ?? [];
+              group.push(marker);
+              groups.set(key, group);
+              return groups;
+            },
+            new Map<string, typeof requestMarkers>(),
+          )
+          .values(),
+      ).map((members) => {
+        const positions = members.map(({ request }) => requestMapPosition(request));
+        return {
+          id: members.map(({ request }) => request.id).sort().join(":"),
+          count: members.length,
+          center: {
+            lat: positions.reduce((sum, position) => sum + position.lat, 0) / positions.length,
+            lng: positions.reduce((sum, position) => sum + position.lng, 0) / positions.length,
+          },
+          pixel: {
+            left: members.reduce((sum, marker) => sum + marker.pixel.left, 0) / members.length,
+            top: members.reduce((sum, marker) => sum + marker.pixel.top, 0) / members.length,
+          },
+        };
+      });
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
@@ -298,11 +362,27 @@ export function MapCanvas({
           );
         })}
 
-      {/* pins — theme changes with the total credit bounty */}
-      {ready &&
-        requests.map((r) => {
-          const pixel = toPixel(requestMapPosition(r));
-          if (!pixel) return null;
+      {/* Ordinary requests collapse into compact clusters until the map is close enough. */}
+      {ordinaryClusters.map((cluster) => (
+        <button
+          key={cluster.id}
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            map.current?.setCenter(cluster.center);
+            map.current?.setZoom(Math.min(DETAIL_ZOOM, Math.max(zoom + 2, 10)));
+          }}
+          className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-signal bg-surface/95 font-display text-xs font-extrabold tabular-nums text-signal shadow-lg shadow-signal/20 backdrop-blur transition-transform hover:scale-105"
+          style={{ left: cluster.pixel.left, top: cluster.pixel.top }}
+          aria-label={`${cluster.count} nearby ${cluster.count === 1 ? "request" : "requests"}. Zoom in to view.`}
+          title="Zoom in to view nearby requests"
+        >
+          {cluster.count}
+        </button>
+      ))}
+
+      {/* Important pins stay visible; all individual pins return at close zoom. */}
+      {importantMarkers.map(({ request: r, pixel }) => {
           const isSel = r.id === selectedId;
           const pooled = boostOf(r.id);
           const pool = r.bounty + pooled;
