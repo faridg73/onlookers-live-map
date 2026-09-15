@@ -88,11 +88,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       .finally(() => setLocating(false));
   };
 
+  const loadBalance = () => {
+    setBalanceLoading(true);
+    void readWalletBalance()
+      .then(setBalance)
+      .catch(() => setBalance(null))
+      .finally(() => setBalanceLoading(false));
+  };
+
   useEffect(() => {
     if (!open) return;
     findSpot();
     void isSignedIn().then(setSignedIn);
-    void readWalletBalance().then(setBalance);
+    loadBalance();
   }, [open]);
 
   useEffect(() => {
@@ -112,14 +120,6 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
 
   const short = balance !== null && balance < totalCredits;
-  const canSubmit =
-    !posting &&
-    !locating &&
-    spot !== null &&
-    balance !== null &&
-    balance >= totalCredits &&
-    human.ready &&
-    (!isCustom || customError === null);
 
   const post = async () => {
     if (signedIn === false) {
