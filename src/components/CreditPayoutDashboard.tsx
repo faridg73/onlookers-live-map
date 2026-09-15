@@ -52,6 +52,7 @@ export function CreditPayoutDashboard() {
       try {
         const status = await loadStatus();
         setBank({ connected: status.connected, payoutsEnabled: status.payoutsEnabled });
+        if (status.supported === false && status.error) setConnectNote(status.error);
       } catch {
         setBank({ connected: false, payoutsEnabled: false });
       }
@@ -76,7 +77,9 @@ export function CreditPayoutDashboard() {
       }
       toast.info("Bank setup opened in a new tab. Come back here when you're done.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not open bank setup");
+      const message = error instanceof Error ? error.message : "Could not open bank setup";
+      if (message.includes(CONNECT_UNSUPPORTED_MARK)) setConnectNote(message);
+      else toast.error(message);
     } finally {
       setBusy(false);
     }
