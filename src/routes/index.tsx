@@ -294,44 +294,44 @@ const GUIDES: Array<{
     icon: Compass,
     kicker: "Platform guide",
     title: "How Onlooker works",
-    body: "Someone wants to see a place right now. You are standing there. That is the whole app.",
+    body: "Ever wished you could see a place right now? Someone out there is already standing in it. That's the whole idea.",
     points: [
-      "Post a bounty with the spot and what you want to see.",
-      "Your credits are held safely until a capture is delivered.",
-      "Pins on the map are live requests waiting for eyes.",
+      "Post a bounty — pick the spot and say what you'd love to see.",
+      "Your credits stay safely held until your capture actually arrives.",
+      "Every pin on the map is a real request from a real person, right now.",
     ],
   },
   {
     icon: Sparkles,
     kicker: "Hunter onboarding",
     title: "Earn your first bounty",
-    body: "Claim a nearby request, film it live and get paid the moment it is accepted.",
+    body: "See a request near you? Claim it, film a quick live capture, and the money lands the moment it's accepted.",
     points: [
-      "Verify your phone so requesters know you are real.",
-      "Claim only requests you can reach within the time window.",
-      "Deliver a steady, clear capture — quality gets you repeat work.",
+      "Verify your phone first — it shows people you're a real human.",
+      "Only claim what you can genuinely reach in time. No rushing needed.",
+      "A clear, steady capture builds trust — and brings repeat requests.",
     ],
   },
   {
     icon: Video,
     kicker: "Live streaming",
-    title: "Best practices on air",
-    body: "A good stream is stable, well lit and easy to follow.",
+    title: "Streaming people stick around for",
+    body: "Nobody expects a film crew. Steady hands, decent light and a little chatter go a surprisingly long way.",
     points: [
-      "Hold your phone steady and pan slowly across the scene.",
-      "Say where you are so viewers get their bearings.",
-      "Answer chat requests — that is what viewers pay for.",
+      "Hold your phone with both hands and pan slowly — let people take the scene in.",
+      "Say where you are out loud; it helps everyone find their bearings.",
+      "Answer the chat. That's the fun part — and it's exactly what viewers are here for.",
     ],
   },
   {
     icon: ShieldCheck,
     kicker: "Safety",
-    title: "Stay safe and legal",
-    body: "Public spaces only. Never put yourself or anyone else at risk for a bounty.",
+    title: "Stay safe out there",
+    body: "Public places only, always. No bounty is ever worth putting yourself — or anyone else — in a tricky spot.",
     points: [
-      "No private property, homes or restricted areas.",
-      "No copyrighted stage shows, performances or game broadcasts.",
-      "Keep chat and payment inside Onlooker so you stay protected.",
+      "Skip private homes, gated property and anywhere you're not meant to be.",
+      "Leave live shows, performances and games alone — that's someone else's work.",
+      "Keep chats and payments on Onlooker. It's how we've got your back.",
     ],
   },
 ];
@@ -369,7 +369,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
               Learning &amp; Guides
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Everything you need to request, capture and stream well.
+              A few friendly pointers to help you get the most out of Onlooker.
             </p>
           </div>
           <Button
