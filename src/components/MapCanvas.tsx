@@ -54,8 +54,6 @@ export function MapCanvas({
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
-  const [places, setPlaces] = useState<NearbyPlace[]>([]);
-  const lastPlaceKey = useRef<string>("");
   const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
