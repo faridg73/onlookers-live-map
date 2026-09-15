@@ -1042,6 +1042,7 @@ export type Database = {
           banned_at: string | null
           created_at: string
           display_name: string
+          follower_count: number
           full_name: string
           hunter_level: number
           id: string
@@ -1069,6 +1070,7 @@ export type Database = {
           banned_at?: string | null
           created_at?: string
           display_name?: string
+          follower_count?: number
           full_name?: string
           hunter_level?: number
           id: string
@@ -1096,6 +1098,7 @@ export type Database = {
           banned_at?: string | null
           created_at?: string
           display_name?: string
+          follower_count?: number
           full_name?: string
           hunter_level?: number
           id?: string
@@ -1543,6 +1546,27 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          followee_id: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          followee_id: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          followee_id?: string
+          follower_id?: string
+          id?: string
         }
         Relationships: []
       }
