@@ -19,6 +19,7 @@ import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { TrendingViewRequests } from "@/components/TrendingViewRequests";
 import { namePin, type ViewPin } from "@/lib/request-a-view";
 import { RequestViewPinDialog } from "@/components/RequestViewPinDialog";
+import { MapTourOverlay } from "@/components/MapTourOverlay";
 
 export const Route = createFileRoute("/")({
   validateSearch: (
