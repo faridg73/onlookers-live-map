@@ -25,11 +25,21 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install dependencies and build web assets
+      - name: Install Capacitor CLI and sync native project
         run: |
-          npm install
-          npm run build
+          npm install --no-audit --no-fund --ignore-scripts
           npx cap sync android
+
+      - name: Restore upload keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "::error::Missing repository secret ANDROID_KEYSTORE_BASE64 (base64 of onlooker-upload.keystore). Google Play only accepts signed bundles."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/onlooker-upload.keystore
+          ls -l android/app/onlooker-upload.keystore
 
       - name: Build signed release bundle
         env:
@@ -38,8 +48,12 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          if [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::Missing signing secrets ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS / ANDROID_KEY_PASSWORD."
+            exit 1
+          fi
           chmod +x ./gradlew
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease --no-daemon --stacktrace
         working-directory: android
 
       - name: Upload bundle artifact
