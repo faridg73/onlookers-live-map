@@ -10,7 +10,7 @@ import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { DARK_MAP_STYLES } from "@/lib/map-style";
 
 import { useBoosts } from "@/lib/boosts-store";
-import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
+import { fetchHunterStats } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
@@ -55,7 +55,7 @@ export function MapCanvas({
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
-  const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
+  const [me, setMe] = useState<{ isIncognito: boolean } | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
   const pinModeRef = useRef(pinMode);
@@ -67,7 +67,7 @@ export function MapCanvas({
   // Own status tier colours the marker; incognito hides the precise dot.
   useEffect(() => {
     void fetchHunterStats().then((stats) =>
-      setMe(stats ? { hunterLevel: stats.hunterLevel, isIncognito: stats.isIncognito } : null),
+      setMe(stats ? { isIncognito: stats.isIncognito } : null),
     );
   }, []);
 
