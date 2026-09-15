@@ -1046,6 +1046,7 @@ function PostScreen() {
           }, 50);
         }}
       />
+      {phoneGate.gate}
     </main>
   );
 }
