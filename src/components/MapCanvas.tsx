@@ -19,9 +19,9 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const DETAIL_ZOOM = 14;
 const POI_ZOOM = 15;
 
-const HIDE_BASE_POIS: google.maps.MapTypeStyle[] = [
-  { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
-  { featureType: "transit.station", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+const HIDE_BUSINESS_POIS: google.maps.MapTypeStyle[] = [
+  { featureType: "poi.business", elementType: "all", stylers: [{ visibility: "off" }] },
+  { featureType: "poi.attraction", elementType: "all", stylers: [{ visibility: "off" }] },
 ];
 
 type Pixel = { left: number; top: number };
@@ -96,7 +96,7 @@ export function MapCanvas({
           // Use Google's standard roadmap layer (the default Map option) without
           // custom styling overrides so the map looks familiar to everyone.
           mapTypeId: "roadmap",
-          styles: HIDE_BASE_POIS,
+          styles: HIDE_BUSINESS_POIS,
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
@@ -109,7 +109,6 @@ export function MapCanvas({
           const nextZoom = map.current?.getZoom();
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
-          map.current?.setOptions({ styles: nextZoom >= POI_ZOOM ? [] : HIDE_BASE_POIS });
         });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
