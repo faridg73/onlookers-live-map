@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex flex-col items-center gap-1 py-3 text-[0.58rem] font-medium uppercase tracking-[0.08em] text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex flex-col items-center gap-1 py-4 text-[0.58rem] font-medium uppercase tracking-[0.08em] text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();
