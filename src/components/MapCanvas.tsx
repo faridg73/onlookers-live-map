@@ -7,9 +7,10 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { DARK_MAP_STYLES } from "@/lib/map-style";
 
 import { useBoosts } from "@/lib/boosts-store";
-import { fetchHunterStats, tierForLevel } from "@/lib/gamification";
+import { fetchHunterStats } from "@/lib/gamification";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
@@ -54,7 +55,7 @@ export function MapCanvas({
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
-  const [me, setMe] = useState<{ hunterLevel: number; isIncognito: boolean } | null>(null);
+  const [me, setMe] = useState<{ isIncognito: boolean } | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
   const pinModeRef = useRef(pinMode);
@@ -66,7 +67,7 @@ export function MapCanvas({
   // Own status tier colours the marker; incognito hides the precise dot.
   useEffect(() => {
     void fetchHunterStats().then((stats) =>
-      setMe(stats ? { hunterLevel: stats.hunterLevel, isIncognito: stats.isIncognito } : null),
+      setMe(stats ? { isIncognito: stats.isIncognito } : null),
     );
   }, []);
 
@@ -85,22 +86,9 @@ export function MapCanvas({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          // Monochrome high-contrast basemap: bright white roads on a light
-          // grey ground so dark bounty pills stand out crisply.
+          // Dark grey basemap so the lemon-green pins glow with contrast.
           mapTypeId: "roadmap",
-          styles: [
-            { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
-            { elementType: "labels.text.fill", stylers: [{ color: "#4a4a4a" }] },
-            { elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }] },
-            { featureType: "water", elementType: "geometry", stylers: [{ color: "#dcdcdc" }] },
-            { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
-            { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
-            { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#cfcfcf" }] },
-            { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#e6e6e6" }] },
-            { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#bfbfbf" }] },
-            { featureType: "poi", stylers: [{ visibility: "off" }] },
-            { featureType: "poi.park", elementType: "geometry", stylers: [{ visibility: "on" }, { color: "#ececec" }] },
-          ],
+          styles: [...DARK_MAP_STYLES, { featureType: "poi", stylers: [{ visibility: "off" }] }],
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
@@ -314,8 +302,8 @@ export function MapCanvas({
             <span className="relative flex size-5 items-center justify-center">
               <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
               <span
-                className="size-3.5 rounded-full border-2 border-surface shadow-lg"
-                style={{ backgroundColor: tierForLevel(me?.hunterLevel ?? 1).dot }}
+                className="size-3.5 rounded-full border-2 border-black/60 shadow-lg"
+                style={{ backgroundColor: "var(--signal)" }}
               />
             </span>
           )}
@@ -337,7 +325,7 @@ export function MapCanvas({
             map.current?.setCenter(cluster.center);
             map.current?.setZoom(Math.min(DETAIL_ZOOM, Math.max(zoom + 2, 10)));
           }}
-          className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-black font-display text-xs font-extrabold tabular-nums text-white shadow-lg shadow-black/30 transition-transform hover:scale-105"
+          className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-black bg-signal font-display text-xs font-extrabold tabular-nums text-signal-foreground shadow-lg shadow-black/40 transition-transform hover:scale-105"
           style={{ left: cluster.pixel.left, top: cluster.pixel.top }}
           aria-label={`${cluster.count} nearby ${cluster.count === 1 ? "request" : "requests"}. Zoom in to view.`}
           title="Zoom in to view nearby requests"
@@ -407,20 +395,14 @@ export function MapCanvas({
                 )}
 
                 {tier === "standard" ? (
-                  /* subtle blue pin with a plain category glyph */
+                  /* lemon-green pin with a plain category glyph */
                   <span
                     className={cn(
                       "relative flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.62rem] font-bold shadow",
-                      closed ? "border-border bg-surface text-muted-foreground" : "text-white",
-                    )}
-                    style={
                       closed
-                        ? undefined
-                        : {
-                            borderColor: "color-mix(in oklch, var(--pin-standard) 70%, black)",
-                            backgroundColor: "color-mix(in oklch, var(--pin-standard) 82%, black)",
-                          }
-                    }
+                        ? "border-border bg-surface text-muted-foreground"
+                        : "border-black/70 bg-signal text-signal-foreground",
+                    )}
                   >
                     <span aria-hidden>{categoryGlyph(r.category)}</span>
                     {isSel && <span className="tabular-nums">{r.place.slice(0, 12)}</span>}
