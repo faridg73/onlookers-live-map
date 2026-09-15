@@ -34,11 +34,15 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          if [ -z "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "::error::Missing repository secret ANDROID_KEYSTORE_BASE64 (base64 of onlooker-upload.keystore). Google Play only accepts signed bundles."
+          if [ -f android/app/onlooker-upload.keystore ]; then
+            echo "Using the upload keystore committed in this repository."
+          elif [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > android/app/onlooker-upload.keystore
+            echo "Restored the upload keystore from the ANDROID_KEYSTORE_BASE64 secret."
+          else
+            echo "::error::No upload keystore found in the repository and no ANDROID_KEYSTORE_BASE64 secret set. Google Play only accepts signed bundles."
             exit 1
           fi
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > android/app/onlooker-upload.keystore
           ls -l android/app/onlooker-upload.keystore
 
       - name: Verify Android signing credentials
