@@ -383,7 +383,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           </Button>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+        <div className="min-h-0 max-h-[calc(85vh-4.5rem)] flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pt-4 [-webkit-overflow-scrolling:touch] pb-[calc(env(safe-area-inset-bottom)+3rem)]">
           {GUIDES.map(({ icon: Icon, kicker, title, body, points }) => (
             <article key={title} className="rounded-xl border border-border bg-surface-raised/70 p-4">
               <p className="flex items-center gap-2 text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
