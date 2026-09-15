@@ -107,10 +107,6 @@ function MapScreen() {
       .filter(({ distance }) => distance <= radiusMiles)
       .sort((a, b) => a.distance - b.distance || b.request.bounty - a.request.bounty);
   }, [requests, userPosition, radiusMiles]);
-  const nearbyLabel = userPosition
-    ? `${nearby.length} live ${nearby.length === 1 ? "request" : "requests"} within ${radius} ${unit}`
-    : "Turn on location to find nearby requests";
-
   return (
     <div className="fixed inset-0">
       <MapCanvas
@@ -171,25 +167,25 @@ function MapScreen() {
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => setMapFilter("all")}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <Map className="size-4" /> Local Bounty Map
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => void navigate({ to: "/community" })}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <Users className="size-4" /> Community Vibe
                 </Button>
                 <Button
                   type="button"
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => void navigate({ to: "/discover" })}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md px-2 py-2 text-[0.68rem] font-bold"
+                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <BookOpen className="size-4" /> Learning &amp; Guides
                 </Button>
