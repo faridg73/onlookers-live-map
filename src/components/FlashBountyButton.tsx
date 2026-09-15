@@ -148,7 +148,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       toast.error(customError);
       return;
     }
-    if (short) {
+    if (balance !== null && short) {
       toast.error(
         `Not enough Credits — this flash bounty locks ${formatCredits(
           totalCredits,
