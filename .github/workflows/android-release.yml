@@ -38,8 +38,43 @@ jobs:
             echo "::error::Missing repository secret ANDROID_KEYSTORE_BASE64 (base64 of onlooker-upload.keystore). Google Play only accepts signed bundles."
             exit 1
           fi
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/onlooker-upload.keystore
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > android/app/onlooker-upload.keystore
           ls -l android/app/onlooker-upload.keystore
+
+      - name: Verify Android signing credentials
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::Missing ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, or ANDROID_KEY_PASSWORD in GitHub Actions secrets."
+            exit 1
+          fi
+
+          if ! keytool -list \
+            -keystore android/app/onlooker-upload.keystore \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" >/dev/null 2>&1; then
+            echo "::error::Android signing credentials do not match onlooker-upload.keystore. Replace ANDROID_KEYSTORE_BASE64 with a fresh single-line base64 encoding of this exact file, then set ANDROID_KEYSTORE_PASSWORD and ANDROID_KEY_ALIAS to the values used when it was created."
+            exit 1
+          fi
+
+          if ! keytool -importkeystore \
+            -srckeystore android/app/onlooker-upload.keystore \
+            -srcstorepass "$ANDROID_KEYSTORE_PASSWORD" \
+            -srcalias "$ANDROID_KEY_ALIAS" \
+            -srckeypass "$ANDROID_KEY_PASSWORD" \
+            -destkeystore "$RUNNER_TEMP/signing-check.p12" \
+            -deststoretype PKCS12 \
+            -deststorepass signing-check-only \
+            -destkeypass signing-check-only \
+            -noprompt >/dev/null 2>&1; then
+            echo "::error::ANDROID_KEY_PASSWORD does not unlock ANDROID_KEY_ALIAS. Update that GitHub Actions secret; it may be the same as ANDROID_KEYSTORE_PASSWORD."
+            exit 1
+          fi
+
+          echo "Android signing file, alias, store password, and key password are valid."
 
       - name: Build signed release bundle
         env:
