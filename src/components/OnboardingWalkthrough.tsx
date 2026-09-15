@@ -9,6 +9,7 @@ import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { Button } from "@/components/ui/button";
 
 const MAP_CONTEXT_EVENT = "onlooker:set-map-context";
+const CONTEXT_ONBOARDING_KEY = "onlooker.context-onboarding-completed";
 
 const GOALS = [
   { id: "find", label: "Find a Live View", icon: Search, destination: "/" },
@@ -46,7 +47,11 @@ export function OnboardingWalkthrough() {
   useEffect(() => {
     let alive = true;
     if (!user) {
-      setOpen(false);
+      try {
+        setOpen(localStorage.getItem(CONTEXT_ONBOARDING_KEY) !== "1");
+      } catch {
+        setOpen(true);
+      }
       return;
     }
     fetchMyProfile(user.id)
@@ -68,6 +73,11 @@ export function OnboardingWalkthrough() {
     setBusy(true);
     try {
       await markOnboardingCompleted().catch(() => undefined);
+      try {
+        localStorage.setItem(CONTEXT_ONBOARDING_KEY, "1");
+      } catch {
+        /* The guide can still close when browser storage is unavailable. */
+      }
       if (position) window.dispatchEvent(new CustomEvent(MAP_CONTEXT_EVENT, { detail: position }));
       setOpen(false);
       if (goal?.destination && goal.destination !== "/") {
