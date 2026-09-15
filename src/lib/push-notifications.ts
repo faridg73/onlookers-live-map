@@ -49,6 +49,31 @@ export async function enablePush(): Promise<PushResult> {
   return token ? { status: "registered", token } : { status: "denied" };
 }
 
+export type BrowserNotifyResult = {
+  status: "granted" | "denied" | "unsupported" | "open-in-new-tab";
+};
+
+/** True when this device has already allowed browser notifications. */
+export function browserNotificationsGranted(): boolean {
+  return typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted";
+}
+
+/**
+ * Fallback for builds without Firebase push: asks the browser/device for
+ * notification permission so alerts can still appear while the app is open.
+ */
+export async function enableBrowserNotifications(): Promise<BrowserNotifyResult> {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return { status: "unsupported" };
+  }
+  if (window.top !== window.self) {
+    return { status: "open-in-new-tab" };
+  }
+  const permission =
+    Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+  return { status: permission === "granted" ? "granted" : "denied" };
+}
+
 /** Removes the Firebase service worker and disables push on this device. */
 export async function disablePush(): Promise<void> {
   const registrations = await navigator.serviceWorker.getRegistrations();
