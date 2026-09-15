@@ -276,6 +276,133 @@ function MapScreen() {
         onClaim={claim}
         onClose={() => select(null)}
       />
+
+      <GuidesOverlay open={guidesOpen} onClose={() => setGuidesOpen(false)} />
+    </div>
+  );
+}
+
+const GUIDES: Array<{
+  icon: typeof Compass;
+  kicker: string;
+  title: string;
+  body: string;
+  points: string[];
+}> = [
+  {
+    icon: Compass,
+    kicker: "Platform guide",
+    title: "How Onlooker works",
+    body: "Someone wants to see a place right now. You are standing there. That is the whole app.",
+    points: [
+      "Post a bounty with the spot and what you want to see.",
+      "Your credits are held safely until a capture is delivered.",
+      "Pins on the map are live requests waiting for eyes.",
+    ],
+  },
+  {
+    icon: Sparkles,
+    kicker: "Hunter onboarding",
+    title: "Earn your first bounty",
+    body: "Claim a nearby request, film it live and get paid the moment it is accepted.",
+    points: [
+      "Verify your phone so requesters know you are real.",
+      "Claim only requests you can reach within the time window.",
+      "Deliver a steady, clear capture — quality gets you repeat work.",
+    ],
+  },
+  {
+    icon: Video,
+    kicker: "Live streaming",
+    title: "Best practices on air",
+    body: "A good stream is stable, well lit and easy to follow.",
+    points: [
+      "Hold your phone steady and pan slowly across the scene.",
+      "Say where you are so viewers get their bearings.",
+      "Answer chat requests — that is what viewers pay for.",
+    ],
+  },
+  {
+    icon: ShieldCheck,
+    kicker: "Safety",
+    title: "Stay safe and legal",
+    body: "Public spaces only. Never put yourself or anyone else at risk for a bounty.",
+    points: [
+      "No private property, homes or restricted areas.",
+      "No copyrighted stage shows, performances or game broadcasts.",
+      "Keep chat and payment inside Onlooker so you stay protected.",
+    ],
+  },
+];
+
+function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end justify-center">
+      <button
+        type="button"
+        aria-label="Close guides"
+        onClick={onClose}
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guides-title"
+        className="relative flex max-h-[85vh] w-full max-w-lg animate-in slide-in-from-bottom-8 flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl duration-300"
+      >
+        <div className="flex items-start gap-3 border-b border-border px-4 py-3.5">
+          <BookOpen className="mt-0.5 size-5 shrink-0 text-signal" />
+          <div className="min-w-0 flex-1">
+            <h2 id="guides-title" className="text-base font-extrabold text-foreground">
+              Learning &amp; Guides
+            </h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Everything you need to request, capture and stream well.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close guides"
+            className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+          </Button>
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          {GUIDES.map(({ icon: Icon, kicker, title, body, points }) => (
+            <article key={title} className="rounded-xl border border-border bg-surface-raised/70 p-4">
+              <p className="flex items-center gap-2 text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
+                <Icon className="size-3.5" /> {kicker}
+              </p>
+              <h3 className="mt-1.5 text-sm font-extrabold text-foreground">{title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">{body}</p>
+              <ul className="mt-2.5 space-y-1.5">
+                {points.map((point) => (
+                  <li key={point} className="flex gap-2 text-xs text-foreground/85">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-signal" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
