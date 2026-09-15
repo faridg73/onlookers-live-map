@@ -295,6 +295,9 @@ function MapScreen() {
 
       <FlashBountyButton variant="map" />
 
+      {/* First-visit tour: explains the concept to new visitors, once per device */}
+      <MapTourOverlay />
+
       <RequestViewPinDialog
         pin={pin}
         naming={naming}
