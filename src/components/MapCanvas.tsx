@@ -85,12 +85,21 @@ export function MapCanvas({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          // Use Google's standard roadmap layer (the default Map option) without
-          // custom styling overrides so the map looks familiar to everyone.
+          // Monochrome high-contrast basemap: bright white roads on a light
+          // grey ground so dark bounty pills stand out crisply.
           mapTypeId: "roadmap",
           styles: [
-            { featureType: "poi.business", elementType: "all", stylers: [{ visibility: "off" }] },
-            { featureType: "poi.attraction", elementType: "all", stylers: [{ visibility: "off" }] },
+            { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#4a4a4a" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }] },
+            { featureType: "water", elementType: "geometry", stylers: [{ color: "#dcdcdc" }] },
+            { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+            { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+            { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#cfcfcf" }] },
+            { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#e6e6e6" }] },
+            { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#bfbfbf" }] },
+            { featureType: "poi", stylers: [{ visibility: "off" }] },
+            { featureType: "poi.park", elementType: "geometry", stylers: [{ visibility: "on" }, { color: "#ececec" }] },
           ],
         });
         const ov = new maps.OverlayView();
@@ -328,7 +337,7 @@ export function MapCanvas({
             map.current?.setCenter(cluster.center);
             map.current?.setZoom(Math.min(DETAIL_ZOOM, Math.max(zoom + 2, 10)));
           }}
-          className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-signal bg-surface/95 font-display text-xs font-extrabold tabular-nums text-signal shadow-lg shadow-signal/20 backdrop-blur transition-transform hover:scale-105"
+          className="absolute grid size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-black font-display text-xs font-extrabold tabular-nums text-white shadow-lg shadow-black/30 transition-transform hover:scale-105"
           style={{ left: cluster.pixel.left, top: cluster.pixel.top }}
           aria-label={`${cluster.count} nearby ${cluster.count === 1 ? "request" : "requests"}. Zoom in to view.`}
           title="Zoom in to view nearby requests"
