@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { MapPin, Radio, Zap } from "lucide-react";
+import { MapPin, Radar, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
