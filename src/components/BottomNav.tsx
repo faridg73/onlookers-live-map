@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex h-full flex-col items-center justify-start gap-1 py-3 text-[0.58rem] font-medium uppercase tracking-[0.08em] leading-none text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.5rem] font-medium uppercase tracking-[0.02em] leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();
@@ -25,15 +25,15 @@ export function BottomNav() {
   return (
     <>
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 pb-safe backdrop-blur-xl">
-        <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pt-1">
+        <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1 px-1 pt-1">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
             <Fragment key={to}>
               {to === "/post" && (
-                <li className="flex-1">
+                <li className="min-w-0 flex-1">
                   <FlashBountyButton variant="nav" />
                 </li>
               )}
-              <li className="flex-1">
+              <li className="min-w-0 flex-1">
                 <Link
                   to={to}
                   activeOptions={{ exact }}
@@ -46,12 +46,12 @@ export function BottomNav() {
                   >
                     <Icon className="size-5" strokeWidth={1.75} />
                   </span>
-                  {label}
+                  <span className="w-full truncate">{label}</span>
                 </Link>
               </li>
             </Fragment>
           ))}
-          <li className="flex-1">
+          <li className="min-w-0 flex-1">
             <button
               type="button"
               onClick={() => setInboxOpen(true)}
@@ -66,7 +66,7 @@ export function BottomNav() {
                   </span>
                 )}
               </span>
-              Live Inbox
+              <span className="w-full leading-tight">Live Inbox</span>
             </button>
           </li>
         </ul>
