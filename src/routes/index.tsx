@@ -144,7 +144,7 @@ function MapScreen() {
         </div>
       </header>
 
-      <section className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-30 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+      <section className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-40 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
         <Button
           type="button"
           variant="ghost"
@@ -162,7 +162,7 @@ function MapScreen() {
             exploreOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
           }`}
         >
-          <div className="min-h-0 max-h-[min(46vh,22rem)] overflow-y-auto overscroll-contain">
+          <div className="min-h-0 max-h-[min(38vh,17rem)] overflow-y-auto overscroll-contain">
             <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
               <div className="flex flex-col gap-2">
                 <Button
