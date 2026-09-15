@@ -1,12 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
-import { Inbox, Loader2, MapPin } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowRight, CircleDollarSign, Inbox, Loader2, MapPin, MessageCircle, Radio, Users } from "lucide-react";
+import { toast } from "sonner";
 import { ChatDrawer, ChatStatusBadge, chatStage } from "@/components/ChatDrawer";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/use-auth";
 import { listChatThreads, type ChatThread } from "@/lib/chat-threads";
+import { sendMessage } from "@/lib/chat";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
+type InboxTab = "bounties" | "streamers";
+
+const QUICK_REPLIES = ["I'm heading there now", "ETA 5 mins"] as const;
 
 function agoLabel(iso: string) {
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -25,10 +33,13 @@ export function ChatInbox({
   onOpenChange: (open: boolean) => void;
 }) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<ChatThread | null>(null);
+  const [tab, setTab] = useState<InboxTab>("bounties");
+  const [sendingQuick, setSendingQuick] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user) {
@@ -64,6 +75,27 @@ export function ChatInbox({
     };
   }, [open, user, load]);
 
+  const activeThreads = useMemo(
+    () => threads.filter((thread) => chatStage(thread.status) === "active"),
+    [threads],
+  );
+  const shownThreads = tab === "streamers" ? activeThreads : threads;
+  const unreadTotal = threads.reduce((total, thread) => total + thread.unread, 0);
+
+  async function sendQuickReply(thread: ChatThread, body: (typeof QUICK_REPLIES)[number]) {
+    const pendingKey = `${thread.key}:${body}`;
+    setSendingQuick(pendingKey);
+    try {
+      await sendMessage(thread.key, body);
+      toast.success("Update sent to the chat.");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "That update could not be sent.");
+    } finally {
+      setSendingQuick(null);
+    }
+  }
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -78,12 +110,46 @@ export function ChatInbox({
             {isMobile && (
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" aria-hidden />
             )}
-            <SheetTitle className="flex items-center gap-2 font-display text-lg font-extrabold tracking-tight text-foreground">
-              <Inbox className="size-4 text-signal" /> Inbox
-            </SheetTitle>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Your conversations with requesters and hunters.
-            </p>
+            <div className="flex items-start justify-between gap-3 pr-7">
+              <div>
+                <SheetTitle className="flex items-center gap-2 font-display text-lg font-extrabold tracking-tight text-foreground">
+                  <Inbox className="size-4 text-signal" /> Live Inbox
+                </SheetTitle>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Coordinate bounties as they happen.
+                </p>
+              </div>
+              {user && unreadTotal > 0 && (
+                <span className="rounded-full bg-signal px-2.5 py-1 text-[0.62rem] font-extrabold text-signal-foreground">
+                  {unreadTotal} new
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 rounded-lg bg-background p-1">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setTab("bounties")}
+                className={cn(
+                  "h-9 rounded-md px-2 text-xs font-bold",
+                  tab === "bounties" && "bg-surface-raised text-signal",
+                )}
+              >
+                <MessageCircle className="size-3.5" /> Bounty Discussions
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setTab("streamers")}
+                className={cn(
+                  "h-9 rounded-md px-2 text-xs font-bold",
+                  tab === "streamers" && "bg-surface-raised text-live",
+                )}
+              >
+                <Radio className="size-3.5" /> Active Streamers
+              </Button>
+            </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
@@ -92,23 +158,44 @@ export function ChatInbox({
                 <Loader2 className="size-5 animate-spin" />
               </div>
             ) : !user ? (
-              <p className="py-10 text-center text-sm text-muted-foreground">
-                Sign in to see your messages.
-              </p>
-            ) : threads.length === 0 ? (
-              <p className="py-10 text-center text-sm text-muted-foreground">
-                No conversations yet. Chat opens as soon as a bounty is claimed.
-              </p>
+              <SignedOutInboxPreview
+                tab={tab}
+                onSignIn={() => {
+                  onOpenChange(false);
+                  void navigate({ to: "/auth" });
+                }}
+              />
+            ) : shownThreads.length === 0 ? (
+              <div className="flex min-h-64 flex-col items-center justify-center px-5 text-center">
+                <span className="grid size-12 place-items-center rounded-full border border-border bg-surface-raised text-signal">
+                  {tab === "streamers" ? <Radio className="size-5" /> : <MessageCircle className="size-5" />}
+                </span>
+                <p className="mt-4 text-sm font-bold text-foreground">
+                  {tab === "streamers" ? "No active stream chats" : "No bounty discussions yet"}
+                </p>
+                <p className="mt-1 max-w-64 text-xs leading-relaxed text-muted-foreground">
+                  {tab === "streamers"
+                    ? "Live coordination appears here when a hunter claims your bounty."
+                    : "Your first conversation opens when a bounty is claimed."}
+                </p>
+              </div>
             ) : (
               <ul className="space-y-2">
-                {threads.map((thread) => (
+                {shownThreads.map((thread) => (
                   <li key={thread.key}>
-                    <button
-                      type="button"
-                      onClick={() => setActive(thread)}
-                      className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-2xl border border-border bg-surface-raised p-3 text-left transition-colors hover:border-signal"
-                    >
-                      <span className="min-w-0">
+                    <article className="rounded-xl border border-border bg-surface-raised p-3 transition-colors hover:border-signal/70">
+                      <button
+                        type="button"
+                        onClick={() => setActive(thread)}
+                        className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] gap-3 text-left"
+                      >
+                        <span className="relative grid size-10 shrink-0 place-items-center rounded-full bg-background font-display text-sm font-extrabold text-foreground">
+                          {thread.title.trim().charAt(0).toUpperCase() || "B"}
+                          {chatStage(thread.status) === "active" && (
+                            <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface-raised bg-live" aria-label="Live now" />
+                          )}
+                        </span>
+                        <span className="min-w-0">
                         <span className="flex items-center gap-2">
                           <span className="truncate text-sm font-bold text-foreground">
                             {thread.title}
@@ -140,7 +227,30 @@ export function ChatInbox({
                           {agoLabel(thread.lastAt)}
                         </span>
                       </span>
-                    </button>
+                      </button>
+
+                      {chatStage(thread.status) === "active" && (
+                        <div className="mt-3 flex gap-2 overflow-x-auto border-t border-border pt-3">
+                          {QUICK_REPLIES.map((reply) => {
+                            const pendingKey = `${thread.key}:${reply}`;
+                            return (
+                              <Button
+                                key={reply}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={sendingQuick !== null}
+                                onClick={() => void sendQuickReply(thread, reply)}
+                                className="h-8 shrink-0 rounded-full border-border bg-background px-3 text-[0.68rem] font-bold text-foreground hover:border-signal hover:text-signal"
+                              >
+                                {sendingQuick === pendingKey && <Loader2 className="size-3 animate-spin" />}
+                                {reply}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </article>
                   </li>
                 ))}
               </ul>
@@ -165,5 +275,56 @@ export function ChatInbox({
         />
       )}
     </>
+  );
+}
+
+function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () => void }) {
+  return (
+    <div className="mx-auto flex min-h-full max-w-sm flex-col px-1 py-2">
+      <section className="overflow-hidden rounded-xl border border-border bg-surface-raised">
+        <div className="border-b border-border bg-background px-4 py-3">
+          <p className="flex items-center gap-2 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-live">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-70" />
+              <span className="relative inline-flex size-2 rounded-full bg-live" />
+            </span>
+            {tab === "streamers" ? "Live coordination" : "Bounty activity"}
+          </p>
+          <h3 className="mt-2 font-display text-xl font-extrabold text-foreground">
+            Stay close to the action.
+          </h3>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            Message hunters, share arrival updates, and follow every live request from claim to payout.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 divide-x divide-border">
+          <div className="p-4">
+            <CircleDollarSign className="size-5 text-signal" />
+            <p className="mt-3 text-xs font-bold text-foreground">Bounty updates</p>
+            <p className="mt-1 text-[0.68rem] leading-relaxed text-muted-foreground">
+              Confirm details and keep the request moving.
+            </p>
+          </div>
+          <div className="p-4">
+            <Users className="size-5 text-live" />
+            <p className="mt-3 text-xs font-bold text-foreground">Live presence</p>
+            <p className="mt-1 text-[0.68rem] leading-relaxed text-muted-foreground">
+              See when an onlooker is active and heading there.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="mt-5 px-2 text-center">
+        <p className="font-display text-base font-extrabold text-foreground">Your live inbox is waiting</p>
+        <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
+          Sign in to join bounty discussions and coordinate with active streamers in real time.
+        </p>
+        <Button type="button" onClick={onSignIn} className="mt-4 h-11 w-full rounded-lg font-extrabold">
+          Sign in to join the conversation <ArrowRight className="size-4" />
+        </Button>
+      </div>
+    </div>
   );
 }
