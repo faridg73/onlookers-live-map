@@ -55,7 +55,7 @@ export function MapTourOverlay() {
   const Icon = current.icon;
   const last = step === steps.length - 1;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -105,6 +105,7 @@ export function MapTourOverlay() {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
