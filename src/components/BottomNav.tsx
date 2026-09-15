@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.5rem] font-medium uppercase tracking-[0.02em] leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.55rem] font-medium leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();
