@@ -49,7 +49,7 @@ export function AlertSettingsCard() {
       const result = await sendTestText({ data: { phone: prefs.phone } });
       setSmsState(
         result.ok
-          ? { ok: true, message: "Test text sent — check your phone." }
+          ? { ok: true, message: "Test text sent. Check your phone." }
           : { ok: false, message: result.error ?? "Could not send that text." },
       );
     } catch (error) {
@@ -110,7 +110,7 @@ export function AlertSettingsCard() {
           loading: false,
           registered: true,
           message:
-            "Alerts are on for this device. Background alerts while the app is fully closed are coming soon — keep Onlooker open or add it to your home screen for the fastest pings.",
+            "Alerts are on for this device. Background alerts while the app is fully closed are coming soon. Keep Onlooker open or add it to your home screen for the fastest pings.",
         });
         set("push_enabled", true);
         toast.success("Device alerts enabled");
@@ -152,7 +152,7 @@ export function AlertSettingsCard() {
       if (result.status === "registered") {
         const saved = await saveToken({ data: { token: result.token, platform: "web" } });
         if (saved.ok) {
-          setPushState({ loading: false, registered: true, message: "Phone push is active — you'll get bounty alerts even when the app is closed." });
+          setPushState({ loading: false, registered: true, message: "Phone push is active. You'll get bounty alerts even when the app is closed." });
           toast.success("Push notifications enabled");
         } else {
           setPushState({ loading: false, registered: true, message: "Permission granted, but the token could not be saved." });
@@ -221,7 +221,7 @@ export function AlertSettingsCard() {
             <p className="mt-0.5 text-[0.7rem] text-muted-foreground">
               {pushState.registered
                 ? "You'll get bounty alerts even when the app is closed."
-                : "Wake your phone when a bounty drops nearby — even with the app closed."}
+                : "Wake your phone when a bounty drops nearby, even with the app closed."}
             </p>
           </div>
           <Button

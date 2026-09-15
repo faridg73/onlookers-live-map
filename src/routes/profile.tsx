@@ -349,15 +349,22 @@ function ProfileScreen() {
           </DialogHeader>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p className="text-foreground">
-              Onlooker Live is the next evolution of real-time mobile broadcasting—a hyper-local marketplace that connects immediate global curiosity with authentic human presence on the ground.
+              Onlooker Live is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
             </p>
             <p>
-              We believe the most compelling moments in the world aren't scripted; they are happening right now, around the corner or across an ocean. By combining intuitive geospatial discovery with a secure, transparent creator economy, Onlooker Live transforms everyday mobile streams into a trusted, on-demand window to the world.
+              The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.
             </p>
             <p>
-              Built for creators, valued by viewers, and designed for instant engagement, we are redefining how live media moves from the screen to the real world. Welcome to the live view network.
+              Made for creators, trusted by viewers, and designed for instant connection. Welcome to the live view network.
             </p>
           </div>
+          <div className="border-t border-border pt-4">
+            <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Follow Onlooker
+            </p>
+            <SocialLinks className="flex items-center gap-3" />
+          </div>
+
         </DialogContent>
       </Dialog>
     </div>

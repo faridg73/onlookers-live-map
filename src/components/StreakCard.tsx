@@ -32,7 +32,7 @@ export function StreakCard() {
               description: result.awardedPass ? "You also earned a free post-boost pass." : undefined,
             });
           } else {
-            toast.success(`Day ${result.currentStreak} streak — keep it going.`);
+            toast.success(`Day ${result.currentStreak} streak. Keep it going.`);
           }
         }
       } catch {
