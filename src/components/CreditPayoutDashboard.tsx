@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
+import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { fetchCreditWallet } from "@/lib/credits";
