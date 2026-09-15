@@ -228,12 +228,11 @@ function CommunityHub() {
           Everything
         </Button>
         </div>
-        <ScrollableLane
-          className="-mx-5 sm:-mx-8"
-          innerClassName="snap-x snap-mandatory gap-3 pl-5 pr-3 pb-2 [scroll-padding-left:1.25rem] sm:pl-8 sm:pr-6 sm:[scroll-padding-left:2rem]"
-          ariaLabel="Category cards"
+        <div
+          role="list"
+          aria-label="Category cards"
+          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2"
         >
-
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
             const Icon = visual.icon;
@@ -242,12 +241,13 @@ function CommunityHub() {
               <button
                 key={c.id}
                 type="button"
+                role="listitem"
                 onClick={() => {
                   setCategory(c.id);
                   setTag(null);
                 }}
                 aria-pressed={category === c.id}
-                className={`group relative h-32 min-w-[260px] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
+                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
@@ -264,7 +264,7 @@ function CommunityHub() {
               </button>
             );
           })}
-        </ScrollableLane>
+        </div>
 
       </section>
 
