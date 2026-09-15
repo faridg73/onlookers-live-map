@@ -404,6 +404,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
