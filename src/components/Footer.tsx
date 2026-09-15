@@ -26,16 +26,22 @@ const SOCIAL_LINKS = [
     label: "X (Twitter)",
     href: "https://x.com/onlooker_live",
     icon: XIcon,
+    brandClass:
+      "text-white hover:bg-white hover:text-black hover:border-white",
   },
   {
     label: "Instagram",
     href: "https://instagram.com/onlooker_live",
     icon: InstagramIcon,
+    brandClass:
+      "text-white hover:border-[#ff0050]/60 hover:shadow-[0_0_12px_rgba(255,0,80,0.35)]",
   },
   {
     label: "TikTok",
     href: "https://tiktok.com/@onlooker_live",
     icon: TikTokIcon,
+    brandClass:
+      "text-white hover:border-[#00f2ea]/60 hover:shadow-[0_0_12px_rgba(0,242,234,0.35)]",
   },
 ] as const;
 
