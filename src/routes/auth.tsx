@@ -95,6 +95,12 @@ function AuthScreen() {
     if (text.includes("too many") || text.includes("rate limit")) {
       return "Too many attempts. Please wait a minute and try again.";
     }
+    if (text.includes("pwned") || text.includes("compromised") || text.includes("leaked")) {
+      return "That password has appeared in a known data breach. Please choose a different one.";
+    }
+    if (text.includes("weak_password") || text.includes("password should")) {
+      return "That password is too weak. Use 10+ characters with a capital letter, a number and a symbol.";
+    }
     return raw || "Something went wrong. Please try again.";
   }
 
@@ -127,6 +133,14 @@ function AuthScreen() {
       setFormError("You must accept the Terms of Service to continue.");
       toast.error("You must accept the Terms of Service to continue.");
       return;
+    }
+    if (mode === "signup") {
+      const weak = describePasswordProblem(password);
+      if (weak) {
+        setFormError(weak);
+        toast.error(weak);
+        return;
+      }
     }
     if (!human.ready) {
       const message =
