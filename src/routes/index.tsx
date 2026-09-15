@@ -158,9 +158,9 @@ function MapScreen() {
           aria-expanded={exploreOpen}
           className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
         >
-          <Search className="size-5 text-signal" />
-          <span className="min-w-0 flex-1 text-left text-sm font-extrabold">What would you like to see?</span>
-          <ChevronDown className={`size-4 transition-transform duration-300 ${exploreOpen ? "rotate-180" : ""}`} />
+          <Search className="size-5 text-signal md:size-6" />
+          <span className="min-w-0 flex-1 text-left text-sm font-extrabold md:text-base">What would you like to see?</span>
+          <ChevronDown className={`size-4 transition-transform duration-300 md:size-5 ${exploreOpen ? "rotate-180" : ""}`} />
         </Button>
 
         <div
