@@ -8,7 +8,7 @@ import { fetchMyVerification, type VerificationStatus } from "@/lib/verification
 
 const CODE_LENGTH = 6;
 
-/** Verify yourself instantly with a texted code — no manual review, no documents. */
+/** Verify yourself instantly with a texted code. No manual review, no documents. */
 export function CreatorVerificationCard() {
   const [status, setStatus] = useState<VerificationStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,7 @@ export function CreatorVerificationCard() {
       const result = await confirmCreatorPhoneCode({ data: { phone: sentTo, code: value } });
       if (!result.ok) throw new Error(result.error ?? "That code didn't work.");
       setStatus({ isVerified: true, requestedAt: null });
-      toast.success("You're verified — free live broadcasting is unlocked.");
+      toast.success("You're verified. Free live broadcasting is unlocked.");
     } catch (err) {
       setCode("");
       codeRef.current?.focus();

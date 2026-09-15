@@ -45,11 +45,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
+import { SocialLinks } from "@/components/Footer";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your Onlooker Profile — earnings and requests" },
+      { title: "Your Onlooker Profile: earnings and requests" },
       {
         name: "description",
         content:
@@ -75,7 +77,7 @@ const ACTIVITY = [
   { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 Credits bounty · 12 min ago" },
   { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "150 Credits bounty · 1 hr ago" },
   { icon: Camera, text: "Sent a live shot of the night market", meta: "+60 Credits bounty · 2 hrs ago" },
-  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
+  { icon: Clock, text: "Request fulfilled: “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
 ];
 
 function ProfileScreen() {
@@ -126,12 +128,13 @@ function ProfileScreen() {
     window.history.replaceState({}, "", window.location.pathname);
 
     if (status === "cancelled") {
-      toast("Checkout cancelled — no charge was made.");
+      toast("Checkout cancelled. You were not charged.");
       return;
     }
     if (status !== "success") return;
 
-    toast.success("Payment received — adding your Credits…");
+    toast.success("Payment received. Adding your Credits…");
+
     const timers = [0, 1500, 4000, 8000].map((delay) =>
       window.setTimeout(
         () => window.dispatchEvent(new Event("onlooker:credits-refresh")),
@@ -198,10 +201,11 @@ function ProfileScreen() {
         className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
       >
         <span className="flex items-center gap-3">
-          <Users className="size-4 text-signal" /> Group Pools — fund a bounty together
+          <Users className="size-4 text-signal" /> Group Pools: fund a bounty together
         </span>
         <ChevronRight className="size-4 text-muted-foreground" />
       </Link>
+
 
       <Link
         to="/payout-history"
@@ -258,7 +262,7 @@ function ProfileScreen() {
           className="flex w-full items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
         >
           <span className="flex items-center gap-3">
-            <Info className="size-4 text-signal" /> How It Works — app guide
+            <Info className="size-4 text-signal" /> How It Works: app guide
           </span>
           <ChevronRight className="size-4 text-muted-foreground" />
         </button>
@@ -345,15 +349,22 @@ function ProfileScreen() {
           </DialogHeader>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p className="text-foreground">
-              Onlooker Live is the next evolution of real-time mobile broadcasting—a hyper-local marketplace that connects immediate global curiosity with authentic human presence on the ground.
+              Onlooker Live is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
             </p>
             <p>
-              We believe the most compelling moments in the world aren't scripted; they are happening right now, around the corner or across an ocean. By combining intuitive geospatial discovery with a secure, transparent creator economy, Onlooker Live transforms everyday mobile streams into a trusted, on-demand window to the world.
+              The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.
             </p>
             <p>
-              Built for creators, valued by viewers, and designed for instant engagement, we are redefining how live media moves from the screen to the real world. Welcome to the live view network.
+              Made for creators, trusted by viewers, and designed for instant connection. Welcome to the live view network.
             </p>
           </div>
+          <div className="border-t border-border pt-4">
+            <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Follow Onlooker
+            </p>
+            <SocialLinks className="flex items-center gap-3" />
+          </div>
+
         </DialogContent>
       </Dialog>
     </div>

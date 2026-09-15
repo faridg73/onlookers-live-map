@@ -90,7 +90,30 @@ function TikTokIcon({ className }: { className?: string }) {
   );
 }
 
+export function SocialLinks({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      {SOCIAL_LINKS.map(({ label, href, icon: Icon, brandClass }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          className={cn(
+            "flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised transition-colors",
+            brandClass
+          )}
+        >
+          <Icon className="size-5" />
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export function Footer() {
+
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
   return (
@@ -117,23 +140,8 @@ export function Footer() {
           </button>
         </nav>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
-          {SOCIAL_LINKS.map(({ label, href, icon: Icon, brandClass }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className={cn(
-                "flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised transition-colors",
-                brandClass
-              )}
-            >
-              <Icon className="size-5" />
-            </a>
-          ))}
-        </div>
+        <SocialLinks className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start" />
+
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
