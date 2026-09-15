@@ -247,10 +247,15 @@ function MapScreen() {
         <Button
           type="button"
           onClick={() => void navigate({ to: "/post" })}
-          className="h-14 w-full justify-start rounded-none bg-foreground px-4 text-background hover:bg-foreground/90"
+          className="h-14 w-full justify-start rounded-none bg-signal px-4 text-signal-foreground shadow-[0_-1px_0_0_var(--color-signal),0_0_24px_0_color-mix(in_oklab,var(--color-signal)_45%,transparent)] transition-colors hover:bg-signal/90"
         >
           <CircleDollarSign className="size-5" />
-          <span className="flex-1 text-left text-sm font-extrabold">Post a Bounty</span>
+          <span className="flex-1 text-left text-sm font-extrabold uppercase tracking-[0.06em]">
+            Post a Bounty
+          </span>
+          <span className="rounded-full bg-signal-foreground/15 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em]">
+            Primary
+          </span>
         </Button>
       </section>
 
