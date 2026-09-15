@@ -433,7 +433,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={!canSubmit}
+              disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
               {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(totalCredits)}`}
