@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.55rem] font-medium leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 py-3 text-center text-[0.55rem] font-medium leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();
@@ -25,7 +25,7 @@ export function BottomNav() {
   return (
     <>
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 pb-safe backdrop-blur-xl">
-        <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1 px-1 pt-1">
+        <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-0.5 pt-1">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
             <Fragment key={to}>
               {to === "/post" && (
