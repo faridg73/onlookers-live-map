@@ -111,14 +111,17 @@ export function Footer() {
         </nav>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
-          {SOCIAL_LINKS.map(({ label, href, icon: Icon }) => (
+          {SOCIAL_LINKS.map(({ label, href, icon: Icon, brandClass }) => (
             <a
               key={label}
               href={href}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised text-muted-foreground transition-colors hover:border-signal/60 hover:text-signal"
+              className={cn(
+                "flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised transition-colors",
+                brandClass
+              )}
             >
               <Icon className="size-5" />
             </a>
