@@ -77,6 +77,7 @@ export function CreatorVerificationCard() {
       codeRef.current?.focus();
       toast.error(err instanceof Error ? err.message : "That code didn't work.");
     } finally {
+      checkingRef.current = false;
       setBusy(false);
     }
   }
