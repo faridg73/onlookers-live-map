@@ -96,7 +96,7 @@ export function MapCanvas({
           // Use Google's standard roadmap layer (the default Map option) without
           // custom styling overrides so the map looks familiar to everyone.
           mapTypeId: "roadmap",
-          styles: HIDE_BASE_POIS,
+          styles: HIDE_BUSINESS_POIS,
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
@@ -109,7 +109,6 @@ export function MapCanvas({
           const nextZoom = map.current?.getZoom();
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
-          map.current?.setOptions({ styles: nextZoom >= POI_ZOOM ? [] : HIDE_BASE_POIS });
         });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
