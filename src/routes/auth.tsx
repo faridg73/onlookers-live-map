@@ -352,12 +352,19 @@ function AuthScreen() {
         <input
           type="password"
           required
-          minLength={8}
+          minLength={mode === "signup" ? 10 : 8}
+          autoComplete={mode === "signup" ? "new-password" : "current-password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password (8+ characters)"
+          placeholder={mode === "signup" ? "Password (10+ characters)" : "Password"}
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
+        {mode === "signup" ? (
+          <p className="px-1 text-xs text-muted-foreground">
+            At least 10 characters with a capital letter, a number and a symbol. Passwords found in
+            known data breaches are rejected.
+          </p>
+        ) : null}
         {human.widget}
         {formError ? (
           <div
