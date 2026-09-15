@@ -22,12 +22,6 @@ export async function fetchMyVerification(expectedUserId?: string): Promise<Veri
   };
 }
 
-/** Applies for creator verification; staff review the request afterwards. */
-export async function requestCreatorVerification(): Promise<string> {
-  const { data, error } = await supabase.rpc("request_creator_verification");
-  if (error) throw new Error(error.message);
-  return (data as string | null) ?? new Date().toISOString();
-}
 
 const verifiedCache = new Map<string, boolean>();
 
