@@ -41,11 +41,15 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies and build web assets
+      - name: Install Capacitor CLI and sync native project
         run: |
-          npm install
-          npm run build
+          npm install --no-audit --no-fund --ignore-scripts
           npx cap sync ios
+
+      - name: Set unique build number
+        run: |
+          cd ios/App
+          xcrun agvtool new-version -all $(( 100 + GITHUB_RUN_NUMBER ))
 
       - name: Build Archive & Upload to App Store Connect
         env:
@@ -53,6 +57,10 @@ jobs:
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
           APP_STORE_P8_KEY: ${{ secrets.APP_STORE_P8_KEY }}
         run: |
+          if [ -z "$APP_STORE_KEY_ID" ] || [ -z "$APP_STORE_ISSUER_ID" ] || [ -z "$APP_STORE_P8_KEY" ]; then
+            echo "::error::Missing App Store Connect secrets APP_STORE_KEY_ID / APP_STORE_ISSUER_ID / APP_STORE_P8_KEY."
+            exit 1
+          fi
           mkdir -p ~/.private_keys
           KEY_PATH=~/.private_keys/AuthKey_${APP_STORE_KEY_ID}.p8
           echo "$APP_STORE_P8_KEY" > "$KEY_PATH"
