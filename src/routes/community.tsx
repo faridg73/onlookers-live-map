@@ -67,6 +67,23 @@ function CommunityHub() {
   const [loading, setLoading] = useState(true);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const vibeRowRef = useRef<HTMLDivElement | null>(null);
+  const [vibeScroll, setVibeScroll] = useState({ width: 100, left: 0 });
+  const updateVibeScroll = useCallback(() => {
+    const el = vibeRowRef.current;
+    if (!el || el.scrollWidth <= el.clientWidth) {
+      setVibeScroll({ width: 100, left: 0 });
+      return;
+    }
+    const width = (el.clientWidth / el.scrollWidth) * 100;
+    const left = (el.scrollLeft / el.scrollWidth) * 100;
+    setVibeScroll({ width, left });
+  }, []);
+  useEffect(() => {
+    updateVibeScroll();
+    window.addEventListener("resize", updateVibeScroll);
+    return () => window.removeEventListener("resize", updateVibeScroll);
+  }, [updateVibeScroll]);
   const { area, busy: locationBusy, error: locationError, useMyLocation, setCity, applyPlace } = useDiscoveryArea();
   const center = useMemo<MapPosition>(() => ({ lat: area.latitude, lng: area.longitude }), [area]);
 
