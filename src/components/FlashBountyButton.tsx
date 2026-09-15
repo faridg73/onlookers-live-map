@@ -55,6 +55,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [selectedTier, setSelectedTier] = useState<FlashTierPreset>(
@@ -88,11 +89,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       .finally(() => setLocating(false));
   };
 
+  const loadBalance = () => {
+    setBalanceLoading(true);
+    void readWalletBalance()
+      .then(setBalance)
+      .catch(() => setBalance(null))
+      .finally(() => setBalanceLoading(false));
+  };
+
   useEffect(() => {
     if (!open) return;
     findSpot();
     void isSignedIn().then(setSignedIn);
-    void readWalletBalance().then(setBalance);
+    loadBalance();
   }, [open]);
 
   useEffect(() => {
@@ -112,14 +121,6 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
 
   const short = balance !== null && balance < totalCredits;
-  const canSubmit =
-    !posting &&
-    !locating &&
-    spot !== null &&
-    balance !== null &&
-    balance >= totalCredits &&
-    human.ready &&
-    (!isCustom || customError === null);
 
   const post = async () => {
     if (signedIn === false) {
@@ -139,7 +140,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       );
       return;
     }
-    if (balance === null) {
+    if (balance === null && balanceLoading) {
       toast.error("We're still loading your Credit balance — try again in a moment.");
       return;
     }
@@ -147,7 +148,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       toast.error(customError);
       return;
     }
-    if (short) {
+    if (balance !== null && short) {
       toast.error(
         `Not enough Credits — this flash bounty locks ${formatCredits(
           totalCredits,
@@ -377,14 +378,28 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             </ul>
 
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-extrabold text-foreground">Your balance</span>
-                <span className={cn(
-                  "font-display text-lg font-extrabold tabular-nums",
-                  short ? "text-destructive" : "text-signal",
-                )}>
-                  {balance === null ? "…" : formatCredits(Math.round(balance))}
-                </span>
+                {balance !== null ? (
+                  <span className={cn(
+                    "font-display text-lg font-extrabold tabular-nums",
+                    short ? "text-destructive" : "text-signal",
+                  )}>
+                    {formatCredits(Math.round(balance))}
+                  </span>
+                ) : balanceLoading ? (
+                  <span className="text-sm font-bold text-muted-foreground">Loading…</span>
+                ) : signedIn === false ? (
+                  <span className="text-sm font-bold text-muted-foreground">Sign in to see it</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={loadBalance}
+                    className="text-sm font-bold text-signal underline"
+                  >
+                    Couldn't load — retry
+                  </button>
+                )}
               </div>
               <div className="flex items-center justify-between border-t border-border pt-2">
                 <span className="text-sm font-extrabold text-foreground">Locked in escrow</span>
@@ -418,7 +433,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={!canSubmit}
+              disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
               {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(totalCredits)}`}
