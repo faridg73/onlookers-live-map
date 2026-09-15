@@ -16,3 +16,4 @@
 - [x] Add preset bounty tiers and a custom-amount input to the "Happening here now" Flash modal with live USD equivalent
 
 - [x] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
+- [x] Make the Flash location editable with live place search and add concise alerting copy

@@ -19,20 +19,23 @@ export function PlaceSearchInput({
   onQueryChange,
   className = "",
   autoFocus = false,
+  value,
 }: {
   placeholder?: string;
   onPick: (place: GeocodeResult) => void;
   onQueryChange?: (query: string) => void;
   className?: string;
   autoFocus?: boolean;
+  value?: string;
 }) {
-  const [query, setQuery] = useState("");
+  const [internalQuery, setInternalQuery] = useState(value ?? "");
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [highlight, setHighlight] = useState(-1);
   const sessionToken = useRef<string>(crypto.randomUUID());
   const requestId = useRef(0);
+  const query = value ?? internalQuery;
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -66,7 +69,7 @@ export function PlaceSearchInput({
   }, [query]);
 
   const update = (value: string) => {
-    setQuery(value);
+    setInternalQuery(value);
     onQueryChange?.(value);
   };
 
