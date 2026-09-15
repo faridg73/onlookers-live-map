@@ -164,15 +164,16 @@ function MapScreen() {
         >
           <div className="min-h-0 overflow-hidden">
             <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
-              <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-col gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setMapFilter("all")}
-                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
                 >
-                  <Map className="size-4" /> Local Bounty Map
-                  <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-signal px-1 text-[0.6rem] font-extrabold leading-none text-background">
+                  <Map className="size-4 shrink-0 text-signal" />
+                  <span className="flex-1 text-left">Local Bounty Map</span>
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-signal px-1 text-[0.6rem] font-extrabold leading-none text-background">
                     {visible.length}
                   </span>
                 </Button>
@@ -180,17 +181,21 @@ function MapScreen() {
                   type="button"
                   variant="outline"
                   onClick={() => void navigate({ to: "/community" })}
-                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
                 >
-                  <Users className="size-4" /> Community Vibe
+                  <Users className="size-4 shrink-0 text-signal" />
+                  <span className="flex-1 text-left">Community Vibe</span>
+                  <ChevronDown className="size-4 -rotate-90 text-muted-foreground" />
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => void navigate({ to: "/discover" })}
-                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
                 >
-                  <BookOpen className="size-4" /> Learning &amp; Guides
+                  <BookOpen className="size-4 shrink-0 text-signal" />
+                  <span className="flex-1 text-left">Learning &amp; Guides</span>
+                  <ChevronDown className="size-4 -rotate-90 text-muted-foreground" />
                 </Button>
               </div>
               <div className="mt-2 flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
