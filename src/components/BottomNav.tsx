@@ -39,7 +39,11 @@ export function BottomNav() {
                   activeOptions={{ exact }}
                   className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
                 >
-                  <span className={`relative ${"primary" in item ? "grid size-8 place-items-center rounded-full bg-signal text-signal-foreground" : ""}`}>
+                  <span
+                    className={`relative grid size-8 place-items-center rounded-full ${
+                      "primary" in item ? "bg-signal text-signal-foreground" : ""
+                    }`}
+                  >
                     <Icon className="size-5" strokeWidth={1.75} />
                   </span>
                   {label}
