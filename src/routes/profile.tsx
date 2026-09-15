@@ -45,11 +45,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
+import { SocialLinks } from "@/components/Footer";
+
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your Onlooker Profile — earnings and requests" },
+      { title: "Your Onlooker Profile: earnings and requests" },
       {
         name: "description",
         content:
@@ -75,7 +77,7 @@ const ACTIVITY = [
   { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 Credits bounty · 12 min ago" },
   { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "150 Credits bounty · 1 hr ago" },
   { icon: Camera, text: "Sent a live shot of the night market", meta: "+60 Credits bounty · 2 hrs ago" },
-  { icon: Clock, text: "Request fulfilled — “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
+  { icon: Clock, text: "Request fulfilled: “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
 ];
 
 function ProfileScreen() {
@@ -126,12 +128,13 @@ function ProfileScreen() {
     window.history.replaceState({}, "", window.location.pathname);
 
     if (status === "cancelled") {
-      toast("Checkout cancelled — no charge was made.");
+      toast("Checkout cancelled. You were not charged.");
       return;
     }
     if (status !== "success") return;
 
-    toast.success("Payment received — adding your Credits…");
+    toast.success("Payment received. Adding your Credits…");
+
     const timers = [0, 1500, 4000, 8000].map((delay) =>
       window.setTimeout(
         () => window.dispatchEvent(new Event("onlooker:credits-refresh")),
@@ -198,10 +201,11 @@ function ProfileScreen() {
         className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
       >
         <span className="flex items-center gap-3">
-          <Users className="size-4 text-signal" /> Group Pools — fund a bounty together
+          <Users className="size-4 text-signal" /> Group Pools: fund a bounty together
         </span>
         <ChevronRight className="size-4 text-muted-foreground" />
       </Link>
+
 
       <Link
         to="/payout-history"
@@ -258,7 +262,7 @@ function ProfileScreen() {
           className="flex w-full items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
         >
           <span className="flex items-center gap-3">
-            <Info className="size-4 text-signal" /> How It Works — app guide
+            <Info className="size-4 text-signal" /> How It Works: app guide
           </span>
           <ChevronRight className="size-4 text-muted-foreground" />
         </button>
