@@ -62,7 +62,7 @@ export function BottomNav() {
                   </span>
                 )}
               </span>
-              Chats
+              Live Inbox
             </button>
           </li>
         </ul>

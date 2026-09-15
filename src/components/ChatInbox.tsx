@@ -148,6 +148,10 @@ export function ChatInbox({
                 )}
               >
                 <Radio className="size-3.5" /> Active Streamers
+                <span className="relative ml-0.5 flex size-1.5" aria-hidden>
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-70" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-live" />
+                </span>
               </Button>
             </div>
           </div>
@@ -317,7 +321,23 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
       </section>
 
       <div className="mt-5 px-2 text-center">
-        <p className="font-display text-base font-extrabold text-foreground">Your live inbox is waiting</p>
+        <div className="flex flex-wrap items-center justify-center gap-1.5" aria-hidden>
+          {["Stream is live", "Heading there now", "ETA 5 mins"].map((chip) => (
+            <span
+              key={chip}
+              className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-[0.65rem] font-bold text-muted-foreground"
+            >
+              <span
+                className={cn(
+                  "size-1.5 rounded-full",
+                  chip === "Stream is live" ? "bg-live" : "bg-signal",
+                )}
+              />
+              {chip}
+            </span>
+          ))}
+        </div>
+        <p className="mt-4 font-display text-base font-extrabold text-foreground">Your live inbox is waiting</p>
         <p className="mx-auto mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
           Sign in to join bounty discussions and coordinate with active streamers in real time.
         </p>
