@@ -8,6 +8,7 @@ import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { HunterBadge } from "@/components/HunterBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { FollowButton } from "@/components/FollowButton";
 import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
