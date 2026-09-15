@@ -231,7 +231,7 @@ function CommunityHub() {
         <div
           role="list"
           aria-label="Category cards"
-          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2"
+          className="flex flex-row overflow-x-auto scrollbar-thin gap-3 px-4 pb-2"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];

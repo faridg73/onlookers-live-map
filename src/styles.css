@@ -269,18 +269,19 @@
 
 @utility scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: var(--color-muted-foreground) var(--color-surface-raised);
 
   &::-webkit-scrollbar {
-    height: 5px;
+    height: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--color-surface-raised);
+    border-radius: 9999px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--color-border);
+    background-color: var(--color-muted-foreground);
     border-radius: 9999px;
   }
 }
