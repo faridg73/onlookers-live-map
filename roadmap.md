@@ -16,3 +16,4 @@
 - [x] Add preset bounty tiers and a custom-amount input to the "Happening here now" Flash modal with live USD equivalent
 
 - [x] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
+- [ ] Redesign first-run onboarding, map controls, markers, and bottom navigation around four clear actions
