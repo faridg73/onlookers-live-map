@@ -83,7 +83,7 @@ export function BountyTipPicker({
           )}
           {shortFall && (
             <span className="mt-1 block font-extrabold text-live">
-              Your wallet has {formatCredits(balance ?? 0)} — lower the tip or buy credits.
+              Your wallet has {formatCredits(balance ?? 0)}, lower the tip or buy credits.
             </span>
           )}
         </span>

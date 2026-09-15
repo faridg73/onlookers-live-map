@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/copyright")({
   head: () => ({
     meta: [
-      { title: "DMCA & Copyright Policy — Onlooker Live" },
+      { title: "DMCA & Copyright Policy | Onlooker Live" },
       {
         name: "description",
         content:
           "Onlooker Live DMCA and copyright infringement policy: prohibited digital content, takedown notices, counter-notifications, and repeat infringer policy.",
       },
-      { property: "og:title", content: "DMCA & Copyright Policy — Onlooker Live" },
+      { property: "og:title", content: "DMCA & Copyright Policy | Onlooker Live" },
       {
         property: "og:description",
         content:

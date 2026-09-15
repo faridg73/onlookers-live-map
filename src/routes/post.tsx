@@ -79,12 +79,12 @@ import {
 export const Route = createFileRoute("/post")({
   head: () => ({
     meta: [
-      { title: "Post a Live Request — Onlooker" },
+      { title: "Post a Live Request | Onlooker" },
       {
         name: "description",
         content: "Describe what you need, choose the exact place, and post a secure live request.",
       },
-      { property: "og:title", content: "Post a Live Request — Onlooker" },
+      { property: "og:title", content: "Post a Live Request | Onlooker" },
       {
         property: "og:description",
         content: "Describe what you need, choose the exact place, and post a secure live request.",
@@ -272,7 +272,7 @@ function PostScreen() {
       return;
     }
     if (!spot || !place.trim()) {
-      toast.error("Pick the exact place — search a venue, tap the map, or use your location.");
+      toast.error("Pick the exact place, search a venue, tap the map, or use your location.");
       return;
     }
     setAction(parsed.action);
@@ -794,7 +794,7 @@ function PostScreen() {
                   )}
                   <p className="mt-3 text-xs font-medium text-muted-foreground">
                     {captureDurationLabel(capture, action === "live")} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
-                    {capture === null && " — the onlooker streams until you end the session."}
+                    {capture === null && ", the onlooker streams until you end the session."}
                   </p>
                 </div>
 
@@ -981,7 +981,7 @@ function PostScreen() {
                 <BountyPriceBreakdown quote={quote} />
                 {tip > 0 && (
                   <p className="text-xs font-medium text-muted-foreground">
-                    Plus a {formatCredits(tip)} tip — {formatCredits(total)} leaves your wallet.
+                    Plus a {formatCredits(tip)} tip, {formatCredits(total)} leaves your wallet.
                   </p>
                 )}
                 <p className="flex gap-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">

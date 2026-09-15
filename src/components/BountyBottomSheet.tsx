@@ -71,7 +71,7 @@ export function BountyBottomSheet({
       onClaim?.(request!.id);
       setCapturing(true);
       toast.success("You're live for this bounty", {
-        description: `${payout} Credits are reserved for you — film the spot and send it in.`,
+        description: `${payout} Credits are reserved for you, film the spot and send it in.`,
       });
     } catch (error) {
       human.reset();

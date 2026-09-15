@@ -23,7 +23,7 @@ const SLIDES = [
   },
   {
     title: "Capture & Earn",
-    body: "Earn real money by responding to nearby requests. Remember: To protect creator rights, always keep your lens on physical logistics—never film inside the show or capture digital app screens.",
+    body: "Earn real money by responding to nearby requests. Remember: To protect creator rights, always keep your lens on physical logistics, never film inside the show or capture digital app screens.",
     art: captureArt,
     icon: Camera,
     alt: "Illustration of a phone camera framing a stadium entrance gate",

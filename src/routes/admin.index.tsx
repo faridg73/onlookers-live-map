@@ -20,7 +20,7 @@ import { moderationReasonLabel } from "@/lib/moderation-reasons";
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Onlooker admin dashboard — payouts and disputes" },
+      { title: "Onlooker admin dashboard, payouts and disputes" },
       {
         name: "description",
         content:
@@ -95,7 +95,7 @@ function AdminDashboard() {
       toast.success(
         approve
           ? `${money(row.amount)} marked as paid to ${row.hunter_name}.`
-          : `Payout declined — ${money(row.amount)} returned to ${row.hunter_name}.`,
+          : `Payout declined, ${money(row.amount)} returned to ${row.hunter_name}.`,
       );
       await refresh();
     } catch (error) {

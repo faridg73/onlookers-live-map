@@ -20,14 +20,14 @@ const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: P
         <Heading style={heading}>DMCA / Infringement Report</Heading>
         <Text style={text}>A copyright holder submitted a new report.</Text>
         <Section style={box}>
-          <Text style={row}><strong>Notice ID:</strong> {noticeId || '—'}</Text>
-          <Text style={row}><strong>Name:</strong> {name || '—'}</Text>
-          <Text style={row}><strong>Email:</strong> {email || '—'}</Text>
-          <Text style={row}><strong>Content URL:</strong> {contentUrl || '—'}</Text>
-          <Text style={row}><strong>Reason code:</strong> {reasonCode || '—'}</Text>
+          <Text style={row}><strong>Notice ID:</strong> {noticeId || '-'}</Text>
+          <Text style={row}><strong>Name:</strong> {name || '-'}</Text>
+          <Text style={row}><strong>Email:</strong> {email || '-'}</Text>
+          <Text style={row}><strong>Content URL:</strong> {contentUrl || '-'}</Text>
+          <Text style={row}><strong>Reason code:</strong> {reasonCode || '-'}</Text>
           <Hr style={hr} />
           <Text style={row}><strong>Description of infringing material:</strong></Text>
-          <Text style={row}>{description || '—'}</Text>
+          <Text style={row}>{description || '-'}</Text>
         </Section>
         <Text style={muted}>
           Review this notice in the Onlooker Live admin panel and respond to the reporter promptly.
@@ -39,7 +39,7 @@ const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: P
 
 export const template = {
   component: Email,
-  subject: 'New DMCA / infringement report — Onlooker Live',
+  subject: 'New DMCA / infringement report | Onlooker Live',
   displayName: 'DMCA report alert',
   to: 'support@onlookerlive.com',
   previewData: {

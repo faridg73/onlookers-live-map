@@ -134,7 +134,7 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
     const timer = window.setTimeout(async () => {
       const found = await geocodeAddress({ data: { address: query } }).catch(() => null);
       if (!found) {
-        setStatus("No match yet — keep typing or place the pin yourself.");
+        setStatus("No match yet, keep typing or place the pin yourself.");
         return;
       }
       const position = { lat: found.latitude, lng: found.longitude };

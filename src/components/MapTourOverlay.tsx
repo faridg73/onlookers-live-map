@@ -14,16 +14,16 @@ const steps = [
   {
     icon: Coins,
     title: "Pins are live requests",
-    body: "Every pin on the map is someone paying to see that spot right now. Gold pins are high bounties — tap any pin to watch or claim it.",
+    body: "Every pin on the map is someone paying to see that spot right now. Gold pins are high bounties, tap any pin to watch or claim it.",
   },
   {
     icon: Globe2,
     title: "Request a view anywhere",
-    body: "Use the REQUEST button to drop a pin on any location and fund a live stream there — a concert, a street, a beach.",
+    body: "Use the REQUEST button to drop a pin on any location and fund a live stream there, a concert, a street, a beach.",
   },
   {
     icon: Zap,
-    title: "Flash — happening here now",
+    title: "Flash, happening here now",
     body: "Standing somewhere interesting? Hit FLASH to instantly alert nearby onlookers to go live at your exact spot and earn.",
   },
 ];

@@ -91,7 +91,7 @@ export function DeadlinePickerDialog({
           onClick={() => picked && onPick(picked)}
           className="w-full rounded-2xl bg-signal py-3 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
         >
-          {valid && picked ? `${confirmLabel} — ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
+          {valid && picked ? `${confirmLabel}, ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
         </button>
       </DialogContent>
     </Dialog>

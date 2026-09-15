@@ -43,7 +43,7 @@ export function poolFormErrors(input: {
   const errors: PoolFormErrors = {};
   const title = sanitizeText(input.title, { maxLength: 90 }).trim();
   const place = sanitizeText(input.place, { maxLength: 120 }).trim();
-  if (title.length < 6) errors.title = "Say what should happen — at least 6 characters.";
+  if (title.length < 6) errors.title = "Say what should happen, at least 6 characters.";
   if (place.length < 3) errors.place = "Add where this should happen, e.g. Soldier Field, Chicago.";
   if (!Number.isFinite(input.goalCredits) || input.goalCredits < POOL_GOAL_MIN)
     errors.goal = `Pick a goal of at least ${POOL_GOAL_MIN} Credits.`;
@@ -153,7 +153,7 @@ export async function openPoolAsMember(
   },
 ): Promise<{ poolId: string; pooled: number }> {
   const identity = await fetchPoolIdentity(expectedUserId);
-  if (!identity) throw new Error("Sign in again — we couldn't confirm your account.");
+  if (!identity) throw new Error("Sign in again, we couldn't confirm your account.");
   const starter = Math.max(POOL_STARTER_CREDITS, Math.round(input.starterCredits));
   const poolId = await createPool(input);
   const pooled = await contributeToPool(poolId, starter);
@@ -168,7 +168,7 @@ export async function contributeToPool(poolId: string, amount: number): Promise<
   });
   if (error) {
     if (/insufficient credits/i.test(error.message))
-      throw new Error("Not enough Credits — top up your balance to chip in.");
+      throw new Error("Not enough Credits, top up your balance to chip in.");
     throw new Error(error.message);
   }
   return Number(data ?? 0);

@@ -144,7 +144,7 @@ export function BountyDetailsDialog({
                 <BoostBounty requestId={request.id} />
               </div>
               <p className="mt-2 text-[0.7rem] text-muted-foreground">
-                Chip in to sweeten this bounty — everything you add goes to whoever films it.
+                Chip in to sweeten this bounty, everything you add goes to whoever films it.
               </p>
             </div>
           )}
@@ -171,7 +171,7 @@ export function BountyDetailsDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Availability check — confirms the hunter sees it live right now. */}
+      {/* Availability check, confirms the hunter sees it live right now. */}
       <AlertDialog open={availabilityPrompt} onOpenChange={setAvailabilityPrompt}>
         <AlertDialogContent>
           <AlertDialogHeader>

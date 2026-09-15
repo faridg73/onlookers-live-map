@@ -266,7 +266,7 @@ export function VenueBountyDialog({
             <button type="button" onClick={() => pickMode("live")} aria-pressed={mode === "live"} className={modeCard(mode === "live")}>
               <Radio className="size-4 text-signal" />
               <p className="mt-1.5 text-sm font-extrabold text-foreground">Live stream</p>
-              <p className="text-xs text-muted-foreground">Watch it happen in real time — you pick the length</p>
+              <p className="text-xs text-muted-foreground">Watch it happen in real time, you pick the length</p>
             </button>
             <button type="button" onClick={() => pickMode("clip")} aria-pressed={mode === "clip"} className={modeCard(mode === "clip")}>
               <Video className="size-4 text-signal" />
@@ -380,7 +380,7 @@ export function VenueBountyDialog({
                   aria-label="Custom capture length in minutes"
                   className="field w-24"
                 />
-                <span>minutes (1–240)</span>
+                <span>minutes (1, 240)</span>
               </label>
             )}
           </div>
@@ -406,7 +406,7 @@ export function VenueBountyDialog({
                   onClick={() => setScheduledStart(null)}
                   className="text-xs font-semibold text-muted-foreground underline underline-offset-2"
                 >
-                  Clear start time — onlooker records as soon as claimed
+                  Clear start time, onlooker records as soon as claimed
                 </button>
               )}
             </div>
@@ -591,7 +591,7 @@ function CustomDeadlinePicker({
           onClick={() => picked && onPick(picked)}
           className="w-full rounded-2xl bg-signal py-3 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
         >
-          {valid && picked ? `Set deadline — ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
+          {valid && picked ? `Set deadline, ${format(picked, "MMM d, h:mm a")}` : "Pick a future time"}
         </button>
       </DialogContent>
     </Dialog>

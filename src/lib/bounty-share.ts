@@ -17,7 +17,7 @@ export function bountyLink(request: LiveRequest, boosted = 0) {
 export async function shareBounty(request: LiveRequest, boosted = 0) {
   const url = bountyLink(request, boosted);
   const amount = request.bounty + boosted;
-  const title = `${amount} Credits bounty — ${request.place}`;
+  const title = `${amount} Credits bounty, ${request.place}`;
   const text = `${request.title} · ${amount} Credits for a live view at ${request.place}. Anyone nearby?`;
 
   const nav = typeof navigator === "undefined" ? null : navigator;
@@ -31,7 +31,7 @@ export async function shareBounty(request: LiveRequest, boosted = 0) {
   }
   try {
     await nav?.clipboard?.writeText(`${text}\n${url}`);
-    toast.success("Bounty link copied — paste it anywhere.");
+    toast.success("Bounty link copied, paste it anywhere.");
   } catch {
     toast.error("Couldn't copy the bounty link.");
   }

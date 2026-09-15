@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — Onlooker live view bounties" },
+      { title: "Terms of Service | Onlooker live view bounties" },
       {
         name: "description",
         content:
@@ -100,7 +100,7 @@ function TermsPage() {
         </p>
         <p>
           <strong className="text-foreground">Zero-tolerance moderation &amp; content removal.</strong>{" "}
-          Onlooker reserves the right—but assumes no obligation—to review, moderate, flag, suspend,
+          Onlooker reserves the right, but assumes no obligation, to review, moderate, flag, suspend,
           or permanently delete any bounty, user profile, or uploaded video that violates these
           terms, depicts illegal acts, or exposes the Platform to legal risk, without prior notice
           or compensation.
@@ -119,8 +119,8 @@ function TermsPage() {
           <strong className="text-foreground">Full release of liability.</strong> To the maximum
           extent permitted by law, Onlooker, its creators, founders, officers, employees, and
           partners shall not be held liable for any direct, indirect, incidental, special,
-          consequential, or punitive damages—including personal injury, property loss, legal fees,
-          or financial penalties—arising out of or in connection with app usage or field activities.
+          consequential, or punitive damages, including personal injury, property loss, legal fees,
+          or financial penalties, arising out of or in connection with app usage or field activities.
         </p>
         <p>
           <strong className="text-foreground">Mandatory indemnification.</strong> You agree to

@@ -34,7 +34,7 @@ export function WeeklyTopOnlookers({ limit = 5 }: { limit?: number }) {
         <p className="mt-3 text-sm text-muted-foreground">Counting this week’s payouts…</p>
       ) : rows.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">
-          Nobody has been paid this week yet — send a clip and take the top spot.
+          Nobody has been paid this week yet, send a clip and take the top spot.
         </p>
       ) : (
         <ol className="mt-3 space-y-1.5">

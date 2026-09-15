@@ -242,7 +242,7 @@ export function RequestCard({
                   const balance = await refundBounty(requestId);
                   remove(request.id);
                   toast.success("Request cancelled", {
-                    description: `${request.bounty} Credits refunded — wallet balance ${Math.round(balance)} Credits.`,
+                    description: `${request.bounty} Credits refunded, wallet balance ${Math.round(balance)} Credits.`,
                   });
                 } catch (error) {
                   toast.error(error instanceof Error ? error.message : "Could not cancel.");

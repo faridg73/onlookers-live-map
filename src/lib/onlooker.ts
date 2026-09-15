@@ -104,13 +104,13 @@ export const CATEGORIES: Category[] = [
     { id: "seatview", label: "View from seats" },
     { id: "crowd", label: "Crowd & queue" },
   ] },
-  { id: "street", label: "Street & Park Performances", short: "Performances", emoji: "\u{1F3B8}", hint: "e.g. The busker's crowd size and energy from the public footpath. Open streets and parks only — never record a ticketed or private performance.", subs: [
+  { id: "street", label: "Street & Park Performances", short: "Performances", emoji: "\u{1F3B8}", hint: "e.g. The busker's crowd size and energy from the public footpath. Open streets and parks only, never record a ticketed or private performance.", subs: [
     { id: "buskers", label: "Buskers & musicians" },
     { id: "parkshows", label: "Park shows" },
     { id: "popupart", label: "Pop-up art" },
     { id: "crowdsize", label: "Crowd & vibe" },
   ] },
-  { id: "community", label: "Community Rescues & Public Phenomena", short: "Community", emoji: "\u{1F6A8}", hint: "e.g. A wide shot of the closed street from a safe public distance. Public streets and parks only — no private property, no confidential response details.", subs: [
+  { id: "community", label: "Community Rescues & Public Phenomena", short: "Community", emoji: "\u{1F6A8}", hint: "e.g. A wide shot of the closed street from a safe public distance. Public streets and parks only, no private property, no confidential response details.", subs: [
     { id: "petrescue", label: "Pet rescues" },
     { id: "response", label: "Public response" },
     { id: "alert", label: "Community alert" },

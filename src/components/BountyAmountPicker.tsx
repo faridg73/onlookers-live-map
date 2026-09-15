@@ -99,7 +99,7 @@ export function BountyAmountPicker({
       )}
       {!tooLow && shortFall && (
         <p className="text-xs font-bold text-destructive">
-          Your wallet has {formatCredits(balance ?? 0)} — buy credits before locking{" "}
+          Your wallet has {formatCredits(balance ?? 0)}, buy credits before locking{" "}
           {formatCredits(value)}.
         </p>
       )}

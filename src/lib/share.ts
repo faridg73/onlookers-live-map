@@ -16,7 +16,7 @@ export async function shareBountyVideo(video: BountyVideo) {
   }
 
   const title = video.request_title || "Onlooker live view";
-  const text = `${title}${video.request_place ? ` — ${video.request_place}` : ""} · captured on Onlooker`;
+  const text = `${title}${video.request_place ? `, ${video.request_place}` : ""} · captured on Onlooker`;
 
   const nav = typeof navigator === "undefined" ? null : navigator;
   if (nav?.share) {
@@ -31,7 +31,7 @@ export async function shareBountyVideo(video: BountyVideo) {
 
   try {
     await nav?.clipboard?.writeText(`${text}\n${url}`);
-    toast.success("Share link copied — paste it anywhere.");
+    toast.success("Share link copied, paste it anywhere.");
   } catch {
     toast.error("Couldn't copy the share link.");
   }

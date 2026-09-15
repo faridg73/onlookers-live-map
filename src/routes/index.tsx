@@ -37,13 +37,13 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "Onlooker — Live views from people already there" },
+      { title: "Onlooker, Live views from people already there" },
       {
         name: "description",
         content:
           "See any place in real time. Post a bounty, and someone standing there sends back a live photo within minutes.",
       },
-      { property: "og:title", content: "Onlooker — Live views from people already there" },
+      { property: "og:title", content: "Onlooker, Live views from people already there" },
       {
         property: "og:description",
         content: "Post a bounty and get a live photo of any place from someone nearby.",
@@ -296,7 +296,7 @@ const GUIDES: Array<{
     title: "How Onlooker works",
     body: "Ever wished you could see a place right now? Someone out there is already standing in it. That's the whole idea.",
     points: [
-      "Post a bounty — pick the spot and say what you'd love to see.",
+      "Post a bounty, pick the spot and say what you'd love to see.",
       "Your credits stay safely held until your capture actually arrives.",
       "Every pin on the map is a real request from a real person, right now.",
     ],
@@ -307,9 +307,9 @@ const GUIDES: Array<{
     title: "Earn your first bounty",
     body: "See a request near you? Claim it, film a quick live capture, and the money lands the moment it's accepted.",
     points: [
-      "Verify your phone first — it shows people you're a real human.",
+      "Verify your phone first, it shows people you're a real human.",
       "Only claim what you can genuinely reach in time. No rushing needed.",
-      "A clear, steady capture builds trust — and brings repeat requests.",
+      "A clear, steady capture builds trust, and brings repeat requests.",
     ],
   },
   {
@@ -318,19 +318,19 @@ const GUIDES: Array<{
     title: "Streaming people stick around for",
     body: "Nobody expects a film crew. Steady hands, decent light and a little chatter go a surprisingly long way.",
     points: [
-      "Hold your phone with both hands and pan slowly — let people take the scene in.",
+      "Hold your phone with both hands and pan slowly, let people take the scene in.",
       "Say where you are out loud; it helps everyone find their bearings.",
-      "Answer the chat. That's the fun part — and it's exactly what viewers are here for.",
+      "Answer the chat. That's the fun part, and it's exactly what viewers are here for.",
     ],
   },
   {
     icon: ShieldCheck,
     kicker: "Safety",
     title: "Stay safe out there",
-    body: "Public places only, always. No bounty is ever worth putting yourself — or anyone else — in a tricky spot.",
+    body: "Public places only, always. No bounty is ever worth putting yourself, or anyone else, in a tricky spot.",
     points: [
       "Skip private homes, gated property and anywhere you're not meant to be.",
-      "Leave live shows, performances and games alone — that's someone else's work.",
+      "Leave live shows, performances and games alone, that's someone else's work.",
       "Keep chats and payments on Onlooker. It's how we've got your back.",
     ],
   },

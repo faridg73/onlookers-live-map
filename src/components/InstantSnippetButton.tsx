@@ -65,7 +65,7 @@ export function InstantSnippetButton({
           durationSeconds: SNIPPET_SECONDS,
         });
         const paid = await payInstantSnippet(video.id);
-        toast.success(`Paid instantly — ${Math.round(paid)} Credits is in your wallet.`);
+        toast.success(`Paid instantly, ${Math.round(paid)} Credits is in your wallet.`);
         setOpen(false);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "That snippet could not be sent.");
@@ -162,7 +162,7 @@ export function InstantSnippetButton({
             <DialogTitle>Instant snippet · {request.bounty} Credits</DialogTitle>
             <DialogDescription>
               You are {Math.round(userPosition ? feetAway(userPosition, request) : 0)} ft from this
-              spot. Film {SNIPPET_SECONDS} seconds and the money lands in your wallet right away —
+              spot. Film {SNIPPET_SECONDS} seconds and the money lands in your wallet right away -
               no review needed.
             </DialogDescription>
           </DialogHeader>
@@ -177,7 +177,7 @@ export function InstantSnippetButton({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            What to film: {request.title} — crowd atmosphere, street views, or the scene around
+            What to film: {request.title}, crowd atmosphere, street views, or the scene around
             the venue.
           </p>
 

@@ -64,7 +64,7 @@ export const BRAND_TAG_TEXT = BRAND_HASHTAGS.map((tag) => `#${tag}`).join(" ");
 export function shareCaption(subject: ShareSubject): string {
   const lead = subject.kind === "live" ? "🔴 LIVE NOW" : "📍 Live view wanted";
   const reward = subject.credits ? ` · ${Math.round(subject.credits)} Credits` : "";
-  return `${lead}: ${subject.title} — ${subject.place}${reward}\n${BRAND_TAG_TEXT}`;
+  return `${lead}: ${subject.title}, ${subject.place}${reward}\n${BRAND_TAG_TEXT}`;
 }
 
 export type SocialTarget = {
@@ -132,7 +132,7 @@ export async function shareToPlatform(subject: ShareSubject, target: SocialTarge
     const copied = await copy(`${caption}\n${url}`);
     toast[copied ? "success" : "error"](
       copied
-        ? `Caption copied — paste it into your ${target.label}.`
+        ? `Caption copied, paste it into your ${target.label}.`
         : "Couldn't copy the caption. Copy the link instead.",
     );
     if (typeof window !== "undefined") {
@@ -161,7 +161,7 @@ export async function shareNatively(subject: ShareSubject) {
   }
   const copied = await copy(`${caption}\n${url}`);
   toast[copied ? "success" : "error"](
-    copied ? "Link copied — paste it anywhere." : "Couldn't copy that link.",
+    copied ? "Link copied, paste it anywhere." : "Couldn't copy that link.",
   );
 }
 
@@ -175,7 +175,7 @@ export function embedSnippet(subject: ShareSubject): string {
   const src = embedLink(subject);
   return [
     `<iframe src="${src}"`,
-    `  title="Onlooker live view — ${subject.place.replace(/"/g, "&quot;")}"`,
+    `  title="Onlooker live view, ${subject.place.replace(/"/g, "&quot;")}"`,
     '  width="100%" height="480" loading="lazy"',
     '  style="border:0;border-radius:16px;max-width:640px"',
     '  allow="fullscreen"></iframe>',
@@ -194,6 +194,6 @@ export function mapEmbedSnippet(): string {
 export async function copyEmbedSnippet(snippet: string) {
   const copied = await copy(snippet);
   toast[copied ? "success" : "error"](
-    copied ? "Embed code copied — paste it into your article." : "Couldn't copy the embed code.",
+    copied ? "Embed code copied, paste it into your article." : "Couldn't copy the embed code.",
   );
 }

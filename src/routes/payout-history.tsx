@@ -9,7 +9,7 @@ import { formatCredits } from "@/lib/credits";
 export const Route = createFileRoute("/payout-history")({
   head: () => ({
     meta: [
-      { title: "Payout History — Onlooker" },
+      { title: "Payout History | Onlooker" },
       {
         name: "description",
         content: "Every accepted clip, the platform fee, and the payout that landed in your wallet.",
@@ -105,7 +105,7 @@ function PayoutHistoryScreen() {
           </p>
         ) : payouts.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No payouts yet — get a clip accepted to earn your first bounty.
+            No payouts yet, get a clip accepted to earn your first bounty.
           </p>
         ) : (
           payouts.map((v) => {

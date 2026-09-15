@@ -66,7 +66,7 @@ function ContactScreen() {
       const result = await submitSupportTicket({ data: form });
       if (result.success) {
         setSent(true);
-        toast.success("Message sent — we'll get back to you soon.");
+        toast.success("Message sent, we'll get back to you soon.");
         setForm({ name: "", email: "", subject: "", message: "" });
       } else {
         toast.error(result.error ?? "Couldn't send your message. Try again.");

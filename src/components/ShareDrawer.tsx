@@ -27,7 +27,7 @@ export function ShareDrawer({
     try {
       const url = await referralLink();
       await navigator.clipboard.writeText(url);
-      toast.success("Invite link copied — paste it anywhere.");
+      toast.success("Invite link copied, paste it anywhere.");
       setOpen(false);
     } catch {
       toast.error("Couldn't copy the invite link.");

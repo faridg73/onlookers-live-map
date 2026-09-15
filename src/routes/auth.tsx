@@ -14,7 +14,7 @@ import { PhoneVerification } from "@/components/PhoneVerification";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in to Onlooker — post and fulfil live bounties" },
+      { title: "Sign in to Onlooker, post and fulfil live bounties" },
       {
         name: "description",
         content:
@@ -84,7 +84,7 @@ function AuthScreen() {
     const text = `${code} ${raw}`.toLowerCase();
     if (text.includes("email_not_confirmed") || text.includes("email not confirmed")) {
       setNeedsEmailConfirm(true);
-      return "Confirm your email address first — check your inbox for the verification link we sent.";
+      return "Confirm your email address first, check your inbox for the verification link we sent.";
     }
     if (text.includes("invalid login") || text.includes("invalid_credentials")) {
       return "That email or password is incorrect. Check them and try again.";
@@ -114,7 +114,7 @@ function AuthScreen() {
         options: { emailRedirectTo: window.location.origin },
       });
       if (error) throw error;
-      toast.success("Verification email sent — check your inbox.");
+      toast.success("Verification email sent, check your inbox.");
       setFormError(null);
     } catch (err) {
       const message = describeAuthError(err);
@@ -146,7 +146,7 @@ function AuthScreen() {
       const message =
         mode === "signup"
           ? "Finish the quick human check before creating your account."
-          : "Just a moment — finishing the security check.";
+          : "Just a moment, finishing the security check.";
       setFormError(message);
       toast.error(message);
       return;
@@ -180,7 +180,7 @@ function AuthScreen() {
           await clearPreviousAuthState();
           setNeedsEmailConfirm(true);
           throw new Error(
-            "Confirm your email address first — check your inbox for the verification link we sent.",
+            "Confirm your email address first, check your inbox for the verification link we sent.",
           );
         }
         await supabase.rpc("claim_verified_phone");
@@ -228,7 +228,7 @@ function AuthScreen() {
         setFormError(
           "Number confirmed. We emailed a verification link to " +
             email +
-            " — open it to activate your account, then sign in.",
+            ", open it to activate your account, then sign in.",
         );
         toast.success("Check your email for the verification link.");
       }
@@ -271,7 +271,7 @@ function AuthScreen() {
           One last check
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Almost there — confirm your mobile number and we&rsquo;ll finish setting up{" "}
+          Almost there, confirm your mobile number and we&rsquo;ll finish setting up{" "}
           <span className="font-semibold text-foreground">{email}</span>.
         </p>
         <PhoneVerification
@@ -292,8 +292,8 @@ function AuthScreen() {
         {mode === "signin" ? "Sign in" : "Create your account"}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Sign in to request or film real-world views — entry lines, seat views, queues and venue
-        atmospheres — captured live on location.
+        Sign in to request or film real-world views, entry lines, seat views, queues and venue
+        atmospheres, captured live on location.
       </p>
 
       <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">

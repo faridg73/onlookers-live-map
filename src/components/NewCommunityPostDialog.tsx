@@ -106,7 +106,7 @@ export function NewCommunityPostDialog({
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
       });
-      toast.success(flash ? "Flash Meetup is live — the clock is running." : "Posted to Discover.");
+      toast.success(flash ? "Flash Meetup is live, the clock is running." : "Posted to Discover.");
       setTitle("");
       setBody("");
       setPlace("");
@@ -236,7 +236,7 @@ export function NewCommunityPostDialog({
           onClick={() => setCamera(true)}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-foreground"
         >
-          <Camera className="size-4" /> {mediaPath ? "Photo added — retake" : "Launch camera"}
+          <Camera className="size-4" /> {mediaPath ? "Photo added, retake" : "Launch camera"}
         </button>
 
         <div className="mt-4 rounded-2xl border border-border bg-surface-raised p-3">

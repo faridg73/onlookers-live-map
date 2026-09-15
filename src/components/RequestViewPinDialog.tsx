@@ -102,7 +102,7 @@ export function RequestViewPinDialog({
       return;
     }
     if (!pin) {
-      toast.error("Drop the pin again — we lost those coordinates.");
+      toast.error("Drop the pin again, we lost those coordinates.");
       return;
     }
     const firstError = errors.placeName ?? errors.customBase;
@@ -111,12 +111,12 @@ export function RequestViewPinDialog({
       return;
     }
     if (balance === null) {
-      toast.error("We're still loading your Credit balance — try again in a moment.");
+      toast.error("We're still loading your Credit balance, try again in a moment.");
       return;
     }
     if (short) {
       toast.error(
-        `Not enough Credits — this pin locks ${formatCredits(total)} and you have ${formatCredits(
+        `Not enough Credits, this pin locks ${formatCredits(total)} and you have ${formatCredits(
           Math.round(balance),
         )}. Buy credits to fund this view.`,
       );
@@ -134,7 +134,7 @@ export function RequestViewPinDialog({
       addRequest({
         title: REQUEST_VIEW_TITLE,
         place: placeName.trim(),
-        note: `Live view wanted — ${REQUEST_VIEW_DURATION_MINUTES} minute stream from this pin.`,
+        note: `Live view wanted, ${REQUEST_VIEW_DURATION_MINUTES} minute stream from this pin.`,
         bounty: total,
         category: "events",
         dbId: locked.id,
@@ -360,7 +360,7 @@ export function RequestViewPinDialog({
               disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
-              {posting ? "Locking escrow…" : `Fund this view — lock ${formatCredits(total)}`}
+              {posting ? "Locking escrow…" : `Fund this view, lock ${formatCredits(total)}`}
             </Button>
             {short && (
               <Button

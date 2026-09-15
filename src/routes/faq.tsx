@@ -9,7 +9,7 @@ import {
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "Onlooker FAQ — bounties, payouts & rules" },
+      { title: "Onlooker FAQ, bounties, payouts & rules" },
       {
         name: "description",
         content:

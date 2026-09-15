@@ -20,9 +20,9 @@ function eventVenue(event: LiveEvent): Venue | null {
   if (event.latitude === null || event.longitude === null) return null;
   return {
     slug: event.id,
-    name: event.venueName ? `${event.name} — ${event.venueName}` : event.name,
+    name: event.venueName ? `${event.name}, ${event.venueName}` : event.name,
     area: event.city ?? event.venueName ?? "Event venue",
-    blurb: `${event.category ?? "Live event"} — ask for a live look from inside or outside the gates.`,
+    blurb: `${event.category ?? "Live event"}, ask for a live look from inside or outside the gates.`,
     emoji: "\u{1F3DF}\u{FE0F}",
     category: event.scope === "local" ? "events" : "events",
     latitude: event.latitude,

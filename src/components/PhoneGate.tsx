@@ -69,7 +69,7 @@ export function usePhoneGate(reason = "before you continue") {
         const again = retry.current;
         retry.current = null;
         setOpen(false);
-        toast.success("Number confirmed — you're all set.");
+        toast.success("Number confirmed, you're all set.");
         again?.();
       }}
     />
@@ -109,7 +109,7 @@ function PhoneGateDialog({
                 Confirm your number
               </h2>
               <p className="text-xs text-muted-foreground">
-                One quick text {reason}. Real people only — it keeps bounties, payouts and live
+                One quick text {reason}. Real people only, it keeps bounties, payouts and live
                 meet-ups safe.
               </p>
             </div>

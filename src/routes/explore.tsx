@@ -20,13 +20,13 @@ import {
 export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
-      { title: "Explore live views from around the world — Onlooker" },
+      { title: "Explore live views from around the world | Onlooker" },
       {
         name: "description",
         content:
           "Watch real bounty clips captured by Onlookers worldwide and in your neighborhood. Comment, review and see what is happening right now.",
       },
-      { property: "og:title", content: "Explore live views from around the world — Onlooker" },
+      { property: "og:title", content: "Explore live views from around the world | Onlooker" },
       {
         property: "og:description",
         content: "Real places, captured live by people nearby. Watch, comment and review on Onlooker.",
@@ -197,7 +197,7 @@ function ClipCard({ clip }: { clip: ExploreClip }) {
             <MessageCircle className="size-3.5" /> {comments?.length ?? clip.comments}
           </button>
           <span className="inline-flex items-center gap-1.5">
-            <Star className="size-3.5" /> {clip.rating > 0 ? clip.rating.toFixed(1) : "–"} ({clip.reviews})
+            <Star className="size-3.5" /> {clip.rating > 0 ? clip.rating.toFixed(1) : "-"} ({clip.reviews})
           </span>
         </div>
 
