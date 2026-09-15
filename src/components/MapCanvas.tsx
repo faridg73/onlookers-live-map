@@ -90,7 +90,10 @@ export function MapCanvas({
           // Use Google's standard roadmap layer (the default Map option) without
           // custom styling overrides so the map looks familiar to everyone.
           mapTypeId: "roadmap",
-          styles: HIDE_BUSINESS_POIS,
+          styles: [
+            { featureType: "poi.business", elementType: "all", stylers: [{ visibility: "off" }] },
+            { featureType: "poi.attraction", elementType: "all", stylers: [{ visibility: "off" }] },
+          ],
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
@@ -181,7 +184,7 @@ export function MapCanvas({
       const zoom = m?.getZoom();
       const bounds = m?.getBounds();
       if (!center || typeof zoom !== "number" || !bounds) return;
-      if (zoom < POI_ZOOM) {
+      if (zoom < 15) {
         setPlaces([]);
         lastPlaceKey.current = "";
         return;
