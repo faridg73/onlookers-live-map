@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useHumanCheck } from "@/components/HumanCheck";
+import { usePhoneGate } from "@/components/PhoneGate";
 import { isSignedIn, readWalletBalance } from "@/lib/bounty-escrow";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import {
@@ -64,6 +65,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const human = useHumanCheck("flash-bounty");
+  // Credits only leave a wallet once the number behind the account is confirmed.
+  const phoneGate = usePhoneGate("before credits go into escrow");
 
   const options = useMemo(
     () => ({
@@ -160,6 +163,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       toast.error("Finish the quick human check before going live.");
       return;
     }
+    if (!(await phoneGate.ensureVerified(() => void post()))) return;
     setPosting(true);
     try {
       const check = await verifyHumanCheck({
@@ -453,6 +457,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </div>
         </DialogContent>
       </Dialog>
+      {phoneGate.gate}
     </>
   );
 }

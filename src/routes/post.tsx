@@ -65,6 +65,7 @@ import {
   type CategoryId,
 } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { useVoiceInput } from "@/lib/use-voice-input";
 import { reverseGeocode } from "@/lib/geocode.functions";
@@ -131,6 +132,7 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
+  const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -349,6 +351,10 @@ function PostScreen() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    await runSubmit();
+  }
+
+  async function runSubmit() {
     if (total < MIN_BOUNTY) {
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
@@ -373,6 +379,8 @@ function PostScreen() {
       setModerationOpen(true);
       return;
     }
+    // Credits only leave a wallet once the number behind the account is confirmed.
+    if (!(await phoneGate.ensureVerified(() => void runSubmit()))) return;
     const funds = await readWalletBalance();
     setBalance(funds);
     if (funds !== null && funds < total) {
@@ -1038,6 +1046,7 @@ function PostScreen() {
           }, 50);
         }}
       />
+      {phoneGate.gate}
     </main>
   );
 }

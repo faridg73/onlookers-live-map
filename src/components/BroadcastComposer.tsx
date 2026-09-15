@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useHumanCheck } from "@/components/HumanCheck";
+import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
   BROADCAST_WINDOWS,
@@ -35,6 +36,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   const human = useHumanCheck("community-post");
+  // Live actions need a mobile number confirmed by text, social sign-ins included.
+  const phoneGate = usePhoneGate("before you go live");
 
   useEffect(() => {
     let active = true;
@@ -79,6 +82,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       toast.error("Finish the quick human check before going live.");
       return;
     }
+    if (!(await phoneGate.ensureVerified(() => void goLive()))) return;
     setPosting(true);
     try {
       const check = await verifyHumanCheck({
@@ -252,6 +256,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           Post a paid flash bounty
         </button>
       </p>
+      {phoneGate.gate}
     </div>
   );
 }
