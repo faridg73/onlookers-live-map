@@ -55,6 +55,25 @@ function AuthScreen() {
     await clearPreviousAuthState();
   }
 
+  /**
+   * Strong-password rules checked before the account service is called, so
+   * people get instant, specific feedback instead of a generic rejection.
+   */
+  function describePasswordProblem(value: string): string | null {
+    if (value.length < 10) return "Use at least 10 characters for your password.";
+    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) {
+      return "Include both a small letter and a capital letter in your password.";
+    }
+    if (!/[0-9]/.test(value)) return "Include at least one number in your password.";
+    if (!/[^A-Za-z0-9]/.test(value)) {
+      return "Include at least one symbol, such as ! or ?, in your password.";
+    }
+    if (email && value.toLowerCase().includes(email.split("@")[0]?.toLowerCase() ?? "@@@")) {
+      return "Your password can't contain your email name.";
+    }
+    return null;
+  }
+
   /** Turns raw auth failures into plain-language messages people can act on. */
   function describeAuthError(err: unknown): string {
     const raw = err instanceof Error ? err.message : "";
@@ -75,6 +94,12 @@ function AuthScreen() {
     }
     if (text.includes("too many") || text.includes("rate limit")) {
       return "Too many attempts. Please wait a minute and try again.";
+    }
+    if (text.includes("pwned") || text.includes("compromised") || text.includes("leaked")) {
+      return "That password has appeared in a known data breach. Please choose a different one.";
+    }
+    if (text.includes("weak_password") || text.includes("password should")) {
+      return "That password is too weak. Use 10+ characters with a capital letter, a number and a symbol.";
     }
     return raw || "Something went wrong. Please try again.";
   }
@@ -108,6 +133,14 @@ function AuthScreen() {
       setFormError("You must accept the Terms of Service to continue.");
       toast.error("You must accept the Terms of Service to continue.");
       return;
+    }
+    if (mode === "signup") {
+      const weak = describePasswordProblem(password);
+      if (weak) {
+        setFormError(weak);
+        toast.error(weak);
+        return;
+      }
     }
     if (!human.ready) {
       const message =
@@ -319,12 +352,19 @@ function AuthScreen() {
         <input
           type="password"
           required
-          minLength={8}
+          minLength={mode === "signup" ? 10 : 8}
+          autoComplete={mode === "signup" ? "new-password" : "current-password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password (8+ characters)"
+          placeholder={mode === "signup" ? "Password (10+ characters)" : "Password"}
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
+        {mode === "signup" ? (
+          <p className="px-1 text-xs text-muted-foreground">
+            At least 10 characters with a capital letter, a number and a symbol. Passwords found in
+            known data breaches are rejected.
+          </p>
+        ) : null}
         {human.widget}
         {formError ? (
           <div

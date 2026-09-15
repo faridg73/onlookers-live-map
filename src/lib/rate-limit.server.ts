@@ -20,7 +20,7 @@ export type RateLimitRule = {
 
 export const RATE_LIMITS = {
   /** Sign-in / sign-up attempts from one address. */
-  auth: { bucket: "auth-attempt", limit: 12, windowSeconds: 300 },
+  auth: { bucket: "auth-attempt", limit: 6, windowSeconds: 300 },
   /** Human-check verifications from one address. */
   humanCheck: { bucket: "human-check", limit: 40, windowSeconds: 300 },
   /** Confirmation texts per member — SMS costs money. */
