@@ -19,6 +19,9 @@ import {
   startPayoutOnboarding,
 } from "@/lib/payouts.functions";
 
+/** Marker substring of the "Connect not enabled on this payments account" message. */
+const CONNECT_UNSUPPORTED_MARK = "Direct bank cash-outs";
+
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-signal/15 text-signal",
   processing: "bg-signal/15 text-signal",
@@ -38,6 +41,7 @@ export function CreditPayoutDashboard() {
   const [payouts, setPayouts] = useState<PayoutRequestRow[]>([]);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
+  const [connectNote, setConnectNote] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
