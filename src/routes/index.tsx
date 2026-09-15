@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
+import { ChevronDown, CoinsIcon, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
-import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { isGoldBounty } from "@/lib/bounty-tiers";
