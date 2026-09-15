@@ -59,7 +59,7 @@ export function ShareToSocialButton({
             {subject.kind === "live" && <Radio className="size-4 shrink-0 text-signal" />}
             <span className="break-words">Share {subject.kind === "live" ? "this live stream" : "this pin"}</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="break-words">
             Anywhere you paste this link it shows a preview card with the title, the location pin
             and Onlooker branding.
           </DialogDescription>
