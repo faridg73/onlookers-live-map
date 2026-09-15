@@ -65,6 +65,9 @@ export function AlertSettingsCard() {
   useEffect(() => {
     if (!user) return;
     void fetchAlertPreferences().then(setPrefs);
+    if (browserNotificationsGranted()) {
+      setPushState((s) => ({ ...s, registered: true }));
+    }
   }, [user]);
 
   if (!user) return null;
