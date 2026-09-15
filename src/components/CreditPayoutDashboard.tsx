@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
+import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { fetchCreditWallet } from "@/lib/credits";
@@ -18,6 +18,9 @@ import {
   openPayoutAccount,
   startPayoutOnboarding,
 } from "@/lib/payouts.functions";
+
+/** Marker substring of the "Connect not enabled on this payments account" message. */
+const CONNECT_UNSUPPORTED_MARK = "Direct bank cash-outs";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-signal/15 text-signal",
@@ -38,6 +41,7 @@ export function CreditPayoutDashboard() {
   const [payouts, setPayouts] = useState<PayoutRequestRow[]>([]);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
+  const [connectNote, setConnectNote] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -48,6 +52,7 @@ export function CreditPayoutDashboard() {
       try {
         const status = await loadStatus();
         setBank({ connected: status.connected, payoutsEnabled: status.payoutsEnabled });
+        if (status.supported === false && status.error) setConnectNote(status.error);
       } catch {
         setBank({ connected: false, payoutsEnabled: false });
       }
@@ -72,7 +77,9 @@ export function CreditPayoutDashboard() {
       }
       toast.info("Bank setup opened in a new tab. Come back here when you're done.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not open bank setup");
+      const message = error instanceof Error ? error.message : "Could not open bank setup";
+      if (message.includes(CONNECT_UNSUPPORTED_MARK)) setConnectNote(message);
+      else toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -193,18 +200,34 @@ export function CreditPayoutDashboard() {
         </>
       ) : (
         <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => void connectBank()}
-            disabled={busy}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-live px-4 py-3 text-sm font-bold text-black disabled:opacity-60"
-          >
-            {busy ? <Loader2 className="size-4 animate-spin" /> : <Landmark className="size-4" />}
-            {bank?.connected ? "Finish Stripe Connect setup" : "Onboard with Stripe Connect"}
-          </button>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Link your bank once and every future cash out is paid out automatically.
-          </p>
+          {connectNote && (
+            <div className="mb-3 flex items-start gap-2.5 rounded-xl border border-signal/40 bg-signal/10 px-3 py-3">
+              <AlertCircle className="mt-0.5 size-4 shrink-0 text-signal" />
+              <div>
+                <p className="text-xs font-semibold leading-snug text-foreground">{connectNote}</p>
+                <p className="mt-1 text-[0.68rem] leading-snug text-muted-foreground">
+                  Your earnings are safe — use the <span className="font-semibold text-signal">Request payout</span> button in
+                  your Earnings Wallet above and we&apos;ll handle the transfer for you.
+                </p>
+              </div>
+            </div>
+          )}
+          {!connectNote && (
+            <>
+              <button
+                type="button"
+                onClick={() => void connectBank()}
+                disabled={busy}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-live px-4 py-3 text-sm font-bold text-black disabled:opacity-60"
+              >
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <Landmark className="size-4" />}
+                {bank?.connected ? "Finish Stripe Connect setup" : "Onboard with Stripe Connect"}
+              </button>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Link your bank once and every future cash out is paid out automatically.
+              </p>
+            </>
+          )}
         </div>
       )}
 
