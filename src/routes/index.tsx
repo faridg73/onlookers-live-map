@@ -162,7 +162,7 @@ function MapScreen() {
             exploreOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
           }`}
         >
-          <div className="min-h-0 overflow-hidden">
+          <div className="min-h-0 max-h-[min(46vh,22rem)] overflow-y-auto overscroll-contain">
             <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
               <div className="flex flex-col gap-2">
                 <Button
