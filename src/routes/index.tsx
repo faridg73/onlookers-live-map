@@ -19,6 +19,7 @@ import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { TrendingViewRequests } from "@/components/TrendingViewRequests";
 import { namePin, type ViewPin } from "@/lib/request-a-view";
 import { RequestViewPinDialog } from "@/components/RequestViewPinDialog";
+import { MapTourOverlay } from "@/components/MapTourOverlay";
 
 export const Route = createFileRoute("/")({
   validateSearch: (
@@ -293,6 +294,9 @@ function MapScreen() {
       </button>
 
       <FlashBountyButton variant="map" />
+
+      {/* First-visit tour: explains the concept to new visitors, once per device */}
+      <MapTourOverlay />
 
       <RequestViewPinDialog
         pin={pin}
