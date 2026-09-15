@@ -378,14 +378,28 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             </ul>
 
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-extrabold text-foreground">Your balance</span>
-                <span className={cn(
-                  "font-display text-lg font-extrabold tabular-nums",
-                  short ? "text-destructive" : "text-signal",
-                )}>
-                  {balance === null ? "…" : formatCredits(Math.round(balance))}
-                </span>
+                {balance !== null ? (
+                  <span className={cn(
+                    "font-display text-lg font-extrabold tabular-nums",
+                    short ? "text-destructive" : "text-signal",
+                  )}>
+                    {formatCredits(Math.round(balance))}
+                  </span>
+                ) : balanceLoading ? (
+                  <span className="text-sm font-bold text-muted-foreground">Loading…</span>
+                ) : signedIn === false ? (
+                  <span className="text-sm font-bold text-muted-foreground">Sign in to see it</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={loadBalance}
+                    className="text-sm font-bold text-signal underline"
+                  >
+                    Couldn't load — retry
+                  </button>
+                )}
               </div>
               <div className="flex items-center justify-between border-t border-border pt-2">
                 <span className="text-sm font-extrabold text-foreground">Locked in escrow</span>
