@@ -79,11 +79,58 @@ export function AlertSettingsCard() {
   };
 
   const togglePush = async () => {
+    setPushState((s) => ({ ...s, loading: true }));
+
+    // Builds without background push still support device notifications while
+    // the app is open, so ask for permission instead of showing a hard error.
     if (!pushConfigured()) {
-      toast.error("Push notifications are not configured for this build yet.");
+      if (pushState.registered) {
+        setPushState({
+          loading: false,
+          registered: false,
+          message: "Alerts turned off on this device. Turn them back on any time.",
+        });
+        set("push_enabled", false);
+        toast.success("Device alerts turned off");
+        return;
+      }
+
+      const fallback = await enableBrowserNotifications();
+      if (fallback.status === "granted") {
+        setPushState({
+          loading: false,
+          registered: true,
+          message:
+            "Alerts are on for this device. Background alerts while the app is fully closed are coming soon — keep Onlooker open or add it to your home screen for the fastest pings.",
+        });
+        set("push_enabled", true);
+        toast.success("Device alerts enabled");
+      } else if (fallback.status === "open-in-new-tab") {
+        setPushState({
+          loading: false,
+          registered: false,
+          message: "Open Onlooker in its own tab (or from your home screen) to allow notifications.",
+        });
+        toast("Open Onlooker in its own tab to allow notifications", { icon: "🔔" });
+      } else if (fallback.status === "unsupported") {
+        setPushState({
+          loading: false,
+          registered: false,
+          message:
+            "This browser can't show device notifications. You'll still see in-app alerts and can add text alerts below.",
+        });
+        toast("In-app and text alerts still work on this device");
+      } else {
+        setPushState({
+          loading: false,
+          registered: false,
+          message: "Notifications are blocked for this site. Allow them in your browser settings, then tap Enable again.",
+        });
+        toast("Allow notifications in your browser settings to finish");
+      }
       return;
     }
-    setPushState((s) => ({ ...s, loading: true }));
+
     try {
       if (pushState.registered) {
         await disablePush();
