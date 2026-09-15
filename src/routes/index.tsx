@@ -195,7 +195,7 @@ function MapScreen() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => void navigate({ to: "/discover" })}
+                  onClick={() => setGuidesOpen(true)}
                   className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
                 >
                   <BookOpen className="size-4 shrink-0 text-signal" />
