@@ -457,6 +457,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </div>
         </DialogContent>
       </Dialog>
+      {phoneGate.gate}
     </>
   );
 }
