@@ -247,7 +247,7 @@ function CommunityHub() {
                   setTag(null);
                 }}
                 aria-pressed={category === c.id}
-                className={`group relative h-32 w-[78vw] max-w-[18rem] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
+                className={`group relative h-32 min-w-[260px] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
