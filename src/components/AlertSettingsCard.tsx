@@ -15,7 +15,13 @@ import {
   saveAlertPreferences,
   type AlertPreferences,
 } from "@/lib/alerts";
-import { disablePush, enablePush, pushConfigured } from "@/lib/push-notifications";
+import {
+  browserNotificationsGranted,
+  disablePush,
+  enableBrowserNotifications,
+  enablePush,
+  pushConfigured,
+} from "@/lib/push-notifications";
 
 /**
  * Bounty Radar settings: how far away someone wants to hear about new bounties
