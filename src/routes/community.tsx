@@ -245,12 +245,13 @@ function CommunityHub() {
           Everything
         </Button>
         </div>
+        {/* Mobile keeps the sideways carousel; desktop stacks the cards up-and-down and scrolls with the page. */}
         <div
           ref={vibeRowRef}
           onScroll={updateVibeScroll}
           role="list"
           aria-label="Category cards"
-          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2"
+          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
@@ -266,7 +267,7 @@ function CommunityHub() {
                   setTag(null);
                 }}
                 aria-pressed={category === c.id}
-                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
+                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 md:w-full ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
@@ -284,7 +285,7 @@ function CommunityHub() {
             );
           })}
         </div>
-        <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised" aria-hidden="true">
+        <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised md:hidden" aria-hidden="true">
           <div
             className="h-full rounded-full bg-signal/80 transition-[width,margin] duration-100"
             style={{
