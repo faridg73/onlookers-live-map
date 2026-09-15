@@ -144,7 +144,7 @@ function MapScreen() {
         </div>
       </header>
 
-      <section className="pointer-events-auto absolute inset-x-3 bottom-24 z-30 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+      <section className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-30 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
         <Button
           type="button"
           variant="ghost"
