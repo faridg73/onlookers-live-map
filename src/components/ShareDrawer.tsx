@@ -49,9 +49,9 @@ export function ShareDrawer({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="rounded-t-3xl border-border bg-surface px-5 pb-8">
+      <DrawerContent className="max-h-[85vh] overflow-y-auto rounded-t-3xl border-border bg-surface px-5 pb-8">
         <DrawerHeader className="text-left">
-          <DrawerTitle className="font-display text-xl text-foreground">Share this post</DrawerTitle>
+          <DrawerTitle className="font-display text-xl break-words text-foreground">Share this post</DrawerTitle>
           <DrawerDescription className="text-sm text-muted-foreground">
             Invite people nearby or share the card image.
           </DrawerDescription>
