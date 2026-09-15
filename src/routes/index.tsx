@@ -62,6 +62,7 @@ function MapScreen() {
   const [exploreOpen, setExploreOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
+  const [guidesOpen, setGuidesOpen] = useState(false);
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
