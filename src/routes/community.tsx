@@ -229,9 +229,11 @@ function CommunityHub() {
         </Button>
         </div>
         <div
+          ref={vibeRowRef}
+          onScroll={updateVibeScroll}
           role="list"
           aria-label="Category cards"
-          className="flex flex-row overflow-x-auto scrollbar-thin gap-3 px-4 pb-2"
+          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
@@ -264,6 +266,15 @@ function CommunityHub() {
               </button>
             );
           })}
+        </div>
+        <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised" aria-hidden="true">
+          <div
+            className="h-full rounded-full bg-signal/80 transition-[width,margin] duration-100"
+            style={{
+              width: `${Math.max(vibeScroll.width, 12)}%`,
+              marginLeft: `${vibeScroll.left}%`,
+            }}
+          />
         </div>
 
       </section>
