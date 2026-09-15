@@ -19,9 +19,9 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const DETAIL_ZOOM = 14;
 const POI_ZOOM = 15;
 
-const HIDE_BASE_POIS: google.maps.MapTypeStyle[] = [
-  { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
-  { featureType: "transit.station", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+const HIDE_BUSINESS_POIS: google.maps.MapTypeStyle[] = [
+  { featureType: "poi.business", elementType: "all", stylers: [{ visibility: "off" }] },
+  { featureType: "poi.attraction", elementType: "all", stylers: [{ visibility: "off" }] },
 ];
 
 type Pixel = { left: number; top: number };
