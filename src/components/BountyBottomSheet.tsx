@@ -205,10 +205,12 @@ export function BountyBottomSheet({
                 className="w-full"
               />
             </div>
-            <p className="mt-2 flex items-start gap-2 text-[0.7rem] text-muted-foreground">
-              <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-live" />
-              {PUBLIC_SPACES_DISCLAIMER}
-            </p>
+            <div className="mt-4 flex items-start gap-3 rounded-2xl border border-live/30 bg-surface-raised p-3.5">
+              <ShieldCheck className="mt-0.5 size-5 shrink-0 text-live" />
+              <p className="text-xs font-semibold leading-relaxed text-foreground">
+                {PUBLIC_SPACES_DISCLAIMER}
+              </p>
+            </div>
           </>
         )}
       </SheetContent>
