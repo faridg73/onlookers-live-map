@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, CoinsIcon, Layers, MapPin, Navigation } from "lucide-react";
+import { ChevronDown, CoinsIcon, MapPin, Navigation } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
-import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { isGoldBounty } from "@/lib/bounty-tiers";
@@ -137,30 +136,57 @@ function MapScreen() {
 
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <button
-          type="button"
-          onClick={() => setNearbyOpen((open) => !open)}
-          aria-expanded={nearbyOpen}
-          className="pointer-events-auto mx-auto grid w-full max-w-lg grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-border bg-surface/95 px-4 py-3 text-left shadow-lg backdrop-blur-xl"
-        >
+        {/* Clean top bar: brand, nearby status, filter + nearby toggles */}
+        <div className="pointer-events-auto mx-auto flex w-full max-w-lg items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-xl">
           <img
             src="/icon-192.png"
             alt="Onlooker Live logo"
-            className="size-9 rounded-lg object-cover"
+            className="size-8 rounded-lg object-cover"
           />
-          <div className="min-w-0 flex-1">
-            <h1 className="font-display text-lg font-extrabold leading-none tracking-tight text-foreground">
+          <button
+            type="button"
+            onClick={() => setNearbyOpen((open) => !open)}
+            aria-expanded={nearbyOpen}
+            className="min-w-0 flex-1 text-left"
+          >
+            <h1 className="font-display text-base font-extrabold leading-none tracking-tight text-foreground">
               Onlooker
             </h1>
-            <p className="mt-1 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-live">
+            <p className="mt-0.5 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-live">
               {nearbyLabel}
             </p>
-          </div>
-          <ChevronDown className={`size-5 shrink-0 text-signal transition-transform ${nearbyOpen ? "rotate-180" : ""}`} />
-        </button>
+          </button>
+          <button
+            type="button"
+            onClick={() => setGoldOnly((g) => !g)}
+            aria-pressed={goldOnly}
+            aria-label={goldOnly ? "Show all bounties" : "Show high bounties only"}
+            className="rounded-lg border border-border p-2 transition-colors hover:bg-surface-raised"
+            style={
+              goldOnly
+                ? {
+                    backgroundColor: "var(--pin-gold)",
+                    borderColor: "var(--pin-gold)",
+                    color: "oklch(0.24 0.05 92)",
+                  }
+                : { color: "var(--pin-gold)" }
+            }
+          >
+            <CoinsIcon className="size-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setNearbyOpen((open) => !open)}
+            aria-expanded={nearbyOpen}
+            aria-label="Toggle nearby requests"
+            className="rounded-lg border border-border p-2 text-signal transition-colors hover:bg-surface-raised"
+          >
+            <ChevronDown className={`size-4 transition-transform ${nearbyOpen ? "rotate-180" : ""}`} />
+          </button>
+        </div>
 
         {nearbyOpen && (
-          <section className="pointer-events-auto mx-auto mt-2 max-h-[min(52dvh,28rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-lg border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
+          <section className="pointer-events-auto mx-auto mt-2 max-h-[min(52dvh,28rem)] w-full max-w-lg overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
             {nearby.length > 0 ? (
               <ul className="space-y-2">
                 {nearby.map(({ request, distance }) => (
@@ -171,12 +197,11 @@ function MapScreen() {
                         select(request.id);
                         setNearbyOpen(false);
                       }}
-                      className="grid w-full grid-cols-[minmax(0,1fr)_auto] gap-3 text-left"
+                      className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-left"
                     >
                       <span className="min-w-0">
-                         <LivePulseBadge compact className="mb-1" />
-                         <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                        <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                        <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
                           <span className="truncate">{request.place}</span>
                         </span>
@@ -185,14 +210,16 @@ function MapScreen() {
                         </span>
                       </span>
                       <span className="shrink-0 text-right">
-                        <span className="block font-display text-lg font-extrabold text-signal">${request.bounty}</span>
-                        <span className="flex items-center justify-end gap-1 text-[0.68rem] text-muted-foreground">
+                        <span className="block font-display text-base font-extrabold text-signal">
+                          {request.bounty} cr
+                        </span>
+                        <span className="flex items-center justify-end gap-1 text-[0.65rem] text-muted-foreground">
                           <Navigation className="size-3" /> {formatDistance(distance)}
                         </span>
                       </span>
                     </button>
                     <BountyDetailsDialog request={request} onClaim={claim} userPosition={userPosition}>
-                      <Button type="button" variant="outline" className="mt-3 h-10 w-full rounded-lg font-bold">
+                      <Button type="button" variant="outline" className="mt-2 h-9 w-full rounded-lg text-xs font-bold">
                         View details
                       </Button>
                     </BountyDetailsDialog>
@@ -209,36 +236,9 @@ function MapScreen() {
           </section>
         )}
 
-        {/* sticky filter dock */}
-        <div className="pointer-events-auto mx-auto mt-2 grid w-full max-w-lg grid-cols-2 gap-2 rounded-lg border border-border bg-surface/95 p-1.5 shadow-lg backdrop-blur-xl">
-          <button
-            type="button"
-            onClick={() => setGoldOnly(false)}
-            aria-pressed={!goldOnly}
-            className={`flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition-colors ${
-              goldOnly ? "text-muted-foreground" : "bg-surface-raised text-foreground"
-            }`}
-          >
-            <Layers className="size-3.5" /> All Views
-          </button>
-          <button
-            type="button"
-            onClick={() => setGoldOnly(true)}
-            aria-pressed={goldOnly}
-            className="flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] transition-colors"
-            style={
-              goldOnly
-                ? { backgroundColor: "var(--pin-gold)", color: "oklch(0.24 0.05 92)" }
-                : { color: "var(--pin-gold)" }
-            }
-          >
-            <CoinsIcon className="size-3.5" /> High Bounties
-          </button>
-        </div>
-
-        {/* Live place search: type a few letters, pick a suggestion, jump there. */}
-        <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg space-y-2">
-          <div className="rounded-xl border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-xl">
+        {/* Streamlined search with trending suggestions */}
+        <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg">
+          <div className="rounded-xl bg-surface/95 p-1 shadow-lg backdrop-blur-xl">
             <PlaceSearchInput
               onQueryChange={setSearchText}
               onPick={(place) => {
@@ -246,44 +246,51 @@ function MapScreen() {
                 setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
               }}
             />
-            {searchText.trim().length === 0 && (
-              <TrendingViewRequests
-                className="mt-2"
-                onOpen={(request) => {
-                  select(request.id);
-                  if (typeof request.lat === "number" && typeof request.lng === "number") {
-                    setCenterTarget({ lat: request.lat, lng: request.lng, zoom: 14 });
-                  }
-                }}
-              />
-            )}
           </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setPinMode((on) => !on);
-              setDraftPin(null);
-              setPin(null);
-            }}
-            aria-pressed={pinMode}
-            className={`flex w-full items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-xs font-extrabold uppercase tracking-[0.12em] shadow-lg transition-colors ${
-              pinMode
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface/95 text-cyan backdrop-blur-xl drop-shadow-[0_0_10px_var(--cyan-glow)]"
-            }`}
-          >
-            {pinMode ? <X className="size-4" /> : <Globe2 className="size-4" />}
-            {pinMode ? "Cancel pin drop" : "Request a view anywhere"}
-          </button>
-
-          {pinMode && (
-            <p className="rounded-lg border-2 border-signal/40 bg-surface/95 px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal shadow-lg backdrop-blur-xl">
-              Now tap anywhere on the map to drop your pin
-            </p>
+          {searchText.trim().length === 0 && (
+            <TrendingViewRequests
+              className="mt-2"
+              onOpen={(request) => {
+                select(request.id);
+                if (typeof request.lat === "number" && typeof request.lng === "number") {
+                  setCenterTarget({ lat: request.lat, lng: request.lng, zoom: 14 });
+                }
+              }}
+            />
           )}
         </div>
+
+        {pinMode && (
+          <p className="pointer-events-auto mx-auto mt-2 w-full max-w-lg rounded-xl border border-signal/40 bg-surface/95 px-3 py-2 text-center text-[0.7rem] font-bold uppercase tracking-[0.1em] text-signal shadow-lg backdrop-blur-xl">
+            Tap anywhere on the map to drop your pin
+          </p>
+        )}
       </header>
+
+      {/* Floating "Request a view anywhere" action */}
+      <button
+        type="button"
+        onClick={() => {
+          setPinMode((on) => !on);
+          setDraftPin(null);
+          setPin(null);
+        }}
+        aria-pressed={pinMode}
+        className="pointer-events-auto absolute bottom-28 left-4 z-30 flex flex-col items-center gap-1"
+      >
+        <span
+          className={`grid size-14 place-items-center rounded-full border-2 shadow-xl backdrop-blur-xl transition-transform active:scale-95 ${
+            pinMode
+              ? "border-signal bg-signal text-signal-foreground"
+              : "border-border bg-surface/95 text-cyan drop-shadow-[0_0_10px_var(--cyan-glow)]"
+          }`}
+        >
+          {pinMode ? <X className="size-5" /> : <Globe2 className="size-5" />}
+        </span>
+        <span className="rounded-full bg-surface/90 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-cyan backdrop-blur">
+          {pinMode ? "Cancel" : "Request"}
+        </span>
+      </button>
 
       <FlashBountyButton variant="map" />
 
