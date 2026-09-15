@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Coins, Globe2, Radio, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
