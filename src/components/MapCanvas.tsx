@@ -21,6 +21,7 @@ const POI_ZOOM = 15;
 
 const HIDE_BASE_POIS: google.maps.MapTypeStyle[] = [
   { featureType: "poi", elementType: "all", stylers: [{ visibility: "off" }] },
+  { featureType: "transit.station", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
 ];
 
 type Pixel = { left: number; top: number };
@@ -250,7 +251,12 @@ export function MapCanvas({
           request.bountyType === "live_stream" &&
           request.status === "claimed" &&
           !isClosed(request);
-        return request.id === selectedId || activeLive || bountyTier(total) === "gold";
+        return (
+          request.id === selectedId ||
+          activeLive ||
+          request.bountyTier === "priority_hunt" ||
+          bountyTier(total) === "gold"
+        );
       });
   const importantIds = new Set(importantMarkers.map(({ request }) => request.id));
   const clusterGrid = zoom <= 7 ? 150 : zoom <= 10 ? 120 : 96;
