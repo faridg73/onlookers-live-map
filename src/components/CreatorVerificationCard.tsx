@@ -8,7 +8,7 @@ import { fetchMyVerification, type VerificationStatus } from "@/lib/verification
 
 const CODE_LENGTH = 6;
 
-/** Verify yourself instantly with a texted code — no manual review, no documents. */
+/** Verify yourself instantly with a texted code. No manual review, no documents. */
 export function CreatorVerificationCard() {
   const [status, setStatus] = useState<VerificationStatus | null>(null);
   const [loading, setLoading] = useState(true);
