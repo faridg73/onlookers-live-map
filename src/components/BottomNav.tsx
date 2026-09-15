@@ -24,8 +24,8 @@ export function BottomNav() {
 
   return (
     <>
-      <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 backdrop-blur-xl">
-        <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pb-[env(safe-area-inset-bottom)]">
+      <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 pb-safe backdrop-blur-xl">
+        <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 pt-1">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
             <Fragment key={to}>
               {to === "/post" && (
