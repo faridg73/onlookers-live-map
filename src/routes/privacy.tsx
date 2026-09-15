@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Onlooker live view bounties" },
+      { title: "Privacy Policy | Onlooker live view bounties" },
       {
         name: "description",
         content:
@@ -177,19 +177,19 @@ function PrivacyPage() {
 
       <Section title="9. Permissions summary for app stores">
         <p>
-          <strong className="text-foreground">Location (precise, while in use)</strong> — map
+          <strong className="text-foreground">Location (precise, while in use)</strong>, map
           centring, nearby request distances, pin placement, geofence verification of captures.
         </p>
         <p>
-          <strong className="text-foreground">Camera</strong> — capturing the photo or video that
+          <strong className="text-foreground">Camera</strong>, capturing the photo or video that
           fulfils a bounty request.
         </p>
         <p>
-          <strong className="text-foreground">Microphone</strong> — recording audio as part of a
+          <strong className="text-foreground">Microphone</strong>, recording audio as part of a
           bounty video.
         </p>
         <p>
-          <strong className="text-foreground">Photos / storage</strong> — saving or selecting a
+          <strong className="text-foreground">Photos / storage</strong>, saving or selecting a
           profile photo where you choose to.
         </p>
         <p>

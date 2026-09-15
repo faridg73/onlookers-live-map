@@ -23,13 +23,13 @@ import { requestCurrentPosition } from "@/lib/geolocation";
 export const Route = createFileRoute("/feed")({
   head: () => ({
     meta: [
-      { title: "Live Requests Feed — Onlooker" },
+      { title: "Live Requests Feed | Onlooker" },
       {
         name: "description",
         content:
           "Every open live photo request near you, ranked by bounty and time left. Claim one and shoot it.",
       },
-      { property: "og:title", content: "Live Requests Feed — Onlooker" },
+      { property: "og:title", content: "Live Requests Feed | Onlooker" },
       {
         property: "og:description",
         content: "Open live photo requests near you, ranked by bounty and time left.",
@@ -390,7 +390,7 @@ function FeedScreen() {
           </div>
         )}
         {list.length === 0 && (
-          <RecentCapturesFeed blurb="Nothing live nearby — watch captures that already wrapped." />
+          <RecentCapturesFeed blurb="Nothing live nearby, watch captures that already wrapped." />
         )}
       </div>
     </div>

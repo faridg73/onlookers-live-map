@@ -20,7 +20,7 @@ function ago(iso: string) {
 export function RecentCapturesFeed({
   limit = 6,
   title = "Recent captures",
-  blurb = "Streams that already wrapped — still watchable any time.",
+  blurb = "Streams that already wrapped, still watchable any time.",
 }: {
   limit?: number;
   title?: string;

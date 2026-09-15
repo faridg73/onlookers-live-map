@@ -16,13 +16,13 @@ import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onloo
 export const Route = createFileRoute("/hunt")({
   head: () => ({
     meta: [
-      { title: "Hunter Dashboard — Earn on Onlooker" },
+      { title: "Hunter Dashboard, Earn on Onlooker" },
       {
         name: "description",
         content:
           "See every open bounty near you with the payout, the time left and how far you have to walk.",
       },
-      { property: "og:title", content: "Hunter Dashboard — Earn on Onlooker" },
+      { property: "og:title", content: "Hunter Dashboard, Earn on Onlooker" },
       {
         property: "og:description",
         content: "Open bounties near you with payout, time left and distance.",
@@ -118,7 +118,7 @@ function HuntScreen() {
         </div>
         <div className={stat}>
           <Navigation className="size-4 text-signal" aria-hidden />
-          <p className="mt-1 font-display text-xl text-foreground">{position ? nearby : "—"}</p>
+          <p className="mt-1 font-display text-xl text-foreground">{position ? nearby : "-"}</p>
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
             Within {radius} {unit}
           </p>
@@ -195,13 +195,13 @@ function HuntScreen() {
               <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 No open bounties right now. Watch the archive while you wait.
               </p>
-              <RecentCapturesFeed blurb="Finished streams from hunters near you — still watchable." />
+              <RecentCapturesFeed blurb="Finished streams from hunters near you, still watchable." />
               <RecentActivityFeed />
             </div>
           )}
           {list.length > 0 && nearby === 0 && position && (
             <div className="space-y-4">
-              <RecentCapturesFeed blurb="Nothing live in your radius — here's what already wrapped." />
+              <RecentCapturesFeed blurb="Nothing live in your radius, here's what already wrapped." />
               <RecentActivityFeed />
             </div>
           )}

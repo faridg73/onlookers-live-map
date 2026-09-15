@@ -222,7 +222,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
             }
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {posting ? "Locking bounty…" : `Post request — lock ${Number.isFinite(bounty) ? bounty : 0} Credits`}
+            {posting ? "Locking bounty…" : `Post request, lock ${Number.isFinite(bounty) ? bounty : 0} Credits`}
           </button>
         </form>
       </DialogContent>

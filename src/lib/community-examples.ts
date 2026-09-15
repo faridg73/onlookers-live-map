@@ -16,7 +16,7 @@ type SeedCopy = Omit<ExampleSeed, "id" | "tag">;
 
 const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
   friends: {
-    "new in town": { kicker: "New connections", title: "Sunset coffee for Newport newcomers", body: "A relaxed table for anyone still learning the neighborhood — come for one drink or stay for the walk." },
+    "new in town": { kicker: "New connections", title: "Sunset coffee for Newport newcomers", body: "A relaxed table for anyone still learning the neighborhood, come for one drink or stay for the walk." },
     coffee: { kicker: "Coffee crew", title: "Laptop-free coffee at the corner café", body: "Meet a few nearby people over pour-overs, pastries and actual conversation." },
     walk: { kicker: "Walking club", title: "Back Bay loop before golden hour", body: "An easy waterfront loop with plenty of pauses. Comfortable shoes and friendly dogs welcome." },
     gym: { kicker: "Training partner", title: "Looking for a consistent morning gym buddy", body: "Three weekday sessions, beginner-friendly pace, and no pressure to match weights." },
@@ -24,7 +24,7 @@ const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
     "30s": { kicker: "People in their 30s", title: "Sunday brunch table with two seats open", body: "A casual monthly brunch for locals who want to widen their circle." },
   },
   meetups: {
-    tonight: { kicker: "Tonight", title: "Rooftop trivia team needs two more", body: "First round starts at 7:30. No trivia expertise required — just bring one oddly specific fact." },
+    tonight: { kicker: "Tonight", title: "Rooftop trivia team needs two more", body: "First round starts at 7:30. No trivia expertise required, just bring one oddly specific fact." },
     food: { kicker: "Food meetup", title: "Three-stop taco crawl on Bristol", body: "We are comparing the house specialty at each stop and finishing with churros." },
     music: { kicker: "Music meetup", title: "Vinyl listening hour at the record shop", body: "Each person picks one side of an album, then the group votes on the closing record." },
     sports: { kicker: "Pickup sports", title: "Two players needed for beach volleyball", body: "Friendly doubles rotation starting at 5:45. All skill levels can jump in." },

@@ -58,8 +58,8 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
     reason: allowed
       ? ""
       : verification?.requestedAt
-        ? "Your creator verification is in review — free broadcasting unlocks once it's approved."
-        : "Free broadcasting opens once you're a verified creator — apply on your profile, or deliver a couple of paid captures to unlock it.",
+        ? "Your creator verification is in review, free broadcasting unlocks once it's approved."
+        : "Free broadcasting opens once you're a verified creator, apply on your profile, or deliver a couple of paid captures to unlock it.",
   };
 }
 

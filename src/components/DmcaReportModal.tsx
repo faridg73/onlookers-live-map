@@ -47,7 +47,7 @@ export function DmcaReportModal({
       });
       if (!result.success) throw new Error(result.error ?? "Could not submit the report.");
       setDone(true);
-      toast.success("Report submitted — our team will review it.");
+      toast.success("Report submitted, our team will review it.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not submit the report.");
     } finally {

@@ -21,17 +21,17 @@ import { discoveryImage } from "@/lib/discovery-visuals";
 export const Route = createFileRoute("/discover/")({
   head: () => ({
     meta: [
-      { title: "Browse Places Near You — Onlooker Live Views" },
+      { title: "Browse Places Near You | Onlooker Live Views" },
       {
         name: "description",
         content:
           "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a live view.",
       },
-      { property: "og:title", content: "Browse Places Near You — Onlooker Live Views" },
+      { property: "og:title", content: "Browse Places Near You | Onlooker Live Views" },
       {
         property: "og:description",
         content:
-          "Trending events, live sports and local hotspots around your city — request a live view from someone already there.",
+          "Trending events, live sports and local hotspots around your city, request a live view from someone already there.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -69,7 +69,7 @@ function DiscoverHome() {
 
       <h1 className="font-display text-3xl tracking-tight text-foreground">Browse places</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Everything here is pulled live from the area you're browsing — pick a spot and ask for a
+        Everything here is pulled live from the area you're browsing, pick a spot and ask for a
         view.
       </p>
 
@@ -191,7 +191,7 @@ function DiscoverHome() {
                     })}
                 {!eventsLoading && eventPlaces.length === 0 && (
                   <p className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-                    No event venues found around {area.label} yet — try another city.
+                    No event venues found around {area.label} yet, try another city.
                   </p>
                 )}
               </ScrollableLane>

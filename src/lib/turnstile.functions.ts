@@ -43,7 +43,7 @@ export const verifyHumanCheck = createServerFn({ method: "POST" })
     // No token means the widget could not run in that browser (blocked script,
     // hostname not allowed yet). Let the person through rather than trap them.
     if (!data.token) {
-      console.warn("[turnstile] no token supplied for", data.action, "— allowing");
+      console.warn("[turnstile] no token supplied for", data.action, "- allowing");
       return { ok: true, configured: true, reason: "unverified" };
     }
 
@@ -74,7 +74,7 @@ export async function assertHuman(token: string | null | undefined, action: stri
   const secret = process.env["TURNSTILE_SECRET_KEY"];
   if (!secret) return;
   if (!token) {
-    console.warn("[turnstile] no token for", action, "— allowing (widget unavailable)");
+    console.warn("[turnstile] no token for", action, "- allowing (widget unavailable)");
     return;
   }
   try {

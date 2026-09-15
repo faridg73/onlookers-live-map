@@ -149,7 +149,7 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
           metadata,
           ...(customerId ? { customer: customerId } : {}),
           payment_intent_data: {
-            description: `${pack.name} — ${pack.credits} Credits`,
+            description: `${pack.name}, ${pack.credits} Credits`,
             metadata,
           },
           line_items: [
@@ -161,7 +161,7 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
                     currency: "usd",
                     unit_amount: pack.priceCents,
                     product_data: {
-                      name: `${pack.name} — ${pack.credits} Credits`,
+                      name: `${pack.name}, ${pack.credits} Credits`,
                       description: pack.blurb,
                     },
                   },

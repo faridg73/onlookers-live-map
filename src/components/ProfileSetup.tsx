@@ -131,7 +131,7 @@ export function ProfileSetup() {
       return;
     }
     if (nameState.kind === "taken") {
-      toast.error("That username is already claimed — pick another.");
+      toast.error("That username is already claimed, pick another.");
       return;
     }
     if (nameState.kind !== "free") {
@@ -162,10 +162,10 @@ export function ProfileSetup() {
       // leftover session from an earlier login on this device.
       const { data: fresh, error: sessionError } = await supabase.auth.getUser();
       if (sessionError || !fresh.user) {
-        throw new Error("Your session expired — please sign in again.");
+        throw new Error("Your session expired, please sign in again.");
       }
       if (user && fresh.user.id !== user.id) {
-        throw new Error("Your session changed — reload the page and try again.");
+        throw new Error("Your session changed, reload the page and try again.");
       }
 
       await completeMyProfile({
@@ -247,7 +247,7 @@ export function ProfileSetup() {
             </div>
             {nameState.kind === "taken" && (
               <p className="mt-1.5 text-xs text-destructive">
-                “{username.trim()}” is already claimed — try another.
+                “{username.trim()}” is already claimed, try another.
               </p>
             )}
             {nameState.kind === "invalid" && (
@@ -297,7 +297,7 @@ export function ProfileSetup() {
 
         <h3 className="mt-6 text-sm font-semibold text-foreground">Account recovery</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Answer at least two — we use these to confirm it's you.
+          Answer at least two, we use these to confirm it's you.
         </p>
         <div className="mt-3 space-y-3">
           {SECURITY_QUESTIONS.map((q) => (

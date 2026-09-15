@@ -14,7 +14,7 @@ export function clipShareCaption(video: BountyVideo): string {
   const tags = ["#OnlookerLive", hashtag(video.request_place), hashtag(video.request_title), "#ConcertLogistics"]
     .filter(Boolean)
     .join(" ");
-  return `${video.request_title} — ${video.request_place}\n${tags}`;
+  return `${video.request_title}, ${video.request_place}\n${tags}`;
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {

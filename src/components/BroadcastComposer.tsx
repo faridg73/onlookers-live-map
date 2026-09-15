@@ -71,7 +71,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       return;
     }
     if (!spot || !place.trim()) {
-      toast.error("Pick where you're streaming from — use your location or tap the map.");
+      toast.error("Pick where you're streaming from, use your location or tap the map.");
       return;
     }
     if (!isRequestAllowed(title, body, place)) {

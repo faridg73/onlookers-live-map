@@ -529,7 +529,7 @@ export function MapCanvas({
         </button>
         {(geoState === "unavailable" || geoState === "denied") && (
           <p className="w-28 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[10px] font-medium leading-tight text-muted-foreground backdrop-blur">
-            {geoState === "denied" ? "Allow location in device settings" : "Location unavailable — tap to retry"}
+            {geoState === "denied" ? "Allow location in device settings" : "Location unavailable, tap to retry"}
           </p>
         )}
       </div>

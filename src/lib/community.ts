@@ -33,7 +33,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     tags: ["new in town", "coffee", "walk", "gym", "20s", "30s"],
     iceBreakers: [
       {
-        title: "New here — who wants coffee?",
+        title: "New here, who wants coffee?",
         body: "Just moved in and looking for a couple of easy-going people to grab coffee with this week.",
       },
       {
@@ -89,7 +89,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
       },
       {
         title: "Practice ordering food with me",
-        body: "Live from a real counter — you order, I translate, we both learn.",
+        body: "Live from a real counter, you order, I translate, we both learn.",
       },
     ],
   },
@@ -119,7 +119,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     iceBreakers: [
       {
         title: "Open house walkthrough this afternoon",
-        body: "Streaming room by room — ask me to check the light, storage or any finish up close.",
+        body: "Streaming room by room, ask me to check the light, storage or any finish up close.",
       },
       {
         title: "Renovation progress check",
@@ -136,7 +136,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     iceBreakers: [
       {
         title: "Flea market finds, live from the tables",
-        body: "Walking the rows now — tell me what you want inspected or priced.",
+        body: "Walking the rows now, tell me what you want inspected or priced.",
       },
       {
         title: "Neighborhood garage sale walkthrough",
@@ -153,7 +153,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     iceBreakers: [
       {
         title: "Street busker on the main plaza right now",
-        body: "Great set, decent crowd — streaming a few minutes from the footpath.",
+        body: "Great set, decent crowd, streaming a few minutes from the footpath.",
       },
       {
         title: "Festival opening before the crowd arrives",

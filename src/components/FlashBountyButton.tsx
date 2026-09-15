@@ -138,13 +138,13 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       toast.error(
         locateError ??
           (locating
-            ? "Still finding your exact spot — hang on a moment."
+            ? "Still finding your exact spot, hang on a moment."
             : "We couldn't pin your location. Tap Retry above."),
       );
       return;
     }
     if (balance === null && balanceLoading) {
-      toast.error("We're still loading your Credit balance — try again in a moment.");
+      toast.error("We're still loading your Credit balance, try again in a moment.");
       return;
     }
     if (isCustom && customError) {
@@ -153,7 +153,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     }
     if (balance !== null && short) {
       toast.error(
-        `Not enough Credits — this flash bounty locks ${formatCredits(
+        `Not enough Credits, this flash bounty locks ${formatCredits(
           totalCredits,
         )} and you have ${formatCredits(Math.round(balance))}. Buy credits to go live here.`,
       );
@@ -175,7 +175,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       addRequest({
         title: FLASH_TITLE,
         place: spot.formatted,
-        note: `Live now — ${FLASH_DURATION_MINUTES} minute stream from this exact spot.`,
+        note: `Live now, ${FLASH_DURATION_MINUTES} minute stream from this exact spot.`,
         bounty: totalCredits,
         category: "events",
         dbId: locked.id,
@@ -206,7 +206,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Flash bounty — something is happening here now"
+          aria-label="Flash bounty, something is happening here now"
           title="Instantly alerts nearby onlookers to go live at this exact spot."
           className="pointer-events-auto absolute bottom-28 right-4 z-30 flex flex-col items-center gap-1"
         >
@@ -221,7 +221,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Flash bounty — something is happening here now"
+          aria-label="Flash bounty, something is happening here now"
           title="Instantly alerts nearby onlookers to go live at this exact spot."
           className="group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.55rem] font-bold leading-tight text-signal"
         >
@@ -400,7 +400,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                     onClick={loadBalance}
                     className="text-sm font-bold text-signal underline"
                   >
-                    Couldn't load — retry
+                    Couldn't load, retry
                   </button>
                 )}
               </div>
@@ -439,7 +439,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
-              {posting ? "Broadcasting…" : `Go live here — lock ${formatCredits(totalCredits)}`}
+              {posting ? "Broadcasting…" : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
             {short && (
               <Button

@@ -36,11 +36,11 @@ import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Discover — meetups, tutorials & language swaps | Onlooker Live" },
+      { title: "Discover, meetups, tutorials & language swaps | Onlooker Live" },
       {
         name: "description",
         content:
-          "Find friends, join a flash meetup, learn something in ten minutes or swap languages with someone nearby — live on Onlooker.",
+          "Find friends, join a flash meetup, learn something in ten minutes or swap languages with someone nearby, live on Onlooker.",
       },
       { property: "og:title", content: "Discover live community meetups on Onlooker" },
       {
@@ -219,7 +219,7 @@ function CommunityHub() {
           See what your city is doing now
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          A live local stream — tap a lane, tighten the radius, or open the map.
+          A live local stream, tap a lane, tighten the radius, or open the map.
         </p>
         <Link
           to="/discover"
@@ -441,12 +441,12 @@ function CommunityHub() {
           <div className="columns-1 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
             {rest.map(renderCard)}
           </div>
-          {/* Live activity is thin here — fall back to the evergreen clip archive. */}
+          {/* Live activity is thin here, fall back to the evergreen clip archive. */}
           {!loading && visible.length < 3 && (
             <div className="mt-6">
               <RecentCapturesFeed
                 title="Recent captures"
-                blurb="Quiet nearby right now — here are streams that already wrapped."
+                blurb="Quiet nearby right now, here are streams that already wrapped."
               />
             </div>
           )}

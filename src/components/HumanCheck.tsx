@@ -181,7 +181,7 @@ function TurnstileWidget({
     if (discreet) return null;
     return (
       <p className="text-xs text-muted-foreground">
-        Skipping the human check on this device — you can carry on.
+        Skipping the human check on this device, you can carry on.
       </p>
     );
   }

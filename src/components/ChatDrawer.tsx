@@ -100,7 +100,7 @@ export function ChatDrawer({
     setWorking(true);
     try {
       const paid = await approveAndPay(review.videoId, requestKey);
-      toast.success(`Approved — $${paid.toFixed(2)} released to the hunter.`);
+      toast.success(`Approved, $${paid.toFixed(2)} released to the hunter.`);
       setConfirming(false);
       refresh();
     } catch (err) {

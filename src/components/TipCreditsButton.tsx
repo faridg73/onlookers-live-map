@@ -24,7 +24,7 @@ export function TipCreditsButton({
     try {
       const res = await tipCredits({ receiverId, amount });
       toast.success(
-        `Sent ${formatCredits(amount)} — ${receiverName ?? "they"} received ${formatCredits(res.amountNet)}.`,
+        `Sent ${formatCredits(amount)}, ${receiverName ?? "they"} received ${formatCredits(res.amountNet)}.`,
       );
       setOpen(false);
     } catch (err) {

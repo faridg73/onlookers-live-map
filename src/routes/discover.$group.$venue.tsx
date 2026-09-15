@@ -37,9 +37,9 @@ export const Route = createFileRoute("/discover/$group/$venue")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Not found — Onlooker" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Not found | Onlooker" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} Live Views — Onlooker`;
+    const title = `${loaderData.name} Live Views | Onlooker`;
     const description = `${loaderData.blurb} Post a bounty and get a live view from ${loaderData.name}, ${loaderData.area}.`;
     return {
       meta: [
@@ -117,7 +117,7 @@ function VenueScreen() {
     });
     toast.success(
       on
-        ? `Following ${venue.name} — you'll be alerted about new bounties within five miles.`
+        ? `Following ${venue.name}, you'll be alerted about new bounties within five miles.`
         : `Stopped following ${venue.name}.`,
     );
   };
@@ -198,7 +198,7 @@ function VenueScreen() {
         ))}
         {live.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Nothing live here right now — be the first to ask for a view.
+            Nothing live here right now, be the first to ask for a view.
           </p>
         )}
       </div>

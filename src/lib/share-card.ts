@@ -156,7 +156,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
 /** Caption with hashtags and the sharer's referral link. */
 export async function shareCaption(artifact: ShareArtifact): Promise<string> {
   const link = await referralLink();
-  const bits = [artifact.title, artifact.place].filter(Boolean).join(" — ");
+  const bits = [artifact.title, artifact.place].filter(Boolean).join(", ");
   return `${bits}\nLive on Onlooker Live 👀 ${link}\n#OnlookerLive #LiveView`;
 }
 
@@ -183,7 +183,7 @@ export async function shareArtifact(artifact: ShareArtifact): Promise<"shared" |
   setTimeout(() => URL.revokeObjectURL(link.href), 10_000);
   try {
     await navigator.clipboard?.writeText(caption);
-    toast.success("Card saved and caption copied — post it anywhere.");
+    toast.success("Card saved and caption copied, post it anywhere.");
   } catch {
     toast.success("Card saved to your device.");
   }

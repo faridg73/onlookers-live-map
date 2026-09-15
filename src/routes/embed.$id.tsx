@@ -22,7 +22,7 @@ export const Route = createFileRoute("/embed/$id")({
   }),
   head: ({ match }) => {
     const { place } = match.search as Search;
-    const heading = `Onlooker live view${place ? ` — ${place}` : ""}`;
+    const heading = `Onlooker live view${place ? `, ${place}` : ""}`;
     return {
       meta: [
         { title: heading },

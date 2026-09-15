@@ -17,7 +17,7 @@ import { moderationReasonLabel } from "@/lib/moderation-reasons";
 export const Route = createFileRoute("/disputes")({
   head: () => ({
     meta: [
-      { title: "Onlooker Disputes — submit evidence & get a ruling" },
+      { title: "Onlooker Disputes, submit evidence & get a ruling" },
       {
         name: "description",
         content:
@@ -70,7 +70,7 @@ function DisputesScreen() {
         <div>
           <h1 className="font-display text-2xl text-foreground">Dispute center</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            The bounty stays locked in escrow while a dispute is open. Add evidence here — a
+            The bounty stays locked in escrow while a dispute is open. Add evidence here, a
             moderator reviews both sides and releases or refunds the money.
           </p>
         </div>

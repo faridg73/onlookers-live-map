@@ -17,13 +17,13 @@ import type { DiscoveredPlace } from "@/lib/places.functions";
 export const Route = createFileRoute("/discover/trending")({
   head: () => ({
     meta: [
-      { title: "Trending Feeds & Live Events Near You — Onlooker" },
+      { title: "Trending Feeds & Live Events Near You | Onlooker" },
       {
         name: "description",
         content:
-          "Live sports, concerts, fight nights and public gatherings happening around your city this weekend — launch a bounty and get a live view in minutes.",
+          "Live sports, concerts, fight nights and public gatherings happening around your city this weekend, launch a bounty and get a live view in minutes.",
       },
-      { property: "og:title", content: "Trending Feeds & Live Events Near You — Onlooker" },
+      { property: "og:title", content: "Trending Feeds & Live Events Near You | Onlooker" },
       {
         property: "og:description",
         content:
@@ -99,7 +99,7 @@ function TrendingScreen() {
         <Flame className="size-6 text-signal" aria-hidden /> Trending feeds
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        {weekend ? "Happening this weekend" : "Coming up"} around {area.label} — tap any card to
+        {weekend ? "Happening this weekend" : "Coming up"} around {area.label}, tap any card to
         launch a live view from that exact spot.
       </p>
 
@@ -190,7 +190,7 @@ function TrendingScreen() {
 
         {!loading && items.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            No trending venues found around {area.label} yet — try another city above.
+            No trending venues found around {area.label} yet, try another city above.
           </p>
         )}
       </div>

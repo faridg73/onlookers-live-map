@@ -5,7 +5,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Top Reporters — Onlooker bounty payout ranking" },
+      { title: "Top Reporters | Onlooker bounty payout ranking" },
       {
         name: "description",
         content:

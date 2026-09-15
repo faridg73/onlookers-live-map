@@ -77,7 +77,7 @@ export function PayPerMinuteStream({
           .catch(async (err: unknown) => {
             toast.error(
               err instanceof Error && /insufficient/i.test(err.message)
-                ? "You're out of Credits — the live session ended."
+                ? "You're out of Credits, the live session ended."
                 : "The live session ended.",
             );
             if (timer.current) clearInterval(timer.current);

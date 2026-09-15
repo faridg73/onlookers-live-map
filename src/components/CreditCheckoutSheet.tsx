@@ -57,7 +57,7 @@ export function CreditCheckoutSheet({
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
-              {pack.credits} Credits — {formatPackPrice(pack.priceCents)}
+              {pack.credits} Credits, {formatPackPrice(pack.priceCents)}
             </p>
             <p className="text-xs text-muted-foreground">Apple Pay, Google Pay, Link or card</p>
           </div>

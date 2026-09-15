@@ -153,7 +153,7 @@ export function quoteBounty(input: {
       detail:
         weatherFactor === 1
           ? "Clear conditions, no extra"
-          : `${pct(weatherFactor)} — ${conditionByMultiplier(weatherFactor).label.toLowerCase()}`,
+          : `${pct(weatherFactor)}, ${conditionByMultiplier(weatherFactor).label.toLowerCase()}`,
       multiplier: weatherFactor,
       runningTotal: total,
     },

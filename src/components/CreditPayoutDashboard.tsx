@@ -116,7 +116,7 @@ export function CreditPayoutDashboard() {
     setBusy(true);
     try {
       await requestCreditCashout(value);
-      toast.success(`Cash out requested — $${creditsToUsd(value).toFixed(2)} is on the way.`);
+      toast.success(`Cash out requested, $${creditsToUsd(value).toFixed(2)} is on the way.`);
       setAmount("");
       await refresh();
     } catch (error) {
@@ -206,7 +206,7 @@ export function CreditPayoutDashboard() {
               <div>
                 <p className="text-xs font-semibold leading-snug text-foreground">{connectNote}</p>
                 <p className="mt-1 text-[0.68rem] leading-snug text-muted-foreground">
-                  Your earnings are safe — use the <span className="font-semibold text-signal">Request payout</span> button in
+                  Your earnings are safe, use the <span className="font-semibold text-signal">Request payout</span> button in
                   your Earnings Wallet above and we&apos;ll handle the transfer for you.
                 </p>
               </div>

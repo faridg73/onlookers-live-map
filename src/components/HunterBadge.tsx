@@ -20,7 +20,7 @@ export function HunterBadge({
         tier.badge,
         className,
       )}
-      title={`${tier.name} onlooker — level ${level}`}
+      title={`${tier.name} onlooker, level ${level}`}
     >
       <Shield className="size-3" />
       {tier.name}

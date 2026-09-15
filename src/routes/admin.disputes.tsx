@@ -22,7 +22,7 @@ import { moderationReasonLabel } from "@/lib/moderation-reasons";
 export const Route = createFileRoute("/admin/disputes")({
   head: () => ({
     meta: [
-      { title: "Onlooker moderator dashboard — dispute review" },
+      { title: "Onlooker moderator dashboard, dispute review" },
       {
         name: "description",
         content:
@@ -240,7 +240,7 @@ function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () =>
         </p>
         <p className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
           {item.evidence_count} evidence {item.evidence_count === 1 ? "entry" : "entries"} ·{" "}
-          {item.disputed_at ? new Date(item.disputed_at).toLocaleString() : "—"} ·{" "}
+          {item.disputed_at ? new Date(item.disputed_at).toLocaleString() : "-"} ·{" "}
           {open ? "Hide" : "Review"}
         </p>
       </button>

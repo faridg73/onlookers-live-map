@@ -16,7 +16,7 @@ export const Route = createFileRoute("/b/$id")({
   head: ({ match }) => {
     const { amt, place, title } = match.search as Search;
     const heading = amt
-      ? `$${amt} bounty${place ? ` — ${place}` : ""} · Onlooker`
+      ? `$${amt} bounty${place ? `, ${place}` : ""} · Onlooker`
       : "Live view bounty · Onlooker";
     const desc = title
       ? `${title}${place ? ` at ${place}` : ""}. Capture a live photo or clip and claim the bounty.`
@@ -56,7 +56,7 @@ function BountyPreview() {
           <span className="font-display text-base tracking-tight text-foreground">Onlooker</span>
         </div>
         <div className="px-5 py-6">
-          <div className="font-display text-5xl leading-none text-signal">${amt ?? "—"}</div>
+          <div className="font-display text-5xl leading-none text-signal">${amt ?? "0"}</div>
           <div className="mt-2 text-[0.65rem] uppercase tracking-[0.18em] text-signal/70">
             live view bounty
           </div>

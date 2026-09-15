@@ -32,7 +32,7 @@ import {
 export const Route = createFileRoute("/admin-control")({
   head: () => ({
     meta: [
-      { title: "Onlooker control center — moderation, cash-outs, metrics" },
+      { title: "Onlooker control center, moderation, cash-outs, metrics" },
       {
         name: "description",
         content:
@@ -189,7 +189,7 @@ function ControlCenter() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search flags, users or keywords — e.g. Ticketmaster"
+              placeholder="Search flags, users or keywords, e.g. Ticketmaster"
               className="w-full rounded-xl border border-border bg-surface-raised py-2.5 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-live/40"
             />
           </div>

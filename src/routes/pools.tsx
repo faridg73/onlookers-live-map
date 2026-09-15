@@ -27,7 +27,7 @@ import { fetchCreditWallet, formatCreditCash } from "@/lib/credits";
 export const Route = createFileRoute("/pools")({
   head: () => ({
     meta: [
-      { title: "Group Pools — fund a bounty together on Onlooker" },
+      { title: "Group Pools, fund a bounty together on Onlooker" },
       {
         name: "description",
         content:
@@ -97,16 +97,16 @@ function PoolsScreen() {
       return;
     }
     if (!user || !identity) {
-      toast.error("Sign in again — we couldn't confirm your account.");
+      toast.error("Sign in again, we couldn't confirm your account.");
       return;
     }
     if (balance === null) {
-      toast.error("We're still loading your Credit balance — try again in a moment.");
+      toast.error("We're still loading your Credit balance, try again in a moment.");
       return;
     }
     if (balance < starter) {
       toast.error(
-        `Not enough Credits — opening this pool puts ${starter} behind it and you have ${balance}. Top up on your balance page.`,
+        `Not enough Credits, opening this pool puts ${starter} behind it and you have ${balance}. Top up on your balance page.`,
       );
       return;
     }
@@ -127,7 +127,7 @@ function PoolsScreen() {
         kind,
         starterCredits: starter,
       });
-      toast.success(`Pool opened with ${starter} Credits behind it — share it so people chip in.`);
+      toast.success(`Pool opened with ${starter} Credits behind it, share it so people chip in.`);
       setTitle("");
       setPlace("");
       setErrors({});
@@ -145,13 +145,13 @@ function PoolsScreen() {
   const chipIn = async (pool: BountyPool, amount: number) => {
     if (balance !== null && balance < amount) {
       toast.error(
-        `Not enough Credits — you have ${balance} and this chip-in needs ${amount}. Top up on your balance page.`,
+        `Not enough Credits, you have ${balance} and this chip-in needs ${amount}. Top up on your balance page.`,
       );
       return;
     }
     try {
       const total = await contributeToPool(pool.id, amount);
-      toast.success(`You chipped in ${amount} Credits — ${total} of ${pool.goalCredits} pooled.`);
+      toast.success(`You chipped in ${amount} Credits, ${total} of ${pool.goalCredits} pooled.`);
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't chip in right now.");
@@ -291,7 +291,7 @@ function PoolsScreen() {
                 </p>
                 {balance !== null && balance < starter && (
                   <p className="mt-1 text-xs text-destructive">
-                    You have {balance} Credits — top up before opening this pool.
+                    You have {balance} Credits, top up before opening this pool.
                   </p>
                 )}
               </div>
@@ -317,7 +317,7 @@ function PoolsScreen() {
               <p className="text-sm text-muted-foreground">Loading pools…</p>
             ) : pools.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                No pools yet — start the first one for your city.
+                No pools yet, start the first one for your city.
               </p>
             ) : (
               pools.map((pool) => {

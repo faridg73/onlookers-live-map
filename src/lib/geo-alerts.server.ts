@@ -202,7 +202,7 @@ export async function notifyLocalOnlookersOfBounty(
         request.prompt,
       )}`
     : `Film the ${readableCategory(request.category, request.prompt)}`;
-  const body = `${ask} — ${net} Credits are already locked in escrow and pay out once your stream is verified.`;
+  const body = `${ask}, ${net} Credits are already locked in escrow and pay out once your stream is verified.`;
   const path = `/?b=${request.id}&snap=1`;
 
   await supabaseAdmin.from("notifications").insert(

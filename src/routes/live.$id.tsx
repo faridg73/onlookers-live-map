@@ -24,7 +24,7 @@ export const Route = createFileRoute("/live/$id")({
   }),
   head: ({ match, params }) => {
     const { title, place } = match.search as Search;
-    const heading = `🔴 Live now${place ? ` — ${place}` : ""} · Onlooker`;
+    const heading = `🔴 Live now${place ? `, ${place}` : ""} · Onlooker`;
     const desc = `${title ?? "A live view is streaming right now"}${
       place ? ` at ${place}` : ""
     }. Watch it live on Onlooker. #Onlooker`;

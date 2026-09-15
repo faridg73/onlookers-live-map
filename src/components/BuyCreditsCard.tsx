@@ -113,7 +113,7 @@ export function BuyCreditsCard() {
             </div>
             <div className="shrink-0 text-right">
               <p className="text-sm font-semibold text-live">
-                {customPack ? formatPackPrice(customPack.priceCents) : "—"}
+                {customPack ? formatPackPrice(customPack.priceCents) : "-"}
               </p>
               <button
                 type="button"

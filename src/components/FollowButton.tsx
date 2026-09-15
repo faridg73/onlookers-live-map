@@ -72,7 +72,7 @@ export function FollowButton({
         ? await unfollowCreator(creatorId)
         : await followCreator(creatorId);
       if (mounted.current) setCount(next);
-      if (!wasFollowing) toast.success(`Following ${creatorName} — you'll see their live broadcasts first.`);
+      if (!wasFollowing) toast.success(`Following ${creatorName}, you'll see their live broadcasts first.`);
     } catch (err) {
       if (mounted.current) {
         setFollowing(wasFollowing);
