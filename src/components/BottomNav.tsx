@@ -16,7 +16,7 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex flex-col items-center gap-1 py-4 text-[0.58rem] font-medium uppercase tracking-[0.08em] text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex h-full flex-col items-center justify-start gap-1 py-3 text-[0.58rem] font-medium uppercase tracking-[0.08em] leading-none text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const { unread } = useChatAlerts();
@@ -39,7 +39,11 @@ export function BottomNav() {
                   activeOptions={{ exact }}
                   className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
                 >
-                  <span className={`relative ${"primary" in item ? "grid size-8 place-items-center rounded-full bg-signal text-signal-foreground" : ""}`}>
+                  <span
+                    className={`relative grid size-8 place-items-center rounded-full ${
+                      "primary" in item ? "bg-signal text-signal-foreground" : ""
+                    }`}
+                  >
                     <Icon className="size-5" strokeWidth={1.75} />
                   </span>
                   {label}
@@ -54,7 +58,7 @@ export function BottomNav() {
               aria-label={unread > 0 ? `Live Inbox, ${unread} unread messages` : "Live Inbox"}
               className={`${linkClass} w-full ${inboxOpen ? "text-signal" : ""}`}
             >
-              <span className="relative">
+              <span className="relative grid size-8 place-items-center rounded-full">
                 <MessageCircle className="size-5" strokeWidth={1.75} />
                 {unread > 0 && (
                   <span className="absolute -right-2 -top-1.5 min-w-4 rounded-full bg-destructive px-1 text-center text-[0.6rem] font-extrabold leading-4 text-destructive-foreground">

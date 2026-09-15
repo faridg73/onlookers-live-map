@@ -219,9 +219,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           onClick={() => setOpen(true)}
           aria-label="Flash bounty — something is happening here now"
           title="Instantly alerts nearby onlookers to go live at this exact spot."
-          className="group flex w-full flex-col items-center gap-1 py-3 text-[0.58rem] font-extrabold uppercase tracking-[0.08em] text-signal"
+          className="group flex h-full w-full flex-col items-center justify-start gap-1 py-3 text-[0.58rem] font-extrabold uppercase leading-none tracking-[0.08em] text-signal"
         >
-
           <span className="grid size-8 place-items-center rounded-full bg-signal text-signal-foreground">
             <Zap className="size-5" strokeWidth={2.25} />
           </span>

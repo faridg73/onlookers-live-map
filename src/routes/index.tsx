@@ -144,7 +144,7 @@ function MapScreen() {
         </div>
       </header>
 
-      <section className="pointer-events-auto absolute inset-x-3 bottom-24 z-30 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+      <section className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-40 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
         <Button
           type="button"
           variant="ghost"
@@ -162,7 +162,7 @@ function MapScreen() {
             exploreOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
           }`}
         >
-          <div className="min-h-0 overflow-hidden">
+          <div className="min-h-0 max-h-[min(38vh,17rem)] overflow-y-auto overscroll-contain">
             <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
               <div className="flex flex-col gap-2">
                 <Button
@@ -247,10 +247,15 @@ function MapScreen() {
         <Button
           type="button"
           onClick={() => void navigate({ to: "/post" })}
-          className="h-14 w-full justify-start rounded-none bg-foreground px-4 text-background hover:bg-foreground/90"
+          className="h-14 w-full justify-start rounded-none bg-signal px-4 text-signal-foreground shadow-[0_-1px_0_0_var(--color-signal),0_0_24px_0_color-mix(in_oklab,var(--color-signal)_45%,transparent)] transition-colors hover:bg-signal/90"
         >
           <CircleDollarSign className="size-5" />
-          <span className="flex-1 text-left text-sm font-extrabold">Post a Bounty</span>
+          <span className="flex-1 text-left text-sm font-extrabold uppercase tracking-[0.06em]">
+            Post a Bounty
+          </span>
+          <span className="rounded-full bg-signal-foreground/15 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em]">
+            Primary
+          </span>
         </Button>
       </section>
 
