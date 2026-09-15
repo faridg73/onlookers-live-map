@@ -2031,9 +2031,9 @@ export type Database = {
       mark_creator_verified: {
         Args: { _phone: string; _user_id: string }
         Returns: {
-          is_verified: boolean
-          phone: string
-          phone_verified_at: string
+          verified: boolean
+          verified_at: string
+          verified_phone: string
         }[]
       }
       onlookers_within_radius: {

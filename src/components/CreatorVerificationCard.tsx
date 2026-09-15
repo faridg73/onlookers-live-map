@@ -19,6 +19,8 @@ export function CreatorVerificationCard() {
   const [code, setCode] = useState("");
   const [seconds, setSeconds] = useState(0);
   const codeRef = useRef<HTMLInputElement>(null);
+  // iOS autofill can fire twice in a row — keep one code from being checked twice.
+  const checkingRef = useRef(false);
 
   useEffect(() => {
     let active = true;
@@ -62,6 +64,8 @@ export function CreatorVerificationCard() {
   }
 
   async function confirm(value: string) {
+    if (checkingRef.current) return;
+    checkingRef.current = true;
     setBusy(true);
     try {
       const result = await confirmCreatorPhoneCode({ data: { phone: sentTo, code: value } });
@@ -73,6 +77,7 @@ export function CreatorVerificationCard() {
       codeRef.current?.focus();
       toast.error(err instanceof Error ? err.message : "That code didn't work.");
     } finally {
+      checkingRef.current = false;
       setBusy(false);
     }
   }
