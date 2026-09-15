@@ -53,7 +53,7 @@ export const Route = createFileRoute("/")({
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
   const navigate = useNavigate();
-  const { b, snap } = Route.useSearch();
+  const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [exploreOpen, setExploreOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
@@ -163,21 +163,24 @@ function MapScreen() {
           }`}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="border-b border-border bg-surface-raised/80 p-3">
+            <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
               <div className="grid grid-cols-3 gap-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setMapFilter("all")}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <Map className="size-4" /> Local Bounty Map
+                  <span className="absolute right-1.5 top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-signal px-1 text-[0.6rem] font-extrabold leading-none text-background">
+                    {visible.length}
+                  </span>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => void navigate({ to: "/community" })}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <Users className="size-4" /> Community Vibe
                 </Button>
@@ -185,7 +188,7 @@ function MapScreen() {
                   type="button"
                   variant="outline"
                   onClick={() => void navigate({ to: "/discover" })}
-                  className="h-auto min-h-16 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
+                  className="relative h-auto min-h-14 flex-col gap-1 rounded-md border-border bg-background px-2 py-2 text-[0.68rem] font-bold text-foreground"
                 >
                   <BookOpen className="size-4" /> Learning &amp; Guides
                 </Button>
@@ -203,15 +206,20 @@ function MapScreen() {
                     key={key}
                     type="button"
                     size="sm"
-                    variant={mapFilter === key ? "default" : "outline"}
+                    variant="outline"
+                    aria-pressed={mapFilter === key}
                     onClick={() => setMapFilter(key)}
-                    className="h-8 shrink-0 rounded-full px-3 text-[0.68rem] font-bold"
+                    className={`h-8 shrink-0 rounded-full border px-3 text-[0.68rem] font-extrabold transition-colors duration-150 ${
+                      mapFilter === key
+                        ? "border-signal bg-signal text-background shadow-[0_0_0_1px_var(--color-signal)]"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    }`}
                   >
                     {label}
                   </Button>
                 ))}
               </div>
-              <p className="mt-2 text-[0.65rem] text-muted-foreground" aria-live="polite">
+              <p className="mt-1.5 text-[0.65rem] text-muted-foreground" aria-live="polite">
                 {mapFilter === "nearby" && !userPosition
                   ? `Allow location access to see requests within ${radius} ${unit}.`
                   : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
