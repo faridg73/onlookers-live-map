@@ -302,8 +302,8 @@ export function MapCanvas({
             <span className="relative flex size-5 items-center justify-center">
               <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
               <span
-                className="size-3.5 rounded-full border-2 border-surface shadow-lg"
-                style={{ backgroundColor: tierForLevel(me?.hunterLevel ?? 1).dot }}
+                className="size-3.5 rounded-full border-2 border-black/60 shadow-lg"
+                style={{ backgroundColor: "var(--signal)" }}
               />
             </span>
           )}
@@ -395,20 +395,14 @@ export function MapCanvas({
                 )}
 
                 {tier === "standard" ? (
-                  /* subtle blue pin with a plain category glyph */
+                  /* lemon-green pin with a plain category glyph */
                   <span
                     className={cn(
                       "relative flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.62rem] font-bold shadow",
-                      closed ? "border-border bg-surface text-muted-foreground" : "text-white",
-                    )}
-                    style={
                       closed
-                        ? undefined
-                        : {
-                            borderColor: "color-mix(in oklch, var(--pin-standard) 70%, black)",
-                            backgroundColor: "color-mix(in oklch, var(--pin-standard) 82%, black)",
-                          }
-                    }
+                        ? "border-border bg-surface text-muted-foreground"
+                        : "border-black/70 bg-signal text-signal-foreground",
+                    )}
                   >
                     <span aria-hidden>{categoryGlyph(r.category)}</span>
                     {isSel && <span className="tabular-nums">{r.place.slice(0, 12)}</span>}
