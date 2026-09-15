@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Copyright,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { DmcaReportModal } from "@/components/DmcaReportModal";
 
 const LINKS = [
