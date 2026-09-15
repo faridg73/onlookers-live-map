@@ -230,7 +230,7 @@ function CommunityHub() {
         </div>
         <ScrollableLane
           className="-mx-5 sm:-mx-8"
-          innerClassName="snap-x snap-mandatory gap-3 px-5 pb-2 [scroll-padding-left:1.25rem] sm:px-8 sm:[scroll-padding-left:2rem]"
+          innerClassName="snap-x snap-mandatory gap-3 pl-5 pr-3 pb-2 [scroll-padding-left:1.25rem] sm:pl-8 sm:pr-6 sm:[scroll-padding-left:2rem]"
           ariaLabel="Category cards"
         >
 
