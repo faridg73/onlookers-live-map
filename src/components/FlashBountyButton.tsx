@@ -81,8 +81,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   /** Pro / Media Desk dispatch for outlets, investigators and pro users. */
   const [proMode, setProMode] = useState(false);
   const [proOptionIds, setProOptionIds] = useState<FlashProOptionId[]>([]);
-  /** Legal release and indemnification, mandatory for a Pro dispatch. */
-  const [proRelease, setProRelease] = useState(false);
+  /** Legal release and indemnification, mandatory for every dispatch. */
+  const [legalRelease, setLegalRelease] = useState(false);
   const toggleProOption = (id: FlashProOptionId) =>
     setProOptionIds((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
@@ -196,8 +196,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       );
       return;
     }
-    if (proMode && !proRelease) {
-      toast.error("Accept the Pro / Media Desk legal release before dispatching.");
+    if (!legalRelease) {
+      toast.error("Accept the legal release and indemnification before going live.");
       return;
     }
     if (!human.ready) {
@@ -495,13 +495,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                 <Switch
                   id="flash-pro-mode"
                   checked={proMode}
-                  onCheckedChange={(next) => {
-                    setProMode(next);
-                    if (!next) {
-                      setProOptionIds([]);
-                      setProRelease(false);
-                    }
-                  }}
+                  onCheckedChange={setProMode}
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5 text-sm font-extrabold text-foreground">
@@ -559,32 +553,6 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                       );
                     })}
                   </div>
-
-                  <label
-                    className={cn(
-                      "flex cursor-pointer items-start gap-3 rounded-xl border-2 p-2.5 transition-colors",
-                      proRelease
-                        ? "border-signal bg-signal/10"
-                        : "border-destructive/60 bg-surface",
-                    )}
-                  >
-                    <input
-                      id="flash-pro-release"
-                      type="checkbox"
-                      checked={proRelease}
-                      onChange={(e) => setProRelease(e.target.checked)}
-                      className="mt-0.5 size-4 shrink-0 accent-signal"
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-1.5 text-xs font-extrabold text-foreground">
-                        <ShieldCheck className="size-3.5 shrink-0 text-signal" />
-                        Legal release and indemnification (required)
-                      </span>
-                      <span className="block text-[0.65rem] font-medium leading-snug text-muted-foreground">
-                        {PRO_RELEASE_NOTICE}
-                      </span>
-                    </span>
-                  </label>
                 </>
               )}
             </div>
@@ -678,20 +646,46 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
             <div>{human.widget}</div>
 
+            <label
+              id="flash-legal-release"
+              className={cn(
+                "flex cursor-pointer items-start gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                legalRelease
+                  ? "border-signal bg-signal/10"
+                  : "border-destructive/60 bg-surface",
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={legalRelease}
+                onChange={(e) => setLegalRelease(e.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-signal"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-center gap-1.5 text-xs font-extrabold text-foreground">
+                  <ShieldCheck className="size-3.5 shrink-0 text-signal" />
+                  Legal release and indemnification (required)
+                </span>
+                <span className="block text-[0.65rem] font-medium leading-snug text-muted-foreground">
+                  {PRO_RELEASE_NOTICE}
+                </span>
+              </span>
+            </label>
+
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting || (proMode && !proRelease)}
+              disabled={posting || !legalRelease}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
             >
               {posting
                 ? "Locking credits, starting camera…"
                 : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
-            {proMode && !proRelease && (
+            {!legalRelease && (
               <p className="text-xs font-bold text-destructive">
                 Accept the legal release and indemnification above to unlock this
-                professional dispatch.
+                dispatch.
               </p>
             )}
             {short && (
