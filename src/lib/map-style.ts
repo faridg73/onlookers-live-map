@@ -7,6 +7,8 @@
  * intentionally unaffected.
  */
 export const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
+  { elementType: "geometry", stylers: [{ color: "#252525" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
   // Text: near-white fills with a deep stroke so every label pops on the dark base.
   { elementType: "labels.text.fill", stylers: [{ color: "#f5f5f5" }] },
   { elementType: "labels.text.stroke", stylers: [{ color: "#0d0d0d", weight: 2.5 }] },
