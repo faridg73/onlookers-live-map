@@ -88,7 +88,8 @@ export function OnboardingWalkthrough() {
 
   if (!open) return null;
 
-  const slide = SLIDES[step]!;
+  const slide = SLIDES[step];
+  if (!slide) return null;
   const Icon = slide.icon;
   const last = step === SLIDES.length - 1;
 

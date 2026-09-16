@@ -38,13 +38,13 @@ import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 export const Route = createFileRoute("/community")({
   head: () => ({
     meta: [
-      { title: "Discover, meetups, tutorials & language swaps | Onlooker Live" },
+      { title: "Community impact and verified earnings | Onlooker" },
       {
         name: "description",
         content:
-          "Find friends, join a flash meetup, learn something in ten minutes or swap languages with someone nearby, live on Onlooker.",
+          "Help with real-world requests, complete verified captures, and earn through transparent bounties backed by locked credits.",
       },
-      { property: "og:title", content: "Discover live community meetups on Onlooker" },
+      { property: "og:title", content: "Community impact and verified earnings | Onlooker" },
       {
         property: "og:description",
         content:
