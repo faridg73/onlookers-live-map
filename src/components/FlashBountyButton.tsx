@@ -69,6 +69,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  /** Set once escrow is locked; renders the full-screen live camera stage. */
+  const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
   const toggleCondition = (id: FlashConditionId) =>
     setConditionIds((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
