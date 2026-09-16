@@ -66,6 +66,7 @@ function CommunityHub() {
   const [tag, setTag] = useState<string | null>(null);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
+  const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
   const [impactView, setImpactView] = useState<"help" | "mine">("help");
@@ -356,33 +357,58 @@ function CommunityHub() {
       </section>
 
       <section aria-label="Discover categories" className="mt-6">
-        <div className="mb-3 flex items-center justify-between px-5 sm:px-8">
+        <div className="mb-3 flex items-center justify-between gap-2 px-5 sm:px-8">
           <h2 className="text-sm font-extrabold uppercase tracking-[0.14em] text-foreground">Explore by vibe</h2>
-          <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setCategory("all");
-            setTag(null);
-          }}
-          className={category === "all" ? "text-signal" : "text-muted-foreground"}
-        >
-          Everything
-        </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setVibeGridOpen((open) => !open)}
+              aria-expanded={vibeGridOpen}
+              className="h-auto p-0 text-xs font-bold text-signal underline decoration-signal/50 underline-offset-4 hover:bg-transparent hover:text-signal"
+            >
+              {vibeGridOpen ? "Hide" : "See All"}
+            </Button>
+            <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setCategory("all");
+              setTag(null);
+            }}
+            className={category === "all" ? "text-signal" : "text-muted-foreground"}
+          >
+            Everything
+          </Button>
+          </div>
         </div>
         {/* Mobile keeps the sideways carousel; desktop stacks the cards up-and-down and scrolls with the page. */}
+        <div className="relative">
+          {/* Subtle gradient edge fades while the carousel is scrolling */}
+          {!vibeGridOpen && (
+            <>
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background via-background/70 to-transparent md:hidden" />
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background via-background/70 to-transparent md:hidden" />
+            </>
+          )}
         <div
           ref={vibeRowRef}
           onScroll={updateVibeScroll}
           role="list"
           aria-label="Category cards"
-          className="flex flex-row overflow-x-auto no-scrollbar gap-3 px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
+          className={`no-scrollbar gap-3 px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-3 ${
+            vibeGridOpen
+              ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              : "flex flex-row snap-x snap-mandatory overflow-x-auto md:overflow-visible"
+          }`}
         >
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
             const Icon = visual.icon;
             const previewUrl = categoryPreviews[c.id];
+            const active = category === c.id;
             return (
               <button
                 key={c.id}
@@ -392,8 +418,8 @@ function CommunityHub() {
                   setCategory(c.id);
                   setTag(null);
                 }}
-                aria-pressed={category === c.id}
-                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 md:w-full ${category === c.id ? "border-signal ring-2 ring-signal/30" : "border-border"}`}
+                aria-pressed={active}
+                className={`group relative h-32 flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 ${vibeGridOpen ? "w-full" : "w-[280px] md:w-full"} ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
@@ -411,14 +437,17 @@ function CommunityHub() {
             );
           })}
         </div>
-        <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised md:hidden" aria-hidden="true">
-          <div
-            className="h-full rounded-full bg-signal/80 transition-[width,margin] duration-100"
-            style={{
-              width: `${Math.max(vibeScroll.width, 12)}%`,
-              marginLeft: `${vibeScroll.left}%`,
-            }}
-          />
+        {!vibeGridOpen && (
+          <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised md:hidden" aria-hidden="true">
+            <div
+              className="h-full rounded-full bg-signal/80 transition-[width,margin] duration-100"
+              style={{
+                width: `${Math.max(vibeScroll.width, 12)}%`,
+                marginLeft: `${vibeScroll.left}%`,
+              }}
+            />
+          </div>
+        )}
         </div>
 
       </section>
