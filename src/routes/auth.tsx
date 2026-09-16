@@ -409,10 +409,16 @@ function AuthScreen() {
         <button
           type="submit"
           disabled={busy || !accepted || !human.ready}
-          className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+          aria-disabled={busy || !accepted || !human.ready}
+          className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
         </button>
+        {!accepted ? (
+          <p className="px-1 text-center text-xs text-muted-foreground">
+            Tick the agreement box above to continue.
+          </p>
+        ) : null}
       </form>
 
       <button
