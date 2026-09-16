@@ -681,13 +681,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting}
-              className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+              disabled={posting || (proMode && !proRelease)}
+              className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
             >
               {posting
                 ? "Locking credits, starting camera…"
                 : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
+            {proMode && !proRelease && (
+              <p className="text-xs font-bold text-destructive">
+                Accept the legal release and indemnification above to unlock this
+                professional dispatch.
+              </p>
+            )}
             {short && (
               <Button
                 type="button"
