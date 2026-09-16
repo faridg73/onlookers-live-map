@@ -182,9 +182,18 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
   });
   const picked = flashConditionsFor(options.conditionIds);
   const proPicked = options.proMode ? flashProOptionsFor(options.proOptionIds) : [];
-  if (!picked.length && !options.proMode) return base;
+  if (!picked.length && !options.proMode) {
+    return {
+      ...base,
+      // Only active pricing steps: drop the flat "Conditions" line and any
+      // other no-op multiplier row so the breakdown sums exactly what was picked.
+      lines: base.lines.filter((line) => line.multiplier === null || line.multiplier !== 1),
+    };
+  }
   let running = base.total;
-  const lines = [...base.lines];
+  const lines = base.lines.filter(
+    (line) => line.multiplier === null || line.multiplier !== 1,
+  );
   for (const condition of picked) {
     running += condition.credits;
     lines.push({
