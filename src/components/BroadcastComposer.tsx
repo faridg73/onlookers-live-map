@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
+import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import {
   BROADCAST_WINDOWS,
   fetchBroadcastEligibility,
