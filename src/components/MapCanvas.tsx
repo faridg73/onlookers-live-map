@@ -371,8 +371,71 @@ export function MapCanvas({
         </div>
       )}
 
-      {/* Business/POI labels are intentionally not rendered: the map shows only
-          Onlooker live streams and bounties. */}
+      {/* Real businesses in view: app-drawn labels, no Google POI clicks. */}
+      {!pinMode &&
+        placeMarkers.map(({ place, pixel }) => (
+          <button
+            key={place.id}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              setActivePlaceId(activePlaceId === place.id ? null : place.id);
+            }}
+            className="absolute flex max-w-[9rem] -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-border bg-surface/85 px-1.5 py-0.5 text-[0.58rem] font-bold text-foreground shadow backdrop-blur transition-colors hover:bg-surface-raised"
+            style={{ left: pixel.left, top: pixel.top }}
+            aria-label={`${place.name}${place.rating ? `, rated ${place.rating}` : ""}`}
+          >
+            <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--signal)" }} />
+            <span className="truncate">{place.name}</span>
+            {place.rating !== null && (
+              <span className="shrink-0 tabular-nums text-signal">{place.rating.toFixed(1)}</span>
+            )}
+          </button>
+        ))}
+
+      {/* Details for the tapped business. */}
+      {activePlace && (
+        <div className="absolute left-3 right-20 z-40 max-w-xs rounded-lg border border-border bg-surface/95 p-3 shadow-2xl backdrop-blur-xl top-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
+          <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-display text-sm font-extrabold text-foreground">
+                {activePlace.name}
+              </p>
+              {activePlace.primaryType && (
+                <p className="mt-0.5 truncate text-[0.62rem] font-bold uppercase tracking-[0.08em] text-signal">
+                  {activePlace.primaryType}
+                </p>
+              )}
+              {activePlace.rating !== null && (
+                <p className="mt-1 flex items-center gap-1 text-[0.68rem] font-bold text-foreground">
+                  <Star className="size-3 text-signal" aria-hidden />
+                  {activePlace.rating.toFixed(1)}
+                  {activePlace.ratingCount !== null && (
+                    <span className="font-medium text-muted-foreground">
+                      ({activePlace.ratingCount} reviews)
+                    </span>
+                  )}
+                </p>
+              )}
+              {activePlace.address && (
+                <p className="mt-1 text-[0.66rem] leading-snug text-muted-foreground">
+                  {activePlace.address}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setActivePlaceId(null)}
+              aria-label="Close place details"
+              className="rounded-full border border-border bg-surface p-1 text-muted-foreground hover:bg-surface-raised"
+            >
+              <X className="size-3" />
+            </button>
+          </div>
+        </div>
+      )}
+
+
 
 
 
