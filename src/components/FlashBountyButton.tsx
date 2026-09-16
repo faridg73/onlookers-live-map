@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
@@ -210,6 +211,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
       });
       // Straight into the live stage so the camera opens immediately.
+      setLiveRequestKey(locked.id ?? null);
       setLiveSpot(spot);
     } catch (error) {
       human.reset();
@@ -406,7 +408,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                   ≈ {formatCreditCash(Math.max(0, Math.round(Number(customBase) || 0)))} USD at {CREDITS_PER_USD} Credits per $1
                 </p>
                 <p className="text-xs font-medium text-signal">
-                  Minimum escrow: {FLASH_MIN_BOUNTY_CREDITS} Credits
+                  Minimum escrow: {FLASH_MIN_BOUNTY_CREDITS} Credits ·{" "}
+                  {formatCreditCash(FLASH_MIN_BOUNTY_CREDITS)}
                 </p>
                 {customError && (
                   <p className="text-xs font-bold text-destructive">{customError}</p>
