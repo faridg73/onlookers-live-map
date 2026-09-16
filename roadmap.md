@@ -23,3 +23,5 @@
 - [ ] User switches nameservers at Namecheap to jule.ns.cloudflare.com / robert.ns.cloudflare.com; as of 2026-09-16 public DNS still shows dns1/dns2.registrar-servers.com, zone still pending.
 - [ ] After activation: enable Under Attack Mode (security_level) and a rate-limiting / WAF rule on the free plan.
 - [x] Closed a payout loophole: capture claims can no longer be self-approved; only the requester can approve.
+- [ ] Cloudflare zone still "pending" — rechecks automatically; DNSSEC validation failure detected (likely stale DS record / DNSSEC on at Namecheap) — user to disable DNSSEC at Namecheap
+- [ ] Once zone active: enable Under Attack Mode + rate limiting rule
