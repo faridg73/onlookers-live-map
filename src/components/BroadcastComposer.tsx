@@ -114,6 +114,20 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
     }
   };
 
+  if (liveNow) {
+    return (
+      <LiveBroadcastStage
+        title={liveNow.title}
+        place={liveNow.place}
+        onEnd={() => {
+          setLiveNow(null);
+          toast.success("Broadcast ended");
+          void navigate({ to: "/community" });
+        }}
+      />
+    );
+  }
+
   if (gate && !gate.allowed) {
     return (
       <div className="mx-auto max-w-xl animate-rise space-y-4">
