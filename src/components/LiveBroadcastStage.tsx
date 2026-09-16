@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Loader2, Mic, MicOff, Radio, SwitchCamera, Square } from "lucide-react";
+import {
+  Loader2,
+  MessageCircle,
+  Mic,
+  MicOff,
+  Radio,
+  SwitchCamera,
+  Square,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { BountyChat } from "@/components/BountyChat";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 
 /**
