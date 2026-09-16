@@ -32,6 +32,7 @@ import {
   postFlashBounty,
   quoteFlashBounty,
   readFlashSpot,
+  type FlashConditionId,
   type FlashSpot,
   type FlashTierPreset,
 } from "@/lib/flash-bounty";
