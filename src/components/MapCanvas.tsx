@@ -7,7 +7,6 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { DARK_MAP_STYLES } from "@/lib/map-style";
 import { fetchMapAreaPlaces, type DiscoveredPlace } from "@/lib/places.functions";
 
 import { useBoosts } from "@/lib/boosts-store";
@@ -95,9 +94,7 @@ export function MapCanvas({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          // Dark grey basemap so the lemon-green pins glow with contrast.
-          mapTypeId: "roadmap",
-          styles: [...DARK_MAP_STYLES, { featureType: "poi", stylers: [{ visibility: "off" }] }],
+          
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};
