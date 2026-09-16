@@ -8,7 +8,7 @@ import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 /**
  * In-app camera for chat clips. Recording stops on its own at 60 seconds and
  * records at a modest bitrate so uploads stay quick. It is the only way media
- * enters Onlooker Live — nothing can come from the photo gallery.
+ * enters Onlooker LLC — nothing can come from the photo gallery.
  */
 export function VideoRecorder({
   onClose,

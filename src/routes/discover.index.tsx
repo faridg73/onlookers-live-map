@@ -21,13 +21,13 @@ import { discoveryImage } from "@/lib/discovery-visuals";
 export const Route = createFileRoute("/discover/")({
   head: () => ({
     meta: [
-      { title: "Browse Places Near You | Onlooker Live Views" },
+      { title: "Browse Places Near You | Onlooker LLC Views" },
       {
         name: "description",
         content:
           "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a live view.",
       },
-      { property: "og:title", content: "Browse Places Near You | Onlooker Live Views" },
+      { property: "og:title", content: "Browse Places Near You | Onlooker LLC Views" },
       {
         property: "og:description",
         content:

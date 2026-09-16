@@ -14,7 +14,7 @@ Copy the text into the store consoles. Files in this folder:
 | `screenshots/ios67-*.png` | App Store 6.7" screenshots (1290×2796) |
 | `screenshots/ios65-*.png` | App Store 6.5" screenshots (1242×2688) |
 
-All icons are generated from the Onlooker Live wordmark (neon-lime ring on black).
+All icons are generated from the Onlooker LLC wordmark (neon-lime ring on black).
 Android launcher icons, iOS `AppIcon-512@2x.png` and the web/PWA icons in `public/`
 are already updated in the repo and ship with the next build.
 

@@ -36,7 +36,7 @@ export const Route = createFileRoute("/admin-control")({
       {
         name: "description",
         content:
-          "Admin control center for Onlooker Live: review flagged content, approve hunter cash-outs and track platform volume.",
+          "Admin control center for Onlooker LLC: review flagged content, approve hunter cash-outs and track platform volume.",
       },
       { property: "og:title", content: "Onlooker control center" },
       {

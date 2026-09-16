@@ -179,7 +179,7 @@ export function TermsBody() {
 
       <Section title="User-Generated Content and Real-World Platform Utility">
         <p>
-          <strong className="text-foreground">Physical-Capture Restriction.</strong> Onlooker Live
+          <strong className="text-foreground">Physical-Capture Restriction.</strong> Onlooker LLC
           is strictly a platform designed to crowdsource real-time, real-world visual logistics of
           physical locations (e.g., foot-traffic density, entry-line lengths, parking availability,
           and stadium seat configurations). You agree that you will only fulfill requests and post
@@ -199,9 +199,9 @@ export function TermsBody() {
         </p>
         <p>
           <strong className="text-foreground">Indemnification &amp; Liability for Breach.</strong>{" "}
-          Onlooker Live employs automated keyword filters and technical restrictions to block digital
+          Onlooker LLC employs automated keyword filters and technical restrictions to block digital
           application recordings. Circumvention of these safeguards constitutes a material breach of
-          these Terms. You agree to indemnify, defend, and hold harmless Onlooker Live, its
+          these Terms. You agree to indemnify, defend, and hold harmless Onlooker LLC, its
           parents, subsidiaries, and affiliates from any claims, liabilities, losses, damages,
           costs, or expenses (including reasonable attorneys&apos; fees) arising out of or related to
           your distribution of unauthorized third-party digital property or copyrighted material on

@@ -1,6 +1,6 @@
 /**
  * Requests that ask someone to film a screen, a ticket barcode or a broadcast
- * are blocked before they reach the map. Onlooker Live only pays for real,
+ * are blocked before they reach the map. Onlooker LLC only pays for real,
  * physical views of a place.
  */
 export const FORBIDDEN_TERMS = [
@@ -17,7 +17,7 @@ export const FORBIDDEN_TERMS = [
 ] as const;
 
 export const BLOCKED_REQUEST_MESSAGE =
-  "Request Blocked: To protect creator rights, Onlooker Live cannot fulfill requests to record third-party apps, digital ticket feeds, or live broadcasts. Please update your request to ask for a physical view (e.g., line lengths, crowd sizes, or seat views).";
+  "Request Blocked: To protect creator rights, Onlooker LLC cannot fulfill requests to record third-party apps, digital ticket feeds, or live broadcasts. Please update your request to ask for a physical view (e.g., line lengths, crowd sizes, or seat views).";
 
 /** Normalises punctuation and spacing so "screen-record!!" still matches. */
 function normalise(text: string) {

@@ -24,7 +24,7 @@ export const Route = createFileRoute("/discover/$group/")({
     if (!loaderData) {
       return { meta: [{ title: "Not found | Onlooker" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} | Onlooker Live Views`;
+    const title = `${loaderData.name} | Onlooker LLC Views`;
     return {
       meta: [
         { title },

@@ -10,16 +10,16 @@ import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-
 export const Route = createFileRoute("/dmca")({
   head: () => ({
     meta: [
-      { title: "DMCA / Report Infringement | Onlooker Live" },
+      { title: "DMCA / Report Infringement | Onlooker LLC" },
       {
         name: "description",
         content:
-          "Report copyrighted material on Onlooker Live. Submit a DMCA notice and our team will review it promptly.",
+          "Report copyrighted material on Onlooker LLC. Submit a DMCA notice and our team will review it promptly.",
       },
-      { property: "og:title", content: "DMCA / Report Infringement | Onlooker Live" },
+      { property: "og:title", content: "DMCA / Report Infringement | Onlooker LLC" },
       {
         property: "og:description",
-        content: "Submit a copyright infringement report for review by the Onlooker Live team.",
+        content: "Submit a copyright infringement report for review by the Onlooker LLC team.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -70,8 +70,8 @@ function DmcaPage() {
         </div>
 
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Onlooker Live is built around user-generated views of public spaces, crowds, streets,
-          tailgates, and venue surroundings. If you believe content on Onlooker Live infringes your
+          Onlooker LLC is built around user-generated views of public spaces, crowds, streets,
+          tailgates, and venue surroundings. If you believe content on Onlooker LLC infringes your
           copyright, tell us below and our team will review it promptly. Read our{" "}
           <a
             href="/copyright"

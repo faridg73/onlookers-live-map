@@ -123,7 +123,7 @@ export function MyBountyVideos() {
                     title: v.request_title || "Live view capture",
                     place: v.request_place ?? "",
                     credits: Number(v.payout_amount ?? v.bounty_amount ?? 0),
-                    note: "Captured live on Onlooker Live.",
+                    note: "Captured live on Onlooker LLC.",
                   }}
                 />
               </div>

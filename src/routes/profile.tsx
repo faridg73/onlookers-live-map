@@ -341,15 +341,15 @@ function ProfileScreen() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl tracking-tight text-foreground">
-              About Onlooker Live
+              About Onlooker LLC
             </DialogTitle>
             <DialogDescription className="sr-only">
-              Company mission and vision for Onlooker Live.
+              Company mission and vision for Onlooker LLC.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p className="text-foreground">
-              Onlooker Live is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
+              Onlooker LLC is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
             </p>
             <p>
               The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.

@@ -2,7 +2,7 @@ import { playbackUrl, type BountyVideo } from "@/lib/bounty-videos";
 
 const BRAND = "#CCFF00";
 const BANNER_TEXT =
-  "Live outside the stadium right now on Onlooker Live! Download the App to see views near you.";
+  "Live outside the stadium right now on Onlooker LLC! Download the App to see views near you.";
 
 function hashtag(value: string): string {
   const clean = value.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "");
@@ -51,7 +51,7 @@ function pickMimeType(): string {
 }
 
 /**
- * Re-renders the clip through a canvas, burning in the Onlooker Live watermark
+ * Re-renders the clip through a canvas, burning in the Onlooker LLC watermark
  * (top corner) and the viral banner (bottom), then returns a shareable File.
  */
 export async function compileWatermarkedClip(
@@ -155,7 +155,7 @@ export async function compileWatermarkedClip(
     requestAnimationFrame(drawFrame);
   };
 
-  onProgress?.("Adding Onlooker Live branding…");
+  onProgress?.("Adding Onlooker LLC branding…");
   recorder.start(250);
   await source.play();
   drawFrame();
@@ -182,7 +182,7 @@ export async function shareClipToSocials(
 
   onProgress?.("Opening share sheet…");
   if (navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], text: caption, title: "Onlooker Live" });
+    await navigator.share({ files: [file], text: caption, title: "Onlooker LLC" });
     return "shared";
   }
 

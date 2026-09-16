@@ -31,7 +31,7 @@ export function ContentModerationAlertModal({
               Request Blocked
             </DialogTitle>
             <DialogDescription className="text-sm leading-relaxed text-slate-600">
-              To protect creator rights, Onlooker Live cannot fulfill requests to record
+              To protect creator rights, Onlooker LLC cannot fulfill requests to record
               third-party apps, digital ticket feeds, or live broadcasts. Please update your
               request to ask for a physical view (e.g., line lengths, crowd sizes, or seat views).
             </DialogDescription>
