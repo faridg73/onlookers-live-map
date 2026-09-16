@@ -25,3 +25,4 @@
 - [x] Closed a payout loophole: capture claims can no longer be self-approved; only the requester can approve.
 - [ ] Cloudflare zone still "pending" — rechecks automatically; DNSSEC validation failure detected (likely stale DS record / DNSSEC on at Namecheap) — user to disable DNSSEC at Namecheap
 - [ ] Once zone active: enable Under Attack Mode + rate limiting rule
+- [x] Explain Onlooker accountability on Home, contrast standard apps in onboarding, and show real community earning impact.

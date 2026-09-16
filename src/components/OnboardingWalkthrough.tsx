@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, Camera, CoinsIcon, MapPin } from "lucide-react";
+import { ArrowRight, BadgeCheck, LockKeyhole, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, markOnboardingCompleted, REPLAY_ONBOARDING_EVENT } from "@/lib/profile";
 import browseArt from "@/assets/onboarding-browse.png";
@@ -8,25 +9,28 @@ import captureArt from "@/assets/onboarding-capture.png";
 
 const SLIDES = [
   {
-    title: "Browse Live Views",
-    body: "See real-time crowd sizes, line lengths, and atmospheres outside major events before you even arrive.",
+    step: "Standard video apps",
+    title: "Conversation, without a commitment",
+    body: "Most video apps are built for casual chatting. There is no clear task, no locked value, and no shared way to confirm what happened.",
     art: browseArt,
-    icon: MapPin,
-    alt: "Illustration of glowing map pins scattered across a dark city map",
+    icon: MessageCircle,
+    alt: "Illustration representing ordinary video conversations",
   },
   {
-    title: "Request a Bounty",
-    body: "Can't find parking or want to check the merch line? Drop a credit bounty and get an onlooker on the ground to show you live video proof.",
+    step: "The Onlooker network",
+    title: "A real request, backed by locked credits",
+    body: "Post a bounty for something happening in the real world. Your credits stay protected while an onlooker claims the request and captures what you asked to see.",
     art: creditsArt,
-    icon: CoinsIcon,
-    alt: "Illustration of a glowing Credit token with orbiting credits",
+    icon: LockKeyhole,
+    alt: "Illustration of credits protected while a bounty is active",
   },
   {
-    title: "Capture & Earn",
-    body: "Earn real money by responding to nearby requests. Remember: To protect creator rights, always keep your lens on physical logistics, never film inside the show or capture digital app screens.",
+    step: "Verified result",
+    title: "Proof first, then credits are released",
+    body: "The requester reviews the live proof before the bounty is completed. Once it is verified, the onlooker earns and everyone can see how the result was reached.",
     art: captureArt,
-    icon: Camera,
-    alt: "Illustration of a phone camera framing a stadium entrance gate",
+    icon: BadgeCheck,
+    alt: "Illustration of a verified real-world capture",
   },
 ] as const;
 
@@ -84,12 +88,13 @@ export function OnboardingWalkthrough() {
 
   if (!open) return null;
 
-  const slide = SLIDES[step]!;
+  const slide = SLIDES[step];
+  if (!slide) return null;
   const Icon = slide.icon;
   const last = step === SLIDES.length - 1;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/90 px-4 pb-6 pt-16 sm:items-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-background/90 px-4 pb-6 pt-16 sm:items-center">
       <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-surface">
         <div key={step} className="animate-in fade-in slide-in-from-right-8 duration-300">
           <div className="relative">
@@ -105,7 +110,7 @@ export function OnboardingWalkthrough() {
             <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 backdrop-blur">
               <Icon className="size-4 text-signal" />
               <span className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-                {slide.title}
+                Step {step + 1} · {slide.step}
               </span>
             </div>
           </div>
@@ -131,33 +136,34 @@ export function OnboardingWalkthrough() {
           </div>
 
           {last ? (
-            <button
+            <Button
               type="button"
               disabled={busy}
               onClick={() => void finish()}
-              className="flex items-center gap-2 rounded-2xl bg-signal px-5 py-2.5 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+              className="h-10 rounded-2xl px-5 text-sm font-semibold uppercase tracking-[0.14em]"
             >
               {busy ? "Saving…" : "Get Started"}
               <ArrowRight className="size-4" />
-            </button>
+            </Button>
           ) : (
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => void finish()}
                 disabled={busy}
-                className="px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                className="px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
               >
                 Skip
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setStep((s) => Math.min(s + 1, SLIDES.length - 1))}
-                className="flex items-center gap-2 rounded-2xl bg-signal px-5 py-2.5 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground"
+                className="h-10 rounded-2xl px-5 text-sm font-semibold uppercase tracking-[0.14em]"
               >
                 Next
                 <ArrowRight className="size-4" />
-              </button>
+              </Button>
             </div>
           )}
         </div>

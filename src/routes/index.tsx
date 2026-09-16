@@ -2,9 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
+  BadgeCheck,
   ChevronDown,
   CircleDollarSign,
   Compass,
+  LockKeyhole,
   Map,
   Radio,
   Search,
@@ -41,12 +43,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "See any place in real time. Post a bounty, and someone standing there sends back a live photo within minutes.",
+          "Onlooker connects live streaming with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
       },
-      { property: "og:title", content: "Onlooker, Live views from people already there" },
+      { property: "og:title", content: "Onlooker | Live proof backed by locked credits" },
       {
         property: "og:description",
-        content: "Post a bounty and get a live photo of any place from someone nearby.",
+        content: "Post a bounty, lock credits, and release them only after real-world proof is verified.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -61,6 +63,7 @@ function MapScreen() {
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [exploreOpen, setExploreOpen] = useState(false);
+  const [accountabilityOpen, setAccountabilityOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
@@ -150,11 +153,60 @@ function MapScreen() {
         </div>
       </header>
 
-      <section className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-40 mx-auto w-auto max-w-lg overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+      <div className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-40 mx-auto flex w-auto max-w-lg flex-col gap-2">
+        <section className="overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              setAccountabilityOpen((open) => !open);
+              setExploreOpen(false);
+            }}
+            aria-expanded={accountabilityOpen}
+            className="h-auto min-h-12 w-full justify-start rounded-none px-4 py-2.5 text-foreground hover:bg-surface-raised"
+          >
+            <ShieldCheck className="size-5 text-signal" />
+            <span className="min-w-0 flex-1 text-left">
+              <span className="block text-xs font-extrabold uppercase tracking-[0.1em] text-signal">
+                Real-world accountability
+              </span>
+              <span className="block truncate text-[0.68rem] text-muted-foreground">
+                Bounties backed by locked credits and verified proof
+              </span>
+            </span>
+            <ChevronDown className={`size-4 transition-transform duration-300 ${accountabilityOpen ? "rotate-180" : ""}`} />
+          </Button>
+          <div
+            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+              accountabilityOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="grid grid-cols-3 border-t border-border bg-surface-raised/80 px-3 py-3">
+                {[
+                  { icon: CircleDollarSign, label: "Post", text: "Set a real request" },
+                  { icon: LockKeyhole, label: "Lock", text: "Credits stay protected" },
+                  { icon: BadgeCheck, label: "Verify", text: "Release after proof" },
+                ].map(({ icon: Icon, label, text }, index) => (
+                  <div key={label} className={`px-2 ${index > 0 ? "border-l border-border" : ""}`}>
+                    <Icon className="size-4 text-signal" aria-hidden />
+                    <p className="mt-1 text-xs font-extrabold text-foreground">{label}</p>
+                    <p className="mt-0.5 text-[0.62rem] leading-snug text-muted-foreground">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
         <Button
           type="button"
           variant="ghost"
-          onClick={() => setExploreOpen((open) => !open)}
+          onClick={() => {
+            setExploreOpen((open) => !open);
+            setAccountabilityOpen(false);
+          }}
           aria-expanded={exploreOpen}
           className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
         >
@@ -263,7 +315,8 @@ function MapScreen() {
             Primary
           </span>
         </Button>
-      </section>
+        </section>
+      </div>
 
 
       <BountyBottomSheet
