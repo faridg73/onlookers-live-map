@@ -31,3 +31,4 @@
 - [x] Official trademark logo (onlooker-official-logo.png) — slogan recolored to neon lime
 - [x] Restore standard Google Maps styling and roll out the official square eye logo across web and mobile.
 - [x] Remove custom black and green dot markers from the map without changing its interface or app behavior.
+- [x] Remove all red location pins from the map while leaving the standard Google Maps layout and app features untouched.
