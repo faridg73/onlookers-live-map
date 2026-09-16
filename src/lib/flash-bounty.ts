@@ -171,6 +171,7 @@ export function postFlashBounty(
       Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE),
     ),
     conditionIds: options.conditionIds ?? [],
+    instructions: (options.instructions ?? "").trim().slice(0, FLASH_INSTRUCTIONS_MAX),
   };
   const quote = quoteFlashBounty(resolved);
   const picked = flashConditionsFor(resolved.conditionIds);
@@ -182,6 +183,7 @@ export function postFlashBounty(
     ...(picked.length
       ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
       : []),
+    ...(resolved.instructions ? [`Instructions: ${resolved.instructions}`] : []),
     "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
   ].join("\n");
 
