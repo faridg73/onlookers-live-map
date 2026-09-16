@@ -22,6 +22,8 @@ import {
   computeFlashCredits,
   DEFAULT_CUSTOM_BASE,
   DEFAULT_FLASH_TIER,
+  FLASH_CONDITIONS,
+  flashConditionsCredits,
   FLASH_DURATION_MINUTES,
   FLASH_MIN_BOUNTY_CREDITS,
   FLASH_TIERS,
