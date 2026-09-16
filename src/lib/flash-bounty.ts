@@ -52,7 +52,11 @@ export const FLASH_TIERS: FlashTierPreset[] = [
 ];
 
 export const DEFAULT_FLASH_TIER: BountyTierId = "fast_catch";
-export const DEFAULT_CUSTOM_BASE = 100;
+/** The absolute floor: 40 Credits = $10.00 at 4 Credits per $1. */
+export const DEFAULT_CUSTOM_BASE = FLASH_MIN_BOUNTY_CREDITS;
+
+/** Cap on the optional free-text directions the poster can leave. */
+export const FLASH_INSTRUCTIONS_MAX = 400;
 
 /** Optional extras the requester can tick, each adding its own credits. */
 export type FlashConditionId = "rain_storm" | "night_view" | "landmark";
@@ -85,12 +89,77 @@ export const FLASH_CONDITIONS: FlashCondition[] = [
   },
 ];
 
+/** Professional add-ons, only available in Pro / Media Desk mode. */
+export type FlashProOptionId =
+  | "raw_archive"
+  | "news_alert"
+  | "extended_retention"
+  | "multi_angle";
+
+export type FlashProOption = {
+  id: FlashProOptionId;
+  label: string;
+  credits: number;
+  blurb: string;
+};
+
+export const FLASH_PRO_OPTIONS: FlashProOption[] = [
+  {
+    id: "raw_archive",
+    label: "Raw uncompressed archive stream",
+    credits: 100,
+    blurb: "Broadcast-grade master file, no re-encode",
+  },
+  {
+    id: "news_alert",
+    label: "Priority News Alert push",
+    credits: 200,
+    blurb: "Pushed to verified Pro onlookers first",
+  },
+  {
+    id: "extended_retention",
+    label: "Extended retention window (7 days)",
+    credits: 150,
+    blurb: "Footage kept available for a full week",
+  },
+  {
+    id: "multi_angle",
+    label: "Multi-angle request coordination",
+    credits: 300,
+    blurb: "Several onlookers dispatched to the same scene",
+  },
+];
+
+/** A professional dispatch pays double the standard base before add-ons. */
+export const PRO_DISPATCH_MULTIPLIER = 2;
+
+/** Legal wording the requester must accept before a Pro dispatch is locked. */
+export const PRO_RELEASE_NOTICE =
+  "I accept Onlooker LLC's Terms of Service and confirm that my organization indemnifies and holds Onlooker LLC harmless for the use, licensing, and republication of any footage captured on this professional dispatch, and waives liability claims arising from the capture.";
+
 export type FlashBountyOptions = {
   tierId: BountyTierId;
   customBase: number;
   /** Ticked add-on conditions, each adding its credits to the escrow total. */
   conditionIds?: FlashConditionId[];
+  /** Optional free-text directions for the onlooker who takes the bounty. */
+  instructions?: string;
+  /** Pro / Media Desk dispatch: doubled base plus professional add-ons. */
+  proMode?: boolean;
+  proOptionIds?: FlashProOptionId[];
 };
+
+export function flashProOptionsFor(
+  ids: FlashProOptionId[] | undefined,
+): FlashProOption[] {
+  if (!ids?.length) return [];
+  return FLASH_PRO_OPTIONS.filter((o) => ids.includes(o.id));
+}
+
+/** Extra credits added by the ticked professional add-ons. */
+export function flashProCredits(ids: FlashProOptionId[] | undefined): number {
+  return flashProOptionsFor(ids).reduce((sum, o) => sum + o.credits, 0);
+}
 
 export function flashConditionsFor(ids: FlashConditionId[] | undefined): FlashCondition[] {
   if (!ids?.length) return [];
@@ -112,7 +181,8 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
     weatherMultiplier: 1,
   });
   const picked = flashConditionsFor(options.conditionIds);
-  if (!picked.length) return base;
+  const proPicked = options.proMode ? flashProOptionsFor(options.proOptionIds) : [];
+  if (!picked.length && !options.proMode) return base;
   let running = base.total;
   const lines = [...base.lines];
   for (const condition of picked) {
@@ -123,6 +193,24 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
       multiplier: null,
       runningTotal: running,
     });
+  }
+  if (options.proMode) {
+    running = Math.round(running * PRO_DISPATCH_MULTIPLIER);
+    lines.push({
+      label: "Pro / Media Desk dispatch",
+      detail: `×${PRO_DISPATCH_MULTIPLIER} professional priority rate`,
+      multiplier: PRO_DISPATCH_MULTIPLIER,
+      runningTotal: running,
+    });
+    for (const option of proPicked) {
+      running += option.credits;
+      lines.push({
+        label: `${option.label} (+${option.credits})`,
+        detail: option.blurb,
+        multiplier: null,
+        runningTotal: running,
+      });
+    }
   }
   return { ...base, lines, total: running };
 }
@@ -165,9 +253,13 @@ export function postFlashBounty(
       Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE),
     ),
     conditionIds: options.conditionIds ?? [],
+    instructions: (options.instructions ?? "").trim().slice(0, FLASH_INSTRUCTIONS_MAX),
+    proMode: options.proMode ?? false,
+    proOptionIds: options.proMode ? (options.proOptionIds ?? []) : [],
   };
   const quote = quoteFlashBounty(resolved);
   const picked = flashConditionsFor(resolved.conditionIds);
+  const proPicked = flashProOptionsFor(resolved.proOptionIds);
 
   const details = [
     "Format: Go Live Now (flash bounty)",
@@ -176,6 +268,20 @@ export function postFlashBounty(
     ...(picked.length
       ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
       : []),
+    ...(resolved.proMode
+      ? [
+          "Tier: Pro / Media Desk professional dispatch",
+          ...(proPicked.length
+            ? [
+                `Pro options: ${proPicked
+                  .map((o) => `${o.label} (+${o.credits})`)
+                  .join(", ")}`,
+              ]
+            : []),
+          "Legal release and indemnification accepted by the requesting desk.",
+        ]
+      : []),
+    ...(resolved.instructions ? [`Instructions: ${resolved.instructions}`] : []),
     "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
   ].join("\n");
 

@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Loader2, Mic, MicOff, Radio, SwitchCamera, Square } from "lucide-react";
+import {
+  Loader2,
+  MessageCircle,
+  Mic,
+  MicOff,
+  Radio,
+  SwitchCamera,
+  Square,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { BountyChat } from "@/components/BountyChat";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 
 /**
@@ -16,6 +26,8 @@ export function LiveBroadcastStage({
   onEnd,
   initialFacing = "environment",
   initialMuted = false,
+  requestKey = null,
+  instructions = null,
 }: {
   title: string;
   place: string;
@@ -24,7 +36,12 @@ export function LiveBroadcastStage({
   initialFacing?: "environment" | "user";
   /** Mic state chosen in the pre-stream checks. */
   initialMuted?: boolean;
+  /** Bounty this stream belongs to; unlocks the live chat with the other side. */
+  requestKey?: string | null;
+  /** Directions the poster left for the onlooker. */
+  instructions?: string | null;
 }) {
+  const [chatOpen, setChatOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
@@ -138,14 +155,40 @@ export function LiveBroadcastStage({
             <Loader2 className="size-8 animate-spin text-white/80" />
           </div>
         )}
-        <p className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/80 to-transparent px-4 pb-3 pt-8 text-sm font-extrabold text-white">
-          {title}
-        </p>
+        <div className="absolute inset-x-0 bottom-0 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent px-4 pb-3 pt-8">
+          {instructions?.trim() && (
+            <p className="rounded-xl border border-signal/40 bg-black/60 px-2.5 py-1.5 text-[0.7rem] font-medium leading-snug text-white/85">
+              <span className="font-extrabold text-signal">Instructions: </span>
+              {instructions.trim()}
+            </p>
+          )}
+          <p className="truncate text-sm font-extrabold text-white">{title}</p>
+        </div>
+
+        {requestKey && chatOpen && (
+          <div className="absolute inset-x-0 bottom-0 top-auto max-h-[65%] overflow-y-auto rounded-t-3xl border-t-2 border-border bg-surface px-3 pb-3 pt-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                Live chat
+              </p>
+              <button
+                type="button"
+                aria-label="Close live chat"
+                onClick={() => setChatOpen(false)}
+                className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <BountyChat requestKey={requestKey} bare />
+          </div>
+        )}
       </div>
 
       <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
         {PUBLIC_SPACES_DISCLAIMER}
       </p>
+
 
       <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
@@ -174,6 +217,18 @@ export function LiveBroadcastStage({
             className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
           >
             <SwitchCamera className="size-5" />
+          </button>
+        )}
+        {requestKey && (
+          <button
+            type="button"
+            aria-label={chatOpen ? "Hide live chat" : "Open live chat"}
+            onClick={() => setChatOpen((v) => !v)}
+            className={`inline-flex size-12 items-center justify-center rounded-full border ${
+              chatOpen ? "border-signal bg-signal/20 text-signal" : "border-white/40 text-white"
+            }`}
+          >
+            <MessageCircle className="size-5" />
           </button>
         )}
       </div>

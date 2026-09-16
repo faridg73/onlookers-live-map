@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { LocateFixed, MapPin, Radar, Timer, Zap } from "lucide-react";
+import { BadgeCheck, LocateFixed, MapPin, Radar, ShieldCheck, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
@@ -26,7 +28,12 @@ import {
   FLASH_CONDITIONS,
   flashConditionsCredits,
   FLASH_DURATION_MINUTES,
+  FLASH_INSTRUCTIONS_MAX,
   FLASH_MIN_BOUNTY_CREDITS,
+  FLASH_PRO_OPTIONS,
+  flashProCredits,
+  PRO_DISPATCH_MULTIPLIER,
+  PRO_RELEASE_NOTICE,
   FLASH_TIERS,
   FLASH_TITLE,
   FLASH_WINDOW_MINUTES,
@@ -34,6 +41,7 @@ import {
   quoteFlashBounty,
   readFlashSpot,
   type FlashConditionId,
+  type FlashProOptionId,
   type FlashSpot,
   type FlashTierPreset,
 } from "@/lib/flash-bounty";
@@ -70,8 +78,21 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  /** Pro / Media Desk dispatch for outlets, investigators and pro users. */
+  const [proMode, setProMode] = useState(false);
+  const [proOptionIds, setProOptionIds] = useState<FlashProOptionId[]>([]);
+  /** Legal release and indemnification, mandatory for a Pro dispatch. */
+  const [proRelease, setProRelease] = useState(false);
+  const toggleProOption = (id: FlashProOptionId) =>
+    setProOptionIds((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
   /** Set once escrow is locked; renders the full-screen live camera stage. */
   const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
+  /** Saved bounty id, so the live chat thread matches the posted bounty. */
+  const [liveRequestKey, setLiveRequestKey] = useState<string | null>(null);
+  /** Optional directions for whoever picks up the bounty. */
+  const [instructions, setInstructions] = useState("");
   const toggleCondition = (id: FlashConditionId) =>
     setConditionIds((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
@@ -85,8 +106,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       tierId: selectedTier.id,
       customBase: selectedTier.baseCredits ?? Math.max(0, Math.round(Number(customBase) || 0)),
       conditionIds,
+      instructions,
+      proMode,
+      proOptionIds,
     }),
-    [selectedTier, customBase, conditionIds],
+    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
@@ -172,6 +196,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       );
       return;
     }
+    if (proMode && !proRelease) {
+      toast.error("Accept the Pro / Media Desk legal release before dispatching.");
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before going live.");
       return;
@@ -205,6 +233,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
       });
       // Straight into the live stage so the camera opens immediately.
+      setLiveRequestKey(locked.id ?? null);
       setLiveSpot(spot);
     } catch (error) {
       human.reset();
@@ -401,7 +430,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                   ≈ {formatCreditCash(Math.max(0, Math.round(Number(customBase) || 0)))} USD at {CREDITS_PER_USD} Credits per $1
                 </p>
                 <p className="text-xs font-medium text-signal">
-                  Minimum escrow: {FLASH_MIN_BOUNTY_CREDITS} Credits
+                  Minimum escrow: {FLASH_MIN_BOUNTY_CREDITS} Credits ·{" "}
+                  {formatCreditCash(FLASH_MIN_BOUNTY_CREDITS)}
                 </p>
                 {customError && (
                   <p className="text-xs font-bold text-destructive">{customError}</p>
@@ -453,6 +483,131 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                   );
                 })}
               </div>
+            </div>
+
+            <div
+              className={cn(
+                "space-y-3 rounded-2xl border-2 p-3 transition-colors",
+                proMode ? "border-signal bg-signal/5" : "border-border bg-surface-raised",
+              )}
+            >
+              <label className="flex cursor-pointer items-center gap-3">
+                <Switch
+                  id="flash-pro-mode"
+                  checked={proMode}
+                  onCheckedChange={(next) => {
+                    setProMode(next);
+                    if (!next) {
+                      setProOptionIds([]);
+                      setProRelease(false);
+                    }
+                  }}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-1.5 text-sm font-extrabold text-foreground">
+                    <BadgeCheck className="size-4 shrink-0 text-signal" />
+                    Pro / Media Desk mode
+                  </span>
+                  <span className="block text-[0.65rem] font-medium text-muted-foreground">
+                    For media outlets, investigators and professional users. ×
+                    {PRO_DISPATCH_MULTIPLIER} priority dispatch rate.
+                  </span>
+                </span>
+              </label>
+
+              {proMode && (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                      Select pro media options
+                    </p>
+                    <span className="font-display text-sm font-extrabold tabular-nums text-signal">
+                      +{flashProCredits(proOptionIds).toLocaleString()} Credits
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {FLASH_PRO_OPTIONS.map((option) => {
+                      const checked = proOptionIds.includes(option.id);
+                      return (
+                        <label
+                          key={option.id}
+                          className={cn(
+                            "flex cursor-pointer items-center gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                            checked
+                              ? "border-signal bg-signal/10"
+                              : "border-border bg-surface hover:border-signal/50",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleProOption(option.id)}
+                            className="size-4 shrink-0 accent-signal"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-xs font-extrabold text-foreground">
+                              {option.label}
+                            </span>
+                            <span className="block text-[0.65rem] font-medium text-muted-foreground">
+                              {option.blurb}
+                            </span>
+                          </span>
+                          <span className="shrink-0 font-display text-sm font-extrabold tabular-nums text-signal">
+                            +{option.credits}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <label
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                      proRelease
+                        ? "border-signal bg-signal/10"
+                        : "border-destructive/60 bg-surface",
+                    )}
+                  >
+                    <input
+                      id="flash-pro-release"
+                      type="checkbox"
+                      checked={proRelease}
+                      onChange={(e) => setProRelease(e.target.checked)}
+                      className="mt-0.5 size-4 shrink-0 accent-signal"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5 text-xs font-extrabold text-foreground">
+                        <ShieldCheck className="size-3.5 shrink-0 text-signal" />
+                        Legal release and indemnification (required)
+                      </span>
+                      <span className="block text-[0.65rem] font-medium leading-snug text-muted-foreground">
+                        {PRO_RELEASE_NOTICE}
+                      </span>
+                    </span>
+                  </label>
+                </>
+              )}
+            </div>
+
+            <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+              <label
+                htmlFor="flash-instructions"
+                className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground"
+              >
+                Optional instructions for hunter
+              </label>
+              <Textarea
+                id="flash-instructions"
+                value={instructions}
+                maxLength={FLASH_INSTRUCTIONS_MAX}
+                rows={3}
+                onChange={(e) => setInstructions(e.target.value)}
+                placeholder="Point the camera at the north entrance, show the crowd size, no need for audio."
+                className="min-h-20 rounded-xl border-2 border-border bg-surface text-sm"
+              />
+              <p className="text-right text-[0.65rem] font-medium text-muted-foreground">
+                {instructions.length}/{FLASH_INSTRUCTIONS_MAX}
+              </p>
             </div>
 
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
@@ -526,13 +681,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting}
-              className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+              disabled={posting || (proMode && !proRelease)}
+              className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
             >
               {posting
                 ? "Locking credits, starting camera…"
                 : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
+            {proMode && !proRelease && (
+              <p className="text-xs font-bold text-destructive">
+                Accept the legal release and indemnification above to unlock this
+                professional dispatch.
+              </p>
+            )}
             {short && (
               <Button
                 type="button"
@@ -553,8 +714,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         <LiveBroadcastStage
           title={FLASH_TITLE}
           place={liveSpot.formatted}
+          requestKey={liveRequestKey}
+          instructions={instructions}
           onEnd={() => {
             setLiveSpot(null);
+            setLiveRequestKey(null);
             toast.success("Broadcast ended", {
               description: "Your flash stream is saved to the feed.",
             });
