@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { MapPin, Radio, ShieldCheck } from "lucide-react";
+import {
+  Camera,
+  Lock,
+  MapPin,
+  Mic,
+  MicOff,
+  Radio,
+  ShieldCheck,
+  SwitchCamera,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -9,9 +19,12 @@ import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import {
+  BROADCAST_AUDIENCES,
+  BROADCAST_SAFETY_NOTICE,
   BROADCAST_WINDOWS,
   fetchBroadcastEligibility,
   startFreeBroadcast,
+  type BroadcastAudience,
   type BroadcastEligibility,
 } from "@/lib/broadcast";
 import { COMMUNITY_CATEGORIES, type CommunityCategory } from "@/lib/community";
