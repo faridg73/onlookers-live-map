@@ -107,8 +107,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       customBase: selectedTier.baseCredits ?? Math.max(0, Math.round(Number(customBase) || 0)),
       conditionIds,
       instructions,
+      proMode,
+      proOptionIds,
     }),
-    [selectedTier, customBase, conditionIds, instructions],
+    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
