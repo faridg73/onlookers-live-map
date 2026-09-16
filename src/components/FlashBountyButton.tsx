@@ -72,6 +72,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
   /** Set once escrow is locked; renders the full-screen live camera stage. */
   const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
+  /** Saved bounty id, so the live chat thread matches the posted bounty. */
+  const [liveRequestKey, setLiveRequestKey] = useState<string | null>(null);
+  /** Optional directions for whoever picks up the bounty. */
+  const [instructions, setInstructions] = useState("");
   const toggleCondition = (id: FlashConditionId) =>
     setConditionIds((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
@@ -85,8 +89,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       tierId: selectedTier.id,
       customBase: selectedTier.baseCredits ?? Math.max(0, Math.round(Number(customBase) || 0)),
       conditionIds,
+      instructions,
     }),
-    [selectedTier, customBase, conditionIds],
+    [selectedTier, customBase, conditionIds, instructions],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
@@ -553,8 +558,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         <LiveBroadcastStage
           title={FLASH_TITLE}
           place={liveSpot.formatted}
+          requestKey={liveRequestKey}
+          instructions={instructions}
           onEnd={() => {
             setLiveSpot(null);
+            setLiveRequestKey(null);
             toast.success("Broadcast ended", {
               description: "Your flash stream is saved to the feed.",
             });
