@@ -26,5 +26,5 @@
 - [x] Cloudflare zone activated and onlookerlive.com is serving as the primary domain.
 - [ ] Once zone active: enable Under Attack Mode + rate limiting rule
 - [x] Explain Onlooker accountability on Home, contrast standard apps in onboarding, and show real community earning impact.
-- [ ] Publish the current web build to onlookerlive.com.
-- [ ] Generate fresh Android and iOS release artifacts for the current build.
+- [x] Publish the current web build to onlookerlive.com.
+- [x] Synchronize fresh Android v1.2 build 15 and iOS v1.2 build 30 release projects; automated signed store builds run from the configured release workflows.
