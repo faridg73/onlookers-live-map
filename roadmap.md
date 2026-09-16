@@ -37,5 +37,5 @@
 - [x] Minimum base 40 Credits ($10.00), tiers/conditions scale from it
 - [x] Optional Instructions for Hunter field
 - [x] Live chat widget on the active broadcast screen
-- [ ] Pro / Media Desk tier: mode toggle, pro-grade add-ons, escrow scaling
-- [ ] Mandatory legal release + indemnification checkbox gating Go Live on Pro tier
+- [x] Pro / Media Desk tier: mode toggle, pro-grade add-ons, escrow scaling
+- [x] Mandatory legal release + indemnification checkbox gating Go Live on Pro tier
