@@ -27,6 +27,7 @@ import {
   FLASH_CONDITIONS,
   flashConditionsCredits,
   FLASH_DURATION_MINUTES,
+  FLASH_INSTRUCTIONS_MAX,
   FLASH_MIN_BOUNTY_CREDITS,
   FLASH_TIERS,
   FLASH_TITLE,
@@ -461,6 +462,27 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
                   );
                 })}
               </div>
+            </div>
+
+            <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+              <label
+                htmlFor="flash-instructions"
+                className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground"
+              >
+                Optional instructions for hunter
+              </label>
+              <Textarea
+                id="flash-instructions"
+                value={instructions}
+                maxLength={FLASH_INSTRUCTIONS_MAX}
+                rows={3}
+                onChange={(e) => setInstructions(e.target.value)}
+                placeholder="Point the camera at the north entrance, show the crowd size, no need for audio."
+                className="min-h-20 rounded-xl border-2 border-border bg-surface text-sm"
+              />
+              <p className="text-right text-[0.65rem] font-medium text-muted-foreground">
+                {instructions.length}/{FLASH_INSTRUCTIONS_MAX}
+              </p>
             </div>
 
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
