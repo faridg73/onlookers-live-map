@@ -57,6 +57,12 @@ export function MapCanvas({
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
   const [me, setMe] = useState<{ isIncognito: boolean } | null>(null);
+  // Real businesses in the current view, loaded once the map settles close enough.
+  const [view, setView] = useState<{ lat: number; lng: number; radius: number; zoom: number } | null>(
+    null,
+  );
+  const [places, setPlaces] = useState<DiscoveredPlace[]>([]);
+  const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
   const pinModeRef = useRef(pinMode);
