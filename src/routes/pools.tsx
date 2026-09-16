@@ -33,7 +33,7 @@ export const Route = createFileRoute("/pools")({
         content:
           "Chip in Credits with other people to fund bigger community bounties and sponsor local flash meetups.",
       },
-      { property: "og:title", content: "Group Pools on Onlooker Live" },
+      { property: "og:title", content: "Group Pools on Onlooker LLC" },
       {
         property: "og:description",
         content: "Pool Credits with your city to fund bigger bounties and flash meetups.",

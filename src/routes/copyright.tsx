@@ -3,17 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/copyright")({
   head: () => ({
     meta: [
-      { title: "DMCA & Copyright Policy | Onlooker Live" },
+      { title: "DMCA & Copyright Policy | Onlooker LLC" },
       {
         name: "description",
         content:
-          "Onlooker Live DMCA and copyright infringement policy: prohibited digital content, takedown notices, counter-notifications, and repeat infringer policy.",
+          "Onlooker LLC DMCA and copyright infringement policy: prohibited digital content, takedown notices, counter-notifications, and repeat infringer policy.",
       },
-      { property: "og:title", content: "DMCA & Copyright Policy | Onlooker Live" },
+      { property: "og:title", content: "DMCA & Copyright Policy | Onlooker LLC" },
       {
         property: "og:description",
         content:
-          "How to report copyright infringement on Onlooker Live and our DMCA takedown procedures.",
+          "How to report copyright infringement on Onlooker LLC and our DMCA takedown procedures.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -42,7 +42,7 @@ function CopyrightPage() {
       </p>
 
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        Onlooker Live (&ldquo;Onlooker,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
+        Onlooker LLC (&ldquo;Onlooker,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
         respects the intellectual property rights of others and expects its users to do the same. In
         accordance with the Digital Millennium Copyright Act (&ldquo;DMCA&rdquo;), Pub. L. 105-304, we
         will respond expeditiously to clear notices of alleged copyright infringement that are reported
@@ -51,7 +51,7 @@ function CopyrightPage() {
 
       <Section title="1. Prohibited digital content & screen captures">
         <p>
-          Onlooker Live is strictly a platform for crowdsourcing real-world, physical, location-based
+          Onlooker LLC is strictly a platform for crowdsourcing real-world, physical, location-based
           utility (for example line lengths, venue atmospheres, physical seat views). The broadcasting,
           streaming, screen-recording, or screenshotting of third-party digital interfaces,
           applications, mobile tickets, barcodes, or live event feeds (including but not limited to
@@ -64,7 +64,7 @@ function CopyrightPage() {
         <p>
           If you are a copyright owner, authorized to act on behalf of one, or authorized to act under
           any exclusive right under copyright, please report alleged copyright infringements taking place
-          on or through the Onlooker Live platform by submitting a written DMCA Notice to our
+          on or through the Onlooker LLC platform by submitting a written DMCA Notice to our
           Designated Agent.
         </p>
         <p>Your notice must substantially include the following information:</p>
@@ -77,7 +77,7 @@ function CopyrightPage() {
           <li>
             Identification of the material that is claimed to be infringing or to be the subject of
             infringing activity, including specific URLs, request IDs, or geo-coordinates within the
-            Onlooker Live app to help us locate the material;
+            Onlooker LLC app to help us locate the material;
           </li>
           <li>
             Your contact information, including your address, telephone number, and an email address;
@@ -125,7 +125,7 @@ function CopyrightPage() {
 
       <Section title="5. Repeat infringer policy">
         <p>
-          In accordance with the DMCA and other applicable laws, Onlooker Live maintains a strict policy
+          In accordance with the DMCA and other applicable laws, Onlooker LLC maintains a strict policy
           of terminating, in appropriate circumstances and at our sole discretion, users who are deemed
           to be repeat infringers. We also reserve the right to ban any user who attempts to upload
           digital media captured from third-party mobile applications.

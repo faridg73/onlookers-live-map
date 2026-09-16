@@ -14,7 +14,7 @@ interface Props {
 const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>New DMCA / infringement report submitted on Onlooker Live</Preview>
+    <Preview>New DMCA / infringement report submitted on Onlooker LLC</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={heading}>DMCA / Infringement Report</Heading>
@@ -30,7 +30,7 @@ const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: P
           <Text style={row}>{description || '-'}</Text>
         </Section>
         <Text style={muted}>
-          Review this notice in the Onlooker Live admin panel and respond to the reporter promptly.
+          Review this notice in the Onlooker LLC admin panel and respond to the reporter promptly.
         </Text>
       </Container>
     </Body>
@@ -39,7 +39,7 @@ const Email = ({ name, email, contentUrl, reasonCode, description, noticeId }: P
 
 export const template = {
   component: Email,
-  subject: 'New DMCA / infringement report | Onlooker Live',
+  subject: 'New DMCA / infringement report | Onlooker LLC',
   displayName: 'DMCA report alert',
   to: 'support@onlookerlive.com',
   previewData: {

@@ -157,7 +157,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
 export async function shareCaption(artifact: ShareArtifact): Promise<string> {
   const link = await referralLink();
   const bits = [artifact.title, artifact.place].filter(Boolean).join(", ");
-  return `${bits}\nLive on Onlooker Live 👀 ${link}\n#OnlookerLive #LiveView`;
+  return `${bits}\nLive on Onlooker LLC 👀 ${link}\n#OnlookerLive #LiveView`;
 }
 
 /**
@@ -169,7 +169,7 @@ export async function shareArtifact(artifact: ShareArtifact): Promise<"shared" |
 
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], text: caption, title: "Onlooker Live" });
+      await navigator.share({ files: [file], text: caption, title: "Onlooker LLC" });
       return "shared";
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return "shared";

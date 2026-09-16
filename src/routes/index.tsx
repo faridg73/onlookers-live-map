@@ -130,7 +130,7 @@ function MapScreen() {
         <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
           <img
             src="/icon-192.png"
-            alt="Onlooker Live logo"
+            alt="Onlooker LLC logo"
             className="size-10 rounded-lg object-cover md:size-12"
           />
           <h1 className="text-xs font-extrabold leading-none tracking-tight text-foreground md:text-sm">
