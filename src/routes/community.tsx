@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Compass, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
+import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -32,6 +32,8 @@ import {
   type CommunityPost,
 } from "@/lib/community";
 import { CategoryExampleCards } from "@/components/CategoryExampleCards";
+import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
+import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -46,7 +48,7 @@ export const Route = createFileRoute("/community")({
       {
         property: "og:description",
         content:
-          "A media-first local feed with verified creators, live streams and Credit tipping for everything happening around you.",
+          "Help with real requests, complete verified captures, and earn through bounties backed by locked credits.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,6 +59,7 @@ export const Route = createFileRoute("/community")({
 
 function CommunityHub() {
   const { user } = useAuth();
+  const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [media, setMedia] = useState<Record<string, string>>({});
   const [category, setCategory] = useState<CommunityCategory | "all">("all");
@@ -65,6 +68,9 @@ function CommunityHub() {
   const [composing, setComposing] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [impactView, setImpactView] = useState<"help" | "mine">("help");
+  const [earnings, setEarnings] = useState<EarningsSummary | null>(null);
+  const [earningsLoading, setEarningsLoading] = useState(false);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
@@ -105,6 +111,34 @@ function CommunityHub() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    let alive = true;
+    if (!user) {
+      setEarnings(null);
+      setEarningsLoading(false);
+      return;
+    }
+    setEarningsLoading(true);
+    fetchMyEarnings()
+      .then((summary) => {
+        if (alive) setEarnings(summary);
+      })
+      .catch(() => {
+        if (alive) setEarnings(null);
+      })
+      .finally(() => {
+        if (alive) setEarningsLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [user?.id]);
+
+  const openBounties = useMemo(
+    () => requests.filter((request) => request.status === "open" && !isClosed(request)),
+    [requests],
+  );
 
   useEffect(() => {
     try {
@@ -228,6 +262,98 @@ function CommunityHub() {
           Browse venues & events →
         </Link>
       </header>
+
+      <section aria-labelledby="community-impact-title" className="mt-6 border-y border-border bg-surface/55 px-5 py-5 sm:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
+              <HandCoins className="size-4" /> Community impact
+            </p>
+            <h2 id="community-impact-title" className="mt-1 text-xl font-extrabold text-foreground">
+              Help someone. Earn when the work is verified.
+            </h2>
+          </div>
+          <div className="flex rounded-md border border-border bg-background p-0.5" role="tablist" aria-label="Community impact views">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              role="tab"
+              aria-selected={impactView === "help"}
+              onClick={() => setImpactView("help")}
+              className={impactView === "help" ? "bg-signal text-signal-foreground" : "text-muted-foreground"}
+            >
+              Help others earn
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              role="tab"
+              aria-selected={impactView === "mine"}
+              onClick={() => setImpactView("mine")}
+              className={impactView === "mine" ? "bg-signal text-signal-foreground" : "text-muted-foreground"}
+            >
+              My impact
+            </Button>
+          </div>
+        </div>
+
+        {impactView === "help" ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { icon: CircleDollarSign, value: openBounties.length.toString(), label: "Open now" },
+                { icon: LockKeyhole, value: "Protected", label: "Credits locked" },
+                { icon: BadgeCheck, value: "Verified", label: "Proof before pay" },
+              ].map(({ icon: Icon, value, label }) => (
+                <article key={label} className="rounded-md border border-border bg-background p-3">
+                  <Icon className="size-4 text-signal" aria-hidden />
+                  <p className="mt-2 break-words text-sm font-extrabold text-foreground">{value}</p>
+                  <p className="mt-0.5 text-[0.65rem] text-muted-foreground">{label}</p>
+                </article>
+              ))}
+            </div>
+            <Button asChild className="w-full sm:w-auto">
+              <Link to="/">View bounty map</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-4">
+            {!user ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-background p-4">
+                <p className="text-sm text-muted-foreground">Sign in to see your verified earnings and completed work.</p>
+                <Button asChild size="sm"><Link to="/auth">Sign in</Link></Button>
+              </div>
+            ) : earningsLoading ? (
+              <p className="text-sm text-muted-foreground">Loading your impact…</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {[
+                  { value: `${earnings?.grossCredits ?? 0}`, label: "Credits earned" },
+                  { value: `${earnings?.feeCredits ?? 0}`, label: "Platform fee" },
+                  { value: `${earnings?.netCredits ?? 0}`, label: "Credits paid" },
+                  { value: `${earnings?.entries ?? 0}`, label: "Verified earnings" },
+                ].map((metric) => (
+                  <article key={metric.label} className="rounded-md border border-border bg-background p-3">
+                    <p className="text-lg font-extrabold text-signal">{metric.value}</p>
+                    <p className="mt-0.5 text-[0.68rem] text-muted-foreground">{metric.label}</p>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <ol className="mt-4 grid grid-cols-4 gap-1 border-t border-border pt-3" aria-label="How verified earning works">
+          {["Claim", "Capture", "Requester verifies", "Credits release"].map((label, index) => (
+            <li key={label} className="flex min-w-0 items-center gap-1.5 text-[0.62rem] font-bold text-muted-foreground">
+              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-signal/15 text-[0.6rem] text-signal">{index + 1}</span>
+              <span className="leading-tight">{label}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <section aria-label="Discover categories" className="mt-6">
         <div className="mb-3 flex items-center justify-between px-5 sm:px-8">
