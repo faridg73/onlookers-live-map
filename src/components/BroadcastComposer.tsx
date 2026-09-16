@@ -104,7 +104,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       toast.success("You're broadcasting", {
         description: "Followers and people nearby can see it on Discover. No credits held.",
       });
-      await navigate({ to: "/community" });
+      // Open the live camera view so the creator sees their own feed while live.
+      setLiveNow({ title: title.trim(), place: place.trim() });
     } catch (error) {
       human.reset();
       toast.error(error instanceof Error ? error.message : "Couldn't start the broadcast.");
