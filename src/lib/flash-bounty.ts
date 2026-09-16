@@ -54,20 +54,77 @@ export const FLASH_TIERS: FlashTierPreset[] = [
 export const DEFAULT_FLASH_TIER: BountyTierId = "fast_catch";
 export const DEFAULT_CUSTOM_BASE = 100;
 
+/** Optional extras the requester can tick, each adding its own credits. */
+export type FlashConditionId = "rain_storm" | "night_view" | "landmark";
+
+export type FlashCondition = {
+  id: FlashConditionId;
+  label: string;
+  credits: number;
+  blurb: string;
+};
+
+export const FLASH_CONDITIONS: FlashCondition[] = [
+  {
+    id: "rain_storm",
+    label: "Rain/Storm check",
+    credits: 20,
+    blurb: "Filming in wet or severe weather",
+  },
+  {
+    id: "night_view",
+    label: "Night/Low light view",
+    credits: 10,
+    blurb: "After-dark visibility",
+  },
+  {
+    id: "landmark",
+    label: "Specific landmark",
+    credits: 30,
+    blurb: "Must frame an exact landmark or event",
+  },
+];
+
 export type FlashBountyOptions = {
   tierId: BountyTierId;
   customBase: number;
+  /** Ticked add-on conditions, each adding its credits to the escrow total. */
+  conditionIds?: FlashConditionId[];
 };
+
+export function flashConditionsFor(ids: FlashConditionId[] | undefined): FlashCondition[] {
+  if (!ids?.length) return [];
+  return FLASH_CONDITIONS.filter((c) => ids.includes(c.id));
+}
+
+/** Extra credits added by the ticked conditions. */
+export function flashConditionsCredits(ids: FlashConditionId[] | undefined): number {
+  return flashConditionsFor(ids).reduce((sum, c) => sum + c.credits, 0);
+}
 
 /** Builds the itemised quote for a flash bounty with the fixed duration/window. */
 export function quoteFlashBounty(options: FlashBountyOptions) {
-  return quoteBounty({
+  const base = quoteBounty({
     tier: options.tierId,
     customBase: options.customBase,
     durationMinutes: FLASH_DURATION_MINUTES,
     minutesUntilDue: FLASH_WINDOW_MINUTES,
     weatherMultiplier: 1,
   });
+  const picked = flashConditionsFor(options.conditionIds);
+  if (!picked.length) return base;
+  let running = base.total;
+  const lines = [...base.lines];
+  for (const condition of picked) {
+    running += condition.credits;
+    lines.push({
+      label: `${condition.label} (+${condition.credits})`,
+      detail: condition.blurb,
+      multiplier: null,
+      runningTotal: running,
+    });
+  }
+  return { ...base, lines, total: running };
 }
 
 /** Total credits that will be locked in escrow for the selected flash options. */
@@ -107,14 +164,18 @@ export function postFlashBounty(
       FLASH_MIN_BOUNTY_CREDITS,
       Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE),
     ),
+    conditionIds: options.conditionIds ?? [],
   };
   const quote = quoteFlashBounty(resolved);
-
+  const picked = flashConditionsFor(resolved.conditionIds);
 
   const details = [
     "Format: Go Live Now (flash bounty)",
     `Requested capture: ${FLASH_DURATION_MINUTES} min live session`,
     "Camera: Wide establishing · Vertical",
+    ...(picked.length
+      ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
+      : []),
     "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
   ].join("\n");
 

@@ -22,6 +22,8 @@ import {
   computeFlashCredits,
   DEFAULT_CUSTOM_BASE,
   DEFAULT_FLASH_TIER,
+  FLASH_CONDITIONS,
+  flashConditionsCredits,
   FLASH_DURATION_MINUTES,
   FLASH_MIN_BOUNTY_CREDITS,
   FLASH_TIERS,
@@ -30,6 +32,7 @@ import {
   postFlashBounty,
   quoteFlashBounty,
   readFlashSpot,
+  type FlashConditionId,
   type FlashSpot,
   type FlashTierPreset,
 } from "@/lib/flash-bounty";
@@ -65,6 +68,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   );
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
+  const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  const toggleCondition = (id: FlashConditionId) =>
+    setConditionIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
   const human = useHumanCheck("flash-bounty");
   // Credits only leave a wallet once the number behind the account is confirmed.
   const phoneGate = usePhoneGate("before credits go into escrow");
@@ -73,8 +81,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
     () => ({
       tierId: selectedTier.id,
       customBase: selectedTier.baseCredits ?? Math.max(0, Math.round(Number(customBase) || 0)),
+      conditionIds,
     }),
-    [selectedTier, customBase],
+    [selectedTier, customBase, conditionIds],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
@@ -395,6 +404,51 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
 
               </div>
             )}
+
+            <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                  Select optional conditions
+                </p>
+                <span className="font-display text-sm font-extrabold tabular-nums text-signal">
+                  +{flashConditionsCredits(conditionIds).toLocaleString()} Credits
+                </span>
+              </div>
+              <div className="space-y-2">
+                {FLASH_CONDITIONS.map((condition) => {
+                  const checked = conditionIds.includes(condition.id);
+                  return (
+                    <label
+                      key={condition.id}
+                      className={cn(
+                        "flex cursor-pointer items-center gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                        checked
+                          ? "border-signal bg-signal/10"
+                          : "border-border bg-surface hover:border-signal/50",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleCondition(condition.id)}
+                        className="size-4 shrink-0 accent-signal"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-extrabold text-foreground">
+                          {condition.label}
+                        </span>
+                        <span className="block text-[0.65rem] font-medium text-muted-foreground">
+                          {condition.blurb}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-display text-sm font-extrabold tabular-nums text-signal">
+                        +{condition.credits}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
 
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-2">
