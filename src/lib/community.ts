@@ -2,16 +2,16 @@ import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 
-/** The community categories that open the Discover hub. */
+/** The broadcast lanes that open the Discover hub. */
 export type CommunityCategory =
-  | "friends"
-  | "meetups"
-  | "tutorials"
-  | "language"
+  | "breaking"
   | "culture"
-  | "realestate"
+  | "traffic"
   | "markets"
-  | "events";
+  | "meetups"
+  | "arts"
+  | "sports"
+  | "general";
 
 export type CommunityCategoryDef = {
   id: CommunityCategory;
