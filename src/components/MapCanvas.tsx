@@ -220,6 +220,37 @@ export function MapCanvas({
     map.current.setZoom(centerTarget.zoom ?? 14);
   }, [ready, centerTarget]);
 
+  /**
+   * Real businesses for the settled view: names, ratings and addresses straight
+   * from Google Places. Only fetched close in, and debounced, to stay cheap.
+   */
+  const placeKey = view && view.zoom >= PLACE_ZOOM ? `${view.lat}:${view.lng}:${view.radius}` : "";
+  useEffect(() => {
+    if (!placeKey || !view) {
+      setPlaces([]);
+      setActivePlaceId(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void fetchMapAreaPlaces({
+        data: { latitude: view.lat, longitude: view.lng, radiusMeters: view.radius },
+      })
+        .then((result) => {
+          if (!cancelled) setPlaces(result);
+        })
+        .catch(() => {
+          if (!cancelled) setPlaces([]);
+        });
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeKey]);
+
+
   // `tick` re-runs pixel math whenever the map moves.
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
