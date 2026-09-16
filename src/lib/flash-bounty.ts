@@ -254,9 +254,12 @@ export function postFlashBounty(
     ),
     conditionIds: options.conditionIds ?? [],
     instructions: (options.instructions ?? "").trim().slice(0, FLASH_INSTRUCTIONS_MAX),
+    proMode: options.proMode ?? false,
+    proOptionIds: options.proMode ? (options.proOptionIds ?? []) : [],
   };
   const quote = quoteFlashBounty(resolved);
   const picked = flashConditionsFor(resolved.conditionIds);
+  const proPicked = flashProOptionsFor(resolved.proOptionIds);
 
   const details = [
     "Format: Go Live Now (flash bounty)",
