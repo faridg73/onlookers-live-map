@@ -215,11 +215,18 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
               variant="outline"
               aria-pressed={hours === option.hours}
               onClick={() => setHours(option.hours)}
-              className={`h-11 text-xs font-extrabold ${
+              className={`h-auto flex-col gap-0.5 py-2.5 text-xs font-extrabold ${
                 hours === option.hours ? "border-signal bg-signal text-signal-foreground" : ""
               }`}
             >
               {option.label}
+              <span
+                className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${
+                  hours === option.hours ? "text-signal-foreground/80" : "text-muted-foreground"
+                }`}
+              >
+                {option.tier}
+              </span>
             </Button>
           ))}
         </div>
