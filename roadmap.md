@@ -19,6 +19,6 @@
 - [x] Make the Flash location editable with live place search and add concise alerting copy
 - [x] Reduce Map marker clutter with zoom-aware POI visibility and smart bounty clusters
 - [ ] Resolve Android signing secret mismatch: encoded keystore was entered as the password; identify/reset the correct signing credentials.
-- [ ] Finish Cloudflare protection for onlookerlive.com after the site is added and the connector token has zone security permissions.
-- [ ] Reconnect Cloudflare connector with new scoped token, then: create zone, recreate DNS records, get nameservers set at Namecheap, enable Under Attack Mode + rate limiting.
-- [ ] Avoid repeated Cloudflare approval popups by guiding the remaining DNS changes through one controlled approval at a time.
+- [x] Reconnect Cloudflare connector with new scoped token, create zone, recreate all DNS records (A @/www proxied, Google + Lovable verification TXTs, SPF, MX, DKIM, notify Mailgun setup).
+- [ ] User switches nameservers at Namecheap to jule.ns.cloudflare.com / robert.ns.cloudflare.com; wait for zone to activate.
+- [ ] After activation: enable Under Attack Mode (security_level) and a rate-limiting / WAF rule on the free plan.
