@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 import { PhoneVerification } from "@/components/PhoneVerification";
+import { LegalDialog, useLegalDialog } from "@/components/legal/LegalDialog";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -43,6 +44,8 @@ function AuthScreen() {
   const [verifying, setVerifying] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  // Terms and Privacy open in a popup so a half-filled form is never lost.
+  const legal = useLegalDialog();
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
@@ -296,27 +299,45 @@ function AuthScreen() {
         atmospheres, captured live on location.
       </p>
 
-      <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
         <input
+          id="accept-legal"
           type="checkbox"
+          required
           checked={accepted}
           onChange={(e) => setAccepted(e.target.checked)}
+          aria-describedby="accept-legal-text"
           className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
         />
-        <span>
-          By signing in, you agree to Onlooker&rsquo;s{" "}
-          <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">
+        <span id="accept-legal-text">
+          <label htmlFor="accept-legal" className="cursor-pointer">
+            I agree to Onlooker&rsquo;s{" "}
+          </label>
+          <button
+            type="button"
+            onClick={() => legal.open("terms")}
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
             Terms of Service
-          </Link>{" "}
+          </button>{" "}
           and{" "}
-          <Link to="/privacy" className="font-semibold text-foreground underline underline-offset-4">
+          <button
+            type="button"
+            onClick={() => legal.open("privacy")}
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
             Privacy Policy
-          </Link>
-          , acknowledging that you operate independently, assume all legal and physical liability,
-          will only record in lawful public spaces without trespassing, and hold Onlooker harmless
-          from any legal actions.
+          </button>
+          <label htmlFor="accept-legal" className="cursor-pointer">
+            , acknowledging that I operate independently, assume all legal and physical liability,
+            will only record in lawful public spaces without trespassing, and hold Onlooker harmless
+            from any legal actions.
+          </label>
         </span>
-      </label>
+      </div>
+
+      <LegalDialog doc={legal.doc} onClose={legal.close} />
+
 
       <button
         type="button"
@@ -388,10 +409,16 @@ function AuthScreen() {
         <button
           type="submit"
           disabled={busy || !accepted || !human.ready}
-          className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+          aria-disabled={busy || !accepted || !human.ready}
+          className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
         </button>
+        {!accepted ? (
+          <p className="px-1 text-center text-xs text-muted-foreground">
+            Tick the agreement box above to continue.
+          </p>
+        ) : null}
       </form>
 
       <button
