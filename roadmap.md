@@ -32,3 +32,10 @@
 - [x] Restore standard Google Maps styling and roll out the official square eye logo across web and mobile.
 - [x] Remove custom black and green dot markers from the map without changing its interface or app behavior.
 - [x] Remove all red location pins from the map while leaving the standard Google Maps layout and app features untouched.
+
+## Flash modal (Sep 16)
+- [x] Minimum base 40 Credits ($10.00), tiers/conditions scale from it
+- [x] Optional Instructions for Hunter field
+- [x] Live chat widget on the active broadcast screen
+- [ ] Pro / Media Desk tier: mode toggle, pro-grade add-ons, escrow scaling
+- [ ] Mandatory legal release + indemnification checkbox gating Go Live on Pro tier
