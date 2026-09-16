@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CoinsIcon, LocateFixed, Share2 } from "lucide-react";
+import { CoinsIcon, LocateFixed, Share2, Star, X } from "lucide-react";
 import { shareBounty } from "@/lib/bounty-share";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
@@ -8,6 +8,7 @@ import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { DARK_MAP_STYLES } from "@/lib/map-style";
+import { fetchMapAreaPlaces, type DiscoveredPlace } from "@/lib/places.functions";
 
 import { useBoosts } from "@/lib/boosts-store";
 import { fetchHunterStats } from "@/lib/gamification";
@@ -18,6 +19,8 @@ import { cn } from "@/lib/utils";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const DETAIL_ZOOM = 14;
+/** Real business names and ratings only load once the map is this close in. */
+const PLACE_ZOOM = 15;
 
 type Pixel = { left: number; top: number };
 
@@ -56,6 +59,12 @@ export function MapCanvas({
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const { boostOf } = useBoosts();
   const [me, setMe] = useState<{ isIncognito: boolean } | null>(null);
+  // Real businesses in the current view, loaded once the map settles close enough.
+  const [view, setView] = useState<{ lat: number; lng: number; radius: number; zoom: number } | null>(
+    null,
+  );
+  const [places, setPlaces] = useState<DiscoveredPlace[]>([]);
+  const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
 
   // Live values for the map's own click listener, which is registered once.
   const pinModeRef = useRef(pinMode);
@@ -102,12 +111,33 @@ export function MapCanvas({
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
         });
+        // Once the map settles, note the area on screen so real place data can load.
+        map.current.addListener("idle", () => {
+          const current = map.current;
+          const centre = current?.getCenter();
+          const bounds = current?.getBounds();
+          const currentZoom = current?.getZoom();
+          if (!centre || !bounds || typeof currentZoom !== "number") return;
+          const ne = bounds.getNorthEast();
+          // Rough metre distance from the centre to a corner of the view.
+          const latMetres = (ne.lat() - centre.lat()) * 111320;
+          const lngMetres =
+            (ne.lng() - centre.lng()) * 111320 * Math.cos((centre.lat() * Math.PI) / 180);
+          const radius = Math.round(Math.hypot(latMetres, lngMetres));
+          setView({
+            lat: Number(centre.lat().toFixed(4)),
+            lng: Number(centre.lng().toFixed(4)),
+            radius: clamp(radius || 1200, 200, 5000),
+            zoom: currentZoom,
+          });
+        });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
           if (pinModeRef.current && at) {
             onMapPinRef.current?.({ lat: at.lat(), lng: at.lng() });
             return;
           }
+          setActivePlaceId(null);
           onSelect(null);
         });
         setReady(true);
@@ -192,10 +222,48 @@ export function MapCanvas({
     map.current.setZoom(centerTarget.zoom ?? 14);
   }, [ready, centerTarget]);
 
+  /**
+   * Real businesses for the settled view: names, ratings and addresses straight
+   * from Google Places. Only fetched close in, and debounced, to stay cheap.
+   */
+  const placeKey = view && view.zoom >= PLACE_ZOOM ? `${view.lat}:${view.lng}:${view.radius}` : "";
+  useEffect(() => {
+    if (!placeKey || !view) {
+      setPlaces([]);
+      setActivePlaceId(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      void fetchMapAreaPlaces({
+        data: { latitude: view.lat, longitude: view.lng, radiusMeters: view.radius },
+      })
+        .then((result) => {
+          if (!cancelled) setPlaces(result);
+        })
+        .catch(() => {
+          if (!cancelled) setPlaces([]);
+        });
+    }, 400);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeKey]);
+
+
   // `tick` re-runs pixel math whenever the map moves.
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
+  const placeMarkers = ready
+    ? places.flatMap((place) => {
+        const pixel = toPixel({ lat: place.latitude, lng: place.longitude });
+        return pixel ? [{ place, pixel }] : [];
+      })
+    : [];
+  const activePlace = places.find((place) => place.id === activePlaceId) ?? null;
   const requestMarkers = ready
     ? requests.flatMap((request) => {
         const pixel = toPixel(requestMapPosition(request));
@@ -310,8 +378,71 @@ export function MapCanvas({
         </div>
       )}
 
-      {/* Business/POI labels are intentionally not rendered: the map shows only
-          Onlooker live streams and bounties. */}
+      {/* Real businesses in view: app-drawn labels, no Google POI clicks. */}
+      {!pinMode &&
+        placeMarkers.map(({ place, pixel }) => (
+          <button
+            key={place.id}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              setActivePlaceId(activePlaceId === place.id ? null : place.id);
+            }}
+            className="absolute flex max-w-[9rem] -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-border bg-surface/85 px-1.5 py-0.5 text-[0.58rem] font-bold text-foreground shadow backdrop-blur transition-colors hover:bg-surface-raised"
+            style={{ left: pixel.left, top: pixel.top }}
+            aria-label={`${place.name}${place.rating ? `, rated ${place.rating}` : ""}`}
+          >
+            <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--signal)" }} />
+            <span className="truncate">{place.name}</span>
+            {place.rating !== null && (
+              <span className="shrink-0 tabular-nums text-signal">{place.rating.toFixed(1)}</span>
+            )}
+          </button>
+        ))}
+
+      {/* Details for the tapped business. */}
+      {activePlace && (
+        <div className="absolute left-3 right-20 z-40 max-w-xs rounded-lg border border-border bg-surface/95 p-3 shadow-2xl backdrop-blur-xl top-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
+          <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-display text-sm font-extrabold text-foreground">
+                {activePlace.name}
+              </p>
+              {activePlace.primaryType && (
+                <p className="mt-0.5 truncate text-[0.62rem] font-bold uppercase tracking-[0.08em] text-signal">
+                  {activePlace.primaryType}
+                </p>
+              )}
+              {activePlace.rating !== null && (
+                <p className="mt-1 flex items-center gap-1 text-[0.68rem] font-bold text-foreground">
+                  <Star className="size-3 text-signal" aria-hidden />
+                  {activePlace.rating.toFixed(1)}
+                  {activePlace.ratingCount !== null && (
+                    <span className="font-medium text-muted-foreground">
+                      ({activePlace.ratingCount} reviews)
+                    </span>
+                  )}
+                </p>
+              )}
+              {activePlace.address && (
+                <p className="mt-1 text-[0.66rem] leading-snug text-muted-foreground">
+                  {activePlace.address}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setActivePlaceId(null)}
+              aria-label="Close place details"
+              className="rounded-full border border-border bg-surface p-1 text-muted-foreground hover:bg-surface-raised"
+            >
+              <X className="size-3" />
+            </button>
+          </div>
+        </div>
+      )}
+
+
 
 
 
