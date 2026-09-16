@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { TermsBody } from "@/components/legal/legal-content";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
