@@ -99,6 +99,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
     }
+    if (!agreed) {
+      toast.error("Accept the safety reminder before going live.");
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before going live.");
       return;
@@ -116,6 +120,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         body: body.trim(),
         place: place.trim(),
         hours,
+        audience,
         latitude: spot.latitude,
         longitude: spot.longitude,
       });
@@ -137,6 +142,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       <LiveBroadcastStage
         title={liveNow.title}
         place={liveNow.place}
+        initialFacing={facing}
+        initialMuted={!micOn}
         onEnd={() => {
           setLiveNow(null);
           toast.success("Broadcast ended");
