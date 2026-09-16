@@ -211,6 +211,72 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </label>
 
       <div>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Audience visibility</p>
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {BROADCAST_AUDIENCES.map((option) => {
+            const active = audience === option.id;
+            const Icon = option.id === "public" ? Radio : option.id === "followers" ? Users : Lock;
+            return (
+              <Button
+                key={option.id}
+                type="button"
+                variant="outline"
+                aria-pressed={active}
+                onClick={() => setAudience(option.id)}
+                className={`h-auto items-start justify-start gap-2 py-2.5 text-left text-xs font-extrabold ${
+                  active ? "border-signal bg-signal/10 text-signal" : ""
+                }`}
+              >
+                <Icon className="mt-0.5 size-3.5 shrink-0" />
+                <span className="flex flex-col gap-0.5">
+                  {option.label}
+                  <span
+                    className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${
+                      active ? "text-signal/80" : "text-muted-foreground"
+                    }`}
+                  >
+                    {option.hint}
+                  </span>
+                </span>
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Pre-broadcast checks</p>
+        <div className="mt-2 flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            aria-pressed={micOn}
+            aria-label={micOn ? "Mute microphone before going live" : "Unmute microphone"}
+            onClick={() => setMicOn((current) => !current)}
+            className={`size-11 rounded-full p-0 ${micOn ? "border-signal text-signal" : ""}`}
+          >
+            {micOn ? <Mic className="size-4" /> : <MicOff className="size-4" />}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            aria-label={
+              facing === "environment" ? "Switch to front camera" : "Switch to rear camera"
+            }
+            onClick={() => setFacing((c) => (c === "environment" ? "user" : "environment"))}
+            className="size-11 rounded-full border-signal p-0 text-signal"
+          >
+            <SwitchCamera className="size-4" />
+          </Button>
+          <p className="text-xs font-medium text-muted-foreground">
+            <Camera className="mr-1 inline size-3.5 text-signal" />
+            {facing === "environment" ? "Rear camera" : "Front camera"} ·{" "}
+            {micOn ? "Mic on" : "Mic muted"}
+          </p>
+        </div>
+      </div>
+
+      <div>
         <p className="text-xs font-bold uppercase text-muted-foreground">Lane</p>
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {COMMUNITY_CATEGORIES.map((option) => (
