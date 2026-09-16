@@ -8,6 +8,7 @@ import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { DARK_MAP_STYLES } from "@/lib/map-style";
+import { fetchMapAreaPlaces, type DiscoveredPlace } from "@/lib/places.functions";
 
 import { useBoosts } from "@/lib/boosts-store";
 import { fetchHunterStats } from "@/lib/gamification";
