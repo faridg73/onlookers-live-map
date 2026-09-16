@@ -120,6 +120,7 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
     lines.push({
       label: `${condition.label} (+${condition.credits})`,
       detail: condition.blurb,
+      multiplier: null,
       runningTotal: running,
     });
   }
