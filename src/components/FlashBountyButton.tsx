@@ -78,6 +78,15 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  /** Pro / Media Desk dispatch for outlets, investigators and pro users. */
+  const [proMode, setProMode] = useState(false);
+  const [proOptionIds, setProOptionIds] = useState<FlashProOptionId[]>([]);
+  /** Legal release and indemnification, mandatory for a Pro dispatch. */
+  const [proRelease, setProRelease] = useState(false);
+  const toggleProOption = (id: FlashProOptionId) =>
+    setProOptionIds((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
+    );
   /** Set once escrow is locked; renders the full-screen live camera stage. */
   const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
   /** Saved bounty id, so the live chat thread matches the posted bounty. */
