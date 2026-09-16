@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
+import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import {
   Dialog,
   DialogContent,
@@ -69,6 +70,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  /** Set once escrow is locked; renders the full-screen live camera stage. */
+  const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
   const toggleCondition = (id: FlashConditionId) =>
     setConditionIds((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
@@ -195,12 +198,14 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       });
       human.reset();
       setOpen(false);
+      setPosting(false);
       toast.success("Flash bounty is live", {
         description: `Onlookers near you were alerted. ${formatCredits(
           totalCredits,
         )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
       });
-      await navigate({ to: "/feed" });
+      // Straight into the live stage so the camera opens immediately.
+      setLiveSpot(spot);
     } catch (error) {
       human.reset();
       toast.error(error instanceof Error ? error.message : "Could not post the flash bounty.");
@@ -524,7 +529,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
-              {posting ? "Broadcasting…" : `Go live here, lock ${formatCredits(totalCredits)}`}
+              {posting
+                ? "Locking credits, starting camera…"
+                : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
             {short && (
               <Button
@@ -542,6 +549,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </div>
         </DialogContent>
       </Dialog>
+      {liveSpot && (
+        <LiveBroadcastStage
+          title={FLASH_TITLE}
+          place={liveSpot.formatted}
+          onEnd={() => {
+            setLiveSpot(null);
+            toast.success("Broadcast ended", {
+              description: "Your flash stream is saved to the feed.",
+            });
+            void navigate({ to: "/feed" });
+          }}
+        />
+      )}
       {phoneGate.gate}
     </>
   );

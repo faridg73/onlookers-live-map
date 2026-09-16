@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Loader2, Mic, MicOff, Radio, SwitchCamera, Square } from "lucide-react";
 import { toast } from "sonner";
 
@@ -113,7 +114,7 @@ export function LiveBroadcastStage({
 
   const clock = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
-  return (
+  const stage = (
     <div className="fixed inset-0 z-[80] flex flex-col bg-black">
       <div className="flex items-center gap-2 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-red-400">
@@ -178,4 +179,8 @@ export function LiveBroadcastStage({
       </div>
     </div>
   );
+
+  // Portalled to the body so a positioned/transformed parent (like the map
+  // overlay) can never clip or shrink the full-screen stage.
+  return typeof document === "undefined" ? stage : createPortal(stage, document.body);
 }
