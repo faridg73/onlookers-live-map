@@ -40,10 +40,14 @@ jobs:
 
       - name: Verify Android signing credentials
         env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'MZULa4hadPy3U65XWT+UsBxG7nzF+Imp' }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'onlooker-key' }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'MZULa4hadPy3U65XWT+UsBxG7nzF+Imp' }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          if [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ] || [ -z "$ANDROID_KEY_PASSWORD" ]; then
+            echo "::error::Missing Android signing secrets."
+            exit 1
+          fi
           if ! keytool -list \
             -keystore android/app/onlooker-upload.keystore \
             -storepass "$ANDROID_KEYSTORE_PASSWORD" \
@@ -56,9 +60,9 @@ jobs:
       - name: Build signed release bundle
         env:
           ANDROID_KEYSTORE_FILE: onlooker-upload.keystore
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'MZULa4hadPy3U65XWT+UsBxG7nzF+Imp' }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'onlooker-key' }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'MZULa4hadPy3U65XWT+UsBxG7nzF+Imp' }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew
           ./gradlew bundleRelease --no-daemon --stacktrace

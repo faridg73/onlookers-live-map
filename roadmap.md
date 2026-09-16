@@ -20,9 +20,11 @@
 - [x] Reduce Map marker clutter with zoom-aware POI visibility and smart bounty clusters
 - [ ] Resolve Android signing secret mismatch: encoded keystore was entered as the password; identify/reset the correct signing credentials.
 - [x] Reconnect Cloudflare connector with new scoped token, create zone, recreate all DNS records (A @/www proxied, Google + Lovable verification TXTs, SPF, MX, DKIM, notify Mailgun setup).
-- [ ] User switches nameservers at Namecheap to jule.ns.cloudflare.com / robert.ns.cloudflare.com; as of 2026-09-16 public DNS still shows dns1/dns2.registrar-servers.com, zone still pending.
+- [x] User switched nameservers and onlookerlive.com is active through Cloudflare.
 - [ ] After activation: enable Under Attack Mode (security_level) and a rate-limiting / WAF rule on the free plan.
 - [x] Closed a payout loophole: capture claims can no longer be self-approved; only the requester can approve.
-- [ ] Cloudflare zone still "pending" — rechecks automatically; DNSSEC validation failure detected (likely stale DS record / DNSSEC on at Namecheap) — user to disable DNSSEC at Namecheap
+- [x] Cloudflare zone activated and onlookerlive.com is serving as the primary domain.
 - [ ] Once zone active: enable Under Attack Mode + rate limiting rule
 - [x] Explain Onlooker accountability on Home, contrast standard apps in onboarding, and show real community earning impact.
+- [x] Publish the current web build to onlookerlive.com.
+- [x] Synchronize fresh Android v1.2 build 15 and iOS v1.2 build 30 release projects; automated signed store builds run from the configured release workflows.
