@@ -71,12 +71,26 @@ export function TermsBody() {
         </p>
       </Section>
 
-      <Section title="Content Ownership, Moderation &amp; Rights">
+      <Section title="User-Generated Content (UGC) License">
         <p>
-          <strong className="text-foreground">User content responsibility.</strong> Users retain
-          ownership of the videos and media they create, but grant Onlooker a worldwide,
-          non-exclusive, royalty-free, transferable license to store, host, display, and stream
-          uploaded content to fulfill platform operations.
+          <strong className="text-foreground">You keep ownership.</strong> Users retain full
+          ownership of the photos, videos, audio, text, and other materials they create and upload
+          (&ldquo;User-Generated Content&rdquo; or &ldquo;UGC&rdquo;).
+        </p>
+        <p>
+          <strong className="text-foreground">License you grant us.</strong> By uploading UGC you
+          grant Onlooker a worldwide, non-exclusive, royalty-free, transferable and sublicensable
+          license to host, store, reproduce, modify (for formatting, thumbnails, and compression),
+          publicly display, publicly perform, stream, and distribute that UGC in connection with
+          operating, providing, improving, and promoting the Platform. This license ends for a piece
+          of UGC when you delete it, except where it has already been delivered to a requester as
+          part of a completed bounty, shared by you with others, or retained as required by law.
+        </p>
+        <p>
+          <strong className="text-foreground">Your warranty.</strong> You represent and warrant that
+          you own or control all rights to your UGC, that it does not infringe any third
+          party&rsquo;s copyright, trademark, privacy, publicity, or other rights, and that you have
+          obtained any consents required by law for anyone identifiably depicted.
         </p>
         <p>
           <strong className="text-foreground">Zero-tolerance moderation &amp; content removal.</strong>{" "}
@@ -84,6 +98,57 @@ export function TermsBody() {
           or permanently delete any bounty, user profile, or uploaded video that violates these
           terms, depicts illegal acts, or exposes the Platform to legal risk, without prior notice
           or compensation.
+        </p>
+      </Section>
+
+      <Section title="Prohibited Content and Conduct">
+        <p>
+          <strong className="text-foreground">The following are strictly prohibited</strong> and
+          result in immediate content removal and possible permanent account termination:
+        </p>
+        <p>
+          (a) any content that is unlawful, or that depicts, promotes, or facilitates illegal
+          activity; (b) content involving minors in any sexual, exploitative, or dangerous context;
+          (c) violence, gore, torture, or content glorifying harm to people or animals; (d) hate
+          speech or content targeting individuals or groups based on race, ethnicity, religion,
+          gender, sexual orientation, disability, or similar protected characteristics; (e)
+          harassment, stalking, doxxing, threats, or intimidation of any person; (f) non-consensual
+          intimate imagery or recording of any person in a state of undress or where they have a
+          reasonable expectation of privacy; (g) fraud, scams, impersonation, or deceptive
+          practices, including impersonating law enforcement or officials; (h) spam, malware,
+          phishing, or attempts to compromise the Platform or other users&apos; accounts; (i)
+          infringement of intellectual-property rights, including recording or restreaming
+          ticketed, paywalled, or broadcast events; (j) content that endangers public safety,
+          including interference with emergency services.
+        </p>
+        <p>
+          We may report suspected illegal content to law enforcement and preserve related records
+          for that purpose.
+        </p>
+      </Section>
+
+      <Section title="Copyright and DMCA Takedown Policy">
+        <p>
+          <strong className="text-foreground">Reporting infringement.</strong> If you believe
+          content on Onlooker infringes your copyright, send a written notice containing: (1) your
+          physical or electronic signature; (2) identification of the copyrighted work claimed to be
+          infringed; (3) identification of the infringing material and its location on the Platform
+          (a link or the bounty/video reference); (4) your name, address, telephone number, and
+          email; (5) a statement that you have a good-faith belief the use is not authorized by the
+          copyright owner, its agent, or the law; and (6) a statement, under penalty of perjury,
+          that the information in your notice is accurate and that you are the copyright owner or
+          authorized to act on their behalf.
+        </p>
+        <p>
+          <strong className="text-foreground">Our response.</strong> Upon receipt of a valid notice
+          under 17 U.S.C. &sect;512, we will remove or disable access to the identified material,
+          notify the user who posted it, and provide them an opportunity to submit a
+          counter-notification. Where a valid counter-notification is received, we may restore the
+          material unless the complainant files a court action within the statutory period.
+        </p>
+        <p>
+          <strong className="text-foreground">Repeat infringers.</strong> Accounts of users who
+          repeatedly infringe copyright will be terminated.
         </p>
       </Section>
 
@@ -293,6 +358,41 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
           processing, and lodge a complaint with your local data protection authority. We do not
           sell or share personal information as those laws define the terms. Contact us to exercise
           any of these rights.
+        </p>
+      </Section>
+
+      <Section title="8A. California privacy rights (CCPA/CPRA)">
+        <p>
+          If you are a California resident, the California Consumer Privacy Act (as amended by the
+          CPRA) gives you the rights below, which you can exercise free of charge:
+        </p>
+        <p>
+          <strong className="text-foreground">Right to know.</strong> You may request the categories
+          and specific pieces of personal information we have collected about you, the sources, the
+          purposes, and the categories of third parties it is disclosed to. In the preceding 12
+          months we have collected: identifiers (name, email, user ID); internet or other electronic
+          network activity (sign-in timestamps, device/browser data); precise geolocation data
+          (while the app is in use); audio/visual information (the bounty media you upload); and
+          commercial information (wallet and transaction history).
+        </p>
+        <p>
+          <strong className="text-foreground">Right to delete and correct.</strong> You may request
+          deletion of your personal information, or correction of inaccurate information, subject to
+          legal exceptions (for example transaction records we must keep for tax and accounting).
+        </p>
+        <p>
+          <strong className="text-foreground">Right to opt out of sale or sharing.</strong> We do
+          not sell your personal information for money and we do not share it for cross-context
+          behavioral advertising, so there is nothing to opt out of. If this ever changes, a
+          &ldquo;Do Not Sell or Share My Personal Information&rdquo; control will be provided.
+        </p>
+        <p>
+          <strong className="text-foreground">Right to limit sensitive data and to
+          non-discrimination.</strong> Precise geolocation is a sensitive category and is used only
+          to provide the service you request; we do not use or disclose it for other purposes. We
+          will never discriminate against you for exercising any CCPA right. You may also designate
+          an authorized agent to make a request on your behalf; we will verify the request as the
+          law requires.
         </p>
       </Section>
 
