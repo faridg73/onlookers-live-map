@@ -28,3 +28,4 @@
 - [x] Explain Onlooker accountability on Home, contrast standard apps in onboarding, and show real community earning impact.
 - [x] Publish the current web build to onlookerlive.com.
 - [x] Synchronize fresh Android v1.2 build 15 and iOS v1.2 build 30 release projects; automated signed store builds run from the configured release workflows.
+- [x] Official trademark logo (onlooker-official-logo.png) — slogan recolored to neon lime
