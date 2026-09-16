@@ -53,7 +53,7 @@ export function NewCommunityPostDialog({
   /** Opens the live camera as soon as the sheet appears (Start Live Stream flow). */
   initialCamera?: boolean;
 }) {
-  const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "friends");
+  const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "general");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [place, setPlace] = useState("");
