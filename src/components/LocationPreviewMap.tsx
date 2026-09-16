@@ -8,7 +8,7 @@ import { ScrollableLane } from "@/components/ScrollableLane";
 import { geocodeAddress, reverseGeocode } from "@/lib/geocode.functions";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { DARK_MAP_STYLES, lemonPinIcon } from "@/lib/map-style";
+import { lemonPinIcon } from "@/lib/map-style";
 import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
 
 export type PickedLocation = { latitude: number; longitude: number; formatted: string };
@@ -82,13 +82,6 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          // Same dark grey skin as the main map so the lemon pin pops.
-          styles: [
-            ...DARK_MAP_STYLES,
-            { featureType: "poi", elementType: "labels", stylers: [{ visibility: "on" }] },
-            { featureType: "poi.business", elementType: "labels", stylers: [{ visibility: "on" }] },
-            { featureType: "transit", elementType: "labels", stylers: [{ visibility: "on" }] },
-          ],
         });
         const nextMarker = new maps.Marker({
           map: nextMap,

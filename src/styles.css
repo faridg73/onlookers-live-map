@@ -140,7 +140,7 @@
   --foreground: oklch(1 0 0); /* #FFFFFF */
   --surface: oklch(0.19125 0 0); /* #141414 elevated surface */
   --surface-raised: oklch(0.19125 0 0);
-  --map: #2b2b2b; /* dark grey basemap behind the Google tiles */
+  --map: oklch(1 0 0); /* neutral fallback behind standard Google map tiles */
   --signal: oklch(0.93071 0.22858 123.09); /* #CCFF00 neon lime */
   --signal-foreground: oklch(0.14 0.03 124);
   --cyan: oklch(0.75 0.18 195); /* electric cyan for high-visibility CTAs */
@@ -165,8 +165,8 @@
   --ring: oklch(0.93071 0.22858 123.09);
 
   /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
-  /* All map markers render in lemon green (the neon lime signal color) on the
-     dark grey basemap; tiers stay distinguishable by size and badges. */
+  /* All map markers render in the neon lime signal color; tiers stay
+     distinguishable by size and badges. */
   --pin-standard: var(--signal);
   --pin-medium: var(--signal);
   --pin-silver: var(--signal);
