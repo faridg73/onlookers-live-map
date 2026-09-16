@@ -248,30 +248,60 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
                 <MapPin className="size-4 shrink-0 text-signal" /> Location
               </label>
-              <PlaceSearchInput
-                value={locationQuery}
-                placeholder={locating ? "Finding your exact spot…" : "Search an address or landmark"}
-                onQueryChange={(query) => {
-                  setLocationQuery(query);
-                  if (query.trim() !== spot?.formatted.trim()) {
-                    setSpot(null);
-                    setLocateError(
-                      query.trim()
-                        ? "Choose a matching place from the suggestions or press Enter to search."
-                        : "Enter an address, landmark, or location name.",
-                    );
-                  }
-                }}
-                onPick={(place) => {
-                  setSpot({
-                    latitude: place.latitude,
-                    longitude: place.longitude,
-                    formatted: place.formatted,
-                  });
-                  setLocationQuery(place.formatted);
-                  setLocateError(null);
-                }}
-              />
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                <div className="min-w-0 flex-1">
+                  <PlaceSearchInput
+                    value={locationQuery}
+                    placeholder={locating ? "Finding your exact spot…" : "Search an address or landmark"}
+                    onQueryChange={(query) => {
+                      setLocationQuery(query);
+                      if (query.trim() !== spot?.formatted.trim()) {
+                        setSpot(null);
+                        setLocateError(
+                          query.trim()
+                            ? "Choose a matching place from the suggestions or press Enter to search."
+                            : "Enter an address, landmark, or location name.",
+                        );
+                      }
+                    }}
+                    onPick={(place) => {
+                      setSpot({
+                        latitude: place.latitude,
+                        longitude: place.longitude,
+                        formatted: place.formatted,
+                      });
+                      setLocationQuery(place.formatted);
+                      setLocateError(null);
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={findSpot}
+                  disabled={locating}
+                  className="h-11 shrink-0 gap-1.5 bg-signal px-3 text-xs font-extrabold leading-tight text-signal-foreground"
+                >
+                  <LocateFixed className={cn("size-4", locating && "animate-pulse")} />
+                  {locating ? "Locating…" : "Use My Current Location"}
+                </Button>
+              </div>
+
+              <div className="pt-1">
+                <LocationPreviewMap
+                  compact
+                  address={locationQuery}
+                  selectedLocation={spot}
+                  onPick={(place) => {
+                    setSpot({
+                      latitude: place.latitude,
+                      longitude: place.longitude,
+                      formatted: place.formatted,
+                    });
+                    setLocationQuery(place.formatted);
+                    setLocateError(null);
+                  }}
+                />
+              </div>
               {locateError && (
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="text-xs font-medium text-destructive">{locateError}</span>
