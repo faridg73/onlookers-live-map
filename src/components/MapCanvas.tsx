@@ -49,7 +49,7 @@ export function MapCanvas({
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const overlay = useRef<google.maps.OverlayView | null>(null);
-  const placePins = useRef<google.maps.Marker[]>([]);
+  
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
@@ -311,30 +311,7 @@ export function MapCanvas({
         };
       });
 
-  // Use Google's familiar default pins for discovered businesses rather than
-  // app-drawn black and green dot markers.
-  useEffect(() => {
-    placePins.current.forEach((pin) => pin.setMap(null));
-    placePins.current = [];
-    if (!ready || pinMode || !map.current) return;
-
-    placePins.current = places.map((place) => {
-      const pin = new google.maps.Marker({
-        map: map.current,
-        position: { lat: place.latitude, lng: place.longitude },
-        title: place.name,
-      });
-      pin.addListener("click", () =>
-        setActivePlaceId((current) => (current === place.id ? null : place.id)),
-      );
-      return pin;
-    });
-
-    return () => {
-      placePins.current.forEach((pin) => pin.setMap(null));
-      placePins.current = [];
-    };
-  }, [pinMode, places, ready]);
+  // Business pins removed per request — the map shows no location pins.
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
