@@ -196,6 +196,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       );
       return;
     }
+    if (proMode && !proRelease) {
+      toast.error("Accept the Pro / Media Desk legal release before dispatching.");
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before going live.");
       return;
