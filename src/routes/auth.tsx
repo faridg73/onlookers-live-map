@@ -299,27 +299,45 @@ function AuthScreen() {
         atmospheres, captured live on location.
       </p>
 
-      <label className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
+      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
         <input
+          id="accept-legal"
           type="checkbox"
+          required
           checked={accepted}
           onChange={(e) => setAccepted(e.target.checked)}
+          aria-describedby="accept-legal-text"
           className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
         />
-        <span>
-          By signing in, you agree to Onlooker&rsquo;s{" "}
-          <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">
+        <span id="accept-legal-text">
+          <label htmlFor="accept-legal" className="cursor-pointer">
+            I agree to Onlooker&rsquo;s{" "}
+          </label>
+          <button
+            type="button"
+            onClick={() => legal.open("terms")}
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
             Terms of Service
-          </Link>{" "}
+          </button>{" "}
           and{" "}
-          <Link to="/privacy" className="font-semibold text-foreground underline underline-offset-4">
+          <button
+            type="button"
+            onClick={() => legal.open("privacy")}
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
             Privacy Policy
-          </Link>
-          , acknowledging that you operate independently, assume all legal and physical liability,
-          will only record in lawful public spaces without trespassing, and hold Onlooker harmless
-          from any legal actions.
+          </button>
+          <label htmlFor="accept-legal" className="cursor-pointer">
+            , acknowledging that I operate independently, assume all legal and physical liability,
+            will only record in lawful public spaces without trespassing, and hold Onlooker harmless
+            from any legal actions.
+          </label>
         </span>
-      </label>
+      </div>
+
+      <LegalDialog doc={legal.doc} onClose={legal.close} />
+
 
       <button
         type="button"
