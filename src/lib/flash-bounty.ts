@@ -89,6 +89,54 @@ export const FLASH_CONDITIONS: FlashCondition[] = [
   },
 ];
 
+/** Professional add-ons, only available in Pro / Media Desk mode. */
+export type FlashProOptionId =
+  | "raw_archive"
+  | "news_alert"
+  | "extended_retention"
+  | "multi_angle";
+
+export type FlashProOption = {
+  id: FlashProOptionId;
+  label: string;
+  credits: number;
+  blurb: string;
+};
+
+export const FLASH_PRO_OPTIONS: FlashProOption[] = [
+  {
+    id: "raw_archive",
+    label: "Raw uncompressed archive stream",
+    credits: 100,
+    blurb: "Broadcast-grade master file, no re-encode",
+  },
+  {
+    id: "news_alert",
+    label: "Priority News Alert push",
+    credits: 200,
+    blurb: "Pushed to verified Pro onlookers first",
+  },
+  {
+    id: "extended_retention",
+    label: "Extended retention window (7 days)",
+    credits: 150,
+    blurb: "Footage kept available for a full week",
+  },
+  {
+    id: "multi_angle",
+    label: "Multi-angle request coordination",
+    credits: 300,
+    blurb: "Several onlookers dispatched to the same scene",
+  },
+];
+
+/** A professional dispatch pays double the standard base before add-ons. */
+export const PRO_DISPATCH_MULTIPLIER = 2;
+
+/** Legal wording the requester must accept before a Pro dispatch is locked. */
+export const PRO_RELEASE_NOTICE =
+  "I accept Onlooker LLC's Terms of Service and confirm that my organization indemnifies and holds Onlooker LLC harmless for the use, licensing, and republication of any footage captured on this professional dispatch, and waives liability claims arising from the capture.";
+
 export type FlashBountyOptions = {
   tierId: BountyTierId;
   customBase: number;
@@ -96,7 +144,22 @@ export type FlashBountyOptions = {
   conditionIds?: FlashConditionId[];
   /** Optional free-text directions for the onlooker who takes the bounty. */
   instructions?: string;
+  /** Pro / Media Desk dispatch: doubled base plus professional add-ons. */
+  proMode?: boolean;
+  proOptionIds?: FlashProOptionId[];
 };
+
+export function flashProOptionsFor(
+  ids: FlashProOptionId[] | undefined,
+): FlashProOption[] {
+  if (!ids?.length) return [];
+  return FLASH_PRO_OPTIONS.filter((o) => ids.includes(o.id));
+}
+
+/** Extra credits added by the ticked professional add-ons. */
+export function flashProCredits(ids: FlashProOptionId[] | undefined): number {
+  return flashProOptionsFor(ids).reduce((sum, o) => sum + o.credits, 0);
+}
 
 export function flashConditionsFor(ids: FlashConditionId[] | undefined): FlashCondition[] {
   if (!ids?.length) return [];
