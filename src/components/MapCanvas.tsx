@@ -109,12 +109,33 @@ export function MapCanvas({
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
         });
+        // Once the map settles, note the area on screen so real place data can load.
+        map.current.addListener("idle", () => {
+          const current = map.current;
+          const centre = current?.getCenter();
+          const bounds = current?.getBounds();
+          const currentZoom = current?.getZoom();
+          if (!centre || !bounds || typeof currentZoom !== "number") return;
+          const ne = bounds.getNorthEast();
+          const radius = Math.round(
+            maps.geometry?.spherical
+              ? maps.geometry.spherical.computeDistanceBetween(centre, ne)
+              : 1200,
+          );
+          setView({
+            lat: Number(centre.lat().toFixed(4)),
+            lng: Number(centre.lng().toFixed(4)),
+            radius: clamp(radius || 1200, 200, 5000),
+            zoom: currentZoom,
+          });
+        });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
           if (pinModeRef.current && at) {
             onMapPinRef.current?.({ lat: at.lat(), lng: at.lng() });
             return;
           }
+          setActivePlaceId(null);
           onSelect(null);
         });
         setReady(true);
