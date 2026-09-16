@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { LocateFixed, MapPin, Radar, Timer, Zap } from "lucide-react";
+import { BadgeCheck, LocateFixed, MapPin, Radar, ShieldCheck, Timer, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
@@ -29,6 +30,10 @@ import {
   FLASH_DURATION_MINUTES,
   FLASH_INSTRUCTIONS_MAX,
   FLASH_MIN_BOUNTY_CREDITS,
+  FLASH_PRO_OPTIONS,
+  flashProCredits,
+  PRO_DISPATCH_MULTIPLIER,
+  PRO_RELEASE_NOTICE,
   FLASH_TIERS,
   FLASH_TITLE,
   FLASH_WINDOW_MINUTES,
@@ -36,6 +41,7 @@ import {
   quoteFlashBounty,
   readFlashSpot,
   type FlashConditionId,
+  type FlashProOptionId,
   type FlashSpot,
   type FlashTierPreset,
 } from "@/lib/flash-bounty";
