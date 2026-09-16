@@ -117,11 +117,11 @@ export function MapCanvas({
           const currentZoom = current?.getZoom();
           if (!centre || !bounds || typeof currentZoom !== "number") return;
           const ne = bounds.getNorthEast();
-          const radius = Math.round(
-            maps.geometry?.spherical
-              ? maps.geometry.spherical.computeDistanceBetween(centre, ne)
-              : 1200,
-          );
+          // Rough metre distance from the centre to a corner of the view.
+          const latMetres = (ne.lat() - centre.lat()) * 111320;
+          const lngMetres =
+            (ne.lng() - centre.lng()) * 111320 * Math.cos((centre.lat() * Math.PI) / 180);
+          const radius = Math.round(Math.hypot(latMetres, lngMetres));
           setView({
             lat: Number(centre.lat().toFixed(4)),
             lng: Number(centre.lng().toFixed(4)),
