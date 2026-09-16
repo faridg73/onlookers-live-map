@@ -485,6 +485,110 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               </div>
             </div>
 
+            <div
+              className={cn(
+                "space-y-3 rounded-2xl border-2 p-3 transition-colors",
+                proMode ? "border-signal bg-signal/5" : "border-border bg-surface-raised",
+              )}
+            >
+              <label className="flex cursor-pointer items-center gap-3">
+                <Switch
+                  id="flash-pro-mode"
+                  checked={proMode}
+                  onCheckedChange={(next) => {
+                    setProMode(next);
+                    if (!next) {
+                      setProOptionIds([]);
+                      setProRelease(false);
+                    }
+                  }}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-1.5 text-sm font-extrabold text-foreground">
+                    <BadgeCheck className="size-4 shrink-0 text-signal" />
+                    Pro / Media Desk mode
+                  </span>
+                  <span className="block text-[0.65rem] font-medium text-muted-foreground">
+                    For media outlets, investigators and professional users. ×
+                    {PRO_DISPATCH_MULTIPLIER} priority dispatch rate.
+                  </span>
+                </span>
+              </label>
+
+              {proMode && (
+                <>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
+                      Select pro media options
+                    </p>
+                    <span className="font-display text-sm font-extrabold tabular-nums text-signal">
+                      +{flashProCredits(proOptionIds).toLocaleString()} Credits
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {FLASH_PRO_OPTIONS.map((option) => {
+                      const checked = proOptionIds.includes(option.id);
+                      return (
+                        <label
+                          key={option.id}
+                          className={cn(
+                            "flex cursor-pointer items-center gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                            checked
+                              ? "border-signal bg-signal/10"
+                              : "border-border bg-surface hover:border-signal/50",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleProOption(option.id)}
+                            className="size-4 shrink-0 accent-signal"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-xs font-extrabold text-foreground">
+                              {option.label}
+                            </span>
+                            <span className="block text-[0.65rem] font-medium text-muted-foreground">
+                              {option.blurb}
+                            </span>
+                          </span>
+                          <span className="shrink-0 font-display text-sm font-extrabold tabular-nums text-signal">
+                            +{option.credits}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  <label
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-xl border-2 p-2.5 transition-colors",
+                      proRelease
+                        ? "border-signal bg-signal/10"
+                        : "border-destructive/60 bg-surface",
+                    )}
+                  >
+                    <input
+                      id="flash-pro-release"
+                      type="checkbox"
+                      checked={proRelease}
+                      onChange={(e) => setProRelease(e.target.checked)}
+                      className="mt-0.5 size-4 shrink-0 accent-signal"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5 text-xs font-extrabold text-foreground">
+                        <ShieldCheck className="size-3.5 shrink-0 text-signal" />
+                        Legal release and indemnification (required)
+                      </span>
+                      <span className="block text-[0.65rem] font-medium leading-snug text-muted-foreground">
+                        {PRO_RELEASE_NOTICE}
+                      </span>
+                    </span>
+                  </label>
+                </>
+              )}
+            </div>
+
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
               <label
                 htmlFor="flash-instructions"
