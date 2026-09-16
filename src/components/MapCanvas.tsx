@@ -49,7 +49,7 @@ export function MapCanvas({
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const overlay = useRef<google.maps.OverlayView | null>(null);
-  const placePins = useRef<google.maps.Marker[]>([]);
+  
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
