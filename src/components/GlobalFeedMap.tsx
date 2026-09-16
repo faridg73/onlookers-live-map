@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { lemonPinIcon } from "@/lib/map-style";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
@@ -72,7 +71,6 @@ export function GlobalFeedMap({
       position: { lat: focus.lat, lng: focus.lng },
       title: focus.label,
       animation: google.maps.Animation.DROP,
-      icon: lemonPinIcon(google.maps),
     });
     return () => {
       focusMarker.current?.setMap(null);
@@ -89,7 +87,6 @@ export function GlobalFeedMap({
         map: map.current,
         position: { lat: clip.latitude!, lng: clip.longitude! },
         title: clip.title,
-        icon: lemonPinIcon(google.maps),
       });
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;

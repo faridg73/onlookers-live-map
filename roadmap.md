@@ -30,4 +30,4 @@
 - [x] Synchronize fresh Android v1.2 build 15 and iOS v1.2 build 30 release projects; automated signed store builds run from the configured release workflows.
 - [x] Official trademark logo (onlooker-official-logo.png) — slogan recolored to neon lime
 - [x] Restore standard Google Maps styling and roll out the official square eye logo across web and mobile.
-- [ ] Remove custom black and green dot markers from the map without changing its interface or app behavior.
+- [x] Remove custom black and green dot markers from the map without changing its interface or app behavior.

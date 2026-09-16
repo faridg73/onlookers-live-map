@@ -8,7 +8,6 @@ import { ScrollableLane } from "@/components/ScrollableLane";
 import { geocodeAddress, reverseGeocode } from "@/lib/geocode.functions";
 import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import { lemonPinIcon } from "@/lib/map-style";
 import { fetchNearbyPlaces, type NearbyPlace } from "@/lib/places.functions";
 
 export type PickedLocation = { latitude: number; longitude: number; formatted: string };
@@ -87,7 +86,6 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
           map: nextMap,
           position: FALLBACK,
           draggable: true,
-          icon: lemonPinIcon(maps),
         });
         map.current = nextMap;
         marker.current = nextMarker;

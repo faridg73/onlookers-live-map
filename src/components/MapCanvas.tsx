@@ -49,6 +49,7 @@ export function MapCanvas({
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const overlay = useRef<google.maps.OverlayView | null>(null);
+  const placePins = useRef<google.maps.Marker[]>([]);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
@@ -316,6 +317,31 @@ export function MapCanvas({
         };
       });
 
+  // Use Google's familiar default pins for discovered businesses rather than
+  // app-drawn black and green dot markers.
+  useEffect(() => {
+    placePins.current.forEach((pin) => pin.setMap(null));
+    placePins.current = [];
+    if (!ready || pinMode || !map.current) return;
+
+    placePins.current = places.map((place) => {
+      const pin = new google.maps.Marker({
+        map: map.current,
+        position: { lat: place.latitude, lng: place.longitude },
+        title: place.name,
+      });
+      pin.addListener("click", () =>
+        setActivePlaceId((current) => (current === place.id ? null : place.id)),
+      );
+      return pin;
+    });
+
+    return () => {
+      placePins.current.forEach((pin) => pin.setMap(null));
+      placePins.current = [];
+    };
+  }, [pinMode, places, ready]);
+
   return (
     <div className="absolute inset-0 overflow-hidden bg-map">
       <div
@@ -365,36 +391,11 @@ export function MapCanvas({
           ) : (
             <span className="relative flex size-5 items-center justify-center">
               <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
-              <span
-                className="size-3.5 rounded-full border-2 border-black/60 shadow-lg"
-                style={{ backgroundColor: "var(--signal)" }}
-              />
+              <span className="size-3.5 rounded-full border-2 border-foreground/80 bg-cat-vehicles shadow-lg" />
             </span>
           )}
         </div>
       )}
-
-      {/* Real businesses in view: app-drawn labels, no Google POI clicks. */}
-      {!pinMode &&
-        placeMarkers.map(({ place, pixel }) => (
-          <button
-            key={place.id}
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              setActivePlaceId(activePlaceId === place.id ? null : place.id);
-            }}
-            className="absolute flex max-w-[9rem] -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-border bg-surface/85 px-1.5 py-0.5 text-[0.58rem] font-bold text-foreground shadow backdrop-blur transition-colors hover:bg-surface-raised"
-            style={{ left: pixel.left, top: pixel.top }}
-            aria-label={`${place.name}${place.rating ? `, rated ${place.rating}` : ""}`}
-          >
-            <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--signal)" }} />
-            <span className="truncate">{place.name}</span>
-            {place.rating !== null && (
-              <span className="shrink-0 tabular-nums text-signal">{place.rating.toFixed(1)}</span>
-            )}
-          </button>
-        ))}
 
       {/* Details for the tapped business. */}
       {activePlace && (
