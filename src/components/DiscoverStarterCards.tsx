@@ -19,9 +19,9 @@ const STARTERS: Array<{
     Icon: CalendarDays,
   },
   {
-    category: "tutorials",
-    title: "Teach a useful skill live",
-    note: "Share a quick lesson and let nearby people watch or join in.",
+    category: "general",
+    title: "Share a skill or a local view live",
+    note: "Go live with something worth showing and let nearby people watch or join in.",
     image: tutorialImage,
     Icon: BookOpen,
   },

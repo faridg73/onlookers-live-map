@@ -2,16 +2,16 @@ import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
 
-/** The community categories that open the Discover hub. */
+/** The broadcast lanes that open the Discover hub. */
 export type CommunityCategory =
-  | "friends"
-  | "meetups"
-  | "tutorials"
-  | "language"
+  | "breaking"
   | "culture"
-  | "realestate"
+  | "traffic"
   | "markets"
-  | "events";
+  | "meetups"
+  | "arts"
+  | "sports"
+  | "general";
 
 export type CommunityCategoryDef = {
   id: CommunityCategory;
@@ -26,113 +26,62 @@ export type CommunityCategoryDef = {
 
 export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
   {
-    id: "friends",
-    label: "Find Friends",
-    blurb: "New in town or just up for company",
-    gradient: "linear-gradient(135deg,#CCFF00 0%,#0F0F0F 70%)",
-    tags: ["new in town", "coffee", "walk", "gym", "20s", "30s"],
+    id: "breaking",
+    label: "Breaking News",
+    blurb: "What's happening, as it happens",
+    gradient: "linear-gradient(135deg,#FF5C5C 0%,#0F0F0F 72%)",
+    tags: ["happening now", "accident", "weather", "road closure", "protest", "fire"],
     iceBreakers: [
       {
-        title: "New here, who wants coffee?",
-        body: "Just moved in and looking for a couple of easy-going people to grab coffee with this week.",
+        title: "Something is happening on my block",
+        body: "Live from the scene, showing what's visible from a safe public spot and which streets are affected.",
       },
       {
-        title: "Sunday morning walk crew",
-        body: "Easy 5k loop, slow pace, good chat. Everyone welcome.",
-      },
-    ],
-  },
-  {
-    id: "meetups",
-    label: "Meetups",
-    blurb: "Something happening, right now",
-    gradient: "linear-gradient(135deg,#7CFF6B 0%,#0F0F0F 72%)",
-    tags: ["tonight", "food", "music", "sports", "outdoors", "free"],
-    iceBreakers: [
-      {
-        title: "Pickup game in an hour",
-        body: "Two players short. Bring water, we play until the lights go off.",
-      },
-      {
-        title: "Street food crawl tonight",
-        body: "Three stops, cash only, meet by the main entrance.",
-      },
-    ],
-  },
-  {
-    id: "tutorials",
-    label: "Tutorials",
-    blurb: "Show someone how it's done",
-    gradient: "linear-gradient(135deg,#FFD166 0%,#0F0F0F 72%)",
-    tags: ["beginner", "cooking", "music", "repair", "tech", "10 min"],
-    iceBreakers: [
-      {
-        title: "I'll show you how to fix a flat",
-        body: "Ten minutes, bring your bike, you'll never pay for it again.",
-      },
-      {
-        title: "First three guitar chords, live",
-        body: "Hop on the stream with a guitar and we'll get you playing a song today.",
-      },
-    ],
-  },
-  {
-    id: "language",
-    label: "Language Exchange",
-    blurb: "Half your language, half mine",
-    gradient: "linear-gradient(135deg,#6BD5FF 0%,#0F0F0F 72%)",
-    tags: ["english", "spanish", "french", "japanese", "beginner", "fluent"],
-    iceBreakers: [
-      {
-        title: "Spanish ↔ English, 30/30",
-        body: "Half an hour each way, no textbooks, we just talk about our week.",
-      },
-      {
-        title: "Practice ordering food with me",
-        body: "Live from a real counter, you order, I translate, we both learn.",
+        title: "Emergency crews just arrived nearby",
+        body: "Streaming the response from the sidewalk, including which roads are closed and the safest way around.",
       },
     ],
   },
   {
     id: "culture",
-    label: "Local Culture",
-    blurb: "The version tourists never see",
+    label: "Community & Culture",
+    blurb: "Festivals, parades and neighborhood life",
     gradient: "linear-gradient(135deg,#FF8FA3 0%,#0F0F0F 72%)",
-    tags: ["market", "festival", "history", "hidden gem", "street art"],
+    tags: ["street festival", "parade", "local history", "hidden gem", "street art", "food scene"],
     iceBreakers: [
       {
-        title: "Market walkthrough, live",
-        body: "I'll walk the stalls and show you what locals actually buy.",
+        title: "Festival from the inside",
+        body: "Streaming the procession from the good side of the street, with the best viewing corners.",
       },
       {
-        title: "Festival from the inside",
-        body: "Streaming the procession from the good side of the street.",
+        title: "Hidden gem walkthrough",
+        body: "Showing a spot most people walk right past, and why it's worth the detour.",
       },
     ],
   },
   {
-    id: "realestate",
-    label: "Real Estate & Construction",
-    blurb: "Properties, projects and neighborhoods",
-    gradient: "linear-gradient(135deg,#9CE0FF 0%,#0F0F0F 72%)",
-    tags: ["open houses", "home renovations", "commercial sites", "neighborhood tours"],
+    id: "traffic",
+    label: "Traffic & Public Updates",
+    blurb: "Commutes, closures and transit status",
+    gradient: "linear-gradient(135deg,#6BD5FF 0%,#0F0F0F 72%)",
+    tags: ["commute", "road work", "transit", "parking", "detour"],
     iceBreakers: [
       {
-        title: "Open house walkthrough this afternoon",
-        body: "Streaming room by room, ask me to check the light, storage or any finish up close.",
+        title: "Rush-hour check on the main corridor",
+        body: "Live lane-by-lane look at the backup and where it finally opens up.",
       },
       {
-        title: "Renovation progress check",
-        body: "Walking through the latest work, materials and details that are still being completed.",
+        title: "Station platform status right now",
+        body: "Showing how crowded it is, whether the delay boards are accurate and the alternate options.",
       },
     ],
   },
   {
     id: "markets",
-    label: "Local Markets & Yard Sales",
+    label: "Markets & Yard Sales",
     blurb: "Secondhand finds and street-side sellers",
     gradient: "linear-gradient(135deg,#FFE066 0%,#0F0F0F 72%)",
-    tags: ["flea markets", "garage sales", "street vendors", "antique fairs"],
+    tags: ["flea markets", "garage sales", "farmers markets", "street vendors", "antique fairs"],
     iceBreakers: [
       {
         title: "Flea market finds, live from the tables",
@@ -145,19 +94,70 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
     ],
   },
   {
-    id: "events",
-    label: "Events & Performances",
-    blurb: "Shows, buskers and big nights out",
+    id: "meetups",
+    label: "Meetups & Social",
+    blurb: "Something happening, right now",
+    gradient: "linear-gradient(135deg,#7CFF6B 0%,#0F0F0F 72%)",
+    tags: ["tonight", "food", "new in town", "music", "outdoors", "free"],
+    iceBreakers: [
+      {
+        title: "Street food crawl tonight",
+        body: "Three stops, cash only, meet by the main entrance.",
+      },
+      {
+        title: "New here, who wants coffee?",
+        body: "Just moved in and looking for a couple of easy-going people to grab coffee with this week.",
+      },
+    ],
+  },
+  {
+    id: "arts",
+    label: "Arts & Performances",
+    blurb: "Shows, buskers and gallery nights",
     gradient: "linear-gradient(135deg,#FF9E6B 0%,#0F0F0F 72%)",
-    tags: ["live music", "street buskers", "festivals", "spontaneous gatherings"],
+    tags: ["live music", "street buskers", "theater", "gallery walk", "open mic"],
     iceBreakers: [
       {
         title: "Street busker on the main plaza right now",
         body: "Great set, decent crowd, streaming a few minutes from the footpath.",
       },
       {
-        title: "Festival opening before the crowd arrives",
-        body: "Showing stages, food lines and the easiest path through the grounds.",
+        title: "Gallery walk before the crowds arrive",
+        body: "A quiet lap through the open rooms with the standout pieces up close.",
+      },
+    ],
+  },
+  {
+    id: "sports",
+    label: "Sports & Recreational",
+    blurb: "Pickup games, match days and group workouts",
+    gradient: "linear-gradient(135deg,#9CE0FF 0%,#0F0F0F 72%)",
+    tags: ["pickup game", "match day", "running", "skate", "fitness"],
+    iceBreakers: [
+      {
+        title: "Pickup game in an hour",
+        body: "Two players short. Bring water, we play until the lights go off.",
+      },
+      {
+        title: "Match day scene outside the stadium",
+        body: "Showing the entry lines, the lot and the fan atmosphere before kickoff.",
+      },
+    ],
+  },
+  {
+    id: "general",
+    label: "General",
+    blurb: "Anything else worth showing live",
+    gradient: "linear-gradient(135deg,#CCFF00 0%,#0F0F0F 70%)",
+    tags: ["just looking around", "ask me anything", "day in the life", "scenic views"],
+    iceBreakers: [
+      {
+        title: "Live wander through the neighborhood",
+        body: "No agenda, just showing what's around right now and answering questions as they come in.",
+      },
+      {
+        title: "Ask a local anything",
+        body: "Live from the main square, answering questions about the area in real time.",
       },
     ],
   },
