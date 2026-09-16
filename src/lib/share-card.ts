@@ -143,7 +143,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
   // Footer wordmark + invite
   ctx.fillStyle = BRAND;
   ctx.font = "800 56px sans-serif";
-  ctx.fillText("ONLOOKER LIVE", pad, height - 220);
+  ctx.fillText("ONLOOKER LLC", pad, height - 220);
   ctx.fillStyle = "rgba(255,255,255,0.78)";
   ctx.font = "600 36px sans-serif";
   ctx.fillText("See what's happening near you, right now.", pad, height - 146);
