@@ -26,6 +26,8 @@ export function LiveBroadcastStage({
   onEnd,
   initialFacing = "environment",
   initialMuted = false,
+  requestKey = null,
+  instructions = null,
 }: {
   title: string;
   place: string;
@@ -34,7 +36,12 @@ export function LiveBroadcastStage({
   initialFacing?: "environment" | "user";
   /** Mic state chosen in the pre-stream checks. */
   initialMuted?: boolean;
+  /** Bounty this stream belongs to; unlocks the live chat with the other side. */
+  requestKey?: string | null;
+  /** Directions the poster left for the onlooker. */
+  instructions?: string | null;
 }) {
+  const [chatOpen, setChatOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
