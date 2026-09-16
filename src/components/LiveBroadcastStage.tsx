@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Loader2, Mic, MicOff, Radio, SwitchCamera, Square } from "lucide-react";
 import { toast } from "sonner";
 
@@ -178,4 +179,8 @@ export function LiveBroadcastStage({
       </div>
     </div>
   );
+
+  // Portalled to the body so a positioned/transformed parent (like the map
+  // overlay) can never clip or shrink the full-screen stage.
+  return typeof document === "undefined" ? stage : createPortal(stage, document.body);
 }
