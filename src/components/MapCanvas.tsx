@@ -94,7 +94,6 @@ export function MapCanvas({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};

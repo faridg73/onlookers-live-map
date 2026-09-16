@@ -1,13 +1,5 @@
 /// <reference types="google.maps" />
 
-/**
- * Permanent shared Google Maps skin. Every map surface imports this single
- * configuration so Google cannot fall back to its light roadmap appearance.
- * Styling only: native map gestures, controls, map data, and markers are
- * intentionally unaffected.
- */
-export const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [];
-
 /** Lemon-green teardrop pin for native Google markers (pickers, global feed). */
 export function lemonPinIcon(maps: typeof google.maps): google.maps.Symbol {
   return {

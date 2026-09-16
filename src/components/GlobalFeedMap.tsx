@@ -46,7 +46,6 @@ export function GlobalFeedMap({
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          
         });
         setMapReady(true);
       })

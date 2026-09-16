@@ -82,8 +82,6 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
           clickableIcons: false,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          // Same dark grey skin as the main map so the lemon pin pops.
-          
         });
         const nextMarker = new maps.Marker({
           map: nextMap,
