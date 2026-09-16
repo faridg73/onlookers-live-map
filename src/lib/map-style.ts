@@ -1,24 +1,31 @@
 /// <reference types="google.maps" />
 
 /**
- * Shared Google Maps skin: a dark grey basemap so every Onlooker marker in
- * lemon green (#CCFF00 — the same neon lime as the app's --signal token) pops
- * with maximum contrast.
+ * Permanent shared Google Maps skin. Every map surface imports this single
+ * configuration so Google cannot fall back to its light roadmap appearance.
+ * Styling only: native map gestures, controls, map data, and markers are
+ * intentionally unaffected.
  */
 export const DARK_MAP_STYLES: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#2b2b2b" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#9a9a9a" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#2b2b2b" }] },
-  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#2b2b2b" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#1b1b1b" }] },
-  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#6f6f6f" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#3d3d3d" }] },
-  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#2b2b2b" }] },
+  { elementType: "geometry", stylers: [{ color: "#252525" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#a3a3a3" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#1a1a1a" }] },
+  { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#4a4a4a" }] },
+  { featureType: "administrative.land_parcel", stylers: [{ visibility: "off" }] },
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#252525" }] },
+  { featureType: "poi", elementType: "geometry", stylers: [{ color: "#292929" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#858585" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263329" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#3b3b3b" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#202020" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#b3b3b3" }] },
   { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#4a4a4a" }] },
-  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#3d3d3d" }] },
-  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#3d3d3d" }] },
-  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#7a7a7a" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#26332a" }] },
+  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#303030" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#303030" }] },
+  { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#8f8f8f" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#151515" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#6f6f6f" }] },
 ];
 
 /** Lemon-green teardrop pin for native Google markers (pickers, global feed). */
