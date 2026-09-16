@@ -219,6 +219,18 @@ export function LiveBroadcastStage({
             <SwitchCamera className="size-5" />
           </button>
         )}
+        {requestKey && (
+          <button
+            type="button"
+            aria-label={chatOpen ? "Hide live chat" : "Open live chat"}
+            onClick={() => setChatOpen((v) => !v)}
+            className={`inline-flex size-12 items-center justify-center rounded-full border ${
+              chatOpen ? "border-signal bg-signal/20 text-signal" : "border-white/40 text-white"
+            }`}
+          >
+            <MessageCircle className="size-5" />
+          </button>
+        )}
       </div>
     </div>
   );
