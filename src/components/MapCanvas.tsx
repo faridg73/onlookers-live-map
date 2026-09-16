@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const DETAIL_ZOOM = 14;
+/** Real business names and ratings only load once the map is this close in. */
+const PLACE_ZOOM = 15;
 
 type Pixel = { left: number; top: number };
 
