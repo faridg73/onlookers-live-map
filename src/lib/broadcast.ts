@@ -18,6 +18,19 @@ export const BROADCAST_WINDOWS = [
   { hours: 1, label: "1-Hour", tier: "Extended Coverage" },
 ] as const;
 
+/** Who can see a broadcast while it is live. */
+export type BroadcastAudience = "public" | "followers" | "private";
+
+export const BROADCAST_AUDIENCES = [
+  { id: "public", label: "Public", hint: "Everyone on the map" },
+  { id: "followers", label: "Followers only", hint: "People who follow you" },
+  { id: "private", label: "Private", hint: "Only you, for testing" },
+] as const satisfies ReadonlyArray<{ id: BroadcastAudience; label: string; hint: string }>;
+
+/** Community guidelines line shown right above the go-live button. */
+export const BROADCAST_SAFETY_NOTICE =
+  "By going live, you agree to follow safety rules. No illegal activity or driving violations.";
+
 /** Level at which a creator can broadcast for free without a track record badge. */
 export const BROADCAST_MIN_LEVEL = 2;
 
@@ -70,16 +83,18 @@ export function startFreeBroadcast(input: {
   body: string;
   place: string;
   hours: number;
+  audience?: BroadcastAudience;
   latitude?: number | null;
   longitude?: number | null;
   mediaPath?: string | null;
 }): Promise<string> {
+  const audience = input.audience ?? "public";
   return createCommunityPost({
     category: input.category,
     title: input.title,
     body: input.body,
     place: input.place,
-    tags: ["live", "free broadcast"],
+    tags: ["live", "free broadcast", `audience:${audience}`],
     mediaPath: input.mediaPath ?? null,
     isFlash: true,
     flashHours: input.hours,
