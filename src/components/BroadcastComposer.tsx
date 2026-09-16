@@ -47,6 +47,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [category, setCategory] = useState<CommunityCategory>("meetups");
   const [hours, setHours] = useState<number>(1);
+  const [audience, setAudience] = useState<BroadcastAudience>("public");
+  /** Pre-stream hardware checks carried into the live stage. */
+  const [micOn, setMicOn] = useState(true);
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [agreed, setAgreed] = useState(false);
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
