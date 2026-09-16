@@ -13,9 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 /** How long a free broadcast stays on the feed, in hours. */
 export const BROADCAST_WINDOWS = [
-  { hours: 0.5, label: "30 min" },
-  { hours: 1, label: "1 hour" },
-  { hours: 3, label: "3 hours" },
+  { hours: 0.25, label: "15 min", tier: "Quick Snap" },
+  { hours: 0.5, label: "30 min", tier: "Standard Broadcast" },
+  { hours: 1, label: "1-Hour", tier: "Extended Coverage" },
 ] as const;
 
 /** Level at which a creator can broadcast for free without a track record badge. */
