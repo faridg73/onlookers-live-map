@@ -65,6 +65,11 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   );
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
+  const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  const toggleCondition = (id: FlashConditionId) =>
+    setConditionIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
   const human = useHumanCheck("flash-bounty");
   // Credits only leave a wallet once the number behind the account is confirmed.
   const phoneGate = usePhoneGate("before credits go into escrow");
