@@ -181,7 +181,8 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
     weatherMultiplier: 1,
   });
   const picked = flashConditionsFor(options.conditionIds);
-  if (!picked.length) return base;
+  const proPicked = options.proMode ? flashProOptionsFor(options.proOptionIds) : [];
+  if (!picked.length && !options.proMode) return base;
   let running = base.total;
   const lines = [...base.lines];
   for (const condition of picked) {
@@ -192,6 +193,24 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
       multiplier: null,
       runningTotal: running,
     });
+  }
+  if (options.proMode) {
+    running = Math.round(running * PRO_DISPATCH_MULTIPLIER);
+    lines.push({
+      label: "Pro / Media Desk dispatch",
+      detail: `×${PRO_DISPATCH_MULTIPLIER} professional priority rate`,
+      multiplier: PRO_DISPATCH_MULTIPLIER,
+      runningTotal: running,
+    });
+    for (const option of proPicked) {
+      running += option.credits;
+      lines.push({
+        label: `${option.label} (+${option.credits})`,
+        detail: option.blurb,
+        multiplier: null,
+        runningTotal: running,
+      });
+    }
   }
   return { ...base, lines, total: running };
 }
