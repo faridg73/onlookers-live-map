@@ -52,7 +52,11 @@ export const FLASH_TIERS: FlashTierPreset[] = [
 ];
 
 export const DEFAULT_FLASH_TIER: BountyTierId = "fast_catch";
-export const DEFAULT_CUSTOM_BASE = 100;
+/** The absolute floor: 40 Credits = $10.00 at 4 Credits per $1. */
+export const DEFAULT_CUSTOM_BASE = FLASH_MIN_BOUNTY_CREDITS;
+
+/** Cap on the optional free-text directions the poster can leave. */
+export const FLASH_INSTRUCTIONS_MAX = 400;
 
 /** Optional extras the requester can tick, each adding its own credits. */
 export type FlashConditionId = "rain_storm" | "night_view" | "landmark";
@@ -90,6 +94,8 @@ export type FlashBountyOptions = {
   customBase: number;
   /** Ticked add-on conditions, each adding its credits to the escrow total. */
   conditionIds?: FlashConditionId[];
+  /** Optional free-text directions for the onlooker who takes the bounty. */
+  instructions?: string;
 };
 
 export function flashConditionsFor(ids: FlashConditionId[] | undefined): FlashCondition[] {
