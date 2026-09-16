@@ -20,3 +20,4 @@
 - [x] Reduce Map marker clutter with zoom-aware POI visibility and smart bounty clusters
 - [ ] Resolve Android signing secret mismatch: encoded keystore was entered as the password; identify/reset the correct signing credentials.
 - [ ] Finish Cloudflare protection for onlookerlive.com after the site is added and the connector token has zone security permissions.
+- [ ] Reconnect Cloudflare connector with new scoped token, then: create zone, recreate DNS records, get nameservers set at Namecheap, enable Under Attack Mode + rate limiting.
