@@ -258,7 +258,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Where you are</p>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Location tag</p>
+        <p className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-signal/40 bg-signal/10 px-2.5 py-1 text-xs font-extrabold text-signal">
+          <MapPin className="size-3.5 shrink-0" />
+          <span className="truncate">{place.trim() || "No spot picked yet"}</span>
+        </p>
         <div className="mt-2 flex gap-2">
           <input
             value={place}
@@ -291,9 +295,24 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
 
       {human.widget}
 
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(event) => setAgreed(event.target.checked)}
+          className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--signal))]"
+        />
+        <span className="text-xs font-medium leading-snug text-muted-foreground">
+          <span className="font-extrabold uppercase tracking-[0.12em] text-foreground">
+            Safety reminder
+          </span>{" "}
+          {BROADCAST_SAFETY_NOTICE}
+        </span>
+      </label>
+
       <Button
         type="button"
-        disabled={posting}
+        disabled={posting || !agreed}
         onClick={() => void goLive()}
         className="h-12 w-full gap-2 text-sm font-extrabold uppercase tracking-[0.14em]"
       >
