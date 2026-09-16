@@ -274,6 +274,55 @@ export const fetchNearbyPlaces = createServerFn({ method: "POST" })
     });
   });
 
+const mapAreaSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  /** Radius of the visible map area, capped so one view stays cheap. */
+  radiusMeters: z.number().min(50).max(5000).default(1200),
+  maxResults: z.number().int().min(1).max(20).default(20),
+});
+
+/**
+ * Real businesses inside the current map view, with names, ratings and
+ * addresses, so panning or searching shows what is actually there.
+ */
+export const fetchMapAreaPlaces = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => mapAreaSchema.parse(data))
+  .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+    await enforceRateLimit(RATE_LIMITS.placesSearch);
+    const creds = credentials();
+    if (!creds) return [];
+
+    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${creds.lovableKey}`,
+        "X-Connection-Api-Key": creds.mapsKey,
+        "Content-Type": "application/json",
+        "X-Goog-FieldMask": DISCOVERY_FIELDS,
+      },
+      body: JSON.stringify({
+        maxResultCount: data.maxResults,
+        rankPreference: "POPULARITY",
+        locationRestriction: {
+          circle: {
+            center: { latitude: data.latitude, longitude: data.longitude },
+            radius: data.radiusMeters,
+          },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(`[places] map area search failed [${response.status}]: ${body}`);
+      return [];
+    }
+
+    const payload = (await response.json()) as { places?: RawPlace[] };
+    return (payload.places ?? []).flatMap(toDiscovered);
+  });
+
 const photoSchema = z.object({
   photoNames: z.array(z.string().min(5).max(600)).min(1).max(16),
   maxWidthPx: z.number().int().min(120).max(1200).default(480),
