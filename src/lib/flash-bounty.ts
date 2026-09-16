@@ -268,6 +268,19 @@ export function postFlashBounty(
     ...(picked.length
       ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
       : []),
+    ...(resolved.proMode
+      ? [
+          "Tier: Pro / Media Desk professional dispatch",
+          ...(proPicked.length
+            ? [
+                `Pro options: ${proPicked
+                  .map((o) => `${o.label} (+${o.credits})`)
+                  .join(", ")}`,
+              ]
+            : []),
+          "Legal release and indemnification accepted by the requesting desk.",
+        ]
+      : []),
     ...(resolved.instructions ? [`Instructions: ${resolved.instructions}`] : []),
     "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
   ].join("\n");
