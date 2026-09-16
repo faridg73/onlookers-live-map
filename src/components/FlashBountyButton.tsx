@@ -529,7 +529,9 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               disabled={posting}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
             >
-              {posting ? "Broadcasting…" : `Go live here, lock ${formatCredits(totalCredits)}`}
+              {posting
+                ? "Locking credits, starting camera…"
+                : `Go live here, lock ${formatCredits(totalCredits)}`}
             </Button>
             {short && (
               <Button
