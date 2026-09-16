@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 import { PhoneVerification } from "@/components/PhoneVerification";
+import { LegalDialog, useLegalDialog } from "@/components/legal/LegalDialog";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -43,6 +44,8 @@ function AuthScreen() {
   const [verifying, setVerifying] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  // Terms and Privacy open in a popup so a half-filled form is never lost.
+  const legal = useLegalDialog();
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
