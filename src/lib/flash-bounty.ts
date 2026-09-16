@@ -164,14 +164,18 @@ export function postFlashBounty(
       FLASH_MIN_BOUNTY_CREDITS,
       Math.round(options.customBase ?? DEFAULT_CUSTOM_BASE),
     ),
+    conditionIds: options.conditionIds ?? [],
   };
   const quote = quoteFlashBounty(resolved);
-
+  const picked = flashConditionsFor(resolved.conditionIds);
 
   const details = [
     "Format: Go Live Now (flash bounty)",
     `Requested capture: ${FLASH_DURATION_MINUTES} min live session`,
     "Camera: Wide establishing · Vertical",
+    ...(picked.length
+      ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
+      : []),
     "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
   ].join("\n");
 
