@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
+import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import {
   Dialog,
   DialogContent,
@@ -546,6 +547,19 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </div>
         </DialogContent>
       </Dialog>
+      {liveSpot && (
+        <LiveBroadcastStage
+          title={FLASH_TITLE}
+          place={liveSpot.formatted}
+          onEnd={() => {
+            setLiveSpot(null);
+            toast.success("Broadcast ended", {
+              description: "Your flash stream is saved to the feed.",
+            });
+            void navigate({ to: "/feed" });
+          }}
+        />
+      )}
       {phoneGate.gate}
     </>
   );
