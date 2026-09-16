@@ -21,3 +21,4 @@
 - [ ] Resolve Android signing secret mismatch: encoded keystore was entered as the password; identify/reset the correct signing credentials.
 - [ ] Finish Cloudflare protection for onlookerlive.com after the site is added and the connector token has zone security permissions.
 - [ ] Reconnect Cloudflare connector with new scoped token, then: create zone, recreate DNS records, get nameservers set at Namecheap, enable Under Attack Mode + rate limiting.
+- [ ] Avoid repeated Cloudflare approval popups by guiding the remaining DNS changes through one controlled approval at a time.
