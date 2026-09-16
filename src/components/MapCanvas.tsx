@@ -254,12 +254,6 @@ export function MapCanvas({
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
-  const placeMarkers = ready
-    ? places.flatMap((place) => {
-        const pixel = toPixel({ lat: place.latitude, lng: place.longitude });
-        return pixel ? [{ place, pixel }] : [];
-      })
-    : [];
   const activePlace = places.find((place) => place.id === activePlaceId) ?? null;
   const requestMarkers = ready
     ? requests.flatMap((request) => {
@@ -391,7 +385,7 @@ export function MapCanvas({
           ) : (
             <span className="relative flex size-5 items-center justify-center">
               <span className="absolute inset-0 animate-ping-slow rounded-full bg-live/40" />
-              <span className="size-3.5 rounded-full border-2 border-foreground/80 bg-cat-vehicles shadow-lg" />
+              <span className="size-3.5 rounded-full border-2 border-foreground/80 bg-cyan shadow-lg" />
             </span>
           )}
         </div>
