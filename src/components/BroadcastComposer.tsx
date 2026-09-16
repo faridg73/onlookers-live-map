@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { MapPin, Radio, ShieldCheck } from "lucide-react";
+import {
+  Camera,
+  Lock,
+  MapPin,
+  Mic,
+  MicOff,
+  Radio,
+  ShieldCheck,
+  SwitchCamera,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -9,9 +19,12 @@ import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import {
+  BROADCAST_AUDIENCES,
+  BROADCAST_SAFETY_NOTICE,
   BROADCAST_WINDOWS,
   fetchBroadcastEligibility,
   startFreeBroadcast,
+  type BroadcastAudience,
   type BroadcastEligibility,
 } from "@/lib/broadcast";
 import { COMMUNITY_CATEGORIES, type CommunityCategory } from "@/lib/community";
@@ -34,6 +47,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [category, setCategory] = useState<CommunityCategory>("meetups");
   const [hours, setHours] = useState<number>(1);
+  const [audience, setAudience] = useState<BroadcastAudience>("public");
+  /** Pre-stream hardware checks carried into the live stage. */
+  const [micOn, setMicOn] = useState(true);
+  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [agreed, setAgreed] = useState(false);
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
@@ -81,6 +99,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
     }
+    if (!agreed) {
+      toast.error("Accept the safety reminder before going live.");
+      return;
+    }
     if (!human.ready) {
       toast.error("Finish the quick human check before going live.");
       return;
@@ -98,6 +120,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         body: body.trim(),
         place: place.trim(),
         hours,
+        audience,
         latitude: spot.latitude,
         longitude: spot.longitude,
       });
@@ -119,6 +142,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       <LiveBroadcastStage
         title={liveNow.title}
         place={liveNow.place}
+        initialFacing={facing}
+        initialMuted={!micOn}
         onEnd={() => {
           setLiveNow(null);
           toast.success("Broadcast ended");
@@ -186,6 +211,72 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </label>
 
       <div>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Audience visibility</p>
+        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {BROADCAST_AUDIENCES.map((option) => {
+            const active = audience === option.id;
+            const Icon = option.id === "public" ? Radio : option.id === "followers" ? Users : Lock;
+            return (
+              <Button
+                key={option.id}
+                type="button"
+                variant="outline"
+                aria-pressed={active}
+                onClick={() => setAudience(option.id)}
+                className={`h-auto items-start justify-start gap-2 py-2.5 text-left text-xs font-extrabold ${
+                  active ? "border-signal bg-signal/10 text-signal" : ""
+                }`}
+              >
+                <Icon className="mt-0.5 size-3.5 shrink-0" />
+                <span className="flex flex-col gap-0.5">
+                  {option.label}
+                  <span
+                    className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${
+                      active ? "text-signal/80" : "text-muted-foreground"
+                    }`}
+                  >
+                    {option.hint}
+                  </span>
+                </span>
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Pre-broadcast checks</p>
+        <div className="mt-2 flex items-center gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            aria-pressed={micOn}
+            aria-label={micOn ? "Mute microphone before going live" : "Unmute microphone"}
+            onClick={() => setMicOn((current) => !current)}
+            className={`size-11 rounded-full p-0 ${micOn ? "border-signal text-signal" : ""}`}
+          >
+            {micOn ? <Mic className="size-4" /> : <MicOff className="size-4" />}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            aria-label={
+              facing === "environment" ? "Switch to front camera" : "Switch to rear camera"
+            }
+            onClick={() => setFacing((c) => (c === "environment" ? "user" : "environment"))}
+            className="size-11 rounded-full border-signal p-0 text-signal"
+          >
+            <SwitchCamera className="size-4" />
+          </Button>
+          <p className="text-xs font-medium text-muted-foreground">
+            <Camera className="mr-1 inline size-3.5 text-signal" />
+            {facing === "environment" ? "Rear camera" : "Front camera"} ·{" "}
+            {micOn ? "Mic on" : "Mic muted"}
+          </p>
+        </div>
+      </div>
+
+      <div>
         <p className="text-xs font-bold uppercase text-muted-foreground">Lane</p>
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {COMMUNITY_CATEGORIES.map((option) => (
@@ -233,7 +324,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Where you are</p>
+        <p className="text-xs font-bold uppercase text-muted-foreground">Location tag</p>
+        <p className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-signal/40 bg-signal/10 px-2.5 py-1 text-xs font-extrabold text-signal">
+          <MapPin className="size-3.5 shrink-0" />
+          <span className="truncate">{place.trim() || "No spot picked yet"}</span>
+        </p>
         <div className="mt-2 flex gap-2">
           <input
             value={place}
@@ -266,9 +361,24 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
 
       {human.widget}
 
+      <label className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(event) => setAgreed(event.target.checked)}
+          className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--signal))]"
+        />
+        <span className="text-xs font-medium leading-snug text-muted-foreground">
+          <span className="font-extrabold uppercase tracking-[0.12em] text-foreground">
+            Safety reminder
+          </span>{" "}
+          {BROADCAST_SAFETY_NOTICE}
+        </span>
+      </label>
+
       <Button
         type="button"
-        disabled={posting}
+        disabled={posting || !agreed}
         onClick={() => void goLive()}
         className="h-12 w-full gap-2 text-sm font-extrabold uppercase tracking-[0.14em]"
       >

@@ -13,18 +13,24 @@ export function LiveBroadcastStage({
   title,
   place,
   onEnd,
+  initialFacing = "environment",
+  initialMuted = false,
 }: {
   title: string;
   place: string;
   onEnd: () => void;
+  /** Camera side chosen in the pre-stream checks. */
+  initialFacing?: "environment" | "user";
+  /** Mic state chosen in the pre-stream checks. */
+  initialMuted?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [facing, setFacing] = useState<"environment" | "user">("environment");
+  const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
   const [ready, setReady] = useState(false);
   const [switching, setSwitching] = useState(false);
   const [multiCamera, setMultiCamera] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(initialMuted);
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
