@@ -127,21 +127,23 @@ function MapScreen() {
       />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
-        <div className="pointer-events-auto mx-auto flex w-full max-w-lg items-center gap-3 rounded-lg border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-xl md:ml-auto md:mr-0 md:w-auto md:gap-4 md:rounded-xl md:px-4 md:py-3 md:shadow-2xl">
-          <img
-            src="/icon-192.png"
-            alt="Onlooker Live logo"
-            className="size-8 rounded-lg object-cover md:size-11 md:rounded-xl md:border md:border-border md:p-0.5"
-          />
-          <div className="min-w-0 flex-1 md:flex-none">
-            <h1 className="font-display text-base font-extrabold leading-none tracking-tight text-foreground md:text-xl">
-              Onlooker
-            </h1>
-            <p className="mt-0.5 truncate text-[0.65rem] font-bold text-muted-foreground md:text-xs">
-              Live eyes, anywhere
-            </p>
+          <div className="pointer-events-auto mx-auto flex w-full max-w-lg items-center gap-3 rounded-lg border border-border bg-surface/95 px-3 py-2 shadow-lg backdrop-blur-xl md:ml-auto md:mr-0 md:w-auto md:gap-4 md:rounded-xl md:px-4 md:py-3 md:shadow-2xl">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-base font-extrabold leading-none tracking-tight text-foreground md:text-xl">
+                Onlooker
+              </h1>
+            </div>
+            <div className="flex shrink-0 flex-col items-center gap-1">
+              <img
+                src="/icon-192.png"
+                alt="Onlooker Live logo"
+                className="size-10 rounded-lg object-cover md:size-12"
+              />
+              <p className="whitespace-nowrap text-[0.58rem] font-bold leading-none text-muted-foreground md:text-[0.65rem]">
+                Live eyes, anywhere
+              </p>
+            </div>
           </div>
-        </div>
         <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg md:fixed md:bottom-[7.25rem] md:right-6 md:mt-0 md:w-80 md:max-w-none">
           <div className="rounded-lg border border-border bg-surface/95 p-1 shadow-lg backdrop-blur-xl md:rounded-xl md:p-1.5 md:shadow-2xl">
             <PlaceSearchInput
