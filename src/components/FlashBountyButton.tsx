@@ -195,12 +195,14 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       });
       human.reset();
       setOpen(false);
+      setPosting(false);
       toast.success("Flash bounty is live", {
         description: `Onlookers near you were alerted. ${formatCredits(
           totalCredits,
         )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,
       });
-      await navigate({ to: "/feed" });
+      // Straight into the live stage so the camera opens immediately.
+      setLiveSpot(spot);
     } catch (error) {
       human.reset();
       toast.error(error instanceof Error ? error.message : "Could not post the flash bounty.");
