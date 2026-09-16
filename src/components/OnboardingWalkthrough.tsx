@@ -93,7 +93,7 @@ export function OnboardingWalkthrough() {
   const last = step === SLIDES.length - 1;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/90 px-4 pb-6 pt-16 sm:items-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-background/90 px-4 pb-6 pt-16 sm:items-center">
       <div className="w-full max-w-md overflow-hidden rounded-3xl border border-border bg-surface">
         <div key={step} className="animate-in fade-in slide-in-from-right-8 duration-300">
           <div className="relative">
