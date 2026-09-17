@@ -51,6 +51,27 @@ export function LiveBroadcastStage({
   const [muted, setMuted] = useState(initialMuted);
   const [seconds, setSeconds] = useState(0);
 
+  // The parent re-renders on background polling and passes a fresh onEnd every
+  // time. Keeping it in a ref means the capture effect below never restarts, so
+  // the camera view no longer blinks every few seconds.
+  const onEndRef = useRef(onEnd);
+  useEffect(() => {
+    onEndRef.current = onEnd;
+  }, [onEnd]);
+
+  const mutedRef = useRef(muted);
+  mutedRef.current = muted;
+
+  /** Release the hardware, then hand control back to the parent. */
+  const stopAndEnd = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+    onEndRef.current();
+  }, []);
+
+  // Opens the real device camera through MediaDevices/WebRTC. Runs only on
+  // mount and when the lens is flipped — never on unrelated re-renders.
   useEffect(() => {
     let alive = true;
     void (async () => {
@@ -69,7 +90,7 @@ export function LiveBroadcastStage({
         }
         streamRef.current?.getTracks().forEach((t) => t.stop());
         streamRef.current = stream;
-        stream.getAudioTracks().forEach((t) => (t.enabled = !muted));
+        stream.getAudioTracks().forEach((t) => (t.enabled = !mutedRef.current));
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play().catch(() => undefined);
@@ -92,20 +113,19 @@ export function LiveBroadcastStage({
           return;
         }
         toast.error("Allow camera and microphone access to show your live feed.");
-        onEnd();
+        onEndRef.current();
       }
     })();
     return () => {
       alive = false;
     };
-    // muted is applied to tracks separately; re-running on it would restart the camera.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [facing, onEnd]);
+  }, [facing]);
 
   // Release the camera when the stage closes.
   useEffect(
     () => () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     },
     [],
   );
@@ -203,7 +223,7 @@ export function LiveBroadcastStage({
           type="button"
           aria-label="End broadcast"
           disabled={!ready}
-          onClick={onEnd}
+          onClick={stopAndEnd}
           className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white disabled:opacity-50"
         >
           <Square className="size-6" />

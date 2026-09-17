@@ -19,6 +19,7 @@ import {
 } from "@/lib/discovery";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
+import { RouteErrorPanel } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/discover/$group/$venue")({
   loader: ({ params }) => {
@@ -53,6 +54,7 @@ export const Route = createFileRoute("/discover/$group/$venue")({
     };
   },
   component: VenueScreen,
+  errorComponent: RouteErrorPanel,
 });
 
 function VenueScreen() {

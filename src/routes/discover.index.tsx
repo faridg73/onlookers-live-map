@@ -17,6 +17,7 @@ import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
 import { discoveryImage } from "@/lib/discovery-visuals";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/discover/")({
     ],
   }),
   component: DiscoverHome,
+  errorComponent: RouteErrorPanel,
 });
 
 const WEEKEND = [0, 5, 6];
@@ -114,7 +116,9 @@ function DiscoverHome() {
       {view === "map" ? (
         <div className="mt-4 space-y-3">
           <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
-            <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
+            <SectionBoundary label="The map">
+              <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
+            </SectionBoundary>
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>

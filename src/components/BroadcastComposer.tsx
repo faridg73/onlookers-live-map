@@ -147,7 +147,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         onEnd={() => {
           setLiveNow(null);
           toast.success("Broadcast ended");
-          void navigate({ to: "/community" });
+          void navigate({ to: "/discover" });
         }}
       />
     );

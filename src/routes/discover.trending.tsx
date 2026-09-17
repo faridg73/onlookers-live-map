@@ -12,6 +12,7 @@ import { discoveryGroupBySlug } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 
 export const Route = createFileRoute("/discover/trending")({
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/discover/trending")({
     ],
   }),
   component: TrendingScreen,
+  errorComponent: RouteErrorPanel,
 });
 
 const TAGS = [
@@ -104,7 +106,9 @@ function TrendingScreen() {
       </p>
 
       <div className="mt-4">
-        <AreaPicker />
+        <SectionBoundary label="Area picker">
+          <AreaPicker />
+        </SectionBoundary>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
