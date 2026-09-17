@@ -94,6 +94,14 @@ export const SOCIAL_TARGETS: SocialTarget[] = [
   { id: "telegram", label: "Telegram", captionFirst: false, hint: "Sends the link in a chat" },
 ];
 
+export function platformShareUrl(
+  target: SocialTarget["id"],
+  url: string,
+  caption: string,
+): string {
+  return webTarget(target, url, caption);
+}
+
 function webTarget(target: SocialTarget["id"], url: string, caption: string): string {
   const link = encodeURIComponent(url);
   const text = encodeURIComponent(caption);
