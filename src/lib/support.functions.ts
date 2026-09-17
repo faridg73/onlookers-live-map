@@ -46,9 +46,46 @@ export const submitSupportTicket = createServerFn({ method: "POST" })
       .select("id")
       .single();
 
-    if (error) {
-      return { success: false, error: error.message };
+    if (error || !row) {
+      return { success: false, error: error?.message ?? "Could not save your message." };
     }
 
-    return { success: true, id: row?.id };
+    // Alert the support inbox. The ticket is already stored, so a delivery
+    // failure must never lose the message — it is logged, not thrown.
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      await sendTemplateEmail("support-ticket", "support@onlookerlive.com", {
+        templateData: {
+          name: data.name,
+          email: data.email,
+          subject: data.subject,
+          message: data.message,
+          ticketId: row.id,
+          userId: userId ?? "not signed in",
+        },
+        replyTo: data.email,
+        idempotencyKey: `support-ticket-${row.id}`,
+      });
+    } catch (err) {
+      console.error("Support ticket alert email failed", err);
+    }
+
+    // Confirmation copy to the person who wrote in.
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      await sendTemplateEmail("support-received", data.email, {
+        templateData: {
+          name: data.name,
+          subject: data.subject,
+          message: data.message,
+          ticketId: row.id,
+        },
+        replyTo: "support@onlookerlive.com",
+        idempotencyKey: `support-received-${row.id}`,
+      });
+    } catch (err) {
+      console.error("Support confirmation email failed", err);
+    }
+
+    return { success: true, id: row.id };
   });
