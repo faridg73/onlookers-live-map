@@ -55,7 +55,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
-  const [liveNow, setLiveNow] = useState<{ title: string; place: string } | null>(null);
+  const [liveNow, setLiveNow] = useState<{ title: string; place: string; key: string } | null>(null);
   const human = useHumanCheck("community-post");
   // Live actions need a mobile number confirmed by text, social sign-ins included.
   const phoneGate = usePhoneGate("before you go live");
