@@ -41,5 +41,5 @@
 - [x] Mandatory legal release + indemnification checkbox gating Go Live on Pro tier
 
 ## Responsive layout audit (Sep 17)
-- [ ] Standardize shared page containers, discovery layouts, profile sections, grids, and overflow behavior across phone, tablet, laptop, and large desktop widths
-- [ ] Verify representative routes at iPhone, Android, iPad, laptop, and desktop viewport sizes
+- [x] Standardize shared page containers, discovery layouts, profile sections, grids, and overflow behavior across phone, tablet, laptop, and large desktop widths
+- [x] Verify representative routes at iPhone, Android, iPad, laptop, and desktop viewport sizes
