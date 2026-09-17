@@ -232,3 +232,85 @@ export async function thumbnailUrls(videos: BountyVideo[], expiresInSeconds = 60
   });
   return map;
 }
+
+/**
+ * Saves a finished live broadcast recording so the creator can replay it from
+ * their profile. Works for both paid flash streams (a real request id) and free
+ * broadcasts (a local key the escrow triggers safely ignore).
+ */
+export async function saveBroadcastRecording({
+  blob,
+  seconds,
+  requestId,
+  title,
+  place,
+  bounty = 0,
+  note = "",
+}: {
+  blob: Blob;
+  seconds: number;
+  requestId: string;
+  title: string;
+  place: string;
+  bounty?: number;
+  note?: string;
+}): Promise<BountyVideo> {
+  const { data: auth } = await supabase.auth.getUser();
+  const user = auth.user;
+  if (!user) throw new Error("Sign in to save your broadcast.");
+
+  const extension = blob.type.includes("mp4") ? "mp4" : "webm";
+  const file = new File([blob], `broadcast-${Date.now()}.${extension}`, {
+    type: blob.type || "video/webm",
+  });
+  const path = `${user.id}/${requestId}/${Date.now()}.${extension}`;
+
+  await uploadMedia({
+    bucket: BOUNTY_VIDEO_BUCKET,
+    path,
+    file,
+    contentType: file.type,
+  });
+
+  let thumbPath: string | null = null;
+  const thumb = await captureThumbnail(file);
+  if (thumb) {
+    const candidate = `${path.replace(/\.[^.]+$/, "")}-thumb.jpg`;
+    try {
+      await uploadMedia({
+        bucket: BOUNTY_VIDEO_BUCKET,
+        path: candidate,
+        file: thumb,
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+      thumbPath = candidate;
+    } catch {
+      thumbPath = null;
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("bounty_videos")
+    .insert({
+      request_id: requestId,
+      uploader_id: user.id,
+      request_title: title,
+      request_place: place,
+      bounty_amount: bounty,
+      note: sanitizeText(note, { multiline: true, maxLength: 1000 }),
+      storage_path: path,
+      thumb_path: thumbPath,
+      duration_seconds: Math.max(1, Math.round(seconds)),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    await supabase.storage
+      .from(BOUNTY_VIDEO_BUCKET)
+      .remove(thumbPath ? [path, thumbPath] : [path]);
+    throw error;
+  }
+  return data as BountyVideo;
+}

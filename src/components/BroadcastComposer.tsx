@@ -55,7 +55,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
-  const [liveNow, setLiveNow] = useState<{ title: string; place: string } | null>(null);
+  const [liveNow, setLiveNow] = useState<{ title: string; place: string; key: string } | null>(null);
   const human = useHumanCheck("community-post");
   // Live actions need a mobile number confirmed by text, social sign-ins included.
   const phoneGate = usePhoneGate("before you go live");
@@ -128,7 +128,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         description: "Followers and people nearby can see it on Discover. No credits held.",
       });
       // Open the live camera view so the creator sees their own feed while live.
-      setLiveNow({ title: title.trim(), place: place.trim() });
+      setLiveNow({ title: title.trim(), place: place.trim(), key: `broadcast-${Date.now()}` });
     } catch (error) {
       human.reset();
       toast.error(error instanceof Error ? error.message : "Couldn't start the broadcast.");
@@ -144,6 +144,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         place={liveNow.place}
         initialFacing={facing}
         initialMuted={!micOn}
+        save={liveNow.key}
         onEnd={() => {
           setLiveNow(null);
           toast.success("Broadcast ended", {

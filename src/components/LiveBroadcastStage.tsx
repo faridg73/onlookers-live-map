@@ -28,6 +28,8 @@ export function LiveBroadcastStage({
   initialMuted = false,
   requestKey = null,
   instructions = null,
+  save = null,
+  bounty = 0,
 }: {
   title: string;
   place: string;
@@ -40,8 +42,15 @@ export function LiveBroadcastStage({
   requestKey?: string | null;
   /** Directions the poster left for the onlooker. */
   instructions?: string | null;
+  /** Storage key the finished recording is filed under; null skips saving. */
+  save?: string | null;
+  /** Credits attached to this stream, stored with the saved recording. */
+  bounty?: number;
 }) {
   const [chatOpen, setChatOpen] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const [saving, setSaving] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
@@ -62,13 +71,70 @@ export function LiveBroadcastStage({
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
 
-  /** Release the hardware, then hand control back to the parent. */
-  const stopAndEnd = useCallback(() => {
+  const secondsRef = useRef(0);
+  secondsRef.current = seconds;
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
+  /** Records the live feed so the finished stream can be replayed later. */
+  const startRecording = useCallback((stream: MediaStream) => {
+    if (typeof MediaRecorder === "undefined" || !saveRef.current) return;
+    const type = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm"].find((candidate) =>
+      MediaRecorder.isTypeSupported(candidate),
+    );
+    try {
+      const recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorder.start(1000);
+      recorderRef.current = recorder;
+    } catch {
+      recorderRef.current = null;
+    }
+  }, []);
+
+  /** Release the hardware, save the recording, then hand control to the parent. */
+  const stopAndEnd = useCallback(async () => {
+    const recorder = recorderRef.current;
+    recorderRef.current = null;
+    if (recorder && recorder.state !== "inactive") {
+      await new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+        recorder.stop();
+        setTimeout(resolve, 4000);
+      });
+    }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
+
+    const chunks = chunksRef.current;
+    chunksRef.current = [];
+    const key = saveRef.current;
+    if (key && chunks.length > 0) {
+      setSaving(true);
+      try {
+        const blob = new Blob(chunks, { type: chunks[0]?.type || "video/webm" });
+        const { saveBroadcastRecording } = await import("@/lib/bounty-videos");
+        await saveBroadcastRecording({
+          blob,
+          seconds: secondsRef.current,
+          requestId: key,
+          title,
+          place,
+          bounty,
+        });
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Couldn't save your stream recording.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    }
     onEndRef.current();
-  }, []);
+  }, [bounty, place, title]);
 
   // Opens the real device camera through MediaDevices/WebRTC. Runs only on
   // mount and when the lens is flipped — never on unrelated re-renders.
@@ -127,6 +193,7 @@ export function LiveBroadcastStage({
         }
         setReady(true);
         setSwitching(false);
+        startRecording(stream);
         void navigator.mediaDevices
           .enumerateDevices()
           .then((devices) => {
@@ -150,7 +217,7 @@ export function LiveBroadcastStage({
     return () => {
       alive = false;
     };
-  }, [facing]);
+  }, [facing, startRecording]);
 
   // Release the camera when the stage closes.
   useEffect(
@@ -253,11 +320,11 @@ export function LiveBroadcastStage({
         <button
           type="button"
           aria-label="End broadcast"
-          disabled={!ready}
-          onClick={stopAndEnd}
+          disabled={!ready || saving}
+          onClick={() => void stopAndEnd()}
           className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white disabled:opacity-50"
         >
-          <Square className="size-6" />
+          {saving ? <Loader2 className="size-6 animate-spin" /> : <Square className="size-6" />}
         </button>
         {multiCamera && (
           <button
