@@ -74,7 +74,7 @@ function GroupScreen() {
       : [];
 
   return (
-    <div className="app-shell pb-28 pt-6">
+    <div className="app-shell pb-28 pt-safe">
       <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
         ← All places
       </Link>

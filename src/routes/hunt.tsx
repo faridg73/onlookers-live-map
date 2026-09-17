@@ -95,7 +95,7 @@ function HuntScreen() {
   const stat = "rounded-2xl border border-border bg-surface p-3";
 
   return (
-    <div className="app-shell pb-28 pt-6">
+    <div className="app-shell pb-28 pt-safe">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Hunter dashboard</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Open bounties you can claim right now, ranked for the fastest payout.

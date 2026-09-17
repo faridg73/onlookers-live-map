@@ -348,6 +348,10 @@
   }
 }
 
+@utility pt-safe {
+  padding-top: max(env(safe-area-inset-top), 1.5rem);
+}
+
 @utility pb-safe {
   padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
 }

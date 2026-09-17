@@ -95,7 +95,7 @@ function VenueScreen() {
 
   if (!venue) {
     return (
-      <div className="app-shell pb-28 pt-6">
+      <div className="app-shell pb-28 pt-safe">
         <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
           ← All places
         </Link>
@@ -131,7 +131,7 @@ function VenueScreen() {
   const past = related.filter((r) => r.status === "fulfilled");
 
   return (
-    <div className="app-shell pb-32 pt-6">
+    <div className="app-shell pb-32 pt-safe">
       <Link
         to="/discover/$group"
         params={{ group: params.group }}
