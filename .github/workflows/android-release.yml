@@ -40,7 +40,6 @@ jobs:
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           if [ ! -s android/app/onlooker-upload.keystore ]; then
             echo "::error::ANDROID_KEYSTORE_BASE64 is missing, invalid, or decoded to an empty file."
@@ -64,63 +63,11 @@ jobs:
             -storepass:env ANDROID_KEYSTORE_PASSWORD \
             -alias "$ANDROID_KEY_ALIAS" >/dev/null
 
-          KEYSTORE_TYPE="$(keytool -list \
-            -J-Duser.language=en \
-            -keystore android/app/onlooker-upload.keystore \
-            -storepass:env ANDROID_KEYSTORE_PASSWORD 2>/dev/null \
-            | sed -n 's/^Keystore type: //p' \
-            | tr '[:lower:]' '[:upper:]' \
-            | head -n 1)"
-
-          if [ -z "$KEYSTORE_TYPE" ]; then
-            echo "::error::The keystore opened, but its format could not be identified."
-            exit 1
-          fi
-
-          mkdir -p "$RUNNER_TEMP/signing-probe"
-          printf 'Onlooker signing probe' > "$RUNNER_TEMP/signing-probe/probe.txt"
-          jar --create \
-            --file "$RUNNER_TEMP/signing-probe.jar" \
-            -C "$RUNNER_TEMP/signing-probe" probe.txt
-
-          sign_probe() {
-            cp "$RUNNER_TEMP/signing-probe.jar" "$RUNNER_TEMP/signing-probe-test.jar"
-            jarsigner \
-              -keystore android/app/onlooker-upload.keystore \
-              -storepass:env ANDROID_KEYSTORE_PASSWORD \
-              -keypass:env RESOLVED_ANDROID_KEY_PASSWORD \
-              "$RUNNER_TEMP/signing-probe-test.jar" \
-              "$ANDROID_KEY_ALIAS" >/dev/null 2>&1
-          }
-
-          if [ "$KEYSTORE_TYPE" = "PKCS12" ]; then
-            # Java's PKCS12 implementation requires one password for both the
-            # container and private key. jarsigner may silently ignore a
-            # different -keypass, so do not use it as a password test here.
-            export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
-          else
-            if [ -z "$ANDROID_KEY_PASSWORD" ]; then
-              echo "::error::ANDROID_KEY_PASSWORD is missing for this $KEYSTORE_TYPE keystore."
-              exit 1
-            fi
-            if ! LC_ALL=C grep -q '^[ -~]*$' <<< "$ANDROID_KEY_PASSWORD"; then
-              echo "::error::ANDROID_KEY_PASSWORD must contain ASCII characters only."
-              exit 1
-            fi
-            export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
-            if ! sign_probe; then
-              echo "::error::ANDROID_KEY_PASSWORD cannot unlock the private key in this $KEYSTORE_TYPE keystore."
-              exit 1
-            fi
-          fi
-
-          if ! sign_probe; then
-            echo "::error::The signing key could not be verified before the Android build."
-            exit 1
-          fi
-
-          echo "::add-mask::$RESOLVED_ANDROID_KEY_PASSWORD"
-          printf 'RESOLVED_ANDROID_KEY_PASSWORD=%s\n' "$RESOLVED_ANDROID_KEY_PASSWORD" >> "$GITHUB_ENV"
+          # This upload keystore is PKCS12. Java uses the verified store
+          # password for its private key as well; a separate key-password
+          # secret caused the repeated BadPadding signing failure.
+          echo "::add-mask::$ANDROID_KEYSTORE_PASSWORD"
+          printf 'RESOLVED_ANDROID_KEY_PASSWORD=%s\n' "$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Build signed release bundle
         env:
