@@ -81,8 +81,21 @@ export async function sendSms(to: string, body: string): Promise<SmsResult> {
       return { ok: false, error: message };
     }
 
-    const parsed = JSON.parse(text) as { sid?: string };
-    return { ok: true, sid: parsed.sid ?? "" };
+    const parsed = JSON.parse(text) as { sid?: string; status?: string; error_code?: number | null };
+    const sid = parsed.sid ?? "";
+
+    // Twilio accepts the request first and only reports carrier rejections a
+    // moment later, so confirm the message really left before claiming success.
+    const immediate = statusProblem(parsed.status ?? "", parsed.error_code ?? null);
+    if (immediate) {
+      console.error(`[sms] rejected on create ${sid}: ${parsed.status} ${parsed.error_code}`);
+      return { ok: false, error: immediate };
+    }
+
+    const settled = await confirmDelivery(sid, lovableKey, connectionKey);
+    if (settled) return { ok: false, error: settled };
+    return { ok: true, sid };
+
   } catch (error) {
     console.error("[sms] send threw", error);
     return { ok: false, error: "Could not reach the texting service." };
