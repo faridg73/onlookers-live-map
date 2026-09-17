@@ -1,31 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  Loader2,
-  MessageCircle,
-  Mic,
-  MicOff,
-  Radio,
-  SwitchCamera,
-  Square,
-  X,
-} from "lucide-react";
+import { Loader2, MessageCircle, Radio, Video, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { BountyChat } from "@/components/BountyChat";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
+import { captureDurationSeconds, requestNativeCapture } from "@/lib/native-capture";
 
 /**
- * Full-screen live stage shown while a free broadcast is running. It opens the
- * real camera with getUserMedia (WebRTC media capture, the same API the native
- * shells expose) so the creator can see exactly what viewers see.
+ * Full-screen stage for a broadcast. The capture itself is handed to the phone's
+ * native camera app (file input with `capture="environment"`), so the clip keeps
+ * native quality and stabilisation. Once the person finishes filming, the clip is
+ * saved and the stage closes.
  */
 export function LiveBroadcastStage({
   title,
   place,
   onEnd,
-  initialFacing = "environment",
-  initialMuted = false,
   requestKey = null,
   instructions = null,
   save = null,
@@ -34,9 +25,9 @@ export function LiveBroadcastStage({
   title: string;
   place: string;
   onEnd: () => void;
-  /** Camera side chosen in the pre-stream checks. */
+  /** Camera side chosen in the pre-stream checks (handled by the native camera). */
   initialFacing?: "environment" | "user";
-  /** Mic state chosen in the pre-stream checks. */
+  /** Mic state chosen in the pre-stream checks (handled by the native camera). */
   initialMuted?: boolean;
   /** Bounty this stream belongs to; unlocks the live chat with the other side. */
   requestKey?: string | null;
@@ -48,82 +39,45 @@ export function LiveBroadcastStage({
   bounty?: number;
 }) {
   const [chatOpen, setChatOpen] = useState(false);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
   const [saving, setSaving] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
-  const [ready, setReady] = useState(false);
-  const [switching, setSwitching] = useState(false);
-  const [multiCamera, setMultiCamera] = useState(false);
-  const [muted, setMuted] = useState(initialMuted);
-  const [seconds, setSeconds] = useState(0);
+  const [capturing, setCapturing] = useState(false);
+  const opened = useRef(false);
 
   // The parent re-renders on background polling and passes a fresh onEnd every
-  // time. Keeping it in a ref means the capture effect below never restarts, so
-  // the camera view no longer blinks every few seconds.
+  // time, so it is kept in a ref and never restarts the capture flow.
   const onEndRef = useRef(onEnd);
   useEffect(() => {
     onEndRef.current = onEnd;
   }, [onEnd]);
 
-  const mutedRef = useRef(muted);
-  mutedRef.current = muted;
+  const meta = useRef({ title, place, bounty, save });
+  meta.current = { title, place, bounty, save };
 
-  const secondsRef = useRef(0);
-  secondsRef.current = seconds;
-  const saveRef = useRef(save);
-  saveRef.current = save;
-
-  /** Records the live feed so the finished stream can be replayed later. */
-  const startRecording = useCallback((stream: MediaStream) => {
-    if (typeof MediaRecorder === "undefined" || !saveRef.current) return;
-    const type = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm"].find((candidate) =>
-      MediaRecorder.isTypeSupported(candidate),
-    );
+  const capture = useCallback(async () => {
+    setCapturing(true);
+    let file: File | null = null;
     try {
-      const recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
-      };
-      recorder.start(1000);
-      recorderRef.current = recorder;
+      file = await requestNativeCapture("video");
     } catch {
-      recorderRef.current = null;
+      toast.error("Your camera could not be opened. Check camera permissions and try again.");
+    } finally {
+      setCapturing(false);
     }
-  }, []);
+    if (!file) return;
 
-  /** Release the hardware, save the recording, then hand control to the parent. */
-  const stopAndEnd = useCallback(async () => {
-    const recorder = recorderRef.current;
-    recorderRef.current = null;
-    if (recorder && recorder.state !== "inactive") {
-      await new Promise<void>((resolve) => {
-        recorder.onstop = () => resolve();
-        recorder.stop();
-        setTimeout(resolve, 4000);
-      });
-    }
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
-
-    const chunks = chunksRef.current;
-    chunksRef.current = [];
-    const key = saveRef.current;
-    if (key && chunks.length > 0) {
+    const key = meta.current.save;
+    if (key) {
       setSaving(true);
       try {
-        const blob = new Blob(chunks, { type: chunks[0]?.type || "video/webm" });
+        const seconds = await captureDurationSeconds(file);
         const { saveBroadcastRecording } = await import("@/lib/bounty-videos");
         await saveBroadcastRecording({
-          blob,
-          seconds: secondsRef.current,
+          blob: file,
+          seconds,
           requestId: key,
-          title,
-          place,
-          bounty,
+          title: meta.current.title,
+          place: meta.current.place,
+          bounty: meta.current.bounty,
         });
       } catch (error) {
         toast.error(
@@ -134,157 +88,56 @@ export function LiveBroadcastStage({
       }
     }
     onEndRef.current();
-  }, [bounty, place, title]);
+  }, []);
 
-  // Opens the real device camera through MediaDevices/WebRTC. Runs only on
-  // mount and when the lens is flipped — never on unrelated re-renders.
+  // Open the camera app right away — the tap that started the broadcast counts
+  // as the user gesture the system needs.
   useEffect(() => {
-    let alive = true;
-
-    /**
-     * Asks for the requested lens by name first (`exact` binds the physical
-     * rear/front hardware on iOS and Android instead of the default virtual
-     * device), then relaxes to `ideal`, then to any camera at all.
-     */
-    async function openCamera() {
-      const shapes: MediaStreamConstraints[] = [
-        {
-          video: {
-            facingMode: { exact: facing },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: true,
-        },
-        {
-          video: {
-            facingMode: { ideal: facing },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: true,
-        },
-        { video: true, audio: true },
-      ];
-      let lastError: unknown = null;
-      for (const constraints of shapes) {
-        try {
-          return await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (error) {
-          lastError = error;
-        }
-      }
-      throw lastError ?? new Error("No camera available");
-    }
-
-    void (async () => {
-      try {
-        const stream = await openCamera();
-        if (!alive) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        streamRef.current = stream;
-        stream.getAudioTracks().forEach((t) => (t.enabled = !mutedRef.current));
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => undefined);
-        }
-        setReady(true);
-        setSwitching(false);
-        startRecording(stream);
-        void navigator.mediaDevices
-          .enumerateDevices()
-          .then((devices) => {
-            if (alive) setMultiCamera(devices.filter((d) => d.kind === "videoinput").length > 1);
-          })
-          .catch(() => undefined);
-      } catch {
-        if (!alive) return;
-        setSwitching(false);
-        // Never flip `facing` here: a failing lens would re-run this effect and
-        // loop forever on iOS. Keep the current view or exit once.
-        if (streamRef.current) {
-          setReady(true);
-          toast.error("This device only has one camera available.");
-          return;
-        }
-        toast.error("Allow camera and microphone access to show your live feed.");
-        onEndRef.current();
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [facing, startRecording]);
-
-  // Release the camera when the stage closes.
-  useEffect(
-    () => () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const timer = setInterval(() => setSeconds((value) => value + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const toggleMic = useCallback(() => {
-    setMuted((current) => {
-      const next = !current;
-      streamRef.current?.getAudioTracks().forEach((t) => (t.enabled = !next));
-      return next;
-    });
-  }, []);
-
-  const flipCamera = useCallback(() => {
-    setSwitching(true);
-    setReady(false);
-    setFacing((current) => (current === "environment" ? "user" : "environment"));
-  }, []);
-
-  const clock = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+    if (opened.current) return;
+    opened.current = true;
+    const id = requestAnimationFrame(() => void capture());
+    return () => cancelAnimationFrame(id);
+  }, [capture]);
 
   const stage = (
     <div className="fixed inset-0 z-[80] flex flex-col bg-black">
       <div className="flex items-center gap-2 px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-red-400">
-          <Radio className="size-3" /> live
+          <Radio className="size-3" /> capture
         </span>
-        <span className="text-xs font-semibold tabular-nums text-white/80">{clock}</span>
         <span className="ml-auto truncate text-xs font-medium text-white/70">{place}</span>
+        <button
+          type="button"
+          aria-label="Close capture"
+          disabled={saving}
+          onClick={() => onEndRef.current()}
+          className="rounded-full bg-white/10 p-2 text-white disabled:opacity-50"
+        >
+          <X className="size-4" />
+        </button>
       </div>
 
-      <div className="relative min-h-0 flex-1">
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          className={`size-full object-cover transition-opacity duration-200 ${
-            switching ? "opacity-0" : "opacity-100"
-          } ${facing === "user" ? "-scale-x-100" : ""}`}
-        />
-        {switching && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Loader2 className="size-8 animate-spin text-white/80" />
-          </div>
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+        {saving || capturing ? (
+          <Loader2 className="size-9 animate-spin text-white/80" />
+        ) : (
+          <Video className="size-10 text-white/70" />
         )}
-        <div className="absolute inset-x-0 bottom-0 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent px-4 pb-3 pt-8">
-          {instructions?.trim() && (
-            <p className="rounded-xl border border-signal/40 bg-black/60 px-2.5 py-1.5 text-[0.7rem] font-medium leading-snug text-white/85">
-              <span className="font-extrabold text-signal">Instructions: </span>
-              {instructions.trim()}
-            </p>
-          )}
-          <p className="truncate text-sm font-extrabold text-white">{title}</p>
-        </div>
+        <p className="text-sm font-extrabold text-white">{title}</p>
+        <p className="text-xs leading-relaxed text-white/65">
+          {saving
+            ? "Saving your clip…"
+            : "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."}
+        </p>
+        {instructions?.trim() && (
+          <p className="rounded-xl border border-signal/40 bg-black/60 px-3 py-2 text-[0.7rem] font-medium leading-snug text-white/85">
+            <span className="font-extrabold text-signal">Instructions: </span>
+            {instructions.trim()}
+          </p>
+        )}
 
         {requestKey && chatOpen && (
-          <div className="absolute inset-x-0 bottom-0 top-auto max-h-[65%] overflow-y-auto rounded-t-3xl border-t-2 border-border bg-surface px-3 pb-3 pt-2">
+          <div className="absolute inset-x-0 bottom-0 max-h-[65%] overflow-y-auto rounded-t-3xl border-t-2 border-border bg-surface px-3 pb-3 pt-2 text-left">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
                 Live chat
@@ -307,42 +160,21 @@ export function LiveBroadcastStage({
         {PUBLIC_SPACES_DISCLAIMER}
       </p>
 
-
-      <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+      <div className="flex items-center justify-center gap-4 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
           type="button"
-          aria-label={muted ? "Unmute microphone" : "Mute microphone"}
-          onClick={toggleMic}
-          className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white"
+          disabled={saving || capturing}
+          onClick={() => void capture()}
+          className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
-          {muted ? <MicOff className="size-5" /> : <Mic className="size-5" />}
+          <Video className="size-5" /> Open camera
         </button>
-        <button
-          type="button"
-          aria-label="End broadcast"
-          disabled={!ready || saving}
-          onClick={() => void stopAndEnd()}
-          className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white disabled:opacity-50"
-        >
-          {saving ? <Loader2 className="size-6 animate-spin" /> : <Square className="size-6" />}
-        </button>
-        {multiCamera && (
-          <button
-            type="button"
-            aria-label={facing === "environment" ? "Switch to front camera" : "Switch to rear camera"}
-            disabled={switching}
-            onClick={flipCamera}
-            className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
-          >
-            <SwitchCamera className="size-5" />
-          </button>
-        )}
         {requestKey && (
           <button
             type="button"
             aria-label={chatOpen ? "Hide live chat" : "Open live chat"}
             onClick={() => setChatOpen((v) => !v)}
-            className={`inline-flex size-12 items-center justify-center rounded-full border ${
+            className={`inline-flex size-14 items-center justify-center rounded-full border ${
               chatOpen ? "border-signal bg-signal/20 text-signal" : "border-white/40 text-white"
             }`}
           >
