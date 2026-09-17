@@ -71,13 +71,70 @@ export function LiveBroadcastStage({
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
 
-  /** Release the hardware, then hand control back to the parent. */
-  const stopAndEnd = useCallback(() => {
+  const secondsRef = useRef(0);
+  secondsRef.current = seconds;
+  const saveRef = useRef(save);
+  saveRef.current = save;
+
+  /** Records the live feed so the finished stream can be replayed later. */
+  const startRecording = useCallback((stream: MediaStream) => {
+    if (typeof MediaRecorder === "undefined" || !saveRef.current) return;
+    const type = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm"].find((candidate) =>
+      MediaRecorder.isTypeSupported(candidate),
+    );
+    try {
+      const recorder = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+      recorder.start(1000);
+      recorderRef.current = recorder;
+    } catch {
+      recorderRef.current = null;
+    }
+  }, []);
+
+  /** Release the hardware, save the recording, then hand control to the parent. */
+  const stopAndEnd = useCallback(async () => {
+    const recorder = recorderRef.current;
+    recorderRef.current = null;
+    if (recorder && recorder.state !== "inactive") {
+      await new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+        recorder.stop();
+        setTimeout(resolve, 4000);
+      });
+    }
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
+
+    const chunks = chunksRef.current;
+    chunksRef.current = [];
+    const key = saveRef.current;
+    if (key && chunks.length > 0) {
+      setSaving(true);
+      try {
+        const blob = new Blob(chunks, { type: chunks[0]?.type || "video/webm" });
+        const { saveBroadcastRecording } = await import("@/lib/bounty-videos");
+        await saveBroadcastRecording({
+          blob,
+          seconds: secondsRef.current,
+          requestId: key,
+          title,
+          place,
+          bounty,
+        });
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Couldn't save your stream recording.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    }
     onEndRef.current();
-  }, []);
+  }, [bounty, place, title]);
 
   // Opens the real device camera through MediaDevices/WebRTC. Runs only on
   // mount and when the lens is flipped — never on unrelated re-renders.
