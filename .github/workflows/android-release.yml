@@ -26,10 +26,12 @@ jobs:
           java-version: '21'
 
       - name: Install Capacitor CLI and sync native project
-        run: |
+        run: 
           npm install --no-audit --no-fund --ignore-scripts
           npx cap sync android
-
+      - name: Decode Keystore
+    run: |
+      echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/onlooker-upload.keystor
       - name: Check upload keystore
         run: |
           if [ ! -f android/app/onlooker-upload.keystore ]; then
@@ -38,7 +40,6 @@ jobs:
           fi
           ls -l android/app/onlooker-upload.keystore
 
-    
       - name: Build signed release bundle
         env:
           ANDROID_KEYSTORE_FILE: onlooker-upload.keystore
@@ -56,3 +57,4 @@ jobs:
           name: onlooker-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
+      if-no-files-found: error
