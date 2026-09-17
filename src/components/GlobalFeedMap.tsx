@@ -183,7 +183,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
       </div>
 
       <div className="space-y-3 p-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
           <div className="min-w-0">
             <h3 className="font-display text-lg leading-tight text-foreground">{clip.title}</h3>
             <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -193,7 +193,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
           <HunterBadge level={clip.hunterLevel} showLevel={false} />
         </div>
 
-        <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <Eye className="size-3.5" /> {clip.views}
             {tips > 0 && (
@@ -204,7 +204,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
             type="button"
             disabled={tipping}
             onClick={() => void tip()}
-            className="inline-flex items-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50 sm:w-auto"
           >
             {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <CoinsIcon className="size-3.5" />}
             Micro-Tip Hunter {MICRO_TIP} Credits

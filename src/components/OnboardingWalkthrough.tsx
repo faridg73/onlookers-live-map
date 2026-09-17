@@ -104,7 +104,7 @@ export function OnboardingWalkthrough() {
               width={1024}
               height={768}
               loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
+                  className="aspect-[4/3] max-h-[30dvh] w-full object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface to-transparent" />
             <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1.5 backdrop-blur">
