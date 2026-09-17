@@ -39,3 +39,7 @@
 - [x] Live chat widget on the active broadcast screen
 - [x] Pro / Media Desk tier: mode toggle, pro-grade add-ons, escrow scaling
 - [x] Mandatory legal release + indemnification checkbox gating Go Live on Pro tier
+
+## Responsive layout audit (Sep 17)
+- [ ] Standardize shared page containers, discovery layouts, profile sections, grids, and overflow behavior across phone, tablet, laptop, and large desktop widths
+- [ ] Verify representative routes at iPhone, Android, iPad, laptop, and desktop viewport sizes
