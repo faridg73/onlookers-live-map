@@ -47,7 +47,7 @@ function BountyPreview() {
   const { amt, place, title } = Route.useSearch();
 
   return (
-    <div className="mx-auto flex min-h-[80vh] max-w-lg flex-col justify-center px-4 pb-28 pt-6">
+    <div className="mx-auto flex min-h-[80vh] w-full max-w-3xl flex-col justify-center px-4 pb-28 pt-6 sm:px-6">
       <div className="overflow-hidden rounded-3xl border border-border bg-surface">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">

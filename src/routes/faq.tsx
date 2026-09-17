@@ -96,7 +96,7 @@ Posting a real estate bounty requires checking the authorization box in the requ
 
 function FAQScreen() {
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="reading-shell pb-28 pt-6">
       <div className="mb-6 flex items-center gap-3">
         <div className="flex size-12 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
           <HelpCircle className="size-6" />

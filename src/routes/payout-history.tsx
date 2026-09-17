@@ -56,7 +56,7 @@ function PayoutHistoryScreen() {
   );
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
       <Link
         to="/profile"
         className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/privacy")({
 
 function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-28 pt-10">
+    <div className="reading-shell pb-28 pt-10">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         Onlooker Privacy Policy
       </h1>

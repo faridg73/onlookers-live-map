@@ -59,7 +59,7 @@ function DmcaPage() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <main className="mx-auto w-full max-w-lg flex-1 px-4 pb-16 pt-[max(2rem,env(safe-area-inset-top))]">
+      <main className="reading-shell flex-1 pb-16 pt-[max(2rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-3">
           <span className="inline-flex size-10 items-center justify-center rounded-xl bg-signal/15 text-signal">
             <ShieldAlert className="size-5" />

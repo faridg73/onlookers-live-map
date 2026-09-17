@@ -72,7 +72,7 @@ function GroupScreen() {
       : [];
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
         ← All places
       </Link>

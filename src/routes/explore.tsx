@@ -51,7 +51,7 @@ function ExplorePage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-lg px-4 pb-28 pt-8">
+    <main className="app-shell pb-28 pt-8">
       <h1 className="font-display text-3xl text-foreground">Explore</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Live views captured by Onlookers around the world and down the street.
