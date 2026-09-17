@@ -74,16 +74,46 @@ export function LiveBroadcastStage({
   // mount and when the lens is flipped — never on unrelated re-renders.
   useEffect(() => {
     let alive = true;
-    void (async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+
+    /**
+     * Asks for the requested lens by name first (`exact` binds the physical
+     * rear/front hardware on iOS and Android instead of the default virtual
+     * device), then relaxes to `ideal`, then to any camera at all.
+     */
+    async function openCamera() {
+      const shapes: MediaStreamConstraints[] = [
+        {
+          video: {
+            facingMode: { exact: facing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: true,
+        },
+        {
           video: {
             facingMode: { ideal: facing },
             width: { ideal: 1280 },
             height: { ideal: 720 },
           },
           audio: true,
-        });
+        },
+        { video: true, audio: true },
+      ];
+      let lastError: unknown = null;
+      for (const constraints of shapes) {
+        try {
+          return await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      throw lastError ?? new Error("No camera available");
+    }
+
+    void (async () => {
+      try {
+        const stream = await openCamera();
         if (!alive) {
           stream.getTracks().forEach((t) => t.stop());
           return;
@@ -106,10 +136,11 @@ export function LiveBroadcastStage({
       } catch {
         if (!alive) return;
         setSwitching(false);
+        // Never flip `facing` here: a failing lens would re-run this effect and
+        // loop forever on iOS. Keep the current view or exit once.
         if (streamRef.current) {
           setReady(true);
           toast.error("This device only has one camera available.");
-          setFacing((current) => (current === "environment" ? "user" : "environment"));
           return;
         }
         toast.error("Allow camera and microphone access to show your live feed.");
