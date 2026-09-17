@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Play, Share2, Video, X } from "lucide-react";
-import { shareBountyVideo } from "@/lib/share";
+import { ShareVideoDialog } from "@/components/ShareVideoDialog";
 
 import { toast } from "sonner";
 import { formatCredits } from "@/lib/credits";
@@ -108,6 +108,15 @@ export function MyBountyVideos() {
                 >
                   <Play className="size-3.5" /> Watch
                 </button>
+                <ShareVideoDialog video={v}>
+                  <button
+                    type="button"
+                    aria-label="Share video"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-signal/10 px-3 py-1.5 text-xs font-semibold text-signal"
+                  >
+                    <Share2 className="size-3.5" /> Share
+                  </button>
+                </ShareVideoDialog>
               </div>
               {playing?.id === v.id && (
                 <div className="relative mx-auto mt-3 w-full max-w-xs">
