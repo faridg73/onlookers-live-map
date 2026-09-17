@@ -241,6 +241,12 @@ async function handleWebhook(request: Request, env: StripeEnv) {
         session: (event.data.object as Record<string, any>)["id"],
       });
       break;
+    case "invoice.paid":
+      await renewSubscription(event.data.object as Record<string, any>, env);
+      break;
+    case "customer.subscription.deleted":
+      await endSubscription(event.data.object as Record<string, any>);
+      break;
     default:
       console.log("[webhook] unhandled event", event.type);
   }
