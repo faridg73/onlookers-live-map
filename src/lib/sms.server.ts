@@ -39,6 +39,41 @@ function statusProblem(status: string, errorCode: number | null): string | null 
 export type SmsResult = { ok: true; sid: string } | { ok: false; error: string };
 
 
+/**
+ * Polls a just-sent message for a few seconds. Returns a readable problem when
+ * the carrier rejected it, or null when it looks fine (still queued is fine).
+ */
+async function confirmDelivery(
+  sid: string,
+  lovableKey: string,
+  connectionKey: string,
+): Promise<string | null> {
+  if (!sid) return null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    try {
+      const response = await fetch(`${GATEWAY_URL}/Messages/${sid}.json`, {
+        headers: {
+          Authorization: `Bearer ${lovableKey}`,
+          "X-Connection-Api-Key": connectionKey,
+        },
+      });
+      if (!response.ok) return null;
+      const message = (await response.json()) as { status?: string; error_code?: number | null };
+      const problem = statusProblem(message.status ?? "", message.error_code ?? null);
+      if (problem) {
+        console.error(`[sms] ${sid} ${message.status} error ${message.error_code}`);
+        return problem;
+      }
+      if (message.status === "sent" || message.status === "delivered") return null;
+    } catch (error) {
+      console.error("[sms] status check threw", error);
+      return null;
+    }
+  }
+  return null;
+}
+
 /** Sends one text message. Never throws — callers get a readable failure instead. */
 export async function sendSms(to: string, body: string): Promise<SmsResult> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
