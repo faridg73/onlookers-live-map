@@ -108,24 +108,6 @@ export function MyBountyVideos() {
                 >
                   <Play className="size-3.5" /> Watch
                 </button>
-                <button
-                  type="button"
-                  aria-label="Share video"
-                  onClick={() => void shareBountyVideo(v)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-signal/50 bg-signal/10 px-3 py-1.5 text-xs font-semibold text-signal"
-                >
-                  <Share2 className="size-3.5" /> Share
-                </button>
-                <ShareArtifactButton
-                  className="rounded-full px-3 py-1.5"
-                  artifact={{
-                    kind: "bounty",
-                    title: v.request_title || "Live view capture",
-                    place: v.request_place ?? "",
-                    credits: Number(v.payout_amount ?? v.bounty_amount ?? 0),
-                    note: "Captured live on Onlooker LLC.",
-                  }}
-                />
               </div>
               {playing?.id === v.id && (
                 <div className="relative mx-auto mt-3 w-full max-w-xs">
