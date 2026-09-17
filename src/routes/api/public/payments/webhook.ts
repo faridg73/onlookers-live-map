@@ -89,9 +89,65 @@ async function creditCreditPurchase(session: Record<string, any>, env: StripeEnv
   console.log("[webhook] credits credited", { session: session["id"], userId, credits, fresh: data });
 }
 
-/** Routes a settled checkout to the right wallet: money top-up or credit pack. */
+/** Activates an Onlooker+ membership and grants its included credits once. */
+async function activateSubscription(session: Record<string, any>, env: StripeEnv) {
+  const meta = session["metadata"] ?? {};
+  const userId = meta.userId ?? session["client_reference_id"];
+  const credits = Number(meta.credits ?? 0);
+  const tier = String(meta.tier ?? "");
+  const cycle = String(meta.cycle ?? "monthly");
+
+  if (!userId || !tier) {
+    console.error("[webhook] subscription missing user or tier", {
+      session: session["id"],
+      userId,
+      tier,
+    });
+    return;
+  }
+
+  const supabase = getSupabase();
+
+  if (credits > 0) {
+    const { error } = await supabase.rpc("credit_purchase", {
+      _user_id: userId,
+      _session_id: session["id"],
+      _package_id: `plus_${tier}_${cycle}`,
+      _coins: Math.round(credits),
+      _amount_cents: Number(session["amount_total"] ?? 0),
+      _environment: env,
+    });
+    if (error) {
+      console.error("[webhook] subscription credits failed", {
+        session: session["id"],
+        userId,
+        message: error.message,
+      });
+      throw new Error(error.message);
+    }
+  }
+
+  const { error: tierError } = await supabase
+    .from("user_wallets")
+    .update({ subscription_tier: tier, updated_at: new Date().toISOString() })
+    .eq("user_id", userId);
+  if (tierError) {
+    console.error("[webhook] subscription tier update failed", {
+      session: session["id"],
+      userId,
+      message: tierError.message,
+    });
+    throw new Error(tierError.message);
+  }
+
+  console.log("[webhook] membership active", { session: session["id"], userId, tier, credits });
+}
+
+/** Routes a settled checkout: membership, credit pack or money top-up. */
 async function fulfil(session: Record<string, any>, env: StripeEnv) {
-  if (session["metadata"]?.kind === "credit_purchase") await creditCreditPurchase(session, env);
+  const kind = session["metadata"]?.kind;
+  if (kind === "subscription") await activateSubscription(session, env);
+  else if (kind === "credit_purchase") await creditCreditPurchase(session, env);
   else await creditTopUp(session, env);
 }
 
