@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Circle, Loader2, SwitchCamera, Square, X } from "lucide-react";
+import { Camera, Loader2, Video, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
+import { requestNativeCapture } from "@/lib/native-capture";
 
 /**
- * In-app camera for chat clips. Recording stops on its own at 60 seconds and
- * records at a modest bitrate so uploads stay quick. It is the only way media
- * enters Onlooker LLC — nothing can come from the photo gallery.
+ * Launches the phone's own camera app for clips and photos. There is no in-app
+ * camera preview any more: the system camera keeps full native quality and
+ * stabilisation, and nothing can be picked from the photo gallery.
  */
 export function VideoRecorder({
   onClose,
@@ -17,258 +18,94 @@ export function VideoRecorder({
 }: {
   onClose: () => void;
   onRecorded: (file: File) => void;
-  /** When provided, a shutter button grabs a still frame from the live camera. */
+  /** When provided, a second button opens the native camera in photo mode. */
   onPhoto?: (file: File) => void;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const [recording, setRecording] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [ready, setReady] = useState(false);
-  const [saving, setSaving] = useState(false);
-  /** Which lens is live. "user" is the selfie camera and previews mirrored. */
-  const [facing, setFacing] = useState<"environment" | "user">("environment");
-  const [switching, setSwitching] = useState(false);
-  const [multiCamera, setMultiCamera] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const autoOpened = useRef(false);
 
-  useEffect(() => {
-    let alive = true;
-    void (async () => {
+  const capture = useCallback(
+    async (mode: "video" | "photo") => {
+      if (busy) return;
+      setBusy(true);
       try {
-        // Ask for 720p in the natural orientation of whichever lens is active so
-        // the preview and the recorded clip keep the same aspect ratio.
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: facing },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            aspectRatio: { ideal: 16 / 9 },
-          },
-          audio: true,
-        });
-        if (!alive) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
+        const file = await requestNativeCapture(mode);
+        if (!file) return;
+        if (mode === "photo") {
+          if (onPhoto) onPhoto(file);
+          else onRecorded(file);
+        } else {
+          onRecorded(file);
         }
-        streamRef.current?.getTracks().forEach((t) => t.stop());
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => undefined);
-        }
-        setReady(true);
-        setSwitching(false);
-        void navigator.mediaDevices
-          .enumerateDevices()
-          .then((devices) => {
-            if (!alive) return;
-            setMultiCamera(devices.filter((d) => d.kind === "videoinput").length > 1);
-          })
-          .catch(() => undefined);
-      } catch {
-        if (!alive) return;
-        setSwitching(false);
-        // A failed flip keeps the camera that already works instead of closing.
-        if (streamRef.current) {
-          setReady(true);
-          toast.error("This device only has one camera available.");
-          setFacing((current) => (current === "environment" ? "user" : "environment"));
-          return;
-        }
-        toast.error("Camera access was blocked. Allow the camera to record a clip.");
         onClose();
+      } catch {
+        toast.error("Your camera could not be opened. Check camera permissions and try again.");
+      } finally {
+        setBusy(false);
       }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [facing, onClose]);
-
-  // Release the camera when the recorder closes.
-  useEffect(
-    () => () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
     },
-    [],
+    [busy, onClose, onPhoto, onRecorded],
   );
 
-  const flipCamera = useCallback(() => {
-    if (recording) return;
-    setSwitching(true);
-    setReady(false);
-    setFacing((current) => (current === "environment" ? "user" : "environment"));
-  }, [recording]);
-
-  const stop = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop();
-    }
-    setRecording(false);
-  }, []);
-
+  // When only a clip is wanted, jump straight into the camera app — the tap that
+  // opened this screen still counts as the user gesture.
   useEffect(() => {
-    if (!recording) return;
-    const timer = setInterval(() => {
-      setSeconds((value) => {
-        const next = value + 1;
-        if (next >= MAX_CLIP_SECONDS) stop();
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [recording, stop]);
-
-  function start() {
-    const stream = streamRef.current;
-    if (!stream) return;
-    const candidates = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
-    const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported(type));
-    if (!mimeType) {
-      toast.error("This device can't record video in the app. Try the built-in browser camera.");
-      return;
-    }
-    chunksRef.current = [];
-    const recorder = new MediaRecorder(stream, {
-      mimeType,
-      videoBitsPerSecond: 900_000,
-      audioBitsPerSecond: 64_000,
-    });
-    recorder.ondataavailable = (event) => {
-      if (event.data.size > 0) chunksRef.current.push(event.data);
-    };
-    recorder.onstop = () => {
-      setSaving(true);
-      const blob = new Blob(chunksRef.current, { type: mimeType });
-      const ext = mimeType.includes("mp4") ? "mp4" : "webm";
-      const file = new File([blob], `clip-${Date.now()}.${ext}`, { type: blob.type });
-      setSaving(false);
-      if (file.size > 0) onRecorded(file);
-      onClose();
-    };
-    recorderRef.current = recorder;
-    recorder.start(500);
-    setSeconds(0);
-    setRecording(true);
-  }
-
-  /** Grab a still frame straight off the live camera feed. */
-  function snapshot() {
-    const video = videoRef.current;
-    if (!video || !onPhoto) return;
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || 1280;
-    canvas.height = video.videoHeight || 720;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    // The selfie preview is mirrored, so the still is flipped to match it.
-    if (facing === "user") {
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          toast.error("Couldn't capture that photo. Try again.");
-          return;
-        }
-        onPhoto(new File([blob], `photo-${Date.now()}.jpg`, { type: "image/jpeg" }));
-        onClose();
-      },
-      "image/jpeg",
-      0.85,
-    );
-  }
-
-  const remaining = Math.max(0, MAX_CLIP_SECONDS - seconds);
+    if (onPhoto || autoOpened.current) return;
+    autoOpened.current = true;
+    const id = requestAnimationFrame(() => void capture("video"));
+    return () => cancelAnimationFrame(id);
+  }, [capture, onPhoto]);
 
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-black">
       <div className="flex items-center justify-between px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">
-          {recording ? `Recording · ${remaining}s left` : `Max ${MAX_CLIP_SECONDS}s`}
+          Camera · max {MAX_CLIP_SECONDS}s
         </p>
         <button
           type="button"
           aria-label="Close camera"
-          onClick={() => {
-            stop();
-            onClose();
-          }}
+          onClick={onClose}
           className="rounded-full bg-white/10 p-2 text-white"
         >
           <X className="size-4" />
         </button>
       </div>
 
-      <div className="relative min-h-0 flex-1">
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          className={`size-full object-cover transition-opacity duration-200 ${
-            switching ? "opacity-0" : "opacity-100"
-          } ${facing === "user" ? "-scale-x-100" : ""}`}
-        />
-        {switching && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Loader2 className="size-8 animate-spin text-white/80" />
-          </div>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+        {busy ? (
+          <Loader2 className="size-8 animate-spin text-white/80" />
+        ) : (
+          <Video className="size-10 text-white/70" />
         )}
+        <p className="text-sm font-semibold text-white">
+          Your phone's camera opens for this capture, so the clip keeps its full quality.
+        </p>
+        <p className="text-xs text-white/60">Film it, then tap use or done to send it here.</p>
       </div>
 
       <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
         {PUBLIC_SPACES_DISCLAIMER}
       </p>
 
-      <div className="flex items-center justify-center gap-6 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
-        {saving ? (
-          <Loader2 className="size-8 animate-spin text-white" />
-        ) : recording ? (
+      <div className="flex flex-col gap-3 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void capture("video")}
+          className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
+        >
+          <Video className="size-5" /> Open camera to film
+        </button>
+        {onPhoto && (
           <button
             type="button"
-            aria-label="Stop recording"
-            onClick={stop}
-            className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white"
+            disabled={busy}
+            onClick={() => void capture("photo")}
+            className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 font-display text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
           >
-            <Square className="size-6" />
+            <Camera className="size-5" /> Take a photo instead
           </button>
-        ) : (
-          <>
-            {onPhoto && (
-              <button
-                type="button"
-                aria-label="Take a live photo"
-                disabled={!ready}
-                onClick={snapshot}
-                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
-              >
-                <Camera className="size-5" />
-              </button>
-            )}
-            <button
-              type="button"
-              aria-label="Start recording"
-              disabled={!ready}
-              onClick={start}
-              className="inline-flex size-16 items-center justify-center rounded-full bg-signal text-signal-foreground disabled:opacity-50"
-            >
-              <Circle className="size-6" />
-            </button>
-            {multiCamera && (
-              <button
-                type="button"
-                aria-label={facing === "environment" ? "Switch to front camera" : "Switch to rear camera"}
-                disabled={switching}
-                onClick={flipCamera}
-                className="inline-flex size-12 items-center justify-center rounded-full border border-white/40 text-white disabled:opacity-50"
-              >
-                <SwitchCamera className="size-5" />
-              </button>
-            )}
-          </>
         )}
       </div>
     </div>
