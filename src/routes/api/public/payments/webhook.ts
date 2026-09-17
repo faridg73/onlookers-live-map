@@ -127,6 +127,9 @@ async function activateSubscription(session: Record<string, any>, env: StripeEnv
     }
   }
 
+  // Make sure the wallet row exists before stamping the plan onto it.
+  await supabase.rpc("ensure_user_wallet", { _user_id: userId });
+
   const { error: tierError } = await supabase
     .from("user_wallets")
     .update({ subscription_tier: tier, updated_at: new Date().toISOString() })
