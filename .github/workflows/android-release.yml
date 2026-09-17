@@ -47,7 +47,7 @@ jobs:
             exit 1
           fi
 
-          for secret_name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+          for secret_name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS; do
             value="${!secret_name}"
             if [ -z "$value" ]; then
               echo "::error::$secret_name is missing."
@@ -63,6 +63,19 @@ jobs:
             -keystore android/app/onlooker-upload.keystore \
             -storepass:env ANDROID_KEYSTORE_PASSWORD \
             -alias "$ANDROID_KEY_ALIAS" >/dev/null
+
+          KEYSTORE_TYPE="$(keytool -list \
+            -J-Duser.language=en \
+            -keystore android/app/onlooker-upload.keystore \
+            -storepass:env ANDROID_KEYSTORE_PASSWORD 2>/dev/null \
+            | sed -n 's/^Keystore type: //p' \
+            | tr '[:lower:]' '[:upper:]' \
+            | head -n 1)"
+
+          if [ -z "$KEYSTORE_TYPE" ]; then
+            echo "::error::The keystore opened, but its format could not be identified."
+            exit 1
+          fi
 
           mkdir -p "$RUNNER_TEMP/signing-probe"
           printf 'Onlooker signing probe' > "$RUNNER_TEMP/signing-probe/probe.txt"
@@ -80,16 +93,30 @@ jobs:
               "$ANDROID_KEY_ALIAS" >/dev/null 2>&1
           }
 
-          export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
-          if ! sign_probe; then
-            # PKCS12 keystores commonly require the private-key password to
-            # match the keystore password, even when a separate secret exists.
+          if [ "$KEYSTORE_TYPE" = "PKCS12" ]; then
+            # Java's PKCS12 implementation requires one password for both the
+            # container and private key. jarsigner may silently ignore a
+            # different -keypass, so do not use it as a password test here.
             export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
-            if ! sign_probe; then
-              echo "::error::The private key cannot be unlocked. ANDROID_KEY_PASSWORD does not match this keystore, and the keystore password does not unlock it either. Re-enter the private-key password used when onlooker-upload.keystore was created."
+          else
+            if [ -z "$ANDROID_KEY_PASSWORD" ]; then
+              echo "::error::ANDROID_KEY_PASSWORD is missing for this $KEYSTORE_TYPE keystore."
               exit 1
             fi
-            echo "ANDROID_KEY_PASSWORD did not match; using the verified keystore password for this PKCS12 private key."
+            if ! LC_ALL=C grep -q '^[ -~]*$' <<< "$ANDROID_KEY_PASSWORD"; then
+              echo "::error::ANDROID_KEY_PASSWORD must contain ASCII characters only."
+              exit 1
+            fi
+            export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
+            if ! sign_probe; then
+              echo "::error::ANDROID_KEY_PASSWORD cannot unlock the private key in this $KEYSTORE_TYPE keystore."
+              exit 1
+            fi
+          fi
+
+          if ! sign_probe; then
+            echo "::error::The signing key could not be verified before the Android build."
+            exit 1
           fi
 
           echo "::add-mask::$RESOLVED_ANDROID_KEY_PASSWORD"
