@@ -716,7 +716,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             toast.success("Broadcast ended", {
               description: "Your flash stream is saved to the feed.",
             });
-            void navigate({ to: "/feed" });
+            void navigate({ to: "/discover" });
           }}
         />
       )}
