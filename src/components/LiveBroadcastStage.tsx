@@ -42,8 +42,15 @@ export function LiveBroadcastStage({
   requestKey?: string | null;
   /** Directions the poster left for the onlooker. */
   instructions?: string | null;
+  /** Storage key the finished recording is filed under; null skips saving. */
+  save?: string | null;
+  /** Credits attached to this stream, stored with the saved recording. */
+  bounty?: number;
 }) {
   const [chatOpen, setChatOpen] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const [saving, setSaving] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [facing, setFacing] = useState<"environment" | "user">(initialFacing);
