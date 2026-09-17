@@ -9,13 +9,35 @@ export function normalizePhone(raw: string): string | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
   const digits = trimmed.replace(/[^\d]/g, "");
-  if (trimmed.startsWith("+")) return digits.length >= 8 ? `+${digits}` : null;
+  // A leading "+" is often typed without a country code (e.g. "+310 400 9981"),
+  // so fall through to the US rules whenever the digits look like a US number.
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  if (trimmed.startsWith("+")) return digits.length >= 8 ? `+${digits}` : null;
   return digits.length >= 11 ? `+${digits}` : null;
 }
 
+/** Plain-language explanations for the Twilio failures we can actually hit. */
+function statusProblem(status: string, errorCode: number | null): string | null {
+  if (status !== "failed" && status !== "undelivered") return null;
+  switch (errorCode) {
+    case 30034:
+      return "Your Twilio number isn't registered for US A2P 10DLC messaging yet, so carriers are blocking these texts. Register the number in Twilio, then try again.";
+    case 21211:
+    case 21614:
+      return "That mobile number isn't a valid text-capable number.";
+    case 21610:
+      return "That number has replied STOP, so we can't text it.";
+    case 21408:
+    case 21612:
+      return "Your Twilio number can't send texts to that destination.";
+    default:
+      return `The carrier rejected the text${errorCode ? ` (error ${errorCode})` : ""}.`;
+  }
+}
+
 export type SmsResult = { ok: true; sid: string } | { ok: false; error: string };
+
 
 /** Sends one text message. Never throws — callers get a readable failure instead. */
 export async function sendSms(to: string, body: string): Promise<SmsResult> {
