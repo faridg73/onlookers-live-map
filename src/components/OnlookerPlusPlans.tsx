@@ -14,11 +14,12 @@ import { SubscriptionCheckoutSheet } from "@/components/SubscriptionCheckoutShee
 import type { SubscriptionTier } from "@/lib/wallet-ledger";
 
 /** The Onlooker+ mark, reused in headers and plan cards. */
-export function PlusMark({ className = "" }: { className?: string }) {
+export function PlusMark({ className = "", label }: { className?: string; label?: string }) {
   return (
     <span className={`inline-flex items-baseline font-display tracking-tight ${className}`}>
       Onlooker
-      <span className="ml-0.5 text-signal">+</span>
+      <span className="text-signal">+</span>
+      {label ? <span className="ml-1">{label}</span> : null}
     </span>
   );
 }
@@ -81,7 +82,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
               <div className={`-m-4 mb-4 rounded-t-2xl border-b px-4 py-3 ${plan.accent.bg} ${plan.accent.border}`}>
                 <div className="flex items-center justify-between gap-2">
                   <p className={`font-display text-base ${plan.accent.text}`}>
-                    <PlusMark /> {plan.name}
+                    <PlusMark label={plan.name} />
                   </p>
                   {plan.highlight && (
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] ${plan.accent.chip}`}>
