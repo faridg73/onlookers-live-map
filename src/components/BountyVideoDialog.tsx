@@ -3,7 +3,7 @@ import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, Share2
 import { formatCredits } from "@/lib/credits";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
-import { shareBountyVideo } from "@/lib/share";
+import { ShareVideoDialog } from "@/components/ShareVideoDialog";
 import { shareClipToSocials } from "@/lib/share-clip";
 import { toast } from "sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -307,20 +307,16 @@ export function BountyVideoDialog({
                     >
                       <Play className="size-3.5" /> Watch
                     </button>
-                    <button
-                      type="button"
-                      aria-label="Share video"
-                      title={v.uploader_id === user.id ? "Share to TikTok / Instagram Reels" : "Share video"}
-                      disabled={v.uploader_id === user.id && sharingId === v.id}
-                      onClick={() => (v.uploader_id === user.id ? void shareClip(v) : void shareBountyVideo(v))}
-                      className="text-muted-foreground transition-colors hover:text-signal disabled:opacity-50"
-                    >
-                      {v.uploader_id === user.id && sharingId === v.id ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        <Share2 className="size-4" />
-                      )}
-                    </button>
+                    <ShareVideoDialog video={v}>
+                      <button
+                        type="button"
+                        aria-label="Share video"
+                        title="Share video"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-signal/10 px-3 py-1.5 text-xs font-semibold text-signal"
+                      >
+                        <Share2 className="size-3.5" /> Share
+                      </button>
+                    </ShareVideoDialog>
                     {v.uploader_id === user.id && (
                       <button
                         type="button"
