@@ -84,6 +84,7 @@ export function startFreeBroadcast(input: {
   place: string;
   hours: number;
   audience?: BroadcastAudience;
+  tags?: string[];
   latitude?: number | null;
   longitude?: number | null;
   mediaPath?: string | null;
@@ -94,7 +95,7 @@ export function startFreeBroadcast(input: {
     title: input.title,
     body: input.body,
     place: input.place,
-    tags: ["live", "free broadcast", `audience:${audience}`],
+    tags: ["live", "free broadcast", `audience:${audience}`, ...(input.tags ?? [])],
     mediaPath: input.mediaPath ?? null,
     isFlash: true,
     flashHours: input.hours,

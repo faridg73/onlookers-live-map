@@ -3,6 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
+import { CreatorVibePills } from "@/components/CreatorVibePills";
 import { ScrollableLane } from "@/components/ScrollableLane";
 
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
@@ -35,6 +36,7 @@ import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
+import { CREATOR_VIBES, isCreatorVibeActive } from "@/lib/creator-vibes";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -227,6 +229,7 @@ function CommunityHub() {
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
+  const activeVibe = CREATOR_VIBES.find((vibe) => isCreatorVibeActive(vibe, category, tag)) ?? null;
 
   const renderCard = ({ post, miles }: { post: CommunityPost; miles: number | null }) => (
     <CommunityPostCard
@@ -264,6 +267,20 @@ function CommunityHub() {
         >
           Browse venues & events →
         </Link>
+        <div className="mt-4">
+          <CreatorVibePills
+            activeId={activeVibe?.id ?? null}
+            onSelect={(vibe) => {
+              if (!vibe) {
+                setCategory("all");
+                setTag(null);
+                return;
+              }
+              setCategory(vibe.category);
+              setTag(vibe.tag);
+            }}
+          />
+        </div>
       </header>
 
       <section aria-labelledby="community-impact-title" className="mt-6 border-y border-border bg-surface/55 px-5 py-5 sm:px-8">

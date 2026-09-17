@@ -179,6 +179,8 @@ function ProfileScreen() {
 
       <AccountCenter />
 
+      <MyBountyVideos />
+
       <Link
         to="/balance"
         className="mt-6 flex items-center justify-between rounded-2xl border border-live bg-live/10 px-4 py-3 text-sm text-foreground hover:bg-live/15"
@@ -241,8 +243,6 @@ function ProfileScreen() {
       <WeeklyTopOnlookers />
 
       <Leaderboard limit={5} moreLink />
-
-      <MyBountyVideos />
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
       <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">

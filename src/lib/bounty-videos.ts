@@ -21,6 +21,10 @@ export type BountyVideo = {
   accepted_at: string | null;
   accepted_by: string | null;
   payout_amount: number;
+  view_count: number;
+  is_public: boolean;
+  is_instant: boolean;
+  expired_at: string | null;
 };
 
 /** Accept a clip: pays the reporter their bounty (minus the 15% app fee). */
