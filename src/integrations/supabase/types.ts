@@ -1525,6 +1525,42 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction_ledger: {
+        Row: {
+          created_at: string
+          credit_change: number
+          dollar_value: number
+          id: string
+          status: string
+          stripe_reference_id: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credit_change?: number
+          dollar_value?: number
+          id?: string
+          status?: string
+          stripe_reference_id?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credit_change?: number
+          dollar_value?: number
+          id?: string
+          status?: string
+          stripe_reference_id?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_credit_wallets: {
         Row: {
           created_at: string
@@ -1587,6 +1623,33 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_wallets: {
+        Row: {
+          created_at: string
+          credit_balance: number
+          id: string
+          subscription_tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credit_balance?: number
+          id?: string
+          subscription_tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credit_balance?: number
+          id?: string
+          subscription_tier?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
