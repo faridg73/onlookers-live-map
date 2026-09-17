@@ -64,7 +64,7 @@ function DiscoverHome() {
     ).length;
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <RadarAlerts />
 
       <h1 className="font-display text-3xl tracking-tight text-foreground">Browse places</h1>
@@ -113,7 +113,7 @@ function DiscoverHome() {
 
       {view === "map" ? (
         <div className="mt-4 space-y-3">
-          <div className="h-[26rem] overflow-hidden rounded-2xl border border-border">
+          <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
             <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
           </div>
           {selected ? (
@@ -199,7 +199,7 @@ function DiscoverHome() {
             </section>
           )}
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {DISCOVERY_GROUPS.map((group) => (
               <Link
                 key={group.slug}

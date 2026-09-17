@@ -31,8 +31,8 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="min-w-0">
           <h3 className="font-display text-lg text-foreground">
             <PlusMark /> membership
           </h3>
@@ -41,7 +41,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
           <div
             role="group"
             aria-label="Billing cycle"
@@ -69,7 +69,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
         </div>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {PLUS_PLANS.map((plan) => {
           const active = currentTier === plan.id;
           return (
@@ -86,7 +86,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                   </span>
                 )}
                 <div className="min-h-8">
-                  <p className={`whitespace-nowrap font-display text-[0.8rem] leading-6 tracking-tight ${plan.accent.text}`}>
+                    <p className={`whitespace-nowrap font-display text-sm leading-6 ${plan.accent.text}`}>
                     <PlusMark label={plan.name} />
                   </p>
                 </div>

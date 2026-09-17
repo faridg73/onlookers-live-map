@@ -23,8 +23,8 @@ export function TransactionLedgerTable({
 }) {
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
           <h3 className="font-display text-lg text-foreground">Transaction History &amp; Ledger</h3>
           <p className="text-xs text-muted-foreground">
             Every credit in and out of your wallet, with its dollar value.
@@ -42,7 +42,7 @@ export function TransactionLedgerTable({
           No transactions yet. Top-ups, tips and bounty payouts will appear here.
         </p>
       ) : (
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-border">
+        <div className="scrollbar-thin mt-4 max-w-full overflow-x-auto overscroll-x-contain rounded-2xl border border-border">
           <table className="w-full min-w-[34rem] text-left text-sm">
             <thead className="bg-surface">
               <tr className="text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">

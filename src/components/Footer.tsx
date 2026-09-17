@@ -118,8 +118,8 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-surface px-4 py-8">
-      <div className="mx-auto max-w-lg">
-        <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mx-auto w-full max-w-7xl">
+        <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
           {LINKS.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}

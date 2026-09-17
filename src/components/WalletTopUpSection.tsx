@@ -39,8 +39,8 @@ export function WalletTopUpSection() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
           <h3 className="font-display text-lg text-foreground">Top up your wallet</h3>
           <p className="text-xs text-muted-foreground">
             4 credits = $1.00 USD. Credits land as soon as payment clears.
@@ -49,7 +49,7 @@ export function WalletTopUpSection() {
         <CoinsIcon className="size-4 text-signal" />
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {TOPUP_PACKAGES.map((tier) => (
           <button
             key={tier.id}
@@ -91,8 +91,8 @@ export function WalletTopUpSection() {
         >
           Custom amount
         </label>
-        <div className="mt-2 flex flex-wrap items-end gap-3">
-          <div className="flex min-w-[9rem] flex-1 items-center gap-2">
+        <div className="mt-2 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end">
+          <div className="flex min-w-0 items-center gap-2">
             <input
               id="topup-custom-credits"
               type="number"
