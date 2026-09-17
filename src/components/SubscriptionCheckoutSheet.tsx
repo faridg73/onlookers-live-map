@@ -2,19 +2,24 @@ import { useEffect, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Loader2, X } from "lucide-react";
 
-import { formatPackPrice, type CreditPackage } from "@/lib/credit-packages";
-import { startCreditPurchase } from "@/lib/credits.functions";
 import { getStripe } from "@/lib/stripe";
+import { startSubscriptionCheckout } from "@/lib/subscriptions.functions";
+import {
+  formatMoney,
+  planCredits,
+  planPriceCents,
+  type BillingCycle,
+  type PlusPlan,
+} from "@/lib/subscriptions";
 
-/**
- * Full-coverage payment sheet. The embedded form offers Apple Pay, Google Pay,
- * Link and card entry, then returns to /profile with the session id.
- */
-export function CreditCheckoutSheet({
-  pack,
+/** Payment sheet for an Onlooker+ membership. */
+export function SubscriptionCheckoutSheet({
+  plan,
+  cycle,
   onClose,
 }: {
-  pack: CreditPackage;
+  plan: PlusPlan;
+  cycle: BillingCycle;
   onClose: () => void;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -27,11 +32,8 @@ export function CreditCheckoutSheet({
 
     void (async () => {
       try {
-        const result = await startCreditPurchase({
-          data:
-            pack.id === "custom"
-              ? { customCredits: pack.credits }
-              : { packageId: pack.id },
+        const result = await startSubscriptionCheckout({
+          data: { planId: plan.id, cycle },
         });
         if (!live) return;
         if (result.error) throw new Error(result.error);
@@ -42,7 +44,7 @@ export function CreditCheckoutSheet({
         const message = cause instanceof Error ? cause.message : "Could not open checkout";
         setError(
           message.toLowerCase().includes("unauthorized")
-            ? "Please sign in to buy Credits."
+            ? "Please sign in to join Onlooker+."
             : message,
         );
       }
@@ -51,7 +53,7 @@ export function CreditCheckoutSheet({
     return () => {
       live = false;
     };
-  }, [pack.id]);
+  }, [plan.id, cycle]);
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-black/80 backdrop-blur-sm sm:items-center">
@@ -62,9 +64,12 @@ export function CreditCheckoutSheet({
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
-              {pack.credits} Credits, {formatPackPrice(pack.priceCents)}
+              Onlooker+ {plan.name}, {formatMoney(planPriceCents(plan, cycle))}
+              {cycle === "monthly" ? "/mo" : "/yr"}
             </p>
-            <p className="text-xs text-muted-foreground">Apple Pay, Google Pay, Link or card</p>
+            <p className="text-xs text-muted-foreground">
+              {planCredits(plan, cycle).toLocaleString()} credits per billing period
+            </p>
           </div>
           <button
             type="button"

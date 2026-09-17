@@ -3,34 +3,28 @@ import { ArrowDownLeft, ArrowUpRight, CoinsIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  CREDIT_LABELS,
-  fetchCreditWallet,
-  listCreditTransactions,
-  type CreditLedgerEntry,
-  type CreditWallet,
-} from "@/lib/credits";
-
-const when = (iso: string) => {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.round(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins} min ago`;
-  const hrs = Math.round(mins / 60);
-  if (hrs < 24) return `${hrs} hr ago`;
-  return new Date(iso).toLocaleDateString();
-};
+  fetchUserWallet,
+  formatLedgerWhen,
+  ledgerTypeLabel,
+  listLedgerEntries,
+  type LedgerEntry,
+  type UserWallet,
+} from "@/lib/wallet-ledger";
 
 /** Credits balance plus a feed of incoming and outgoing credit movement. */
 export function CreditWalletCard() {
-  const [wallet, setWallet] = useState<CreditWallet | null>(null);
-  const [ledger, setLedger] = useState<CreditLedgerEntry[]>([]);
+  const [wallet, setWallet] = useState<UserWallet | null>(null);
+  const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
-      const next = await fetchCreditWallet();
-      setWallet(next);
-      setLedger(next ? await listCreditTransactions(next.id) : []);
+      const [nextWallet, nextLedger] = await Promise.all([
+        fetchUserWallet(),
+        listLedgerEntries(20),
+      ]);
+      setWallet(nextWallet);
+      setLedger(nextLedger);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load your credits");
     } finally {
@@ -57,11 +51,11 @@ export function CreditWalletCard() {
   if (!wallet) return null;
 
   const earned = ledger
-    .filter((entry) => entry.direction === "in")
-    .reduce((sum, entry) => sum + entry.amountNet, 0);
+    .filter((entry) => entry.creditChange > 0)
+    .reduce((sum, entry) => sum + entry.creditChange, 0);
   const spent = ledger
-    .filter((entry) => entry.direction === "out")
-    .reduce((sum, entry) => sum + entry.amountGross, 0);
+    .filter((entry) => entry.creditChange < 0)
+    .reduce((sum, entry) => sum + Math.abs(entry.creditChange), 0);
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
@@ -105,7 +99,7 @@ export function CreditWalletCard() {
         ) : (
           <ul className="space-y-2">
             {ledger.map((entry) => {
-              const incoming = entry.direction === "in";
+              const incoming = entry.creditChange >= 0;
               return (
                 <li
                   key={entry.id}
@@ -124,11 +118,10 @@ export function CreditWalletCard() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-foreground">
-                      {CREDIT_LABELS[entry.type]}
+                      {ledgerTypeLabel(entry.type)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {when(entry.createdAt)}
-                      {!incoming && entry.amountFee > 0 ? ` · ${entry.amountFee} credit fee` : ""}
+                      {formatLedgerWhen(entry.createdAt)}
                     </p>
                   </div>
                   <span
@@ -136,7 +129,8 @@ export function CreditWalletCard() {
                       incoming ? "text-live" : "text-foreground"
                     }`}
                   >
-                    {incoming ? `+${entry.amountNet}` : `−${entry.amountGross}`}
+                    {incoming ? "+" : "−"}
+                    {Math.abs(entry.creditChange)}
                   </span>
                 </li>
               );

@@ -97,6 +97,47 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
   },
 ];
 
+/**
+ * Wallet top-up presets shown in the profile account centre. Each pack pays for
+ * credits at the 4:$1 baseline and throws in bonus credits on top.
+ */
+export const TOPUP_PACKAGES: CreditPackage[] = [
+  {
+    id: "topup_50",
+    priceId: "topup_50_usd",
+    name: "Quick top-up",
+    baseCredits: 40,
+    bonusCredits: 10,
+    credits: 50,
+    priceCents: 1000,
+    blurb: "50 credits for $10.",
+  },
+  {
+    id: "topup_150",
+    priceId: "topup_150_usd",
+    name: "Regular top-up",
+    baseCredits: 100,
+    bonusCredits: 50,
+    credits: 150,
+    priceCents: 2500,
+    blurb: "150 credits for $25.",
+    badge: "Popular",
+  },
+  {
+    id: "topup_500",
+    priceId: "topup_500_usd",
+    name: "Big top-up",
+    baseCredits: 320,
+    bonusCredits: 180,
+    credits: 500,
+    priceCents: 8000,
+    blurb: "500 credits for $80.",
+    badge: "Best Value",
+  },
+];
+
+CREDIT_PACKAGES.push(...TOPUP_PACKAGES);
+
 export const creditPackageById = (id: string): CreditPackage | undefined =>
   CREDIT_PACKAGES.find((pack) => pack.id === id);
 

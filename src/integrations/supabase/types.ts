@@ -1531,6 +1531,7 @@ export type Database = {
           credit_change: number
           dollar_value: number
           id: string
+          source_id: string | null
           status: string
           stripe_reference_id: string | null
           type: string
@@ -1542,6 +1543,7 @@ export type Database = {
           credit_change?: number
           dollar_value?: number
           id?: string
+          source_id?: string | null
           status?: string
           stripe_reference_id?: string | null
           type: string
@@ -1553,6 +1555,7 @@ export type Database = {
           credit_change?: number
           dollar_value?: number
           id?: string
+          source_id?: string | null
           status?: string
           stripe_reference_id?: string | null
           type?: string
@@ -2014,6 +2017,7 @@ export type Database = {
       end_stream_session: { Args: { _session_id: string }; Returns: boolean }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
       ensure_credit_wallet: { Args: { _user_id: string }; Returns: string }
+      ensure_user_wallet: { Args: { _user_id: string }; Returns: undefined }
       expire_stale_media: { Args: never; Returns: Json }
       explore_clips: {
         Args: { _limit?: number; _offset?: number }
