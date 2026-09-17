@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Camera, Sparkles, X, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import {
@@ -73,10 +74,26 @@ export function NewCommunityPostDialog({
       setCategory(initialCategory);
       setTags([]);
     }
-    if (initialCamera) setCamera(true);
+    setCamera(Boolean(initialCamera));
   }, [open, initialCamera, initialCategory]);
 
   if (!open) return null;
+
+  if (initialCamera) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 sm:items-center sm:p-6">
+        <div className="max-h-[92dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-3xl border border-border bg-surface p-5 sm:rounded-3xl">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-extrabold text-foreground">Start live stream</h2>
+            <button type="button" aria-label="Close" onClick={() => onOpenChange(false)}>
+              <X className="size-5 text-muted-foreground" />
+            </button>
+          </div>
+          <BroadcastComposer onSwitchToBounty={() => onOpenChange(false)} />
+        </div>
+      </div>
+    );
+  }
 
   const submit = async () => {
     if (title.trim().length < 4) {

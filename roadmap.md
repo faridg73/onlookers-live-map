@@ -43,3 +43,7 @@
 ## Responsive layout audit (Sep 17)
 - [x] Standardize shared page containers, discovery layouts, profile sections, grids, and overflow behavior across phone, tablet, laptop, and large desktop widths
 - [x] Verify representative routes at iPhone, Android, iPad, laptop, and desktop viewport sizes
+## Creator workflow update (Sep 17)
+- [ ] Add creator vibe filters to Discover/Trending
+- [ ] Add broadcast category tagging before going live
+- [ ] Add creator stream history and analytics to Profile
