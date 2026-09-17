@@ -64,12 +64,43 @@ jobs:
             -storepass:env ANDROID_KEYSTORE_PASSWORD \
             -alias "$ANDROID_KEY_ALIAS" >/dev/null
 
+          mkdir -p "$RUNNER_TEMP/signing-probe"
+          printf 'Onlooker signing probe' > "$RUNNER_TEMP/signing-probe/probe.txt"
+          jar --create \
+            --file "$RUNNER_TEMP/signing-probe.jar" \
+            -C "$RUNNER_TEMP/signing-probe" probe.txt
+
+          sign_probe() {
+            cp "$RUNNER_TEMP/signing-probe.jar" "$RUNNER_TEMP/signing-probe-test.jar"
+            jarsigner \
+              -keystore android/app/onlooker-upload.keystore \
+              -storepass:env ANDROID_KEYSTORE_PASSWORD \
+              -keypass:env RESOLVED_ANDROID_KEY_PASSWORD \
+              "$RUNNER_TEMP/signing-probe-test.jar" \
+              "$ANDROID_KEY_ALIAS" >/dev/null 2>&1
+          }
+
+          export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
+          if ! sign_probe; then
+            # PKCS12 keystores commonly require the private-key password to
+            # match the keystore password, even when a separate secret exists.
+            export RESOLVED_ANDROID_KEY_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
+            if ! sign_probe; then
+              echo "::error::The private key cannot be unlocked. ANDROID_KEY_PASSWORD does not match this keystore, and the keystore password does not unlock it either. Re-enter the private-key password used when onlooker-upload.keystore was created."
+              exit 1
+            fi
+            echo "ANDROID_KEY_PASSWORD did not match; using the verified keystore password for this PKCS12 private key."
+          fi
+
+          echo "::add-mask::$RESOLVED_ANDROID_KEY_PASSWORD"
+          printf 'RESOLVED_ANDROID_KEY_PASSWORD=%s\n' "$RESOLVED_ANDROID_KEY_PASSWORD" >> "$GITHUB_ENV"
+
       - name: Build signed release bundle
         env:
           ANDROID_KEYSTORE_FILE: onlooker-upload.keystore
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ env.RESOLVED_ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew
           ./gradlew bundleRelease --no-daemon --stacktrace
