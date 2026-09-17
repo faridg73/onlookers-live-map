@@ -387,13 +387,23 @@ export function BountyVideoDialog({
                     </Link>
                   )}
                   {playing?.id === v.id && (
-                    <video
-                      src={playing.url}
-                      controls
-                      playsInline
-                      autoPlay
-                      className="mt-3 w-full rounded-xl bg-black"
-                    />
+                    <div className="relative mx-auto mt-3 w-full max-w-xs">
+                      <video
+                        src={playing.url}
+                        controls
+                        playsInline
+                        autoPlay
+                        className="max-h-[38dvh] w-full rounded-xl bg-black object-contain"
+                      />
+                      <button
+                        type="button"
+                        aria-label="Close video"
+                        onClick={() => setPlaying(null)}
+                        className="absolute right-1.5 top-1.5 flex size-8 items-center justify-center rounded-full bg-black/75 text-signal transition-colors hover:bg-black"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
