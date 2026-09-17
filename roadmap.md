@@ -18,7 +18,7 @@
 - [x] Flash "Happening here now" modal: format the bounty details box as structured badges (Capture Type, Camera Guidance, Instruction)
 - [x] Make the Flash location editable with live place search and add concise alerting copy
 - [x] Reduce Map marker clutter with zoom-aware POI visibility and smart bounty clusters
-- [ ] Resolve Android signing secret mismatch: encoded keystore was entered as the password; identify/reset the correct signing credentials.
+- [ ] Resolve Android signing secret mismatch: confirm whether the user regenerated the keystore or only changed its saved password, then align the encoded keystore and password.
 - [x] Reconnect Cloudflare connector with new scoped token, create zone, recreate all DNS records (A @/www proxied, Google + Lovable verification TXTs, SPF, MX, DKIM, notify Mailgun setup).
 - [x] User switched nameservers and onlookerlive.com is active through Cloudflare.
 - [ ] After activation: enable Under Attack Mode (security_level) and a rate-limiting / WAF rule on the free plan.

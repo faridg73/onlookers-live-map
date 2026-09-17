@@ -58,11 +58,6 @@ jobs:
             fi
           done
 
-          keytool -list \
-            -keystore android/app/onlooker-upload.keystore \
-            -storepass:env ANDROID_KEYSTORE_PASSWORD \
-            -alias "$ANDROID_KEY_ALIAS" >/dev/null
-
           # This upload keystore is PKCS12. Java uses the verified store
           # password for its private key as well; a separate key-password
           # secret caused the repeated BadPadding signing failure.
