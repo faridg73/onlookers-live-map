@@ -709,6 +709,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           title={FLASH_TITLE}
           place={liveSpot.formatted}
           requestKey={liveRequestKey}
+          save={liveRequestKey ?? `flash-${Date.now()}`}
           instructions={instructions}
           onEnd={() => {
             setLiveSpot(null);
