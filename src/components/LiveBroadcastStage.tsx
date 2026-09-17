@@ -223,7 +223,7 @@ export function LiveBroadcastStage({
           type="button"
           aria-label="End broadcast"
           disabled={!ready}
-          onClick={onEnd}
+          onClick={stopAndEnd}
           className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white disabled:opacity-50"
         >
           <Square className="size-6" />
