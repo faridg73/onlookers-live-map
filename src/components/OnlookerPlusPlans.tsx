@@ -79,14 +79,14 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                 plan.highlight ? `${plan.accent.border} shadow-[0_0_0_1px] shadow-signal/20` : "border-border"
               }`}
             >
-              <div className={`relative -m-4 mb-4 flex flex-col rounded-t-2xl border-b px-4 py-3 ${plan.accent.bg} ${plan.accent.border}`}>
+              <div className={`relative -m-4 mb-4 flex flex-col rounded-t-2xl border-b px-3.5 py-3 ${plan.accent.bg} ${plan.accent.border}`}>
                 {plan.highlight && (
                   <span className={`absolute -top-2.5 right-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] ${plan.accent.chip}`}>
                     <Sparkles className="size-2.5" /> Popular
                   </span>
                 )}
                 <div className="min-h-8">
-                  <p className={`font-display text-sm leading-6 ${plan.accent.text}`}>
+                  <p className={`whitespace-nowrap font-display text-[0.8rem] leading-6 tracking-tight ${plan.accent.text}`}>
                     <PlusMark label={plan.name} />
                   </p>
                 </div>
