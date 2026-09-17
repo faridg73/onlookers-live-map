@@ -24,7 +24,6 @@ export function LocationSearchBar({ className = "" }: { className?: string }) {
   const [applying, setApplying] = useState(false);
   const sessionToken = useRef<string>(crypto.randomUUID());
   const requestId = useRef(0);
-  useEffect(() => { console.log("LSB mount"); return () => console.log("LSB unmount"); }, []);
 
   // Debounced live suggestions — cities, landmarks, venues and addresses.
   useEffect(() => {
@@ -35,7 +34,6 @@ export function LocationSearchBar({ className = "" }: { className?: string }) {
       setListOpen(false);
       return;
     }
-    console.log("LSB query effect", trimmed);
     setSuggesting(true);
     const id = ++requestId.current;
     const timer = setTimeout(() => {
