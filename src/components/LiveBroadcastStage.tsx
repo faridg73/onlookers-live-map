@@ -193,6 +193,7 @@ export function LiveBroadcastStage({
         }
         setReady(true);
         setSwitching(false);
+        startRecording(stream);
         void navigator.mediaDevices
           .enumerateDevices()
           .then((devices) => {
@@ -216,7 +217,7 @@ export function LiveBroadcastStage({
     return () => {
       alive = false;
     };
-  }, [facing]);
+  }, [facing, startRecording]);
 
   // Release the camera when the stage closes.
   useEffect(
@@ -319,11 +320,11 @@ export function LiveBroadcastStage({
         <button
           type="button"
           aria-label="End broadcast"
-          disabled={!ready}
-          onClick={stopAndEnd}
+          disabled={!ready || saving}
+          onClick={() => void stopAndEnd()}
           className="inline-flex size-16 items-center justify-center rounded-full bg-destructive text-white disabled:opacity-50"
         >
-          <Square className="size-6" />
+          {saving ? <Loader2 className="size-6 animate-spin" /> : <Square className="size-6" />}
         </button>
         {multiCamera && (
           <button
