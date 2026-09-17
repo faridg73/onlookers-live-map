@@ -92,8 +92,11 @@ function TrendingScreen() {
     ).length;
 
   return (
-    <div className="app-shell pb-28 pt-6">
-      <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
+    <div className="app-shell pb-28 pt-[max(env(safe-area-inset-top),1.5rem)]">
+      <Link
+        to="/discover"
+        className="inline-block py-2 pr-4 text-xs font-bold uppercase tracking-[0.14em] text-signal"
+      >
         ← Browse places
       </Link>
 
