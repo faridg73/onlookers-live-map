@@ -546,7 +546,9 @@ function CommunityHub() {
 
       {view === "map" ? (
         <div className="mt-5 px-5 sm:px-8">
-          <GlobalFeedMap focus={focus} />
+          <SectionBoundary label="The map">
+            <GlobalFeedMap focus={focus} />
+          </SectionBoundary>
         </div>
       ) : (
         <section className="mt-5 px-5 sm:px-8">

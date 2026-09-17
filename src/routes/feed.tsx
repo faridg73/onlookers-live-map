@@ -392,7 +392,9 @@ function FeedScreen() {
           </div>
         )}
         {list.length === 0 && (
-          <RecentCapturesFeed blurb="Nothing live nearby, watch captures that already wrapped." />
+          <SectionBoundary label="Recent captures">
+            <RecentCapturesFeed blurb="Nothing live nearby, watch captures that already wrapped." />
+          </SectionBoundary>
         )}
       </div>
     </div>

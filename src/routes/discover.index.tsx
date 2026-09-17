@@ -116,7 +116,9 @@ function DiscoverHome() {
       {view === "map" ? (
         <div className="mt-4 space-y-3">
           <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
-            <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
+            <SectionBoundary label="The map">
+              <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
+            </SectionBoundary>
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>

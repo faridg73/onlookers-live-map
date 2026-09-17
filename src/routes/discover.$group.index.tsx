@@ -11,7 +11,7 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
 import { discoveryImage } from "@/lib/discovery-visuals";
-import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
+import { RouteErrorPanel } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/discover/$group/")({
   loader: ({ params }) => {
