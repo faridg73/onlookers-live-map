@@ -48,13 +48,13 @@ export function AccountCenter() {
   const tier = wallet?.subscriptionTier ?? "free";
 
   return (
-    <section className="mt-6 rounded-3xl border border-border bg-surface-raised p-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+    <section className="mt-6 rounded-3xl border border-border bg-surface-raised p-3 sm:p-4 lg:p-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="min-w-0">
           <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Wallet balance
           </p>
-          <div className="mt-1 flex items-baseline gap-2">
+          <div className="mt-1 flex min-w-0 flex-wrap items-baseline gap-2">
             {loading ? (
               <span className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" /> Loading…

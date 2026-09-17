@@ -289,7 +289,7 @@ export function AlertSettingsCard() {
       <p className="mt-5 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
         Alert radius
       </p>
-      <div className="mt-2 grid grid-cols-4 gap-2">
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {RADIUS_CHOICES.map((miles) => (
           <button
             key={miles}

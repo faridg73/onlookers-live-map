@@ -25,7 +25,7 @@ export function BottomNav() {
   return (
     <>
       <nav className="pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-surface/85 pb-safe backdrop-blur-xl">
-        <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-0.5 pt-1">
+        <ul className="mx-auto flex w-full max-w-7xl items-stretch justify-between gap-0.5 px-0.5 pt-1 sm:px-4 lg:px-8">
           {items.map(({ to, label, icon: Icon, exact, ...item }) => (
             <Fragment key={to}>
               {to === "/post" && (

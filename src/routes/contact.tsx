@@ -79,7 +79,7 @@ function ContactScreen() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-lg px-4 pb-28 pt-8">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <header className="flex items-start gap-3">
         <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
           <Headphones className="size-6" />

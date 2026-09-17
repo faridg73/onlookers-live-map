@@ -245,7 +245,7 @@ function CommunityHub() {
 
   return (
     <main className="min-h-dvh overflow-x-hidden bg-background pb-28">
-      <div className="mx-auto w-full max-w-5xl">
+      <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
           <Compass className="size-4" /> Discover

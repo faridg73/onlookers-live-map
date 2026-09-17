@@ -24,7 +24,7 @@ export function BountyTipPicker({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {TIPS.map((amount) => {
           const on = value === amount;
           return (

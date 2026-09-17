@@ -78,7 +78,7 @@ function ModeratorDashboard() {
 
   if (!user || staff === false) {
     return (
-      <main className="mx-auto w-full max-w-lg px-4 pb-28 pt-16 text-center">
+      <main className="reading-shell pb-28 pt-16 text-center">
         <ShieldCheck className="mx-auto size-8 text-signal" />
         <h1 className="mt-4 font-display text-2xl text-foreground">Moderators only</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -95,7 +95,7 @@ function ModeratorDashboard() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-lg px-4 pb-28 pt-8">
+    <main className="mx-auto w-full max-w-7xl px-4 pb-28 pt-8 sm:px-6 lg:px-8">
       <header className="flex items-start gap-3">
         <Gavel className="mt-1 size-6 text-signal" />
         <div>

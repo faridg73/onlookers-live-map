@@ -72,7 +72,7 @@ function GroupScreen() {
       : [];
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
         ← All places
       </Link>
@@ -117,7 +117,7 @@ function GroupScreen() {
         </div>
       )}
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {loading &&
           places.length === 0 &&
           [0, 1, 2, 3].map((i) => (

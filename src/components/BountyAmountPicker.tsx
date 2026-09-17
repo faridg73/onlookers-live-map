@@ -26,7 +26,7 @@ export function BountyAmountPicker({
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {PRESETS.map(({ amount, tag, icon }) => {
           const on = value === amount;
           return (

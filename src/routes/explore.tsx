@@ -51,7 +51,7 @@ function ExplorePage() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-lg px-4 pb-28 pt-8">
+    <main className="app-shell pb-28 pt-8">
       <h1 className="font-display text-3xl text-foreground">Explore</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Live views captured by Onlookers around the world and down the street.
@@ -92,7 +92,7 @@ function ExplorePage() {
         </p>
       )}
 
-      <div className="mt-6 space-y-5">
+      <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {tab === "nearby" &&
           clips.map((clip) => (
             <ClipCard key={clip.id} clip={clip} />

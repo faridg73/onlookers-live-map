@@ -56,7 +56,7 @@ export function CategoryPicker({
         </button>
       )}
 
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 min-[420px]:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6">
         {PRIMARY_CATEGORIES.map((c) => {
           const on = value === c.id;
           const hue = `var(--cat-${c.id})`;

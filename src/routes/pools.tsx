@@ -164,7 +164,7 @@ function PoolsScreen() {
     }`;
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <h1 className="font-display text-2xl tracking-tight text-foreground">Group Pools</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Everyone chips in Credits together to fund a bigger bounty or sponsor a local flash meetup.
@@ -244,7 +244,7 @@ function PoolsScreen() {
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {POOL_GOAL_PRESETS.map((amount) => (
                   <button
                     key={amount}
@@ -269,7 +269,7 @@ function PoolsScreen() {
                 <p className="mb-2 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
                   Your starter chip-in
                 </p>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {POOL_CHIP_IN_AMOUNTS.map((amount) => (
                     <button
                       key={amount}
@@ -312,7 +312,7 @@ function PoolsScreen() {
             </Button>
           )}
 
-          <div className="mt-6 space-y-3">
+          <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {loading ? (
               <p className="text-sm text-muted-foreground">Loading pools…</p>
             ) : pools.length === 0 ? (

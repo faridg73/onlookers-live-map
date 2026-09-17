@@ -206,7 +206,7 @@ function FeedScreen() {
   };
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Live requests</h1>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
@@ -348,7 +348,7 @@ function FeedScreen() {
       </div>
 
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
-      <div className="mt-2 grid grid-cols-5 gap-1.5">
+      <div className="mt-2 grid grid-cols-2 gap-1.5 min-[420px]:grid-cols-3 sm:grid-cols-5">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -365,7 +365,7 @@ function FeedScreen() {
         ))}
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {list.map((r) => (
           <BountyDetailsDialog key={r.id} request={r} onClaim={claim}>
             <RequestCard request={r} compact distanceLabel={distanceLabel(r)} />

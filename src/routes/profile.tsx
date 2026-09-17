@@ -147,21 +147,23 @@ function ProfileScreen() {
 
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
-      <div className="flex items-center gap-4">
+    <div className="app-shell pb-28 pt-6">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-signal font-display text-2xl text-signal-foreground">
           {(profile?.display_name ?? user?.email ?? "ON").slice(0, 2).toUpperCase()}
         </div>
-        <div>
-          <h1 className="flex items-center gap-2 font-display text-2xl tracking-tight text-foreground">
+        <div className="min-w-0">
+          <h1 className="flex min-w-0 items-center gap-2 font-display text-2xl tracking-tight text-foreground">
+            <span className="truncate">
             {profile?.display_name ?? user?.email?.split("@")[0] ?? "Onlooker"}
+            </span>
             {verified && <VerifiedBadge className="size-5" />}
           </h1>
           <p className="text-sm text-muted-foreground">Onlooker since 2025 · Harbor District</p>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-3 gap-3">
+      <div className="mt-6 grid grid-cols-1 gap-3 min-[360px]:grid-cols-3">
         {STATS.map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-2xl border border-border bg-surface p-4 text-center">
             <Icon className="mx-auto size-4 text-signal" />
@@ -221,7 +223,7 @@ function ProfileScreen() {
       </Link>
 
       <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
-      <div className="mt-3 space-y-2">
+      <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {ACTIVITY.map(({ icon: Icon, text, meta }) => (
           <div
             key={text}
@@ -243,7 +245,7 @@ function ProfileScreen() {
       <MyBountyVideos />
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {mine.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
             You haven't posted a live request yet.

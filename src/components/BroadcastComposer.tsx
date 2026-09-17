@@ -278,7 +278,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
 
       <div>
         <p className="text-xs font-bold uppercase text-muted-foreground">Lane</p>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mt-2 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 lg:grid-cols-4">
           {COMMUNITY_CATEGORIES.map((option) => (
             <Button
               key={option.id}

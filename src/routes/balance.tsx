@@ -87,7 +87,7 @@ function BalanceScreen() {
   }, [user, refresh]);
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
       <Link
         to="/profile"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

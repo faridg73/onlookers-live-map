@@ -95,13 +95,13 @@ function HuntScreen() {
   const stat = "rounded-2xl border border-border bg-surface p-3";
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-28 pt-6">
+    <div className="app-shell pb-28 pt-6">
       <h1 className="font-display text-3xl tracking-tight text-foreground">Hunter dashboard</h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Open bounties you can claim right now, ranked for the fastest payout.
       </p>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
+      <div className="mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
         <div className={stat}>
           <DollarSign className="size-4 text-signal" aria-hidden />
           <p className="mt-1 font-display text-xl text-foreground">${potential}</p>
@@ -162,15 +162,15 @@ function HuntScreen() {
       <div className="mt-5 space-y-4">
         <HunterEarningBanner />
 
-        <div className="space-y-3">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {list.map(({ request, payout, left, miles }) => (
-            <div key={request.id}>
-              <div className="flex items-center justify-between gap-2 px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
-                <span className="flex items-center gap-2">
+              <div key={request.id} className="min-w-0">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
+                <span className="flex min-w-0 flex-wrap items-center gap-2">
                   <span className="text-signal">Earn ${payout}</span>
                   <UrgencyBadge minutesLeft={left} bounty={payout} compact />
                 </span>
-                <span className="flex items-center gap-2 text-muted-foreground">
+                <span className="flex shrink-0 flex-col items-end gap-1 text-muted-foreground sm:flex-row sm:gap-2">
                   <span className="flex items-center gap-1">
                     <Clock className="size-3" aria-hidden /> {left} min left
                   </span>
