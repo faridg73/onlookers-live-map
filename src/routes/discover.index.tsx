@@ -8,6 +8,8 @@ import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { RadarAlerts } from "@/components/RadarAlerts";
 import { AreaPicker } from "@/components/AreaPicker";
+import { LocationSearchBar } from "@/components/LocationSearchBar";
+
 import { DISCOVERY_GROUPS, discoveryGroupBySlug, placeSlug } from "@/lib/discovery";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
@@ -75,9 +77,12 @@ function DiscoverHome() {
         view.
       </p>
 
+      <LocationSearchBar className="mt-4" />
+
       <div className="mt-4">
         <AreaPicker />
       </div>
+
 
       <Link
         to="/discover/trending"
