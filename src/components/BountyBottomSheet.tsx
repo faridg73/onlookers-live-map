@@ -119,7 +119,7 @@ export function BountyBottomSheet({
         }
       }}
     >
-      <SheetContent side="bottom" className="rounded-t-3xl border-border bg-surface px-5 pb-8">
+      <SheetContent side="bottom" className="rounded-t-3xl border-border bg-surface px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5">
         <SheetHeader className="text-left">
           <div className="flex items-center gap-2">
             <CategoryBadge category={request.category} compact />

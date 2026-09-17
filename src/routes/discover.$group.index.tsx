@@ -117,7 +117,7 @@ function GroupScreen() {
         </div>
       )}
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {loading &&
           places.length === 0 &&
           [0, 1, 2, 3].map((i) => (

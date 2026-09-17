@@ -92,7 +92,7 @@ function ExplorePage() {
         </p>
       )}
 
-      <div className="mt-6 space-y-5">
+      <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {tab === "nearby" &&
           clips.map((clip) => (
             <ClipCard key={clip.id} clip={clip} />

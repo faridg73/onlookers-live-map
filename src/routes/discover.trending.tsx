@@ -107,7 +107,7 @@ function TrendingScreen() {
         <AreaPicker />
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
         <button
           type="button"
           onClick={() => setFilter(null)}
@@ -148,7 +148,7 @@ function TrendingScreen() {
             Real games, concerts and shows on sale around {area.label}.
           </p>
 
-          <div className="mt-3 space-y-3">
+          <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {eventsLoading && events.length === 0
               ? [0, 1, 2].map((i) => (
                   <div
@@ -169,7 +169,7 @@ function TrendingScreen() {
 
 
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <TrendingCard
             key={item.place.id}
