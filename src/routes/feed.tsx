@@ -19,6 +19,7 @@ import {
 } from "@/lib/onlooker";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { requestCurrentPosition } from "@/lib/geolocation";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/feed")({
     ],
   }),
   component: FeedScreen,
+  errorComponent: RouteErrorPanel,
 });
 
 const FILTERS: Array<{ key: RequestStatus | "all"; label: string }> = [

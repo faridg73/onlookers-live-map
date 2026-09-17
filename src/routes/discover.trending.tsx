@@ -12,6 +12,7 @@ import { discoveryGroupBySlug } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 
 export const Route = createFileRoute("/discover/trending")({
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/discover/trending")({
     ],
   }),
   component: TrendingScreen,
+  errorComponent: RouteErrorPanel,
 });
 
 const TAGS = [

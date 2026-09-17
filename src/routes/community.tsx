@@ -34,6 +34,7 @@ import {
 import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/community")({
     ],
   }),
   component: CommunityHub,
+  errorComponent: RouteErrorPanel,
 });
 
 function CommunityHub() {

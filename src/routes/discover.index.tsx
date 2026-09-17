@@ -17,6 +17,7 @@ import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
 import { discoveryImage } from "@/lib/discovery-visuals";
+import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/discover/")({
     ],
   }),
   component: DiscoverHome,
+  errorComponent: RouteErrorPanel,
 });
 
 const WEEKEND = [0, 5, 6];
