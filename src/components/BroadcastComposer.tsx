@@ -146,8 +146,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         initialMuted={!micOn}
         onEnd={() => {
           setLiveNow(null);
-          toast.success("Broadcast ended");
-          void navigate({ to: "/discover" });
+          toast.success("Broadcast ended", {
+            description: "Find it in your profile history.",
+          });
+          void navigate({ to: "/profile" });
         }}
       />
     );
