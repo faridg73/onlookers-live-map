@@ -79,18 +79,18 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                 plan.highlight ? `${plan.accent.border} shadow-[0_0_0_1px] shadow-signal/20` : "border-border"
               }`}
             >
-              <div className={`-m-4 mb-4 rounded-t-2xl border-b px-4 py-3 ${plan.accent.bg} ${plan.accent.border}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <p className={`font-display text-base ${plan.accent.text}`}>
+              <div className={`-m-4 mb-4 flex flex-col rounded-t-2xl border-b px-4 py-3 ${plan.accent.bg} ${plan.accent.border}`}>
+                <div className="flex min-h-8 items-start justify-between gap-2">
+                  <p className={`font-display text-sm leading-6 ${plan.accent.text}`}>
                     <PlusMark label={plan.name} />
                   </p>
                   {plan.highlight && (
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] ${plan.accent.chip}`}>
+                    <span className={`mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] ${plan.accent.chip}`}>
                       <Sparkles className="size-2.5" /> Popular
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-[0.7rem] text-muted-foreground">{plan.tagline}</p>
+                <p className="mt-1 min-h-[2rem] text-[0.7rem] leading-4 text-muted-foreground">{plan.tagline}</p>
               </div>
 
               <div className="flex items-baseline gap-1">
