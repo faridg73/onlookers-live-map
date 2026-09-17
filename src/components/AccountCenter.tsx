@@ -74,7 +74,7 @@ export function AccountCenter() {
 
         <span className="inline-flex items-center gap-1.5 rounded-full border border-signal/40 bg-signal/10 px-3 py-1 text-xs font-semibold text-signal">
           <CoinsIcon className="size-3.5" />
-          {tier === "free" ? "Free plan" : <><PlusMark /> {tier}</>}
+          {tier === "free" ? "Free plan" : <PlusMark label={tier} />}
         </span>
       </div>
 
