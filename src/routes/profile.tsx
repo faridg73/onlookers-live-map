@@ -46,6 +46,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { SocialLinks } from "@/components/Footer";
+import { AccountCenter } from "@/components/AccountCenter";
 
 
 export const Route = createFileRoute("/profile")({
@@ -173,6 +174,8 @@ function ProfileScreen() {
       </div>
 
       <StreakCard />
+
+      <AccountCenter />
 
       <Link
         to="/balance"
