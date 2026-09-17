@@ -310,38 +310,29 @@ export function BountyVideoDialog({
                     <button
                       type="button"
                       aria-label="Share video"
-                      onClick={() => void shareBountyVideo(v)}
-                      className="text-muted-foreground transition-colors hover:text-signal"
+                      title={v.uploader_id === user.id ? "Share to TikTok / Instagram Reels" : "Share video"}
+                      disabled={v.uploader_id === user.id && sharingId === v.id}
+                      onClick={() => (v.uploader_id === user.id ? void shareClip(v) : void shareBountyVideo(v))}
+                      className="text-muted-foreground transition-colors hover:text-signal disabled:opacity-50"
                     >
-                      <Share2 className="size-4" />
+                      {v.uploader_id === user.id && sharingId === v.id ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Share2 className="size-4" />
+                      )}
                     </button>
                     {v.uploader_id === user.id && (
-                      <>
-                        <button
-                          type="button"
-                          aria-label="Share to TikTok / Instagram Reels"
-                          title="Share to TikTok / Instagram Reels"
-                          disabled={sharingId === v.id}
-                          onClick={() => void shareClip(v)}
-                          className="text-muted-foreground transition-colors hover:text-signal disabled:opacity-50"
-                        >
-                          {sharingId === v.id ? (
-                            <Loader2 className="size-4 animate-spin" />
-                          ) : (
-                            <Share2 className="size-4" />
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          aria-label="Delete video"
-                          onClick={() => void remove(v)}
-                          className="text-muted-foreground transition-colors hover:text-destructive"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </>
+                      <button
+                        type="button"
+                        aria-label="Delete video"
+                        onClick={() => void remove(v)}
+                        className="text-muted-foreground transition-colors hover:text-destructive"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
                     )}
                   </div>
+
                   {v.accepted_at ? (
                     <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
                       <CoinsIcon className="size-3.5" /> Accepted ·{" "}
