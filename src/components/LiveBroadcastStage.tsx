@@ -28,6 +28,8 @@ export function LiveBroadcastStage({
   initialMuted = false,
   requestKey = null,
   instructions = null,
+  save = null,
+  bounty = 0,
 }: {
   title: string;
   place: string;
