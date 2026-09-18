@@ -79,4 +79,4 @@ Home Explore Nearby neon category artwork
 - [x] Add the uploaded Traffic badge to the large Home card
 - [x] Keep Strange Sightings artwork prominent on its Home card
 - [x] Remove custom badge artwork from compact category dropdowns
-- [ ] Verify Home card sizing and unchanged tap behaviors
+- [x] Verify Home card sizing and unchanged tap behaviors
