@@ -28,4 +28,4 @@ Traffic map mode
 - [x] Add live highway traffic overlay
 - [x] Highlight incident heat zones in yellow and orange
 - [x] Show vehicle incidents and closures with timestamps
-- [ ] Verify traffic mode across phone and desktop
+- [x] Verify traffic mode across phone and desktop
