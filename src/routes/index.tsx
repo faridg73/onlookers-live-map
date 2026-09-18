@@ -597,7 +597,7 @@ function MapScreen() {
                     variant="outline"
                     aria-pressed={active}
                     onClick={() => {
-                      setCategoryTaps(recordCategoryTap(tile.id));
+                      recordCategoryTap(tile.id);
                       if (tile.communityLink) {
                         void navigate({ to: "/community" });
                         return;
