@@ -14,15 +14,23 @@ export function BroadcastCategoryPicker({
   subcategory,
   onCategoryChange,
   onSubcategoryChange,
+  allowAll = false,
+  laneLabel = "Broadcast lane",
+  menuLabel = "Choose a broadcast lane",
+  allLabel = "All categories",
 }: {
-  categoryId: BroadcastCategoryId;
+  categoryId: BroadcastCategoryId | null;
   subcategory: string | null;
-  onCategoryChange: (categoryId: BroadcastCategoryId) => void;
+  onCategoryChange: (categoryId: BroadcastCategoryId | null) => void;
   onSubcategoryChange: (subcategory: string | null) => void;
+  allowAll?: boolean;
+  laneLabel?: string;
+  menuLabel?: string;
+  allLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const selected = broadcastCategoryById(categoryId);
+  const selected = categoryId ? broadcastCategoryById(categoryId) : null;
 
   useEffect(() => {
     if (!open) return;
@@ -44,14 +52,14 @@ export function BroadcastCategoryPicker({
         className="h-auto min-h-14 w-full justify-start gap-3 border-border bg-surface-raised px-3 py-2.5 text-left hover:border-signal/60 hover:bg-surface-raised"
       >
         <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-signal/30 bg-signal/10 text-lg">
-          {selected.icon}
+          {selected?.icon ?? "🌐"}
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[0.6rem] font-extrabold uppercase text-signal">
-            Broadcast lane
+            {laneLabel}
           </span>
           <span className="block truncate text-sm font-extrabold text-foreground">
-            {selected.label}
+            {selected?.label ?? allLabel}
           </span>
         </span>
         <ChevronDown className={cn("size-4 text-muted-foreground transition-transform", open && "rotate-180")} />
@@ -64,8 +72,29 @@ export function BroadcastCategoryPicker({
           className="absolute inset-x-0 top-[calc(100%+0.4rem)] z-40 max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-signal/35 bg-popover p-1.5 shadow-2xl"
         >
           <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-popover px-2 py-2 text-[0.62rem] font-extrabold uppercase text-muted-foreground">
-            <Layers3 className="size-3.5 text-signal" /> Choose a broadcast lane
+            <Layers3 className="size-3.5 text-signal" /> {menuLabel}
           </div>
+          {allowAll && (
+            <Button
+              type="button"
+              variant="ghost"
+              role="option"
+              aria-selected={categoryId === null}
+              onClick={() => {
+                onCategoryChange(null);
+                onSubcategoryChange(null);
+                setOpen(false);
+              }}
+              className={cn(
+                "h-auto min-h-11 w-full justify-start gap-2.5 whitespace-normal rounded-md px-2 py-2 text-left",
+                categoryId === null ? "bg-signal/10 text-signal" : "text-foreground hover:bg-accent",
+              )}
+            >
+              <span className="w-6 shrink-0 text-center text-base" aria-hidden>🌐</span>
+              <span className="min-w-0 flex-1 text-xs font-bold leading-snug">{allLabel}</span>
+              {categoryId === null && <Check className="size-4 shrink-0" strokeWidth={3} />}
+            </Button>
+          )}
           {BROADCAST_CATEGORIES.map((category, index) => {
             const active = category.id === categoryId;
             return (
@@ -99,7 +128,7 @@ export function BroadcastCategoryPicker({
         </div>
       )}
 
-      <div className="mt-3">
+      {selected && <div className="mt-3">
         <p className="text-[0.62rem] font-extrabold uppercase text-muted-foreground">
           Refine your vibe
         </p>
@@ -142,7 +171,7 @@ export function BroadcastCategoryPicker({
             );
           })}
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

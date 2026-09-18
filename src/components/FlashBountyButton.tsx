@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
+import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,10 @@ import {
 
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
+import {
+  broadcastCategoryById,
+  type BroadcastCategoryId,
+} from "@/lib/broadcast-categories";
 
 /**
  * One-tap flash bounty. Tapping it grabs the poster's GPS straight away and
@@ -78,6 +83,8 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
   const [customBase, setCustomBase] = useState<string>(String(DEFAULT_CUSTOM_BASE));
   const [customError, setCustomError] = useState<string | null>(null);
   const [conditionIds, setConditionIds] = useState<FlashConditionId[]>([]);
+  const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
+  const [subcategory, setSubcategory] = useState<string | null>(null);
   /** Pro / Media Desk dispatch for outlets, investigators and pro users. */
   const [proMode, setProMode] = useState(false);
   const [proOptionIds, setProOptionIds] = useState<FlashProOptionId[]>([]);
@@ -109,13 +116,16 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
       instructions,
       proMode,
       proOptionIds,
+      categoryId,
+      subcategory,
     }),
-    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds],
+    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds, categoryId, subcategory],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
   const totalCredits = quote.total;
   const isCustom = selectedTier.id === "standard";
+  const selectedCategory = broadcastCategoryById(categoryId);
 
   const findSpot = () => {
     setLocating(true);
@@ -218,7 +228,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
         place: spot.formatted,
         note: `Live now, ${FLASH_DURATION_MINUTES} minute stream from this exact spot.`,
         bounty: totalCredits,
-        category: "events",
+        category: selectedCategory.requestCategory,
         dbId: locked.id,
         lat: spot.latitude,
         lng: spot.longitude,
@@ -288,6 +298,21 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </DialogHeader>
 
           <div className="space-y-4">
+            <div className="rounded-xl border border-border bg-background p-3">
+              <p className="mb-2 text-[0.65rem] font-bold uppercase text-muted-foreground">
+                Flash category & vibe
+              </p>
+              <BroadcastCategoryPicker
+                categoryId={categoryId}
+                subcategory={subcategory}
+                onCategoryChange={(next) => {
+                  if (next) setCategoryId(next);
+                }}
+                onSubcategoryChange={setSubcategory}
+                laneLabel="Flash lane"
+                menuLabel="Choose a Flash lane"
+              />
+            </div>
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
               <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
                 <MapPin className="size-4 shrink-0 text-signal" /> Location

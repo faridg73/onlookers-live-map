@@ -1,4 +1,5 @@
 import type { CommunityCategory } from "@/lib/community";
+import type { CategoryId } from "@/lib/onlooker";
 
 export type BroadcastCategoryId =
   | "breaking-incidents"
@@ -23,6 +24,7 @@ export type BroadcastCategory = {
   label: string;
   icon: string;
   communityCategory: CommunityCategory;
+  requestCategory: CategoryId;
   subcategories: readonly string[];
 };
 
@@ -32,6 +34,7 @@ const DEFAULT_BROADCAST_CATEGORY: BroadcastCategory = {
   label: "Breaking News & Incidents",
   icon: "🚨",
   communityCategory: "breaking",
+  requestCategory: "community",
   subcategories: ["Accidents", "Weather", "Hazards", "Emergency Services"],
 };
 
@@ -42,6 +45,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Traffic & Public Updates",
     icon: "🚦",
     communityCategory: "traffic",
+    requestCategory: "transit",
     subcategories: ["Road Closures", "Public Transit", "Congestion", "Heavy Traffic"],
   },
   {
@@ -49,6 +53,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Arts & Performances",
     icon: "🎨",
     communityCategory: "arts",
+    requestCategory: "art",
     subcategories: ["Street Musicians", "Theater", "Art Installations", "Pop-ups"],
   },
   {
@@ -56,6 +61,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Food & Local Dining",
     icon: "🍜",
     communityCategory: "meetups",
+    requestCategory: "food",
     subcategories: ["Food Trucks", "Night Markets", "Hidden Gems", "Cafe Culture"],
   },
   {
@@ -63,6 +69,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Car Culture & Spotting",
     icon: "🏎️",
     communityCategory: "traffic",
+    requestCategory: "vehicles",
     subcategories: ["Exotics", "Supercar", "Classic", "Meetup", "Modified"],
   },
   {
@@ -70,6 +77,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Style & Street Fashion",
     icon: "✨",
     communityCategory: "culture",
+    requestCategory: "street",
     subcategories: ["Trends", "Outfits", "Shopping Hubs"],
   },
   {
@@ -77,6 +85,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Local Events & Sports",
     icon: "🏆",
     communityCategory: "sports",
+    requestCategory: "sports",
     subcategories: ["Community Games", "Tournaments", "Parades", "Gatherings"],
   },
   {
@@ -84,6 +93,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Nature & Wildlife",
     icon: "🌿",
     communityCategory: "general",
+    requestCategory: "outdoors",
     subcategories: ["Trails", "Parks", "Ocean/Beach Sightings", "Sunset Spots"],
   },
   {
@@ -91,6 +101,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Real Estate & Architecture",
     icon: "🏛️",
     communityCategory: "culture",
+    requestCategory: "realestate",
     subcategories: ["Neighborhood Tours", "Construction", "Historic Homes"],
   },
   {
@@ -98,6 +109,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Nightlife & Entertainment",
     icon: "🌙",
     communityCategory: "arts",
+    requestCategory: "nightlife",
     subcategories: ["Clubs", "Lounges", "Concerts", "Comedy"],
   },
   {
@@ -105,6 +117,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Tech & Innovation",
     icon: "🤖",
     communityCategory: "general",
+    requestCategory: "events",
     subcategories: ["Gadget Spotting", "Robotics", "Local Tech Hubs"],
   },
   {
@@ -112,6 +125,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Shopping & Retail",
     icon: "🛍️",
     communityCategory: "markets",
+    requestCategory: "markets",
     subcategories: ["Sales", "Grand Openings", "Mall Activity"],
   },
   {
@@ -119,6 +133,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Fitness & Outdoors",
     icon: "🏃",
     communityCategory: "sports",
+    requestCategory: "outdoors",
     subcategories: ["Run Clubs", "Skate Parks", "Outdoor Workouts"],
   },
   {
@@ -126,6 +141,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Pets & Animals",
     icon: "🐾",
     communityCategory: "general",
+    requestCategory: "community",
     subcategories: ["Dog Parks", "Adoption Events", "Local Wildlife"],
   },
   {
@@ -133,6 +149,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Community & Culture",
     icon: "🤝",
     communityCategory: "culture",
+    requestCategory: "community",
     subcategories: ["Farmers Markets", "Charity Drives", "Local Traditions"],
   },
   {
@@ -140,6 +157,7 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
     label: "Casual IRL / Just Chatting",
     icon: "💬",
     communityCategory: "general",
+    requestCategory: "street",
     subcategories: ["General Hangouts", "Street Interviews", "Daily Life"],
   },
 ] as const;
