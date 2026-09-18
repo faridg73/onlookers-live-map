@@ -2060,6 +2060,7 @@ export type Database = {
           view_count: number
         }[]
       }
+      guard_cashout_velocity: { Args: { _uid: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

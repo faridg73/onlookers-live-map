@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { submitEarningsPayout } from "@/lib/cashout.functions";
 
 export type WalletBalance = {
   available: number;
@@ -36,12 +37,9 @@ export type PayoutRequest = {
 
 /** Files a payout request for admin review and holds the amount aside. */
 export async function requestEarningsPayout(amount: number, destination = "bank") {
-  const { data, error } = await supabase.rpc("request_earnings_payout", {
-    _amount: amount,
-    _destination: destination,
-  });
-  if (error) throw new Error(error.message);
-  return data as string;
+  const result = await submitEarningsPayout({ data: { amount, destination } });
+  if (result.error || !result.id) throw new Error(result.error ?? "Could not file the payout request");
+  return result.id;
 }
 
 /** Payout requests filed by the signed-in person, newest first. */

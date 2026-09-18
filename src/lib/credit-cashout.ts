@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { submitCreditCashout } from "@/lib/cashout.functions";
 import { CREDITS_PER_USD, creditsToUsdValue } from "@/lib/credits";
 
 export { CREDITS_PER_USD };
@@ -46,14 +47,9 @@ export async function listCreditPayouts(limit = 20): Promise<PayoutRequestRow[]>
  * never be spent twice or vanish without a payout row.
  */
 export async function requestCreditCashout(credits: number): Promise<string> {
-  const { data, error } = await supabase.rpc("request_credit_cashout", {
-    _coins: Math.round(credits),
-  });
-  if (error) {
-    if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");
-    throw new Error(error.message);
-  }
-  return String(data);
+  const result = await submitCreditCashout({ data: { credits: Math.round(credits) } });
+  if (result.error || !result.id) throw new Error(result.error ?? "Could not file the cash-out request");
+  return result.id;
 }
 
 export const PAYOUT_STATUS_LABELS: Record<string, string> = {
