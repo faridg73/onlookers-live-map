@@ -75,6 +75,20 @@ export function MyBountyVideos() {
     }
   }
 
+  async function remove(video: BountyVideo) {
+    setDeleting(video.id);
+    try {
+      await deleteBountyVideo(video);
+      setVideos((prev) => prev.filter((row) => row.id !== video.id));
+      setPlaying((current) => (current?.id === video.id ? null : current));
+      toast.success("Stream removed from your history.");
+    } catch {
+      toast.error("Couldn't delete that stream. Try again.");
+    } finally {
+      setDeleting(null);
+    }
+  }
+
   return (
     <section className="mt-6 rounded-3xl border border-border bg-surface-raised p-3 sm:p-4 lg:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
