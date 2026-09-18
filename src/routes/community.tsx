@@ -41,8 +41,19 @@ import {
   broadcastCategoryById,
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
+import {
+  STRANGE_SIGHTINGS_ID,
+  STRANGE_SIGHTINGS_IMAGE_URL,
+  STRANGE_SIGHTINGS_LABEL,
+  STRANGE_SIGHTINGS_SUBCATEGORIES,
+  matchesStrangeSighting,
+} from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
+  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs" } =>
+    search["mystery"] === "report" || search["mystery"] === "logs"
+      ? { mystery: search["mystery"] }
+      : {},
   head: () => ({
     meta: [
       { title: "Community impact and verified earnings | Onlooker" },
@@ -69,6 +80,7 @@ function CommunityHub() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
+  const { mystery } = Route.useSearch();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -76,6 +88,7 @@ function CommunityHub() {
   const [category, setCategory] = useState<CommunityCategory | "all">("all");
   const [tag, setTag] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
+  const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
@@ -124,6 +137,19 @@ function CommunityHub() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!mystery) return;
+    setStrangeSightings(true);
+    setCategory("all");
+    setCategoryId(null);
+    setTag(null);
+    setVibeGridOpen(true);
+    if (mystery === "report") {
+      setLiveFirst(false);
+      setComposing(true);
+    }
+  }, [mystery]);
 
   useEffect(() => {
     let alive = true;
@@ -229,6 +255,9 @@ function CommunityHub() {
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
 
     const inLane = inRange.filter(({ post }) => {
+      if (strangeSightings) {
+        return matchesStrangeSighting(`${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`);
+      }
       if (category === "all") return true;
       if (post.category !== category) return false;
       return !categoryId || post.tags.some((postTag) => postTag.toLowerCase() === categoryId);
@@ -237,7 +266,7 @@ function CommunityHub() {
 
     // Subcategory pills are strict: never substitute sibling or unrelated posts.
     return sort(exact);
-  }, [posts, category, categoryId, tag, radius, distanceFor, matchesTag]);
+  }, [posts, category, categoryId, strangeSightings, tag, radius, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
@@ -431,6 +460,7 @@ function CommunityHub() {
               setCategory("all");
               setTag(null);
               setCategoryId(null);
+              setStrangeSightings(false);
             }}
             className={category === "all" ? "text-signal" : "text-muted-foreground"}
           >
@@ -438,7 +468,7 @@ function CommunityHub() {
           </Button>
           </div>
         </div>
-        {/* Mobile keeps the sideways carousel; "See All" opens the full 16-lane grid. */}
+        {/* Mobile keeps the sideways carousel; "See All" opens every browse category. */}
         <div className="relative">
           {/* Subtle gradient edge fades while the carousel is scrolling */}
           {!vibeGridOpen && (
@@ -466,6 +496,7 @@ function CommunityHub() {
                       setCategoryId(lane.id);
                       setCategory(lane.communityCategory);
                       setTag(null);
+                      setStrangeSightings(false);
                     }}
                     aria-pressed={active}
                     className={`group flex h-full w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-signal/30 hover:border-signal/60"}`}
@@ -478,8 +509,10 @@ function CommunityHub() {
                         icon={Icon}
                         coverClass={visual.coverClass}
                       />
-                      <span className="absolute left-1.5 top-1.5 grid size-6 place-items-center rounded-md bg-background/70 text-sm backdrop-blur-sm" aria-hidden="true">
-                        {lane.icon}
+                      <span className="absolute left-1.5 top-1.5 grid size-7 place-items-center overflow-hidden rounded-md border border-signal/35 bg-background/80 text-sm backdrop-blur-sm" aria-hidden="true">
+                        {lane.iconImageUrl ? (
+                          <img src={lane.iconImageUrl} alt="" className="size-full object-cover p-0.5" />
+                        ) : lane.icon}
                       </span>
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
@@ -510,6 +543,34 @@ function CommunityHub() {
                 </div>
               );
             })}
+            <div role="listitem" className="min-w-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setStrangeSightings(true);
+                  setCategory("all");
+                  setCategoryId(null);
+                  setTag(null);
+                }}
+                aria-pressed={strangeSightings}
+                className={`group flex w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
+              >
+                <span className="relative block aspect-square w-full overflow-hidden bg-background">
+                  <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="Neon UFO above a glowing spiral" className="size-full object-cover" />
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
+                  <strong className="line-clamp-2 text-[0.72rem] font-extrabold leading-tight text-foreground">{STRANGE_SIGHTINGS_LABEL}</strong>
+                  <small className="line-clamp-2 text-[0.58rem] leading-snug text-muted-foreground">UFO · Unexplained Lights</small>
+                </span>
+              </button>
+              {strangeSightings && (
+                <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Strange sighting filters">
+                  {STRANGE_SIGHTINGS_SUBCATEGORIES.map((sub) => (
+                    <button key={sub} type="button" onClick={() => setTag(tag === sub ? null : sub)} aria-pressed={tag === sub} className={`rounded-full border px-2.5 py-1 text-[0.7rem] font-bold ${tag === sub ? "border-signal bg-signal text-signal-foreground" : "border-border text-muted-foreground"}`}>{sub}</button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
         <div
@@ -533,6 +594,7 @@ function CommunityHub() {
                   setCategory(c.id);
                   setTag(null);
                   setCategoryId(null);
+                  setStrangeSightings(false);
                 }}
                 aria-pressed={active}
                 className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
@@ -569,6 +631,18 @@ function CommunityHub() {
 
 
       </section>
+
+      {strangeSightings && (
+        <section className="mx-5 mt-4 border-y border-signal/45 bg-surface px-4 py-4 shadow-[0_0_24px_var(--color-signal)] sm:mx-8">
+          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-signal">Mystery desk</p>
+          <h2 className="mt-1 text-lg font-extrabold text-foreground">Report, investigate, or request proof</h2>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            <Button type="button" onClick={() => { setLiveFirst(false); setComposing(true); }} className="h-auto min-h-10 whitespace-normal text-xs">Report Sighting</Button>
+            <Button type="button" variant="outline" onClick={() => { setView("feed"); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }} className="h-auto min-h-10 whitespace-normal border-signal/45 text-xs">View Community Logs</Button>
+            <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal border-signal/45 text-xs"><Link to="/post" search={{ mystery: "1" }}>Request a Mystery Bounty</Link></Button>
+          </div>
+        </section>
+      )}
 
       <ScrollableLane
         className="mt-2 -mx-5 sm:-mx-8"
@@ -665,8 +739,8 @@ function CommunityHub() {
           <SectionBoundary label="The map">
             <GlobalFeedMap
               focus={focus}
-              categoryId={categoryId}
-              categoryLabel={categoryId ? broadcastCategoryById(categoryId).label : null}
+              categoryLabel={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
+              {...(strangeSightings ? { categoryId: STRANGE_SIGHTINGS_ID } : { categoryId })}
               subcategory={tag}
             />
           </SectionBoundary>
@@ -740,7 +814,8 @@ function CommunityHub() {
         onOpenChange={setComposing}
         onPosted={() => void load()}
         initialCamera={liveFirst}
-        {...(category !== "all" ? { initialCategory: category } : {})}
+        {...(strangeSightings ? { initialCategory: "general" as const, initialTitle: "Strange sighting near ", initialTags: [STRANGE_SIGHTINGS_ID, "UFO"] } : {})}
+        {...(!strangeSightings && category !== "all" ? { initialCategory: category } : {})}
       />
       </div>
 

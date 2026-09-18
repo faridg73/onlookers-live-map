@@ -58,6 +58,11 @@ import {
   recordCategoryTap,
   sortCategoriesByUsage,
 } from "@/lib/category-usage";
+import {
+  STRANGE_SIGHTINGS_IMAGE_URL,
+  matchesStrangeSighting,
+} from "@/lib/strange-sightings";
+import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -77,7 +82,8 @@ const MAP_CATEGORY_TILES: Array<{
   bountyMap?: boolean;
   communityLink?: boolean;
   guidesLink?: boolean;
-  theme?: { emoji: string; active: string; badge: string };
+  sightings?: boolean;
+  theme?: { emoji?: string; imageUrl?: string; active: string; badge: string };
 }> = [
   {
     id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"],
@@ -113,7 +119,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
-    theme: { emoji: "⚡", active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
+    theme: { imageUrl: breakingNewsAsset.url, active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
   },
   {
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
@@ -148,6 +154,11 @@ const MAP_CATEGORY_TILES: Array<{
     id: "guides", label: "Guides", icon: BookOpen, categories: [],
     guidesLink: true,
     theme: { emoji: "🧭", active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
+  },
+  {
+    id: "strange-sightings", label: "Strange Sightings & UFO", icon: Eye, categories: [],
+    sightings: true,
+    theme: { imageUrl: STRANGE_SIGHTINGS_IMAGE_URL, active: "border-signal bg-signal/15 text-foreground", badge: "text-signal" },
   },
 ];
 
@@ -202,6 +213,9 @@ function tileMatches(
   }
   if (tile.liveStreams) {
     return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+  }
+  if (tile.sightings) {
+    return matchesStrangeSighting(`${request.title} ${request.note} ${request.instructions ?? ""} ${request.place}`);
   }
   return Boolean(request.category && tile.categories.includes(request.category));
 }
@@ -341,6 +355,7 @@ function MapScreen() {
   const creatorsMode = activeCategoryTile?.creators === true;
   const scannerMode = activeCategoryTile?.scanner === true;
   const bountyMapMode = activeCategoryTile?.bountyMap === true;
+  const sightingsMode = activeCategoryTile?.sightings === true;
   const bountyMapRanked = useMemo(
     () =>
       bountyMapMode
@@ -627,7 +642,7 @@ function MapScreen() {
                       select(null);
                       setGatheringClusterIds([]);
                     }}
-                    className={`relative h-[5.5rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
+                    className={`relative h-[6.25rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
                       active
                         ? tile.theme
                           ? tile.theme.active
@@ -637,12 +652,16 @@ function MapScreen() {
                         : "border-border bg-background text-foreground"
                     }`}
                   >
-                    {tile.theme ? (
+                    {tile.theme?.imageUrl ? (
+                      <span className="size-10 overflow-hidden rounded-md border border-signal/50 bg-surface-raised shadow-[0_0_16px_var(--color-signal)]" aria-hidden="true">
+                        <img src={tile.theme.imageUrl} alt="" className="size-full object-cover" />
+                      </span>
+                    ) : tile.theme?.emoji ? (
                       <span className="text-2xl leading-none" aria-hidden="true">{tile.theme.emoji}</span>
                     ) : (
                       <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
                     )}
-                    <span className="w-full truncate">{tile.label}</span>
+                    <span className="line-clamp-2 w-full whitespace-normal px-1 leading-tight">{tile.label}</span>
                     <span className={`absolute right-1.5 top-1.5 text-[0.7rem] font-extrabold ${
                       active
                         ? tile.theme ? "text-current" : "text-signal-foreground"
@@ -654,6 +673,51 @@ function MapScreen() {
                 );
               })}
             </div>
+
+            {sightingsMode && (
+              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="" className="size-12 rounded-md border border-signal/50 object-cover shadow-[0_0_18px_var(--color-signal)]" />
+                    <div className="min-w-0">
+                      <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">Mystery watch</p>
+                      <h2 className="truncate text-base font-extrabold text-foreground">Strange Sightings &amp; UFO</h2>
+                    </div>
+                  </div>
+                  <Button type="button" variant="ghost" size="icon" aria-label="Close mystery watch" onClick={() => setCategoryTile(null)} className="size-8 shrink-0 text-muted-foreground">
+                    <X className="size-4" />
+                  </Button>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-3 space-y-2">
+                    {visible.slice(0, 5).map((request) => (
+                      <Button key={`sighting-${request.id}`} type="button" variant="outline" onClick={() => {
+                        select(request.id);
+                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                        setDrawerOpen(false);
+                      }} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-md border-signal/35 bg-background px-3 py-2.5 text-left">
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place}</span>
+                        </span>
+                        <span className="text-[0.68rem] font-extrabold uppercase text-signal">View</span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-signal/40 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No mystery bounties are active nearby. Be the first to report one.
+                  </p>
+                )}
+
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  <Button type="button" onClick={() => void navigate({ to: "/community", search: { mystery: "report" } })} className="h-auto min-h-10 whitespace-normal px-2 py-2 text-xs">Report Sighting</Button>
+                  <Button type="button" variant="outline" onClick={() => void navigate({ to: "/community", search: { mystery: "logs" } })} className="h-auto min-h-10 whitespace-normal border-signal/45 px-2 py-2 text-xs">View Community Logs</Button>
+                  <Button type="button" variant="outline" onClick={() => void navigate({ to: "/post", search: { mystery: "1" } })} className="h-auto min-h-10 whitespace-normal border-signal/45 px-2 py-2 text-xs">Request a Mystery Bounty</Button>
+                </div>
+              </div>
+            )}
 
             {bountyMapMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
