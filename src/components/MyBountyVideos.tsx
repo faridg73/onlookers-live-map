@@ -6,9 +6,26 @@ import { ShareVideoDialog } from "@/components/ShareVideoDialog";
 import { toast } from "sonner";
 import { formatCredits } from "@/lib/credits";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { listMyVideos, playbackUrl, thumbnailUrls, type BountyVideo } from "@/lib/bounty-videos";
+import {
+  deleteBountyVideo,
+  listMyVideos,
+  playbackUrl,
+  thumbnailUrls,
+  type BountyVideo,
+} from "@/lib/bounty-videos";
 
 function formatDuration(seconds: number | null) {
   if (!seconds) return "0:00";
@@ -21,6 +38,7 @@ export function MyBountyVideos() {
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const totalViews = videos.reduce((sum, video) => sum + Number(video.view_count ?? 0), 0);
@@ -56,6 +74,20 @@ export function MyBountyVideos() {
       setPlaying({ id: video.id, url: await playbackUrl(video.storage_path) });
     } catch {
       toast.error("Couldn't open that video.");
+    }
+  }
+
+  async function remove(video: BountyVideo) {
+    setDeleting(video.id);
+    try {
+      await deleteBountyVideo(video);
+      setVideos((prev) => prev.filter((row) => row.id !== video.id));
+      setPlaying((current) => (current?.id === video.id ? null : current));
+      toast.success("Stream removed from your history.");
+    } catch {
+      toast.error("Couldn't delete that stream. Try again.");
+    } finally {
+      setDeleting(null);
     }
   }
 
@@ -106,7 +138,32 @@ export function MyBountyVideos() {
             ) : (
               <div className="space-y-3">
                 {videos.map((v) => (
-                  <div key={v.id} className="rounded-2xl border border-border bg-surface p-3">
+                  <div key={v.id} className="relative rounded-2xl border border-border bg-surface p-3 pr-11">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Delete stream"
+                          disabled={deleting === v.id}
+                          className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full border border-border bg-surface-raised text-muted-foreground transition-colors hover:border-destructive/60 hover:text-destructive disabled:opacity-50"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this stream?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            “{v.request_title || "Live broadcast"}” will be removed from your
+                            profile history permanently. This can't be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep it</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => void remove(v)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                     <div className="flex flex-col gap-3 min-[460px]:flex-row min-[460px]:items-center">
                       {thumbs[v.id] ? (
                         <img
