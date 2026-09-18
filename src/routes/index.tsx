@@ -70,6 +70,7 @@ import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
 import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
 import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
 import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
+import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -98,7 +99,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"],
-    theme: { emoji: "🎭", active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
+    theme: { imageUrl: eventsArtsAsset.url, active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
   },
   {
     id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"],
