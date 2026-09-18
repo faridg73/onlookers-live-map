@@ -52,4 +52,4 @@ Top Creators map mode
 - [x] Add a network-wide creator leaderboard tile
 - [x] Rank creators by followers and reach
 - [x] Show verification badges and live status
-- [ ] Verify the grid across phone and desktop
+- [x] Verify the grid across phone and desktop
