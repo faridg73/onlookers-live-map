@@ -122,7 +122,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
-    theme: { emoji: "🔥", active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
+    theme: { imageUrl: trendingNearYouAsset.url, active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
   },
   {
     id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
