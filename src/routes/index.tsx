@@ -789,6 +789,60 @@ function MapScreen() {
               </div>
             )}
 
+            {scannerMode && (
+              <div className="mt-3 border-t border-violet-500/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-violet-400">
+                      <Volume2 className="size-3.5" /> Live scanner feed
+                    </p>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Scanner</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {visible.slice(0, 5).map((request) => {
+                      const emergency = isCrisisRequest(request);
+                      return (
+                        <Button key={request.id} type="button" variant="outline" onClick={() => {
+                          select(request.id);
+                          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                        }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-violet-500/35 bg-background px-3 py-2.5 text-left">
+                          <span className={`size-2 rounded-full ${emergency ? "animate-pulse bg-crisis" : "bg-violet-400"}`} />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                            <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
+                              {emergency ? "Emergency channel" : "Traffic channel"} · {request.place}
+                            </span>
+                          </span>
+                          <span className="flex shrink-0 items-center gap-1 text-[0.7rem] font-bold text-muted-foreground">
+                            <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
+                          </span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-violet-500/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No emergency or traffic chatter is hitting the scanner right now.
+                  </p>
+                )}
+
+                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-bold text-foreground">
+                  <Volume2 className="size-4 text-violet-400" /> Open scanner audio
+                </Button>
+                {scannerNotice && (
+                  <p className="mt-2 text-center text-[0.75rem] text-muted-foreground">
+                    No verified public scanner audio is linked to these alerts yet.
+                  </p>
+                )}
+              </div>
+            )}
+
             {creatorsMode && (
               <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
