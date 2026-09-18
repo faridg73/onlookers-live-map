@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ChevronDown, HelpCircle, X } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
