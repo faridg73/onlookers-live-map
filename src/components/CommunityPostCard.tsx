@@ -10,10 +10,12 @@ import { HunterBadge } from "@/components/HunterBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { FollowButton } from "@/components/FollowButton";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
 import { awardReputation } from "@/lib/reputation";
+import { fetchMyTrustLevel, type TrustLevel } from "@/lib/trust-tiers";
 import {
   PIN_CREDIT_OPTIONS,
   categoryDef,
@@ -41,10 +43,12 @@ export function CommunityPostCard({
   onShowOnMap?: () => void;
   onChanged: () => void;
 }) {
+  const { user } = useAuth();
   const [watching, setWatching] = useState(false);
   const [boosting, setBoosting] = useState(false);
   const [trust, setTrust] = useState<TrustStats | null>(null);
   const [voting, setVoting] = useState<"validate" | "flag" | null>(null);
+  const [viewerTrustLevel, setViewerTrustLevel] = useState<TrustLevel>(1);
   const def = categoryDef(post.category);
   const visual = COMMUNITY_VISUALS[post.category];
   const CategoryIcon = visual.icon;
@@ -58,6 +62,14 @@ export function CommunityPostCard({
       alive = false;
     };
   }, [post.userId]);
+
+  useEffect(() => {
+    if (!user) {
+      setViewerTrustLevel(1);
+      return;
+    }
+    void fetchMyTrustLevel().then(setViewerTrustLevel);
+  }, [user]);
 
   const left = timeLeftLabel(post.expiresAt);
   const pinned = isPinned(post);
@@ -207,13 +219,14 @@ export function CommunityPostCard({
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
-          {!isMine && isReport && (
+          {!isMine && isReport && reportStatus !== "expired" && (
             <>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={voting !== null}
+                disabled={voting !== null || !user || viewerTrustLevel < 2}
+                title={viewerTrustLevel < 2 ? "Validation requires a Level 2 or Level 3 account" : "Validate this report"}
                 onClick={() => void vote("validate")}
                 className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
               >
@@ -223,7 +236,7 @@ export function CommunityPostCard({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={voting !== null}
+                disabled={voting !== null || !user}
                 onClick={() => void vote("flag")}
                 className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
               >

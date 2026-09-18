@@ -131,12 +131,18 @@ export function GlobalFeedMap({
       .filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null)
       .map((post) => {
         const status = post.reportStatus ?? "unverified";
-        const color = status === "confirmed" ? "#62d394" : status === "disputed" ? "#ff4d5e" : status === "expired" ? "#7b8494" : "#f2c94c";
+        const styles = getComputedStyle(document.documentElement);
+        const color = status === "confirmed"
+          ? styles.getPropertyValue("--signal").trim()
+          : status === "disputed"
+            ? styles.getPropertyValue("--crisis").trim()
+            : styles.getPropertyValue("--muted-foreground").trim();
+        const strokeColor = styles.getPropertyValue("--background").trim();
         return new google.maps.Marker({
           map: map.current,
           position: { lat: post.latitude ?? 0, lng: post.longitude ?? 0 },
           title: `${post.title} · ${status}`,
-          icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor: "#0f0f0f", strokeWeight: 2, scale: 8 },
+          icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
         });
       });
     return () => {
