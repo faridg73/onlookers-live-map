@@ -71,6 +71,7 @@ import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
 import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
 import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
 import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
+import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -156,7 +157,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "community", label: "Community", icon: Users, categories: ["community"],
     communityLink: true,
-    theme: { emoji: "👥", active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
+    theme: { imageUrl: communityUnityAsset.url, active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
   },
   {
     id: "guides", label: "Guides", icon: BookOpen, categories: [],
