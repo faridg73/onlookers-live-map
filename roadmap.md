@@ -115,8 +115,8 @@ Home Events & Arts neon category artwork
 - [x] Legal pledge checkbox gating the glowing Submit Report button, with the 911 safety warning
 
 ## Refine Create Community Report modal
-- [ ] Rebalance the modal and replace the incident dropdown with a five-icon grid
-- [ ] Make creator authentication an automatic trust-level status
-- [ ] Add locale-aware radius labels and immediate media thumbnails
-- [ ] Keep the submit control visible with pledge-gated neon activation
-- [ ] Verify phone and desktop behavior without changing report security
+- [x] Rebalance the modal and replace the incident dropdown with a five-icon grid
+- [x] Make creator authentication an automatic trust-level status aligned with the trust-workflow reference
+- [x] Add locale-aware radius labels and immediate media thumbnails
+- [x] Keep the submit control visible with pledge-gated neon activation
+- [x] Verify phone and desktop behavior without changing report security

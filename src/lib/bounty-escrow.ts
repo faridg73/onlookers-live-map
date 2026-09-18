@@ -18,8 +18,8 @@ function message(error: unknown, fallback: string) {
 export async function isSignedIn() {
   try {
     const { supabase } = await import("@/integrations/supabase/client");
-    const { data } = await supabase.auth.getSession();
-    return !!data.session;
+    const { data, error } = await supabase.auth.getUser();
+    return !error && Boolean(data.user);
   } catch {
     return false;
   }
