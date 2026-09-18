@@ -72,6 +72,7 @@ import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json
 import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
 import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
 import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
+import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -104,7 +105,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"],
-    theme: { emoji: "🌲", active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
+    theme: { imageUrl: outdoorRecreationAsset.url, active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
   },
   {
     id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
