@@ -84,14 +84,32 @@ export function LiveBroadcastStage({
     onEndRef.current();
   }, []);
 
-  // Open the camera app right away — the tap that started the broadcast counts
-  // as the user gesture the system needs.
+  const capture = useCallback(async () => {
+    setCapturing(true);
+    let file: File | null = null;
+    try {
+      file = await requestNativeCapture("video");
+    } catch {
+      toast.error("Your camera could not be opened. Check camera permissions and try again.");
+    } finally {
+      setCapturing(false);
+    }
+    if (file) await handleFile(file);
+  }, [handleFile]);
+
+  // On phones the camera app opens right away — the tap that started the
+  // broadcast counts as the user gesture. Computers wait for a button instead.
   useEffect(() => {
-    if (opened.current) return;
+    if (opened.current || !isMobileCaptureDevice()) return;
     opened.current = true;
     const id = requestAnimationFrame(() => void capture());
     return () => cancelAnimationFrame(id);
   }, [capture]);
+
+  const [isMobile, setIsMobile] = useState(true);
+  useEffect(() => {
+    setIsMobile(isMobileCaptureDevice());
+  }, []);
 
   const stage = (
     <div className="fixed inset-0 z-[80] flex flex-col bg-black">
