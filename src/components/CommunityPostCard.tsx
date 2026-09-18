@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
+import { awardReputation } from "@/lib/reputation";
 import {
   PIN_CREDIT_OPTIONS,
   categoryDef,
