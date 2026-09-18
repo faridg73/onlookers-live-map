@@ -23,7 +23,6 @@ export function VideoRecorder({
   onPhoto?: (file: File) => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const autoOpened = useRef(false);
   const [isMobile, setIsMobile] = useState(true);
 
   // Checked after hydration so the server and browser render the same markup.

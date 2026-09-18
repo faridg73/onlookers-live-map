@@ -97,14 +97,9 @@ export function LiveBroadcastStage({
     if (file) await handleFile(file);
   }, [handleFile]);
 
-  // On phones the camera app opens right away — the tap that started the
-  // broadcast counts as the user gesture. Computers wait for a button instead.
-  useEffect(() => {
-    if (opened.current || !isMobileCaptureDevice()) return;
-    opened.current = true;
-    const id = requestAnimationFrame(() => void capture());
-    return () => cancelAnimationFrame(id);
-  }, [capture]);
+  // The camera is never launched automatically. iOS refuses camera clicks that
+  // are not tied to a real tap, which left this stage stuck on a loading spinner.
+  // Everyone taps "Open camera" here instead.
 
   const [isMobile, setIsMobile] = useState(true);
   useEffect(() => {
