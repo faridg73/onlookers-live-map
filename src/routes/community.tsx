@@ -50,9 +50,10 @@ import {
 } from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs" } => ({
-    mystery: search["mystery"] === "report" || search["mystery"] === "logs" ? search["mystery"] : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs" } =>
+    search["mystery"] === "report" || search["mystery"] === "logs"
+      ? { mystery: search["mystery"] }
+      : {},
   head: () => ({
     meta: [
       { title: "Community impact and verified earnings | Onlooker" },
@@ -736,7 +737,6 @@ function CommunityHub() {
           <SectionBoundary label="The map">
             <GlobalFeedMap
               focus={focus}
-              categoryId={categoryId}
               categoryLabel={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
               {...(strangeSightings ? { categoryId: STRANGE_SIGHTINGS_ID } : { categoryId })}
               subcategory={tag}
