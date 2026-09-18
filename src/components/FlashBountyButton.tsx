@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
+import { BroadcastWrapUp } from "@/components/BroadcastWrapUp";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import {
   Dialog,
@@ -98,6 +99,12 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
   const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
   /** Saved bounty id, so the live chat thread matches the posted bounty. */
   const [liveRequestKey, setLiveRequestKey] = useState<string | null>(null);
+  /** Closing summary shown once a flash stream ends. */
+  const [wrapUp, setWrapUp] = useState<{
+    place: string;
+    saved: boolean;
+    seconds: number | null;
+  } | null>(null);
   /** Optional directions for whoever picks up the bounty. */
   const [instructions, setInstructions] = useState("");
   const toggleCondition = (id: FlashConditionId) =>
