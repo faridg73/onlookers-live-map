@@ -88,9 +88,9 @@ Home Emergencies neon category artwork
 - [x] Verify prominent sizing on mobile and desktop
 
 Home Events & Arts neon category artwork
-- [x] Add the uploaded Events & Arts badge to the large Home card (BLOCKED: the attached upload was a duplicate of the Food & Markets badge — waiting for the correct image)
-- [ ] Preserve the existing events/art filtering and tap behavior
-- [ ] Verify prominent sizing on mobile and desktop
+- [x] Add the uploaded Events & Arts badge to the large Home card — badge received as HEJFHERWIF.jpeg
+- [x] Preserve the existing events/art filtering and tap behavior
+- [x] Verify prominent sizing on mobile and desktop
 
 ## Home Community neon category artwork
 - [x] Add the uploaded "Community Unity" neon badge to the large Home "Community" card (BLOCKED previously; badge received iytdfytfiytf.jpeg / user ref watermarked_img_12722684178706055576.jpg), preserve the community routing/tap behavior, verify prominent sizing on mobile and desktop.
