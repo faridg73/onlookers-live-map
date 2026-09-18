@@ -272,19 +272,27 @@ export type Database = {
           category: string
           created_at: string
           expires_at: string | null
+          flag_count: number
           id: string
           is_flash: boolean
           latitude: number | null
           longitude: number | null
+          media_analysis_status: string
           media_path: string | null
           media_url: string | null
           pinned_credits: number
           pinned_until: string | null
           place: string
+          report_incident_type: string | null
+          report_radius_m: number | null
+          report_status: string | null
+          reporter_trust_level: number | null
           tags: string[]
           title: string
+          trust_score: number
           updated_at: string
           user_id: string
+          validation_count: number
           view_count: number
         }
         Insert: {
@@ -293,19 +301,27 @@ export type Database = {
           category: string
           created_at?: string
           expires_at?: string | null
+          flag_count?: number
           id?: string
           is_flash?: boolean
           latitude?: number | null
           longitude?: number | null
+          media_analysis_status?: string
           media_path?: string | null
           media_url?: string | null
           pinned_credits?: number
           pinned_until?: string | null
           place?: string
+          report_incident_type?: string | null
+          report_radius_m?: number | null
+          report_status?: string | null
+          reporter_trust_level?: number | null
           tags?: string[]
           title: string
+          trust_score?: number
           updated_at?: string
           user_id: string
+          validation_count?: number
           view_count?: number
         }
         Update: {
@@ -314,22 +330,65 @@ export type Database = {
           category?: string
           created_at?: string
           expires_at?: string | null
+          flag_count?: number
           id?: string
           is_flash?: boolean
           latitude?: number | null
           longitude?: number | null
+          media_analysis_status?: string
           media_path?: string | null
           media_url?: string | null
           pinned_credits?: number
           pinned_until?: string | null
           place?: string
+          report_incident_type?: string | null
+          report_radius_m?: number | null
+          report_status?: string | null
+          reporter_trust_level?: number | null
           tags?: string[]
           title?: string
+          trust_score?: number
           updated_at?: string
           user_id?: string
+          validation_count?: number
           view_count?: number
         }
         Relationships: []
+      }
+      community_report_votes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          vote: string
+          voter_id: string
+          voter_trust_level: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          vote: string
+          voter_id: string
+          voter_trust_level: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          vote?: string
+          voter_id?: string
+          voter_trust_level?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_report_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       credit_purchases: {
         Row: {
@@ -1988,6 +2047,10 @@ export type Database = {
         }[]
       }
       build_alias: { Args: { _user_id: string }; Returns: string }
+      calculate_community_report_state: {
+        Args: { _post_id: string }
+        Returns: undefined
+      }
       can_chat_on_request: {
         Args: { _request_key: string; _user_id: string }
         Returns: boolean
@@ -2239,17 +2302,25 @@ export type Database = {
           category: string
           created_at: string
           expires_at: string
+          flag_count: number
           hunter_level: number
           id: string
           is_flash: boolean
           latitude: number
           longitude: number
+          media_analysis_status: string
           media_path: string
           pinned_credits: number
           pinned_until: string
           place: string
+          report_incident_type: string
+          report_radius_m: number
+          report_status: string
+          reporter_trust_level: number
           tags: string[]
           title: string
+          trust_score: number
+          validation_count: number
         }[]
       }
       public_profile_card: {
@@ -2385,6 +2456,15 @@ export type Database = {
         }[]
       }
       trust_level: { Args: { _user_id: string }; Returns: number }
+      vote_on_community_report: {
+        Args: { _post_id: string; _vote: string }
+        Returns: {
+          flag_count: number
+          report_status: string
+          trust_score: number
+          validation_count: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
