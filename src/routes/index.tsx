@@ -10,6 +10,7 @@ import {
   MapPin,
   Radio,
   Search,
+  ShieldCheck,
   Sparkles,
   Users,
   Video,
@@ -69,6 +70,7 @@ function MapScreen() {
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
+  const drawerDragged = useRef(false);
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
@@ -93,22 +95,26 @@ function MapScreen() {
     setRecentPlaces(readRecentPlaces());
   }, []);
 
-  const focusPlace = useCallback((place: { formatted: string; latitude: number; longitude: number; label?: string }) => {
-    setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
-    setRecentPlaces(
-      rememberRecentPlace({
-        formatted: place.formatted,
-        latitude: place.latitude,
-        longitude: place.longitude,
-        label: place.label,
-      }),
-    );
-    setSearchOpen(false);
-  }, []);
+  const focusPlace = useCallback(
+    (place: { formatted: string; latitude: number; longitude: number; label?: string }) => {
+      setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+      setRecentPlaces(
+        rememberRecentPlace({
+          formatted: place.formatted,
+          latitude: place.latitude,
+          longitude: place.longitude,
+          ...(place.label ? { label: place.label } : {}),
+        }),
+      );
+      setSearchOpen(false);
+    },
+    [],
+  );
 
   const finishDrawerDrag = useCallback((clientY: number) => {
     if (dragStartY.current === null) return;
     const distance = clientY - dragStartY.current;
+    drawerDragged.current = Math.abs(distance) > 12;
     if (Math.abs(distance) > 36) setDrawerOpen(distance < 0);
     dragStartY.current = null;
   }, []);
@@ -176,56 +182,72 @@ function MapScreen() {
                   onPick={focusPlace}
                 />
               </div>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
                 aria-label="Close search"
                 onClick={() => setSearchOpen(false)}
                 className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface/95 text-foreground shadow-lg backdrop-blur-xl md:hidden"
               >
                 <X className="size-4" />
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="outline"
               aria-label="Search for a place"
               onClick={() => setSearchOpen(true)}
-              className="flex h-11 items-center gap-2 rounded-full border border-border bg-surface/95 px-4 text-foreground shadow-2xl backdrop-blur-xl md:w-full"
+              className="flex h-11 items-center justify-start gap-2 rounded-full border border-border bg-surface/95 px-4 text-foreground shadow-2xl backdrop-blur-xl md:w-full"
             >
               <Search className="size-4 shrink-0 text-signal" />
               <span className="truncate text-sm font-bold text-muted-foreground">Search this area</span>
-            </button>
+            </Button>
           )}
         </div>
       </header>
 
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto w-full border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
         aria-label="Map actions"
       >
-        <button
+        <Button
           type="button"
+          variant="ghost"
           aria-expanded={drawerOpen}
           aria-label={drawerOpen ? "Collapse map drawer" : "Expand map drawer"}
-          onClick={() => setDrawerOpen((open) => !open)}
+          onClick={() => {
+            if (drawerDragged.current) {
+              drawerDragged.current = false;
+              return;
+            }
+            setDrawerOpen((open) => !open);
+          }}
           onPointerDown={(event) => {
             dragStartY.current = event.clientY;
+            drawerDragged.current = false;
             event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={(event) => {
+            if (dragStartY.current !== null && Math.abs(event.clientY - dragStartY.current) > 12) {
+              drawerDragged.current = true;
+            }
           }}
           onPointerUp={(event) => finishDrawerDrag(event.clientY)}
           onPointerCancel={() => {
             dragStartY.current = null;
           }}
-          className="flex h-12 w-full touch-none flex-col items-center justify-center gap-1 text-foreground"
+          className="flex h-12 w-full shrink-0 touch-none flex-col items-center justify-center gap-1 rounded-none text-foreground hover:bg-surface-raised"
         >
           <span className="h-1 w-10 rounded-full bg-muted-foreground/55" aria-hidden />
           <span className="flex w-full items-center justify-between px-4 text-xs font-extrabold uppercase tracking-[0.1em]">
             Explore nearby
             <ChevronDown className={`size-4 text-signal transition-transform ${drawerOpen ? "rotate-180" : ""}`} />
           </span>
-        </button>
+        </Button>
 
-        <div className={`overflow-y-auto overscroll-contain px-4 transition-opacity ${drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
           <div className="border-t border-border pb-3 pt-3">
             <div className="mb-2 flex items-center gap-2">
               <History className="size-4 text-signal" aria-hidden />
@@ -247,14 +269,15 @@ function MapScreen() {
                 ))}
               </div>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setSearchOpen(true)}
-                className="flex w-full items-center gap-2 rounded-md border border-dashed border-border bg-background px-3 py-2 text-left text-xs text-muted-foreground"
+                className="flex h-auto w-full items-center justify-start gap-2 rounded-md border border-dashed border-border bg-background px-3 py-2 text-left text-xs font-normal text-muted-foreground"
               >
                 <Search className="size-4 shrink-0 text-signal" />
                 Search for a place to build your history.
-              </button>
+              </Button>
             )}
           </div>
 
@@ -292,7 +315,7 @@ function MapScreen() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 border-t border-border py-3">
+          <div className="grid grid-cols-2 gap-2 border-t border-border py-3">
             {[
               { label: "Bounty map", icon: Map, action: () => setMapFilter("all") },
               { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
@@ -313,15 +336,15 @@ function MapScreen() {
           </div>
         </div>
 
-        <div className="border-t border-border bg-surface px-4 py-3">
-        <Button
-          type="button"
-          onClick={() => void navigate({ to: "/post" })}
-          className="h-12 w-full justify-center rounded-md bg-signal px-4 text-signal-foreground shadow-[0_0_24px_0_color-mix(in_oklab,var(--color-signal)_38%,transparent)] transition-colors hover:bg-signal/90"
-        >
-          <CircleDollarSign className="size-5" />
-          <span className="text-sm font-extrabold uppercase tracking-[0.08em]">Post a Bounty</span>
-        </Button>
+        <div className="shrink-0 border-t border-border bg-surface px-4 py-3">
+          <Button
+            type="button"
+            onClick={() => void navigate({ to: "/post" })}
+            className="h-12 w-full justify-center rounded-md bg-signal px-4 text-signal-foreground shadow-[0_0_24px_0_color-mix(in_oklab,var(--color-signal)_38%,transparent)] transition-colors hover:bg-signal/90"
+          >
+            <CircleDollarSign className="size-5" />
+            <span className="text-sm font-extrabold uppercase tracking-[0.08em]">Post a Bounty</span>
+          </Button>
         </div>
       </section>
 
