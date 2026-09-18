@@ -6,7 +6,7 @@ import {
   CircleDollarSign,
   Compass,
   History,
-  Map,
+  HelpCircle,
   MapPin,
   Martini,
   Radio,
