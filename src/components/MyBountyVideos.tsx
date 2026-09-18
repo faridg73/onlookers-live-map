@@ -72,6 +72,7 @@ export function MyBountyVideos() {
 
   async function watch(video: BountyVideo) {
     try {
+      setPlayFailed(null);
       setPlaying({ id: video.id, url: await playbackUrl(video.storage_path) });
     } catch {
       toast.error("Couldn't open that video.");
