@@ -35,3 +35,9 @@ Public Gathering map mode
 - [x] Open selected clusters with estimated headcounts
 - [x] List live onlooker streams within the cluster
 - [x] Verify gathering mode across phone and desktop
+
+Trending Near You map mode
+- [x] Filter broadcasts and bounties to a two-mile radius
+- [x] Load nearby media posts into the map drawer
+- [x] Rank fast-rising local activity with timestamps
+- [x] Verify the local feed across phone and desktop
