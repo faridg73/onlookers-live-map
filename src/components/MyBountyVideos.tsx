@@ -6,9 +6,25 @@ import { ShareVideoDialog } from "@/components/ShareVideoDialog";
 import { toast } from "sonner";
 import { formatCredits } from "@/lib/credits";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { listMyVideos, playbackUrl, thumbnailUrls, type BountyVideo } from "@/lib/bounty-videos";
+import {
+  deleteBountyVideo,
+  listMyVideos,
+  playbackUrl,
+  thumbnailUrls,
+  type BountyVideo,
+} from "@/lib/bounty-videos";
 
 function formatDuration(seconds: number | null) {
   if (!seconds) return "0:00";
