@@ -580,7 +580,7 @@ function MapScreen() {
 
           <div className="border-t border-border py-3">
             <div className="grid grid-cols-3 gap-2" aria-label="Map categories">
-              {MAP_CATEGORY_TILES.map((tile) => {
+              {orderedCategoryTiles.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
                 const count = tile.creators
