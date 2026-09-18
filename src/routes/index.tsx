@@ -101,11 +101,11 @@ const MAP_CATEGORY_TILES: Array<{
   theme?: { emoji?: string; imageUrl?: string; active: string; badge: string };
 }> = [
   {
-    id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"],
+    id: "food", label: "Food & Markets", icon: Utensils, categories: ["food", "markets"],
     theme: { imageUrl: foodMarketsAsset.url, active: "border-orange-500 bg-orange-500/20 text-orange-50", badge: "text-orange-400" },
   },
   {
-    id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"],
+    id: "events", label: "Events & Arts", icon: Ticket, categories: ["events", "sports", "art"],
     theme: { imageUrl: eventsArtsAsset.url, active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
   },
   {
@@ -113,7 +113,7 @@ const MAP_CATEGORY_TILES: Array<{
     theme: { imageUrl: outdoorRecreationAsset.url, active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
   },
   {
-    id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
+    id: "traffic", label: "Traffic & Transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
     theme: { imageUrl: trafficUpdatesAsset.url, active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
   },
   {
