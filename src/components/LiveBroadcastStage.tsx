@@ -60,10 +60,13 @@ export function LiveBroadcastStage({
 
   const handleFile = useCallback(async (file: File) => {
     const key = meta.current.save;
+    let saved = false;
+    let length: number | null = null;
     if (key) {
       setSaving(true);
       try {
         const seconds = await captureDurationSeconds(file);
+        length = seconds;
         const { saveBroadcastRecording } = await import("@/lib/bounty-videos");
         await saveBroadcastRecording({
           blob: file,
@@ -73,6 +76,7 @@ export function LiveBroadcastStage({
           place: meta.current.place,
           bounty: meta.current.bounty,
         });
+        saved = true;
       } catch (error) {
         toast.error(
           error instanceof Error ? error.message : "Couldn't save your stream recording.",
@@ -81,7 +85,7 @@ export function LiveBroadcastStage({
         setSaving(false);
       }
     }
-    onEndRef.current();
+    onEndRef.current({ saved, seconds: length });
   }, []);
 
   const capture = useCallback(async () => {
@@ -117,7 +121,7 @@ export function LiveBroadcastStage({
           type="button"
           aria-label="Close capture"
           disabled={saving}
-          onClick={() => onEndRef.current()}
+          onClick={() => onEndRef.current({ saved: false, seconds: null })}
           className="rounded-full bg-white/10 p-2 text-white disabled:opacity-50"
         >
           <X className="size-4" />
