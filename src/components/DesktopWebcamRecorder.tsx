@@ -36,12 +36,23 @@ export function DesktopWebcamRecorder({
 
   const start = useCallback(async () => {
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      toast.error("This browser can't use your webcam. You can choose an existing clip instead.");
+      setState("failed");
       return;
     }
     setState("starting");
+    // If the camera hasn't answered within the timeout, stop waiting and show
+    // the fallback instead of an endless spinner.
+    const timeoutId = window.setTimeout(() => {
+      setState((current) => {
+        if (current !== "starting") return current;
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        return "failed";
+      });
+    }, CAMERA_TIMEOUT_MS);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      window.clearTimeout(timeoutId);
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -49,10 +60,22 @@ export function DesktopWebcamRecorder({
       }
       setState("live");
     } catch {
-      setState("idle");
-      toast.error("Your webcam could not be opened. Check the browser's camera permission.");
+      window.clearTimeout(timeoutId);
+      setState("failed");
     }
   }, []);
+
+  const pickFile = useCallback(() => {
+    if (typeof document === "undefined") return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "video/*";
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      if (file && file.size > 0) onRecorded(file);
+    });
+    input.click();
+  }, [onRecorded]);
 
   const record = useCallback(() => {
     const stream = streamRef.current;
