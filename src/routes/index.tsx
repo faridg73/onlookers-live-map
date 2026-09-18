@@ -65,17 +65,36 @@ const MAP_CATEGORY_TILES: Array<{
   trending?: boolean;
   viral?: boolean;
   creators?: boolean;
+  theme?: { emoji: string; active: string; badge: string };
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
   { id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"] },
-  { id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"] },
+  {
+    id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
+    theme: { emoji: "🚗", active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
+  },
   { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
-  { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
-  { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
-  { id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true },
-  { id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true },
-  { id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true },
+  {
+    id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
+    theme: { emoji: "🚨", active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
+  },
+  {
+    id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
+    theme: { emoji: "👥", active: "border-blue-400 bg-blue-400/20 text-blue-50", badge: "text-blue-400" },
+  },
+  {
+    id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
+    theme: { emoji: "🔥", active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
+  },
+  {
+    id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
+    theme: { emoji: "⚡", active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
+  },
+  {
+    id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
+    theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
+  },
 ];
 
 const CRISIS_TERMS = [
@@ -457,7 +476,7 @@ function MapScreen() {
                     variant="outline"
                     aria-pressed={mapFilter === key}
                     onClick={() => setMapFilter(key)}
-                    className={`h-8 shrink-0 rounded-full border px-3 text-[0.68rem] font-extrabold transition-colors duration-150 ${
+                    className={`h-8 shrink-0 rounded-full border px-3 text-[0.75rem] font-extrabold transition-colors duration-150 ${
                       mapFilter === key
                         ? "border-signal bg-signal text-background shadow-[0_0_0_1px_var(--color-signal)]"
                         : "border-border bg-background text-muted-foreground hover:text-foreground"
@@ -467,7 +486,7 @@ function MapScreen() {
                   </Button>
                 ))}
             </div>
-            <p className="mt-2 text-[0.65rem] text-muted-foreground" aria-live="polite">
+            <p className="mt-2 text-[0.75rem] text-muted-foreground" aria-live="polite">
               {mapFilter === "nearby" && !userPosition
                 ? `Allow location access to see requests within ${radius} ${unit}.`
                 : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
@@ -502,17 +521,27 @@ function MapScreen() {
                       select(null);
                       setGatheringClusterIds([]);
                     }}
-                    className={`relative h-20 min-w-0 flex-col gap-1 rounded-md px-1 text-[0.65rem] font-bold ${
-                      active && tile.crisis
-                        ? "border-crisis bg-crisis text-crisis-foreground"
-                        : active
-                          ? "border-signal bg-signal text-signal-foreground"
+                    className={`relative h-[5.5rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
+                      active
+                        ? tile.theme
+                          ? tile.theme.active
+                          : tile.crisis
+                            ? "border-crisis bg-crisis text-crisis-foreground"
+                            : "border-signal bg-signal text-signal-foreground"
                         : "border-border bg-background text-foreground"
                     }`}
                   >
-                    <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
+                    {tile.theme ? (
+                      <span className="text-2xl leading-none" aria-hidden="true">{tile.theme.emoji}</span>
+                    ) : (
+                      <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
+                    )}
                     <span className="w-full truncate">{tile.label}</span>
-                    <span className={`absolute right-1.5 top-1.5 text-[0.58rem] ${active ? "text-signal-foreground" : "text-muted-foreground"}`}>
+                    <span className={`absolute right-1.5 top-1.5 text-[0.7rem] font-extrabold ${
+                      active
+                        ? tile.theme ? "text-current" : "text-signal-foreground"
+                        : tile.theme ? tile.theme.badge : "text-muted-foreground"
+                    }`}>
                       {count}
                     </span>
                   </Button>
@@ -523,7 +552,7 @@ function MapScreen() {
             {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
+                  <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
                     {activeCategoryTile.label} nearby
                   </h2>
                   <Button
@@ -531,7 +560,7 @@ function MapScreen() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setCategoryTile(null)}
-                    className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-signal"
+                    className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-signal"
                   >
                     Show all
                   </Button>
@@ -551,8 +580,8 @@ function MapScreen() {
                         className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left"
                       >
                         <span className="min-w-0">
-                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">
+                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
                             {request.place}
                           </span>
                         </span>
@@ -574,12 +603,12 @@ function MapScreen() {
               <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">
                       <Flame className="size-3.5" /> Rising within 2 miles
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Trending Near You</h2>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Trending Near You</h2>
                   </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
@@ -604,10 +633,10 @@ function MapScreen() {
                           }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-signal/30 bg-background px-3 py-2.5 text-left">
                             {live ? <Radio className="size-4 animate-pulse text-live" /> : <CircleDollarSign className="size-4 text-signal" />}
                             <span className="min-w-0">
-                              <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
-                              <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{live ? "Live broadcast" : `${poolOf(request)} credit bounty`} · {request.place}</span>
+                              <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                              <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{live ? "Live broadcast" : `${poolOf(request)} credit bounty`} · {request.place}</span>
                             </span>
-                            <span className="shrink-0 text-[0.58rem] font-bold text-muted-foreground">{liveTimestamp(request.minutesAgo).replace("Updated ", "")}</span>
+                            <span className="shrink-0 text-[0.7rem] font-bold text-muted-foreground">{liveTimestamp(request.minutesAgo).replace("Updated ", "")}</span>
                           </Button>
                         );
                       })}
@@ -619,10 +648,10 @@ function MapScreen() {
                           ? <img src={nearbyPostMedia[post.mediaPath]} alt="" className="size-8 rounded object-cover" />
                           : <Image className="size-4 text-signal" />}
                         <span className="min-w-0">
-                          <span className="block truncate text-xs font-bold text-foreground">{post.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">Media post · {post.place || "Nearby"}</span>
+                          <span className="block truncate text-sm font-bold text-foreground">{post.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">Media post · {post.place || "Nearby"}</span>
                         </span>
-                        <span className="shrink-0 text-[0.58rem] font-bold text-muted-foreground">{liveTimestamp(Math.max(0, Math.floor((Date.now() - new Date(post.createdAt).getTime()) / 60_000))).replace("Updated ", "")}</span>
+                        <span className="shrink-0 text-[0.7rem] font-bold text-muted-foreground">{liveTimestamp(Math.max(0, Math.floor((Date.now() - new Date(post.createdAt).getTime()) / 60_000))).replace("Updated ", "")}</span>
                       </Button>
                     ))}
                   </div>
@@ -638,12 +667,12 @@ function MapScreen() {
               <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
                       <Sparkles className="size-3.5" /> Network-wide momentum
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Viral &amp; Breaking</h2>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Viral &amp; Breaking</h2>
                   </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
@@ -666,12 +695,12 @@ function MapScreen() {
                           }} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/30 bg-background px-3 py-2.5 text-left">
                             <span className="min-w-0">
                               <span className="flex min-w-0 items-center gap-1.5">
-                                {breaking && <span className="shrink-0 rounded-sm bg-crisis px-1.5 py-0.5 text-[0.52rem] font-extrabold uppercase text-crisis-foreground">Breaking</span>}
-                                <span className="truncate text-xs font-bold text-foreground">{request.title}</span>
+                                {breaking && <span className="shrink-0 rounded-sm bg-crisis px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase text-crisis-foreground">Breaking</span>}
+                                <span className="truncate text-sm font-bold text-foreground">{request.title}</span>
                               </span>
-                              <span className="mt-1 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} engagements</span>
+                              <span className="mt-1 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} engagements</span>
                             </span>
-                            <span className="flex shrink-0 items-center gap-1 text-[0.62rem] font-extrabold text-crisis">
+                            <span className="flex shrink-0 items-center gap-1 text-[0.72rem] font-extrabold text-crisis">
                               <Eye className="size-3.5" /> +{velocity.toFixed(1)}/min
                             </span>
                           </Button>
@@ -690,12 +719,12 @@ function MapScreen() {
               <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">
                       <Trophy className="size-3.5" /> Network leaderboard
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Top Creators</h2>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Top Creators</h2>
                   </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
@@ -706,7 +735,7 @@ function MapScreen() {
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     {topCreators.slice(0, 8).map((creator, index) => (
                       <div key={creator.id} className="relative min-w-0 rounded-md border border-border bg-background p-3">
-                        <span className="absolute right-2 top-2 text-[0.58rem] font-extrabold text-muted-foreground">#{index + 1}</span>
+                        <span className="absolute right-2 top-2 text-[0.7rem] font-extrabold text-muted-foreground">#{index + 1}</span>
                         <div className="flex items-center gap-2 pr-5">
                           <div className="relative shrink-0">
                             {creator.avatarUrl ? (
@@ -720,15 +749,15 @@ function MapScreen() {
                           </div>
                           <span className="min-w-0">
                             <span className="flex min-w-0 items-center gap-1">
-                              <span className="truncate text-xs font-extrabold text-foreground">{creator.name}</span>
+                              <span className="truncate text-base font-extrabold text-foreground">{creator.name}</span>
                               {creator.verified && <VerifiedBadge className="size-3.5" />}
                             </span>
-                            <span className={`mt-0.5 block text-[0.58rem] font-extrabold uppercase ${creator.live ? "text-live" : "text-muted-foreground"}`}>
+                            <span className={`mt-0.5 block text-[0.7rem] font-extrabold uppercase ${creator.live ? "text-live" : "text-muted-foreground"}`}>
                               {creator.live ? "Live now" : "Creator"}
                             </span>
                           </span>
                         </div>
-                        <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[0.62rem]">
+                        <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[0.72rem]">
                           <span className="font-bold text-foreground">{creator.followerCount.toLocaleString()} followers</span>
                           <span className="text-muted-foreground">{creator.totalViews.toLocaleString()} views</span>
                         </div>
@@ -747,17 +776,17 @@ function MapScreen() {
               <div className="mt-3 border-t border-gathering-high/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-gathering-high">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-gathering-high">
                       <span className="size-2 animate-pulse rounded-full bg-gathering-high" /> Crowd activity
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">
                       {gatheringClusterIds.length > 0 ? "Gathering cluster details" : "Public gatherings nearby"}
                     </h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => {
                     setCategoryTile(null);
                     setGatheringClusterIds([]);
-                  }} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  }} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
@@ -772,11 +801,11 @@ function MapScreen() {
                     <>
                       <div className="mt-2 grid grid-cols-2 gap-2">
                         <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
-                          <p className="text-[0.58rem] font-bold uppercase text-muted-foreground">Estimated headcount</p>
+                          <p className="text-[0.7rem] font-bold uppercase text-muted-foreground">Estimated headcount</p>
                           <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{headcount}</p>
                         </div>
                         <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
-                          <p className="text-[0.58rem] font-bold uppercase text-muted-foreground">Live onlookers</p>
+                          <p className="text-[0.7rem] font-bold uppercase text-muted-foreground">Live onlookers</p>
                           <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{liveStreams.length}</p>
                         </div>
                       </div>
@@ -792,10 +821,10 @@ function MapScreen() {
                               }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-gathering-low/35 bg-background px-3 py-2.5 text-left">
                                 <MapPin className="size-4 text-gathering-high" />
                                 <span className="min-w-0">
-                                  <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
-                                  <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} people</span>
+                                  <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                                  <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} people</span>
                                 </span>
-                                <span className={`flex shrink-0 items-center gap-1 text-[0.58rem] font-extrabold uppercase ${live ? "text-live" : "text-muted-foreground"}`}>
+                                <span className={`flex shrink-0 items-center gap-1 text-[0.7rem] font-extrabold uppercase ${live ? "text-live" : "text-muted-foreground"}`}>
                                   <Eye className="size-3" /> {live ? "Live" : liveTimestamp(request.minutesAgo).replace("Updated ", "")}
                                 </span>
                               </Button>
@@ -817,17 +846,17 @@ function MapScreen() {
               <div className="mt-3 border-t border-traffic-heavy/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-traffic-heavy">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-traffic-heavy">
                       <span className="size-2 animate-pulse rounded-full bg-traffic-heavy" /> Live road conditions
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Traffic incidents &amp; closures</h2>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Traffic incidents &amp; closures</h2>
                   </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
 
-                <div className="mt-2 flex items-center gap-3 text-[0.62rem] font-bold text-muted-foreground">
+                <div className="mt-2 flex items-center gap-3 text-[0.72rem] font-bold text-muted-foreground">
                   <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-slow" /> Slow</span>
                   <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-heavy" /> Heavy</span>
                 </div>
@@ -842,10 +871,10 @@ function MapScreen() {
                       }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-traffic-slow/35 bg-background px-3 py-2.5 text-left">
                         <span className={`size-2.5 rounded-full ${request.minutesAgo <= 15 ? "bg-traffic-heavy" : "bg-traffic-slow"}`} />
                         <span className="min-w-0">
-                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{trafficIncidentType(request)} · {request.place}</span>
+                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{trafficIncidentType(request)} · {request.place}</span>
                         </span>
-                        <span className="flex shrink-0 items-center gap-1 text-[0.58rem] font-bold text-muted-foreground">
+                        <span className="flex shrink-0 items-center gap-1 text-[0.7rem] font-bold text-muted-foreground">
                           <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
                         </span>
                       </Button>
@@ -863,12 +892,12 @@ function MapScreen() {
               <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
                       <span className="size-2 animate-pulse rounded-full bg-crisis" /> Crisis watch
                     </p>
-                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Live crisis streams</h2>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Live crisis streams</h2>
                   </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
                     Exit
                   </Button>
                 </div>
@@ -883,10 +912,10 @@ function MapScreen() {
                       }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/45 bg-background px-3 py-2.5 text-left">
                         <span className="size-2 animate-pulse rounded-full bg-crisis" />
                         <span className="min-w-0">
-                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place}</span>
+                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place}</span>
                         </span>
-                        <span className="shrink-0 text-[0.62rem] font-extrabold uppercase text-crisis">
+                        <span className="shrink-0 text-[0.72rem] font-extrabold uppercase text-crisis">
                           {request.bountyType === "live_stream" && request.status === "claimed" ? "Live" : "Alert"}
                         </span>
                       </Button>
@@ -898,11 +927,11 @@ function MapScreen() {
                   </p>
                 )}
 
-                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-xs font-bold text-foreground">
+                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-bold text-foreground">
                   <Volume2 className="size-4 text-crisis" /> Emergency scanner audio
                 </Button>
                 {scannerNotice && (
-                  <p className="mt-2 text-center text-[0.65rem] text-muted-foreground">
+                  <p className="mt-2 text-center text-[0.75rem] text-muted-foreground">
                     No verified public scanner audio is linked to these alerts yet.
                   </p>
                 )}
@@ -925,7 +954,7 @@ function MapScreen() {
                 type="button"
                 variant="outline"
                 onClick={action}
-                className="h-16 min-w-0 flex-col gap-1 rounded-md border-border bg-background px-1 text-[0.68rem] font-bold text-foreground"
+                className="h-16 min-w-0 flex-col gap-1 rounded-md border-border bg-background px-1 text-[0.75rem] font-bold text-foreground"
               >
                 <Icon className="size-4 text-signal" />
                 <span className="w-full truncate">{label}</span>
