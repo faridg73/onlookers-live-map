@@ -143,7 +143,7 @@ export async function uploadBountyVideo({
     bucket: BOUNTY_VIDEO_BUCKET,
     path,
     file,
-    contentType: file.type || "video/mp4",
+    contentType: playableContentType(file.type),
   });
 
   let thumbPath: string | null = null;
