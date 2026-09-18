@@ -39,6 +39,7 @@ export function MyBountyVideos() {
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [playFailed, setPlayFailed] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const totalViews = videos.reduce((sum, video) => sum + Number(video.view_count ?? 0), 0);
@@ -221,8 +222,27 @@ export function MyBountyVideos() {
                           controls
                           playsInline
                           autoPlay
+                          preload="metadata"
+                          onError={() => setPlayFailed(v.id)}
+                          onLoadedData={() =>
+                            setPlayFailed((current) => (current === v.id ? null : current))
+                          }
                           className="max-h-[38dvh] w-full rounded-xl bg-black object-contain"
                         />
+                        {playFailed === v.id && (
+                          <div className="mt-2 rounded-xl border border-border bg-surface-raised p-3 text-center text-xs text-muted-foreground">
+                            <p>This clip won't play in this browser.</p>
+                            <a
+                              href={playing.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              download
+                              className="mt-2 inline-flex rounded-full bg-signal px-4 py-1.5 text-[0.7rem] font-semibold text-signal-foreground"
+                            >
+                              Open or download
+                            </a>
+                          </div>
+                        )}
                         <button
                           type="button"
                           aria-label="Close video"
