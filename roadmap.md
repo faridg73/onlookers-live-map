@@ -47,3 +47,9 @@ Viral & Breaking map mode
 - [x] Rank content by engagement velocity
 - [x] Show high-velocity metrics and Breaking badges
 - [x] Verify the feed across phone and desktop
+
+Top Creators map mode
+- [x] Add a network-wide creator leaderboard tile
+- [x] Rank creators by followers and reach
+- [x] Show verification badges and live status
+- [x] Verify the grid across phone and desktop

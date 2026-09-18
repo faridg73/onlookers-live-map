@@ -25,6 +25,7 @@ import {
   Eye,
   Flame,
   Image,
+  Trophy,
   X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -49,6 +50,8 @@ import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { listTopCreators, type TopCreator } from "@/lib/top-creators";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -61,6 +64,7 @@ const MAP_CATEGORY_TILES: Array<{
   gathering?: boolean;
   trending?: boolean;
   viral?: boolean;
+  creators?: boolean;
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
@@ -71,6 +75,7 @@ const MAP_CATEGORY_TILES: Array<{
   { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
   { id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true },
   { id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true },
+  { id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true },
 ];
 
 const CRISIS_TERMS = [
@@ -138,6 +143,8 @@ function MapScreen() {
   const [nearbyPosts, setNearbyPosts] = useState<CommunityPost[]>([]);
   const [nearbyPostMedia, setNearbyPostMedia] = useState<Record<string, string>>({});
   const [trendingLoading, setTrendingLoading] = useState(false);
+  const [topCreators, setTopCreators] = useState<TopCreator[]>([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
@@ -213,14 +220,17 @@ function MapScreen() {
   const gatheringMode = activeCategoryTile?.gathering === true;
   const trendingMode = activeCategoryTile?.trending === true;
   const viralMode = activeCategoryTile?.viral === true;
+  const creatorsMode = activeCategoryTile?.creators === true;
   const visible = useMemo(
     () =>
       activeCategoryTile
-        ? (activeCategoryTile.viral ? requests : statusFiltered).filter((request) =>
+        ? (activeCategoryTile.viral || activeCategoryTile.creators ? requests : statusFiltered).filter((request) =>
             activeCategoryTile.trending
               ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
               : activeCategoryTile.viral
               ? true
+              : activeCategoryTile.creators
+              ? false
               : activeCategoryTile.crisis
               ? isCrisisRequest(request)
               : request.category && activeCategoryTile.categories.includes(request.category),
@@ -257,6 +267,25 @@ function MapScreen() {
       alive = false;
     };
   }, [trendingMode, userPosition]);
+
+  useEffect(() => {
+    if (!creatorsMode) return;
+    let alive = true;
+    setCreatorsLoading(true);
+    void listTopCreators()
+      .then((creators) => {
+        if (alive) setTopCreators(creators);
+      })
+      .catch(() => {
+        if (alive) setTopCreators([]);
+      })
+      .finally(() => {
+        if (alive) setCreatorsLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [creatorsMode]);
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   const nearby = useMemo(() => {
@@ -450,7 +479,9 @@ function MapScreen() {
               {MAP_CATEGORY_TILES.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
-                const count = (tile.viral ? requests : statusFiltered).filter((request) =>
+                const count = tile.creators
+                  ? topCreators.length
+                  : (tile.viral ? requests : statusFiltered).filter((request) =>
                   tile.crisis
                     ? isCrisisRequest(request)
                     : tile.trending
@@ -458,7 +489,7 @@ function MapScreen() {
                     : tile.viral
                       ? true
                     : request.category && tile.categories.includes(request.category),
-                ).length;
+                  ).length;
                 return (
                   <Button
                     key={tile.id}
@@ -489,7 +520,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -650,6 +681,63 @@ function MapScreen() {
                 ) : (
                   <p className="mt-3 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
                     No network-wide stories are accelerating right now.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {creatorsMode && (
+              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+                      <Trophy className="size-3.5" /> Network leaderboard
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Top Creators</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {creatorsLoading ? (
+                  <p className="mt-3 text-center text-xs font-bold text-muted-foreground">Loading creator rankings…</p>
+                ) : topCreators.length > 0 ? (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {topCreators.slice(0, 8).map((creator, index) => (
+                      <div key={creator.id} className="relative min-w-0 rounded-md border border-border bg-background p-3">
+                        <span className="absolute right-2 top-2 text-[0.58rem] font-extrabold text-muted-foreground">#{index + 1}</span>
+                        <div className="flex items-center gap-2 pr-5">
+                          <div className="relative shrink-0">
+                            {creator.avatarUrl ? (
+                              <img src={creator.avatarUrl} alt="" className="size-9 rounded-full object-cover" />
+                            ) : (
+                              <span className="grid size-9 place-items-center rounded-full bg-surface-raised text-xs font-extrabold text-signal">
+                                {creator.name.slice(0, 2).toUpperCase()}
+                              </span>
+                            )}
+                            {creator.live && <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background bg-live" aria-label="Live now" />}
+                          </div>
+                          <span className="min-w-0">
+                            <span className="flex min-w-0 items-center gap-1">
+                              <span className="truncate text-xs font-extrabold text-foreground">{creator.name}</span>
+                              {creator.verified && <VerifiedBadge className="size-3.5" />}
+                            </span>
+                            <span className={`mt-0.5 block text-[0.58rem] font-extrabold uppercase ${creator.live ? "text-live" : "text-muted-foreground"}`}>
+                              {creator.live ? "Live now" : "Creator"}
+                            </span>
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[0.62rem]">
+                          <span className="font-bold text-foreground">{creator.followerCount.toLocaleString()} followers</span>
+                          <span className="text-muted-foreground">{creator.totalViews.toLocaleString()} views</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    Creator rankings will appear as the network grows.
                   </p>
                 )}
               </div>
