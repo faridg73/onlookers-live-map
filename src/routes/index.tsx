@@ -65,6 +65,12 @@ const MAP_CATEGORY_TILES: Array<{
   trending?: boolean;
   viral?: boolean;
   creators?: boolean;
+  crime?: boolean;
+  scanner?: boolean;
+  liveStreams?: boolean;
+  bountyMap?: boolean;
+  communityLink?: boolean;
+  guidesLink?: boolean;
   theme?: { emoji: string; active: string; badge: string };
 }> = [
   {
@@ -107,6 +113,36 @@ const MAP_CATEGORY_TILES: Array<{
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
     theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
   },
+  {
+    id: "crime", label: "Crime Reports", icon: Siren, categories: [],
+    crime: true,
+    theme: { emoji: "🚨", active: "border-rose-500 bg-rose-500/20 text-rose-50", badge: "text-rose-400" },
+  },
+  {
+    id: "scanner", label: "Scanner", icon: Radio, categories: [],
+    scanner: true,
+    theme: { emoji: "📻", active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
+  },
+  {
+    id: "livestream", label: "Live Stream", icon: Video, categories: [],
+    liveStreams: true,
+    theme: { emoji: "📹", active: "border-lime-400 bg-lime-400/20 text-lime-50", badge: "text-lime-400" },
+  },
+  {
+    id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
+    bountyMap: true,
+    theme: { emoji: "🗺️", active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
+  },
+  {
+    id: "community", label: "Community", icon: Users, categories: ["community"],
+    communityLink: true,
+    theme: { emoji: "👥", active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
+  },
+  {
+    id: "guides", label: "Guides", icon: BookOpen, categories: [],
+    guidesLink: true,
+    theme: { emoji: "🧭", active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
+  },
 ];
 
 const CRISIS_TERMS = [
@@ -130,6 +166,38 @@ function isCrisisRequest(request: LiveRequest) {
   if (request.category !== "community" && request.category !== "weather") return false;
   const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
   return CRISIS_TERMS.some((term) => text.includes(term));
+}
+
+const CRIME_TERMS = [
+  "crime", "theft", "stolen", "robbery", "police", "cops", "arrest", "shooting", "vandalism", "suspicious", "mugging", "assault", "broke into",
+];
+
+function isCrimeRequest(request: LiveRequest) {
+  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
+  return CRIME_TERMS.some((term) => text.includes(term));
+}
+
+const SCANNER_CATEGORIES: Array<CategoryId> = ["transit", "parking", "vehicles"];
+
+function tileMatches(
+  tile: (typeof MAP_CATEGORY_TILES)[number],
+  request: LiveRequest,
+  userPosition: MapPosition | null,
+): boolean {
+  if (tile.creators) return false;
+  if (tile.trending) {
+    return Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES);
+  }
+  if (tile.viral || tile.bountyMap) return true;
+  if (tile.crisis) return isCrisisRequest(request);
+  if (tile.crime) return isCrimeRequest(request);
+  if (tile.scanner) {
+    return isCrisisRequest(request) || (request.category !== undefined && SCANNER_CATEGORIES.includes(request.category));
+  }
+  if (tile.liveStreams) {
+    return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+  }
+  return Boolean(request.category && tile.categories.includes(request.category));
 }
 
 export const Route = createFileRoute("/")({
@@ -252,23 +320,13 @@ function MapScreen() {
   const trendingMode = activeCategoryTile?.trending === true;
   const viralMode = activeCategoryTile?.viral === true;
   const creatorsMode = activeCategoryTile?.creators === true;
-  const visible = useMemo(
-    () =>
-      activeCategoryTile
-        ? (activeCategoryTile.viral || activeCategoryTile.creators ? requests : statusFiltered).filter((request) =>
-            activeCategoryTile.trending
-              ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
-              : activeCategoryTile.viral
-              ? true
-              : activeCategoryTile.creators
-              ? false
-              : activeCategoryTile.crisis
-              ? isCrisisRequest(request)
-              : request.category && activeCategoryTile.categories.includes(request.category),
-          )
-        : statusFiltered,
-    [activeCategoryTile, requests, statusFiltered],
-  );
+  const scannerMode = activeCategoryTile?.scanner === true;
+  const visible = useMemo(() => {
+    if (!activeCategoryTile) return statusFiltered;
+    if (activeCategoryTile.creators) return [];
+    const pool = activeCategoryTile.viral ? requests : statusFiltered;
+    return pool.filter((request) => tileMatches(activeCategoryTile, request, userPosition));
+  }, [activeCategoryTile, requests, statusFiltered, userPosition]);
 
   useEffect(() => {
     if (!trendingMode || !userPosition) return;
@@ -512,15 +570,11 @@ function MapScreen() {
                 const active = categoryTile === tile.id;
                 const count = tile.creators
                   ? topCreators.length
+                  : tile.guidesLink
+                  ? GUIDES.length
                   : (tile.viral ? requests : statusFiltered).filter((request) =>
-                  tile.crisis
-                    ? isCrisisRequest(request)
-                    : tile.trending
-                      ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
-                    : tile.viral
-                      ? true
-                    : request.category && tile.categories.includes(request.category),
-                  ).length;
+                      tileMatches(tile, request, userPosition),
+                    ).length;
                 return (
                   <Button
                     key={tile.id}
@@ -528,6 +582,14 @@ function MapScreen() {
                     variant="outline"
                     aria-pressed={active}
                     onClick={() => {
+                      if (tile.communityLink) {
+                        void navigate({ to: "/community" });
+                        return;
+                      }
+                      if (tile.guidesLink) {
+                        setGuidesOpen(true);
+                        return;
+                      }
                       setCategoryTile(active ? null : tile.id);
                       setDrawerOpen(true);
                       select(null);
@@ -561,7 +623,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -722,6 +784,60 @@ function MapScreen() {
                 ) : (
                   <p className="mt-3 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
                     No network-wide stories are accelerating right now.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {scannerMode && (
+              <div className="mt-3 border-t border-violet-500/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-violet-400">
+                      <Volume2 className="size-3.5" /> Live scanner feed
+                    </p>
+                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Scanner</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {visible.slice(0, 5).map((request) => {
+                      const emergency = isCrisisRequest(request);
+                      return (
+                        <Button key={request.id} type="button" variant="outline" onClick={() => {
+                          select(request.id);
+                          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                        }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-violet-500/35 bg-background px-3 py-2.5 text-left">
+                          <span className={`size-2 rounded-full ${emergency ? "animate-pulse bg-crisis" : "bg-violet-400"}`} />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                            <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
+                              {emergency ? "Emergency channel" : "Traffic channel"} · {request.place}
+                            </span>
+                          </span>
+                          <span className="flex shrink-0 items-center gap-1 text-[0.7rem] font-bold text-muted-foreground">
+                            <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
+                          </span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-violet-500/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No emergency or traffic chatter is hitting the scanner right now.
+                  </p>
+                )}
+
+                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-bold text-foreground">
+                  <Volume2 className="size-4 text-violet-400" /> Open scanner audio
+                </Button>
+                {scannerNotice && (
+                  <p className="mt-2 text-center text-[0.75rem] text-muted-foreground">
+                    No verified public scanner audio is linked to these alerts yet.
                   </p>
                 )}
               </div>
