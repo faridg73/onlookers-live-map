@@ -81,6 +81,9 @@ import {
 } from "@/lib/request-intent";
 
 export const Route = createFileRoute("/post")({
+  validateSearch: (search: Record<string, unknown>): { mystery?: "1" } => ({
+    mystery: search["mystery"] === "1" ? "1" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Post a Live Request | Onlooker" },

@@ -10,6 +10,7 @@ import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
+import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 
 /**
  * Worldwide map of clips that requesters already paid for. Travellers can watch
@@ -65,7 +66,9 @@ export function GlobalFeedMap({
     const vibeNeedle = subcategory?.toLowerCase().trim();
     return (clips ?? []).filter((clip) => {
       const haystack = `${clip.title} ${clip.note} ${clip.place}`.toLowerCase();
-      const categoryMatches = !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
+      const categoryMatches = categoryIdNeedle === STRANGE_SIGHTINGS_ID
+        ? matchesStrangeSighting(haystack)
+        : !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
       return categoryMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
     });
   }, [clips, categoryId, categoryLabel, subcategory]);

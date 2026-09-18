@@ -46,6 +46,8 @@ export function NewCommunityPostDialog({
   onPosted,
   initialCategory,
   initialCamera,
+  initialTitle,
+  initialTags,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -53,6 +55,8 @@ export function NewCommunityPostDialog({
   initialCategory?: CommunityCategory;
   /** Opens the live camera as soon as the sheet appears (Start Live Stream flow). */
   initialCamera?: boolean;
+  initialTitle?: string;
+  initialTags?: string[];
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "general");
   const [title, setTitle] = useState("");
@@ -72,10 +76,11 @@ export function NewCommunityPostDialog({
     if (!open) return;
     if (initialCategory) {
       setCategory(initialCategory);
-      setTags([]);
+      setTags(initialTags ?? []);
     }
+    if (initialTitle) setTitle(initialTitle);
     setCamera(Boolean(initialCamera));
-  }, [open, initialCamera, initialCategory]);
+  }, [open, initialCamera, initialCategory, initialTags, initialTitle]);
 
   if (!open) return null;
 
