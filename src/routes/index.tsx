@@ -446,9 +446,13 @@ function MapScreen() {
             Live eyes, anywhere
           </p>
         </div>
-        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:left-1/2 md:w-[min(32rem,calc(100vw-14rem))] md:-translate-x-1/2">
+        <div
+          className={`pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:left-1/2 md:-translate-x-1/2 ${
+            searchOpen ? "w-[min(21rem,calc(100vw-6.25rem))] md:w-[min(32rem,calc(100vw-14rem))]" : ""
+          }`}
+        >
           {searchOpen ? (
-            <div className="flex w-[min(21rem,calc(100vw-6.25rem))] items-start gap-1.5 md:w-full">
+            <div className="flex w-full origin-left animate-search-slide items-start gap-1.5 motion-reduce:animate-none">
               <div className="min-w-0 flex-1 rounded-full border border-border bg-surface/95 p-1 shadow-2xl backdrop-blur-xl">
                 <PlaceSearchInput
                   autoFocus
@@ -471,12 +475,12 @@ function MapScreen() {
             <Button
               type="button"
               variant="outline"
+              size="icon"
               aria-label="Search for a place"
               onClick={() => setSearchOpen(true)}
-              className="flex h-11 items-center justify-start gap-2 rounded-full border border-border bg-surface/95 px-4 text-foreground shadow-2xl backdrop-blur-xl md:w-full"
+              className="grid size-11 place-items-center rounded-full border border-border bg-surface/95 text-foreground shadow-2xl backdrop-blur-xl"
             >
               <Search className="size-4 shrink-0 text-signal" />
-              <span className="truncate text-sm font-bold text-muted-foreground">Search this area</span>
             </Button>
           )}
         </div>
