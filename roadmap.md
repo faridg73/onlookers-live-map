@@ -10,3 +10,9 @@ Responsive Home map controls
 - [x] Connect recent search history and map recentering
 - [x] Keep Post a Bounty visible as the primary drawer action
 - [x] Verify mobile and desktop interactions
+
+Home map category filtering
+- [x] Add state for six category tiles
+- [x] Filter map markers by the active category lane
+- [x] Show a contextual result feed inside the drawer
+- [x] Verify tile filtering and result selection

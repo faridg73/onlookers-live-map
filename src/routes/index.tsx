@@ -8,10 +8,15 @@ import {
   History,
   Map,
   MapPin,
+  Martini,
   Radio,
   Search,
   ShieldCheck,
   Sparkles,
+  Ticket,
+  TrafficCone,
+  Trees,
+  Utensils,
   Users,
   Video,
   X,
@@ -23,13 +28,33 @@ import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
-import { distanceMiles, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
+import {
+  distanceMiles,
+  requestMapPosition,
+  type CategoryId,
+  type LiveRequest,
+  type MapPosition,
+} from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
 
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
+
+const MAP_CATEGORY_TILES: Array<{
+  id: string;
+  label: string;
+  icon: typeof Utensils;
+  categories: CategoryId[];
+}> = [
+  { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
+  { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
+  { id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"] },
+  { id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"] },
+  { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
+  { id: "community", label: "Community", icon: Users, categories: ["community", "street", "realestate"] },
+];
 
 export const Route = createFileRoute("/")({
   validateSearch: (
@@ -67,6 +92,7 @@ function MapScreen() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
+  const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
@@ -122,7 +148,7 @@ function MapScreen() {
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
   // The Home sheet filters the live map immediately without changing the underlying request data.
-  const visible = useMemo(
+  const statusFiltered = useMemo(
     () =>
       requests.filter((request) => {
         if (mapFilter === "all") return true;
@@ -134,6 +160,17 @@ function MapScreen() {
         return distanceMiles(userPosition, requestMapPosition(request)) <= radiusMiles;
       }),
     [requests, mapFilter, poolOf, radiusMiles, userPosition],
+  );
+
+  const activeCategoryTile = MAP_CATEGORY_TILES.find((tile) => tile.id === categoryTile) ?? null;
+  const visible = useMemo(
+    () =>
+      activeCategoryTile
+        ? statusFiltered.filter(
+            (request) => request.category && activeCategoryTile.categories.includes(request.category),
+          )
+        : statusFiltered,
+    [activeCategoryTile, statusFiltered],
   );
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
@@ -313,6 +350,92 @@ function MapScreen() {
                 ? `Allow location access to see requests within ${radius} ${unit}.`
                 : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
             </p>
+          </div>
+
+          <div className="border-t border-border py-3">
+            <div className="grid grid-cols-3 gap-2" aria-label="Map categories">
+              {MAP_CATEGORY_TILES.map((tile) => {
+                const Icon = tile.icon;
+                const active = categoryTile === tile.id;
+                const count = statusFiltered.filter(
+                  (request) => request.category && tile.categories.includes(request.category),
+                ).length;
+                return (
+                  <Button
+                    key={tile.id}
+                    type="button"
+                    variant="outline"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setCategoryTile(active ? null : tile.id);
+                      setDrawerOpen(true);
+                      select(null);
+                    }}
+                    className={`relative h-20 min-w-0 flex-col gap-1 rounded-md px-1 text-[0.65rem] font-bold ${
+                      active
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-border bg-background text-foreground"
+                    }`}
+                  >
+                    <Icon className={`size-5 ${active ? "text-signal-foreground" : "text-signal"}`} />
+                    <span className="w-full truncate">{tile.label}</span>
+                    <span className={`absolute right-1.5 top-1.5 text-[0.58rem] ${active ? "text-signal-foreground" : "text-muted-foreground"}`}>
+                      {count}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
+
+            {activeCategoryTile && (
+              <div className="mt-3 border-t border-border pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
+                    {activeCategoryTile.label} nearby
+                  </h2>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCategoryTile(null)}
+                    className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-signal"
+                  >
+                    Show all
+                  </Button>
+                </div>
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {visible.slice(0, 4).map((request) => (
+                      <Button
+                        key={request.id}
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          select(request.id);
+                          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                          setDrawerOpen(false);
+                        }}
+                        className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">
+                            {request.place}
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-xs font-extrabold text-signal">
+                          {poolOf(request)} cr
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 border-t border-border py-3">
