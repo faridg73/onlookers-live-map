@@ -454,7 +454,7 @@ function CommunityHub() {
             className="no-scrollbar grid max-h-[70dvh] grid-cols-4 gap-2 overflow-y-auto px-3 pb-4 sm:gap-2.5 md:grid-cols-4 md:gap-3"
           >
             {BROADCAST_CATEGORIES.map((lane) => {
-              const visual = COMMUNITY_VISUALS[lane.communityCategory];
+              const visual = COMMUNITY_VISUALS[lane.communityCategory] ?? COMMUNITY_VISUALS.general;
               const Icon = visual.icon;
               const previewUrl = categoryPreviews[lane.communityCategory];
               const active = categoryId === lane.id;
