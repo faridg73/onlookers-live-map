@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ScrollableLane } from "@/components/ScrollableLane";
 
@@ -120,6 +120,15 @@ function DiscoverHome() {
 
       {view === "map" ? (
         <div className="mt-4 space-y-3">
+          <button
+            type="button"
+            onClick={() => setView("grid")}
+            aria-label="Back to Browse places"
+            className="relative z-10 inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-signal/60"
+          >
+            <ArrowLeft className="size-4 text-signal" aria-hidden />
+            Browse places
+          </button>
           <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
             <SectionBoundary label="The map">
               <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
