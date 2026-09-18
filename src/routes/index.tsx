@@ -52,6 +52,11 @@ import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/r
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { listTopCreators, type TopCreator } from "@/lib/top-creators";
+import {
+  readCategoryTapCounts,
+  recordCategoryTap,
+  sortCategoriesByUsage,
+} from "@/lib/category-usage";
 
 const TRENDING_RADIUS_MILES = 2;
 
