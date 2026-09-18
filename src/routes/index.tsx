@@ -7,6 +7,7 @@ import {
   Compass,
   History,
   HelpCircle,
+  Map,
   MapPin,
   Martini,
   Radio,
