@@ -11,6 +11,7 @@ import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
+import type { CommunityPost } from "@/lib/community";
 
 /**
  * Worldwide map of clips that requesters already paid for. Travellers can watch
@@ -21,12 +22,14 @@ export function GlobalFeedMap({
   categoryId,
   categoryLabel,
   subcategory,
+  reports = [],
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
   categoryId?: string | null;
   categoryLabel?: string | null;
   subcategory?: string | null;
+  reports?: CommunityPost[];
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -35,6 +38,7 @@ export function GlobalFeedMap({
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
+  const reportMarkers = useRef<google.maps.Marker[]>([]);
 
   useEffect(() => {
     void listGlobalClips({ data: { limit: 30 } })
@@ -119,6 +123,33 @@ export function GlobalFeedMap({
       markers.current = [];
     };
   }, [pinned, mapReady, focus]);
+
+  useEffect(() => {
+    if (!map.current) return;
+    reportMarkers.current.forEach((marker) => marker.setMap(null));
+    reportMarkers.current = reports
+      .filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null)
+      .map((post) => {
+        const status = post.reportStatus ?? "unverified";
+        const styles = getComputedStyle(document.documentElement);
+        const color = status === "confirmed"
+          ? styles.getPropertyValue("--signal").trim()
+          : status === "disputed"
+            ? styles.getPropertyValue("--crisis").trim()
+            : styles.getPropertyValue("--muted-foreground").trim();
+        const strokeColor = styles.getPropertyValue("--background").trim();
+        return new google.maps.Marker({
+          map: map.current,
+          position: { lat: post.latitude ?? 0, lng: post.longitude ?? 0 },
+          title: `${post.title} · ${status}`,
+          icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
+        });
+      });
+    return () => {
+      reportMarkers.current.forEach((marker) => marker.setMap(null));
+      reportMarkers.current = [];
+    };
+  }, [reports, mapReady]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
 

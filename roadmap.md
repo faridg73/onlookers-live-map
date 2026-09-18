@@ -120,3 +120,10 @@ Home Events & Arts neon category artwork
 - [x] Add locale-aware radius labels and immediate media thumbnails
 - [x] Keep the submit control visible with pledge-gated neon activation
 - [x] Verify phone and desktop behavior without changing report security
+
+## Complete report verification loop
+- [x] Add visible simulated media-analysis processing and durable result state
+- [x] Add Validate and Flag controls to active incident-report cards
+- [x] Enforce Level 2/3 validation and one vote per member in the backend
+- [x] Calculate report trust scores and Confirmed, Disputed, Unverified, or Expired statuses
+- [x] Show dynamic report statuses on neighborhood map markers

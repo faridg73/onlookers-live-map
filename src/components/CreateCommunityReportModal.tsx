@@ -68,6 +68,7 @@ export function CreateCommunityReportModal({
     name: string;
   } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -96,7 +97,7 @@ export function CreateCommunityReportModal({
 
   const picked = incident ? incidentById(incident) : undefined;
   const locked = Boolean(picked?.emergency) && level < 3;
-  const ready = Boolean(picked) && !locked && details.trim().length >= 8 && accepted && !uploading;
+  const ready = Boolean(picked) && !locked && details.trim().length >= 8 && accepted && !uploading && !analyzing;
   const tier = trustTier(level);
   const radiusLabel =
     unit === "mi"
@@ -114,7 +115,12 @@ export function CreateCommunityReportModal({
     });
     setUploading(true);
     void uploadCommunityPhoto(file)
-      .then((path) => setMediaPath(path))
+      .then(async (path) => {
+        setMediaPath(path);
+        setAnalyzing(true);
+        await new Promise((resolve) => window.setTimeout(resolve, 900));
+        setAnalyzing(false);
+      })
       .catch((err: unknown) =>
         toast.error(err instanceof Error ? err.message : "Couldn't attach that media."),
       )
@@ -139,6 +145,9 @@ export function CreateCommunityReportModal({
         isFlash: false,
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
+        reportIncidentType: picked.id,
+        reportRadiusM: radius,
+        mediaAnalysisStatus: mediaPath ? "complete" : "not_required",
       });
       void awardReputation("validate_marker", `report:${picked.id}:${Date.now()}`);
       toast.success("Report filed. Thanks for keeping the area informed.");
@@ -244,8 +253,8 @@ export function CreateCommunityReportModal({
                   <img src={mediaPreview.url} alt="Selected report media" className="size-full object-cover" />
                 )}
                 <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-background/85 px-2 py-1 text-[0.65rem] text-foreground">
-                  {uploading ? <Loader2 className="size-3 animate-spin text-signal" /> : <BadgeCheck className="size-3 text-signal" />}
-                  <span className="truncate">{uploading ? "Uploading…" : mediaPreview.name}</span>
+                  {uploading || analyzing ? <Loader2 className="size-3 animate-spin text-signal" /> : <BadgeCheck className="size-3 text-signal" />}
+                  <span className="truncate">{uploading ? "Uploading…" : analyzing ? "Analyzing media…" : `Analysis complete · ${mediaPreview.name}`}</span>
                 </div>
               </div>
             )}
