@@ -133,4 +133,4 @@ Home Events & Arts neon category artwork
 - [x] Persist Community filters, tabs, map/feed view, and focused report
 - [x] Persist Explore and Browse Places tabs plus selected map item
 - [x] Restore Community, Explore, and Browse Places map center and zoom
-- [ ] Verify restoration through back navigation on phone and desktop
+- [x] Verify restoration through back navigation on phone and desktop
