@@ -10,6 +10,22 @@
 export type NativeCaptureMode = "video" | "photo";
 
 /**
+ * True on phones and tablets, where the `capture` attribute launches the real
+ * camera app. Desktops and MacBooks ignore (or mishandle) `capture`, so they get
+ * a normal picker/webcam file dialog instead.
+ */
+export function isMobileCaptureDevice(): boolean {
+  if (typeof navigator === "undefined" || typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const phoneUA = /Android|iPhone|iPod|iPad|Windows Phone|Mobile Safari|Opera Mini/i.test(ua);
+  // iPadOS reports a desktop UA but exposes touch points.
+  const touchMac =
+    /Macintosh/.test(ua) && typeof navigator.maxTouchPoints === "number" && navigator.maxTouchPoints > 1;
+  const coarse = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+  return phoneUA || touchMac || (coarse && window.innerWidth <= 1024);
+}
+
+/**
  * Opens the device camera app and resolves with the captured file, or null when
  * the person backs out without filming.
  */
@@ -20,8 +36,9 @@ export function requestNativeCapture(mode: NativeCaptureMode = "video"): Promise
     const input = document.createElement("input");
     input.type = "file";
     input.accept = mode === "video" ? "video/*" : "image/*";
-    // Tells iOS and Android to launch the camera instead of the file browser.
-    input.setAttribute("capture", "environment");
+    // Phones and tablets launch the camera app; desktops fall back to the normal
+    // file dialog (which can still record from a connected webcam).
+    if (isMobileCaptureDevice()) input.setAttribute("capture", "environment");
     input.style.position = "fixed";
     input.style.left = "-9999px";
     input.style.opacity = "0";

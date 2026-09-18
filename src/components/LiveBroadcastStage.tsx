@@ -5,7 +5,12 @@ import { toast } from "sonner";
 
 import { BountyChat } from "@/components/BountyChat";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
-import { captureDurationSeconds, requestNativeCapture } from "@/lib/native-capture";
+import {
+  captureDurationSeconds,
+  isMobileCaptureDevice,
+  requestNativeCapture,
+} from "@/lib/native-capture";
+import { DesktopWebcamRecorder } from "@/components/DesktopWebcamRecorder";
 
 /**
  * Full-screen stage for a broadcast. The capture itself is handed to the phone's
@@ -53,18 +58,7 @@ export function LiveBroadcastStage({
   const meta = useRef({ title, place, bounty, save });
   meta.current = { title, place, bounty, save };
 
-  const capture = useCallback(async () => {
-    setCapturing(true);
-    let file: File | null = null;
-    try {
-      file = await requestNativeCapture("video");
-    } catch {
-      toast.error("Your camera could not be opened. Check camera permissions and try again.");
-    } finally {
-      setCapturing(false);
-    }
-    if (!file) return;
-
+  const handleFile = useCallback(async (file: File) => {
     const key = meta.current.save;
     if (key) {
       setSaving(true);
@@ -90,14 +84,32 @@ export function LiveBroadcastStage({
     onEndRef.current();
   }, []);
 
-  // Open the camera app right away — the tap that started the broadcast counts
-  // as the user gesture the system needs.
+  const capture = useCallback(async () => {
+    setCapturing(true);
+    let file: File | null = null;
+    try {
+      file = await requestNativeCapture("video");
+    } catch {
+      toast.error("Your camera could not be opened. Check camera permissions and try again.");
+    } finally {
+      setCapturing(false);
+    }
+    if (file) await handleFile(file);
+  }, [handleFile]);
+
+  // On phones the camera app opens right away — the tap that started the
+  // broadcast counts as the user gesture. Computers wait for a button instead.
   useEffect(() => {
-    if (opened.current) return;
+    if (opened.current || !isMobileCaptureDevice()) return;
     opened.current = true;
     const id = requestAnimationFrame(() => void capture());
     return () => cancelAnimationFrame(id);
   }, [capture]);
+
+  const [isMobile, setIsMobile] = useState(true);
+  useEffect(() => {
+    setIsMobile(isMobileCaptureDevice());
+  }, []);
 
   const stage = (
     <div className="fixed inset-0 z-[80] flex flex-col bg-black">
@@ -127,8 +139,18 @@ export function LiveBroadcastStage({
         <p className="text-xs leading-relaxed text-white/65">
           {saving
             ? "Saving your clip…"
-            : "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."}
+            : isMobile
+              ? "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."
+              : "Record straight from your computer's webcam, or choose a video file you already have."}
         </p>
+        {!isMobile && !saving && (
+          <div className="w-full max-w-md text-left">
+            <DesktopWebcamRecorder
+              disabled={saving || capturing}
+              onRecorded={(file) => void handleFile(file)}
+            />
+          </div>
+        )}
         {instructions?.trim() && (
           <p className="rounded-xl border border-signal/40 bg-black/60 px-3 py-2 text-[0.7rem] font-medium leading-snug text-white/85">
             <span className="font-extrabold text-signal">Instructions: </span>
@@ -167,7 +189,7 @@ export function LiveBroadcastStage({
           onClick={() => void capture()}
           className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
-          <Video className="size-5" /> Open camera
+          <Video className="size-5" /> {isMobile ? "Open camera" : "Choose a video file"}
         </button>
         {requestKey && (
           <button
