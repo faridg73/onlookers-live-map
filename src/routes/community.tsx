@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
+import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { distanceMiles, type MapPosition } from "@/lib/onlooker";
 import {
@@ -37,6 +38,7 @@ import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
+import { readSessionState, writeSessionState } from "@/lib/session-state";
 import {
   BROADCAST_CATEGORIES,
   broadcastCategoryById,
@@ -103,6 +105,8 @@ function CommunityHub() {
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
   const [vibeScroll, setVibeScroll] = useState({ width: 100, left: 0 });
+  const stateRestored = useRef(false);
+  useSessionScroll("onlooker:scroll:community", !loading);
   const updateVibeScroll = useCallback(() => {
     const el = vibeRowRef.current;
     if (!el || el.scrollWidth <= el.clientWidth) {
@@ -139,6 +143,45 @@ function CommunityHub() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const saved = readSessionState<{
+      category?: CommunityCategory | "all";
+      tag?: string | null;
+      categoryId?: BroadcastCategoryId | null;
+      strangeSightings?: boolean;
+      view?: "feed" | "map";
+      impactView?: "help" | "mine";
+      radius?: RadiusChoiceId;
+      vibeGridOpen?: boolean;
+      focus?: { lat: number; lng: number; label: string } | null;
+    }>("onlooker:view:community", {});
+    if (saved.category === "all" || COMMUNITY_CATEGORIES.some((item) => item.id === saved.category)) setCategory(saved.category);
+    setTag(saved.tag ?? null);
+    if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
+    setStrangeSightings(Boolean(saved.strangeSightings));
+    if (saved.view === "feed" || saved.view === "map") setView(saved.view);
+    if (saved.impactView === "help" || saved.impactView === "mine") setImpactView(saved.impactView);
+    if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
+    setVibeGridOpen(Boolean(saved.vibeGridOpen));
+    setFocus(saved.focus ?? null);
+    stateRestored.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!stateRestored.current) return;
+    writeSessionState("onlooker:view:community", {
+      category,
+      tag,
+      categoryId,
+      strangeSightings,
+      view,
+      impactView,
+      radius,
+      vibeGridOpen,
+      focus,
+    });
+  }, [category, tag, categoryId, strangeSightings, view, impactView, radius, vibeGridOpen, focus]);
 
   useEffect(() => {
     if (!mystery) return;
@@ -748,6 +791,7 @@ function CommunityHub() {
             <GlobalFeedMap
               focus={focus}
               reports={posts}
+              viewportStorageKey="onlooker:map:community"
               categoryLabel={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
               {...(strangeSightings ? { categoryId: STRANGE_SIGHTINGS_ID } : { categoryId })}
               subcategory={tag}
