@@ -68,6 +68,7 @@ import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
 import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
 import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
 import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
+import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -116,7 +117,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
-    theme: { emoji: "👥", active: "border-blue-400 bg-blue-400/20 text-blue-50", badge: "text-blue-400" },
+    theme: { imageUrl: publicGatheringAsset.url, active: "border-blue-400 bg-blue-400/20 text-blue-50", badge: "text-blue-400" },
   },
   {
     id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
