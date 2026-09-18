@@ -520,7 +520,7 @@ function CommunityHub() {
           className="no-scrollbar flex flex-row snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
-            const visual = COMMUNITY_VISUALS[c.id];
+            const visual = COMMUNITY_VISUALS[c.id] ?? COMMUNITY_VISUALS.general;
             const Icon = visual.icon;
             const previewUrl = categoryPreviews[c.id];
             const active = category === c.id;
