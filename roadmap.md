@@ -69,3 +69,8 @@ Strange Sightings & UFO browse category
 - [x] Add its report, community-log, and mystery-bounty actions
 - [x] Filter its live/recorded feed and map results without changing broadcast creation
 - [x] Verify mobile, desktop, and type safety
+
+Breaking News custom category artwork
+- [ ] Replace the Breaking News emoji with the uploaded neon badge
+- [ ] Preserve its existing filtering, modal, and routing behavior
+- [ ] Verify sizing and interaction on mobile and desktop
