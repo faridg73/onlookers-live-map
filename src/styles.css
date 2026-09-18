@@ -89,6 +89,18 @@
   --animate-float-up: float-up 1.8s ease-out forwards;
   --animate-shimmer: shimmer 2.6s ease-in-out infinite;
   --animate-slow-pan: slow-pan 18s ease-in-out infinite alternate;
+  --animate-search-slide: search-slide 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes search-slide {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
