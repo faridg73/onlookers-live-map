@@ -93,7 +93,7 @@ Home Events & Arts neon category artwork
 - [ ] Verify prominent sizing on mobile and desktop
 
 ## Home Community neon category artwork
-- [ ] Add the uploaded "Community Unity" neon badge to the large Home "Community" card (BLOCKED previously; badge received iytdfytfiytf.jpeg / user ref watermarked_img_12722684178706055576.jpg), preserve the community routing/tap behavior, verify prominent sizing on mobile and desktop.
+- [x] Add the uploaded "Community Unity" neon badge to the large Home "Community" card (BLOCKED previously; badge received iytdfytfiytf.jpeg / user ref watermarked_img_12722684178706055576.jpg), preserve the community routing/tap behavior, verify prominent sizing on mobile and desktop.
 - [x] Home Outdoor Recreation neon category artwork — add the uploaded "Outdoor Recreation" badge (jrgojergherg.jpeg) to the large Home card, keep tap behavior, verify mobile + desktop.
 - [x] Home Nightlife neon category artwork — add the uploaded "NIGHTLIFE" badge (gigjgvjhvgjh.jpeg) to the large Home card, keep tap behavior, verify mobile + desktop.
 - [x] Home Top Creators neon category artwork — added the uploaded "TOP CREATORS" badge to the large Home card, kept tap behavior, verified mobile + desktop.
