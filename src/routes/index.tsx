@@ -623,7 +623,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
