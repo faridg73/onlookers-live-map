@@ -191,7 +191,9 @@ function tileMatches(
   if (tile.viral || tile.bountyMap) return true;
   if (tile.crisis) return isCrisisRequest(request);
   if (tile.crime) return isCrimeRequest(request);
-  if (tile.scanner) return isCrisisRequest(request) || SCANNER_CATEGORIES.includes(request.category);
+  if (tile.scanner) {
+    return isCrisisRequest(request) || (request.category !== undefined && SCANNER_CATEGORIES.includes(request.category));
+  }
   if (tile.liveStreams) {
     return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
   }
