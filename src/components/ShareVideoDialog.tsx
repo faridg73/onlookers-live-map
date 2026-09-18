@@ -45,20 +45,38 @@ export function ShareVideoDialog({
     try {
       const url = await link();
       if (!url) return;
-      if (captionFirst) {
-        try {
-          await navigator.clipboard.writeText(`${caption}\n${url}`);
-          toast.success(`Caption and link copied, paste them into your ${label}.`);
-        } catch {
-          toast.error("Couldn't copy the caption. Copy the link instead.");
-        }
+      // Always put the caption + link on the clipboard first, so the share still
+      // works when the platform's site is blocked by a browser extension,
+      // network policy, or popup blocker.
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(`${caption}\n${url}`);
+        copied = true;
+      } catch {
+        copied = false;
       }
-      window.open(platformShareUrl(id, url, caption), "_blank", "noopener,noreferrer");
+      const win = window.open(platformShareUrl(id, url, caption), "_blank", "noopener,noreferrer");
+      if (!win) {
+        toast[copied ? "success" : "error"](
+          copied
+            ? `${label} couldn't open here — the caption and link are copied, paste them into ${label}.`
+            : `${label} couldn't open and the copy failed. Use "Copy link" instead.`,
+        );
+      } else if (captionFirst) {
+        toast[copied ? "success" : "error"](
+          copied
+            ? `Caption and link copied, paste them into your ${label}.`
+            : "Couldn't copy the caption. Copy the link instead.",
+        );
+      } else if (copied) {
+        toast.success(`Opening ${label}. The caption and link are also copied, just in case.`);
+      }
       setOpen(false);
     } finally {
       setBusy(false);
     }
   }
+
 
   async function copyLink() {
     setBusy(true);
