@@ -140,8 +140,41 @@ function MapScreen() {
             Live eyes, anywhere
           </p>
         </div>
-        <div className="pointer-events-auto mx-auto mt-2 w-full max-w-lg md:fixed md:bottom-[7.25rem] md:right-6 md:mt-0 md:w-80 md:max-w-none">
-          <div className="rounded-lg border border-border bg-surface/95 p-1 shadow-lg backdrop-blur-xl md:rounded-xl md:p-1.5 md:shadow-2xl">
+        {/* Mobile: floating search pill that expands only when tapped, so the
+            map and pins stay fully visible. Desktop keeps the always-open box. */}
+        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:fixed md:bottom-[7.25rem] md:left-auto md:right-6 md:top-auto md:w-80">
+          {searchOpen ? (
+            <div className="flex w-[min(20rem,calc(100vw-6.5rem))] items-start gap-1.5 md:w-80">
+              <div className="min-w-0 flex-1 rounded-lg border border-border bg-surface/95 p-1 shadow-lg backdrop-blur-xl md:rounded-xl md:p-1.5 md:shadow-2xl">
+                <PlaceSearchInput
+                  autoFocus
+                  onPick={(place) => {
+                    setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+                    setSearchOpen(false);
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                aria-label="Close search"
+                onClick={() => setSearchOpen(false)}
+                className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface/95 text-foreground shadow-lg backdrop-blur-xl md:hidden"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              aria-label="Search for a place"
+              onClick={() => setSearchOpen(true)}
+              className="grid size-11 place-items-center rounded-full border border-border bg-surface/95 text-signal shadow-lg backdrop-blur-xl md:hidden"
+            >
+              <Search className="size-5" />
+            </button>
+          )}
+          {/* Desktop always-open search box */}
+          <div className="hidden rounded-xl border border-border bg-surface/95 p-1.5 shadow-2xl backdrop-blur-xl md:block">
             <PlaceSearchInput
               onPick={(place) => {
                 setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
