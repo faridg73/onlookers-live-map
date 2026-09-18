@@ -37,6 +37,7 @@ export function MyBountyVideos() {
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const totalViews = videos.reduce((sum, video) => sum + Number(video.view_count ?? 0), 0);
