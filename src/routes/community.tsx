@@ -418,7 +418,7 @@ function CommunityHub() {
           </Button>
           </div>
         </div>
-        {/* Mobile keeps the sideways carousel; desktop stacks the cards up-and-down and scrolls with the page. */}
+        {/* Mobile keeps the sideways carousel; "See All" opens the full 16-lane grid. */}
         <div className="relative">
           {/* Subtle gradient edge fades while the carousel is scrolling */}
           {!vibeGridOpen && (
@@ -427,16 +427,78 @@ function CommunityHub() {
               <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background via-background/70 to-transparent md:hidden" />
             </>
           )}
+        {vibeGridOpen ? (
+          <div
+            role="list"
+            aria-label="All category cards"
+            className="no-scrollbar grid max-h-[70dvh] grid-cols-2 gap-3 overflow-y-auto px-4 pb-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4"
+          >
+            {BROADCAST_CATEGORIES.map((lane) => {
+              const visual = COMMUNITY_VISUALS[lane.communityCategory];
+              const Icon = visual.icon;
+              const previewUrl = categoryPreviews[lane.communityCategory];
+              const active = categoryId === lane.id;
+              return (
+                <div key={lane.id} role="listitem" className="min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategoryId(lane.id);
+                      setCategory(lane.communityCategory);
+                      setTag(null);
+                    }}
+                    aria-pressed={active}
+                    className={`group relative h-32 w-full overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-border"}`}
+                  >
+                    <LoopingPreview
+                      videoUrl={previewUrl}
+                      imageUrl={previewUrl ? undefined : visual.image}
+                      alt={previewUrl ? `Live preview for ${lane.label}` : `${lane.label} category`}
+                      icon={Icon}
+                      coverClass={visual.coverClass}
+                    />
+                    <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                    <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
+                      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-base text-signal-foreground" aria-hidden="true">
+                        {lane.icon}
+                      </span>
+                      <span className="min-w-0">
+                        <strong className="block text-sm leading-tight">{lane.label}</strong>
+                        <small className="mt-0.5 line-clamp-1 block text-[0.7rem] text-foreground/75">
+                          {lane.subcategories.slice(0, 3).join(" · ")}
+                        </small>
+                      </span>
+                    </span>
+                  </button>
+                  {active && (
+                    <div className="mt-2 flex flex-wrap gap-1.5" aria-label={`${lane.label} vibes`}>
+                      {lane.subcategories.map((sub) => {
+                        const on = (tag ?? "").toLowerCase() === sub.toLowerCase();
+                        return (
+                          <button
+                            key={sub}
+                            type="button"
+                            onClick={() => setTag(on ? null : sub)}
+                            aria-pressed={on}
+                            className={`rounded-full border px-2.5 py-1 text-[0.7rem] font-bold transition-colors ${on ? "border-signal bg-signal text-signal-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
+                          >
+                            {sub}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
         <div
           ref={vibeRowRef}
           onScroll={updateVibeScroll}
           role="list"
           aria-label="Category cards"
-          className={`no-scrollbar gap-3 px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-3 ${
-            vibeGridOpen
-              ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              : "flex flex-row snap-x snap-mandatory overflow-x-auto md:overflow-visible"
-          }`}
+          className="no-scrollbar flex flex-row snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id];
@@ -454,7 +516,7 @@ function CommunityHub() {
                   setCategoryId(null);
                 }}
                 aria-pressed={active}
-                className={`group relative h-32 flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 ${vibeGridOpen ? "w-full" : "w-[280px] md:w-full"} ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
+                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
@@ -472,6 +534,7 @@ function CommunityHub() {
             );
           })}
         </div>
+        )}
         {!vibeGridOpen && (
           <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised md:hidden" aria-hidden="true">
             <div
@@ -484,6 +547,7 @@ function CommunityHub() {
           </div>
         )}
         </div>
+
 
       </section>
 
