@@ -35,6 +35,7 @@
   --color-signal: var(--signal);
   --color-signal-foreground: var(--signal-foreground);
   --color-live: var(--live);
+  --color-crisis: var(--crisis);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -146,6 +147,7 @@
   --cyan: oklch(0.75 0.18 195); /* electric cyan for high-visibility CTAs */
   --cyan-glow: oklch(0.75 0.18 195 / 0.35);
   --live: oklch(0.79 0.16 165);
+  --crisis: oklch(0.64 0.24 27);
   --card: oklch(0.19125 0 0);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.19125 0 0);

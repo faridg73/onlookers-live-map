@@ -33,6 +33,7 @@ export function MapCanvas({
   onMapPin,
   draftPin = null,
   centerTarget = null,
+  crisisMode = false,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -45,6 +46,8 @@ export function MapCanvas({
   draftPin?: MapPosition | null;
   /** A place searched for in pin mode; the map flies there when it changes. */
   centerTarget?: (MapPosition & { zoom?: number }) | null;
+  /** Emergency mode keeps every crisis request visible as a pulsing red marker. */
+  crisisMode?: boolean;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -261,7 +264,7 @@ export function MapCanvas({
         return pixel ? [{ request, pixel }] : [];
       })
     : [];
-  const showAllRequests = zoom >= DETAIL_ZOOM;
+  const showAllRequests = crisisMode || zoom >= DETAIL_ZOOM;
   const importantMarkers = showAllRequests
     ? requestMarkers
     : requestMarkers.filter(({ request }) => {
@@ -454,8 +457,14 @@ export function MapCanvas({
               aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
+                {crisisMode && !closed && (
+                  <>
+                    <span className="absolute bottom-0 size-20 animate-ping-slow rounded-full bg-crisis/35 motion-reduce:animate-none" />
+                    <span className="absolute bottom-1 size-14 rounded-full border-2 border-crisis/80" />
+                  </>
+                )}
                 {/* bounties running out of time pulse hard so they can't be missed */}
-                {!closed && r.status === "open" && r.expiresInMin <= 20 && (
+                {!crisisMode && !closed && r.status === "open" && r.expiresInMin <= 20 && (
                   <>
                     <span
                       className="absolute bottom-0 size-20 animate-ping-slow rounded-full motion-reduce:animate-none"
@@ -468,7 +477,7 @@ export function MapCanvas({
                   </>
                 )}
                 {/* gold pins keep a soft pulsing halo ring */}
-                {tier === "gold" && !closed && (
+                {!crisisMode && tier === "gold" && !closed && (
                   <>
                     <span
                       className="absolute bottom-0 size-16 animate-ping-slow rounded-full"
@@ -480,7 +489,7 @@ export function MapCanvas({
                     />
                   </>
                 )}
-                {tier === "medium" && r.status === "open" && (
+                {!crisisMode && tier === "medium" && r.status === "open" && (
                   <span
                     className="absolute bottom-0 size-9 animate-ping-slow rounded-full"
                     style={{ backgroundColor: "color-mix(in oklch, var(--pin-medium) 22%, transparent)" }}
@@ -493,7 +502,12 @@ export function MapCanvas({
                   </span>
                 )}
 
-                {tier === "standard" ? (
+                {crisisMode ? (
+                  <span className="relative grid size-11 place-items-center rounded-full border-2 border-crisis bg-crisis text-crisis-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-crisis)_65%,transparent)]">
+                    <span className="text-lg" aria-hidden>!</span>
+                    <span className="sr-only">Crisis</span>
+                  </span>
+                ) : tier === "standard" ? (
                   /* lemon-green pin with a plain category glyph */
                   <span
                     className={cn(
@@ -575,7 +589,9 @@ export function MapCanvas({
                 <span
                   className={cn("size-1.5 rotate-45 -translate-y-[3px]")}
                   style={{
-                    backgroundColor: closed
+                    backgroundColor: crisisMode
+                      ? "var(--crisis)"
+                      : closed
                       ? "var(--border)"
                       : tier === "gold"
                         ? "var(--pin-gold)"

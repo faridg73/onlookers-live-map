@@ -12,6 +12,7 @@ import {
   Radio,
   Search,
   ShieldCheck,
+  Siren,
   Sparkles,
   Ticket,
   TrafficCone,
@@ -19,6 +20,7 @@ import {
   Utensils,
   Users,
   Video,
+  Volume2,
   X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -40,6 +42,7 @@ import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
 
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 
 const MAP_CATEGORY_TILES: Array<{
@@ -47,14 +50,25 @@ const MAP_CATEGORY_TILES: Array<{
   label: string;
   icon: typeof Utensils;
   categories: CategoryId[];
+  crisis?: boolean;
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
   { id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"] },
   { id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"] },
   { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
-  { id: "community", label: "Community", icon: Users, categories: ["community", "street", "realestate"] },
+  { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
 ];
+
+const CRISIS_TERMS = [
+  "accident", "crash", "collision", "emergency", "fire", "flood", "hazard", "rescue", "smoke", "storm",
+];
+
+function isCrisisRequest(request: LiveRequest) {
+  if (request.category !== "community" && request.category !== "weather") return false;
+  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
+  return CRISIS_TERMS.some((term) => text.includes(term));
+}
 
 export const Route = createFileRoute("/")({
   validateSearch: (
@@ -93,6 +107,7 @@ function MapScreen() {
   const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
+  const [scannerNotice, setScannerNotice] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
@@ -163,11 +178,14 @@ function MapScreen() {
   );
 
   const activeCategoryTile = MAP_CATEGORY_TILES.find((tile) => tile.id === categoryTile) ?? null;
+  const crisisMode = activeCategoryTile?.crisis === true;
   const visible = useMemo(
     () =>
       activeCategoryTile
-        ? statusFiltered.filter(
-            (request) => request.category && activeCategoryTile.categories.includes(request.category),
+        ? statusFiltered.filter((request) =>
+            activeCategoryTile.crisis
+              ? isCrisisRequest(request)
+              : request.category && activeCategoryTile.categories.includes(request.category),
           )
         : statusFiltered,
     [activeCategoryTile, statusFiltered],
@@ -193,6 +211,7 @@ function MapScreen() {
         onSelect={select}
         onUserPositionChange={setUserPosition}
         centerTarget={centerTarget}
+        crisisMode={crisisMode}
       />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
@@ -357,8 +376,10 @@ function MapScreen() {
               {MAP_CATEGORY_TILES.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
-                const count = statusFiltered.filter(
-                  (request) => request.category && tile.categories.includes(request.category),
+                const count = statusFiltered.filter((request) =>
+                  tile.crisis
+                    ? isCrisisRequest(request)
+                    : request.category && tile.categories.includes(request.category),
                 ).length;
                 return (
                   <Button
@@ -372,12 +393,14 @@ function MapScreen() {
                       select(null);
                     }}
                     className={`relative h-20 min-w-0 flex-col gap-1 rounded-md px-1 text-[0.65rem] font-bold ${
-                      active
-                        ? "border-signal bg-signal text-signal-foreground"
+                      active && tile.crisis
+                        ? "border-crisis bg-crisis text-crisis-foreground"
+                        : active
+                          ? "border-signal bg-signal text-signal-foreground"
                         : "border-border bg-background text-foreground"
                     }`}
                   >
-                    <Icon className={`size-5 ${active ? "text-signal-foreground" : "text-signal"}`} />
+                    <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
                     <span className="w-full truncate">{tile.label}</span>
                     <span className={`absolute right-1.5 top-1.5 text-[0.58rem] ${active ? "text-signal-foreground" : "text-muted-foreground"}`}>
                       {count}
@@ -387,7 +410,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && (
+            {activeCategoryTile && !crisisMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -434,6 +457,59 @@ function MapScreen() {
                     No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
                   </p>
                 )}
+              </div>
+            )}
+
+            {crisisMode && (
+              <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
+                      <span className="size-2 animate-pulse rounded-full bg-crisis" /> Crisis watch
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Live crisis streams</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {visible.slice(0, 4).map((request) => (
+                      <Button key={request.id} type="button" variant="outline" onClick={() => {
+                        select(request.id);
+                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                        setDrawerOpen(false);
+                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/45 bg-background px-3 py-2.5 text-left">
+                        <span className="size-2 animate-pulse rounded-full bg-crisis" />
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place}</span>
+                        </span>
+                        <span className="shrink-0 text-[0.62rem] font-extrabold uppercase text-crisis">
+                          {request.bountyType === "live_stream" && request.status === "claimed" ? "Live" : "Alert"}
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No active crisis streams are reported in this area.
+                  </p>
+                )}
+
+                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-xs font-bold text-foreground">
+                  <Volume2 className="size-4 text-crisis" /> Emergency scanner audio
+                </Button>
+                {scannerNotice && (
+                  <p className="mt-2 text-center text-[0.65rem] text-muted-foreground">
+                    No verified public scanner audio is linked to these alerts yet.
+                  </p>
+                )}
+                <div className="mt-3">
+                  <FlashBountyButton variant="crisis" />
+                </div>
               </div>
             )}
           </div>
