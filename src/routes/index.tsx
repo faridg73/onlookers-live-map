@@ -1237,6 +1237,9 @@ function MapScreen() {
                     No verified public scanner audio is linked to these alerts yet.
                   </p>
                 )}
+                <Button type="button" onClick={() => setReportOpen(true)} className="mt-2 h-10 w-full justify-center rounded-md text-sm font-bold">
+                  Create community report
+                </Button>
                 <div className="mt-3">
                   <FlashBountyButton variant="crisis" />
                 </div>
