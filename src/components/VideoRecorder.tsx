@@ -32,7 +32,7 @@ export function VideoRecorder({
 
   const capture = useCallback(
     async (mode: "video" | "photo") => {
-      if (busy) return;
+      
       setBusy(true);
       try {
         const file = await requestNativeCapture(mode);
