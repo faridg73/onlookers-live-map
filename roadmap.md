@@ -113,3 +113,10 @@ Home Events & Arts neon category artwork
 - [x] Reputation points for flagging outdated posts, validating markers and the safety tutorial, with daily caps and admin ambassador seeding
 - [x] Create Community Report form (incident grid, verified-only toggle, media, geo-radius, witnesses)
 - [x] Legal pledge checkbox gating the glowing Submit Report button, with the 911 safety warning
+
+## Refine Create Community Report modal
+- [ ] Rebalance the modal and replace the incident dropdown with a five-icon grid
+- [ ] Make creator authentication an automatic trust-level status
+- [ ] Add locale-aware radius labels and immediate media thumbnails
+- [ ] Keep the submit control visible with pledge-gated neon activation
+- [ ] Verify phone and desktop behavior without changing report security
