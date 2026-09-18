@@ -46,7 +46,6 @@ export function LiveBroadcastStage({
   const [chatOpen, setChatOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [capturing, setCapturing] = useState(false);
-  const opened = useRef(false);
 
   // The parent re-renders on background polling and passes a fresh onEnd every
   // time, so it is kept in a ref and never restarts the capture flow.
@@ -97,14 +96,9 @@ export function LiveBroadcastStage({
     if (file) await handleFile(file);
   }, [handleFile]);
 
-  // On phones the camera app opens right away — the tap that started the
-  // broadcast counts as the user gesture. Computers wait for a button instead.
-  useEffect(() => {
-    if (opened.current || !isMobileCaptureDevice()) return;
-    opened.current = true;
-    const id = requestAnimationFrame(() => void capture());
-    return () => cancelAnimationFrame(id);
-  }, [capture]);
+  // The camera is never launched automatically. iOS refuses camera clicks that
+  // are not tied to a real tap, which left this stage stuck on a loading spinner.
+  // Everyone taps "Open camera" here instead.
 
   const [isMobile, setIsMobile] = useState(true);
   useEffect(() => {
@@ -130,7 +124,7 @@ export function LiveBroadcastStage({
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-        {saving || capturing ? (
+        {saving ? (
           <Loader2 className="size-9 animate-spin text-white/80" />
         ) : (
           <Video className="size-10 text-white/70" />
@@ -140,7 +134,7 @@ export function LiveBroadcastStage({
           {saving
             ? "Saving your clip…"
             : isMobile
-              ? "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."
+              ? "Tap open camera — your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."
               : "Record straight from your computer's webcam, or choose a video file you already have."}
         </p>
         {!isMobile && !saving && (
@@ -185,7 +179,7 @@ export function LiveBroadcastStage({
       <div className="flex items-center justify-center gap-4 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
           type="button"
-          disabled={saving || capturing}
+          disabled={saving}
           onClick={() => void capture()}
           className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
