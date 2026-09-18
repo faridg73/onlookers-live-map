@@ -64,7 +64,7 @@ import {
  * shows a single confirm button — no wizard, no fields — before the credits are
  * locked and every onlooker standing nearby gets a time-sensitive alert.
  */
-export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
+export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisis" }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -271,7 +271,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
             Flash
           </span>
         </button>
-      ) : (
+      ) : variant === "nav" ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -284,6 +284,14 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           </span>
           <span className="w-full truncate">Flash</span>
         </button>
+      ) : (
+        <Button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="h-11 w-full justify-center rounded-md bg-crisis px-4 font-extrabold uppercase tracking-[0.08em] text-crisis-foreground hover:bg-crisis/90"
+        >
+          <Zap className="size-4" /> Drop Live Alert
+        </Button>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>

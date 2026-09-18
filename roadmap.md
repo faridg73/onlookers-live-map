@@ -16,3 +16,10 @@ Home map category filtering
 - [x] Filter map markers by the active category lane
 - [x] Show a contextual result feed inside the drawer
 - [x] Verify tile filtering and result selection
+
+Emergency map mode
+- [x] Filter to emergency-tagged crisis requests
+- [x] Render pulsing red crisis markers
+- [x] Add live crisis stream and scanner controls
+- [x] Connect the Drop Live Alert action
+- [x] Verify emergency mode across phone and desktop
