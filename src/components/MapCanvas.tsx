@@ -66,7 +66,7 @@ export function MapCanvas({
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(15);
   const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
@@ -113,7 +113,9 @@ export function MapCanvas({
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
           center: REGIONAL_CENTER,
-          zoom: 13,
+          // Street-level default so business, shop and landmark labels are
+          // visible like the standard Google city map.
+          zoom: 15,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.
           minZoom: 2,
