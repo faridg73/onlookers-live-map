@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Square, Video } from "lucide-react";
+import { CameraOff, FolderOpen, Loader2, RefreshCw, Square, Video } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
+
+/** Give up on the camera after this long and show the fallback instead of spinning forever. */
+const CAMERA_TIMEOUT_MS = 3000;
 
 /**
  * Desktop / laptop recorder. Phones use the system camera app, but computers
@@ -20,7 +23,7 @@ export function DesktopWebcamRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
-  const [state, setState] = useState<"idle" | "starting" | "live" | "recording">("idle");
+  const [state, setState] = useState<"idle" | "starting" | "live" | "recording" | "failed">("idle");
   const [seconds, setSeconds] = useState(0);
 
   const stopStream = useCallback(() => {
@@ -33,12 +36,23 @@ export function DesktopWebcamRecorder({
 
   const start = useCallback(async () => {
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      toast.error("This browser can't use your webcam. You can choose an existing clip instead.");
+      setState("failed");
       return;
     }
     setState("starting");
+    // If the camera hasn't answered within the timeout, stop waiting and show
+    // the fallback instead of an endless spinner.
+    const timeoutId = window.setTimeout(() => {
+      setState((current) => {
+        if (current !== "starting") return current;
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        return "failed";
+      });
+    }, CAMERA_TIMEOUT_MS);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      window.clearTimeout(timeoutId);
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -46,10 +60,22 @@ export function DesktopWebcamRecorder({
       }
       setState("live");
     } catch {
-      setState("idle");
-      toast.error("Your webcam could not be opened. Check the browser's camera permission.");
+      window.clearTimeout(timeoutId);
+      setState("failed");
     }
   }, []);
+
+  const pickFile = useCallback(() => {
+    if (typeof document === "undefined") return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "video/*";
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      if (file && file.size > 0) onRecorded(file);
+    });
+    input.click();
+  }, [onRecorded]);
 
   const record = useCallback(() => {
     const stream = streamRef.current;
@@ -102,12 +128,22 @@ export function DesktopWebcamRecorder({
           ref={videoRef}
           muted
           playsInline
-          className={`aspect-video w-full object-cover ${state === "idle" ? "opacity-0" : ""}`}
+          className={`aspect-video w-full object-cover ${state === "idle" || state === "failed" ? "opacity-0" : ""}`}
         />
         {state === "idle" && (
           <p className="absolute inset-0 grid place-items-center px-4 text-center text-xs text-white/60">
             Your computer's webcam will appear here once you start it.
           </p>
+        )}
+        {state === "failed" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
+            <CameraOff className="size-8 text-white/50" />
+            <p className="text-xs font-semibold text-white">Your camera couldn't be opened.</p>
+            <p className="text-[0.7rem] leading-relaxed text-white/60">
+              Check that your browser is allowed to use the camera (the padlock icon in the address
+              bar), close other apps using the webcam, then retry — or choose a video file instead.
+            </p>
+          </div>
         )}
         {state === "recording" && (
           <span className="absolute left-3 top-3 rounded-full bg-red-500/90 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-white">
@@ -116,7 +152,26 @@ export function DesktopWebcamRecorder({
         )}
       </div>
 
-      {state === "idle" || state === "starting" ? (
+      {state === "failed" ? (
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => void start()}
+            className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
+          >
+            <RefreshCw className="size-5" /> Retry camera
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={pickFile}
+            className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 font-display text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
+          >
+            <FolderOpen className="size-5" /> Choose a video file
+          </button>
+        </div>
+      ) : state === "idle" || state === "starting" ? (
         <button
           type="button"
           disabled={disabled || state === "starting"}
