@@ -84,4 +84,4 @@ Home Explore Nearby neon category artwork
 Home Emergencies neon category artwork
 - [x] Add the uploaded Emergencies badge to the large Home card
 - [x] Preserve the existing crisis view and tap behavior
-- [ ] Verify prominent sizing on mobile and desktop
+- [x] Verify prominent sizing on mobile and desktop
