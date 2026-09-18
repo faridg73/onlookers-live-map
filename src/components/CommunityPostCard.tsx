@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { fetchTrustStatsCached, type TrustStats } from "@/lib/trust";
 import { formatCredits } from "@/lib/credits";
+import { awardReputation } from "@/lib/reputation";
 import {
   PIN_CREDIT_OPTIONS,
   categoryDef,
@@ -167,6 +168,40 @@ export function CommunityPostCard({
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
+          {!isMine && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void awardReputation("validate_marker", post.id).then((total) =>
+                    toast.success(
+                      total === null ? "Sign in to earn reputation." : `Thanks — ${total} reputation points.`,
+                    ),
+                  );
+                }}
+                className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+              >
+                Still accurate
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void awardReputation("flag_outdated", post.id).then((total) =>
+                    toast.success(
+                      total === null ? "Sign in to earn reputation." : `Flagged — ${total} reputation points.`,
+                    ),
+                  );
+                }}
+                className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+              >
+                Outdated
+              </Button>
+            </>
+          )}
           {isMine && (
             <>
               <Button

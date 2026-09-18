@@ -15,6 +15,7 @@ import {
   type RadiusChoiceId,
 } from "@/components/CommunityFeedFilters";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
+import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
@@ -91,6 +92,7 @@ function CommunityHub() {
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -629,6 +631,14 @@ function CommunityHub() {
 
 
       </section>
+
+      <div className="mx-5 mt-4 sm:mx-8">
+        <Button type="button" variant="outline" onClick={() => setReportOpen(true)} className="h-11 w-full justify-center rounded-xl border-crisis/60 text-sm font-extrabold uppercase tracking-[0.1em] text-crisis">
+          Create community report
+        </Button>
+      </div>
+
+      <CreateCommunityReportModal open={reportOpen} onOpenChange={setReportOpen} onPosted={() => setView("feed")} />
 
       {strangeSightings && (
         <section className="mx-5 mt-4 border-y border-signal/45 bg-surface px-4 py-4 shadow-[0_0_24px_var(--color-signal)] sm:mx-8">

@@ -49,6 +49,7 @@ import { saveMyLocation } from "@/lib/hunter-location";
 
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
+import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -273,6 +274,7 @@ function MapScreen() {
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [scannerNotice, setScannerNotice] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [gatheringClusterIds, setGatheringClusterIds] = useState<string[]>([]);
   const [nearbyPosts, setNearbyPosts] = useState<CommunityPost[]>([]);
   const [nearbyPostMedia, setNearbyPostMedia] = useState<Record<string, string>>({});
@@ -1237,6 +1239,9 @@ function MapScreen() {
                     No verified public scanner audio is linked to these alerts yet.
                   </p>
                 )}
+                <Button type="button" onClick={() => setReportOpen(true)} className="mt-2 h-10 w-full justify-center rounded-md text-sm font-bold">
+                  Create community report
+                </Button>
                 <div className="mt-3">
                   <FlashBountyButton variant="crisis" />
                 </div>
@@ -1291,6 +1296,8 @@ function MapScreen() {
       />
 
       <GuidesOverlay open={guidesOpen} onClose={() => setGuidesOpen(false)} />
+
+      <CreateCommunityReportModal open={reportOpen} onOpenChange={setReportOpen} />
     </div>
   );
 }
