@@ -106,7 +106,7 @@ function FAQScreen() {
       >
         <X className="size-5" />
       </button>
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-3 pr-14">
         <div className="flex size-12 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
           <HelpCircle className="size-6" />
         </div>
