@@ -23,3 +23,9 @@ Emergency map mode
 - [x] Add live crisis stream and scanner controls
 - [x] Connect the Drop Live Alert action
 - [x] Verify emergency mode across phone and desktop
+
+Traffic map mode
+- [x] Add live highway traffic overlay
+- [x] Highlight incident heat zones in yellow and orange
+- [x] Show vehicle incidents and closures with timestamps
+- [ ] Verify traffic mode across phone and desktop

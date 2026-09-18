@@ -34,6 +34,7 @@ export function MapCanvas({
   draftPin = null,
   centerTarget = null,
   crisisMode = false,
+  trafficMode = false,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -48,10 +49,13 @@ export function MapCanvas({
   centerTarget?: (MapPosition & { zoom?: number }) | null;
   /** Emergency mode keeps every crisis request visible as a pulsing red marker. */
   crisisMode?: boolean;
+  /** Traffic mode adds Google's live traffic layer and incident heat halos. */
+  trafficMode?: boolean;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
   const overlay = useRef<google.maps.OverlayView | null>(null);
+  const trafficLayer = useRef<google.maps.TrafficLayer | null>(null);
   
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -82,6 +86,17 @@ export function MapCanvas({
       setMe(stats ? { isIncognito: stats.isIncognito } : null),
     );
   }, []);
+
+  useEffect(() => {
+    if (!ready || !map.current) return;
+    if (trafficMode) {
+      trafficLayer.current ??= new google.maps.TrafficLayer();
+      trafficLayer.current.setMap(map.current);
+    } else {
+      trafficLayer.current?.setMap(null);
+    }
+    return () => trafficLayer.current?.setMap(null);
+  }, [ready, trafficMode]);
 
   // Boot the map once.
   useEffect(() => {
@@ -457,6 +472,12 @@ export function MapCanvas({
               aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
+                {trafficMode && !closed && (
+                  <>
+                    <span className={`absolute bottom-0 size-24 animate-ping-slow rounded-full motion-reduce:animate-none ${r.minutesAgo <= 15 ? "bg-traffic-heavy/35" : "bg-traffic-slow/30"}`} />
+                    <span className={`absolute bottom-1 size-16 rounded-full border-2 ${r.minutesAgo <= 15 ? "border-traffic-heavy/80" : "border-traffic-slow/80"}`} />
+                  </>
+                )}
                 {crisisMode && !closed && (
                   <>
                     <span className="absolute bottom-0 size-20 animate-ping-slow rounded-full bg-crisis/35 motion-reduce:animate-none" />
@@ -502,7 +523,11 @@ export function MapCanvas({
                   </span>
                 )}
 
-                {crisisMode ? (
+                {trafficMode ? (
+                  <span className={`relative grid size-11 place-items-center rounded-full border-2 text-sm font-black text-background shadow-lg ${r.minutesAgo <= 15 ? "border-traffic-heavy bg-traffic-heavy" : "border-traffic-slow bg-traffic-slow"}`}>
+                    {categoryGlyph(r.category)}
+                  </span>
+                ) : crisisMode ? (
                   <span className="relative grid size-11 place-items-center rounded-full border-2 border-crisis bg-crisis text-crisis-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-crisis)_65%,transparent)]">
                     <span className="text-lg" aria-hidden>!</span>
                     <span className="sr-only">Crisis</span>
@@ -589,7 +614,9 @@ export function MapCanvas({
                 <span
                   className={cn("size-1.5 rotate-45 -translate-y-[3px]")}
                   style={{
-                    backgroundColor: crisisMode
+                    backgroundColor: trafficMode
+                      ? r.minutesAgo <= 15 ? "var(--traffic-heavy)" : "var(--traffic-slow)"
+                      : crisisMode
                       ? "var(--crisis)"
                       : closed
                       ? "var(--border)"

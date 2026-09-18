@@ -21,6 +21,7 @@ import {
   Users,
   Video,
   Volume2,
+  Clock3,
   X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -63,6 +64,19 @@ const MAP_CATEGORY_TILES: Array<{
 const CRISIS_TERMS = [
   "accident", "crash", "collision", "emergency", "fire", "flood", "hazard", "rescue", "smoke", "storm",
 ];
+
+function trafficIncidentType(request: LiveRequest) {
+  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
+  if (/clos|detour|blocked/.test(text)) return "Road closure";
+  if (/crash|accident|collision|vehicle/.test(text)) return "Vehicle incident";
+  if (/train|bus|transit|station/.test(text)) return "Transit update";
+  return "Heavy traffic";
+}
+
+function liveTimestamp(minutesAgo: number) {
+  if (minutesAgo < 1) return "Updated now";
+  return `Updated ${minutesAgo}m ago`;
+}
 
 function isCrisisRequest(request: LiveRequest) {
   if (request.category !== "community" && request.category !== "weather") return false;
@@ -179,6 +193,7 @@ function MapScreen() {
 
   const activeCategoryTile = MAP_CATEGORY_TILES.find((tile) => tile.id === categoryTile) ?? null;
   const crisisMode = activeCategoryTile?.crisis === true;
+  const trafficMode = activeCategoryTile?.id === "traffic";
   const visible = useMemo(
     () =>
       activeCategoryTile
@@ -212,6 +227,7 @@ function MapScreen() {
         onUserPositionChange={setUserPosition}
         centerTarget={centerTarget}
         crisisMode={crisisMode}
+        trafficMode={trafficMode}
       />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
@@ -410,7 +426,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -455,6 +471,52 @@ function MapScreen() {
                 ) : (
                   <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
                     No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {trafficMode && (
+              <div className="mt-3 border-t border-traffic-heavy/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-traffic-heavy">
+                      <span className="size-2 animate-pulse rounded-full bg-traffic-heavy" /> Live road conditions
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Traffic incidents &amp; closures</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                <div className="mt-2 flex items-center gap-3 text-[0.62rem] font-bold text-muted-foreground">
+                  <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-slow" /> Slow</span>
+                  <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-heavy" /> Heavy</span>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {visible.slice(0, 5).map((request) => (
+                      <Button key={request.id} type="button" variant="outline" onClick={() => {
+                        select(request.id);
+                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                        setDrawerOpen(false);
+                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-traffic-slow/35 bg-background px-3 py-2.5 text-left">
+                        <span className={`size-2.5 rounded-full ${request.minutesAgo <= 15 ? "bg-traffic-heavy" : "bg-traffic-slow"}`} />
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{trafficIncidentType(request)} · {request.place}</span>
+                        </span>
+                        <span className="flex shrink-0 items-center gap-1 text-[0.58rem] font-bold text-muted-foreground">
+                          <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-traffic-slow/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No vehicle incidents or road closures are reported in this area.
                   </p>
                 )}
               </div>

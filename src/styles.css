@@ -36,6 +36,8 @@
   --color-signal-foreground: var(--signal-foreground);
   --color-live: var(--live);
   --color-crisis: var(--crisis);
+  --color-traffic-slow: var(--traffic-slow);
+  --color-traffic-heavy: var(--traffic-heavy);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -148,6 +150,8 @@
   --cyan-glow: oklch(0.75 0.18 195 / 0.35);
   --live: oklch(0.79 0.16 165);
   --crisis: oklch(0.64 0.24 27);
+  --traffic-slow: oklch(0.86 0.18 93);
+  --traffic-heavy: oklch(0.72 0.19 55);
   --card: oklch(0.19125 0 0);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.19125 0 0);
