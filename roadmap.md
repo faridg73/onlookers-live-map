@@ -56,4 +56,4 @@ Top Creators map mode
 
 App-wide typography readability
 - [x] Increase the shared type scale by one step
-- [ ] Verify key phone and desktop screens for fit and overflow
+- [x] Verify key phone and desktop screens for fit and overflow
