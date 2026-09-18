@@ -73,6 +73,8 @@ import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
 import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
 import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
 import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.json";
+import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
+import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -113,7 +115,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"],
-    theme: { emoji: "🍸", active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
+    theme: { imageUrl: nightlifeAsset.url, active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
   },
   {
     id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
@@ -133,7 +135,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
-    theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
+    theme: { imageUrl: topCreatorsAsset.url, active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
   },
   {
     id: "crime", label: "Crime Reports", icon: Siren, categories: [],
