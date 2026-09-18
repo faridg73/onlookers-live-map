@@ -2,6 +2,10 @@ import { quoteBounty, type BountyTierId } from "@/lib/bounty-pricing";
 import { lockBounty, type LockedBounty } from "@/lib/bounty-escrow";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { reverseGeocode } from "@/lib/geocode.functions";
+import {
+  broadcastCategoryById,
+  type BroadcastCategoryId,
+} from "@/lib/broadcast-categories";
 
 /** Minimum credits a flash bounty can lock. Higher than the general minimum
  *  because a spontaneous, time-sensitive alert needs enough reward to motivate
@@ -147,6 +151,8 @@ export type FlashBountyOptions = {
   /** Pro / Media Desk dispatch: doubled base plus professional add-ons. */
   proMode?: boolean;
   proOptionIds?: FlashProOptionId[];
+  categoryId?: BroadcastCategoryId;
+  subcategory?: string | null;
 };
 
 export function flashProOptionsFor(
@@ -265,15 +271,20 @@ export function postFlashBounty(
     instructions: (options.instructions ?? "").trim().slice(0, FLASH_INSTRUCTIONS_MAX),
     proMode: options.proMode ?? false,
     proOptionIds: options.proMode ? (options.proOptionIds ?? []) : [],
+    categoryId: options.categoryId ?? "breaking-incidents",
+    subcategory: options.subcategory?.trim() || null,
   };
   const quote = quoteFlashBounty(resolved);
   const picked = flashConditionsFor(resolved.conditionIds);
   const proPicked = flashProOptionsFor(resolved.proOptionIds);
+  const selectedCategory = broadcastCategoryById(resolved.categoryId ?? "breaking-incidents");
 
   const details = [
     "Format: Go Live Now (flash bounty)",
     `Requested capture: ${FLASH_DURATION_MINUTES} min live session`,
     "Camera: Wide establishing · Vertical",
+    `Category: ${selectedCategory.label}`,
+    ...(resolved.subcategory ? [`Vibe: ${resolved.subcategory}`] : []),
     ...(picked.length
       ? [`Conditions: ${picked.map((c) => `${c.label} (+${c.credits})`).join(", ")}`]
       : []),
@@ -299,7 +310,7 @@ export function postFlashBounty(
     details,
     locationName: spot.formatted,
     bounty: quote.total,
-    category: "events",
+    category: selectedCategory.requestCategory,
     latitude: spot.latitude,
     longitude: spot.longitude,
     minutes: FLASH_WINDOW_MINUTES,

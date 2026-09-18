@@ -16,9 +16,15 @@ import { REGIONAL_CENTER } from "@/lib/onlooker";
  */
 export function GlobalFeedMap({
   focus,
+  categoryId,
+  categoryLabel,
+  subcategory,
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
+  categoryId?: string | null;
+  categoryLabel?: string | null;
+  subcategory?: string | null;
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -54,9 +60,19 @@ export function GlobalFeedMap({
     };
   }, []);
 
+  const filteredClips = useMemo(() => {
+    const categoryNeedle = categoryLabel?.toLowerCase().trim();
+    const categoryIdNeedle = categoryId?.toLowerCase().trim();
+    const vibeNeedle = subcategory?.toLowerCase().trim();
+    return (clips ?? []).filter((clip) => {
+      const haystack = `${clip.title} ${clip.note} ${clip.place}`.toLowerCase();
+      const categoryMatches = !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
+      return categoryMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
+    });
+  }, [clips, categoryId, categoryLabel, subcategory]);
   const pinned = useMemo(
-    () => (clips ?? []).filter((c) => c.latitude !== null && c.longitude !== null),
-    [clips],
+    () => filteredClips.filter((c) => c.latitude !== null && c.longitude !== null),
+    [filteredClips],
   );
 
   // A Discover card asked us to show its exact spot: centre there and mark it.
@@ -102,7 +118,7 @@ export function GlobalFeedMap({
     };
   }, [pinned, mapReady, focus]);
 
-  const active = (clips ?? []).find((c) => c.id === activeId) ?? null;
+  const active = filteredClips.find((c) => c.id === activeId) ?? null;
 
   return (
     <div className="mt-6">
@@ -122,12 +138,14 @@ export function GlobalFeedMap({
       {active && <GlobalClipBubble clip={active} />}
 
       <div className="mt-5 space-y-4">
-        {(clips ?? []).map((clip) => (
+        {filteredClips.map((clip) => (
           <GlobalClipBubble key={clip.id} clip={clip} compact={clip.id !== activeId} />
         ))}
-        {clips?.length === 0 && (
+        {clips !== null && filteredClips.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No unlocked clips yet. Once requesters approve footage it shows up here.
+            {categoryLabel
+              ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
+              : "No unlocked clips yet. Once requesters approve footage it shows up here."}
           </p>
         )}
       </div>

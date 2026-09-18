@@ -3,7 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
-import { CreatorVibePills } from "@/components/CreatorVibePills";
+import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ScrollableLane } from "@/components/ScrollableLane";
 
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
@@ -36,7 +36,10 @@ import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
-import { CREATOR_VIBES, isCreatorVibeActive } from "@/lib/creator-vibes";
+import {
+  broadcastCategoryById,
+  type BroadcastCategoryId,
+} from "@/lib/broadcast-categories";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -68,6 +71,7 @@ function CommunityHub() {
   const [media, setMedia] = useState<Record<string, string>>({});
   const [category, setCategory] = useState<CommunityCategory | "all">("all");
   const [tag, setTag] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
@@ -220,16 +224,19 @@ function CommunityHub() {
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
 
-    const inLane = inRange.filter(({ post }) => category === "all" || post.category === category);
+    const inLane = inRange.filter(({ post }) => {
+      if (category === "all") return true;
+      if (post.category !== category) return false;
+      return !categoryId || post.tags.some((postTag) => postTag.toLowerCase() === categoryId);
+    });
     const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
 
     // Subcategory pills are strict: never substitute sibling or unrelated posts.
     return sort(exact);
-  }, [posts, category, tag, radius, distanceFor, matchesTag]);
+  }, [posts, category, categoryId, tag, radius, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
-  const activeVibe = CREATOR_VIBES.find((vibe) => isCreatorVibeActive(vibe, category, tag)) ?? null;
 
   const renderCard = ({ post, miles }: { post: CommunityPost; miles: number | null }) => (
     <CommunityPostCard
@@ -268,17 +275,24 @@ function CommunityHub() {
           Browse venues & events →
         </Link>
         <div className="mt-4">
-          <CreatorVibePills
-            activeId={activeVibe?.id ?? null}
-            onSelect={(vibe) => {
-              if (!vibe) {
+          <BroadcastCategoryPicker
+            categoryId={categoryId}
+            subcategory={tag}
+            allowAll
+            laneLabel="Discover category"
+            menuLabel="Browse all categories"
+            allLabel="All live content"
+            onCategoryChange={(next) => {
+              setCategoryId(next);
+              if (!next) {
                 setCategory("all");
                 setTag(null);
                 return;
               }
-              setCategory(vibe.category);
-              setTag(vibe.tag);
+              setCategory(broadcastCategoryById(next).communityCategory);
+              setTag(null);
             }}
+            onSubcategoryChange={setTag}
           />
         </div>
       </header>
@@ -396,6 +410,7 @@ function CommunityHub() {
             onClick={() => {
               setCategory("all");
               setTag(null);
+              setCategoryId(null);
             }}
             className={category === "all" ? "text-signal" : "text-muted-foreground"}
           >
@@ -436,6 +451,7 @@ function CommunityHub() {
                 onClick={() => {
                   setCategory(c.id);
                   setTag(null);
+                  setCategoryId(null);
                 }}
                 aria-pressed={active}
                 className={`group relative h-32 flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 ${vibeGridOpen ? "w-full" : "w-[280px] md:w-full"} ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
@@ -564,7 +580,12 @@ function CommunityHub() {
       {view === "map" ? (
         <div className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="The map">
-            <GlobalFeedMap focus={focus} />
+            <GlobalFeedMap
+              focus={focus}
+              categoryId={categoryId}
+              categoryLabel={categoryId ? broadcastCategoryById(categoryId).label : null}
+              subcategory={tag}
+            />
           </SectionBoundary>
         </div>
       ) : (
