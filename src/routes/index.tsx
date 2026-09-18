@@ -67,6 +67,7 @@ import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json"
 import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
 import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
 import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
+import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
