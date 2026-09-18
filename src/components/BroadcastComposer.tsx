@@ -227,7 +227,9 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         <BroadcastCategoryPicker
           categoryId={categoryId}
           subcategory={subcategory}
-          onCategoryChange={setCategoryId}
+          onCategoryChange={(next) => {
+            if (next) setCategoryId(next);
+          }}
           onSubcategoryChange={setSubcategory}
         />
       </div>
