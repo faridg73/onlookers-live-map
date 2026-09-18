@@ -10,6 +10,7 @@ import { BuyCreditsCard } from "@/components/BuyCreditsCard";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { MyEarningsCard } from "@/components/MyEarningsCard";
 import { creditPackageById } from "@/lib/credit-packages";
+import { InlineSignIn } from "@/components/InlineSignIn";
 
 export const Route = createFileRoute("/balance")({
   head: () => ({
@@ -101,9 +102,12 @@ function BalanceScreen() {
       </p>
 
       {!loading && !user ? (
-        <p className="mt-6 rounded-2xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted-foreground">
-          Sign in to see your balance, purchases and cash out options.
-        </p>
+        <div className="mt-6 max-w-md">
+          <InlineSignIn
+            title="Sign in to see your balance"
+            message="Your credit balance, purchase history and cash-out options appear here the moment you're signed in."
+          />
+        </div>
       ) : (
         <>
           <CreditWalletCard />
