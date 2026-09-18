@@ -152,7 +152,26 @@ export function DesktopWebcamRecorder({
         )}
       </div>
 
-      {state === "idle" || state === "starting" ? (
+      {state === "failed" ? (
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => void start()}
+            className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
+          >
+            <RefreshCw className="size-5" /> Retry camera
+          </button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={pickFile}
+            className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 font-display text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
+          >
+            <FolderOpen className="size-5" /> Choose a video file
+          </button>
+        </div>
+      ) : state === "idle" || state === "starting" ? (
         <button
           type="button"
           disabled={disabled || state === "starting"}
