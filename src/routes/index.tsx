@@ -570,15 +570,11 @@ function MapScreen() {
                 const active = categoryTile === tile.id;
                 const count = tile.creators
                   ? topCreators.length
+                  : tile.guidesLink
+                  ? GUIDES.length
                   : (tile.viral ? requests : statusFiltered).filter((request) =>
-                  tile.crisis
-                    ? isCrisisRequest(request)
-                    : tile.trending
-                      ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
-                    : tile.viral
-                      ? true
-                    : request.category && tile.categories.includes(request.category),
-                  ).length;
+                      tileMatches(tile, request, userPosition),
+                    ).length;
                 return (
                   <Button
                     key={tile.id}
@@ -586,6 +582,14 @@ function MapScreen() {
                     variant="outline"
                     aria-pressed={active}
                     onClick={() => {
+                      if (tile.communityLink) {
+                        void navigate({ to: "/community" });
+                        return;
+                      }
+                      if (tile.guidesLink) {
+                        setGuidesOpen(true);
+                        return;
+                      }
                       setCategoryTile(active ? null : tile.id);
                       setDrawerOpen(true);
                       select(null);
