@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Clock, DollarSign, Navigation, Radio } from "lucide-react";
+import { Clock, DollarSign, Navigation, Radio, X } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
