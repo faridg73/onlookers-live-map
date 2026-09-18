@@ -70,6 +70,14 @@ import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
 import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
 import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
 import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
+import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
+import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
+import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.json";
+import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
+import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
+import scannerAsset from "@/assets/scanner-badge.jpg.asset.json";
+import bountyMapAsset from "@/assets/bounty-map-badge.jpg.asset.json";
+import guidesAsset from "@/assets/guides-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -98,11 +106,11 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"],
-    theme: { emoji: "🎭", active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
+    theme: { imageUrl: eventsArtsAsset.url, active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
   },
   {
     id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"],
-    theme: { emoji: "🌲", active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
+    theme: { imageUrl: outdoorRecreationAsset.url, active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
   },
   {
     id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
@@ -110,7 +118,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"],
-    theme: { emoji: "🍸", active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
+    theme: { imageUrl: nightlifeAsset.url, active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
   },
   {
     id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
@@ -130,7 +138,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
-    theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
+    theme: { imageUrl: topCreatorsAsset.url, active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
   },
   {
     id: "crime", label: "Crime Reports", icon: Siren, categories: [],
@@ -140,7 +148,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "scanner", label: "Scanner", icon: Radio, categories: [],
     scanner: true,
-    theme: { emoji: "📻", active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
+    theme: { imageUrl: scannerAsset.url, active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
   },
   {
     id: "livestream", label: "Live Stream", icon: Video, categories: [],
@@ -150,17 +158,17 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
     bountyMap: true,
-    theme: { emoji: "🗺️", active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
+    theme: { imageUrl: bountyMapAsset.url, active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
   },
   {
     id: "community", label: "Community", icon: Users, categories: ["community"],
     communityLink: true,
-    theme: { emoji: "👥", active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
+    theme: { imageUrl: communityUnityAsset.url, active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
   },
   {
     id: "guides", label: "Guides", icon: BookOpen, categories: [],
     guidesLink: true,
-    theme: { emoji: "🧭", active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
+    theme: { imageUrl: guidesAsset.url, active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
   },
   {
     id: "strange-sightings", label: "Strange Sightings & UFO", icon: Eye, categories: [],

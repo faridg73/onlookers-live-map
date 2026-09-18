@@ -88,6 +88,21 @@ Home Emergencies neon category artwork
 - [x] Verify prominent sizing on mobile and desktop
 
 Home Events & Arts neon category artwork
-- [ ] Add the uploaded Events & Arts badge to the large Home card (BLOCKED: the attached upload was a duplicate of the Food & Markets badge — waiting for the correct image)
-- [ ] Preserve the existing events/art filtering and tap behavior
-- [ ] Verify prominent sizing on mobile and desktop
+- [x] Add the uploaded Events & Arts badge to the large Home card — badge received as HEJFHERWIF.jpeg
+- [x] Preserve the existing events/art filtering and tap behavior
+- [x] Verify prominent sizing on mobile and desktop
+
+## Home Community neon category artwork
+- [x] Add the uploaded "Community Unity" neon badge to the large Home "Community" card (BLOCKED previously; badge received iytdfytfiytf.jpeg / user ref watermarked_img_12722684178706055576.jpg), preserve the community routing/tap behavior, verify prominent sizing on mobile and desktop.
+- [x] Home Outdoor Recreation neon category artwork — add the uploaded "Outdoor Recreation" badge (jrgojergherg.jpeg) to the large Home card, keep tap behavior, verify mobile + desktop.
+- [x] Home Nightlife neon category artwork — add the uploaded "NIGHTLIFE" badge (gigjgvjhvgjh.jpeg) to the large Home card, keep tap behavior, verify mobile + desktop.
+- [x] Home Top Creators neon category artwork — added the uploaded "TOP CREATORS" badge to the large Home card, kept tap behavior, verified mobile + desktop.
+
+## Home Scanner neon category artwork
+- [x] Add the uploaded "SCANNER" neon badge (hfjfhksdrjfghbkjrgber.jpeg) to the large Home card, preserve the scanner tap behavior, verify prominent sizing on mobile and desktop.
+
+## Home Bounty Map neon category artwork
+- [x] Add the uploaded "BOUNTY MAP" neon badge (tyhrthrdtht.jpeg) to the large Home card, preserve the bounty-map tap behavior, verify prominent sizing on mobile and desktop.
+
+## Home Guides neon category artwork
+- [x] Add the uploaded "GUILDS" neon badge (hgjehrgjerrhger.jpeg) to the large Home "Guides" card — message said Bounty Map, but Bounty Map was already badge'd; the artwork matches Guides, preserve tap behavior, verify mobile + desktop.
