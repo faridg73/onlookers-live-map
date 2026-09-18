@@ -156,7 +156,7 @@ export function CreateCommunityReportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-background/90 p-0 sm:items-center sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-background/90 p-0 sm:items-center sm:p-6">
       <div className="flex max-h-[96dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:rounded-2xl">
         <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
           <Button type="button" variant="ghost" size="icon" aria-label="Back" onClick={() => onOpenChange(false)}>
