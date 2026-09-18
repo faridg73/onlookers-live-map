@@ -124,7 +124,7 @@ function DiscoverHome() {
             type="button"
             onClick={() => setView("grid")}
             aria-label="Back to Browse places"
-            className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-signal/60"
+            className="relative z-10 inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-signal/60"
           >
             <ArrowLeft className="size-4 text-signal" aria-hidden />
             Browse places
