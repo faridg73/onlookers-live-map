@@ -24,6 +24,12 @@ export function VideoRecorder({
 }) {
   const [busy, setBusy] = useState(false);
   const autoOpened = useRef(false);
+  const [isMobile, setIsMobile] = useState(true);
+
+  // Checked after hydration so the server and browser render the same markup.
+  useEffect(() => {
+    setIsMobile(isMobileCaptureDevice());
+  }, []);
 
   const capture = useCallback(
     async (mode: "video" | "photo") => {
@@ -51,7 +57,7 @@ export function VideoRecorder({
   // When only a clip is wanted, jump straight into the camera app — the tap that
   // opened this screen still counts as the user gesture.
   useEffect(() => {
-    if (onPhoto || autoOpened.current) return;
+    if (onPhoto || autoOpened.current || !isMobileCaptureDevice()) return;
     autoOpened.current = true;
     const id = requestAnimationFrame(() => void capture("video"));
     return () => cancelAnimationFrame(id);
