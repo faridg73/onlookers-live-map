@@ -137,7 +137,32 @@ export function MyBountyVideos() {
             ) : (
               <div className="space-y-3">
                 {videos.map((v) => (
-                  <div key={v.id} className="rounded-2xl border border-border bg-surface p-3">
+                  <div key={v.id} className="relative rounded-2xl border border-border bg-surface p-3 pr-11">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label="Delete stream"
+                          disabled={deleting === v.id}
+                          className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full border border-border bg-surface-raised text-muted-foreground transition-colors hover:border-destructive/60 hover:text-destructive disabled:opacity-50"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this stream?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            “{v.request_title || "Live broadcast"}” will be removed from your
+                            profile history permanently. This can't be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep it</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => void remove(v)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                     <div className="flex flex-col gap-3 min-[460px]:flex-row min-[460px]:items-center">
                       {thumbs[v.id] ? (
                         <img
