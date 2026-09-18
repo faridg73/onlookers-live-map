@@ -261,7 +261,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Flash bounty, something is happening here now"
-          title="Instantly alerts nearby onlookers to go live at this exact spot."
+          title="Drop a live alert to pull nearby onlookers into this exact spot."
           className="pointer-events-auto absolute bottom-28 right-4 z-30 flex flex-col items-center gap-1"
         >
           <span className="grid size-16 place-items-center rounded-full bg-signal text-signal-foreground shadow-xl shadow-signal/30 ring-4 ring-signal/25 transition-transform active:scale-95">
@@ -276,7 +276,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Flash bounty, something is happening here now"
-          title="Instantly alerts nearby onlookers to go live at this exact spot."
+          title="Drop a live alert to pull nearby onlookers into this exact spot."
           className="group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 px-0.5 py-3 text-center text-[0.55rem] font-bold leading-tight text-signal"
         >
           <span className="grid size-8 shrink-0 place-items-center rounded-full bg-signal text-signal-foreground">
@@ -293,7 +293,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" }) {
               <Zap className="size-6 text-signal" /> Happening here now
             </DialogTitle>
             <DialogDescription>
-              Instantly alerts nearby onlookers to go live at this exact spot.
+              Drop a live alert to pull nearby onlookers into this exact spot.
             </DialogDescription>
           </DialogHeader>
 
