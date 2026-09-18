@@ -54,6 +54,13 @@ function HuntScreen() {
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("distance");
   const { formatDistance, radius, unit } = useDistanceUnit(position);
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+
+  const close = () => {
+    if (canGoBack) router.history.back();
+    else void router.navigate({ to: "/" });
+  };
 
   const locate = async () => {
     setError(null);
