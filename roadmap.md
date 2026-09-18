@@ -22,4 +22,4 @@ Emergency map mode
 - [x] Render pulsing red crisis markers
 - [x] Add live crisis stream and scanner controls
 - [x] Connect the Drop Live Alert action
-- [ ] Verify emergency mode across phone and desktop
+- [x] Verify emergency mode across phone and desktop
