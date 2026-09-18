@@ -62,6 +62,7 @@ import {
   STRANGE_SIGHTINGS_IMAGE_URL,
   matchesStrangeSighting,
 } from "@/lib/strange-sightings";
+import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -118,7 +119,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
-    theme: { emoji: "⚡", active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
+    theme: { imageUrl: breakingNewsAsset.url, active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
   },
   {
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
