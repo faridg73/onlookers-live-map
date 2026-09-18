@@ -33,6 +33,7 @@ import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
+import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
@@ -175,6 +176,8 @@ function PostScreen() {
   const [accessCode, setAccessCode] = useState("");
   const [recent, setRecent] = useState<RecentPlace[]>([]);
   const [gpsBusy, setGpsBusy] = useState(false);
+  /** Refill panel, so a short wallet never ends the journey. */
+  const [topUpOpen, setTopUpOpen] = useState(false);
   const voice = useVoiceInput((text) => setPrompt(text));
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
@@ -390,8 +393,9 @@ function PostScreen() {
     if (funds !== null && funds < total) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
         description: `Buy Credits to lock a ${total} Credits bounty${tip > 0 ? " including your tip" : ""}.`,
-        action: { label: "Buy credits", onClick: () => void navigate({ to: "/profile" }) },
+        action: { label: "Buy credits", onClick: () => setTopUpOpen(true) },
       });
+      setTopUpOpen(true);
       return;
     }
     setPosting(true);
