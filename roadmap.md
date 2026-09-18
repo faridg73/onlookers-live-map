@@ -40,4 +40,4 @@ Trending Near You map mode
 - [x] Filter broadcasts and bounties to a two-mile radius
 - [x] Load nearby media posts into the map drawer
 - [x] Rank fast-rising local activity with timestamps
-- [ ] Verify the local feed across phone and desktop
+- [x] Verify the local feed across phone and desktop
