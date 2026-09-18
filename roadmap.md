@@ -119,4 +119,4 @@ Home Events & Arts neon category artwork
 - [x] Make creator authentication an automatic trust-level status aligned with the trust-workflow reference
 - [x] Add locale-aware radius labels and immediate media thumbnails
 - [x] Keep the submit control visible with pledge-gated neon activation
-- [ ] Verify phone and desktop behavior without changing report security
+- [x] Verify phone and desktop behavior without changing report security
