@@ -1214,6 +1214,33 @@ export type Database = {
           },
         ]
       }
+      reputation_events: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          points: number
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          points?: number
+          subject?: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          points?: number
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       request_access_codes: {
         Row: {
           code: string
@@ -1559,6 +1586,33 @@ export type Database = {
           status?: string
           stripe_reference_id?: string | null
           type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trust_grants: {
+        Row: {
+          ambassador_region: string
+          created_at: string
+          first_responder: boolean
+          seeded_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ambassador_region?: string
+          created_at?: string
+          first_responder?: boolean
+          seeded_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ambassador_region?: string
+          created_at?: string
+          first_responder?: boolean
+          seeded_points?: number
           updated_at?: string
           user_id?: string
         }
@@ -1920,6 +1974,10 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: number
       }
+      award_reputation: {
+        Args: { _action: string; _subject?: string }
+        Returns: number
+      }
       award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
       bill_stream_minute: {
         Args: { _session_id: string }
@@ -2233,6 +2291,7 @@ export type Database = {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
       }
+      reputation_total: { Args: { _user_id: string }; Returns: number }
       request_cashout: { Args: { _amount: number }; Returns: string }
       request_coin_cashout: { Args: { _coins: number }; Returns: string }
       request_creator_verification: { Args: never; Returns: string }
@@ -2249,6 +2308,15 @@ export type Database = {
       resolve_payout: {
         Args: { _approve: boolean; _note: string; _payout_id: string }
         Returns: boolean
+      }
+      seed_ambassador: {
+        Args: {
+          _first_responder?: boolean
+          _points?: number
+          _region: string
+          _user_id: string
+        }
+        Returns: undefined
       }
       set_moderator: {
         Args: { _email: string; _enabled: boolean }
@@ -2316,6 +2384,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      trust_level: { Args: { _user_id: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
