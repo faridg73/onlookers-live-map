@@ -95,8 +95,17 @@ Posting a real estate bounty requires checking the authorization box in the requ
 ];
 
 function FAQScreen() {
+  const navigate = useNavigate();
   return (
-    <div className="reading-shell pb-28 pt-6">
+    <div className="reading-shell relative pb-28 pt-6">
+      <button
+        type="button"
+        aria-label="Close help and FAQ"
+        onClick={() => void navigate({ to: "/" })}
+        className="absolute right-4 top-6 flex size-10 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+      >
+        <X className="size-5" />
+      </button>
       <div className="mb-6 flex items-center gap-3">
         <div className="flex size-12 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
           <HelpCircle className="size-6" />
