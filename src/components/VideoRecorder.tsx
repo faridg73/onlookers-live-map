@@ -4,7 +4,8 @@ import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
-import { requestNativeCapture } from "@/lib/native-capture";
+import { isMobileCaptureDevice, requestNativeCapture } from "@/lib/native-capture";
+import { DesktopWebcamRecorder } from "@/components/DesktopWebcamRecorder";
 
 /**
  * Launches the phone's own camera app for clips and photos. There is no in-app
