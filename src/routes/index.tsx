@@ -66,6 +66,7 @@ import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json";
 import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
 import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
+import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -141,7 +142,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "livestream", label: "Live Stream", icon: Video, categories: [],
     liveStreams: true,
-    theme: { emoji: "📹", active: "border-lime-400 bg-lime-400/20 text-lime-50", badge: "text-lime-400" },
+    theme: { imageUrl: liveStreamAsset.url, active: "border-lime-400 bg-lime-400/20 text-lime-50", badge: "text-lime-400" },
   },
   {
     id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
