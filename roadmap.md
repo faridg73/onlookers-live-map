@@ -9,4 +9,4 @@ Responsive Home map controls
 - [x] Add the collapsible drag-handle drawer
 - [x] Connect recent search history and map recentering
 - [x] Keep Post a Bounty visible as the primary drawer action
-- [ ] Verify mobile and desktop interactions
+- [x] Verify mobile and desktop interactions
