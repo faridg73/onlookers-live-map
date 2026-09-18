@@ -16,6 +16,7 @@ import { GeolocationFailure, requestCurrentPosition } from "@/lib/geolocation";
 import { REGIONAL_CENTER, requestMapPosition, type LiveRequest, type MapPosition } from "@/lib/onlooker";
 import { isClosed } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
+import { readMapViewport, writeSessionState } from "@/lib/session-state";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const DETAIL_ZOOM = 14;
@@ -38,6 +39,7 @@ export function MapCanvas({
   trafficMode = false,
   gatheringMode = false,
   onGatheringClusterSelect,
+  viewportStorageKey,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -57,6 +59,7 @@ export function MapCanvas({
   /** Public gathering mode shows crowd-density circles behind venue pins. */
   gatheringMode?: boolean;
   onGatheringClusterSelect?: (requestIds: string[]) => void;
+  viewportStorageKey?: string;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -78,6 +81,7 @@ export function MapCanvas({
   );
   const [places, setPlaces] = useState<DiscoveredPlace[]>([]);
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
+  const restoredViewport = useRef(false);
 
   // Live values for the map's own click listener, which is registered once.
   const pinModeRef = useRef(pinMode);
@@ -110,12 +114,14 @@ export function MapCanvas({
     loadGoogleMaps()
       .then((maps) => {
         if (cancelled || !holder.current) return;
+        const savedViewport = readMapViewport(viewportStorageKey);
+        restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
-          center: REGIONAL_CENTER,
+          center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
           // Street-level default so business, shop and landmark labels are
           // visible like the standard Google city map.
-          zoom: 15,
+          zoom: savedViewport?.zoom ?? 15,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.
           minZoom: 2,
@@ -151,6 +157,13 @@ export function MapCanvas({
             radius: clamp(radius || 1200, 200, 5000),
             zoom: currentZoom,
           });
+          if (viewportStorageKey) {
+            writeSessionState(viewportStorageKey, {
+              lat: centre.lat(),
+              lng: centre.lng(),
+              zoom: currentZoom,
+            });
+          }
         });
         map.current.addListener("click", (event: google.maps.MapMouseEvent) => {
           const at = event.latLng;
@@ -172,7 +185,7 @@ export function MapCanvas({
       overlay.current?.setMap(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [viewportStorageKey]);
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
@@ -209,6 +222,7 @@ export function MapCanvas({
   }, [onUserPositionChange, centerOn]);
 
   useEffect(() => {
+    if (restoredViewport.current) return;
     locateMe();
   }, [locateMe]);
 

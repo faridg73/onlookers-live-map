@@ -7,6 +7,8 @@ import { LoopingPreview } from "@/components/LoopingPreview";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/use-auth";
+import { useSessionScroll } from "@/hooks/use-session-scroll";
+import { readSessionState, writeSessionState } from "@/lib/session-state";
 import {
   countClipView,
   fetchClipComments,
@@ -42,6 +44,19 @@ function ExplorePage() {
   const [clips, setClips] = useState<ExploreClip[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"nearby" | "global">("nearby");
+  const restored = useRef(false);
+
+  useSessionScroll("onlooker:scroll:explore", !loading);
+
+  useEffect(() => {
+    const saved = readSessionState<"nearby" | "global">("onlooker:view:explore", "nearby");
+    if (saved === "nearby" || saved === "global") setTab(saved);
+    restored.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (restored.current) writeSessionState("onlooker:view:explore", tab);
+  }, [tab]);
 
   useEffect(() => {
     void fetchExploreClips()
@@ -78,7 +93,7 @@ function ExplorePage() {
         ))}
       </div>
 
-      {tab === "global" && <GlobalFeedMap />}
+      {tab === "global" && <GlobalFeedMap viewportStorageKey="onlooker:map:explore-global" />}
 
       {tab === "nearby" && loading && (
         <p className="mt-10 flex items-center justify-center gap-2 text-sm text-muted-foreground">
