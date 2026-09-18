@@ -87,7 +87,7 @@ export function InlineSignIn({ title = "Sign in", message }: InlineSignInProps) 
       const described = describeAuthError(err);
       setNeedsEmailConfirm(described.needsEmailConfirm);
       setFormError(described.message);
-it      toast.error(described.message);
+      toast.error(described.message);
     }
   }
 
