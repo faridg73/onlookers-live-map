@@ -47,3 +47,4 @@
 - [x] Add creator vibe filters to Discover/Trending
 - [x] Add broadcast category tagging before going live
 - [x] Add creator stream history and analytics to Profile
+- [x] Expand broadcast creation to 16 contextual categories with dynamic vibe choices
