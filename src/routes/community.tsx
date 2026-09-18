@@ -747,6 +747,7 @@ function CommunityHub() {
           <SectionBoundary label="The map">
             <GlobalFeedMap
               focus={focus}
+              reports={posts}
               categoryLabel={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
               {...(strangeSightings ? { categoryId: STRANGE_SIGHTINGS_ID } : { categoryId })}
               subcategory={tag}
