@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, Loader2, Video, X } from "lucide-react";
+import { Camera, Video, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
@@ -106,7 +106,7 @@ export function VideoRecorder({
       <div className="flex flex-col gap-3 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
           type="button"
-          disabled={busy}
+
           onClick={() => void capture("video")}
           className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
@@ -115,7 +115,7 @@ export function VideoRecorder({
         {onPhoto && (
           <button
             type="button"
-            disabled={busy}
+
             onClick={() => void capture("photo")}
             className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 font-display text-sm font-extrabold uppercase tracking-[0.12em] text-white disabled:opacity-50"
           >
