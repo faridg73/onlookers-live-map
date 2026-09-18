@@ -53,3 +53,7 @@ Top Creators map mode
 - [x] Rank creators by followers and reach
 - [x] Show verification badges and live status
 - [x] Verify the grid across phone and desktop
+
+App-wide typography readability
+- [x] Increase the shared type scale by one step
+- [x] Verify key phone and desktop screens for fit and overflow
