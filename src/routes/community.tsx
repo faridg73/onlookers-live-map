@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
+import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
+import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
