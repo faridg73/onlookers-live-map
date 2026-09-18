@@ -208,9 +208,18 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           <p className="mt-2 text-sm text-muted-foreground">{gate.reason}</p>
         </div>
         {gate.signedIn ? (
-          <Button type="button" className="w-full" onClick={onSwitchToBounty}>
-            Post a paid flash bounty instead
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => void navigate({ to: "/profile" })}
+            >
+              Apply to become a verified creator
+            </Button>
+            <Button type="button" variant="outline" className="w-full" onClick={onSwitchToBounty}>
+              Post a paid flash bounty instead
+            </Button>
+          </div>
         ) : (
           <Button type="button" className="w-full" onClick={() => void navigate({ to: "/auth" })}>
             Sign in
