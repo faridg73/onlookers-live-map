@@ -46,7 +46,6 @@ export function LiveBroadcastStage({
   const [chatOpen, setChatOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [capturing, setCapturing] = useState(false);
-  const opened = useRef(false);
 
   // The parent re-renders on background polling and passes a fresh onEnd every
   // time, so it is kept in a ref and never restarts the capture flow.
