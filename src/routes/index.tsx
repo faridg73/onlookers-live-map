@@ -65,17 +65,36 @@ const MAP_CATEGORY_TILES: Array<{
   trending?: boolean;
   viral?: boolean;
   creators?: boolean;
+  theme?: { emoji: string; active: string; badge: string };
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
   { id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"] },
-  { id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"] },
+  {
+    id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
+    theme: { emoji: "🚗", active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
+  },
   { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
-  { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
-  { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
-  { id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true },
-  { id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true },
-  { id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true },
+  {
+    id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
+    theme: { emoji: "🚨", active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
+  },
+  {
+    id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
+    theme: { emoji: "👥", active: "border-blue-400 bg-blue-400/20 text-blue-50", badge: "text-blue-400" },
+  },
+  {
+    id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
+    theme: { emoji: "🔥", active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
+  },
+  {
+    id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
+    theme: { emoji: "⚡", active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
+  },
+  {
+    id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
+    theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
+  },
 ];
 
 const CRISIS_TERMS = [
@@ -502,17 +521,27 @@ function MapScreen() {
                       select(null);
                       setGatheringClusterIds([]);
                     }}
-                    className={`relative h-20 min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
-                      active && tile.crisis
-                        ? "border-crisis bg-crisis text-crisis-foreground"
-                        : active
-                          ? "border-signal bg-signal text-signal-foreground"
+                    className={`relative h-[5.5rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
+                      active
+                        ? tile.theme
+                          ? tile.theme.active
+                          : tile.crisis
+                            ? "border-crisis bg-crisis text-crisis-foreground"
+                            : "border-signal bg-signal text-signal-foreground"
                         : "border-border bg-background text-foreground"
                     }`}
                   >
-                    <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
+                    {tile.theme ? (
+                      <span className="text-2xl leading-none" aria-hidden="true">{tile.theme.emoji}</span>
+                    ) : (
+                      <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
+                    )}
                     <span className="w-full truncate">{tile.label}</span>
-                    <span className={`absolute right-1.5 top-1.5 text-[0.7rem] ${active ? "text-signal-foreground" : "text-muted-foreground"}`}>
+                    <span className={`absolute right-1.5 top-1.5 text-[0.7rem] font-extrabold ${
+                      active
+                        ? tile.theme ? "text-current" : "text-signal-foreground"
+                        : tile.theme ? tile.theme.badge : "text-muted-foreground"
+                    }`}>
                       {count}
                     </span>
                   </Button>
