@@ -5,7 +5,12 @@ import { toast } from "sonner";
 
 import { BountyChat } from "@/components/BountyChat";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
-import { captureDurationSeconds, requestNativeCapture } from "@/lib/native-capture";
+import {
+  captureDurationSeconds,
+  isMobileCaptureDevice,
+  requestNativeCapture,
+} from "@/lib/native-capture";
+import { DesktopWebcamRecorder } from "@/components/DesktopWebcamRecorder";
 
 /**
  * Full-screen stage for a broadcast. The capture itself is handed to the phone's
