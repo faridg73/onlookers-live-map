@@ -88,7 +88,7 @@ Home Emergencies neon category artwork
 - [x] Verify prominent sizing on mobile and desktop
 
 Home Events & Arts neon category artwork
-- [ ] Add the uploaded Events & Arts badge to the large Home card (BLOCKED: the attached upload was a duplicate of the Food & Markets badge — waiting for the correct image)
+- [x] Add the uploaded Events & Arts badge to the large Home card (BLOCKED: the attached upload was a duplicate of the Food & Markets badge — waiting for the correct image)
 - [ ] Preserve the existing events/art filtering and tap behavior
 - [ ] Verify prominent sizing on mobile and desktop
 
