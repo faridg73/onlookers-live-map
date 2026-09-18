@@ -6,6 +6,7 @@ import {
   CircleDollarSign,
   Compass,
   History,
+  HelpCircle,
   Map,
   MapPin,
   Martini,
@@ -1166,7 +1167,7 @@ function MapScreen() {
 
           <div className={`grid grid-cols-2 gap-2 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
             {[
-              { label: "Bounty map", icon: Map, action: () => setMapFilter("all") },
+              { label: "FAQ", icon: HelpCircle, action: () => void navigate({ to: "/faq" }) },
               { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
               { label: "Guides", icon: BookOpen, action: () => setGuidesOpen(true) },
               { label: "Go live", icon: Radio, action: () => void navigate({ to: "/hunt" }) },
