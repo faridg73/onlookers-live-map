@@ -156,7 +156,8 @@ function CommunityHub() {
       vibeGridOpen?: boolean;
       focus?: { lat: number; lng: number; label: string } | null;
     }>("onlooker:view:community", {});
-    if (saved.category === "all" || COMMUNITY_CATEGORIES.some((item) => item.id === saved.category)) setCategory(saved.category);
+    const savedCategory = saved.category;
+    if (savedCategory === "all" || COMMUNITY_CATEGORIES.some((item) => item.id === savedCategory)) setCategory(savedCategory);
     setTag(saved.tag ?? null);
     if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
     setStrangeSightings(Boolean(saved.strangeSightings));
