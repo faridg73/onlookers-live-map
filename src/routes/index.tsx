@@ -92,7 +92,7 @@ const MAP_CATEGORY_TILES: Array<{
 }> = [
   {
     id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"],
-    theme: { emoji: "🍔", active: "border-orange-500 bg-orange-500/20 text-orange-50", badge: "text-orange-400" },
+    theme: { imageUrl: foodMarketsAsset.url, active: "border-orange-500 bg-orange-500/20 text-orange-50", badge: "text-orange-400" },
   },
   {
     id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"],
