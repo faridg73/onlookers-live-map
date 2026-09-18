@@ -66,7 +66,7 @@ export function MapCanvas({
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [tick, setTick] = useState(0);
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(15);
   const [userPos, setUserPos] = useState<google.maps.LatLngLiteral | null>(null);
   const [geoState, setGeoState] = useState<"pending" | "located" | "denied" | "unavailable">("pending");
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
