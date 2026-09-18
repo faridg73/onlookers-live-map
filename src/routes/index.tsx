@@ -230,7 +230,7 @@ function MapScreen() {
   );
 
   useEffect(() => {
-    if ((!trendingMode && !viralMode) || (trendingMode && !userPosition)) return;
+    if (!trendingMode || !userPosition) return;
     let alive = true;
     setTrendingLoading(true);
     void listCommunityPosts()
@@ -238,7 +238,7 @@ function MapScreen() {
         if (!alive) return;
         const local = posts
           .filter((post) => post.latitude !== null && post.longitude !== null)
-          .filter((post) => viralMode || Boolean(userPosition && distanceMiles(userPosition, { lat: post.latitude ?? 0, lng: post.longitude ?? 0 }) <= TRENDING_RADIUS_MILES))
+          .filter((post) => distanceMiles(userPosition, { lat: post.latitude ?? 0, lng: post.longitude ?? 0 }) <= TRENDING_RADIUS_MILES)
           .sort((a, b) => {
             const score = (post: CommunityPost) =>
               (post.isFlash ? 100 : 0) + post.pinnedCredits * 2 - (Date.now() - new Date(post.createdAt).getTime()) / 60_000;
@@ -256,7 +256,7 @@ function MapScreen() {
     return () => {
       alive = false;
     };
-  }, [trendingMode, userPosition, viralMode]);
+  }, [trendingMode, userPosition]);
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   const nearby = useMemo(() => {
@@ -617,9 +617,7 @@ function MapScreen() {
                   </Button>
                 </div>
 
-                {trendingLoading ? (
-                  <p className="mt-3 text-center text-xs font-bold text-muted-foreground">Ranking network activity…</p>
-                ) : visible.length + nearbyPosts.length > 0 ? (
+                {visible.length > 0 ? (
                   <div className="mt-2 space-y-2">
                     {[...visible]
                       .sort((a, b) => {
@@ -648,28 +646,6 @@ function MapScreen() {
                           </Button>
                         );
                       })}
-                    {nearbyPosts.slice(0, Math.max(0, 7 - visible.length)).map((post) => {
-                      const ageMinutes = Math.max(1, Math.floor((Date.now() - new Date(post.createdAt).getTime()) / 60_000));
-                      const velocity = (post.watchers + post.responses + post.pinnedCredits) / ageMinutes;
-                      const breaking = post.isFlash || (ageMinutes <= 15 && velocity >= 1);
-                      return (
-                        <Button key={`viral-post-${post.id}`} type="button" variant="outline" onClick={() => {
-                          if (post.latitude !== null && post.longitude !== null) setCenterTarget({ lat: post.latitude, lng: post.longitude, zoom: 15 });
-                        }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/30 bg-background px-3 py-2.5 text-left">
-                          {post.mediaPath && nearbyPostMedia[post.mediaPath]
-                            ? <img src={nearbyPostMedia[post.mediaPath]} alt="" className="size-8 rounded object-cover" />
-                            : <Image className="size-4 text-crisis" />}
-                          <span className="min-w-0">
-                            <span className="flex min-w-0 items-center gap-1.5">
-                              {breaking && <span className="shrink-0 rounded-sm bg-crisis px-1.5 py-0.5 text-[0.52rem] font-extrabold uppercase text-crisis-foreground">Breaking</span>}
-                              <span className="truncate text-xs font-bold text-foreground">{post.title}</span>
-                            </span>
-                            <span className="mt-1 block truncate text-[0.65rem] font-normal text-muted-foreground">{post.place || "Onlooker network"}</span>
-                          </span>
-                          <span className="flex shrink-0 items-center gap-1 text-[0.62rem] font-extrabold text-crisis"><Eye className="size-3.5" /> +{velocity.toFixed(1)}/min</span>
-                        </Button>
-                      );
-                    })}
                   </div>
                 ) : (
                   <p className="mt-3 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
