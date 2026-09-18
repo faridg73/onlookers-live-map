@@ -41,6 +41,7 @@ Trending Near You map mode
 - [x] Load nearby media posts into the map drawer
 - [x] Rank fast-rising local activity with timestamps
 - [x] Verify the local feed across phone and desktop
+- [x] Neon badge artwork on the Home Explore Nearby card
 
 Viral & Breaking map mode
 - [x] Add a network-wide Viral & Breaking category
