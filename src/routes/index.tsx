@@ -589,7 +589,7 @@ function MapScreen() {
             </p>
           </div>
 
-          <div className="border-t border-border py-3">
+          <div className={`border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
             <div className="grid grid-cols-3 gap-2" aria-label="Map categories">
               {orderedCategoryTiles.map((tile) => {
                 const Icon = tile.icon;
