@@ -264,9 +264,12 @@ function MapScreen() {
 
   // Device-only tap history so the grid favours the lanes this person uses.
   const [categoryTaps, setCategoryTaps] = useState<Record<string, number>>({});
+  // Re-read after hydration and whenever the drawer closes, so tiles never
+  // shuffle under the user's finger mid-session.
   useEffect(() => {
+    if (drawerOpen) return;
     setCategoryTaps(readCategoryTapCounts());
-  }, []);
+  }, [drawerOpen]);
   const orderedCategoryTiles = useMemo(
     () => sortCategoriesByUsage(MAP_CATEGORY_TILES, categoryTaps),
     [categoryTaps],
