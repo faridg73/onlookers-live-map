@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { SHARED_MAP_OPTIONS } from "@/lib/map-style";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
