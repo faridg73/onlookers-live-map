@@ -138,6 +138,7 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
+  const { mystery } = Route.useSearch();
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(null);
@@ -214,6 +215,14 @@ function PostScreen() {
     void readWalletBalance().then(setBalance);
     setRecent(readRecentPlaces());
   }, []);
+
+  useEffect(() => {
+    if (mystery !== "1") return;
+    setMode("bounty");
+    setPrompt("Request a live video of a strange sighting, unexplained light, or unusual aircraft");
+    setTitle("Investigate a strange sighting");
+    setNote("Capture a clear, steady view of the sighting and its surroundings without approaching anything unsafe.");
+  }, [mystery]);
 
   useEffect(() => {
     if (voice.error) toast.error(voice.error);

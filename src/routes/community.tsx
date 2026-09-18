@@ -468,7 +468,7 @@ function CommunityHub() {
           </Button>
           </div>
         </div>
-        {/* Mobile keeps the sideways carousel; "See All" opens the full 16-lane grid. */}
+        {/* Mobile keeps the sideways carousel; "See All" opens every browse category. */}
         <div className="relative">
           {/* Subtle gradient edge fades while the carousel is scrolling */}
           {!vibeGridOpen && (

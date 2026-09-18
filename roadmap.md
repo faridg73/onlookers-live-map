@@ -65,7 +65,7 @@ Explore drawer: full 16-category grid
 - [x] Home: Bounty Map tile now opens an "Every open bounty, ranked by reward" feed (Sep 18)
 
 Strange Sightings & UFO browse category
-- [ ] Add the uploaded neon UFO artwork and a 17th browse-only category
-- [ ] Add its report, community-log, and mystery-bounty actions
-- [ ] Filter its live/recorded feed and map results without changing broadcast creation
+- [x] Add the uploaded neon UFO artwork and a 17th browse-only category
+- [x] Add its report, community-log, and mystery-bounty actions
+- [x] Filter its live/recorded feed and map results without changing broadcast creation
 - [ ] Verify mobile, desktop, and type safety
