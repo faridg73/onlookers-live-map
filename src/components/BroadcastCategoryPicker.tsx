@@ -59,10 +59,8 @@ export function BroadcastCategoryPicker({
         onClick={() => setOpen((current) => !current)}
         className="h-auto min-h-14 w-full justify-start gap-3 border-border bg-surface-raised px-3 py-2.5 text-left hover:border-signal/60 hover:bg-surface-raised"
       >
-        <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-signal/30 bg-signal/10 text-lg">
-          {selected?.iconImageUrl ? (
-            <img src={selected.iconImageUrl} alt="" className="size-full object-cover p-0.5" />
-          ) : selected?.icon ?? "🌐"}
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-signal/30 bg-signal/10 text-lg">
+          {selected?.icon ?? "🌐"}
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[0.6rem] font-extrabold uppercase text-signal">
@@ -124,10 +122,8 @@ export function BroadcastCategoryPicker({
                   active ? "bg-signal/10 text-signal" : "text-foreground hover:bg-accent",
                 )}
               >
-                <span className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-md text-base" aria-hidden>
-                  {category.iconImageUrl ? (
-                    <img src={category.iconImageUrl} alt="" className="size-full object-cover p-0.5" />
-                  ) : category.icon}
+                <span className="w-6 shrink-0 text-center text-base" aria-hidden>
+                  {category.icon}
                 </span>
                 <span className="min-w-0 flex-1 text-xs font-bold leading-snug">
                   <span className="mr-1 text-muted-foreground">{index + 1}.</span>

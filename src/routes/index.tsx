@@ -63,6 +63,8 @@ import {
   matchesStrangeSighting,
 } from "@/lib/strange-sightings";
 import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
+import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json";
+import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -99,7 +101,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
-    theme: { emoji: "🚗", active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
+    theme: { imageUrl: trafficUpdatesAsset.url, active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
   },
   {
     id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"],
@@ -107,7 +109,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
-    theme: { emoji: "🚨", active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
+    theme: { imageUrl: emergenciesAsset.url, active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
   },
   {
     id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
@@ -642,7 +644,7 @@ function MapScreen() {
                       select(null);
                       setGatheringClusterIds([]);
                     }}
-                    className={`relative h-[6.25rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
+                    className={`relative h-32 min-w-0 flex-col gap-1.5 overflow-hidden rounded-md px-1 pb-2 pt-2 text-[0.75rem] font-bold ${
                       active
                         ? tile.theme
                           ? tile.theme.active
@@ -653,8 +655,8 @@ function MapScreen() {
                     }`}
                   >
                     {tile.theme?.imageUrl ? (
-                      <span className="size-10 overflow-hidden rounded-md border border-signal/50 bg-surface-raised shadow-[0_0_16px_var(--color-signal)]" aria-hidden="true">
-                        <img src={tile.theme.imageUrl} alt="" className="size-full object-cover" />
+                      <span className="size-[4.5rem] overflow-hidden rounded-md border border-signal/50 bg-surface-raised shadow-[0_0_18px_var(--color-signal)]" aria-hidden="true">
+                        <img src={tile.theme.imageUrl} alt="" className="size-full object-cover object-center" />
                       </span>
                     ) : tile.theme?.emoji ? (
                       <span className="text-2xl leading-none" aria-hidden="true">{tile.theme.emoji}</span>

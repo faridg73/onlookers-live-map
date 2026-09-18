@@ -1,6 +1,5 @@
 import type { CommunityCategory } from "@/lib/community";
 import type { CategoryId } from "@/lib/onlooker";
-import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 
 export type BroadcastCategoryId =
   | "breaking-incidents"
@@ -24,7 +23,6 @@ export type BroadcastCategory = {
   id: BroadcastCategoryId;
   label: string;
   icon: string;
-  iconImageUrl?: string;
   communityCategory: CommunityCategory;
   requestCategory: CategoryId;
   subcategories: readonly string[];
@@ -35,7 +33,6 @@ const DEFAULT_BROADCAST_CATEGORY: BroadcastCategory = {
   id: "breaking-incidents",
   label: "Breaking News & Incidents",
   icon: "🚨",
-  iconImageUrl: breakingNewsAsset.url,
   communityCategory: "breaking",
   requestCategory: "community",
   subcategories: ["Accidents", "Weather", "Hazards", "Emergency Services"],
