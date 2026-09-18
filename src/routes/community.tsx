@@ -551,7 +551,7 @@ function CommunityHub() {
                   setTag(null);
                 }}
                 aria-pressed={strangeSightings}
-                className={`group flex h-full w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
+                className={`group flex w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
               >
                 <span className="relative block aspect-square w-full overflow-hidden bg-background">
                   <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="Neon UFO above a glowing spiral" className="size-full object-cover" />

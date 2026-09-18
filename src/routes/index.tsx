@@ -641,7 +641,7 @@ function MapScreen() {
                       select(null);
                       setGatheringClusterIds([]);
                     }}
-                    className={`relative h-[5.5rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
+                    className={`relative h-[6.25rem] min-w-0 flex-col gap-1 rounded-md px-1 text-[0.75rem] font-bold ${
                       active
                         ? tile.theme
                           ? tile.theme.active
@@ -660,7 +660,7 @@ function MapScreen() {
                     ) : (
                       <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
                     )}
-                    <span className="w-full truncate">{tile.label}</span>
+                    <span className="line-clamp-2 w-full whitespace-normal px-1 leading-tight">{tile.label}</span>
                     <span className={`absolute right-1.5 top-1.5 text-[0.7rem] font-extrabold ${
                       active
                         ? tile.theme ? "text-current" : "text-signal-foreground"
