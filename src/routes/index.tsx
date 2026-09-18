@@ -521,7 +521,7 @@ function MapScreen() {
           </span>
         </Button>
 
-        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
+        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
           <div className="border-t border-border pb-3 pt-3">
             <div className="mb-2 flex items-center gap-2">
               <History className="size-4 text-signal" aria-hidden />
