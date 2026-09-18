@@ -106,3 +106,10 @@ Home Events & Arts neon category artwork
 
 ## Home Guides neon category artwork
 - [x] Add the uploaded "GUILDS" neon badge (hgjehrgjerrhger.jpeg) to the large Home "Guides" card — message said Bounty Map, but Bounty Map was already badge'd; the artwork matches Guides, preserve tap behavior, verify mobile + desktop.
+
+## Trust tiers, reputation & community reports
+- [x] Three trust levels (Reader/Flagger, Provisional Contributor, Verified Creator/First Responder) with backend helper and profile badge
+- [x] Emergency incident reports restricted to level 3 (UI lock + database trigger)
+- [x] Reputation points for flagging outdated posts, validating markers and the safety tutorial, with daily caps and admin ambassador seeding
+- [x] Create Community Report form (incident grid, verified-only toggle, media, geo-radius, witnesses)
+- [x] Legal pledge checkbox gating the glowing Submit Report button, with the 911 safety warning
