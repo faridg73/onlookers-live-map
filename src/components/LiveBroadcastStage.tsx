@@ -139,8 +139,18 @@ export function LiveBroadcastStage({
         <p className="text-xs leading-relaxed text-white/65">
           {saving
             ? "Saving your clip…"
-            : "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."}
+            : isMobile
+              ? "Your phone's camera app handles the filming. Tap use or done when you finish and the clip is saved here."
+              : "Record straight from your computer's webcam, or choose a video file you already have."}
         </p>
+        {!isMobile && !saving && (
+          <div className="w-full max-w-md text-left">
+            <DesktopWebcamRecorder
+              disabled={saving || capturing}
+              onRecorded={(file) => void handleFile(file)}
+            />
+          </div>
+        )}
         {instructions?.trim() && (
           <p className="rounded-xl border border-signal/40 bg-black/60 px-3 py-2 text-[0.7rem] font-medium leading-snug text-white/85">
             <span className="font-extrabold text-signal">Instructions: </span>
