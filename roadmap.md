@@ -100,3 +100,6 @@ Home Events & Arts neon category artwork
 
 ## Home Scanner neon category artwork
 - [x] Add the uploaded "SCANNER" neon badge (hfjfhksdrjfghbkjrgber.jpeg) to the large Home card, preserve the scanner tap behavior, verify prominent sizing on mobile and desktop.
+
+## Home Bounty Map neon category artwork
+- [ ] Add the uploaded "BOUNTY MAP" neon badge (tyhrthrdtht.jpeg) to the large Home card, preserve the bounty-map tap behavior, verify prominent sizing on mobile and desktop.
