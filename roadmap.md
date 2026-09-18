@@ -41,3 +41,9 @@ Trending Near You map mode
 - [x] Load nearby media posts into the map drawer
 - [x] Rank fast-rising local activity with timestamps
 - [x] Verify the local feed across phone and desktop
+
+Viral & Breaking map mode
+- [x] Add a network-wide Viral & Breaking category
+- [x] Rank content by engagement velocity
+- [x] Show high-velocity metrics and Breaking badges
+- [ ] Verify the feed across phone and desktop
