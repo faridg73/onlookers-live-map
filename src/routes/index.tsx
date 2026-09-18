@@ -668,7 +668,8 @@ function MapScreen() {
                     onClick={() => setCategoryTile(null)}
                     className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground"
                   >
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
                 {bountyMapRanked.length > 0 ? (
@@ -765,7 +766,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Trending Near You</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -829,7 +831,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Viral &amp; Breaking</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -881,7 +884,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Scanner</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -935,7 +939,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Top Creators</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -997,7 +1002,8 @@ function MapScreen() {
                     setCategoryTile(null);
                     setGatheringClusterIds([]);
                   }} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -1062,7 +1068,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Traffic incidents &amp; closures</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
@@ -1108,7 +1115,8 @@ function MapScreen() {
                     <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Live crisis streams</h2>
                   </div>
                   <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    Exit
+                    <X className="size-4" aria-hidden="true" />
+                    <span className="sr-only">Exit</span>
                   </Button>
                 </div>
 
