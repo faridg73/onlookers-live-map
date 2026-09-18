@@ -76,13 +76,10 @@ export function VideoRecorder({
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 text-center">
         {isMobile ? (
           <>
-            {busy ? (
-              <Loader2 className="size-8 animate-spin text-white/80" />
-            ) : (
-              <Video className="size-10 text-white/70" />
-            )}
+            <Video className="size-10 text-white/70" />
             <p className="text-sm font-semibold text-white">
-              Your phone's camera opens for this capture, so the clip keeps its full quality.
+              Tap open camera and your phone's camera app takes over, so the clip keeps its full
+              quality.
             </p>
             <p className="text-xs text-white/60">Film it, then tap use or done to send it here.</p>
           </>
