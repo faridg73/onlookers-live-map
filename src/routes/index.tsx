@@ -75,6 +75,7 @@ import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
 import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.json";
 import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
 import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
+import scannerAsset from "@/assets/scanner-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -145,7 +146,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "scanner", label: "Scanner", icon: Radio, categories: [],
     scanner: true,
-    theme: { emoji: "📻", active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
+    theme: { imageUrl: scannerAsset.url, active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
   },
   {
     id: "livestream", label: "Live Stream", icon: Video, categories: [],
