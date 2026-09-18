@@ -34,4 +34,4 @@ Public Gathering map mode
 - [x] Add crowd-density heat circles and venue pins
 - [x] Open selected clusters with estimated headcounts
 - [x] List live onlooker streams within the cluster
-- [ ] Verify gathering mode across phone and desktop
+- [x] Verify gathering mode across phone and desktop
