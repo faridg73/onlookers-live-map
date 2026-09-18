@@ -10,7 +10,8 @@ import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 import { PhoneVerification } from "@/components/PhoneVerification";
-import { LegalDialog, useLegalDialog } from "@/components/legal/LegalDialog";
+import { LegalConsent } from "@/components/legal/LegalConsent";
+import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -44,8 +45,6 @@ function AuthScreen() {
   const [verifying, setVerifying] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
-  // Terms and Privacy open in a popup so a half-filled form is never lost.
-  const legal = useLegalDialog();
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
@@ -58,54 +57,7 @@ function AuthScreen() {
     await clearPreviousAuthState();
   }
 
-  /**
-   * Strong-password rules checked before the account service is called, so
-   * people get instant, specific feedback instead of a generic rejection.
-   */
-  function describePasswordProblem(value: string): string | null {
-    if (value.length < 10) return "Use at least 10 characters for your password.";
-    if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) {
-      return "Include both a small letter and a capital letter in your password.";
-    }
-    if (!/[0-9]/.test(value)) return "Include at least one number in your password.";
-    if (!/[^A-Za-z0-9]/.test(value)) {
-      return "Include at least one symbol, such as ! or ?, in your password.";
-    }
-    if (email && value.toLowerCase().includes(email.split("@")[0]?.toLowerCase() ?? "@@@")) {
-      return "Your password can't contain your email name.";
-    }
-    return null;
-  }
 
-  /** Turns raw auth failures into plain-language messages people can act on. */
-  function describeAuthError(err: unknown): string {
-    const raw = err instanceof Error ? err.message : "";
-    const code =
-      typeof err === "object" && err !== null && "code" in err
-        ? String((err as { code?: unknown }).code ?? "")
-        : "";
-    const text = `${code} ${raw}`.toLowerCase();
-    if (text.includes("email_not_confirmed") || text.includes("email not confirmed")) {
-      setNeedsEmailConfirm(true);
-      return "Confirm your email address first, check your inbox for the verification link we sent.";
-    }
-    if (text.includes("invalid login") || text.includes("invalid_credentials")) {
-      return "That email or password is incorrect. Check them and try again.";
-    }
-    if (text.includes("user already registered") || text.includes("already_exists")) {
-      return "An account already exists for that email. Try signing in instead.";
-    }
-    if (text.includes("too many") || text.includes("rate limit")) {
-      return "Too many attempts. Please wait a minute and try again.";
-    }
-    if (text.includes("pwned") || text.includes("compromised") || text.includes("leaked")) {
-      return "That password has appeared in a known data breach. Please choose a different one.";
-    }
-    if (text.includes("weak_password") || text.includes("password should")) {
-      return "That password is too weak. Use 10+ characters with a capital letter, a number and a symbol.";
-    }
-    return raw || "Something went wrong. Please try again.";
-  }
 
   /** Sends a fresh confirmation link when someone never received the first one. */
   async function resendConfirmation() {
@@ -120,9 +72,10 @@ function AuthScreen() {
       toast.success("Verification email sent, check your inbox.");
       setFormError(null);
     } catch (err) {
-      const message = describeAuthError(err);
-      setFormError(message);
-      toast.error(message);
+      const described = describeAuthError(err);
+      setNeedsEmailConfirm(described.needsEmailConfirm);
+      setFormError(described.message);
+      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -138,7 +91,7 @@ function AuthScreen() {
       return;
     }
     if (mode === "signup") {
-      const weak = describePasswordProblem(password);
+      const weak = describePasswordProblem(password, email);
       if (weak) {
         setFormError(weak);
         toast.error(weak);
@@ -194,9 +147,10 @@ function AuthScreen() {
       }
     } catch (err) {
       human.reset();
-      const message = describeAuthError(err);
-      setFormError(message);
-      toast.error(message);
+      const described = describeAuthError(err);
+      setNeedsEmailConfirm(described.needsEmailConfirm);
+      setFormError(described.message);
+      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -237,9 +191,10 @@ function AuthScreen() {
       }
     } catch (err) {
       setVerifying(false);
-      const message = describeAuthError(err);
-      setFormError(message);
-      toast.error(message);
+      const described = describeAuthError(err);
+      setNeedsEmailConfirm(described.needsEmailConfirm);
+      setFormError(described.message);
+      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -299,44 +254,7 @@ function AuthScreen() {
         atmospheres, captured live on location.
       </p>
 
-      <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border bg-surface p-4 text-sm text-muted-foreground">
-        <input
-          id="accept-legal"
-          type="checkbox"
-          required
-          checked={accepted}
-          onChange={(e) => setAccepted(e.target.checked)}
-          aria-describedby="accept-legal-text"
-          className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
-        />
-        <span id="accept-legal-text">
-          <label htmlFor="accept-legal" className="cursor-pointer">
-            I agree to Onlooker&rsquo;s{" "}
-          </label>
-          <button
-            type="button"
-            onClick={() => legal.open("terms")}
-            className="font-semibold text-foreground underline underline-offset-4"
-          >
-            Terms of Service
-          </button>{" "}
-          and{" "}
-          <button
-            type="button"
-            onClick={() => legal.open("privacy")}
-            className="font-semibold text-foreground underline underline-offset-4"
-          >
-            Privacy Policy
-          </button>
-          <label htmlFor="accept-legal" className="cursor-pointer">
-            , acknowledging that I operate independently, assume all legal and physical liability,
-            will only record in lawful public spaces without trespassing, and hold Onlooker harmless
-            from any legal actions.
-          </label>
-        </span>
-      </div>
-
-      <LegalDialog doc={legal.doc} onClose={legal.close} />
+      <LegalConsent accepted={accepted} onChange={setAccepted} />
 
 
       <button
