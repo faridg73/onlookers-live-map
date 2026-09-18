@@ -189,7 +189,7 @@ export function LiveBroadcastStage({
           onClick={() => void capture()}
           className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
-          <Video className="size-5" /> Open camera
+          <Video className="size-5" /> {isMobile ? "Open camera" : "Choose a video file"}
         </button>
         {requestKey && (
           <button
