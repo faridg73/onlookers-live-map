@@ -32,7 +32,7 @@ import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
-import { CategoryPicker } from "@/components/CategoryPicker";
+import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
@@ -61,9 +61,12 @@ import {
   needsAccessCode,
   needsPermissionConfirmation,
   needsPublicSpacesNotice,
-  subOptionById,
   type CategoryId,
 } from "@/lib/onlooker";
+import {
+  broadcastCategoryById,
+  type BroadcastCategoryId,
+} from "@/lib/broadcast-categories";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
@@ -163,8 +166,8 @@ function PostScreen() {
   const [orientation, setOrientation] = useState<string>("vertical");
   const [tier, setTier] = useState<BountyTierId>("standard");
   const [weather, setWeather] = useState(1);
-  const [tile, setTile] = useState<CategoryId>("events");
-  const [sub, setSub] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
+  const [subcategory, setSubcategory] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [moderationOpen, setModerationOpen] = useState(false);
@@ -173,8 +176,8 @@ function PostScreen() {
   const [recent, setRecent] = useState<RecentPlace[]>([]);
   const [gpsBusy, setGpsBusy] = useState(false);
   const voice = useVoiceInput((text) => setPrompt(text));
-  const subOption = subOptionById(tile, sub);
-  const category: CategoryId = subOption?.category ?? tile;
+  const selectedCategory = broadcastCategoryById(categoryId);
+  const category: CategoryId = selectedCategory.requestCategory;
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
 
@@ -283,7 +286,8 @@ function PostScreen() {
     applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
     if (parsed.action === "meetup") {
       setMinutes(60);
-      setTile("community");
+      setCategoryId("community-culture");
+      setSubcategory("Gatherings");
     }
     setStep(2);
   };
@@ -400,7 +404,8 @@ function PostScreen() {
         `Requested capture: ${captureDurationLabel(capture, action === "live")}`,
         `Camera: ${angleLabel} · ${orientationLabel}`,
         scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
-        subOption ? `Focus: ${subOption.label}` : "",
+        `Category: ${selectedCategory.label}`,
+        subcategory ? `Vibe: ${subcategory}` : "",
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
       ].filter(Boolean);
@@ -720,7 +725,8 @@ function PostScreen() {
                         if (id === "meetup") {
                           setMinutes(60);
                           setScheduledStart(null);
-                          setTile("community");
+                          setCategoryId("community-culture");
+                          setSubcategory("Gatherings");
                         }
                       }}
                       className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left transition-all ${action === id ? "border-signal bg-signal/10 shadow-lg shadow-signal/10" : ""}`}
@@ -734,7 +740,16 @@ function PostScreen() {
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category & focus</p>
                   <div className="mt-3">
-                    <CategoryPicker value={tile} onChange={(id) => setTile(id as CategoryId)} sub={sub} onSubChange={setSub} />
+                    <BroadcastCategoryPicker
+                      categoryId={categoryId}
+                      subcategory={subcategory}
+                      onCategoryChange={(next) => {
+                        if (next) setCategoryId(next);
+                      }}
+                      onSubcategoryChange={setSubcategory}
+                      laneLabel="Flash lane"
+                      menuLabel="Choose a Flash lane"
+                    />
                   </div>
                 </div>
 
@@ -865,7 +880,7 @@ function PostScreen() {
                   <CollapsibleContent className="mt-3 space-y-4">
                     <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
                       <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
-                      {needsPublicSpacesNotice(tile) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
+                       {needsPublicSpacesNotice(category) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
                     </div>
                     {permissionNeeded && (
                       <label className="flex gap-3 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
