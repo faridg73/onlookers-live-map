@@ -46,4 +46,4 @@ Viral & Breaking map mode
 - [x] Add a network-wide Viral & Breaking category
 - [x] Rank content by engagement velocity
 - [x] Show high-velocity metrics and Breaking badges
-- [ ] Verify the feed across phone and desktop
+- [x] Verify the feed across phone and desktop

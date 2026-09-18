@@ -216,7 +216,7 @@ function MapScreen() {
   const visible = useMemo(
     () =>
       activeCategoryTile
-        ? statusFiltered.filter((request) =>
+        ? (activeCategoryTile.viral ? requests : statusFiltered).filter((request) =>
             activeCategoryTile.trending
               ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
               : activeCategoryTile.viral
@@ -226,7 +226,7 @@ function MapScreen() {
               : request.category && activeCategoryTile.categories.includes(request.category),
           )
         : statusFiltered,
-    [activeCategoryTile, statusFiltered],
+    [activeCategoryTile, requests, statusFiltered],
   );
 
   useEffect(() => {
@@ -450,7 +450,7 @@ function MapScreen() {
               {MAP_CATEGORY_TILES.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
-                const count = statusFiltered.filter((request) =>
+                const count = (tile.viral ? requests : statusFiltered).filter((request) =>
                   tile.crisis
                     ? isCrisisRequest(request)
                     : tile.trending
