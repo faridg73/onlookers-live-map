@@ -731,6 +731,7 @@ function CommunityHub() {
               />
             </div>
           )}
+          </SectionBoundary>
         </section>
       )}
 
