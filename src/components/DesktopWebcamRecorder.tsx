@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Square, Video } from "lucide-react";
+import { CameraOff, FolderOpen, Loader2, RefreshCw, Square, Video } from "lucide-react";
 import { toast } from "sonner";
 
 import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
+
+/** Give up on the camera after this long and show the fallback instead of spinning forever. */
+const CAMERA_TIMEOUT_MS = 3000;
 
 /**
  * Desktop / laptop recorder. Phones use the system camera app, but computers
@@ -20,7 +23,7 @@ export function DesktopWebcamRecorder({
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
-  const [state, setState] = useState<"idle" | "starting" | "live" | "recording">("idle");
+  const [state, setState] = useState<"idle" | "starting" | "live" | "recording" | "failed">("idle");
   const [seconds, setSeconds] = useState(0);
 
   const stopStream = useCallback(() => {
