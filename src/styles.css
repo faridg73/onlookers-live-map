@@ -38,6 +38,8 @@
   --color-crisis: var(--crisis);
   --color-traffic-slow: var(--traffic-slow);
   --color-traffic-heavy: var(--traffic-heavy);
+  --color-gathering-low: var(--gathering-low);
+  --color-gathering-high: var(--gathering-high);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -152,6 +154,8 @@
   --crisis: oklch(0.64 0.24 27);
   --traffic-slow: oklch(0.86 0.18 93);
   --traffic-heavy: oklch(0.72 0.19 55);
+  --gathering-low: oklch(0.82 0.16 180);
+  --gathering-high: oklch(0.88 0.2 125);
   --card: oklch(0.19125 0 0);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.19125 0 0);

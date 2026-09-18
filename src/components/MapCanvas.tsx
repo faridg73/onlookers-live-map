@@ -35,6 +35,8 @@ export function MapCanvas({
   centerTarget = null,
   crisisMode = false,
   trafficMode = false,
+  gatheringMode = false,
+  onGatheringClusterSelect,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -51,6 +53,9 @@ export function MapCanvas({
   crisisMode?: boolean;
   /** Traffic mode adds Google's live traffic layer and incident heat halos. */
   trafficMode?: boolean;
+  /** Public gathering mode shows crowd-density circles behind venue pins. */
+  gatheringMode?: boolean;
+  onGatheringClusterSelect?: (requestIds: string[]) => void;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -279,7 +284,7 @@ export function MapCanvas({
         return pixel ? [{ request, pixel }] : [];
       })
     : [];
-  const showAllRequests = crisisMode || zoom >= DETAIL_ZOOM;
+  const showAllRequests = crisisMode || trafficMode || gatheringMode || zoom >= DETAIL_ZOOM;
   const importantMarkers = showAllRequests
     ? requestMarkers
     : requestMarkers.filter(({ request }) => {
@@ -328,6 +333,30 @@ export function MapCanvas({
           },
         };
       });
+
+  const gatheringGrid = zoom <= 10 ? 180 : 130;
+  const gatheringClusters = !gatheringMode
+    ? []
+    : Array.from(
+        requestMarkers.reduce(
+          (groups, marker) => {
+            const key = `${Math.floor(marker.pixel.left / gatheringGrid)}:${Math.floor(marker.pixel.top / gatheringGrid)}`;
+            const group = groups.get(key) ?? [];
+            group.push(marker);
+            groups.set(key, group);
+            return groups;
+          },
+          new Map<string, typeof requestMarkers>(),
+        ).values(),
+      ).map((members) => ({
+        id: members.map(({ request }) => request.id).sort().join(":"),
+        requestIds: members.map(({ request }) => request.id),
+        headcount: members.reduce((sum, { request }) => sum + request.watchers + request.responses, 0),
+        pixel: {
+          left: members.reduce((sum, marker) => sum + marker.pixel.left, 0) / members.length,
+          top: members.reduce((sum, marker) => sum + marker.pixel.top, 0) / members.length,
+        },
+      }));
 
   // Business pins removed per request — the map shows no location pins.
 
@@ -451,6 +480,28 @@ export function MapCanvas({
         </button>
       ))}
 
+      {gatheringClusters.map((cluster) => {
+        const diameter = Math.min(132, 64 + Math.sqrt(Math.max(cluster.headcount, 1)) * 7);
+        const busy = cluster.headcount >= 20;
+        return (
+          <button
+            key={`gathering-${cluster.id}`}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onGatheringClusterSelect?.(cluster.requestIds);
+            }}
+            className={`absolute z-10 grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 backdrop-blur-[1px] transition-transform hover:scale-105 ${busy ? "border-gathering-high/80 bg-gathering-high/30" : "border-gathering-low/80 bg-gathering-low/25"}`}
+            style={{ left: cluster.pixel.left, top: cluster.pixel.top, width: diameter, height: diameter }}
+            aria-label={`Public gathering cluster, estimated headcount ${cluster.headcount}. Open details.`}
+          >
+            <span className={`grid size-9 place-items-center rounded-full text-[0.65rem] font-extrabold text-background shadow-lg ${busy ? "bg-gathering-high" : "bg-gathering-low"}`}>
+              {cluster.headcount}
+            </span>
+          </button>
+        );
+      })}
+
       {/* Important pins stay visible; all individual pins return at close zoom. */}
       {importantMarkers.map(({ request: r, pixel }) => {
           const isSel = r.id === selectedId;
@@ -472,6 +523,9 @@ export function MapCanvas({
               aria-label={`${TIER_LABELS[tier]}: ${pool} credits at ${r.place}`}
             >
               <span className="relative flex flex-col items-center">
+                {gatheringMode && !closed && (
+                  <span className="absolute bottom-0 size-14 rounded-full border-2 border-gathering-high/70 bg-gathering-low/20" />
+                )}
                 {trafficMode && !closed && (
                   <>
                     <span className={`absolute bottom-0 size-24 animate-ping-slow rounded-full motion-reduce:animate-none ${r.minutesAgo <= 15 ? "bg-traffic-heavy/35" : "bg-traffic-slow/30"}`} />
@@ -523,7 +577,11 @@ export function MapCanvas({
                   </span>
                 )}
 
-                {trafficMode ? (
+                {gatheringMode ? (
+                  <span className="relative grid size-10 place-items-center rounded-full border-2 border-gathering-high bg-surface text-base shadow-lg" aria-hidden>
+                    {categoryGlyph(r.category)}
+                  </span>
+                ) : trafficMode ? (
                   <span className={`relative grid size-11 place-items-center rounded-full border-2 text-sm font-black text-background shadow-lg ${r.minutesAgo <= 15 ? "border-traffic-heavy bg-traffic-heavy" : "border-traffic-slow bg-traffic-slow"}`}>
                     {categoryGlyph(r.category)}
                   </span>
@@ -614,7 +672,9 @@ export function MapCanvas({
                 <span
                   className={cn("size-1.5 rotate-45 -translate-y-[3px]")}
                   style={{
-                    backgroundColor: trafficMode
+                    backgroundColor: gatheringMode
+                      ? "var(--gathering-high)"
+                      : trafficMode
                       ? r.minutesAgo <= 15 ? "var(--traffic-heavy)" : "var(--traffic-slow)"
                       : crisisMode
                       ? "var(--crisis)"

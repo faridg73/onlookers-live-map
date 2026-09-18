@@ -22,6 +22,7 @@ import {
   Video,
   Volume2,
   Clock3,
+  Eye,
   X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -52,6 +53,7 @@ const MAP_CATEGORY_TILES: Array<{
   icon: typeof Utensils;
   categories: CategoryId[];
   crisis?: boolean;
+  gathering?: boolean;
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
@@ -59,6 +61,7 @@ const MAP_CATEGORY_TILES: Array<{
   { id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"] },
   { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
   { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
+  { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
 ];
 
 const CRISIS_TERMS = [
@@ -122,6 +125,7 @@ function MapScreen() {
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [scannerNotice, setScannerNotice] = useState(false);
+  const [gatheringClusterIds, setGatheringClusterIds] = useState<string[]>([]);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
@@ -194,6 +198,7 @@ function MapScreen() {
   const activeCategoryTile = MAP_CATEGORY_TILES.find((tile) => tile.id === categoryTile) ?? null;
   const crisisMode = activeCategoryTile?.crisis === true;
   const trafficMode = activeCategoryTile?.id === "traffic";
+  const gatheringMode = activeCategoryTile?.gathering === true;
   const visible = useMemo(
     () =>
       activeCategoryTile
@@ -228,6 +233,12 @@ function MapScreen() {
         centerTarget={centerTarget}
         crisisMode={crisisMode}
         trafficMode={trafficMode}
+        gatheringMode={gatheringMode}
+        onGatheringClusterSelect={(ids) => {
+          setGatheringClusterIds(ids);
+          setDrawerOpen(true);
+          select(null);
+        }}
       />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
@@ -407,6 +418,7 @@ function MapScreen() {
                       setCategoryTile(active ? null : tile.id);
                       setDrawerOpen(true);
                       select(null);
+                      setGatheringClusterIds([]);
                     }}
                     className={`relative h-20 min-w-0 flex-col gap-1 rounded-md px-1 text-[0.65rem] font-bold ${
                       active && tile.crisis
@@ -426,7 +438,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -473,6 +485,76 @@ function MapScreen() {
                     No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
                   </p>
                 )}
+              </div>
+            )}
+
+            {gatheringMode && (
+              <div className="mt-3 border-t border-gathering-high/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-gathering-high">
+                      <span className="size-2 animate-pulse rounded-full bg-gathering-high" /> Crowd activity
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">
+                      {gatheringClusterIds.length > 0 ? "Gathering cluster details" : "Public gatherings nearby"}
+                    </h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => {
+                    setCategoryTile(null);
+                    setGatheringClusterIds([]);
+                  }} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {(() => {
+                  const clusterRequests = gatheringClusterIds.length > 0
+                    ? visible.filter((request) => gatheringClusterIds.includes(request.id))
+                    : visible;
+                  const headcount = clusterRequests.reduce((sum, request) => sum + request.watchers + request.responses, 0);
+                  const liveStreams = clusterRequests.filter((request) => request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request));
+                  return (
+                    <>
+                      <div className="mt-2 grid grid-cols-2 gap-2">
+                        <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
+                          <p className="text-[0.58rem] font-bold uppercase text-muted-foreground">Estimated headcount</p>
+                          <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{headcount}</p>
+                        </div>
+                        <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
+                          <p className="text-[0.58rem] font-bold uppercase text-muted-foreground">Live onlookers</p>
+                          <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{liveStreams.length}</p>
+                        </div>
+                      </div>
+
+                      {clusterRequests.length > 0 ? (
+                        <div className="mt-2 space-y-2">
+                          {clusterRequests.slice(0, 5).map((request) => {
+                            const live = request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+                            return (
+                              <Button key={request.id} type="button" variant="outline" onClick={() => {
+                                select(request.id);
+                                setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
+                              }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-gathering-low/35 bg-background px-3 py-2.5 text-left">
+                                <MapPin className="size-4 text-gathering-high" />
+                                <span className="min-w-0">
+                                  <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
+                                  <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} people</span>
+                                </span>
+                                <span className={`flex shrink-0 items-center gap-1 text-[0.58rem] font-extrabold uppercase ${live ? "text-live" : "text-muted-foreground"}`}>
+                                  <Eye className="size-3" /> {live ? "Live" : liveTimestamp(request.minutesAgo).replace("Updated ", "")}
+                                </span>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="mt-3 rounded-md border border-dashed border-gathering-low/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                          No public gatherings are active in this area.
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
 
