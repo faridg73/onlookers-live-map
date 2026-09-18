@@ -33,6 +33,7 @@ import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
+import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
@@ -175,6 +176,8 @@ function PostScreen() {
   const [accessCode, setAccessCode] = useState("");
   const [recent, setRecent] = useState<RecentPlace[]>([]);
   const [gpsBusy, setGpsBusy] = useState(false);
+  /** Refill panel, so a short wallet never ends the journey. */
+  const [topUpOpen, setTopUpOpen] = useState(false);
   const voice = useVoiceInput((text) => setPrompt(text));
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
@@ -390,8 +393,9 @@ function PostScreen() {
     if (funds !== null && funds < total) {
       toast.error(`You have ${Math.round(funds)} Credits in your wallet`, {
         description: `Buy Credits to lock a ${total} Credits bounty${tip > 0 ? " including your tip" : ""}.`,
-        action: { label: "Buy credits", onClick: () => void navigate({ to: "/profile" }) },
+        action: { label: "Buy credits", onClick: () => setTopUpOpen(true) },
       });
+      setTopUpOpen(true);
       return;
     }
     setPosting(true);
@@ -901,6 +905,21 @@ function PostScreen() {
 
             {step === 3 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold text-muted-foreground">
+                    <CoinsIcon className="mr-1 inline size-3.5 text-signal" />
+                    Wallet:{" "}
+                    <span className="font-extrabold text-foreground">
+                      {balance != null ? formatCredits(balance) : "sign in to see"}
+                    </span>
+                    {balance != null && balance < total ? (
+                      <span className="ml-1 text-live">· {formatCredits(Math.ceil(total - balance))} short</span>
+                    ) : null}
+                  </p>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setTopUpOpen(true)} className="gap-1.5">
+                    <CoinsIcon className="size-3.5 text-signal" /> Buy credits
+                  </Button>
+                </div>
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Reward tier</p>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -1059,6 +1078,15 @@ function PostScreen() {
             if (!isRequestAllowed("", note, "") && isRequestAllowed(title, "", "")) noteRef.current?.focus();
             else titleRef.current?.focus();
           }, 50);
+        }}
+      />
+      <BuyCreditsSheet
+        open={topUpOpen}
+        balance={balance}
+        needed={total}
+        onClose={() => {
+          setTopUpOpen(false);
+          void readWalletBalance().then(setBalance);
         }}
       />
       {phoneGate.gate}

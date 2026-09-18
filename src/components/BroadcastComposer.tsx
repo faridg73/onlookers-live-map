@@ -19,6 +19,7 @@ import { useHumanCheck } from "@/components/HumanCheck";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
+import { BroadcastWrapUp } from "@/components/BroadcastWrapUp";
 import {
   BROADCAST_AUDIENCES,
   BROADCAST_SAFETY_NOTICE,
@@ -61,6 +62,13 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
   const [liveNow, setLiveNow] = useState<{ title: string; place: string; key: string } | null>(null);
+  /** Closing summary shown once the stream ends. */
+  const [wrapUp, setWrapUp] = useState<{
+    title: string;
+    place: string;
+    saved: boolean;
+    seconds: number | null;
+  } | null>(null);
   const human = useHumanCheck("community-post");
   // Live actions need a mobile number confirmed by text, social sign-ins included.
   const phoneGate = usePhoneGate("before you go live");
@@ -152,12 +160,39 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         initialFacing={facing}
         initialMuted={!micOn}
         save={liveNow.key}
-        onEnd={() => {
+        onEnd={(result) => {
           setLiveNow(null);
-          toast.success("Broadcast ended", {
-            description: "Find it in your profile history.",
+          setWrapUp({
+            title: liveNow.title,
+            place: liveNow.place,
+            saved: result?.saved ?? false,
+            seconds: result?.seconds ?? null,
           });
+        }}
+      />
+    );
+  }
+
+  if (wrapUp) {
+    return (
+      <BroadcastWrapUp
+        title={wrapUp.title}
+        place={wrapUp.place}
+        categoryLabel={`${selectedCategory.label}${subcategory ? ` · ${subcategory}` : ""}`}
+        saved={wrapUp.saved}
+        seconds={wrapUp.seconds}
+        onGoLiveAgain={() => {
+          setWrapUp(null);
+          setTitle("");
+          setBody("");
+        }}
+        onProfile={() => {
+          setWrapUp(null);
           void navigate({ to: "/profile" });
+        }}
+        onHome={() => {
+          setWrapUp(null);
+          void navigate({ to: "/" });
         }}
       />
     );
@@ -173,9 +208,18 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           <p className="mt-2 text-sm text-muted-foreground">{gate.reason}</p>
         </div>
         {gate.signedIn ? (
-          <Button type="button" className="w-full" onClick={onSwitchToBounty}>
-            Post a paid flash bounty instead
-          </Button>
+          <div className="space-y-2">
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => void navigate({ to: "/profile" })}
+            >
+              Apply to become a verified creator
+            </Button>
+            <Button type="button" variant="outline" className="w-full" onClick={onSwitchToBounty}>
+              Post a paid flash bounty instead
+            </Button>
+          </div>
         ) : (
           <Button type="button" className="w-full" onClick={() => void navigate({ to: "/auth" })}>
             Sign in

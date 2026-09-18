@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { LocationPreviewMap } from "@/components/LocationPreviewMap";
 import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
+import { BroadcastWrapUp } from "@/components/BroadcastWrapUp";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import {
   Dialog,
@@ -98,6 +99,12 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
   const [liveSpot, setLiveSpot] = useState<FlashSpot | null>(null);
   /** Saved bounty id, so the live chat thread matches the posted bounty. */
   const [liveRequestKey, setLiveRequestKey] = useState<string | null>(null);
+  /** Closing summary shown once a flash stream ends. */
+  const [wrapUp, setWrapUp] = useState<{
+    place: string;
+    saved: boolean;
+    seconds: number | null;
+  } | null>(null);
   /** Optional directions for whoever picks up the bounty. */
   const [instructions, setInstructions] = useState("");
   const toggleCondition = (id: FlashConditionId) =>
@@ -744,13 +751,35 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
           requestKey={liveRequestKey}
           save={liveRequestKey ?? `flash-${Date.now()}`}
           instructions={instructions}
-          onEnd={() => {
+          onEnd={(result) => {
+            const place = liveSpot.formatted;
             setLiveSpot(null);
             setLiveRequestKey(null);
-            toast.success("Broadcast ended", {
-              description: "Your flash stream is saved to the feed.",
+            setWrapUp({
+              place,
+              saved: result?.saved ?? false,
+              seconds: result?.seconds ?? null,
             });
+          }}
+        />
+      )}
+      {wrapUp && (
+        <BroadcastWrapUp
+          title={FLASH_TITLE}
+          place={wrapUp.place}
+          saved={wrapUp.saved}
+          seconds={wrapUp.seconds}
+          onGoLiveAgain={() => {
+            setWrapUp(null);
+            setOpen(true);
+          }}
+          onProfile={() => {
+            setWrapUp(null);
             void navigate({ to: "/profile" });
+          }}
+          onHome={() => {
+            setWrapUp(null);
+            void navigate({ to: "/" });
           }}
         />
       )}
