@@ -39,6 +39,8 @@ export const RATE_LIMITS = {
   acceptBounty: { bucket: "accept-bounty", limit: 30, windowSeconds: 3600 },
   /** Credit checkout sessions per member. */
   checkout: { bucket: "checkout", limit: 10, windowSeconds: 900 },
+  /** Cash-out and payout requests per member and per address. */
+  cashout: { bucket: "cashout", limit: 5, windowSeconds: 3600 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export const RATE_LIMITED_MESSAGE =
