@@ -99,4 +99,4 @@ Home Events & Arts neon category artwork
 - [x] Home Top Creators neon category artwork — added the uploaded "TOP CREATORS" badge to the large Home card, kept tap behavior, verified mobile + desktop.
 
 ## Home Scanner neon category artwork
-- [ ] Add the uploaded "SCANNER" neon badge (hfjfhksdrjfghbkjrgber.jpeg) to the large Home card, preserve the scanner tap behavior, verify prominent sizing on mobile and desktop.
+- [x] Add the uploaded "SCANNER" neon badge (hfjfhksdrjfghbkjrgber.jpeg) to the large Home card, preserve the scanner tap behavior, verify prominent sizing on mobile and desktop.
