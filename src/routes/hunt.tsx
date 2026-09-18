@@ -103,7 +103,17 @@ function HuntScreen() {
 
   return (
     <div className="app-shell pb-28 pt-safe">
-      <h1 className="font-display text-3xl tracking-tight text-foreground">Hunter dashboard</h1>
+      <div className="flex items-start justify-between gap-3">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">Hunter dashboard</h1>
+        <button
+          type="button"
+          onClick={close}
+          aria-label="Close Hunter dashboard"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+        >
+          <X className="size-5" aria-hidden />
+        </button>
+      </div>
       <p className="mt-1 text-sm text-muted-foreground">
         Open bounties you can claim right now, ranked for the fastest payout.
       </p>
