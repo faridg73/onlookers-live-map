@@ -23,6 +23,8 @@ import {
   Volume2,
   Clock3,
   Eye,
+  Flame,
+  Image,
   X,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -46,6 +48,9 @@ import { saveMyLocation } from "@/lib/hunter-location";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
+import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
+
+const TRENDING_RADIUS_MILES = 2;
 
 const MAP_CATEGORY_TILES: Array<{
   id: string;
@@ -54,6 +59,7 @@ const MAP_CATEGORY_TILES: Array<{
   categories: CategoryId[];
   crisis?: boolean;
   gathering?: boolean;
+  trending?: boolean;
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
@@ -62,6 +68,7 @@ const MAP_CATEGORY_TILES: Array<{
   { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
   { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
   { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
+  { id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true },
 ];
 
 const CRISIS_TERMS = [
@@ -126,6 +133,9 @@ function MapScreen() {
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [scannerNotice, setScannerNotice] = useState(false);
   const [gatheringClusterIds, setGatheringClusterIds] = useState<string[]>([]);
+  const [nearbyPosts, setNearbyPosts] = useState<CommunityPost[]>([]);
+  const [nearbyPostMedia, setNearbyPostMedia] = useState<Record<string, string>>({});
+  const [trendingLoading, setTrendingLoading] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
@@ -199,17 +209,49 @@ function MapScreen() {
   const crisisMode = activeCategoryTile?.crisis === true;
   const trafficMode = activeCategoryTile?.id === "traffic";
   const gatheringMode = activeCategoryTile?.gathering === true;
+  const trendingMode = activeCategoryTile?.trending === true;
   const visible = useMemo(
     () =>
       activeCategoryTile
         ? statusFiltered.filter((request) =>
-            activeCategoryTile.crisis
+            activeCategoryTile.trending
+              ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
+              : activeCategoryTile.crisis
               ? isCrisisRequest(request)
               : request.category && activeCategoryTile.categories.includes(request.category),
           )
         : statusFiltered,
     [activeCategoryTile, statusFiltered],
   );
+
+  useEffect(() => {
+    if (!trendingMode || !userPosition) return;
+    let alive = true;
+    setTrendingLoading(true);
+    void listCommunityPosts()
+      .then(async (posts) => {
+        if (!alive) return;
+        const local = posts
+          .filter((post) => post.latitude !== null && post.longitude !== null)
+          .filter((post) => distanceMiles(userPosition, { lat: post.latitude ?? 0, lng: post.longitude ?? 0 }) <= TRENDING_RADIUS_MILES)
+          .sort((a, b) => {
+            const score = (post: CommunityPost) =>
+              (post.isFlash ? 100 : 0) + post.pinnedCredits * 2 - (Date.now() - new Date(post.createdAt).getTime()) / 60_000;
+            return score(b) - score(a);
+          });
+        setNearbyPosts(local);
+        setNearbyPostMedia(await communityMediaUrls(local));
+      })
+      .catch(() => {
+        if (alive) setNearbyPosts([]);
+      })
+      .finally(() => {
+        if (alive) setTrendingLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [trendingMode, userPosition]);
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   const nearby = useMemo(() => {
@@ -406,6 +448,8 @@ function MapScreen() {
                 const count = statusFiltered.filter((request) =>
                   tile.crisis
                     ? isCrisisRequest(request)
+                    : tile.trending
+                      ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
                     : request.category && tile.categories.includes(request.category),
                 ).length;
                 return (
@@ -438,7 +482,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -483,6 +527,70 @@ function MapScreen() {
                 ) : (
                   <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
                     No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {trendingMode && (
+              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+                      <Flame className="size-3.5" /> Rising within 2 miles
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Trending Near You</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {!userPosition ? (
+                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    Allow location access to load fast-rising activity within 2 miles.
+                  </p>
+                ) : trendingLoading ? (
+                  <p className="mt-3 text-center text-xs font-bold text-muted-foreground">Loading nearby activity…</p>
+                ) : visible.length + nearbyPosts.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {[...visible]
+                      .sort((a, b) => (b.watchers + b.responses) - (a.watchers + a.responses) || a.minutesAgo - b.minutesAgo)
+                      .slice(0, 4)
+                      .map((request) => {
+                        const live = request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+                        return (
+                          <Button key={`request-${request.id}`} type="button" variant="outline" onClick={() => {
+                            select(request.id);
+                            setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
+                          }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-signal/30 bg-background px-3 py-2.5 text-left">
+                            {live ? <Radio className="size-4 animate-pulse text-live" /> : <CircleDollarSign className="size-4 text-signal" />}
+                            <span className="min-w-0">
+                              <span className="block truncate text-xs font-bold text-foreground">{request.title}</span>
+                              <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">{live ? "Live broadcast" : `${poolOf(request)} credit bounty`} · {request.place}</span>
+                            </span>
+                            <span className="shrink-0 text-[0.58rem] font-bold text-muted-foreground">{liveTimestamp(request.minutesAgo).replace("Updated ", "")}</span>
+                          </Button>
+                        );
+                      })}
+                    {nearbyPosts.slice(0, Math.max(0, 6 - visible.length)).map((post) => (
+                      <Button key={`post-${post.id}`} type="button" variant="outline" onClick={() => {
+                        if (post.latitude !== null && post.longitude !== null) setCenterTarget({ lat: post.latitude, lng: post.longitude, zoom: 16 });
+                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-signal/30 bg-background px-3 py-2.5 text-left">
+                        {post.mediaPath && nearbyPostMedia[post.mediaPath]
+                          ? <img src={nearbyPostMedia[post.mediaPath]} alt="" className="size-8 rounded object-cover" />
+                          : <Image className="size-4 text-signal" />}
+                        <span className="min-w-0">
+                          <span className="block truncate text-xs font-bold text-foreground">{post.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.65rem] font-normal text-muted-foreground">Media post · {post.place || "Nearby"}</span>
+                        </span>
+                        <span className="shrink-0 text-[0.58rem] font-bold text-muted-foreground">{liveTimestamp(Math.max(0, Math.floor((Date.now() - new Date(post.createdAt).getTime()) / 60_000))).replace("Updated ", "")}</span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    Nothing is rising within 2 miles yet. Check back soon.
                   </p>
                 )}
               </div>
