@@ -27,14 +27,16 @@ export type BroadcastCategory = {
 };
 
 /** Creator-facing lanes. Each maps to an existing Discover feed lane for compatibility. */
+const DEFAULT_BROADCAST_CATEGORY: BroadcastCategory = {
+  id: "breaking-incidents",
+  label: "Breaking News & Incidents",
+  icon: "🚨",
+  communityCategory: "breaking",
+  subcategories: ["Accidents", "Weather", "Hazards", "Emergency Services"],
+};
+
 export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
-  {
-    id: "breaking-incidents",
-    label: "Breaking News & Incidents",
-    icon: "🚨",
-    communityCategory: "breaking",
-    subcategories: ["Accidents", "Weather", "Hazards", "Emergency Services"],
-  },
+  DEFAULT_BROADCAST_CATEGORY,
   {
     id: "traffic-updates",
     label: "Traffic & Public Updates",
@@ -142,6 +144,6 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
   },
 ] as const;
 
-export function broadcastCategoryById(id: BroadcastCategoryId) {
-  return BROADCAST_CATEGORIES.find((category) => category.id === id) ?? BROADCAST_CATEGORIES[0];
+export function broadcastCategoryById(id: BroadcastCategoryId): BroadcastCategory {
+  return BROADCAST_CATEGORIES.find((category) => category.id === id) ?? DEFAULT_BROADCAST_CATEGORY;
 }
