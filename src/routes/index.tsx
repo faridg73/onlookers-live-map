@@ -262,6 +262,16 @@ function MapScreen() {
     void refundExpiredBounties();
   }, []);
 
+  // Device-only tap history so the grid favours the lanes this person uses.
+  const [categoryTaps, setCategoryTaps] = useState<Record<string, number>>({});
+  useEffect(() => {
+    setCategoryTaps(readCategoryTapCounts());
+  }, []);
+  const orderedCategoryTiles = useMemo(
+    () => sortCategoriesByUsage(MAP_CATEGORY_TILES, categoryTaps),
+    [categoryTaps],
+  );
+
   // Remember where this person is so nearby bounty alerts can reach them.
   useEffect(() => {
     if (!userPosition) return;
