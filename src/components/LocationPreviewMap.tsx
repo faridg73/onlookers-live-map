@@ -76,11 +76,9 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
       .then((maps) => {
         if (cancelled || !holder.current) return;
         const nextMap = new maps.Map(holder.current, {
+          ...SHARED_MAP_OPTIONS,
           center: FALLBACK,
           zoom: 15,
-          clickableIcons: false,
-          disableDefaultUI: true,
-          gestureHandling: "greedy",
         });
         const nextMarker = new maps.Marker({
           map: nextMap,

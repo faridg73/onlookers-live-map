@@ -7,6 +7,7 @@ import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { bountyTier, categoryGlyph, TIER_LABELS } from "@/lib/bounty-tiers";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
+import { SHARED_MAP_OPTIONS } from "@/lib/map-style";
 import { fetchMapAreaPlaces, type DiscoveredPlace } from "@/lib/places.functions";
 
 import { useBoosts } from "@/lib/boosts-store";
@@ -110,14 +111,12 @@ export function MapCanvas({
       .then((maps) => {
         if (cancelled || !holder.current) return;
         map.current = new maps.Map(holder.current, {
+          ...SHARED_MAP_OPTIONS,
           center: REGIONAL_CENTER,
           zoom: 13,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.
           minZoom: 2,
-          clickableIcons: false,
-          disableDefaultUI: true,
-          gestureHandling: "greedy",
         });
         const ov = new maps.OverlayView();
         ov.onAdd = () => {};

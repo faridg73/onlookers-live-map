@@ -46,11 +46,9 @@ export function GlobalFeedMap({
       .then((maps) => {
         if (cancelled || !holder.current) return;
         map.current = new maps.Map(holder.current, {
+          ...SHARED_MAP_OPTIONS,
           center: REGIONAL_CENTER,
           zoom: 2,
-          clickableIcons: false,
-          disableDefaultUI: true,
-          gestureHandling: "greedy",
         });
         setMapReady(true);
       })
