@@ -63,6 +63,7 @@ function MapScreen() {
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [exploreOpen, setExploreOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [accountabilityOpen, setAccountabilityOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
