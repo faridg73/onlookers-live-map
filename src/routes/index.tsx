@@ -52,6 +52,11 @@ import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/r
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { listTopCreators, type TopCreator } from "@/lib/top-creators";
+import {
+  readCategoryTapCounts,
+  recordCategoryTap,
+  sortCategoriesByUsage,
+} from "@/lib/category-usage";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -256,6 +261,19 @@ function MapScreen() {
   useEffect(() => {
     void refundExpiredBounties();
   }, []);
+
+  // Device-only tap history so the grid favours the lanes this person uses.
+  const [categoryTaps, setCategoryTaps] = useState<Record<string, number>>({});
+  // Re-read after hydration and whenever the drawer closes, so tiles never
+  // shuffle under the user's finger mid-session.
+  useEffect(() => {
+    if (drawerOpen) return;
+    setCategoryTaps(readCategoryTapCounts());
+  }, [drawerOpen]);
+  const orderedCategoryTiles = useMemo(
+    () => sortCategoriesByUsage(MAP_CATEGORY_TILES, categoryTaps),
+    [categoryTaps],
+  );
 
   // Remember where this person is so nearby bounty alerts can reach them.
   useEffect(() => {
@@ -565,7 +583,7 @@ function MapScreen() {
 
           <div className="border-t border-border py-3">
             <div className="grid grid-cols-3 gap-2" aria-label="Map categories">
-              {MAP_CATEGORY_TILES.map((tile) => {
+              {orderedCategoryTiles.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
                 const count = tile.creators
@@ -582,6 +600,7 @@ function MapScreen() {
                     variant="outline"
                     aria-pressed={active}
                     onClick={() => {
+                      recordCategoryTap(tile.id);
                       if (tile.communityLink) {
                         void navigate({ to: "/community" });
                         return;
