@@ -67,14 +67,26 @@ const MAP_CATEGORY_TILES: Array<{
   creators?: boolean;
   theme?: { emoji: string; active: string; badge: string };
 }> = [
-  { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
-  { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
-  { id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"] },
+  {
+    id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"],
+    theme: { emoji: "🍔", active: "border-orange-500 bg-orange-500/20 text-orange-50", badge: "text-orange-400" },
+  },
+  {
+    id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"],
+    theme: { emoji: "🎭", active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
+  },
+  {
+    id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"],
+    theme: { emoji: "🌲", active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
+  },
   {
     id: "traffic", label: "Traffic & transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
     theme: { emoji: "🚗", active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
   },
-  { id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"] },
+  {
+    id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"],
+    theme: { emoji: "🍸", active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
+  },
   {
     id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
     theme: { emoji: "🚨", active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
