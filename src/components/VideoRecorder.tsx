@@ -79,16 +79,33 @@ export function VideoRecorder({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-        {busy ? (
-          <Loader2 className="size-8 animate-spin text-white/80" />
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 text-center">
+        {isMobile ? (
+          <>
+            {busy ? (
+              <Loader2 className="size-8 animate-spin text-white/80" />
+            ) : (
+              <Video className="size-10 text-white/70" />
+            )}
+            <p className="text-sm font-semibold text-white">
+              Your phone's camera opens for this capture, so the clip keeps its full quality.
+            </p>
+            <p className="text-xs text-white/60">Film it, then tap use or done to send it here.</p>
+          </>
         ) : (
-          <Video className="size-10 text-white/70" />
+          <div className="w-full max-w-md text-left">
+            <p className="mb-3 text-sm font-semibold text-white">
+              Record with your computer's webcam, or pick a clip you already have.
+            </p>
+            <DesktopWebcamRecorder
+              disabled={busy}
+              onRecorded={(file) => {
+                onRecorded(file);
+                onClose();
+              }}
+            />
+          </div>
         )}
-        <p className="text-sm font-semibold text-white">
-          Your phone's camera opens for this capture, so the clip keeps its full quality.
-        </p>
-        <p className="text-xs text-white/60">Film it, then tap use or done to send it here.</p>
       </div>
 
       <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
@@ -102,7 +119,7 @@ export function VideoRecorder({
           onClick={() => void capture("video")}
           className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-signal font-display text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
         >
-          <Video className="size-5" /> Open camera to film
+          <Video className="size-5" /> {isMobile ? "Open camera to film" : "Choose a video file"}
         </button>
         {onPhoto && (
           <button
