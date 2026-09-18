@@ -97,9 +97,28 @@ async function captureThumbnail(file: File): Promise<Blob | null> {
 function extensionFor(file: File) {
   const fromName = file.name.includes(".") ? file.name.split(".").pop() : null;
   if (fromName && fromName.length <= 5) return fromName.toLowerCase();
-  if (file.type.includes("quicktime")) return "mov";
-  if (file.type.includes("webm")) return "webm";
+  return extensionForType(file.type);
+}
+
+/** File extension that actually matches the recorded container. */
+function extensionForType(mime: string) {
+  if (mime.includes("webm")) return "webm";
+  if (mime.includes("quicktime") || mime.includes("mov")) return "mov";
+  if (mime.includes("ogg")) return "ogv";
   return "mp4";
+}
+
+/**
+ * Browsers (Chrome especially) refuse to play a file served as
+ * `video/quicktime`, even though phone captures are H.264/AAC that every
+ * player handles. Store those as `video/mp4` so playback works everywhere.
+ */
+function playableContentType(mime: string) {
+  if (!mime) return "video/mp4";
+  if (mime.includes("quicktime") || mime.includes("mov") || mime.includes("x-m4v")) {
+    return "video/mp4";
+  }
+  return mime;
 }
 
 /** Upload a fulfilment video to storage and save the record against the bounty. */
@@ -124,7 +143,7 @@ export async function uploadBountyVideo({
     bucket: BOUNTY_VIDEO_BUCKET,
     path,
     file,
-    contentType: file.type || "video/mp4",
+    contentType: playableContentType(file.type),
   });
 
   let thumbPath: string | null = null;
@@ -263,9 +282,13 @@ export async function saveBroadcastRecording({
   const user = auth.user;
   if (!user) throw new Error("Sign in to save your broadcast.");
 
-  const extension = blob.type.includes("mp4") ? "mp4" : "webm";
+  // Phone captures arrive as QuickTime; keep the name, extension and stored
+  // content type in sync so the clip plays back in every browser.
+  const sourceType = (blob as File).type || "";
+  const extension = extensionForType(sourceType);
+  const contentType = playableContentType(sourceType);
   const file = new File([blob], `broadcast-${Date.now()}.${extension}`, {
-    type: blob.type || "video/webm",
+    type: contentType,
   });
   const path = `${user.id}/${requestId}/${Date.now()}.${extension}`;
 
@@ -273,7 +296,7 @@ export async function saveBroadcastRecording({
     bucket: BOUNTY_VIDEO_BUCKET,
     path,
     file,
-    contentType: file.type,
+    contentType,
   });
 
   let thumbPath: string | null = null;
