@@ -58,18 +58,7 @@ export function LiveBroadcastStage({
   const meta = useRef({ title, place, bounty, save });
   meta.current = { title, place, bounty, save };
 
-  const capture = useCallback(async () => {
-    setCapturing(true);
-    let file: File | null = null;
-    try {
-      file = await requestNativeCapture("video");
-    } catch {
-      toast.error("Your camera could not be opened. Check camera permissions and try again.");
-    } finally {
-      setCapturing(false);
-    }
-    if (!file) return;
-
+  const handleFile = useCallback(async (file: File) => {
     const key = meta.current.save;
     if (key) {
       setSaving(true);
