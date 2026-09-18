@@ -76,6 +76,7 @@ import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.
 import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
 import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
 import scannerAsset from "@/assets/scanner-badge.jpg.asset.json";
+import bountyMapAsset from "@/assets/bounty-map-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -156,7 +157,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
     bountyMap: true,
-    theme: { emoji: "🗺️", active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
+    theme: { imageUrl: bountyMapAsset.url, active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
   },
   {
     id: "community", label: "Community", icon: Users, categories: ["community"],
