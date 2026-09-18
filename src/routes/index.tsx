@@ -60,6 +60,7 @@ const MAP_CATEGORY_TILES: Array<{
   crisis?: boolean;
   gathering?: boolean;
   trending?: boolean;
+  viral?: boolean;
 }> = [
   { id: "food", label: "Food & markets", icon: Utensils, categories: ["food", "markets"] },
   { id: "events", label: "Events & arts", icon: Ticket, categories: ["events", "sports", "art"] },
@@ -69,6 +70,7 @@ const MAP_CATEGORY_TILES: Array<{
   { id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true },
   { id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true },
   { id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true },
+  { id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true },
 ];
 
 const CRISIS_TERMS = [
@@ -210,18 +212,21 @@ function MapScreen() {
   const trafficMode = activeCategoryTile?.id === "traffic";
   const gatheringMode = activeCategoryTile?.gathering === true;
   const trendingMode = activeCategoryTile?.trending === true;
+  const viralMode = activeCategoryTile?.viral === true;
   const visible = useMemo(
     () =>
       activeCategoryTile
-        ? statusFiltered.filter((request) =>
+        ? (activeCategoryTile.viral ? requests : statusFiltered).filter((request) =>
             activeCategoryTile.trending
               ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
+              : activeCategoryTile.viral
+              ? true
               : activeCategoryTile.crisis
               ? isCrisisRequest(request)
               : request.category && activeCategoryTile.categories.includes(request.category),
           )
         : statusFiltered,
-    [activeCategoryTile, statusFiltered],
+    [activeCategoryTile, requests, statusFiltered],
   );
 
   useEffect(() => {
@@ -445,11 +450,13 @@ function MapScreen() {
               {MAP_CATEGORY_TILES.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
-                const count = statusFiltered.filter((request) =>
+                const count = (tile.viral ? requests : statusFiltered).filter((request) =>
                   tile.crisis
                     ? isCrisisRequest(request)
                     : tile.trending
                       ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
+                    : tile.viral
+                      ? true
                     : request.category && tile.categories.includes(request.category),
                 ).length;
                 return (
@@ -482,7 +489,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">
@@ -591,6 +598,58 @@ function MapScreen() {
                 ) : (
                   <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
                     Nothing is rising within 2 miles yet. Check back soon.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {viralMode && (
+              <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
+                      <Sparkles className="size-3.5" /> Network-wide momentum
+                    </p>
+                    <h2 className="mt-1 truncate text-sm font-extrabold text-foreground">Viral &amp; Breaking</h2>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.65rem] font-bold text-muted-foreground">
+                    Exit
+                  </Button>
+                </div>
+
+                {visible.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {[...visible]
+                      .sort((a, b) => {
+                        const velocity = (request: LiveRequest) => (request.watchers + request.responses) / Math.max(1, request.minutesAgo);
+                        return velocity(b) - velocity(a) || (b.watchers + b.responses) - (a.watchers + a.responses);
+                      })
+                      .slice(0, 4)
+                      .map((request) => {
+                        const velocity = (request.watchers + request.responses) / Math.max(1, request.minutesAgo);
+                        const breaking = isCrisisRequest(request) || (request.minutesAgo <= 15 && velocity >= 1);
+                        return (
+                          <Button key={`viral-request-${request.id}`} type="button" variant="outline" onClick={() => {
+                            select(request.id);
+                            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+                          }} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/30 bg-background px-3 py-2.5 text-left">
+                            <span className="min-w-0">
+                              <span className="flex min-w-0 items-center gap-1.5">
+                                {breaking && <span className="shrink-0 rounded-sm bg-crisis px-1.5 py-0.5 text-[0.52rem] font-extrabold uppercase text-crisis-foreground">Breaking</span>}
+                                <span className="truncate text-xs font-bold text-foreground">{request.title}</span>
+                              </span>
+                              <span className="mt-1 block truncate text-[0.65rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} engagements</span>
+                            </span>
+                            <span className="flex shrink-0 items-center gap-1 text-[0.62rem] font-extrabold text-crisis">
+                              <Eye className="size-3.5" /> +{velocity.toFixed(1)}/min
+                            </span>
+                          </Button>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <p className="mt-3 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No network-wide stories are accelerating right now.
                   </p>
                 )}
               </div>
