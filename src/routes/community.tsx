@@ -92,6 +92,7 @@ function CommunityHub() {
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map">("feed");
   const [composing, setComposing] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
