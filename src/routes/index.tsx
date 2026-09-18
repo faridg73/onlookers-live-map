@@ -339,6 +339,14 @@ function MapScreen() {
   const viralMode = activeCategoryTile?.viral === true;
   const creatorsMode = activeCategoryTile?.creators === true;
   const scannerMode = activeCategoryTile?.scanner === true;
+  const bountyMapMode = activeCategoryTile?.bountyMap === true;
+  const bountyMapRanked = useMemo(
+    () =>
+      bountyMapMode
+        ? [...requests].filter((request) => !isClosed(request)).sort((a, b) => poolOf(b) - poolOf(a)).slice(0, 6)
+        : [],
+    [bountyMapMode, requests],
+  );
   const visible = useMemo(() => {
     if (!activeCategoryTile) return statusFiltered;
     if (activeCategoryTile.creators) return [];
@@ -642,7 +650,7 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && (
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && !bountyMapMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
