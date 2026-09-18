@@ -1170,7 +1170,7 @@ function MapScreen() {
               { label: "FAQ", icon: HelpCircle, action: () => void navigate({ to: "/faq" }) },
               { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
               { label: "Guides", icon: BookOpen, action: () => setGuidesOpen(true) },
-              { label: "Go live", icon: Radio, action: () => void navigate({ to: "/hunt" }) },
+              { label: "Go live", icon: Radio, action: () => void navigate({ to: "/post" }) },
             ].map(({ label, icon: Icon, action }) => (
               <Button
                 key={label}
