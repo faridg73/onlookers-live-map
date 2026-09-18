@@ -64,6 +64,7 @@ import {
 } from "@/lib/strange-sightings";
 import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json";
+import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -108,7 +109,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
-    theme: { emoji: "🚨", active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
+    theme: { imageUrl: emergenciesAsset.url, active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
   },
   {
     id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
