@@ -138,6 +138,9 @@ export const TOPUP_PACKAGES: CreditPackage[] = [
 
 CREDIT_PACKAGES.push(...TOPUP_PACKAGES);
 
+// Keep the buy-credits grid in ascending credit order across all tiers.
+CREDIT_PACKAGES.sort((a, b) => a.credits - b.credits);
+
 export const creditPackageById = (id: string): CreditPackage | undefined =>
   CREDIT_PACKAGES.find((pack) => pack.id === id);
 
