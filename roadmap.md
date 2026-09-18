@@ -62,3 +62,4 @@ Explore drawer: full 16-category grid
 - [x] Add Crime Reports, Scanner, Live Stream, Bounty Map, Community, Guides tiles with emojis and vibrant themes
 - [x] Wire each tile's drawer behavior (crime feed, scanner feed, live streams, bounty map, community link, guides overlay)
 - [x] Type-check and verify the 16-card grid on phone
+- [x] Home: Bounty Map tile now opens an "Every open bounty, ranked by reward" feed (Sep 18)

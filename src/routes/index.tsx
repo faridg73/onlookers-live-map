@@ -339,6 +339,14 @@ function MapScreen() {
   const viralMode = activeCategoryTile?.viral === true;
   const creatorsMode = activeCategoryTile?.creators === true;
   const scannerMode = activeCategoryTile?.scanner === true;
+  const bountyMapMode = activeCategoryTile?.bountyMap === true;
+  const bountyMapRanked = useMemo(
+    () =>
+      bountyMapMode
+        ? [...requests].filter((request) => !isClosed(request)).sort((a, b) => poolOf(b) - poolOf(a)).slice(0, 6)
+        : [],
+    [bountyMapMode, requests],
+  );
   const visible = useMemo(() => {
     if (!activeCategoryTile) return statusFiltered;
     if (activeCategoryTile.creators) return [];
@@ -513,7 +521,7 @@ function MapScreen() {
           </span>
         </Button>
 
-        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
+        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
           <div className="border-t border-border pb-3 pt-3">
             <div className="mb-2 flex items-center gap-2">
               <History className="size-4 text-signal" aria-hidden />
@@ -642,7 +650,62 @@ function MapScreen() {
               })}
             </div>
 
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && (
+            {bountyMapMode && (
+              <div className="mt-3 border-t border-border pt-3" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-[0.75rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+                      <Map className="size-3.5" /> Every open bounty
+                    </p>
+                    <h2 className="truncate text-base font-extrabold uppercase tracking-[0.08em] text-foreground">
+                      Ranked by reward
+                    </h2>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCategoryTile(null)}
+                    className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground"
+                  >
+                    Exit
+                  </Button>
+                </div>
+                {bountyMapRanked.length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    {bountyMapRanked.map((request) => (
+                      <Button
+                        key={`bountymap-${request.id}`}
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          select(request.id);
+                          setCenterTarget({ ...requestMapPosition(request), zoom: 14 });
+                          setDrawerOpen(false);
+                        }}
+                        className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
+                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
+                            {request.place}
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-sm font-extrabold text-signal">
+                          {poolOf(request)} cr
+                        </span>
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
+                    No open bounties on the network yet — post the first one.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && !bountyMapMode && (
               <div className="mt-3 border-t border-border pt-3" aria-live="polite">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
