@@ -167,6 +167,40 @@ export function CommunityPostCard({
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
+          {!isMine && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void awardReputation("validate_marker", post.id).then((total) =>
+                    toast.success(
+                      total === null ? "Sign in to earn reputation." : `Thanks — ${total} reputation points.`,
+                    ),
+                  );
+                }}
+                className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+              >
+                Still accurate
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void awardReputation("flag_outdated", post.id).then((total) =>
+                    toast.success(
+                      total === null ? "Sign in to earn reputation." : `Flagged — ${total} reputation points.`,
+                    ),
+                  );
+                }}
+                className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
+              >
+                Outdated
+              </Button>
+            </>
+          )}
           {isMine && (
             <>
               <Button
