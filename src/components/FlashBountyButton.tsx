@@ -744,13 +744,35 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
           requestKey={liveRequestKey}
           save={liveRequestKey ?? `flash-${Date.now()}`}
           instructions={instructions}
-          onEnd={() => {
+          onEnd={(result) => {
+            const place = liveSpot.formatted;
             setLiveSpot(null);
             setLiveRequestKey(null);
-            toast.success("Broadcast ended", {
-              description: "Your flash stream is saved to the feed.",
+            setWrapUp({
+              place,
+              saved: result?.saved ?? false,
+              seconds: result?.seconds ?? null,
             });
+          }}
+        />
+      )}
+      {wrapUp && (
+        <BroadcastWrapUp
+          title={FLASH_TITLE}
+          place={wrapUp.place}
+          saved={wrapUp.saved}
+          seconds={wrapUp.seconds}
+          onGoLiveAgain={() => {
+            setWrapUp(null);
+            setOpen(true);
+          }}
+          onProfile={() => {
+            setWrapUp(null);
             void navigate({ to: "/profile" });
+          }}
+          onHome={() => {
+            setWrapUp(null);
+            void navigate({ to: "/" });
           }}
         />
       )}
