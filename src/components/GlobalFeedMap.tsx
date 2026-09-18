@@ -16,11 +16,13 @@ import { REGIONAL_CENTER } from "@/lib/onlooker";
  */
 export function GlobalFeedMap({
   focus,
+  categoryId,
   categoryLabel,
   subcategory,
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
+  categoryId?: string | null;
   categoryLabel?: string | null;
   subcategory?: string | null;
 }) {
@@ -60,12 +62,14 @@ export function GlobalFeedMap({
 
   const filteredClips = useMemo(() => {
     const categoryNeedle = categoryLabel?.toLowerCase().trim();
+    const categoryIdNeedle = categoryId?.toLowerCase().trim();
     const vibeNeedle = subcategory?.toLowerCase().trim();
     return (clips ?? []).filter((clip) => {
       const haystack = `${clip.title} ${clip.note} ${clip.place}`.toLowerCase();
-      return (!categoryNeedle || haystack.includes(categoryNeedle)) && (!vibeNeedle || haystack.includes(vibeNeedle));
+      const categoryMatches = !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
+      return categoryMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
     });
-  }, [clips, categoryLabel, subcategory]);
+  }, [clips, categoryId, categoryLabel, subcategory]);
   const pinned = useMemo(
     () => filteredClips.filter((c) => c.latitude !== null && c.longitude !== null),
     [filteredClips],

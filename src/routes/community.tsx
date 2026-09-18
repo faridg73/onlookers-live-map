@@ -224,12 +224,16 @@ function CommunityHub() {
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
 
-    const inLane = inRange.filter(({ post }) => category === "all" || post.category === category);
+    const inLane = inRange.filter(({ post }) => {
+      if (category === "all") return true;
+      if (post.category !== category) return false;
+      return !categoryId || post.tags.some((postTag) => postTag.toLowerCase() === categoryId);
+    });
     const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
 
     // Subcategory pills are strict: never substitute sibling or unrelated posts.
     return sort(exact);
-  }, [posts, category, tag, radius, distanceFor, matchesTag]);
+  }, [posts, category, categoryId, tag, radius, distanceFor, matchesTag]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
@@ -578,6 +582,7 @@ function CommunityHub() {
           <SectionBoundary label="The map">
             <GlobalFeedMap
               focus={focus}
+              categoryId={categoryId}
               categoryLabel={categoryId ? broadcastCategoryById(categoryId).label : null}
               subcategory={tag}
             />
