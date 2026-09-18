@@ -74,3 +74,9 @@ Breaking News custom category artwork
 - [x] Replace the Breaking News emoji with the uploaded neon badge
 - [x] Preserve its existing filtering, modal, and routing behavior
 - [x] Verify sizing and interaction on mobile and desktop
+
+Home Explore Nearby neon category artwork
+- [ ] Add the uploaded Traffic badge to the large Home card
+- [ ] Keep Strange Sightings artwork prominent on its Home card
+- [ ] Remove custom badge artwork from compact category dropdowns
+- [ ] Verify Home card sizing and unchanged tap behaviors
