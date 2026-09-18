@@ -69,6 +69,7 @@ import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
 import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
 import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
 import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
+import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -121,7 +122,7 @@ const MAP_CATEGORY_TILES: Array<{
   },
   {
     id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
-    theme: { emoji: "🔥", active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
+    theme: { imageUrl: trendingNearYouAsset.url, active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
   },
   {
     id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
