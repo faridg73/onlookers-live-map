@@ -260,9 +260,25 @@ function CommunityHub() {
     <main className="min-h-dvh overflow-x-hidden bg-background pb-28">
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
-          <Compass className="size-4" /> Discover
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
+            <Compass className="size-4" /> Discover
+          </p>
+          <button
+            type="button"
+            aria-label="Close community"
+            onClick={() => {
+              if (canGoBack) {
+                router.history.back();
+                return;
+              }
+              void navigate({ to: "/" });
+            }}
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface text-foreground transition-colors hover:border-signal hover:text-signal"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
         <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-foreground sm:text-4xl">
           See what your city is doing now
         </h1>
