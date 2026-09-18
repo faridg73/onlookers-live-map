@@ -54,14 +54,9 @@ export function VideoRecorder({
     [busy, onClose, onPhoto, onRecorded],
   );
 
-  // When only a clip is wanted, jump straight into the camera app — the tap that
-  // opened this screen still counts as the user gesture.
-  useEffect(() => {
-    if (onPhoto || autoOpened.current || !isMobileCaptureDevice()) return;
-    autoOpened.current = true;
-    const id = requestAnimationFrame(() => void capture("video"));
-    return () => cancelAnimationFrame(id);
-  }, [capture, onPhoto]);
+  // The camera is never opened automatically: iOS blocks camera clicks that are
+  // not tied to a real tap, which used to leave this screen spinning forever.
+  // The person taps "Open camera to film" instead.
 
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-black">
