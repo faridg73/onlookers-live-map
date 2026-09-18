@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { replayOnboarding } from "@/lib/profile";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { CreatorVerificationCard } from "@/components/CreatorVerificationCard";
+import { TrustLevelBadge } from "@/components/TrustLevelBadge";
 import { fetchMyVerification } from "@/lib/verification";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -197,6 +198,7 @@ function ProfileScreen() {
 
       <HunterStatusCard />
 
+      <TrustLevelBadge className="mt-4" />
       <CreatorVerificationCard />
 
       <AlertSettingsCard />
