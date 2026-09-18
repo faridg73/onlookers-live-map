@@ -70,7 +70,7 @@ export function CreateCommunityReportModal({
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const { unit } = useDistanceUnit(coords);
+  const { unit } = useDistanceUnit(coords ? { lat: coords.latitude, lng: coords.longitude } : null);
 
   useEffect(() => {
     if (!open) return;

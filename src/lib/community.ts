@@ -322,7 +322,14 @@ export async function communityMediaUrls(posts: CommunityPost[]) {
 export async function uploadCommunityPhoto(file: File) {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to add a photo.");
-  const path = `${auth.user.id}/community/${crypto.randomUUID()}.jpg`;
+  const extension = file.type.startsWith("video/")
+    ? file.type.includes("webm")
+      ? "webm"
+      : "mp4"
+    : file.type.includes("png")
+      ? "png"
+      : "jpg";
+  const path = `${auth.user.id}/community/${crypto.randomUUID()}.${extension}`;
   await uploadMedia({ bucket: BUCKET, path, file, contentType: file.type || "image/jpeg" });
   return path;
 }
