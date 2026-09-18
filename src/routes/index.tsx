@@ -65,6 +65,7 @@ import {
 import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
 import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json";
 import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
+import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -130,7 +131,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "crime", label: "Crime Reports", icon: Siren, categories: [],
     crime: true,
-    theme: { emoji: "🚨", active: "border-rose-500 bg-rose-500/20 text-rose-50", badge: "text-rose-400" },
+    theme: { imageUrl: crimeReportsAsset.url, active: "border-rose-500 bg-rose-500/20 text-rose-50", badge: "text-rose-400" },
   },
   {
     id: "scanner", label: "Scanner", icon: Radio, categories: [],
