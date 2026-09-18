@@ -432,7 +432,7 @@ function CommunityHub() {
           <div
             role="list"
             aria-label="All category cards"
-            className="no-scrollbar grid max-h-[70dvh] grid-cols-2 gap-3 overflow-y-auto px-4 pb-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4"
+            className="no-scrollbar grid max-h-[70dvh] grid-cols-4 gap-2 overflow-y-auto px-3 pb-4 sm:gap-2.5 md:grid-cols-4 md:gap-3"
           >
             {BROADCAST_CATEGORIES.map((lane) => {
               const visual = COMMUNITY_VISUALS[lane.communityCategory];
@@ -449,26 +449,25 @@ function CommunityHub() {
                       setTag(null);
                     }}
                     aria-pressed={active}
-                    className={`group relative h-32 w-full overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none md:h-40 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-border"}`}
+                    className={`group flex h-full w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-signal/30 hover:border-signal/60"}`}
                   >
-                    <LoopingPreview
-                      videoUrl={previewUrl}
-                      imageUrl={previewUrl ? undefined : visual.image}
-                      alt={previewUrl ? `Live preview for ${lane.label}` : `${lane.label} category`}
-                      icon={Icon}
-                      coverClass={visual.coverClass}
-                    />
-                    <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                    <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
-                      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-base text-signal-foreground" aria-hidden="true">
+                    <span className="relative block aspect-square w-full overflow-hidden">
+                      <LoopingPreview
+                        videoUrl={previewUrl}
+                        imageUrl={previewUrl ? undefined : visual.image}
+                        alt={previewUrl ? `Live preview for ${lane.label}` : `${lane.label} category`}
+                        icon={Icon}
+                        coverClass={visual.coverClass}
+                      />
+                      <span className="absolute left-1.5 top-1.5 grid size-6 place-items-center rounded-md bg-background/70 text-sm backdrop-blur-sm" aria-hidden="true">
                         {lane.icon}
                       </span>
-                      <span className="min-w-0">
-                        <strong className="block text-sm leading-tight">{lane.label}</strong>
-                        <small className="mt-0.5 line-clamp-1 block text-[0.7rem] text-foreground/75">
-                          {lane.subcategories.slice(0, 3).join(" · ")}
-                        </small>
-                      </span>
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
+                      <strong className="line-clamp-2 text-[0.72rem] font-extrabold leading-tight text-foreground">{lane.label}</strong>
+                      <small className="line-clamp-2 text-[0.58rem] leading-snug text-muted-foreground">
+                        {lane.subcategories.slice(0, 2).join(" · ")}
+                      </small>
                     </span>
                   </button>
                   {active && (
