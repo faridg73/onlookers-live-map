@@ -35,6 +35,7 @@ export function requestNativeCapture(mode: NativeCaptureMode = "video"): Promise
   return new Promise((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
+    input.multiple = false;
     input.accept = mode === "video" ? "video/*" : "image/*";
     // Phones and tablets launch the camera app; desktops fall back to the normal
     // file dialog (which can still record from a connected webcam).
@@ -44,20 +45,49 @@ export function requestNativeCapture(mode: NativeCaptureMode = "video"): Promise
     input.style.opacity = "0";
 
     let settled = false;
+    let checking = false;
+    let leftPage = false;
+    let safety: ReturnType<typeof setTimeout> | undefined;
+
     const finish = (file: File | null) => {
       if (settled) return;
       settled = true;
-      window.removeEventListener("focus", onFocus);
+      if (safety) clearTimeout(safety);
+      window.removeEventListener("focus", onReturn);
+      window.removeEventListener("pageshow", onReturn);
+      document.removeEventListener("visibilitychange", onVisibility);
       input.remove();
       resolve(file);
     };
 
-    // Some system camera apps never fire "cancel"; a window focus with no file
-    // selected means the person came back empty-handed.
-    function onFocus() {
-      setTimeout(() => {
-        if (!input.files || input.files.length === 0) finish(null);
-      }, 800);
+    // iOS/Android camera apps do not reliably fire "cancel", and some deliver the
+    // file a moment after the page becomes visible again. So once we are back on
+    // the page we poll briefly before deciding the person came back empty-handed.
+    const pollForFile = () => {
+      if (settled || checking) return;
+      checking = true;
+      let tries = 0;
+      const tick = () => {
+        if (settled) return;
+        if (input.files && input.files.length > 0) return; // "change" settles it
+        tries += 1;
+        if (tries >= 10) finish(null);
+        else setTimeout(tick, 400);
+      };
+      setTimeout(tick, 500);
+    };
+
+    function onReturn() {
+      if (document.visibilityState === "hidden") return;
+      pollForFile();
+    }
+
+    function onVisibility() {
+      if (document.visibilityState === "hidden") {
+        leftPage = true;
+        return;
+      }
+      if (leftPage) pollForFile();
     }
 
     input.addEventListener("change", () => {
@@ -67,7 +97,16 @@ export function requestNativeCapture(mode: NativeCaptureMode = "video"): Promise
     input.addEventListener("cancel", () => finish(null));
 
     document.body.appendChild(input);
-    window.addEventListener("focus", onFocus);
+    window.addEventListener("focus", onReturn);
+    window.addEventListener("pageshow", onReturn);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    // Last-resort guard: if the camera never opened (a blocked programmatic
+    // click, for example) we must never leave the caller spinning forever.
+    safety = setTimeout(() => {
+      if (!input.files || input.files.length === 0) finish(null);
+    }, 20000);
+
     input.click();
   });
 }
