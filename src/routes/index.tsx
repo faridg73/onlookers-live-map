@@ -77,6 +77,7 @@ import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
 import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
 import scannerAsset from "@/assets/scanner-badge.jpg.asset.json";
 import bountyMapAsset from "@/assets/bounty-map-badge.jpg.asset.json";
+import guidesAsset from "@/assets/guides-badge.jpg.asset.json";
 
 const TRENDING_RADIUS_MILES = 2;
 
@@ -167,7 +168,7 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "guides", label: "Guides", icon: BookOpen, categories: [],
     guidesLink: true,
-    theme: { emoji: "🧭", active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
+    theme: { imageUrl: guidesAsset.url, active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
   },
   {
     id: "strange-sightings", label: "Strange Sightings & UFO", icon: Eye, categories: [],
