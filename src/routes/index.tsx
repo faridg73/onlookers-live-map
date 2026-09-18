@@ -1,16 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
-  BadgeCheck,
   ChevronDown,
   CircleDollarSign,
   Compass,
-  LockKeyhole,
+  History,
   Map,
+  MapPin,
   Radio,
   Search,
-  ShieldCheck,
   Sparkles,
   Users,
   Video,
@@ -29,6 +28,7 @@ import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { saveMyLocation } from "@/lib/hunter-location";
 
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 
 export const Route = createFileRoute("/")({
   validateSearch: (
@@ -62,12 +62,13 @@ function MapScreen() {
   const navigate = useNavigate();
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const [exploreOpen, setExploreOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [accountabilityOpen, setAccountabilityOpen] = useState(false);
+  const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
+  const dragStartY = useRef<number | null>(null);
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
@@ -87,6 +88,30 @@ function MapScreen() {
   useEffect(() => {
     if (b) select(b);
   }, [b, select]);
+
+  useEffect(() => {
+    setRecentPlaces(readRecentPlaces());
+  }, []);
+
+  const focusPlace = useCallback((place: { formatted: string; latitude: number; longitude: number; label?: string }) => {
+    setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+    setRecentPlaces(
+      rememberRecentPlace({
+        formatted: place.formatted,
+        latitude: place.latitude,
+        longitude: place.longitude,
+        label: place.label,
+      }),
+    );
+    setSearchOpen(false);
+  }, []);
+
+  const finishDrawerDrag = useCallback((clientY: number) => {
+    if (dragStartY.current === null) return;
+    const distance = clientY - dragStartY.current;
+    if (Math.abs(distance) > 36) setDrawerOpen(distance < 0);
+    dragStartY.current = null;
+  }, []);
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
@@ -141,18 +166,14 @@ function MapScreen() {
             Live eyes, anywhere
           </p>
         </div>
-        {/* Mobile: floating search pill that expands only when tapped, so the
-            map and pins stay fully visible. Desktop keeps the always-open box. */}
-        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:fixed md:bottom-[7.25rem] md:left-auto md:right-6 md:top-auto md:w-80">
+        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:left-1/2 md:w-[min(32rem,calc(100vw-14rem))] md:-translate-x-1/2">
           {searchOpen ? (
-            <div className="flex w-[min(20rem,calc(100vw-6.5rem))] items-start gap-1.5 md:w-80">
-              <div className="min-w-0 flex-1 rounded-lg border border-border bg-surface/95 p-1 shadow-lg backdrop-blur-xl md:rounded-xl md:p-1.5 md:shadow-2xl">
+            <div className="flex w-[min(21rem,calc(100vw-6.25rem))] items-start gap-1.5 md:w-full">
+              <div className="min-w-0 flex-1 rounded-full border border-border bg-surface/95 p-1 shadow-2xl backdrop-blur-xl">
                 <PlaceSearchInput
                   autoFocus
-                  onPick={(place) => {
-                    setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
-                    setSearchOpen(false);
-                  }}
+                  placeholder="Search a city, place or landmark"
+                  onPick={focusPlace}
                 />
               </div>
               <button
@@ -169,126 +190,76 @@ function MapScreen() {
               type="button"
               aria-label="Search for a place"
               onClick={() => setSearchOpen(true)}
-              className="grid size-11 place-items-center rounded-full border border-border bg-surface/95 text-signal shadow-lg backdrop-blur-xl md:hidden"
+              className="flex h-11 items-center gap-2 rounded-full border border-border bg-surface/95 px-4 text-foreground shadow-2xl backdrop-blur-xl md:w-full"
             >
-              <Search className="size-5" />
+              <Search className="size-4 shrink-0 text-signal" />
+              <span className="truncate text-sm font-bold text-muted-foreground">Search this area</span>
             </button>
           )}
-          {/* Desktop always-open search box */}
-          <div className="hidden rounded-xl border border-border bg-surface/95 p-1.5 shadow-2xl backdrop-blur-xl md:block">
-            <PlaceSearchInput
-              onPick={(place) => {
-                setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
-              }}
-            />
-          </div>
         </div>
       </header>
 
-      <div className="pointer-events-auto absolute inset-x-3 bottom-[6.5rem] z-40 mx-auto flex w-auto max-w-lg flex-col gap-2">
-        <section className="overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => {
-              setAccountabilityOpen((open) => !open);
-              setExploreOpen(false);
-            }}
-            aria-expanded={accountabilityOpen}
-            className="h-auto min-h-12 w-full justify-start rounded-none px-4 py-2.5 text-foreground hover:bg-surface-raised"
-          >
-            <ShieldCheck className="size-5 text-signal" />
-            <span className="min-w-0 flex-1 text-left">
-              <span className="block text-xs font-extrabold uppercase tracking-[0.1em] text-signal">
-                Real-world accountability
-              </span>
-              <span className="block truncate text-[0.68rem] text-muted-foreground">
-                Bounties backed by locked credits and verified proof
-              </span>
-            </span>
-            <ChevronDown className={`size-4 transition-transform duration-300 ${accountabilityOpen ? "rotate-180" : ""}`} />
-          </Button>
-          <div
-            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
-              accountabilityOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="min-h-0 overflow-hidden">
-              <div className="grid grid-cols-3 border-t border-border bg-surface-raised/80 px-3 py-3">
-                {[
-                  { icon: CircleDollarSign, label: "Post", text: "Set a real request" },
-                  { icon: LockKeyhole, label: "Lock", text: "Credits stay protected" },
-                  { icon: BadgeCheck, label: "Verify", text: "Release after proof" },
-                ].map(({ icon: Icon, label, text }, index) => (
-                  <div key={label} className={`px-2 ${index > 0 ? "border-l border-border" : ""}`}>
-                    <Icon className="size-4 text-signal" aria-hidden />
-                    <p className="mt-1 text-xs font-extrabold text-foreground">{label}</p>
-                    <p className="mt-0.5 text-[0.62rem] leading-snug text-muted-foreground">{text}</p>
-                  </div>
+      <section
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto w-full border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
+        aria-label="Map actions"
+      >
+        <button
+          type="button"
+          aria-expanded={drawerOpen}
+          aria-label={drawerOpen ? "Collapse map drawer" : "Expand map drawer"}
+          onClick={() => setDrawerOpen((open) => !open)}
+          onPointerDown={(event) => {
+            dragStartY.current = event.clientY;
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerUp={(event) => finishDrawerDrag(event.clientY)}
+          onPointerCancel={() => {
+            dragStartY.current = null;
+          }}
+          className="flex h-12 w-full touch-none flex-col items-center justify-center gap-1 text-foreground"
+        >
+          <span className="h-1 w-10 rounded-full bg-muted-foreground/55" aria-hidden />
+          <span className="flex w-full items-center justify-between px-4 text-xs font-extrabold uppercase tracking-[0.1em]">
+            Explore nearby
+            <ChevronDown className={`size-4 text-signal transition-transform ${drawerOpen ? "rotate-180" : ""}`} />
+          </span>
+        </button>
+
+        <div className={`overflow-y-auto overscroll-contain px-4 transition-opacity ${drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+          <div className="border-t border-border pb-3 pt-3">
+            <div className="mb-2 flex items-center gap-2">
+              <History className="size-4 text-signal" aria-hidden />
+              <h2 className="text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">Recent searches</h2>
+            </div>
+            {recentPlaces.length > 0 ? (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {recentPlaces.map((place) => (
+                  <Button
+                    key={`${place.formatted}-${place.at}`}
+                    type="button"
+                    variant="outline"
+                    onClick={() => focusPlace(place)}
+                    className="h-9 max-w-48 shrink-0 gap-1.5 rounded-full border-border bg-background px-3 text-xs text-foreground"
+                  >
+                    <MapPin className="size-3.5 shrink-0 text-signal" />
+                    <span className="truncate">{place.label}</span>
+                  </Button>
                 ))}
               </div>
-            </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="flex w-full items-center gap-2 rounded-md border border-dashed border-border bg-background px-3 py-2 text-left text-xs text-muted-foreground"
+              >
+                <Search className="size-4 shrink-0 text-signal" />
+                Search for a place to build your history.
+              </button>
+            )}
           </div>
-        </section>
 
-        <section className="overflow-hidden rounded-lg border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => {
-            setExploreOpen((open) => !open);
-            setAccountabilityOpen(false);
-          }}
-          aria-expanded={exploreOpen}
-          className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
-        >
-          <Search className="size-5 text-signal md:size-6" />
-          <span className="min-w-0 flex-1 text-left text-sm font-extrabold md:text-base">What would you like to see?</span>
-          <ChevronDown className={`size-4 transition-transform duration-300 md:size-5 ${exploreOpen ? "rotate-180" : ""}`} />
-        </Button>
-
-        <div
-          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
-            exploreOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-        >
-          <div className="min-h-0 max-h-[min(38vh,17rem)] overflow-y-auto overscroll-contain">
-            <div className="border-b border-border bg-surface-raised/80 px-3 pb-2.5 pt-3">
-              <div className="flex flex-col gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setMapFilter("all")}
-                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
-                >
-                  <Map className="size-4 shrink-0 text-signal" />
-                  <span className="flex-1 text-left">Local Bounty Map</span>
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-signal px-1 text-[0.6rem] font-extrabold leading-none text-background">
-                    {visible.length}
-                  </span>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => void navigate({ to: "/community" })}
-                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
-                >
-                  <Users className="size-4 shrink-0 text-signal" />
-                  <span className="flex-1 text-left">Community Vibe</span>
-                  <ChevronDown className="size-4 -rotate-90 text-muted-foreground" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setGuidesOpen(true)}
-                  className="flex h-auto min-h-12 w-full items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left text-sm font-bold text-foreground"
-                >
-                  <BookOpen className="size-4 shrink-0 text-signal" />
-                  <span className="flex-1 text-left">Learning &amp; Guides</span>
-                  <ChevronDown className="size-4 -rotate-90 text-muted-foreground" />
-                </Button>
-              </div>
-              <div className="mt-2 flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
+          <div className="border-t border-border py-3">
+            <div className="flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
                 {(
                   [
                     ["all", "All"],
@@ -313,42 +284,46 @@ function MapScreen() {
                     {label}
                   </Button>
                 ))}
-              </div>
-              <p className="mt-1.5 text-[0.65rem] text-muted-foreground" aria-live="polite">
-                {mapFilter === "nearby" && !userPosition
-                  ? `Allow location access to see requests within ${radius} ${unit}.`
-                  : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
-              </p>
             </div>
+            <p className="mt-2 text-[0.65rem] text-muted-foreground" aria-live="polite">
+              {mapFilter === "nearby" && !userPosition
+                ? `Allow location access to see requests within ${radius} ${unit}.`
+                : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 border-t border-border py-3">
+            {[
+              { label: "Bounty map", icon: Map, action: () => setMapFilter("all") },
+              { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
+              { label: "Guides", icon: BookOpen, action: () => setGuidesOpen(true) },
+              { label: "Go live", icon: Radio, action: () => void navigate({ to: "/hunt" }) },
+            ].map(({ label, icon: Icon, action }) => (
+              <Button
+                key={label}
+                type="button"
+                variant="outline"
+                onClick={action}
+                className="h-16 min-w-0 flex-col gap-1 rounded-md border-border bg-background px-1 text-[0.68rem] font-bold text-foreground"
+              >
+                <Icon className="size-4 text-signal" />
+                <span className="w-full truncate">{label}</span>
+              </Button>
+            ))}
           </div>
         </div>
 
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => void navigate({ to: "/hunt" })}
-          className="h-14 w-full justify-start rounded-none border-b border-border px-4 text-foreground hover:bg-surface-raised"
-        >
-          <Radio className="size-5 text-live" />
-          <span className="flex-1 text-left text-sm font-extrabold">Live Stream</span>
-          <Sparkles className="size-4 text-muted-foreground" />
-        </Button>
-
+        <div className="border-t border-border bg-surface px-4 py-3">
         <Button
           type="button"
           onClick={() => void navigate({ to: "/post" })}
-          className="h-14 w-full justify-start rounded-none bg-signal px-4 text-signal-foreground shadow-[0_-1px_0_0_var(--color-signal),0_0_24px_0_color-mix(in_oklab,var(--color-signal)_45%,transparent)] transition-colors hover:bg-signal/90"
+          className="h-12 w-full justify-center rounded-md bg-signal px-4 text-signal-foreground shadow-[0_0_24px_0_color-mix(in_oklab,var(--color-signal)_38%,transparent)] transition-colors hover:bg-signal/90"
         >
           <CircleDollarSign className="size-5" />
-          <span className="flex-1 text-left text-sm font-extrabold uppercase tracking-[0.06em]">
-            Post a Bounty
-          </span>
-          <span className="rounded-full bg-signal-foreground/15 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em]">
-            Primary
-          </span>
+          <span className="text-sm font-extrabold uppercase tracking-[0.08em]">Post a Bounty</span>
         </Button>
-        </section>
-      </div>
+        </div>
+      </section>
 
 
       <BountyBottomSheet
