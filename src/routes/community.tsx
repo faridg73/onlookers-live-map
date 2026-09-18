@@ -66,6 +66,9 @@ export const Route = createFileRoute("/community")({
 });
 
 function CommunityHub() {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
