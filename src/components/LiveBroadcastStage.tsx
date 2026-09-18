@@ -29,7 +29,8 @@ export function LiveBroadcastStage({
 }: {
   title: string;
   place: string;
-  onEnd: () => void;
+  /** Called when the stage closes, with what happened to the recording. */
+  onEnd: (result?: { saved: boolean; seconds: number | null }) => void;
   /** Camera side chosen in the pre-stream checks (handled by the native camera). */
   initialFacing?: "environment" | "user";
   /** Mic state chosen in the pre-stream checks (handled by the native camera). */
