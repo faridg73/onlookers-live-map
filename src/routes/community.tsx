@@ -509,8 +509,10 @@ function CommunityHub() {
                         icon={Icon}
                         coverClass={visual.coverClass}
                       />
-                      <span className="absolute left-1.5 top-1.5 grid size-6 place-items-center rounded-md bg-background/70 text-sm backdrop-blur-sm" aria-hidden="true">
-                        {lane.icon}
+                      <span className="absolute left-1.5 top-1.5 grid size-7 place-items-center overflow-hidden rounded-md border border-signal/35 bg-background/80 text-sm backdrop-blur-sm" aria-hidden="true">
+                        {lane.iconImageUrl ? (
+                          <img src={lane.iconImageUrl} alt="" className="size-full object-cover p-0.5" />
+                        ) : lane.icon}
                       </span>
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">

@@ -71,6 +71,6 @@ Strange Sightings & UFO browse category
 - [x] Verify mobile, desktop, and type safety
 
 Breaking News custom category artwork
-- [ ] Replace the Breaking News emoji with the uploaded neon badge
-- [ ] Preserve its existing filtering, modal, and routing behavior
+- [x] Replace the Breaking News emoji with the uploaded neon badge
+- [x] Preserve its existing filtering, modal, and routing behavior
 - [ ] Verify sizing and interaction on mobile and desktop
