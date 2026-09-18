@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3 } from "lucide-react";
+import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
+import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -66,6 +66,9 @@ export const Route = createFileRoute("/community")({
 });
 
 function CommunityHub() {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -260,9 +263,25 @@ function CommunityHub() {
     <main className="min-h-dvh overflow-x-hidden bg-background pb-28">
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
-          <Compass className="size-4" /> Discover
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
+            <Compass className="size-4" /> Discover
+          </p>
+          <button
+            type="button"
+            aria-label="Close community"
+            onClick={() => {
+              if (canGoBack) {
+                router.history.back();
+                return;
+              }
+              void navigate({ to: "/" });
+            }}
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface text-foreground transition-colors hover:border-signal hover:text-signal"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
         <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-foreground sm:text-4xl">
           See what your city is doing now
         </h1>
@@ -435,7 +454,7 @@ function CommunityHub() {
             className="no-scrollbar grid max-h-[70dvh] grid-cols-4 gap-2 overflow-y-auto px-3 pb-4 sm:gap-2.5 md:grid-cols-4 md:gap-3"
           >
             {BROADCAST_CATEGORIES.map((lane) => {
-              const visual = COMMUNITY_VISUALS[lane.communityCategory];
+              const visual = COMMUNITY_VISUALS[lane.communityCategory] ?? COMMUNITY_VISUALS.general;
               const Icon = visual.icon;
               const previewUrl = categoryPreviews[lane.communityCategory];
               const active = categoryId === lane.id;
@@ -501,7 +520,7 @@ function CommunityHub() {
           className="no-scrollbar flex flex-row snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
         >
           {COMMUNITY_CATEGORIES.map((c) => {
-            const visual = COMMUNITY_VISUALS[c.id];
+            const visual = COMMUNITY_VISUALS[c.id] ?? COMMUNITY_VISUALS.general;
             const Icon = visual.icon;
             const previewUrl = categoryPreviews[c.id];
             const active = category === c.id;
@@ -654,6 +673,7 @@ function CommunityHub() {
         </div>
       ) : (
         <section className="mt-5 px-5 sm:px-8">
+          <SectionBoundary label="The community feed">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
           {!loading && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
@@ -711,6 +731,7 @@ function CommunityHub() {
               />
             </div>
           )}
+          </SectionBoundary>
         </section>
       )}
 
