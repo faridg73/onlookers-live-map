@@ -15,4 +15,4 @@ Home map category filtering
 - [x] Add state for six category tiles
 - [x] Filter map markers by the active category lane
 - [x] Show a contextual result feed inside the drawer
-- [ ] Verify tile filtering and result selection
+- [x] Verify tile filtering and result selection
