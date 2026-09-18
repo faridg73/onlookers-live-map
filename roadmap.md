@@ -29,3 +29,9 @@ Traffic map mode
 - [x] Highlight incident heat zones in yellow and orange
 - [x] Show vehicle incidents and closures with timestamps
 - [x] Verify traffic mode across phone and desktop
+
+Public Gathering map mode
+- [x] Add crowd-density heat circles and venue pins
+- [x] Open selected clusters with estimated headcounts
+- [x] List live onlooker streams within the cluster
+- [x] Verify gathering mode across phone and desktop
