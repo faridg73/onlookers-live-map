@@ -37,6 +37,7 @@ import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import {
+  BROADCAST_CATEGORIES,
   broadcastCategoryById,
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
