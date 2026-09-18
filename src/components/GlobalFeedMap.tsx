@@ -12,6 +12,7 @@ import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 import type { CommunityPost } from "@/lib/community";
+import { readMapViewport, writeSessionState } from "@/lib/session-state";
 
 /**
  * Worldwide map of clips that requesters already paid for. Travellers can watch
@@ -23,6 +24,7 @@ export function GlobalFeedMap({
   categoryLabel,
   subcategory,
   reports = [],
+  viewportStorageKey,
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
@@ -30,6 +32,7 @@ export function GlobalFeedMap({
   categoryLabel?: string | null;
   subcategory?: string | null;
   reports?: CommunityPost[];
+  viewportStorageKey?: string;
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -39,6 +42,7 @@ export function GlobalFeedMap({
   const map = useRef<google.maps.Map | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
   const reportMarkers = useRef<google.maps.Marker[]>([]);
+  const restoredViewport = useRef(false);
 
   useEffect(() => {
     void listGlobalClips({ data: { limit: 30 } })
@@ -51,10 +55,18 @@ export function GlobalFeedMap({
     loadGoogleMaps()
       .then((maps) => {
         if (cancelled || !holder.current) return;
+        const savedViewport = readMapViewport(viewportStorageKey);
+        restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
-          center: REGIONAL_CENTER,
-          zoom: 2,
+          center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
+          zoom: savedViewport?.zoom ?? 2,
+        });
+        map.current.addListener("idle", () => {
+          const center = map.current?.getCenter();
+          const zoom = map.current?.getZoom();
+          if (!viewportStorageKey || !center || typeof zoom !== "number") return;
+          writeSessionState(viewportStorageKey, { lat: center.lat(), lng: center.lng(), zoom });
         });
         setMapReady(true);
       })
@@ -62,7 +74,7 @@ export function GlobalFeedMap({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [viewportStorageKey]);
 
   const filteredClips = useMemo(() => {
     const categoryNeedle = categoryLabel?.toLowerCase().trim();
@@ -113,7 +125,7 @@ export function GlobalFeedMap({
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;
     });
-    if (!focus) {
+    if (!focus && !restoredViewport.current) {
       const bounds = new google.maps.LatLngBounds();
       pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
       map.current.fitBounds(bounds, 48);

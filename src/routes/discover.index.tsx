@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
@@ -18,6 +18,8 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
+import { useSessionScroll } from "@/hooks/use-session-scroll";
+import { readSessionState, writeSessionState } from "@/lib/session-state";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 
@@ -52,6 +54,20 @@ function DiscoverHome() {
   const { area } = useDiscoveryArea();
   const [view, setView] = useState<"grid" | "map">("grid");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const restored = useRef(false);
+
+  useSessionScroll("onlooker:scroll:discover");
+
+  useEffect(() => {
+    const saved = readSessionState<{ view?: "grid" | "map"; selectedId?: string | null }>("onlooker:view:discover", {});
+    if (saved.view === "grid" || saved.view === "map") setView(saved.view);
+    setSelectedId(saved.selectedId ?? null);
+    restored.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId });
+  }, [view, selectedId]);
 
   const eventsGroup = discoveryGroupBySlug("events");
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
@@ -131,7 +147,7 @@ function DiscoverHome() {
           </button>
           <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
             <SectionBoundary label="The map">
-              <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} />
+              <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} viewportStorageKey="onlooker:map:discover" />
             </SectionBoundary>
           </div>
           {selected ? (

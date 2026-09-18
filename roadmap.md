@@ -127,3 +127,10 @@ Home Events & Arts neon category artwork
 - [x] Enforce Level 2/3 validation and one vote per member in the backend
 - [x] Calculate report trust scores and Confirmed, Disputed, Unverified, or Expired statuses
 - [x] Show dynamic report statuses on neighborhood map markers
+
+## Preserve navigation state
+- [x] Restore Community and Explore feed scroll positions within the browser session
+- [x] Persist Community filters, tabs, map/feed view, and focused report
+- [x] Persist Explore and Browse Places tabs plus selected map item
+- [x] Restore Community, Explore, and Browse Places map center and zoom
+- [x] Verify restoration through back navigation on phone and desktop
