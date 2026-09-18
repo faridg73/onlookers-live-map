@@ -1152,7 +1152,7 @@ function MapScreen() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 border-t border-border py-3">
+          <div className={`grid grid-cols-2 gap-2 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
             {[
               { label: "Bounty map", icon: Map, action: () => setMapFilter("all") },
               { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
