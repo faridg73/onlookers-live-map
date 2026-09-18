@@ -195,11 +195,19 @@ export type CommunityPost = {
   authorAvatar: string | null;
   hunterLevel: number;
   authorVerified: boolean;
+  reportIncidentType: string | null;
+  reportRadiusM: number | null;
+  mediaAnalysisStatus: "not_required" | "analyzing" | "complete";
+  reporterTrustLevel: number | null;
+  validationCount: number;
+  flagCount: number;
+  trustScore: number;
+  reportStatus: "confirmed" | "disputed" | "unverified" | "expired" | null;
 };
 
 const BUCKET = "chat-attachments";
 const COLUMNS =
-  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at";
+  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at, report_incident_type, report_radius_m, media_analysis_status, reporter_trust_level, validation_count, flag_count, trust_score, report_status";
 
 function isPinned(post: { pinnedUntil: string | null }) {
   return Boolean(post.pinnedUntil && new Date(post.pinnedUntil).getTime() > Date.now());
@@ -240,6 +248,14 @@ async function listPublicCommunityPosts(
     authorAvatar: null,
     hunterLevel: r.hunter_level ?? 1,
     authorVerified: Boolean(r.author_verified),
+    reportIncidentType: r.report_incident_type ?? null,
+    reportRadiusM: r.report_radius_m ?? null,
+    mediaAnalysisStatus: r.media_analysis_status === "analyzing" || r.media_analysis_status === "complete" ? r.media_analysis_status : "not_required",
+    reporterTrustLevel: r.reporter_trust_level ?? null,
+    validationCount: r.validation_count ?? 0,
+    flagCount: r.flag_count ?? 0,
+    trustScore: r.trust_score ?? 0,
+    reportStatus: r.report_status === "confirmed" || r.report_status === "disputed" || r.report_status === "expired" ? r.report_status : r.report_incident_type ? "unverified" : null,
   }));
 }
 
@@ -297,6 +313,14 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
     authorAvatar: authors.get(r.user_id)?.avatar ?? null,
     hunterLevel: authors.get(r.user_id)?.level ?? 1,
     authorVerified: authors.get(r.user_id)?.verified ?? false,
+    reportIncidentType: r.report_incident_type ?? null,
+    reportRadiusM: r.report_radius_m ?? null,
+    mediaAnalysisStatus: r.media_analysis_status === "analyzing" || r.media_analysis_status === "complete" ? r.media_analysis_status : "not_required",
+    reporterTrustLevel: r.reporter_trust_level ?? null,
+    validationCount: r.validation_count ?? 0,
+    flagCount: r.flag_count ?? 0,
+    trustScore: r.trust_score ?? 0,
+    reportStatus: r.report_status === "confirmed" || r.report_status === "disputed" || r.report_status === "expired" ? r.report_status : r.report_incident_type ? "unverified" : null,
   }));
 
   return posts.sort((a, b) => {
@@ -346,6 +370,9 @@ export async function createCommunityPost(input: {
   flashHours?: number;
   latitude?: number | null;
   longitude?: number | null;
+  reportIncidentType?: string | null;
+  reportRadiusM?: number | null;
+  mediaAnalysisStatus?: "not_required" | "analyzing" | "complete";
 }): Promise<string> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to post.");
@@ -369,11 +396,26 @@ export async function createCommunityPost(input: {
       expires_at: expiresAt,
       latitude: input.latitude ?? null,
       longitude: input.longitude ?? null,
+      report_incident_type: input.reportIncidentType ?? null,
+      report_radius_m: input.reportRadiusM ?? null,
+      media_analysis_status: input.mediaAnalysisStatus ?? "not_required",
     })
     .select("id")
     .single();
   if (error) throw new Error(error.message);
   return data.id;
+}
+
+export async function voteOnCommunityReport(postId: string, vote: "validate" | "flag") {
+  const { data, error } = await supabase.rpc("vote_on_community_report", {
+    _post_id: postId,
+    _vote: vote,
+  });
+  if (error) {
+    if (/duplicate key/i.test(error.message)) throw new Error("You already responded to this report.");
+    throw new Error(error.message);
+  }
+  return data?.[0] ?? null;
 }
 
 /** Spends Credits to pin a post to the top of Discover; returns the new end time. */
