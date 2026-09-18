@@ -65,6 +65,12 @@ const MAP_CATEGORY_TILES: Array<{
   trending?: boolean;
   viral?: boolean;
   creators?: boolean;
+  crime?: boolean;
+  scanner?: boolean;
+  liveStreams?: boolean;
+  bountyMap?: boolean;
+  communityLink?: boolean;
+  guidesLink?: boolean;
   theme?: { emoji: string; active: string; badge: string };
 }> = [
   {
@@ -106,6 +112,36 @@ const MAP_CATEGORY_TILES: Array<{
   {
     id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
     theme: { emoji: "👑", active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
+  },
+  {
+    id: "crime", label: "Crime Reports", icon: Siren, categories: [],
+    crime: true,
+    theme: { emoji: "🚨", active: "border-rose-500 bg-rose-500/20 text-rose-50", badge: "text-rose-400" },
+  },
+  {
+    id: "scanner", label: "Scanner", icon: Radio, categories: [],
+    scanner: true,
+    theme: { emoji: "📻", active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
+  },
+  {
+    id: "livestream", label: "Live Stream", icon: Video, categories: [],
+    liveStreams: true,
+    theme: { emoji: "📹", active: "border-lime-400 bg-lime-400/20 text-lime-50", badge: "text-lime-400" },
+  },
+  {
+    id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
+    bountyMap: true,
+    theme: { emoji: "🗺️", active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
+  },
+  {
+    id: "community", label: "Community", icon: Users, categories: ["community"],
+    communityLink: true,
+    theme: { emoji: "👥", active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
+  },
+  {
+    id: "guides", label: "Guides", icon: BookOpen, categories: [],
+    guidesLink: true,
+    theme: { emoji: "🧭", active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
   },
 ];
 
