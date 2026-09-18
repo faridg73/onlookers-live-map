@@ -14,7 +14,7 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { CreatorVibePills } from "@/components/CreatorVibePills";
+import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
@@ -28,12 +28,14 @@ import {
   type BroadcastAudience,
   type BroadcastEligibility,
 } from "@/lib/broadcast";
-import { COMMUNITY_CATEGORIES, type CommunityCategory } from "@/lib/community";
+import {
+  broadcastCategoryById,
+  type BroadcastCategoryId,
+} from "@/lib/broadcast-categories";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { reverseGeocode } from "@/lib/geocode.functions";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
-import { CREATOR_VIBES } from "@/lib/creator-vibes";
 
 /**
  * Free Social Broadcast composer: a verified creator names what they are
@@ -47,8 +49,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [body, setBody] = useState("");
   const [place, setPlace] = useState("");
   const [spot, setSpot] = useState<PickedLocation | null>(null);
-  const [category, setCategory] = useState<CommunityCategory>("meetups");
-  const [vibeId, setVibeId] = useState<string | null>("foodie");
+  const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("arts-performances");
+  const [subcategory, setSubcategory] = useState<string | null>(null);
   const [hours, setHours] = useState<number>(1);
   const [audience, setAudience] = useState<BroadcastAudience>("public");
   /** Pre-stream hardware checks carried into the live stage. */
@@ -62,7 +64,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const human = useHumanCheck("community-post");
   // Live actions need a mobile number confirmed by text, social sign-ins included.
   const phoneGate = usePhoneGate("before you go live");
-  const selectedVibe = CREATOR_VIBES.find((vibe) => vibe.id === vibeId) ?? null;
+  const selectedCategory = broadcastCategoryById(categoryId);
 
   useEffect(() => {
     let active = true;
@@ -119,13 +121,13 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       await startFreeBroadcast({
-        category,
+        category: selectedCategory.communityCategory,
         title: title.trim(),
         body: body.trim(),
         place: place.trim(),
         hours,
         audience,
-        tags: selectedVibe ? [selectedVibe.tag, selectedVibe.label.toLowerCase()] : [],
+        tags: [selectedCategory.id, selectedCategory.label.toLowerCase(), ...(subcategory ? [subcategory.toLowerCase()] : [])],
         latitude: spot.latitude,
         longitude: spot.longitude,
       });
@@ -219,38 +221,14 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </label>
 
       <div className="rounded-xl border border-border bg-background p-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="block flex-1 space-y-1.5">
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-              Broadcast category
-            </span>
-            <select
-              value={category}
-              onChange={(event) => {
-                setCategory(event.target.value as CommunityCategory);
-                setVibeId(null);
-              }}
-              className="field"
-            >
-              {COMMUNITY_CATEGORIES.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="max-w-xs text-xs leading-snug text-muted-foreground">
-            Pick a lane or tap a creator vibe so viewers can find your stream.
-          </p>
-        </div>
-        <CreatorVibePills
-          activeId={vibeId}
-          allLabel="No vibe"
-          className="mt-3"
-          onSelect={(vibe) => {
-            setVibeId(vibe?.id ?? null);
-            if (vibe) setCategory(vibe.category);
-          }}
+        <p className="mb-2 text-[0.65rem] font-bold uppercase text-muted-foreground">
+          Category & vibe
+        </p>
+        <BroadcastCategoryPicker
+          categoryId={categoryId}
+          subcategory={subcategory}
+          onCategoryChange={setCategoryId}
+          onSubcategoryChange={setSubcategory}
         />
       </div>
 
