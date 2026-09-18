@@ -168,7 +168,7 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface">
       <div
-        className={`relative w-full ${compact ? "h-[10rem] sm:h-[12rem]" : "h-[18rem] sm:h-[22rem]"}`}
+        className={`relative isolate w-full ${compact ? "h-[10rem] sm:h-[12rem]" : "h-[18rem] sm:h-[22rem]"}`}
         onTouchStart={(event) => event.stopPropagation()}
       >
         <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />

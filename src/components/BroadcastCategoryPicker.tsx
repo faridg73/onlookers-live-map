@@ -37,8 +37,16 @@ export function BroadcastCategoryPicker({
     const close = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
+    // Close when focus (tap into a text field, keyboard nav) moves elsewhere.
+    const blurOut = (event: FocusEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
     window.addEventListener("pointerdown", close);
-    return () => window.removeEventListener("pointerdown", close);
+    window.addEventListener("focusin", blurOut);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("focusin", blurOut);
+    };
   }, [open]);
 
   return (
@@ -69,7 +77,7 @@ export function BroadcastCategoryPicker({
         <div
           role="listbox"
           aria-label="Broadcast categories"
-          className="absolute inset-x-0 top-[calc(100%+0.4rem)] z-40 max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-signal/35 bg-popover p-1.5 shadow-2xl"
+          className="absolute inset-x-0 top-[calc(100%+0.4rem)] z-50 max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-signal/35 bg-popover p-1.5 shadow-2xl"
         >
           <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-popover px-2 py-2 text-[0.62rem] font-extrabold uppercase text-muted-foreground">
             <Layers3 className="size-3.5 text-signal" /> {menuLabel}
