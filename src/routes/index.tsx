@@ -590,7 +590,7 @@ function MapScreen() {
           </div>
 
           <div className="border-t border-border py-3">
-            <div className="grid grid-cols-3 gap-2" aria-label="Map categories">
+            <div className={`grid grid-cols-3 gap-2 ${activeCategoryTile ? "hidden" : ""}`} aria-label="Map categories">
               {orderedCategoryTiles.map((tile) => {
                 const Icon = tile.icon;
                 const active = categoryTile === tile.id;
@@ -1152,7 +1152,7 @@ function MapScreen() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 border-t border-border py-3">
+          <div className={`grid grid-cols-2 gap-2 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
             {[
               { label: "Bounty map", icon: Map, action: () => setMapFilter("all") },
               { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
