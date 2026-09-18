@@ -168,6 +168,36 @@ function isCrisisRequest(request: LiveRequest) {
   return CRISIS_TERMS.some((term) => text.includes(term));
 }
 
+const CRIME_TERMS = [
+  "crime", "theft", "stolen", "robbery", "police", "cops", "arrest", "shooting", "vandalism", "suspicious", "mugging", "assault", "broke into",
+];
+
+function isCrimeRequest(request: LiveRequest) {
+  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
+  return CRIME_TERMS.some((term) => text.includes(term));
+}
+
+const SCANNER_CATEGORIES: Array<CategoryId> = ["transit", "parking", "vehicles"];
+
+function tileMatches(
+  tile: (typeof MAP_CATEGORY_TILES)[number],
+  request: LiveRequest,
+  userPosition: MapPosition | null,
+): boolean {
+  if (tile.creators) return false;
+  if (tile.trending) {
+    return Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES);
+  }
+  if (tile.viral || tile.bountyMap) return true;
+  if (tile.crisis) return isCrisisRequest(request);
+  if (tile.crime) return isCrimeRequest(request);
+  if (tile.scanner) return isCrisisRequest(request) || SCANNER_CATEGORIES.includes(request.category);
+  if (tile.liveStreams) {
+    return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
+  }
+  return Boolean(request.category && tile.categories.includes(request.category));
+}
+
 export const Route = createFileRoute("/")({
   validateSearch: (
     search: Record<string, unknown>,
@@ -288,23 +318,13 @@ function MapScreen() {
   const trendingMode = activeCategoryTile?.trending === true;
   const viralMode = activeCategoryTile?.viral === true;
   const creatorsMode = activeCategoryTile?.creators === true;
-  const visible = useMemo(
-    () =>
-      activeCategoryTile
-        ? (activeCategoryTile.viral || activeCategoryTile.creators ? requests : statusFiltered).filter((request) =>
-            activeCategoryTile.trending
-              ? Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES)
-              : activeCategoryTile.viral
-              ? true
-              : activeCategoryTile.creators
-              ? false
-              : activeCategoryTile.crisis
-              ? isCrisisRequest(request)
-              : request.category && activeCategoryTile.categories.includes(request.category),
-          )
-        : statusFiltered,
-    [activeCategoryTile, requests, statusFiltered],
-  );
+  const scannerMode = activeCategoryTile?.scanner === true;
+  const visible = useMemo(() => {
+    if (!activeCategoryTile) return statusFiltered;
+    if (activeCategoryTile.creators) return [];
+    const pool = activeCategoryTile.viral ? requests : statusFiltered;
+    return pool.filter((request) => tileMatches(activeCategoryTile, request, userPosition));
+  }, [activeCategoryTile, requests, statusFiltered, userPosition]);
 
   useEffect(() => {
     if (!trendingMode || !userPosition) return;
