@@ -185,6 +185,8 @@ export function BountyVideoDialog({
           </DialogDescription>
         </DialogHeader>
         <AccessPasscode request={request} />
+        <SitePinVerification requestId={request.dbId ?? null} onState={setPinState} />
+
         <BountyChat requestKey={chatKey(request)} />
 
         {!user ? (
@@ -211,7 +213,7 @@ export function BountyVideoDialog({
               />
               <button
                 type="button"
-                disabled={uploading || closed}
+                disabled={uploading || closed || pinLocked}
                 onClick={() => setCapturing(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
               >
@@ -221,10 +223,16 @@ export function BountyVideoDialog({
                   </>
                 ) : (
                   <>
-                    <Camera className="size-4" /> {closed ? "Submissions closed" : "Film live video"}
+                    <Camera className="size-4" />{" "}
+                    {closed
+                      ? "Submissions closed"
+                      : pinLocked
+                        ? "Enter the on-site PIN first"
+                        : "Film live video"}
                   </>
                 )}
               </button>
+
               <p className="text-center text-[0.68rem] text-muted-foreground">
                 Live camera captures only, gallery videos and screenshots can't be submitted.
                 Film the crowd, street, tailgate, or venue surroundings.
