@@ -21,12 +21,17 @@ export const MEDIA_BUCKETS = {
     allowed: ["video/", "image/"],
     label: "post media",
   },
+  "dispute-evidence": {
+    maxBytes: 20 * 1024 * 1024,
+    allowed: ["video/", "image/", "application/pdf"],
+    label: "dispute evidence",
+  },
 } as const;
 
 export type MediaBucket = keyof typeof MEDIA_BUCKETS;
 
 const inputSchema = z.object({
-  bucket: z.enum(["bounty-videos", "chat-attachments", "posts"]),
+  bucket: z.enum(["bounty-videos", "chat-attachments", "posts", "dispute-evidence"]),
   path: z.string().min(3).max(300),
   contentType: z.string().min(3).max(120),
   sizeBytes: z.number().int().positive(),
