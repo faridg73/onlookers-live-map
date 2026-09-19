@@ -55,6 +55,8 @@
   --color-signal-foreground: var(--signal-foreground);
   --color-live: var(--live);
   --color-crisis: var(--crisis);
+  --color-warning-note: var(--warning-note);
+
   --color-traffic-slow: var(--traffic-slow);
   --color-traffic-heavy: var(--traffic-heavy);
   --color-gathering-low: var(--gathering-low);
@@ -183,6 +185,8 @@
   --cyan-glow: oklch(0.75 0.18 195 / 0.35);
   --live: oklch(0.79 0.16 165);
   --crisis: oklch(0.64 0.24 27);
+  --warning-note: oklch(0.85 0.1 230); /* light blue #7DD3FC */
+
   --traffic-slow: oklch(0.86 0.18 93);
   --traffic-heavy: oklch(0.72 0.19 55);
   --gathering-low: oklch(0.82 0.16 180);
