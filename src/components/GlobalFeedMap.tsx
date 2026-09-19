@@ -112,6 +112,12 @@ export function GlobalFeedMap({
     };
   }, [focus, mapReady]);
 
+  // Every located report, whatever its community-verification status.
+  const pinnedReports = useMemo(
+    () => reports.filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null),
+    [reports],
+  );
+
   // Draw one marker per located clip.
   useEffect(() => {
     if (!map.current || pinned.length === 0) return;
@@ -125,16 +131,29 @@ export function GlobalFeedMap({
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;
     });
-    if (!focus && !restoredViewport.current) {
-      const bounds = new google.maps.LatLngBounds();
-      pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
-      map.current.fitBounds(bounds, 48);
-    }
     return () => {
       markers.current.forEach((m) => m.setMap(null));
       markers.current = [];
     };
-  }, [pinned, mapReady, focus]);
+  }, [pinned, mapReady]);
+
+  // Frame clips and reports together, so a fresh report is never left off-screen.
+  useEffect(() => {
+    if (!map.current || focus || restoredViewport.current) return;
+    const spots = [
+      ...pinned.map((c) => ({ lat: c.latitude!, lng: c.longitude! })),
+      ...pinnedReports.map((p) => ({ lat: p.latitude!, lng: p.longitude! })),
+    ];
+    if (spots.length === 0) return;
+    if (spots.length === 1) {
+      map.current.setCenter(spots[0]!);
+      map.current.setZoom(14);
+      return;
+    }
+    const bounds = new google.maps.LatLngBounds();
+    spots.forEach((spot) => bounds.extend(spot));
+    map.current.fitBounds(bounds, 48);
+  }, [pinned, pinnedReports, mapReady, focus]);
 
   useEffect(() => {
     if (!map.current) return;
