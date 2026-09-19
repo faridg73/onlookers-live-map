@@ -310,7 +310,7 @@ function ReportDetailCard({ post, onClose }: { post: CommunityPost; onClose: () 
           <BadgeCheck className="size-3.5 text-signal" />
           {post.authorName}
           {post.authorVerified && <span className="font-bold text-signal"> · verified</span>}
-          <span className="text-muted-foreground/70"> · Lv {post.hunterLevel}</span>
+          <span className="text-muted-foreground/70"> · Trust Lv {post.reporterTrustLevel ?? 1}</span>
         </span>
         {time && (
           <span className="inline-flex items-center gap-1" title={time.absolute}>
