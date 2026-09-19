@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Flame, Ticket } from "lucide-react";
 import { AreaPicker } from "@/components/AreaPicker";
 import { CreatorVibePills } from "@/components/CreatorVibePills";
