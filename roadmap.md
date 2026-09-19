@@ -182,3 +182,8 @@ Home Events & Arts neon category artwork
 - [x] Accept a validated description and optional private evidence file
 - [x] Hold escrow funds atomically for moderator review after a valid submission
 - [x] Restrict filing to the bounty poster during the active review window
+
+## Legal entity naming
+- [x] Update user-facing company and platform references to Onlooker LLC
+- [x] Update legal pages, FAQs, safety copy, footers, metadata, and release materials
+- [x] Preserve Onlooker Live, Onlooker+, hashtags, URLs, identifiers, and creator-name fallbacks
