@@ -153,6 +153,7 @@ export type FlashBountyOptions = {
   proOptionIds?: FlashProOptionId[];
   categoryId?: BroadcastCategoryId;
   subcategory?: string | null;
+  authorizationConfirmed?: boolean;
 };
 
 export function flashProOptionsFor(
@@ -273,6 +274,7 @@ export function postFlashBounty(
     proOptionIds: options.proMode ? (options.proOptionIds ?? []) : [],
     categoryId: options.categoryId ?? "breaking-incidents",
     subcategory: options.subcategory?.trim() || null,
+    authorizationConfirmed: options.authorizationConfirmed ?? false,
   };
   const quote = quoteFlashBounty(resolved);
   const picked = flashConditionsFor(resolved.conditionIds);
@@ -311,6 +313,7 @@ export function postFlashBounty(
     locationName: spot.formatted,
     bounty: quote.total,
     category: selectedCategory.requestCategory,
+    authorizationConfirmed: resolved.authorizationConfirmed,
     latitude: spot.latitude,
     longitude: spot.longitude,
     minutes: FLASH_WINDOW_MINUTES,

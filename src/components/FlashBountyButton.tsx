@@ -59,6 +59,7 @@ import {
   broadcastCategoryById,
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
+import { needsPermissionConfirmation } from "@/lib/onlooker";
 
 /**
  * One-tap flash bounty. Tapping it grabs the poster's GPS straight away and
@@ -91,6 +92,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
   const [proOptionIds, setProOptionIds] = useState<FlashProOptionId[]>([]);
   /** Legal release and indemnification, mandatory for every dispatch. */
   const [legalRelease, setLegalRelease] = useState(false);
+  const [permissionOk, setPermissionOk] = useState(false);
   const toggleProOption = (id: FlashProOptionId) =>
     setProOptionIds((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
@@ -125,14 +127,16 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
       proOptionIds,
       categoryId,
       subcategory,
+      authorizationConfirmed: permissionOk,
     }),
-    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds, categoryId, subcategory],
+    [selectedTier, customBase, conditionIds, instructions, proMode, proOptionIds, categoryId, subcategory, permissionOk],
   );
 
   const quote = useMemo(() => quoteFlashBounty(options), [options]);
   const totalCredits = quote.total;
   const isCustom = selectedTier.id === "standard";
   const selectedCategory = broadcastCategoryById(categoryId);
+  const permissionNeeded = needsPermissionConfirmation(selectedCategory.requestCategory);
 
   const findSpot = () => {
     setLocating(true);
@@ -215,6 +219,10 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
     }
     if (!legalRelease) {
       toast.error("Accept the legal release and indemnification before going live.");
+      return;
+    }
+    if (permissionNeeded && !permissionOk) {
+      toast.error("Confirm explicit authorization from the seller, agent, or property manager first.");
       return;
     }
     if (!human.ready) {
@@ -327,6 +335,22 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
                 laneLabel="Flash lane"
                 menuLabel="Choose a Flash lane"
               />
+              {permissionNeeded && (
+                <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={permissionOk}
+                    onChange={(event) => setPermissionOk(event.target.checked)}
+                    className="mt-0.5 size-4 shrink-0 accent-signal"
+                  />
+                  <span>
+                    <strong className="block">Authorization required</strong>
+                    Confirm explicit authorization from the seller, listing agent, property manager,
+                    or other authorized party to photograph or film this property.
+                  </span>
+                </label>
+              )}
             </div>
             <div className="space-y-2 rounded-2xl border-2 border-border bg-surface-raised p-3">
               <label className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
@@ -715,7 +739,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
             <Button
               type="button"
               onClick={() => void post()}
-              disabled={posting || !legalRelease}
+              disabled={posting || !legalRelease || (permissionNeeded && !permissionOk)}
               className="h-12 w-full bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
             >
               {posting
