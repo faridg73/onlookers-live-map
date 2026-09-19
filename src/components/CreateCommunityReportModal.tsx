@@ -172,7 +172,9 @@ export function CreateCommunityReportModal({
       onPosted?.();
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't file that report.");
+      const message = err instanceof Error ? err.message : "Couldn't file that report.";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
