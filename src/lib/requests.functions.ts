@@ -31,6 +31,15 @@ const createSchema = z.object({
   category: z.string().trim().max(40).nullable().optional(),
   authorizationConfirmed: z.boolean().optional().default(false),
   accessCode: z.string().trim().min(4).max(40).nullable().optional(),
+  /** Real-estate agent contact used to deliver the 6-digit on-site PIN. */
+  agentContact: z
+    .object({
+      name: z.string().trim().max(120).optional().default(""),
+      phone: z.string().trim().max(32).optional().default(""),
+      email: z.string().trim().max(255).optional().default(""),
+    })
+    .nullable()
+    .optional(),
   minutes: z.number().int().min(15).max(1440).default(60),
   latitude: z.number().min(-90).max(90).default(0),
   longitude: z.number().min(-180).max(180).default(0),
@@ -172,11 +181,36 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     // ever sees it; the onlooker has to get it from the agent standing at the
     // property, which is what unlocks footage submission and the payout.
     if (data.category === "realestate") {
+      const pin = generateSitePin();
       await supabaseAdmin.from("request_site_pins").insert({
         request_id: row.id,
         requester_id: context.userId,
-        pin: generateSitePin(),
+        pin,
       });
+
+      // Deliver the PIN straight to the listing agent the poster named, so the
+      // PIN never has to be copied by hand. A delivery problem must never stop
+      // a paid request from going live.
+      const contact = data.agentContact;
+      const phone = contact?.phone ?? "";
+      const email = contact?.email ?? "";
+      if (phone.length >= 5 || email.includes("@")) {
+        try {
+          const { sendAgentPin } = await import("@/lib/agent-pin.server");
+          const delivery = await sendAgentPin(
+            { name: contact?.name ?? "", phone, email },
+            { pin, requestId: row.id, locationName: data.locationName },
+          );
+          if (phone && !delivery.sms && delivery.smsError) {
+            console.error(`[agent-pin] SMS to agent failed: ${delivery.smsError}`);
+          }
+          if (email && !delivery.email && delivery.emailError) {
+            console.error(`[agent-pin] email to agent failed: ${delivery.emailError}`);
+          }
+        } catch (pinError) {
+          console.error("[agent-pin] agent delivery failed", pinError);
+        }
+      }
     }
 
 
