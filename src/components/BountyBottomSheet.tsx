@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { useHumanCheck } from "@/components/HumanCheck";
@@ -48,6 +49,17 @@ export function BountyBottomSheet({
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const human = useHumanCheck("accept-bounty");
+  const router = useRouter();
+  const navigate = useNavigate();
+
+  /** Return to the exact previous page/view, with the map as a safe fallback. */
+  function goBack() {
+    if (window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+    void navigate({ to: "/" });
+  }
 
   if (!request) return null;
 
