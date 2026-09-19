@@ -83,14 +83,30 @@ export function CreateCommunityReportModal({
   useEffect(() => {
     if (!open) return;
     setFormError(null);
+    setApproximate(false);
     void fetchMyTrustLevel().then(setLevel);
     void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
+    // Every report needs a spot or it can never appear on the map: use the device
+    // position when allowed, otherwise fall back to the last map view the person used.
+    const fallback = () => {
+      const saved = readMapViewport("onlooker:map:community");
+      setCoords({
+        latitude: saved?.lat ?? REGIONAL_CENTER.lat,
+        longitude: saved?.lng ?? REGIONAL_CENTER.lng,
+      });
+      setApproximate(true);
+    };
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-        () => setCoords(null),
+        (pos) => {
+          setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          setApproximate(false);
+        },
+        fallback,
         { timeout: 8000 },
       );
+    } else {
+      fallback();
     }
   }, [open]);
 
