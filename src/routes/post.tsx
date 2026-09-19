@@ -10,20 +10,25 @@ import {
   CloudRain,
   CoinsIcon,
   GraduationCap,
+  Home,
   Info,
+  KeyRound,
   MapPin,
   Mic,
   MicOff,
   Radio,
   Search,
+  ShieldAlert,
   ShieldCheck,
   Smartphone,
   Store,
+  Timer,
   Trees,
   Video,
   X,
   Zap,
 } from "lucide-react";
+
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
