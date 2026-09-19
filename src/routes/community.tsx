@@ -45,10 +45,6 @@ import {
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
 import {
-  STRANGE_SIGHTINGS_ID,
-  STRANGE_SIGHTINGS_IMAGE_URL,
-  STRANGE_SIGHTINGS_LABEL,
-  STRANGE_SIGHTINGS_SUBCATEGORIES,
   matchesStrangeSighting,
 } from "@/lib/strange-sightings";
 
@@ -498,34 +494,6 @@ function CommunityHub() {
                 </div>
               );
             })}
-            <div role="listitem" className="min-w-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setStrangeSightings(true);
-                  setCategory("all");
-                  setCategoryId(null);
-                  setTag(null);
-                }}
-                aria-pressed={strangeSightings}
-                className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none sm:h-44 md:h-48 ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
-              >
-                <span className="relative block min-h-0 w-full flex-1 overflow-hidden bg-background">
-                  <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="Neon UFO above a glowing spiral" className="size-full object-cover" />
-                </span>
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
-                  <strong className="line-clamp-2 text-[0.72rem] font-extrabold leading-tight text-foreground">{STRANGE_SIGHTINGS_LABEL}</strong>
-                  <small className="line-clamp-2 text-[0.58rem] leading-snug text-muted-foreground">UFO · Unexplained Lights</small>
-                </span>
-              </button>
-              {strangeSightings && (
-                <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Strange sighting filters">
-                  {STRANGE_SIGHTINGS_SUBCATEGORIES.map((sub) => (
-                    <button key={sub} type="button" onClick={() => setTag(tag === sub ? null : sub)} aria-pressed={tag === sub} className={`rounded-full border px-2.5 py-1 text-[0.7rem] font-bold ${tag === sub ? "border-signal bg-signal text-signal-foreground" : "border-border text-muted-foreground"}`}>{sub}</button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         ) : (
         <div
