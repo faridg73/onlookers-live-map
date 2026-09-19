@@ -78,9 +78,17 @@ import {
   type CategoryId,
 } from "@/lib/onlooker";
 import {
+  BROADCAST_CATEGORIES,
   broadcastCategoryById,
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
+import {
+  keywordsForSubcategory,
+  subcategoriesFor,
+  type MainCategoryId,
+} from "@/lib/category-subcategories";
+import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sightings";
+
 import { useOnlooker } from "@/lib/onlooker-store";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
