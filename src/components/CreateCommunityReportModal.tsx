@@ -371,7 +371,11 @@ export function CreateCommunityReportModal({
               className="mt-2 w-full accent-signal"
             />
             <p className="mt-1 text-[0.68rem] text-muted-foreground">
-              {coords ? "Locked to your current position." : "Waiting for your location…"}
+              {!coords
+                ? "Waiting for your location…"
+                : approximate
+                  ? "Approximate area — turn on location access for an exact pin."
+                  : "Locked to your current position."}
             </p>
           </section>
 
