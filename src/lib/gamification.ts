@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-/** Reliability tiers earned by completing bounties (100 XP each, a level per 500 XP). */
+/** Reliability tiers earned by completing bounties (10 XP each, a level per 50 XP). */
 export type HunterTier = {
   name: "Bronze" | "Silver" | "Gold" | "Elite";
   minLevel: number;
@@ -17,8 +17,8 @@ export const HUNTER_TIERS: HunterTier[] = [
   { name: "Elite", minLevel: 10, badge: "bg-signal text-signal-foreground", dot: "#CCFF00" },
 ];
 
-export const XP_PER_BOUNTY = 100;
-export const XP_PER_LEVEL = 500;
+export const XP_PER_BOUNTY = 10;
+export const XP_PER_LEVEL = 50;
 
 export function tierForLevel(level: number): HunterTier {
   return [...HUNTER_TIERS].reverse().find((t) => level >= t.minLevel) ?? HUNTER_TIERS[0]!;

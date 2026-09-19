@@ -156,3 +156,9 @@ Home Events & Arts neon category artwork
 - [x] Keep shared dialogs, sheets, and custom full-screen panels below the phone status area
 - [x] Standardize modal and view close controls as visible 44px circular tap targets
 - [x] Verify Help & FAQ spacing and close navigation on a phone viewport
+
+## Profile progression and safety tutorial
+- [x] Keep the Profile header below the phone status area
+- [x] Scale completed bounties to 10 XP and level progression to 50 XP
+- [x] Show live reputation points with high-contrast Level 3 details
+- [x] Award safety points only after completing the interactive tutorial

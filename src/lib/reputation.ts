@@ -44,3 +44,21 @@ export async function fetchMyReputation(): Promise<number> {
   if (error || !Number.isFinite(total)) return 0;
   return total;
 }
+
+/** Whether the signed-in member has already completed the safety tutorial. */
+export async function hasCompletedSafetyTutorial(): Promise<boolean> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return false;
+  const { data, error } = await supabase
+    .from("reputation_events")
+    .select("id")
+    .eq("user_id", auth.user.id)
+    .eq("action", "safety_tutorial")
+    .eq("subject", "v1")
+    .maybeSingle();
+  if (error) {
+    console.error("Could not load safety tutorial status", error);
+    return false;
+  }
+  return Boolean(data);
+}
