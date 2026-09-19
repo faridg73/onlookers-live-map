@@ -120,6 +120,7 @@ Home Events & Arts neon category artwork
 - [x] Add locale-aware radius labels and immediate media thumbnails
 - [x] Keep the submit control visible with pledge-gated neon activation
 - [x] Verify phone and desktop behavior without changing report security
+- [ ] Make every submit requirement visible and verify the final report payload
 
 ## Complete report verification loop
 - [x] Add visible simulated media-analysis processing and durable result state
