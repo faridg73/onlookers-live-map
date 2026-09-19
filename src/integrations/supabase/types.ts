@@ -1099,6 +1099,7 @@ export type Database = {
           alias: string | null
           avatar_url: string | null
           banned_at: string | null
+          bio: string | null
           created_at: string
           display_name: string
           follower_count: number
@@ -1110,6 +1111,7 @@ export type Database = {
           legacy_usd_balance: number
           legal_first_name: string | null
           legal_last_name: string | null
+          location: string | null
           onboarded: boolean
           onboarding_completed: boolean
           phone: string | null
@@ -1127,6 +1129,7 @@ export type Database = {
           alias?: string | null
           avatar_url?: string | null
           banned_at?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string
           follower_count?: number
@@ -1138,6 +1141,7 @@ export type Database = {
           legacy_usd_balance?: number
           legal_first_name?: string | null
           legal_last_name?: string | null
+          location?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
           phone?: string | null
@@ -1155,6 +1159,7 @@ export type Database = {
           alias?: string | null
           avatar_url?: string | null
           banned_at?: string | null
+          bio?: string | null
           created_at?: string
           display_name?: string
           follower_count?: number
@@ -1166,6 +1171,7 @@ export type Database = {
           legacy_usd_balance?: number
           legal_first_name?: string | null
           legal_last_name?: string | null
+          location?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
           phone?: string | null
