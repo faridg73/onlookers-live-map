@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Shield } from "lucide-react";
 import { tierForLevel } from "@/lib/gamification";
 import { cn } from "@/lib/utils";

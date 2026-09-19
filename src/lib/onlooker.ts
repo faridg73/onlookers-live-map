@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export type RequestStatus = "open" | "claimed" | "fulfilled" | "expired";
 
 export type CategoryId =

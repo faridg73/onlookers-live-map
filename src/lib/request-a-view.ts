@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { quoteBounty, type BountyTierId } from "@/lib/bounty-pricing";
 import { lockBounty, type LockedBounty } from "@/lib/bounty-escrow";
 import { reverseGeocode } from "@/lib/geocode.functions";

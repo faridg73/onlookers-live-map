@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, LocateFixed, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";

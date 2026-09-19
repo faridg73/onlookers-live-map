@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";

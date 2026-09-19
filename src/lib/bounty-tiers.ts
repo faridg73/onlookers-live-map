@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import type { LiveRequest } from "@/lib/onlooker";
 
 /** Credit value where a bounty becomes a glowing gold pin. */

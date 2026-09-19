@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2, CloudUpload, Coins, Home, MapPin, Radio, Tag, User } from "lucide-react";

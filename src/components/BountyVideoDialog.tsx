@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, Share2, Trash2, Video, X } from "lucide-react";
 import { formatCredits } from "@/lib/credits";

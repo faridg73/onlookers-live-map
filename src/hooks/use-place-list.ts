@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { searchPlacesByCategory, type DiscoveredPlace } from "@/lib/places.functions";
 import type { DiscoveryArea } from "@/hooks/use-discovery-area";

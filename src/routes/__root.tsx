@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Flame, MapPin } from "lucide-react";
 import { isClosed, useOnlooker } from "@/lib/onlooker-store";
 import type { LiveRequest } from "@/lib/onlooker";

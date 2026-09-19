@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Share2 } from "lucide-react";
 import { ShareDrawer } from "@/components/ShareDrawer";
 import { type ShareArtifact } from "@/lib/share-card";

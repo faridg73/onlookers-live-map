@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { KeyRound, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { readAccessCode } from "@/lib/bounty-escrow";

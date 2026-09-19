@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import type { SubscriptionTier } from "@/lib/wallet-ledger";
 
 /** Billing cadence for an Onlooker+ membership. */

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { CREDITS_PER_USD, PLATFORM_FEE_RATE, creditsToUsdValue } from "@/lib/credits";
 

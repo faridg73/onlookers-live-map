@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 
 /** `null` duration means an open-ended continuous live feed. */

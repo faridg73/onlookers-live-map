@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { Copy, Loader2, Share2 } from "lucide-react";
 import { toast } from "sonner";

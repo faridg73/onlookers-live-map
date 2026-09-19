@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import eventsImage from "@/assets/place-category-events.jpg.asset.json";
 import foodImage from "@/assets/place-category-food.jpg.asset.json";
 import landmarksImage from "@/assets/place-category-landmarks.jpg.asset.json";

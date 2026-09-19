@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Copyright, Loader2, ShieldAlert, Ban, CheckCircle2 } from "lucide-react";

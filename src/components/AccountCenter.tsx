@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { CoinsIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";

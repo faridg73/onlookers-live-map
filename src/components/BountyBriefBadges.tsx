@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { CloudRain, Radio, Timer, Video, Zap } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { conditionByMultiplier } from "@/lib/bounty-pricing";

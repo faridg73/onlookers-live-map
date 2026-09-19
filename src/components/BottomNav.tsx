@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Map, Radio, Plus, UserRound, Compass, MessageCircle, Users, Wallet } from "lucide-react";

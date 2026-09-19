@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Link } from "@tanstack/react-router";
 
 /** Shared heading + body wrapper used by the legal pages and the popups. */

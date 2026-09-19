@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2, ShieldAlert } from "lucide-react";

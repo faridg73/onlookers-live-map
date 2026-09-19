@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { CoinsIcon, Flame, Zap } from "lucide-react";
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCreditWords, formatCredits } from "@/lib/credits";

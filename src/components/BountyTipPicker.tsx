@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { CoinsIcon } from "lucide-react";
 import { formatCreditCash, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";

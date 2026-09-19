@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { distanceMiles, requestMapPosition } from "@/lib/onlooker";

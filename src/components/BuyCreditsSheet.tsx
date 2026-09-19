@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 

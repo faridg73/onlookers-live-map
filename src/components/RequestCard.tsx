@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Eye, MapPin, Camera, MessageCircle, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

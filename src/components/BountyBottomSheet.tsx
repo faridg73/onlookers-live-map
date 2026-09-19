@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";

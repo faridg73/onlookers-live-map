@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Every deal, clip and status update has to stay inside Onlooker LLC, so chat
  * messages get contact details masked before they are stored or shown.

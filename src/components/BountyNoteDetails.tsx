@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Camera, Film, MessageSquare, Radio, Timer } from "lucide-react";
 
 /** Friendly names for the labels used in bounty briefs. */

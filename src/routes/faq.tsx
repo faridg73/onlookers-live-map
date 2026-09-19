@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { HelpCircle, X } from "lucide-react";
 import {

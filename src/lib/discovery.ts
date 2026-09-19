@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import type { CategoryId } from "@/lib/onlooker";
 import type { Venue } from "@/lib/venues";
 import type { DiscoveredPlace } from "@/lib/places.functions";

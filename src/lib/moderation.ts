@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Requests that ask someone to film a screen, a ticket barcode or a broadcast
  * are blocked before they reach the map. Onlooker LLC only pays for real,

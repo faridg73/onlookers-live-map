@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";

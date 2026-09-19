@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CameraOff, FolderOpen, Loader2, RefreshCw, Square, Video } from "lucide-react";
 import { toast } from "sonner";

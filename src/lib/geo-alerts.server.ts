@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /** Server-only geofenced alert dispatch for brand new credit bounties. */
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
