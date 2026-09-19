@@ -158,29 +158,28 @@ export function GlobalFeedMap({
   useEffect(() => {
     if (!map.current) return;
     reportMarkers.current.forEach((marker) => marker.setMap(null));
-    reportMarkers.current = reports
-      .filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null)
-      .map((post) => {
-        const status = post.reportStatus ?? "unverified";
-        const styles = getComputedStyle(document.documentElement);
-        const color = status === "confirmed"
-          ? styles.getPropertyValue("--signal").trim()
-          : status === "disputed"
-            ? styles.getPropertyValue("--crisis").trim()
-            : styles.getPropertyValue("--muted-foreground").trim();
-        const strokeColor = styles.getPropertyValue("--background").trim();
-        return new google.maps.Marker({
-          map: map.current,
-          position: { lat: post.latitude ?? 0, lng: post.longitude ?? 0 },
-          title: `${post.title} · ${status}`,
-          icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
-        });
+    reportMarkers.current = pinnedReports.map((post) => {
+      const status = post.reportStatus ?? "unverified";
+      const styles = getComputedStyle(document.documentElement);
+      const color = status === "confirmed"
+        ? styles.getPropertyValue("--signal").trim()
+        : status === "disputed"
+          ? styles.getPropertyValue("--crisis").trim()
+          : styles.getPropertyValue("--muted-foreground").trim();
+      const strokeColor = styles.getPropertyValue("--background").trim();
+      return new google.maps.Marker({
+        map: map.current,
+        position: { lat: post.latitude!, lng: post.longitude! },
+        title: `${post.title} · ${status}`,
+        zIndex: 999,
+        icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
       });
+    });
     return () => {
       reportMarkers.current.forEach((marker) => marker.setMap(null));
       reportMarkers.current = [];
     };
-  }, [reports, mapReady]);
+  }, [pinnedReports, mapReady]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
 
