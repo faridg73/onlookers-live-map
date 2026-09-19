@@ -174,7 +174,6 @@ function CommunityHub() {
       strangeSightings?: boolean;
       view?: "feed" | "map" | "alerts";
       source?: "all" | "following";
-      impactView?: "help" | "mine";
       radius?: RadiusChoiceId;
       vibeGridOpen?: boolean;
       focus?: { lat: number; lng: number; label: string } | null;
@@ -187,7 +186,6 @@ function CommunityHub() {
     setStrangeSightings(Boolean(saved.strangeSightings));
     if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
-    if (saved.impactView === "help" || saved.impactView === "mine") setImpactView(saved.impactView);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
     setVibeGridOpen(Boolean(saved.vibeGridOpen));
     setFocus(saved.focus ?? null);
@@ -203,12 +201,11 @@ function CommunityHub() {
       strangeSightings,
       view,
       source,
-      impactView,
       radius,
       vibeGridOpen,
       focus,
     });
-  }, [category, tag, categoryId, strangeSightings, view, source, impactView, radius, vibeGridOpen, focus]);
+  }, [category, tag, categoryId, strangeSightings, view, source, radius, vibeGridOpen, focus]);
 
   useEffect(() => {
     if (!mystery) return;
