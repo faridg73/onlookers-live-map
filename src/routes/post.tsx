@@ -262,6 +262,12 @@ function PostScreen() {
   const voice = useVoiceInput((text) => setPrompt(text));
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
+  const subcategoryOptions = subcategoriesFor(mainCategoryId);
+  const mainCategoryLabel =
+    mainCategoryId === STRANGE_SIGHTINGS_ID ? STRANGE_SIGHTINGS_LABEL : selectedCategory.label;
+  /** Keyword metadata carried into the payload for search and analytics. */
+  const subcategoryKeywords = keywordsForSubcategory(mainCategoryId, subcategory);
+
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
 
