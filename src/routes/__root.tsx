@@ -20,6 +20,7 @@ import { Toaster } from "../components/ui/sonner";
 import { ProfileSetup } from "../components/ProfileSetup";
 import { OnboardingWalkthrough } from "../components/OnboardingWalkthrough";
 import { AuthProvider } from "@/hooks/use-auth";
+import { useSessionScroll } from "@/hooks/use-session-scroll";
 
 function NotFoundComponent() {
   return (
@@ -136,8 +137,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   // Embed pages run inside someone else's article: no app navigation there.
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const location = useRouterState({ select: (state) => state.location });
+  const pathname = location.pathname;
   const embedded = pathname.startsWith("/embed");
+  useSessionScroll(`onlooker:scroll:route:${location.href}`);
 
   return (
     <QueryClientProvider client={queryClient}>

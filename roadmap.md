@@ -170,3 +170,8 @@ Home Events & Arts neon category artwork
 ## Mobile sub-page headers
 - [x] Keep sub-page titles and controls below the iPhone status area
 - [x] Standardize back controls with a visible 44px minimum touch target and history-aware navigation
+
+## Persistent navigation state
+- [x] Keep the Home Explore Nearby panel open by default and remember explicit collapse/expand choices
+- [x] Preserve Home filters, selected category, map viewport, and panel scroll position
+- [x] Restore route scroll positions across back navigation, including delayed feed content
