@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -16,7 +16,6 @@ import {
   type RadiusChoiceId,
 } from "@/components/CommunityFeedFilters";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
-import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
@@ -37,8 +36,7 @@ import {
   type CommunityPost,
 } from "@/lib/community";
 import { CategoryExampleCards } from "@/components/CategoryExampleCards";
-import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
-import { isClosed, useOnlooker } from "@/lib/onlooker-store";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 import {
