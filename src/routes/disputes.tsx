@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gavel, Loader2, ShieldAlert } from "lucide-react";
+import { FileUp, Gavel, Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -13,6 +13,17 @@ import {
   type DisputeEvidence,
 } from "@/lib/disputes";
 import { moderationReasonLabel } from "@/lib/moderation-reasons";
+import {
+  listEligibleDisputeBounties,
+  openDisputeWithEvidence,
+  type EligibleDisputeBounty,
+} from "@/lib/dispute-filing.functions";
+import { uploadMedia } from "@/lib/media-upload";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/disputes")({
   head: () => ({
@@ -41,12 +52,14 @@ function DisputesScreen() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   const [staff, setStaff] = useState(false);
+  const [eligible, setEligible] = useState<EligibleDisputeBounty[]>([]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
       setCases(await listDisputes());
-    } catch {
+    } catch (error) {
+      console.error("[disputes] failed to load cases", error);
       setCases([]);
     } finally {
       setLoading(false);
@@ -57,8 +70,15 @@ function DisputesScreen() {
     if (user) {
       void refresh();
       void isReviewStaff().then(setStaff);
+      void listEligibleDisputeBounties()
+        .then(setEligible)
+        .catch((error) => {
+          console.error("[disputes] failed to load eligible bounties", error);
+          setEligible([]);
+        });
     } else {
       setStaff(false);
+      setEligible([]);
       setLoading(false);
     }
   }, [user, refresh]);
@@ -101,10 +121,15 @@ function DisputesScreen() {
         <p className="mt-8 text-center text-sm text-muted-foreground">Loading disputes…</p>
       )}
 
-      {user && !loading && cases.length === 0 && (
-        <p className="mt-8 rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          No open disputes. Flag a clip from its bounty to start one.
-        </p>
+      {user && !loading && (
+        <DisputeFilingForm
+          userId={user.id}
+          bounties={eligible}
+          onSubmitted={async () => {
+            await refresh();
+            setEligible(await listEligibleDisputeBounties());
+          }}
+        />
       )}
 
       <div className="mt-6 space-y-4">
@@ -120,6 +145,161 @@ function DisputesScreen() {
         ))}
       </div>
     </main>
+  );
+}
+
+const DISPUTE_REASONS = [
+  { value: "failure_to_deliver", label: "Failure to Deliver" },
+  { value: "quality_issue", label: "Quality Issue" },
+  { value: "verification_mismatch", label: "Verification Mismatch" },
+] as const;
+
+function DisputeFilingForm({
+  userId,
+  bounties,
+  onSubmitted,
+}: {
+  userId: string;
+  bounties: EligibleDisputeBounty[];
+  onSubmitted: () => Promise<void>;
+}) {
+  const [requestId, setRequestId] = useState("");
+  const [reasonCode, setReasonCode] = useState<(typeof DISPUTE_REASONS)[number]["value"] | "">("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const valid = Boolean(requestId && reasonCode && description.trim().length >= 10 && !busy);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!valid || !reasonCode) return;
+    setBusy(true);
+    setError("");
+    let uploadedPath: string | null = null;
+    try {
+      if (file) {
+        const extension = file.name.split(".").pop()?.replace(/[^A-Za-z0-9]/g, "").toLowerCase() || "bin";
+        uploadedPath = `${userId}/${requestId}/${crypto.randomUUID()}.${extension}`;
+        await uploadMedia({
+          bucket: "dispute-evidence",
+          path: uploadedPath,
+          file,
+          contentType: file.type,
+        });
+      }
+
+      await openDisputeWithEvidence({
+        data: {
+          requestId,
+          reasonCode,
+          description: description.trim(),
+          file: file && uploadedPath
+            ? {
+                storagePath: uploadedPath,
+                fileName: file.name,
+                fileType: file.type as "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm" | "application/pdf",
+                fileSize: file.size,
+              }
+            : null,
+        },
+      });
+      toast.success("Dispute submitted. The bounty funds are now held for moderator review.");
+      setRequestId("");
+      setReasonCode("");
+      setDescription("");
+      setFile(null);
+      await onSubmitted();
+    } catch (cause) {
+      if (uploadedPath) {
+        await supabase.storage.from("dispute-evidence").remove([uploadedPath]).catch(() => undefined);
+      }
+      const message = cause instanceof Error ? cause.message : "Could not submit this dispute.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="mt-8 border-y border-border py-6">
+      <h2 className="font-display text-lg text-foreground">File a dispute</h2>
+      {bounties.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          No submitted bounties are currently inside their review window.
+        </p>
+      ) : (
+        <form className="mt-4 space-y-4" onSubmit={submit}>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Bounty</label>
+            <Select value={requestId} onValueChange={setRequestId}>
+              <SelectTrigger className="h-12 bg-surface"><SelectValue placeholder="Select a submitted bounty" /></SelectTrigger>
+              <SelectContent>
+                {bounties.map((bounty) => (
+                  <SelectItem key={bounty.requestId} value={bounty.requestId}>
+                    {bounty.prompt} · ${bounty.amount.toFixed(2)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Reason</label>
+            <Select value={reasonCode} onValueChange={(value) => setReasonCode(value as typeof reasonCode)}>
+              <SelectTrigger className="h-12 bg-surface"><SelectValue placeholder="Choose a reason" /></SelectTrigger>
+              <SelectContent>
+                {DISPUTE_REASONS.map((reason) => <SelectItem key={reason.value} value={reason.value}>{reason.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label htmlFor="dispute-description" className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">What happened?</label>
+            <Textarea
+              id="dispute-description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value.slice(0, 3000))}
+              minLength={10}
+              maxLength={3000}
+              rows={5}
+              required
+              placeholder="Describe the delivery, quality, or verification problem in detail."
+              className="min-h-32 bg-surface"
+            />
+            <p className="mt-1 text-right text-xs text-muted-foreground">{description.length}/3000</p>
+          </div>
+          <div>
+            <label htmlFor="dispute-file" className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
+              <FileUp className="size-4" /> Evidence file (optional)
+            </label>
+            <Input
+              id="dispute-file"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,application/pdf"
+              className="h-12 bg-surface py-2"
+              onChange={(event) => {
+                const next = event.target.files?.[0] ?? null;
+                if (next && next.size > 20 * 1024 * 1024) {
+                  event.target.value = "";
+                  setFile(null);
+                  setError("Evidence files must be 20 MB or smaller.");
+                  return;
+                }
+                setError("");
+                setFile(next);
+              }}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">Photos, video, or PDF up to 20 MB. Evidence stays private.</p>
+          </div>
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" disabled={!valid} className="h-12 w-full uppercase">
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <Gavel className="size-4" />}
+            Submit dispute to escrow
+          </Button>
+        </form>
+      )}
+    </section>
   );
 }
 

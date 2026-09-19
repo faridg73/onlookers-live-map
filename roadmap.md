@@ -175,3 +175,10 @@ Home Events & Arts neon category artwork
 - [x] Keep the Home Explore Nearby panel open by default and remember explicit collapse/expand choices
 - [x] Preserve Home filters, selected category, map viewport, and panel scroll position
 - [x] Restore route scroll positions across back navigation, including delayed feed content
+
+## Dispute center filing
+- [x] Keep the Dispute Center header below the phone status area
+- [x] Let posters choose an eligible submitted bounty and a dispute reason
+- [x] Accept a validated description and optional private evidence file
+- [x] Hold escrow funds atomically for moderator review after a valid submission
+- [x] Restrict filing to the bounty poster during the active review window
