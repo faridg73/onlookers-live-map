@@ -389,6 +389,23 @@ function PostScreen() {
     setStep(3);
   };
 
+  /** Picking a category sets the Flash lane, the nearby search, and any extra fields it needs. */
+  const choosePlaceCategory = (next: PlaceCategoryId) => {
+    const picked = PLACE_CATEGORIES.find((entry) => entry.id === next);
+    if (!picked) return;
+    setPlaceCategoryId(picked.id);
+    setCategoryId(picked.lane);
+    setSubcategory(null);
+    setPermissionOk(false);
+    setVenueQuery(`${picked.query} near me`);
+    if (picked.id === "emergency-safety") {
+      setTier("fast_catch");
+      setMinutes(15);
+      setCustomDeadline(null);
+    }
+  };
+
+
   const chooseVenue = (venue: DiscoveredPlace) => {
     const formatted = venue.address ? `${venue.name}, ${venue.address}` : venue.name;
     setPlace(formatted);
