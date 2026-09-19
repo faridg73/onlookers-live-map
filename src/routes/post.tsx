@@ -774,30 +774,96 @@ function PostScreen() {
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
                   <Select
-                    {...(placeCategoryId ? { value: placeCategoryId } : {})}
-                    onValueChange={(next: string) => choosePlaceCategory(next as PlaceCategoryId)}
+                    value={placeCategoryId ? `place:${placeCategoryId}` : `main:${mainCategoryId}`}
+                    onValueChange={(next: string) => {
+                      if (next.startsWith("place:")) {
+                        choosePlaceCategory(next.slice(6) as PlaceCategoryId);
+                        return;
+                      }
+                      chooseMainCategory(next.slice(5) as MainCategoryId);
+                    }}
                   >
-
                     <SelectTrigger className="h-auto min-h-14 w-full py-2.5 text-left">
                       <SelectValue placeholder="Choose a category (Real Estate, Malls, Parks…)" />
                     </SelectTrigger>
                     <SelectContent className="max-h-72">
-                      {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
-                        <SelectItem key={id} value={id} className="py-2.5">
-                          <span className="flex items-start gap-2.5 text-left">
-                            <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
-                            <span>
-                              <span className="block font-extrabold text-foreground">{label}</span>
-                              <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                      <SelectGroup>
+                        <SelectLabel>Popular places</SelectLabel>
+                        {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
+                          <SelectItem key={id} value={`place:${id}`} className="py-2.5">
+                            <span className="flex items-start gap-2.5 text-left">
+                              <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
+                              <span>
+                                <span className="block font-extrabold text-foreground">{label}</span>
+                                <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                              </span>
                             </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>All categories</SelectLabel>
+                        {BROADCAST_CATEGORIES.map((lane) => (
+                          <SelectItem key={lane.id} value={`main:${lane.id}`} className="py-2.5">
+                            <span className="flex items-center gap-2.5 text-left font-extrabold text-foreground">
+                              <span aria-hidden>{lane.icon}</span>
+                              {lane.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                        <SelectItem value={`main:${STRANGE_SIGHTINGS_ID}`} className="py-2.5">
+                          <span className="flex items-center gap-2.5 text-left font-extrabold text-foreground">
+                            <span aria-hidden>🛸</span>
+                            {STRANGE_SIGHTINGS_LABEL}
                           </span>
                         </SelectItem>
-                      ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
+                  {subcategoryOptions.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-bold uppercase text-muted-foreground">
+                        Subcategory
+                      </p>
+                      <Select
+                        {...(subcategory ? { value: subcategory } : {})}
+                        onValueChange={(next: string) => chooseSubcategory(next)}
+                      >
+                        <SelectTrigger className="h-auto min-h-12 w-full py-2.5 text-left">
+                          <SelectValue placeholder={`Narrow down ${mainCategoryLabel}`} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-72">
+                          {subcategoryOptions.map((option) => (
+                            <SelectItem key={option.label} value={option.label} className="py-2.5">
+                              <span className="block text-left">
+                                <span className="block font-extrabold text-foreground">{option.label}</span>
+                                <span className="block text-xs font-medium text-muted-foreground">
+                                  {option.keywords.slice(0, 3).join(" · ")}
+                                </span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {subcategoryKeywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {subcategoryKeywords.map((keyword) => (
+                            <span
+                              key={keyword}
+                              className="rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <p className="text-xs font-medium text-muted-foreground">
-                    Picking a category sets the Flash lane and searches nearby places of that type.
+                    Picking a category and subcategory sets the lane, tags the request for search, and
+                    searches nearby places of that type.
                   </p>
+
                   {category === "realestate" && (
                     <div className="space-y-3">
                       <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
