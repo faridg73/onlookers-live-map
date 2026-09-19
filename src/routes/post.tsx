@@ -431,6 +431,7 @@ function PostScreen() {
         locationName: place.trim(),
         bounty: total,
         category,
+        authorizationConfirmed: permissionNeeded && permissionOk,
         accessCode: codeNeeded ? accessCode.trim() : null,
         latitude: spot?.latitude,
         longitude: spot?.longitude,
@@ -759,7 +760,10 @@ function PostScreen() {
                       categoryId={categoryId}
                       subcategory={subcategory}
                       onCategoryChange={(next) => {
-                        if (next) setCategoryId(next);
+                        if (next) {
+                          setCategoryId(next);
+                          setPermissionOk(false);
+                        }
                       }}
                       onSubcategoryChange={setSubcategory}
                       laneLabel="Flash lane"
@@ -888,7 +892,7 @@ function PostScreen() {
                   <textarea ref={noteRef} value={note} onChange={(event) => setNote(event.target.value)} rows={3} required minLength={10} className="field resize-none" />
                 </label>
 
-                <Collapsible>
+                <Collapsible defaultOpen={permissionNeeded}>
                   <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-left text-sm font-bold text-foreground">
                     <Info className="size-4 text-signal" /><span className="flex-1">Privacy & access</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
                   </CollapsibleTrigger>
@@ -897,12 +901,6 @@ function PostScreen() {
                       <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
                        {needsPublicSpacesNotice(category) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
                     </div>
-                    {permissionNeeded && (
-                      <label className="flex gap-3 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-                        <input type="checkbox" checked={permissionOk} onChange={(event) => setPermissionOk(event.target.checked)} className="mt-0.5 size-4 accent-[var(--signal)]" />
-                        I confirm I have permission to have this property photographed or filmed.
-                      </label>
-                    )}
                     {codeNeeded && (
                       <div className="flex gap-2">
                         <input value={accessCode} onChange={(event) => setAccessCode(event.target.value)} maxLength={40} placeholder="Private access passcode" className="field" />
@@ -911,6 +909,22 @@ function PostScreen() {
                     )}
                   </CollapsibleContent>
                 </Collapsible>
+                {permissionNeeded && (
+                  <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={permissionOk}
+                      onChange={(event) => setPermissionOk(event.target.checked)}
+                      className="mt-0.5 size-4 shrink-0 accent-signal"
+                    />
+                    <span>
+                      <strong className="block">Authorization required</strong>
+                      Confirm explicit authorization from the seller, listing agent, property manager,
+                      or other authorized party to photograph or film this property.
+                    </span>
+                  </label>
+                )}
               </div>
             )}
 

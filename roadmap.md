@@ -145,3 +145,9 @@ Home Events & Arts neon category artwork
 - [x] All follow surfaces refresh together after a follow or unfollow
 - [x] Fixed community cards crashing on an old category value
 - [x] Fixed the daily check-in streak error
+
+## Mobile real estate posting safeguards
+- [x] Keep FAQ headers below the phone safe area
+- [x] Restore accessible expand/collapse controls for every guideline question
+- [x] Show and require explicit real estate authorization in bounty forms
+- [x] Enforce the authorization attestation during server-side posting

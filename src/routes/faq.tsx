@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, HelpCircle, X } from "lucide-react";
+import { HelpCircle, X } from "lucide-react";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -97,46 +98,49 @@ Posting a real estate bounty requires checking the authorization box in the requ
 function FAQScreen() {
   const navigate = useNavigate();
   return (
-    <div className="reading-shell relative pb-28 pt-6">
-      <button
-        type="button"
-        aria-label="Close help and FAQ"
-        onClick={() => void navigate({ to: "/" })}
-        className="absolute right-4 top-6 flex size-10 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
-      >
-        <X className="size-5" />
-      </button>
-      <div className="mb-6 flex items-center gap-3 pr-14">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
-          <HelpCircle className="size-6" />
+    <div className="reading-shell pb-28 pt-safe">
+      <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
+            <HelpCircle className="size-6" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="font-display text-2xl text-foreground">
+              Help &amp; FAQ
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Bounties, payouts, rules, and real estate guidelines.
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground">
-            Help &amp; FAQ
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Bounties, payouts, rules, and real estate guidelines.
-          </p>
-        </div>
-      </div>
+        <button
+          type="button"
+          aria-label="Close help and FAQ"
+          onClick={() => void navigate({ to: "/" })}
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+        >
+          <X className="size-5" />
+        </button>
+      </header>
 
-      <div className="space-y-3">
+      <Accordion type="single" collapsible defaultValue="real-estate" className="space-y-3">
         {SECTIONS.map(({ question, answer }) => (
-          <Collapsible key={question}>
-            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-2xl border border-border bg-surface px-4 py-4 text-left transition-colors hover:bg-surface-raised">
-              <span className="pr-4 text-sm font-medium text-foreground">
-                {question}
-              </span>
-              <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="overflow-hidden">
-              <div className="rounded-b-2xl border-x border-b border-border bg-surface px-4 pb-4 pt-2 text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+          <AccordionItem
+            key={question}
+            value={question === "Real estate permission guidelines" ? "real-estate" : question}
+            className="overflow-hidden rounded-2xl border border-border bg-surface"
+          >
+            <AccordionTrigger className="min-h-14 px-4 py-4 text-left text-sm font-medium text-foreground hover:bg-surface-raised hover:no-underline">
+              <span className="pr-4">{question}</span>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-1">
+              <div className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                 {answer}
               </div>
-            </CollapsibleContent>
-          </Collapsible>
+            </AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
 
       <div className="mt-8 rounded-2xl border border-border bg-surface p-4">
         <p className="text-sm text-muted-foreground">

@@ -75,6 +75,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         locationName: place.trim(),
         bounty,
         category,
+        authorizationConfirmed: permissionNeeded && permissionOk,
         accessCode: codeNeeded ? accessCode.trim() : null,
         captchaToken: human.token,
       });
@@ -142,7 +143,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
                 <button
                   key={c.id}
                   type="button"
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => {
+                    setCategory(c.id);
+                    setPermissionOk(false);
+                  }}
                   className={
                     "rounded-full border px-3 py-1.5 text-xs transition-colors " +
                     (category === c.id
@@ -170,8 +174,8 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
                 className="mt-0.5 size-4 shrink-0 accent-[var(--signal)]"
               />
               <span className="text-xs text-muted-foreground">
-                I confirm I have permission from the seller, listing agent or property manager to
-                have this property photographed or filmed.
+                Confirm explicit authorization from the seller, listing agent, property manager,
+                or other authorized party to photograph or film this property.
               </span>
             </label>
           )}

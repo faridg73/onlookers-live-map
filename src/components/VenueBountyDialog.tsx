@@ -23,7 +23,7 @@ import {
   type BountyTierId,
 } from "@/lib/bounty-pricing";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { categoryById } from "@/lib/onlooker";
+import { categoryById, needsPermissionConfirmation } from "@/lib/onlooker";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import type { Venue } from "@/lib/venues";
 
@@ -81,6 +81,8 @@ export function VenueBountyDialog({
   const [bounty, setBounty] = useState(20);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
+  const [permissionOk, setPermissionOk] = useState(false);
+  const permissionNeeded = needsPermissionConfirmation(venue.category);
 
   useEffect(() => {
     if (!open) return;
@@ -146,6 +148,10 @@ export function VenueBountyDialog({
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
     }
+    if (permissionNeeded && !permissionOk) {
+      toast.error("Confirm explicit authorization from the seller, agent, or property manager first.");
+      return;
+    }
     if (!isRequestAllowed(title, note, venue.name)) {
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
       return;
@@ -193,6 +199,7 @@ export function VenueBountyDialog({
         locationName: `${venue.name}, ${venue.area}`,
         bounty: total,
         category: venue.category,
+        authorizationConfirmed: permissionNeeded && permissionOk,
         latitude: venue.latitude,
         longitude: venue.longitude,
         minutes: effectiveMinutes,
@@ -228,6 +235,7 @@ export function VenueBountyDialog({
       setCustomDuration(null);
       setTier("standard");
       setWeather(1);
+      setPermissionOk(false);
       void navigate({ to: "/feed" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not post the bounty.");
@@ -476,9 +484,26 @@ export function VenueBountyDialog({
             </span>
           </p>
 
+          {permissionNeeded && (
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
+              <input
+                type="checkbox"
+                required
+                checked={permissionOk}
+                onChange={(event) => setPermissionOk(event.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-signal"
+              />
+              <span>
+                <strong className="block">Authorization required</strong>
+                Confirm explicit authorization from the seller, listing agent, property manager,
+                or other authorized party to photograph or film this property.
+              </span>
+            </label>
+          )}
+
           <button
             type="submit"
-            disabled={posting || total < MIN_BOUNTY}
+            disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk)}
             className="w-full rounded-2xl bg-signal py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] text-signal-foreground disabled:opacity-40"
           >
             {posting ? "Locking bounty…" : `Lock ${Number.isFinite(total) ? total : 0} Credits`}
