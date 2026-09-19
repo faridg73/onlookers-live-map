@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Camera, MapPin, Radar, Radio, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useRadar } from "@/hooks/use-radar";
@@ -18,6 +18,7 @@ import {
   venueFromPlace,
 } from "@/lib/discovery";
 import { discoveryImage } from "@/lib/discovery-visuals";
+import { PageBackButton } from "@/components/PageBackButton";
 import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
 
@@ -96,9 +97,7 @@ function VenueScreen() {
   if (!venue) {
     return (
       <div className="app-shell pb-28 pt-safe">
-        <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
-          ← All places
-        </Link>
+        <PageBackButton label="All places" fallback="/discover" />
         <div className="mt-6 h-28 animate-pulse rounded-2xl border border-border bg-surface" />
         <p className="mt-4 text-sm text-muted-foreground">
           {loading ? "Loading this spot…" : "We couldn't load this spot. Go back and pick another."}
@@ -132,13 +131,7 @@ function VenueScreen() {
 
   return (
     <div className="app-shell pb-32 pt-safe">
-      <Link
-        to="/discover/$group"
-        params={{ group: params.group }}
-        className="text-xs font-bold uppercase tracking-[0.14em] text-signal"
-      >
-        ← {backLabel}
-      </Link>
+      <PageBackButton label={backLabel} fallback="/discover" />
 
       <div className="mt-3 aspect-[16/7] overflow-hidden rounded-2xl bg-surface-raised">
         <PlacePhoto

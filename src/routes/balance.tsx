@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Receipt } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Loader2, Receipt } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { MyEarningsCard } from "@/components/MyEarningsCard";
 import { creditPackageById } from "@/lib/credit-packages";
 import { InlineSignIn } from "@/components/InlineSignIn";
+import { PageBackButton } from "@/components/PageBackButton";
 
 export const Route = createFileRoute("/balance")({
   head: () => ({
@@ -88,13 +89,8 @@ function BalanceScreen() {
   }, [user, refresh]);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Profile
-      </Link>
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+      <PageBackButton label="Profile" fallback="/profile" />
 
       <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">Balance &amp; Cashout</h1>
       <p className="mt-1 text-sm text-muted-foreground">

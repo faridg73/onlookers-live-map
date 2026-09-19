@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Trophy } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Trophy } from "lucide-react";
 import { Leaderboard } from "@/components/Leaderboard";
+import { PageBackButton } from "@/components/PageBackButton";
 
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
@@ -25,13 +26,8 @@ export const Route = createFileRoute("/leaderboard")({
 
 function LeaderboardPage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Profile
-      </Link>
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+      <PageBackButton label="Profile" fallback="/profile" />
 
       <div className="mt-4 flex items-center gap-3">
         <span className="flex size-12 items-center justify-center rounded-2xl bg-signal text-signal-foreground">

@@ -195,7 +195,7 @@ export function ProfileSetup() {
     "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-signal";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/80 px-4 pb-6 pt-16 sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-black/80 px-4 pb-6 pt-[max(env(safe-area-inset-top),4rem)] sm:items-center">
       <form
         onSubmit={save}
         className="my-auto w-full max-w-md rounded-3xl border border-border bg-surface p-5"

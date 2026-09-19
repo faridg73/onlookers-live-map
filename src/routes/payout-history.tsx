@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, BadgeDollarSign, Landmark, Receipt } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { BadgeDollarSign, Landmark, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { listMyVideos, type BountyVideo } from "@/lib/bounty-videos";
 import { formatCredits } from "@/lib/credits";
+import { PageBackButton } from "@/components/PageBackButton";
 
 export const Route = createFileRoute("/payout-history")({
   head: () => ({
@@ -56,13 +57,8 @@ function PayoutHistoryScreen() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:px-8">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-      >
-        <ArrowLeft className="size-4" /> Profile
-      </Link>
+    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+      <PageBackButton label="Profile" fallback="/profile" />
 
       <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">
         Payout history
