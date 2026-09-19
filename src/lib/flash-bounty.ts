@@ -313,7 +313,7 @@ export function postFlashBounty(
     locationName: spot.formatted,
     bounty: quote.total,
     category: selectedCategory.requestCategory,
-    authorizationConfirmed: resolved.authorizationConfirmed,
+    authorizationConfirmed: resolved.authorizationConfirmed ?? false,
     latitude: spot.latitude,
     longitude: spot.longitude,
     minutes: FLASH_WINDOW_MINUTES,
