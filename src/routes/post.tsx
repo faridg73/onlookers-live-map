@@ -92,6 +92,7 @@ import {
   subcategoriesFor,
   type MainCategoryId,
 } from "@/lib/category-subcategories";
+import { bountyPromptContext } from "@/lib/bounty-prompt-examples";
 import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sightings";
 
 import { useOnlooker } from "@/lib/onlooker-store";
@@ -275,6 +276,11 @@ function PostScreen() {
     mainCategoryId === STRANGE_SIGHTINGS_ID ? STRANGE_SIGHTINGS_LABEL : selectedCategory.label;
   /** Keyword metadata carried into the payload for search and analytics. */
   const subcategoryKeywords = keywordsForSubcategory(mainCategoryId, subcategory);
+  const promptContext = useMemo(
+    () => bountyPromptContext(mainCategoryId, mainCategoryLabel, subcategory),
+    [mainCategoryId, mainCategoryLabel, subcategory],
+  );
+  const promptContextKey = `${mainCategoryId}:${subcategory ?? "all"}`;
 
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
@@ -895,7 +901,7 @@ function PostScreen() {
                   </p>
                 )}
 
-                <div className="rounded-lg border border-border bg-background p-3 focus-within:border-signal">
+                <div className="rounded-lg border border-border bg-background p-3 transition-colors focus-within:border-signal">
                   <div className="flex items-start gap-3">
                     <Search className="mt-1 size-5 shrink-0 text-signal" />
                     <textarea
@@ -903,7 +909,7 @@ function PostScreen() {
                       onChange={(event) => setPrompt(event.target.value)}
                       rows={4}
                       autoFocus
-                      placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
+                      placeholder={promptContext.placeholder}
                       className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                     />
                     <Button
@@ -923,16 +929,22 @@ function PostScreen() {
                   {voice.listening && (
                     <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
                   )}
+                  <p
+                    key={`helper:${promptContextKey}`}
+                    className="mt-2 animate-fade-in pl-8 text-xs font-medium leading-relaxed text-muted-foreground motion-reduce:animate-none"
+                  >
+                    {promptContext.helper}
+                  </p>
                 </div>
 
-                <div>
+                <div
+                  key={`examples:${promptContextKey}`}
+                  className="animate-fade-in motion-reduce:animate-none"
+                  aria-live="polite"
+                >
                   <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {[
-                      "Show me the line at South Coast Plaza",
-                      "I want a 5-minute clip of Fashion Island",
-                      "Spontaneous meetup at Orange Coast College",
-                    ].map((example) => (
+                    {promptContext.examples.map((example) => (
                       <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
                         {example}
                       </Button>

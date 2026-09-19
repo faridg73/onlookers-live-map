@@ -194,3 +194,8 @@ Home Events & Arts neon category artwork
 - [x] Add a dismissible first-time bounty guide with a persistent opt-out
 - [x] Add the Real Estate escrow and PIN security guide on selection
 - [x] Verify both dialogs and the reordered layout on phone and desktop
+
+## Contextual bounty prompts
+- [x] Map helper text, placeholders, and examples to all 17 categories
+- [x] Refine examples immediately when a subcategory changes
+- [x] Fade updated guidance in while respecting reduced-motion settings
