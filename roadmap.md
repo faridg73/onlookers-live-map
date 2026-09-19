@@ -134,3 +134,13 @@ Home Events & Arts neon category artwork
 - [x] Persist Explore and Browse Places tabs plus selected map item
 - [x] Restore Community, Explore, and Browse Places map center and zoom
 - [x] Verify restoration through back navigation on phone and desktop
+
+## Follower system completion
+- [x] Explicit error logging when follow state fails to load
+- [x] Follow buttons on creator rankings, Top Creators cards, and the profile "Creators you follow" list
+- [x] Everyone/Following feed toggle that prioritises followed creators
+- [x] Sample creator post seeded so follow behaviour can be tested
+- [x] Public creator lookups (name, avatar, verified, follower count) via safe read-only helpers
+- [x] All follow surfaces refresh together after a follow or unfollow
+- [x] Fixed community cards crashing on an old category value
+- [x] Fixed the daily check-in streak error

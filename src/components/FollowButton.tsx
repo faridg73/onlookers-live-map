@@ -5,6 +5,8 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   fetchFollowState,
   followCreator,
+  FOLLOWS_CHANGED_EVENT,
+  notifyFollowsChanged,
   unfollowCreator,
   watchFollowerCount,
 } from "@/lib/follows";
@@ -21,10 +23,13 @@ export function FollowButton({
   creatorId,
   creatorName,
   className,
+  size = "sm",
 }: {
   creatorId: string;
   creatorName: string;
   className?: string;
+  /** "md" is for standalone creator surfaces, "sm" sits inline next to a name. */
+  size?: "sm" | "md";
 }) {
   const { user } = useAuth();
   const isSelf = Boolean(user && user.id === creatorId);
@@ -36,17 +41,33 @@ export function FollowButton({
   useEffect(() => {
     mounted.current = true;
     let alive = true;
-    void fetchFollowState(creatorId).then((s) => {
-      if (!alive || !mounted.current) return;
-      setFollowing(s.following);
-      setCount(s.followerCount);
-    });
+    void fetchFollowState(creatorId)
+      .then((s) => {
+        if (!alive || !mounted.current) return;
+        setFollowing(s.following);
+        setCount(s.followerCount);
+      })
+      .catch((err) => {
+        console.error("[FollowButton] could not load follow state", err);
+        if (alive && mounted.current) setCount(null);
+      });
     const unwatch = watchFollowerCount(creatorId, (n) => {
       if (mounted.current) setCount(n);
     });
+    const refresh = () => {
+      void fetchFollowState(creatorId)
+        .then((s) => {
+          if (!mounted.current) return;
+          setFollowing(s.following);
+          setCount(s.followerCount);
+        })
+        .catch((err) => console.error("[FollowButton] could not refresh follow state", err));
+    };
+    window.addEventListener(FOLLOWS_CHANGED_EVENT, refresh);
     return () => {
       alive = false;
       unwatch();
+      window.removeEventListener(FOLLOWS_CHANGED_EVENT, refresh);
     };
   }, [creatorId, user?.id]);
 
@@ -72,6 +93,7 @@ export function FollowButton({
         ? await unfollowCreator(creatorId)
         : await followCreator(creatorId);
       if (mounted.current) setCount(next);
+      notifyFollowsChanged();
       if (!wasFollowing) toast.success(`Following ${creatorName}, you'll see their live broadcasts first.`);
     } catch (err) {
       if (mounted.current) {
@@ -95,14 +117,15 @@ export function FollowButton({
       disabled={busy}
       aria-pressed={following}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-wide transition-colors disabled:opacity-60",
+        "inline-flex shrink-0 items-center gap-1 rounded-full border font-extrabold uppercase tracking-wide transition-colors disabled:opacity-60",
+        size === "md" ? "px-3 py-1.5 text-[0.7rem]" : "px-2 py-0.5 text-[0.62rem]",
         following
           ? "border-signal/50 bg-signal/15 text-signal"
           : "border-border bg-surface-raised text-foreground hover:border-signal/50 hover:text-signal",
         className,
       )}
     >
-      <Icon className="size-3" />
+      <Icon className={size === "md" ? "size-3.5" : "size-3"} />
       {following ? "Following" : "Follow"}
       {count !== null && count > 0 && (
         <span className={following ? "text-signal/80" : "text-muted-foreground"}>

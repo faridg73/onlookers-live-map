@@ -12,12 +12,7 @@ export type TopCreator = {
 
 /** Public creator ranking based on network followers, reach, and current live status. */
 export async function listTopCreators(limit = 12): Promise<TopCreator[]> {
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .select("id, display_name, avatar_url, is_incognito, alias, is_verified, follower_count")
-    .is("banned_at", null)
-    .order("follower_count", { ascending: false })
-    .limit(limit);
+  const { data: profiles, error } = await supabase.rpc("public_top_creators", { _limit: limit });
 
   if (error) throw new Error(error.message);
   if (!profiles?.length) return [];
@@ -40,8 +35,8 @@ export async function listTopCreators(limit = 12): Promise<TopCreator[]> {
   return profiles
     .map((profile) => ({
       id: profile.id,
-      name: profile.is_incognito ? (profile.alias ?? "Onlooker") : (profile.display_name || "Onlooker"),
-      avatarUrl: profile.is_incognito ? null : profile.avatar_url,
+      name: profile.name || "Onlooker",
+      avatarUrl: profile.avatar_url,
       verified: Boolean(profile.is_verified),
       followerCount: profile.follower_count ?? 0,
       totalViews: activity.get(profile.id)?.views ?? 0,

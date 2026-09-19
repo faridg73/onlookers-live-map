@@ -2323,6 +2323,17 @@ export type Database = {
           validation_count: number
         }[]
       }
+      public_creator_cards: {
+        Args: { _ids: string[] }
+        Returns: {
+          avatar_url: string
+          follower_count: number
+          hunter_level: number
+          id: string
+          is_verified: boolean
+          name: string
+        }[]
+      }
       public_profile_card: {
         Args: { _user_id: string }
         Returns: {
@@ -2345,6 +2356,16 @@ export type Database = {
           expires_at: string
           id: string
           location_name: string
+        }[]
+      }
+      public_top_creators: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          follower_count: number
+          id: string
+          is_verified: boolean
+          name: string
         }[]
       }
       record_daily_engagement: {

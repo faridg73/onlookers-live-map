@@ -32,6 +32,7 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
+import { FollowingCreators } from "@/components/FollowingCreators";
 import { EarningsWallet } from "@/components/EarningsWallet";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
@@ -241,6 +242,8 @@ function ProfileScreen() {
           </div>
         ))}
       </div>
+
+      <FollowingCreators />
 
       <WeeklyTopOnlookers />
 

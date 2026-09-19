@@ -50,7 +50,8 @@ export function CommunityPostCard({
   const [voting, setVoting] = useState<"validate" | "flag" | null>(null);
   const [viewerTrustLevel, setViewerTrustLevel] = useState<TrustLevel>(1);
   const def = categoryDef(post.category);
-  const visual = COMMUNITY_VISUALS[post.category];
+  // Older rows can carry a lane that no longer exists, so fall back instead of crashing.
+  const visual = COMMUNITY_VISUALS[post.category] ?? COMMUNITY_VISUALS.general;
   const CategoryIcon = visual.icon;
 
   useEffect(() => {

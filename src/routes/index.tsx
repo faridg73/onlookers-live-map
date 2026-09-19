@@ -54,6 +54,7 @@ import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/r
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { listTopCreators, type TopCreator } from "@/lib/top-creators";
+import { FollowButton } from "@/components/FollowButton";
 import {
   readCategoryTapCounts,
   recordCategoryTap,
@@ -1062,6 +1063,12 @@ function MapScreen() {
                           <span className="font-bold text-foreground">{creator.followerCount.toLocaleString()} followers</span>
                           <span className="text-muted-foreground">{creator.totalViews.toLocaleString()} views</span>
                         </div>
+                        <FollowButton
+                          creatorId={creator.id}
+                          creatorName={creator.name}
+                          size="md"
+                          className="mt-2 w-full justify-center"
+                        />
                       </div>
                     ))}
                   </div>
