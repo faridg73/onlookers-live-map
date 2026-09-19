@@ -59,13 +59,13 @@ export const Route = createFileRoute("/community")({
       : {},
   head: () => ({
     meta: [
-      { title: "Community impact and verified earnings | Onlooker LLC" },
+      { title: "Community feed and local activity | Onlooker LLC" },
       {
         name: "description",
         content:
           "Help with real-world requests, complete verified captures, and earn through transparent bounties backed by locked credits.",
       },
-      { property: "og:title", content: "Community impact and verified earnings | Onlooker LLC" },
+      { property: "og:title", content: "Community feed and local activity | Onlooker LLC" },
       {
         property: "og:description",
         content:
