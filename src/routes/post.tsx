@@ -830,88 +830,6 @@ function PostScreen() {
                     searches nearby places of that type.
                   </p>
 
-                  {category === "realestate" && (
-                    <div className="space-y-3">
-                      <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
-                        <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
-                        <span>
-                          <strong className="block">6-digit PIN handshake required</strong>
-                          A unique 6-digit PIN is generated when you post and sent automatically to
-                          the agent below. The onlooker types it in on site, and footage plus payout
-                          stay locked until it matches.
-                        </span>
-                      </p>
-                      <div className="space-y-2 rounded-lg border border-border bg-background p-3">
-                        <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
-                          Agent / property contact
-                        </p>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Listing agent name</span>
-                          <input
-                            value={agentName}
-                            onChange={(event) => setAgentName(event.target.value)}
-                            maxLength={120}
-                            autoComplete="off"
-                            placeholder="e.g. Dana Reyes"
-                            className="field"
-                          />
-                        </label>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Agent phone number (for SMS)</span>
-                          <input
-                            value={agentPhone}
-                            onChange={(event) => setAgentPhone(event.target.value)}
-                            maxLength={32}
-                            inputMode="tel"
-                            autoComplete="off"
-                            placeholder="+1 310 555 0123"
-                            className="field"
-                          />
-                        </label>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Agent email</span>
-                          <input
-                            value={agentEmail}
-                            onChange={(event) => setAgentEmail(event.target.value)}
-                            maxLength={255}
-                            inputMode="email"
-                            autoComplete="off"
-                            placeholder="agent@brokerage.com"
-                            className="field"
-                          />
-                        </label>
-                        <p className="text-[0.7rem] text-muted-foreground">
-                          Add a phone or email and we text or email the PIN and claim link the moment
-                          the bounty goes live.
-                        </p>
-                      </div>
-                      {permissionNeeded && (
-                        <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
-                          <input
-                            type="checkbox"
-                            checked={permissionOk}
-                            onChange={(event) => setPermissionOk(event.target.checked)}
-                            className="mt-0.5 size-4 shrink-0 accent-signal"
-                          />
-                          <span>
-                            <strong className="block">Authorization required</strong>
-                            Confirm explicit authorization from the seller, listing agent, property
-                            manager, or other authorized party to photograph or film this property.
-                          </span>
-                        </label>
-                      )}
-                    </div>
-                  )}
-                  {placeCategoryId === "emergency-safety" && (
-                    <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
-                      <Timer className="mt-0.5 size-4 shrink-0 text-live" />
-                      <span>
-                        <strong className="block">Fast Catch priority timer on</strong>
-                        This request goes live to nearby onlookers first with a 15-minute window. You
-                        can change the tier and timer on the reward step.
-                      </span>
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
@@ -936,6 +854,46 @@ function PostScreen() {
                     }}
                   />
                 </div>
+
+                {category === "realestate" && (
+                  <div className="space-y-3 rounded-xl border border-signal/40 bg-signal/5 p-3">
+                    <p className="flex gap-2 text-xs font-medium text-foreground">
+                      <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
+                      <span>
+                        <strong className="block">6-digit PIN handshake required</strong>
+                        The agent receives the private PIN and claim link when this bounty goes live.
+                      </span>
+                    </p>
+                    <div className="space-y-2 rounded-lg border border-border bg-background p-3">
+                      <p className="text-xs font-extrabold uppercase text-muted-foreground">Agent / property contact</p>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Listing agent name</span>
+                        <input value={agentName} onChange={(event) => setAgentName(event.target.value)} maxLength={120} autoComplete="off" placeholder="e.g. Dana Reyes" className="field" />
+                      </label>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Agent phone number (for SMS)</span>
+                        <input value={agentPhone} onChange={(event) => setAgentPhone(event.target.value)} maxLength={32} inputMode="tel" autoComplete="off" placeholder="+1 310 555 0123" className="field" />
+                      </label>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Agent email</span>
+                        <input value={agentEmail} onChange={(event) => setAgentEmail(event.target.value)} maxLength={255} inputMode="email" autoComplete="off" placeholder="agent@brokerage.com" className="field" />
+                      </label>
+                      <p className="text-xs text-muted-foreground">Add a phone or email for automatic PIN delivery.</p>
+                    </div>
+                    {permissionNeeded && (
+                      <label className="flex cursor-pointer gap-3 rounded-lg border border-signal/50 bg-background p-3 text-xs text-foreground">
+                        <input type="checkbox" checked={permissionOk} onChange={(event) => setPermissionOk(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-signal" />
+                        <span><strong className="block">Authorization required</strong>Confirm explicit authorization from the seller, listing agent, property manager, or other authorized party to photograph or film this property.</span>
+                      </label>
+                    )}
+                  </div>
+                )}
+                {placeCategoryId === "emergency-safety" && (
+                  <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
+                    <Timer className="mt-0.5 size-4 shrink-0 text-live" />
+                    <span><strong className="block">Fast Catch priority timer on</strong>This request starts with a 15-minute priority window. You can change it on the reward step.</span>
+                  </p>
+                )}
 
                 <div className="rounded-lg border border-border bg-background p-3 focus-within:border-signal">
                   <div className="flex items-start gap-3">
