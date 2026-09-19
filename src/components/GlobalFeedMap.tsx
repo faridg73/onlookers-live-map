@@ -217,6 +217,7 @@ export function GlobalFeedMap({
             </>
           )}
         </span>
+        {activeReport && <ReportDetailCard post={activeReport} onClose={() => setActiveReportId(null)} />}
       </div>
 
       {emergencyOnly ? (
