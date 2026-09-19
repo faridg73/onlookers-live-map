@@ -486,27 +486,39 @@ export type Database = {
           author_id: string
           body: string
           created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
           id: string
           request_id: string
           role: string
+          storage_path: string | null
           updated_at: string
         }
         Insert: {
           author_id: string
           body: string
           created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
           id?: string
           request_id: string
           role?: string
+          storage_path?: string | null
           updated_at?: string
         }
         Update: {
           author_id?: string
           body?: string
           created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
           id?: string
           request_id?: string
           role?: string
+          storage_path?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2287,6 +2299,17 @@ export type Database = {
           status: string
         }[]
       }
+      list_eligible_dispute_bounties: {
+        Args: never
+        Returns: {
+          amount: number
+          location_name: string
+          prompt: string
+          request_id: string
+          review_ends_at: string
+          submitted_at: string
+        }[]
+      }
       mark_chat_notifications_read: {
         Args: { _request_key: string }
         Returns: number
@@ -2310,6 +2333,18 @@ export type Database = {
           distance_miles: number
           user_id: string
         }[]
+      }
+      open_dispute_with_evidence: {
+        Args: {
+          _description: string
+          _file_name?: string
+          _file_size?: number
+          _file_type?: string
+          _reason_code: string
+          _request_id: string
+          _storage_path?: string
+        }
+        Returns: boolean
       }
       pending_verification_requests: {
         Args: never
