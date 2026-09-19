@@ -45,6 +45,8 @@ import {
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
 import {
+  STRANGE_SIGHTINGS_ID,
+  STRANGE_SIGHTINGS_LABEL,
   matchesStrangeSighting,
 } from "@/lib/strange-sightings";
 
