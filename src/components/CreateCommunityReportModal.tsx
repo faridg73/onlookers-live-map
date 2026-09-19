@@ -22,6 +22,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { createCommunityPost, uploadCommunityPhoto } from "@/lib/community";
 import { awardReputation } from "@/lib/reputation";
+import { REGIONAL_CENTER } from "@/lib/onlooker";
+import { readMapViewport } from "@/lib/session-state";
 import {
   EMERGENCY_LOCKED_NOTE,
   INCIDENT_TYPES,
@@ -64,6 +66,7 @@ export function CreateCommunityReportModal({
   const [details, setDetails] = useState("");
   const [radius, setRadius] = useState(500);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [approximate, setApproximate] = useState(false);
   const [mediaPath, setMediaPath] = useState<string | null>(null);
   const [mediaPreview, setMediaPreview] = useState<{
     url: string;
@@ -83,14 +86,30 @@ export function CreateCommunityReportModal({
   useEffect(() => {
     if (!open) return;
     setFormError(null);
+    setApproximate(false);
     void fetchMyTrustLevel().then(setLevel);
     void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
+    // Every report needs a spot or it can never appear on the map: use the device
+    // position when allowed, otherwise fall back to the last map view the person used.
+    const fallback = () => {
+      const saved = readMapViewport("onlooker:map:community");
+      setCoords({
+        latitude: saved?.lat ?? REGIONAL_CENTER.lat,
+        longitude: saved?.lng ?? REGIONAL_CENTER.lng,
+      });
+      setApproximate(true);
+    };
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-        () => setCoords(null),
+        (pos) => {
+          setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+          setApproximate(false);
+        },
+        fallback,
         { timeout: 8000 },
       );
+    } else {
+      fallback();
     }
   }, [open]);
 
@@ -352,7 +371,11 @@ export function CreateCommunityReportModal({
               className="mt-2 w-full accent-signal"
             />
             <p className="mt-1 text-[0.68rem] text-muted-foreground">
-              {coords ? "Locked to your current position." : "Waiting for your location…"}
+              {!coords
+                ? "Waiting for your location…"
+                : approximate
+                  ? "Approximate area — turn on location access for an exact pin."
+                  : "Locked to your current position."}
             </p>
           </section>
 

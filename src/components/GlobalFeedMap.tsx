@@ -112,6 +112,12 @@ export function GlobalFeedMap({
     };
   }, [focus, mapReady]);
 
+  // Every located report, whatever its community-verification status.
+  const pinnedReports = useMemo(
+    () => reports.filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null),
+    [reports],
+  );
+
   // Draw one marker per located clip.
   useEffect(() => {
     if (!map.current || pinned.length === 0) return;
@@ -125,43 +131,55 @@ export function GlobalFeedMap({
       marker.addListener("click", () => setActiveId(clip.id));
       return marker;
     });
-    if (!focus && !restoredViewport.current) {
-      const bounds = new google.maps.LatLngBounds();
-      pinned.forEach((c) => bounds.extend({ lat: c.latitude!, lng: c.longitude! }));
-      map.current.fitBounds(bounds, 48);
-    }
     return () => {
       markers.current.forEach((m) => m.setMap(null));
       markers.current = [];
     };
-  }, [pinned, mapReady, focus]);
+  }, [pinned, mapReady]);
+
+  // Frame clips and reports together, so a fresh report is never left off-screen.
+  useEffect(() => {
+    if (!map.current || focus || restoredViewport.current) return;
+    const spots = [
+      ...pinned.map((c) => ({ lat: c.latitude!, lng: c.longitude! })),
+      ...pinnedReports.map((p) => ({ lat: p.latitude!, lng: p.longitude! })),
+    ];
+    if (spots.length === 0) return;
+    if (spots.length === 1) {
+      map.current.setCenter(spots[0]!);
+      map.current.setZoom(14);
+      return;
+    }
+    const bounds = new google.maps.LatLngBounds();
+    spots.forEach((spot) => bounds.extend(spot));
+    map.current.fitBounds(bounds, 48);
+  }, [pinned, pinnedReports, mapReady, focus]);
 
   useEffect(() => {
     if (!map.current) return;
     reportMarkers.current.forEach((marker) => marker.setMap(null));
-    reportMarkers.current = reports
-      .filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null)
-      .map((post) => {
-        const status = post.reportStatus ?? "unverified";
-        const styles = getComputedStyle(document.documentElement);
-        const color = status === "confirmed"
-          ? styles.getPropertyValue("--signal").trim()
-          : status === "disputed"
-            ? styles.getPropertyValue("--crisis").trim()
-            : styles.getPropertyValue("--muted-foreground").trim();
-        const strokeColor = styles.getPropertyValue("--background").trim();
-        return new google.maps.Marker({
-          map: map.current,
-          position: { lat: post.latitude ?? 0, lng: post.longitude ?? 0 },
-          title: `${post.title} · ${status}`,
-          icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
-        });
+    reportMarkers.current = pinnedReports.map((post) => {
+      const status = post.reportStatus ?? "unverified";
+      const styles = getComputedStyle(document.documentElement);
+      const color = status === "confirmed"
+        ? styles.getPropertyValue("--signal").trim()
+        : status === "disputed"
+          ? styles.getPropertyValue("--crisis").trim()
+          : styles.getPropertyValue("--muted-foreground").trim();
+      const strokeColor = styles.getPropertyValue("--background").trim();
+      return new google.maps.Marker({
+        map: map.current,
+        position: { lat: post.latitude!, lng: post.longitude! },
+        title: `${post.title} · ${status}`,
+        zIndex: 999,
+        icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
       });
+    });
     return () => {
       reportMarkers.current.forEach((marker) => marker.setMap(null));
       reportMarkers.current = [];
     };
-  }, [reports, mapReady]);
+  }, [pinnedReports, mapReady]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
 
