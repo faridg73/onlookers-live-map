@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -195,6 +195,44 @@ function FAQScreen() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("bounties");
   const selected = CATEGORIES.find((category) => category.id === activeCategory);
 
+  const tabsRef = useRef<HTMLElement>(null);
+  const [tabsScroll, setTabsScroll] = useState({
+    canLeft: false,
+    canRight: false,
+    thumbWidth: 100,
+    thumbLeft: 0,
+  });
+
+  const updateTabsScroll = useCallback(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const canLeft = el.scrollLeft > 1;
+    const canRight = el.scrollLeft < max - 1;
+    const visibleRatio = el.scrollWidth > 0 ? el.clientWidth / el.scrollWidth : 1;
+    const thumbWidth = Math.min(100, Math.max(14, visibleRatio * 100));
+    const progress = max > 0 ? el.scrollLeft / max : 0;
+    setTabsScroll({
+      canLeft,
+      canRight,
+      thumbWidth,
+      thumbLeft: progress * (100 - thumbWidth),
+    });
+  }, []);
+
+  useEffect(() => {
+    updateTabsScroll();
+    const el = tabsRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", updateTabsScroll, { passive: true });
+    const ro = new ResizeObserver(updateTabsScroll);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", updateTabsScroll);
+      ro.disconnect();
+    };
+  }, [updateTabsScroll]);
+
   const close = () => {
     if (canGoBack) router.history.back();
     else void router.navigate({ to: "/" });
@@ -227,33 +265,65 @@ function FAQScreen() {
         </Button>
       </header>
 
-      <nav aria-label="Help categories" className="-mx-1 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max gap-2" role="tablist" aria-label="Help categories">
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const active = category.id === activeCategory;
-            return (
-              <Button
-                key={category.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                aria-controls="faq-category-panel"
-                variant={active ? "default" : "secondary"}
-                onClick={() => setActiveCategory(category.id)}
-                className={cn(
-                  "h-11 gap-2 rounded-full border px-4 text-sm",
-                  active ? "border-signal" : "border-border bg-surface text-muted-foreground",
-                )}
-              >
-                <Icon className="size-4" aria-hidden="true" />
-                <span className="sm:hidden">{category.shortLabel}</span>
-                <span className="hidden sm:inline">{category.label}</span>
-              </Button>
-            );
-          })}
+      <div className="relative">
+        {tabsScroll.canLeft && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background via-background/80 to-transparent"
+          />
+        )}
+        {tabsScroll.canRight && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background via-background/80 to-transparent"
+          />
+        )}
+        <nav
+          ref={tabsRef}
+          aria-label="Help categories"
+          className="-mx-1 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex min-w-max gap-2" role="tablist" aria-label="Help categories">
+            {CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const active = category.id === activeCategory;
+              return (
+                <Button
+                  key={category.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls="faq-category-panel"
+                  variant={active ? "default" : "secondary"}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={cn(
+                    "h-11 gap-2 rounded-full border px-4 text-sm",
+                    active ? "border-signal" : "border-border bg-surface text-muted-foreground",
+                  )}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                  <span className="sm:hidden">{category.shortLabel}</span>
+                  <span className="hidden sm:inline">{category.label}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+      {(tabsScroll.canLeft || tabsScroll.canRight) && (
+        <div
+          aria-hidden="true"
+          className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-border/50"
+        >
+          <div
+            className="h-full rounded-full bg-signal shadow-[0_0_8px_color-mix(in_oklab,var(--signal)_55%,transparent)]"
+            style={{
+              width: `${tabsScroll.thumbWidth}%`,
+              marginLeft: `${tabsScroll.thumbLeft}%`,
+            }}
+          />
         </div>
-      </nav>
+      )}
 
       <section
         id="faq-category-panel"
