@@ -45,7 +45,9 @@ import {
 } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
+import { useSessionElementScroll } from "@/hooks/use-session-scroll";
 import { saveMyLocation } from "@/lib/hunter-location";
+import { readSessionState, writeSessionState } from "@/lib/session-state";
 
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
@@ -269,7 +271,7 @@ function MapScreen() {
   const navigate = useNavigate();
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
@@ -286,9 +288,32 @@ function MapScreen() {
   const [guidesOpen, setGuidesOpen] = useState(false);
   const dragStartY = useRef<number | null>(null);
   const drawerDragged = useRef(false);
+  const homeStateRestored = useRef(false);
+  const drawerScrollRef = useSessionElementScroll<HTMLDivElement>("onlooker:scroll:home-drawer");
 
   const { boostOf } = useBoosts();
   const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
+
+  useEffect(() => {
+    const saved = readSessionState<{
+      drawerOpen?: boolean;
+      mapFilter?: "all" | "live" | "nearby" | "high";
+      categoryTile?: string | null;
+    }>("onlooker:view:home", {});
+    if (typeof saved.drawerOpen === "boolean") setDrawerOpen(saved.drawerOpen);
+    if (saved.mapFilter === "all" || saved.mapFilter === "live" || saved.mapFilter === "nearby" || saved.mapFilter === "high") {
+      setMapFilter(saved.mapFilter);
+    }
+    if (saved.categoryTile === null || MAP_CATEGORY_TILES.some((tile) => tile.id === saved.categoryTile)) {
+      setCategoryTile(saved.categoryTile ?? null);
+    }
+    homeStateRestored.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!homeStateRestored.current) return;
+    writeSessionState("onlooker:view:home", { drawerOpen, mapFilter, categoryTile });
+  }, [drawerOpen, mapFilter, categoryTile]);
 
   // Send expired, unfulfilled deposits back to their requesters.
   useEffect(() => {
@@ -456,6 +481,7 @@ function MapScreen() {
         onSelect={select}
         onUserPositionChange={setUserPosition}
         centerTarget={centerTarget}
+        viewportStorageKey="onlooker:map:home"
         crisisMode={crisisMode}
         trafficMode={trafficMode}
         gatheringMode={gatheringMode}
@@ -559,7 +585,7 @@ function MapScreen() {
           </span>
         </Button>
 
-        <div className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
+        <div ref={drawerScrollRef} className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
           <div className="border-t border-border pb-3 pt-3">
             <div className="mb-2 flex items-center gap-2">
               <History className="size-4 text-signal" aria-hidden />
