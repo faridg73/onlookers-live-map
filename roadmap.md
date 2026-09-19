@@ -151,3 +151,8 @@ Home Events & Arts neon category artwork
 - [x] Restore accessible expand/collapse controls for every guideline question
 - [x] Show and require explicit real estate authorization in bounty forms
 - [x] Enforce the authorization attestation during server-side posting
+
+## Mobile safe-area and close controls
+- [x] Keep shared dialogs, sheets, and custom full-screen panels below the phone status area
+- [x] Standardize modal and view close controls as visible 44px circular tap targets
+- [x] Verify Help & FAQ spacing and close navigation on a phone viewport
