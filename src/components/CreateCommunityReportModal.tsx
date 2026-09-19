@@ -16,7 +16,9 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { createCommunityPost, uploadCommunityPhoto } from "@/lib/community";
 import { awardReputation } from "@/lib/reputation";
