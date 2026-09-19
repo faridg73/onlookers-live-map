@@ -16,7 +16,9 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { createCommunityPost, uploadCommunityPhoto } from "@/lib/community";
 import { awardReputation } from "@/lib/reputation";
@@ -72,12 +74,17 @@ export function CreateCommunityReportModal({
   const [analyzing, setAnalyzing] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const { unit } = useDistanceUnit(coords ? { lat: coords.latitude, lng: coords.longitude } : null);
 
   useEffect(() => {
     if (!open) return;
+    setFormError(null);
     void fetchMyTrustLevel().then(setLevel);
+    void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
@@ -130,7 +137,12 @@ export function CreateCommunityReportModal({
 
   const submit = async () => {
     if (!picked || !ready) return;
+    if (signedIn === false) {
+      setFormError("Sign in to file a report — tap Sign in below.");
+      return;
+    }
     setBusy(true);
+    setFormError(null);
     try {
       await createCommunityPost({
         category: picked.category,
@@ -160,7 +172,9 @@ export function CreateCommunityReportModal({
       onPosted?.();
       onOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't file that report.");
+      const message = err instanceof Error ? err.message : "Couldn't file that report.";
+      setFormError(message);
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -346,18 +360,37 @@ export function CreateCommunityReportModal({
             </p>
           </section>
 
-          <Button
-            type="button"
-            disabled={!ready || busy}
-            onClick={() => void submit()}
-            className={`mt-3 h-12 w-full border-2 text-sm font-extrabold uppercase ${
-              ready
-                ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_18px_var(--color-crisis)] hover:bg-crisis/20"
-                : "border-border bg-surface-raised text-muted-foreground shadow-none"
-            }`}
-          >
-            {busy ? "Submitting…" : "Submit Report"}
-          </Button>
+          {formError ? (
+            <p role="alert" className="mt-2 rounded-md border border-crisis bg-crisis/15 px-3 py-2 text-xs font-bold text-crisis">
+              {formError}
+            </p>
+          ) : null}
+
+          {signedIn === false ? (
+            <Button
+              type="button"
+              onClick={() => {
+                onOpenChange(false);
+                void navigate({ to: "/auth" });
+              }}
+              className="mt-3 h-12 w-full border-2 border-signal bg-signal/15 text-sm font-extrabold uppercase text-signal shadow-[0_0_18px_var(--color-signal)] hover:bg-signal/20"
+            >
+              Sign in to submit
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              disabled={!ready || busy}
+              onClick={() => void submit()}
+              className={`mt-3 h-12 w-full border-2 text-sm font-extrabold uppercase ${
+                ready
+                  ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_18px_var(--color-crisis)] hover:bg-crisis/20"
+                  : "border-border bg-surface-raised text-muted-foreground shadow-none"
+              }`}
+            >
+              {busy ? "Submitting…" : "Submit Report"}
+            </Button>
+          )}
         </footer>
       </div>
     </div>,
