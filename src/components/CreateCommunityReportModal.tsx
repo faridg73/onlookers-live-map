@@ -38,7 +38,7 @@ const ICONS: Record<IncidentType["id"], typeof Flame> = {
   general: AlertTriangle,
 };
 
-const REPORT_INCIDENTS = INCIDENT_TYPES.filter((type) => type.id !== "general");
+const REPORT_INCIDENTS = INCIDENT_TYPES;
 
 const LEGAL_LINE =
   "I understand that intentional false reports or pranks result in immediate account suspension and a permanent platform ban.";
