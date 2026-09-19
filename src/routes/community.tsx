@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, UserCheck, X } from "lucide-react";
+import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -93,7 +93,7 @@ function CommunityHub() {
   const [tag, setTag] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
   const [strangeSightings, setStrangeSightings] = useState(false);
-  const [view, setView] = useState<"feed" | "map">("feed");
+  const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
@@ -177,7 +177,7 @@ function CommunityHub() {
       tag?: string | null;
       categoryId?: BroadcastCategoryId | null;
       strangeSightings?: boolean;
-      view?: "feed" | "map";
+      view?: "feed" | "map" | "alerts";
       source?: "all" | "following";
       impactView?: "help" | "mine";
       radius?: RadiusChoiceId;
@@ -190,7 +190,7 @@ function CommunityHub() {
     setTag(saved.tag ?? null);
     if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
     setStrangeSightings(Boolean(saved.strangeSightings));
-    if (saved.view === "feed" || saved.view === "map") setView(saved.view);
+    if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
     if (saved.impactView === "help" || saved.impactView === "mine") setImpactView(saved.impactView);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
