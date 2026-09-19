@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { useHumanCheck } from "@/components/HumanCheck";
@@ -48,6 +49,17 @@ export function BountyBottomSheet({
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
   const human = useHumanCheck("accept-bounty");
+  const router = useRouter();
+  const navigate = useNavigate();
+
+  /** Return to the exact previous page/view, with the map as a safe fallback. */
+  function goBack() {
+    if (window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+    void navigate({ to: "/" });
+  }
 
   if (!request) return null;
 
@@ -119,7 +131,22 @@ export function BountyBottomSheet({
         }
       }}
     >
-      <SheetContent side="bottom" className="rounded-t-3xl border-border bg-surface px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5">
+      <SheetContent
+        side="bottom"
+        className="flex max-h-[88dvh] flex-col rounded-t-3xl border-border bg-surface px-4 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-5"
+      >
+        {/* Back to the exact previous view, mirroring the built-in close button. */}
+        <button
+          type="button"
+          onClick={goBack}
+          aria-label="Go back to the previous page"
+          className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-10 grid size-11 cursor-pointer place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <ArrowLeft className="size-5 text-signal" aria-hidden />
+          <span className="sr-only">Back</span>
+        </button>
+        {/* Everything below the two header controls scrolls vertically. */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-14">
         <SheetHeader className="text-left">
           <div className="flex items-center gap-2">
             <CategoryBadge category={request.category} compact />
@@ -213,6 +240,7 @@ export function BountyBottomSheet({
             </div>
           </>
         )}
+        </div>
       </SheetContent>
     </Sheet>
   );
