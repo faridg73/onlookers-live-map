@@ -1386,6 +1386,50 @@ export type Database = {
         }
         Relationships: []
       }
+      request_site_pins: {
+        Row: {
+          attempts: number
+          created_at: string
+          last_attempt_at: string | null
+          pin: string
+          request_id: string
+          requester_id: string
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          last_attempt_at?: string | null
+          pin: string
+          request_id: string
+          requester_id: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          last_attempt_at?: string | null
+          pin?: string
+          request_id?: string
+          requester_id?: string
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_site_pins_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           bounty_amount: number
@@ -2393,6 +2437,7 @@ export type Database = {
         Returns: string
       }
       request_is_live: { Args: { _request_id: string }; Returns: boolean }
+      request_site_pin_state: { Args: { _request_id: string }; Returns: Json }
       resolve_dispute: {
         Args: { _award_spotter: boolean; _request_id: string }
         Returns: boolean
@@ -2477,6 +2522,10 @@ export type Database = {
         }[]
       }
       trust_level: { Args: { _user_id: string }; Returns: number }
+      verify_request_site_pin: {
+        Args: { _pin: string; _request_id: string }
+        Returns: Json
+      }
       vote_on_community_report: {
         Args: { _post_id: string; _vote: string }
         Returns: {
