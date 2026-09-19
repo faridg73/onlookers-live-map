@@ -117,7 +117,7 @@ function FAQScreen() {
           type="button"
           aria-label="Close help and FAQ"
           onClick={() => void navigate({ to: "/" })}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-5" />
         </button>

@@ -109,7 +109,7 @@ function HuntScreen() {
           type="button"
           onClick={close}
           aria-label="Close Hunter dashboard"
-          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-5" aria-hidden />
         </button>

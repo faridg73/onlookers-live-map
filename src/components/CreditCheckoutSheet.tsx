@@ -59,7 +59,7 @@ export function CreditCheckoutSheet({
         className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-border bg-surface-raised sm:rounded-3xl"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <div className="flex items-center justify-between border-b border-border px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pt-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
               {pack.credits} Credits, {formatPackPrice(pack.priceCents)}
@@ -70,7 +70,7 @@ export function CreditCheckoutSheet({
             type="button"
             onClick={onClose}
             aria-label="Close checkout"
-            className="rounded-full border border-border p-2 text-muted-foreground hover:text-foreground"
+            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm hover:bg-secondary"
           >
             <X className="size-4" />
           </button>

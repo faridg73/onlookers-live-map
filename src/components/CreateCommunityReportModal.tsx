@@ -226,17 +226,17 @@ export function CreateCommunityReportModal({
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end justify-center bg-background/90 p-0 sm:items-center sm:p-6">
       <form
-        className="flex max-h-[96dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:rounded-2xl"
+        className="flex max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:max-h-[96dvh] sm:rounded-2xl"
         onSubmit={(event) => void submit(event)}
       >
-        <header className="z-10 flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
+        <header className="z-10 flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pt-3">
           <Button type="button" variant="ghost" size="icon" aria-label="Back" onClick={() => onOpenChange(false)}>
             <ArrowLeft className="size-5 text-signal" />
           </Button>
           <h2 className="text-center text-base font-extrabold uppercase text-signal sm:text-lg">
             Create Community Report
           </h2>
-          <Button type="button" variant="ghost" size="icon" aria-label="Close report form" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="secondary" size="icon" aria-label="Close report form" onClick={() => onOpenChange(false)} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 shadow-sm">
             <X className="size-5 text-signal" />
           </Button>
         </header>

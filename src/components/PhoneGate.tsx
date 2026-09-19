@@ -98,7 +98,7 @@ function PhoneGateDialog({
         onClick={onCancel}
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
       />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-border bg-background p-5 pb-8 sm:rounded-3xl">
+      <div className="relative z-10 max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-md overflow-y-auto rounded-t-3xl border border-border bg-background px-5 pb-8 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-h-[90dvh] sm:p-5 sm:pb-8 sm:rounded-3xl">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="grid size-9 place-items-center rounded-full bg-signal text-signal-foreground">
@@ -118,7 +118,7 @@ function PhoneGateDialog({
             type="button"
             onClick={onCancel}
             aria-label="Close"
-            className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-muted-foreground"
+            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm"
           >
             <X className="size-4" />
           </button>

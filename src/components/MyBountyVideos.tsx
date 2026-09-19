@@ -248,7 +248,7 @@ export function MyBountyVideos() {
                           type="button"
                           aria-label="Close video"
                           onClick={() => setPlaying(null)}
-                          className="absolute right-1.5 top-1.5 flex size-8 items-center justify-center rounded-full bg-black/75 text-signal transition-colors hover:bg-black"
+                          className="absolute right-1.5 top-1.5 grid size-11 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary"
                         >
                           <X className="size-4" />
                         </button>

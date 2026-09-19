@@ -67,7 +67,7 @@ export function VideoRecorder({
           type="button"
           aria-label="Close camera"
           onClick={onClose}
-          className="rounded-full bg-white/10 p-2 text-white"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm"
         >
           <X className="size-4" />
         </button>

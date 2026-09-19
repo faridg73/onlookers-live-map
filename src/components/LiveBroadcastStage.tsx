@@ -122,7 +122,7 @@ export function LiveBroadcastStage({
           aria-label="Close capture"
           disabled={saving}
           onClick={() => onEndRef.current({ saved: false, seconds: null })}
-          className="rounded-full bg-white/10 p-2 text-white disabled:opacity-50"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm disabled:opacity-50"
         >
           <X className="size-4" />
         </button>
@@ -167,7 +167,7 @@ export function LiveBroadcastStage({
                 type="button"
                 aria-label="Close live chat"
                 onClick={() => setChatOpen(false)}
-                className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground"
+                className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm"
               >
                 <X className="size-4" />
               </button>
