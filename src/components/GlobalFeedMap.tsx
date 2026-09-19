@@ -80,6 +80,7 @@ export function GlobalFeedMap({
   }, [viewportStorageKey]);
 
   const filteredClips = useMemo(() => {
+    if (emergencyOnly) return [];
     const categoryNeedle = categoryLabel?.toLowerCase().trim();
     const categoryIdNeedle = categoryId?.toLowerCase().trim();
     const vibeNeedle = subcategory?.toLowerCase().trim();
@@ -90,7 +91,7 @@ export function GlobalFeedMap({
         : !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
       return categoryMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
     });
-  }, [clips, categoryId, categoryLabel, subcategory]);
+  }, [clips, categoryId, categoryLabel, subcategory, emergencyOnly]);
   const pinned = useMemo(
     () => filteredClips.filter((c) => c.latitude !== null && c.longitude !== null),
     [filteredClips],
@@ -115,10 +116,18 @@ export function GlobalFeedMap({
     };
   }, [focus, mapReady]);
 
-  // Every located report, whatever its community-verification status.
+  // Every located report, whatever its community-verification status. The
+  // emergency view keeps only Level 3 lanes (fire, police, medical).
   const pinnedReports = useMemo(
-    () => reports.filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null),
-    [reports],
+    () =>
+      reports.filter(
+        (post) =>
+          post.reportIncidentType &&
+          post.latitude !== null &&
+          post.longitude !== null &&
+          (!emergencyOnly || incidentById(post.reportIncidentType)?.emergency === true),
+      ),
+    [reports, emergencyOnly],
   );
 
   // Draw one marker per located clip.
