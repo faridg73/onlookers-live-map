@@ -246,6 +246,9 @@ function PostScreen() {
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
   const [subcategory, setSubcategory] = useState<string | null>(null);
   const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
+  /** The main category the subcategory list hangs off (17 in total). */
+  const [mainCategoryId, setMainCategoryId] = useState<MainCategoryId>("breaking-incidents");
+
 
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
