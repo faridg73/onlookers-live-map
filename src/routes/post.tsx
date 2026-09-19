@@ -760,7 +760,10 @@ function PostScreen() {
                       categoryId={categoryId}
                       subcategory={subcategory}
                       onCategoryChange={(next) => {
-                        if (next) setCategoryId(next);
+                        if (next) {
+                          setCategoryId(next);
+                          setPermissionOk(false);
+                        }
                       }}
                       onSubcategoryChange={setSubcategory}
                       laneLabel="Flash lane"
