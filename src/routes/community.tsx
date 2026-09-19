@@ -861,7 +861,25 @@ function CommunityHub() {
         </div>
       </div>
 
-      {view === "map" ? (
+      {view === "alerts" ? (
+        <div className="mt-5 px-5 sm:px-8">
+          <SectionBoundary label="Emergency alert map">
+            <div className="mt-6 rounded-2xl border border-crisis/40 bg-crisis/10 px-4 py-3">
+              <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-crisis">
+                <Siren className="size-4" /> Emergency alerts only
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                High-priority fire, police and medical reports filed by verified Level 3 creators. Bounties and general activity stay on the main feed.
+              </p>
+            </div>
+            <GlobalFeedMap
+              reports={posts}
+              viewportStorageKey="onlooker:map:community-alerts"
+              emergencyOnly
+            />
+          </SectionBoundary>
+        </div>
+      ) : view === "map" ? (
         <div className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="The map">
             <GlobalFeedMap
