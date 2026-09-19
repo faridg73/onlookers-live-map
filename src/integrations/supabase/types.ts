@@ -2343,6 +2343,7 @@ export type Database = {
           _reason_code: string
           _request_id: string
           _storage_path?: string
+          _user_id: string
         }
         Returns: boolean
       }
