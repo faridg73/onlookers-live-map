@@ -157,6 +157,18 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       });
     }
 
+    // Real estate bounties get a unique 6-digit on-site PIN. Only the poster
+    // ever sees it; the onlooker has to get it from the agent standing at the
+    // property, which is what unlocks footage submission and the payout.
+    if (data.category === "realestate") {
+      await supabaseAdmin.from("request_site_pins").insert({
+        request_id: row.id,
+        requester_id: context.userId,
+        pin: generateSitePin(),
+      });
+    }
+
+
     // Text the nearby onlookers who asked for text alerts. A texting problem
     // must never stop a paid request from going live.
     try {
