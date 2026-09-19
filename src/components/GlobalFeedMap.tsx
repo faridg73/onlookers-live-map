@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play, Siren } from "lucide-react";
+import { BadgeCheck, Clock, CoinsIcon, Eye, Globe2, Loader2, MapPin, Play, Siren, X } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +40,7 @@ export function GlobalFeedMap({
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeReportId, setActiveReportId] = useState<string | null>(null);
   // Flips once the map object exists, so a focus that arrived earlier still lands.
   const [mapReady, setMapReady] = useState(false);
   const holder = useRef<HTMLDivElement | null>(null);
@@ -182,13 +183,15 @@ export function GlobalFeedMap({
             ? styles.getPropertyValue("--crisis").trim()
             : styles.getPropertyValue("--muted-foreground").trim();
       const strokeColor = styles.getPropertyValue("--background").trim();
-      return new google.maps.Marker({
+      const marker = new google.maps.Marker({
         map: map.current,
         position: { lat: post.latitude!, lng: post.longitude! },
         title: `${post.title} · ${status}`,
         zIndex: 999,
         icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
       });
+      marker.addListener("click", () => setActiveReportId((current) => (current === post.id ? null : post.id)));
+      return marker;
     });
     return () => {
       reportMarkers.current.forEach((marker) => marker.setMap(null));
@@ -197,6 +200,7 @@ export function GlobalFeedMap({
   }, [pinnedReports, mapReady, emergencyOnly]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
+  const activeReport = pinnedReports.find((p) => p.id === activeReportId) ?? null;
 
   return (
     <div className="mt-6">
@@ -213,6 +217,7 @@ export function GlobalFeedMap({
             </>
           )}
         </span>
+        {activeReport && <ReportDetailCard post={activeReport} onClose={() => setActiveReportId(null)} />}
       </div>
 
       {emergencyOnly ? (
@@ -245,6 +250,85 @@ export function GlobalFeedMap({
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function formatAlertTime(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const minutes = Math.round((Date.now() - date.getTime()) / 60000);
+  const relative =
+    minutes < 1 ? "just now"
+      : minutes < 60 ? `${minutes} min ago`
+        : minutes < 1440 ? `${Math.round(minutes / 60)} hr ago`
+          : `${Math.round(minutes / 1440)} d ago`;
+  return { relative, absolute: date.toLocaleString() };
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  confirmed: "Confirmed",
+  disputed: "Disputed",
+  unverified: "Unverified",
+  expired: "Expired",
+};
+
+/** Popup shown when a red report pin is tapped: category, details, time, creator. */
+function ReportDetailCard({ post, onClose }: { post: CommunityPost; onClose: () => void }) {
+  const incident = post.reportIncidentType ? incidentById(post.reportIncidentType) : undefined;
+  const time = formatAlertTime(post.createdAt);
+  const isEmergency = incident?.emergency === true;
+
+  return (
+    <div className="absolute inset-x-2 bottom-2 z-10 max-h-[85%] overflow-y-auto rounded-2xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+        <div className="min-w-0">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] ${
+              isEmergency ? "bg-crisis text-crisis-foreground" : "bg-surface-raised text-foreground"
+            }`}
+          >
+            {isEmergency && <Siren className="size-3" />}
+            {incident?.label ?? "Community report"}
+          </span>
+          <h3 className="mt-1.5 truncate font-display text-sm leading-tight text-foreground">{post.title}</h3>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close report details"
+          className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-raised text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+
+      {post.body && <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{post.body}</p>}
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <BadgeCheck className="size-3.5 text-signal" />
+          {post.authorName}
+          {post.authorVerified && <span className="font-bold text-signal"> · verified</span>}
+          <span className="text-muted-foreground/70"> · Trust Lv {post.reporterTrustLevel ?? 1}</span>
+        </span>
+        {time && (
+          <span className="inline-flex items-center gap-1" title={time.absolute}>
+            <Clock className="size-3" /> {time.relative}
+          </span>
+        )}
+        <span
+          className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] ${
+            post.reportStatus === "confirmed"
+              ? "bg-signal/15 text-signal"
+              : post.reportStatus === "disputed"
+                ? "bg-crisis/15 text-crisis"
+                : "bg-surface-raised text-muted-foreground"
+          }`}
+        >
+          {STATUS_LABEL[post.reportStatus ?? "unverified"]}
+        </span>
+      </div>
     </div>
   );
 }
