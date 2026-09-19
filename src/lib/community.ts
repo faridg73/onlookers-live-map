@@ -278,14 +278,14 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
   const authorIds = [...new Set(rows.map((r) => r.user_id))];
   const authors = new Map<string, { name: string; avatar: string | null; level: number; verified: boolean }>();
   if (authorIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url, hunter_level, is_incognito, alias, is_verified")
-      .in("id", authorIds);
+    const { data: profiles, error: profileError } = await supabase.rpc("public_creator_cards", {
+      _ids: authorIds,
+    });
+    if (profileError) console.error("[community] could not load post authors", profileError);
     for (const p of profiles ?? []) {
       authors.set(p.id, {
-        name: p.is_incognito ? (p.alias ?? "Onlooker") : (p.display_name ?? "Onlooker"),
-        avatar: p.is_incognito ? null : (p.avatar_url ?? null),
+        name: p.name || "Onlooker",
+        avatar: p.avatar_url ?? null,
         level: p.hunter_level ?? 1,
         verified: Boolean(p.is_verified),
       });

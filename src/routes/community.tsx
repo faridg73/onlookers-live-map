@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, X } from "lucide-react";
+import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
+import { FOLLOWS_CHANGED_EVENT, listFollowedCreatorIds } from "@/lib/follows";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { distanceMiles, type MapPosition } from "@/lib/onlooker";
@@ -93,6 +94,8 @@ function CommunityHub() {
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map">("feed");
+  const [source, setSource] = useState<"all" | "following">("all");
+  const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
@@ -145,12 +148,37 @@ function CommunityHub() {
   }, [load]);
 
   useEffect(() => {
+    if (!user) {
+      setFollowedIds([]);
+      return;
+    }
+    let alive = true;
+    const load = () =>
+      listFollowedCreatorIds()
+        .then((ids) => {
+          if (alive) setFollowedIds(ids);
+        })
+        .catch((err) => {
+          console.error("[community] could not load followed creators", err);
+          if (alive) setFollowedIds([]);
+        });
+    void load();
+    const refresh = () => void load();
+    window.addEventListener(FOLLOWS_CHANGED_EVENT, refresh);
+    return () => {
+      alive = false;
+      window.removeEventListener(FOLLOWS_CHANGED_EVENT, refresh);
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
     const saved = readSessionState<{
       category?: CommunityCategory | "all";
       tag?: string | null;
       categoryId?: BroadcastCategoryId | null;
       strangeSightings?: boolean;
       view?: "feed" | "map";
+      source?: "all" | "following";
       impactView?: "help" | "mine";
       radius?: RadiusChoiceId;
       vibeGridOpen?: boolean;
@@ -163,6 +191,7 @@ function CommunityHub() {
     if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
     setStrangeSightings(Boolean(saved.strangeSightings));
     if (saved.view === "feed" || saved.view === "map") setView(saved.view);
+    if (saved.source === "all" || saved.source === "following") setSource(saved.source);
     if (saved.impactView === "help" || saved.impactView === "mine") setImpactView(saved.impactView);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
     setVibeGridOpen(Boolean(saved.vibeGridOpen));
@@ -178,12 +207,13 @@ function CommunityHub() {
       categoryId,
       strangeSightings,
       view,
+      source,
       impactView,
       radius,
       vibeGridOpen,
       focus,
     });
-  }, [category, tag, categoryId, strangeSightings, view, impactView, radius, vibeGridOpen, focus]);
+  }, [category, tag, categoryId, strangeSightings, view, source, impactView, radius, vibeGridOpen, focus]);
 
   useEffect(() => {
     if (!mystery) return;
@@ -285,12 +315,18 @@ function CommunityHub() {
     return haystack.includes(needle);
   }, []);
 
+  const followedSet = useMemo(() => new Set(followedIds), [followedIds]);
+
   const visible = useMemo(() => {
     const limit = radiusMilesFor(radius);
     const sort = (list: Array<{ post: CommunityPost; miles: number | null }>) =>
       [...list].sort((a, b) => {
         const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
         if (pinDiff !== 0) return pinDiff;
+        // Creators you follow always rise above the rest of the feed.
+        const followDiff =
+          Number(followedSet.has(b.post.userId)) - Number(followedSet.has(a.post.userId));
+        if (followDiff !== 0) return followDiff;
         if (a.miles !== null && b.miles !== null) return a.miles - b.miles;
         if (a.miles !== null) return -1;
         if (b.miles !== null) return 1;
@@ -309,11 +345,13 @@ function CommunityHub() {
       if (post.category !== category) return false;
       return !categoryId || post.tags.some((postTag) => postTag.toLowerCase() === categoryId);
     });
-    const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
+    const followedOnly =
+      source === "following" ? inLane.filter(({ post }) => followedSet.has(post.userId)) : inLane;
+    const exact = tag ? followedOnly.filter(({ post }) => matchesTag(post, tag)) : followedOnly;
 
     // Subcategory pills are strict: never substitute sibling or unrelated posts.
     return sort(exact);
-  }, [posts, category, categoryId, strangeSightings, tag, radius, distanceFor, matchesTag]);
+  }, [posts, category, categoryId, strangeSightings, tag, radius, distanceFor, matchesTag, source, followedSet]);
 
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
@@ -759,6 +797,31 @@ function CommunityHub() {
           >
             <MapIcon className="size-3.5" /> Map
           </Button>
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setSource("all")}
+            aria-pressed={source === "all"}
+            className={`rounded-full text-xs font-bold ${
+              source === "all" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
+            }`}
+          >
+            Everyone
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setSource("following")}
+            aria-pressed={source === "following"}
+            className={`rounded-full text-xs font-bold ${
+              source === "following" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
+            }`}
+          >
+            <UserCheck className="size-3.5" /> Following
+          </Button>
         </div>
         <div className="flex gap-2">
           <Button
@@ -804,7 +867,24 @@ function CommunityHub() {
         <section className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="The community feed">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
-          {!loading && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
+          {!loading && source === "following" && visible.length === 0 && (
+            <div className="mb-6 rounded-2xl border border-dashed border-signal/45 bg-card p-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                {followedIds.length === 0
+                  ? "You don't follow anyone yet. Tap Follow on a creator and their posts land here first."
+                  : "Nobody you follow has posted in this area yet."}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setSource("all")}
+                className="mt-4 rounded-full bg-signal px-5 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground hover:bg-signal/90"
+              >
+                Browse everyone
+              </Button>
+            </div>
+          )}
+          {!loading && source === "all" && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.

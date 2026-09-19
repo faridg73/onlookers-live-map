@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Flame } from "lucide-react";
 import { fetchTopReportersWeekly, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
+import { FollowButton } from "@/components/FollowButton";
 
 /** Small gamified ranking of who earned the most bounty cash in the last 7 days. */
 export function WeeklyTopOnlookers({ limit = 5 }: { limit?: number }) {
@@ -64,6 +65,7 @@ export function WeeklyTopOnlookers({ limit = 5 }: { limit?: number }) {
               <span className="min-w-0 flex-1 truncate text-sm text-foreground">
                 {r.display_name}
               </span>
+              <FollowButton creatorId={r.user_id} creatorName={r.display_name} />
               <span className="text-xs text-muted-foreground">
                 {r.clips} {r.clips === 1 ? "clip" : "clips"}
               </span>

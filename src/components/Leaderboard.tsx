@@ -4,6 +4,7 @@ import { formatCredits } from "@/lib/credits";
 import { Crown, Trophy } from "lucide-react";
 import { fetchTopReporters, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
+import { FollowButton } from "@/components/FollowButton";
 
 const MEDALS = ["text-signal", "text-foreground", "text-muted-foreground"];
 
@@ -90,6 +91,11 @@ export function Leaderboard({
                 <p className="text-xs text-muted-foreground">
                   {r.clips} {r.clips === 1 ? "clip" : "clips"} sent
                 </p>
+                <FollowButton
+                  creatorId={r.user_id}
+                  creatorName={r.display_name}
+                  className="mt-1.5"
+                />
               </div>
               <span className="font-display text-lg text-signal">
                 {formatCredits(r.total_earned)}
