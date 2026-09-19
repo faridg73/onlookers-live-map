@@ -193,12 +193,14 @@ function FAQScreen() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const [activeCategory, setActiveCategory] = useState<CategoryId>("bounties");
-  const selected = CATEGORIES.find((category) => category.id === activeCategory) ?? CATEGORIES[0];
+  const selected = CATEGORIES.find((category) => category.id === activeCategory);
 
   const close = () => {
     if (canGoBack) router.history.back();
     else void router.navigate({ to: "/" });
   };
+
+  if (!selected) return null;
 
   return (
     <main className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
