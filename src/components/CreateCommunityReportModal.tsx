@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   AlertTriangle,
@@ -105,7 +105,22 @@ export function CreateCommunityReportModal({
 
   const picked = incident ? incidentById(incident) : undefined;
   const locked = Boolean(picked?.emergency) && level < 3;
-  const ready = Boolean(picked) && !locked && details.trim().length >= 8 && accepted && !uploading && !analyzing;
+  const detailsLength = details.trim().length;
+  const radiusValid = Number.isFinite(radius) && radius >= 100 && radius <= 2000;
+  const ready = Boolean(picked) && !locked && radiusValid && detailsLength >= 8 && accepted && !uploading && !analyzing;
+  const requirementMessage = !picked
+    ? "Select an incident type."
+    : locked
+      ? "This incident type requires Level 3 verification."
+      : !radiusValid
+        ? "Choose a geo-radius between 100m and 2km."
+        : detailsLength < 8
+          ? `Add at least ${8 - detailsLength} more character${8 - detailsLength === 1 ? "" : "s"} to Details / Witnesses.`
+          : !accepted
+            ? "Check the legal agreement to enable Submit Report."
+            : uploading || analyzing
+              ? "Wait for the media check to finish."
+              : "Ready to submit.";
   const tier = trustTier(level);
   const radiusLabel =
     unit === "mi"
@@ -115,6 +130,7 @@ export function CreateCommunityReportModal({
         : `${(radius / 1000).toFixed(1)} km`;
 
   const handleFile = (file: File) => {
+    setFormError(null);
     const previewUrl = URL.createObjectURL(file);
     setMediaPreview({
       url: previewUrl,
@@ -129,14 +145,22 @@ export function CreateCommunityReportModal({
         await new Promise((resolve) => window.setTimeout(resolve, 900));
         setAnalyzing(false);
       })
-      .catch((err: unknown) =>
-        toast.error(err instanceof Error ? err.message : "Couldn't attach that media."),
-      )
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : "Couldn't attach that media.";
+        setMediaPath(null);
+        setAnalyzing(false);
+        setFormError(message);
+        toast.error(message);
+      })
       .finally(() => setUploading(false));
   };
 
-  const submit = async () => {
-    if (!picked || !ready) return;
+  const submit = async (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    if (!picked || !ready) {
+      setFormError(requirementMessage);
+      return;
+    }
     if (signedIn === false) {
       setFormError("Sign in to file a report — tap Sign in below.");
       return;
@@ -182,7 +206,10 @@ export function CreateCommunityReportModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end justify-center bg-background/90 p-0 sm:items-center sm:p-6">
-      <div className="flex max-h-[96dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:rounded-2xl">
+      <form
+        className="flex max-h-[96dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:rounded-2xl"
+        onSubmit={(event) => void submit(event)}
+      >
         <header className="z-10 flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
           <Button type="button" variant="ghost" size="icon" aria-label="Back" onClick={() => onOpenChange(false)}>
             <ArrowLeft className="size-5 text-signal" />
@@ -214,7 +241,10 @@ export function CreateCommunityReportModal({
                     variant="ghost"
                     aria-pressed={on}
                     disabled={isLocked}
-                    onClick={() => setIncident(type.id)}
+                    onClick={() => {
+                      setIncident(type.id);
+                      setFormError(null);
+                    }}
                     className={`h-[4.75rem] min-w-0 flex-col gap-1 rounded-md border px-1 py-2 text-[0.68rem] font-bold ${
                       on
                         ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_16px_var(--color-crisis)]"
@@ -315,7 +345,10 @@ export function CreateCommunityReportModal({
               step={100}
               value={radius}
               aria-label={`Active geo-radius, ${radiusLabel}`}
-              onChange={(e) => setRadius(Number(e.target.value))}
+              onChange={(e) => {
+                setRadius(Number(e.target.value));
+                setFormError(null);
+              }}
               className="mt-2 w-full accent-signal"
             />
             <p className="mt-1 text-[0.68rem] text-muted-foreground">
@@ -330,11 +363,21 @@ export function CreateCommunityReportModal({
             </p>
             <textarea
               value={details}
-              onChange={(e) => setDetails(e.target.value)}
+              onChange={(e) => {
+                setDetails(e.target.value);
+                setFormError(null);
+              }}
               rows={3}
+              minLength={8}
+              maxLength={2000}
+              required
               placeholder="Enter details or witness accounts…"
+              aria-describedby="report-requirements"
               className="mt-2 w-full resize-none rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-signal"
             />
+            <p className="mt-1 text-right text-[0.68rem] text-muted-foreground">
+              {detailsLength}/8 minimum
+            </p>
           </section>
           </div>
         </div>
@@ -349,7 +392,10 @@ export function CreateCommunityReportModal({
               <input
                 type="checkbox"
                 checked={accepted}
-                onChange={(e) => setAccepted(e.target.checked)}
+                onChange={(e) => {
+                  setAccepted(e.target.checked);
+                  setFormError(null);
+                }}
                 className="mt-0.5 size-4 shrink-0 accent-crisis"
               />
               <span>{LEGAL_LINE}</span>
@@ -368,6 +414,14 @@ export function CreateCommunityReportModal({
             </p>
           ) : null}
 
+          <p
+            id="report-requirements"
+            aria-live="polite"
+            className={`mt-2 text-center text-[0.7rem] font-bold ${ready ? "text-signal" : "text-muted-foreground"}`}
+          >
+            {requirementMessage}
+          </p>
+
           {signedIn === false ? (
             <Button
               type="button"
@@ -381,9 +435,8 @@ export function CreateCommunityReportModal({
             </Button>
           ) : (
             <Button
-              type="button"
+              type="submit"
               disabled={!ready || busy}
-              onClick={() => void submit()}
               className={`mt-3 h-12 w-full border-2 text-sm font-extrabold uppercase ${
                 ready
                   ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_18px_var(--color-crisis)] hover:bg-crisis/20"
@@ -394,7 +447,7 @@ export function CreateCommunityReportModal({
             </Button>
           )}
         </footer>
-      </div>
+      </form>
     </div>,
     document.body,
   );
