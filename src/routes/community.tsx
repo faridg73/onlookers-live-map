@@ -391,7 +391,7 @@ function CommunityHub() {
               }
               void navigate({ to: "/" });
             }}
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface text-foreground transition-colors hover:border-signal hover:text-signal"
+            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:border-signal hover:bg-secondary hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="size-5" />
           </button>

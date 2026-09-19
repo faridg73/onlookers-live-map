@@ -1386,9 +1386,9 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
         role="dialog"
         aria-modal="true"
         aria-labelledby="guides-title"
-        className="relative flex max-h-[85vh] w-full max-w-lg animate-in slide-in-from-bottom-8 flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl duration-300"
+        className="relative flex max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-lg animate-in slide-in-from-bottom-8 flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl duration-300 sm:max-h-[85dvh]"
       >
-        <div className="flex items-start gap-3 border-b border-border px-4 py-3.5">
+        <div className="flex items-start gap-3 border-b border-border px-4 pb-3.5 pt-[max(0.875rem,env(safe-area-inset-top))] sm:pt-3.5">
           <BookOpen className="mt-0.5 size-5 shrink-0 text-signal" />
           <div className="min-w-0 flex-1">
             <h2 id="guides-title" className="text-base font-extrabold text-foreground">
@@ -1404,7 +1404,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
             size="icon"
             onClick={onClose}
             aria-label="Close guides"
-            className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+            className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 text-foreground shadow-sm hover:bg-secondary"
           >
             <X className="size-4" />
           </Button>

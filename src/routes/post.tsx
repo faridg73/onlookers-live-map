@@ -505,7 +505,7 @@ function PostScreen() {
                         : "Reward & escrow"}
               </h1>
             </div>
-            <Button type="button" variant="ghost" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })}>
+            <Button type="button" variant="secondary" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 shadow-sm">
               <X className="size-5" />
             </Button>
           </div>

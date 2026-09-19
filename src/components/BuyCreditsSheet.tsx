@@ -49,7 +49,7 @@ export function BuyCreditsSheet({
             type="button"
             aria-label="Close buy credits"
             onClick={onClose}
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground"
+            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm"
           >
             <X className="size-4" />
           </button>
