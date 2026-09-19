@@ -265,33 +265,65 @@ function FAQScreen() {
         </Button>
       </header>
 
-      <nav aria-label="Help categories" className="-mx-1 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max gap-2" role="tablist" aria-label="Help categories">
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const active = category.id === activeCategory;
-            return (
-              <Button
-                key={category.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                aria-controls="faq-category-panel"
-                variant={active ? "default" : "secondary"}
-                onClick={() => setActiveCategory(category.id)}
-                className={cn(
-                  "h-11 gap-2 rounded-full border px-4 text-sm",
-                  active ? "border-signal" : "border-border bg-surface text-muted-foreground",
-                )}
-              >
-                <Icon className="size-4" aria-hidden="true" />
-                <span className="sm:hidden">{category.shortLabel}</span>
-                <span className="hidden sm:inline">{category.label}</span>
-              </Button>
-            );
-          })}
+      <div className="relative">
+        {tabsScroll.canLeft && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background via-background/80 to-transparent"
+          />
+        )}
+        {tabsScroll.canRight && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background via-background/80 to-transparent"
+          />
+        )}
+        <nav
+          ref={tabsRef}
+          aria-label="Help categories"
+          className="-mx-1 overflow-x-auto px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="flex min-w-max gap-2" role="tablist" aria-label="Help categories">
+            {CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const active = category.id === activeCategory;
+              return (
+                <Button
+                  key={category.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls="faq-category-panel"
+                  variant={active ? "default" : "secondary"}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={cn(
+                    "h-11 gap-2 rounded-full border px-4 text-sm",
+                    active ? "border-signal" : "border-border bg-surface text-muted-foreground",
+                  )}
+                >
+                  <Icon className="size-4" aria-hidden="true" />
+                  <span className="sm:hidden">{category.shortLabel}</span>
+                  <span className="hidden sm:inline">{category.label}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
+      {(tabsScroll.canLeft || tabsScroll.canRight) && (
+        <div
+          aria-hidden="true"
+          className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-border/50"
+        >
+          <div
+            className="h-full rounded-full bg-signal shadow-[0_0_8px_color-mix(in_oklab,var(--signal)_55%,transparent)]"
+            style={{
+              width: `${tabsScroll.thumbWidth}%`,
+              marginLeft: `${tabsScroll.thumbLeft}%`,
+            }}
+          />
         </div>
-      </nav>
+      )}
 
       <section
         id="faq-category-panel"
