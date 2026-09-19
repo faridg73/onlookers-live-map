@@ -13,11 +13,12 @@ import { readSitePinState, verifySitePin, type SitePinState } from "@/lib/site-p
  */
 export function SitePinVerification({
   requestId,
-  onVerified,
+  onState,
 }: {
   /** Database id of the posted request. */
   requestId: string | null | undefined;
-  onVerified?: (state: SitePinState) => void;
+  /** Fires whenever the handshake state is loaded or changes. */
+  onState?: (state: SitePinState) => void;
 }) {
   const [state, setState] = useState<SitePinState | null>(null);
   const [digits, setDigits] = useState("");
@@ -28,7 +29,7 @@ export function SitePinVerification({
     if (!requestId) return;
     const next = await readSitePinState(requestId);
     setState(next);
-    if (next.verified) onVerified?.(next);
+    onState?.(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestId]);
 
