@@ -797,6 +797,17 @@ function CommunityHub() {
           >
             <MapIcon className="size-3.5" /> Map
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setView("alerts")}
+            className={`rounded-full text-xs font-bold ${
+              view === "alerts" ? "bg-crisis text-white" : "text-crisis"
+            }`}
+          >
+            <Siren className="size-3.5" /> Alerts
+          </Button>
           <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
           <Button
             type="button"
