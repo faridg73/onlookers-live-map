@@ -12,6 +12,7 @@ import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 import type { CommunityPost } from "@/lib/community";
+import { incidentById } from "@/lib/trust-tiers";
 import { readMapViewport, writeSessionState } from "@/lib/session-state";
 
 /**
@@ -173,11 +174,13 @@ export function GlobalFeedMap({
     reportMarkers.current = pinnedReports.map((post) => {
       const status = post.reportStatus ?? "unverified";
       const styles = getComputedStyle(document.documentElement);
-      const color = status === "confirmed"
-        ? styles.getPropertyValue("--signal").trim()
-        : status === "disputed"
-          ? styles.getPropertyValue("--crisis").trim()
-          : styles.getPropertyValue("--muted-foreground").trim();
+      const color = emergencyOnly
+        ? styles.getPropertyValue("--crisis").trim()
+        : status === "confirmed"
+          ? styles.getPropertyValue("--signal").trim()
+          : status === "disputed"
+            ? styles.getPropertyValue("--crisis").trim()
+            : styles.getPropertyValue("--muted-foreground").trim();
       const strokeColor = styles.getPropertyValue("--background").trim();
       return new google.maps.Marker({
         map: map.current,
