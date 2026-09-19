@@ -183,13 +183,15 @@ export function GlobalFeedMap({
             ? styles.getPropertyValue("--crisis").trim()
             : styles.getPropertyValue("--muted-foreground").trim();
       const strokeColor = styles.getPropertyValue("--background").trim();
-      return new google.maps.Marker({
+      const marker = new google.maps.Marker({
         map: map.current,
         position: { lat: post.latitude!, lng: post.longitude! },
         title: `${post.title} · ${status}`,
         zIndex: 999,
         icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: color, fillOpacity: 1, strokeColor, strokeWeight: 2, scale: 8 },
       });
+      marker.addListener("click", () => setActiveReportId((current) => (current === post.id ? null : post.id)));
+      return marker;
     });
     return () => {
       reportMarkers.current.forEach((marker) => marker.setMap(null));
@@ -198,6 +200,7 @@ export function GlobalFeedMap({
   }, [pinnedReports, mapReady, emergencyOnly]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
+  const activeReport = pinnedReports.find((p) => p.id === activeReportId) ?? null;
 
   return (
     <div className="mt-6">
