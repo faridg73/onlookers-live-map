@@ -12,6 +12,7 @@ import {
   Lock,
   MapPin,
   Shield,
+  Users,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
