@@ -149,7 +149,7 @@ function ProfileScreen() {
 
 
   return (
-    <div className="app-shell pb-28 pt-safe">
+    <div className="app-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
         <div className="flex size-16 items-center justify-center rounded-2xl bg-signal font-display text-2xl text-signal-foreground">
           {(profile?.display_name ?? user?.email ?? "ON").slice(0, 2).toUpperCase()}
