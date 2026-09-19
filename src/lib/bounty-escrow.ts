@@ -47,6 +47,8 @@ export async function lockBounty(input: {
   /** Required attestation for filming requests involving private real estate. */
   authorizationConfirmed?: boolean;
   accessCode?: string | null;
+  /** Real-estate agent contact for automatic 6-digit PIN delivery by SMS/email. */
+  agentContact?: { name?: string; phone?: string; email?: string } | null;
   latitude?: number | undefined;
   longitude?: number | undefined;
   /** Minutes until the request expires and the deposit is swept back. */

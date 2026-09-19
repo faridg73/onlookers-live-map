@@ -255,6 +255,10 @@ function PostScreen() {
   const [moderationOpen, setModerationOpen] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
   const [accessCode, setAccessCode] = useState("");
+  /** Real-estate agent contacts who receive the 6-digit PIN automatically. */
+  const [agentName, setAgentName] = useState("");
+  const [agentPhone, setAgentPhone] = useState("");
+  const [agentEmail, setAgentEmail] = useState("");
   const [recent, setRecent] = useState<RecentPlace[]>([]);
   const [gpsBusy, setGpsBusy] = useState(false);
   /** Refill panel, so a short wallet never ends the journey. */
@@ -513,6 +517,22 @@ function PostScreen() {
       toast.error("Add a 6-digit code or word the onlooker can quote on site.");
       return;
     }
+    if (category === "realestate") {
+      const phone = agentPhone.trim();
+      const email = agentEmail.trim();
+      if (!phone && !email) {
+        toast.error("Add the agent's phone or email so we can send the 6-digit PIN.");
+        return;
+      }
+      if (phone && !/^\+?[0-9 ()-]{5,32}$/.test(phone)) {
+        toast.error("Enter a valid agent phone number, e.g. +1 310 555 0123.");
+        return;
+      }
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        toast.error("Enter a valid agent email address.");
+        return;
+      }
+    }
     if (!isRequestAllowed(title, note, place)) {
       setModerationOpen(true);
       return;
@@ -555,6 +575,10 @@ function PostScreen() {
         category,
         authorizationConfirmed: permissionNeeded && permissionOk,
         accessCode: codeNeeded ? accessCode.trim() : null,
+        agentContact:
+          category === "realestate"
+            ? { name: agentName.trim(), phone: agentPhone.trim(), email: agentEmail.trim() }
+            : null,
         latitude: spot?.latitude,
         longitude: spot?.longitude,
         minutes,
@@ -870,11 +894,55 @@ function PostScreen() {
                         <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
                         <span>
                           <strong className="block">6-digit PIN handshake required</strong>
-                          A unique 6-digit PIN is generated when you post. Give it to the on-site
-                          seller or agent, the onlooker types it in on site, and footage plus payout
+                          A unique 6-digit PIN is generated when you post and sent automatically to
+                          the agent below. The onlooker types it in on site, and footage plus payout
                           stay locked until it matches.
                         </span>
                       </p>
+                      <div className="space-y-2 rounded-lg border border-border bg-background p-3">
+                        <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+                          Agent / property contact
+                        </p>
+                        <label className="block space-y-1">
+                          <span className="text-xs font-bold text-foreground/85">Listing agent name</span>
+                          <input
+                            value={agentName}
+                            onChange={(event) => setAgentName(event.target.value)}
+                            maxLength={120}
+                            autoComplete="off"
+                            placeholder="e.g. Dana Reyes"
+                            className="field"
+                          />
+                        </label>
+                        <label className="block space-y-1">
+                          <span className="text-xs font-bold text-foreground/85">Agent phone number (for SMS)</span>
+                          <input
+                            value={agentPhone}
+                            onChange={(event) => setAgentPhone(event.target.value)}
+                            maxLength={32}
+                            inputMode="tel"
+                            autoComplete="off"
+                            placeholder="+1 310 555 0123"
+                            className="field"
+                          />
+                        </label>
+                        <label className="block space-y-1">
+                          <span className="text-xs font-bold text-foreground/85">Agent email</span>
+                          <input
+                            value={agentEmail}
+                            onChange={(event) => setAgentEmail(event.target.value)}
+                            maxLength={255}
+                            inputMode="email"
+                            autoComplete="off"
+                            placeholder="agent@brokerage.com"
+                            className="field"
+                          />
+                        </label>
+                        <p className="text-[0.7rem] text-muted-foreground">
+                          Add a phone or email and we text or email the PIN and claim link the moment
+                          the bounty goes live.
+                        </p>
+                      </div>
                       {permissionNeeded && (
                         <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
                           <input
