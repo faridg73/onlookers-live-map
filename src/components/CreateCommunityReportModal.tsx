@@ -22,6 +22,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { createCommunityPost, uploadCommunityPhoto } from "@/lib/community";
 import { awardReputation } from "@/lib/reputation";
+import { REGIONAL_CENTER } from "@/lib/onlooker";
+import { readMapViewport } from "@/lib/session-state";
 import {
   EMERGENCY_LOCKED_NOTE,
   INCIDENT_TYPES,
