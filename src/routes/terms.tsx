@@ -25,7 +25,7 @@ export const Route = createFileRoute("/terms")({
 
 function TermsPage() {
   return (
-    <div className="reading-shell pb-28 pt-10">
+    <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         Onlooker Terms of Service &amp; Legal Disclaimer
       </h1>
@@ -35,7 +35,7 @@ function TermsPage() {
 
       <Link
         to="/auth"
-        className="mt-10 inline-block rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-semibold text-foreground"
+        className="mt-10 inline-flex min-h-11 items-center rounded-full border border-border bg-secondary/80 px-4 py-3 text-sm font-semibold text-foreground"
       >
         Back to sign in
       </Link>

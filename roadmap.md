@@ -166,3 +166,7 @@ Home Events & Arts neon category artwork
 ## Profile management
 - [x] Let members upload a profile photo and edit their name, location, and bio
 - [x] Require typed confirmation before securely deleting an account and its linked data
+
+## Mobile sub-page headers
+- [x] Keep sub-page titles and controls below the iPhone status area
+- [x] Standardize back controls with a visible 44px minimum touch target and history-aware navigation

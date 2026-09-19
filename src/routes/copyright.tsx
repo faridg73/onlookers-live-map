@@ -33,7 +33,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function CopyrightPage() {
   return (
-    <div className="reading-shell pb-28 pt-10">
+    <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         DMCA &amp; Copyright Infringement Policy
       </h1>

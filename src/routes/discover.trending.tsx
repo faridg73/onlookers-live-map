@@ -16,6 +16,7 @@ import type { DiscoveredPlace } from "@/lib/places.functions";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { CREATOR_VIBES } from "@/lib/creator-vibes";
 import type { DiscoveryGroup } from "@/lib/discovery";
+import { PageBackButton } from "@/components/PageBackButton";
 
 
 export const Route = createFileRoute("/discover/trending")({
@@ -126,12 +127,7 @@ function TrendingScreen() {
 
   return (
     <div className="app-shell pb-28 pt-safe">
-      <Link
-        to="/discover"
-        className="inline-block py-2 pr-4 text-xs font-bold uppercase tracking-[0.14em] text-signal"
-      >
-        ← Browse places
-      </Link>
+      <PageBackButton label="Browse places" fallback="/discover" />
 
       <h1 className="mt-3 inline-flex items-center gap-2 font-display text-3xl tracking-tight text-foreground">
         <Flame className="size-6 text-signal" aria-hidden /> Trending feeds

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
+import { PageBackButton } from "@/components/PageBackButton";
 
 export const Route = createFileRoute("/discover/$group/")({
   loader: ({ params }) => {
@@ -75,9 +76,7 @@ function GroupScreen() {
 
   return (
     <div className="app-shell pb-28 pt-safe">
-      <Link to="/discover" className="text-xs font-bold uppercase tracking-[0.14em] text-signal">
-        ← All places
-      </Link>
+      <PageBackButton label="All places" fallback="/discover" />
       <h1 className="mt-2 font-display text-3xl tracking-tight text-foreground">{heading}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{tagline}</p>
 
