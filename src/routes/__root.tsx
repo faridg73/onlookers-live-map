@@ -150,9 +150,10 @@ function RootComponent() {
           <BoostProvider>
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
+            {/* Home is a full-screen fixed map that would cover the footer, so mount it only on scrollable pages. */}
+            {!embedded && pathname !== "/" && <Footer />}
             {!embedded && (
               <>
-                <Footer />
                 <BottomNav />
                 <ProfileSetup />
                 <OnboardingWalkthrough />
