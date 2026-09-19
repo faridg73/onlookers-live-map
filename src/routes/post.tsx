@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
@@ -263,6 +264,9 @@ function PostScreen() {
   const [gpsBusy, setGpsBusy] = useState(false);
   /** Refill panel, so a short wallet never ends the journey. */
   const [topUpOpen, setTopUpOpen] = useState(false);
+  const [firstPostGuideOpen, setFirstPostGuideOpen] = useState(false);
+  const [hideFirstPostGuide, setHideFirstPostGuide] = useState(false);
+  const [realEstateGuideOpen, setRealEstateGuideOpen] = useState(false);
   const voice = useVoiceInput((text) => setPrompt(text));
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
@@ -303,6 +307,17 @@ function PostScreen() {
     void readWalletBalance().then(setBalance);
     setRecent(readRecentPlaces());
   }, []);
+
+  useEffect(() => {
+    if (mode !== "bounty") return;
+    try {
+      if (window.localStorage.getItem("onlooker:bounty-introduction-hidden") !== "1") {
+        setFirstPostGuideOpen(true);
+      }
+    } catch {
+      setFirstPostGuideOpen(true);
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (mystery !== "1") return;
@@ -424,6 +439,7 @@ function PostScreen() {
     setSubcategory(null);
     setPermissionOk(false);
     setVenueQuery(`${picked.query} near me`);
+    if (picked.id === "real-estate") setRealEstateGuideOpen(true);
     if (picked.id === "emergency-safety") {
       setTier("fast_catch");
       setMinutes(15);
@@ -438,6 +454,7 @@ function PostScreen() {
     setCategoryId(next === STRANGE_SIGHTINGS_ID ? "breaking-incidents" : next);
     setSubcategory(null);
     setPermissionOk(false);
+    if (next === "real-estate") setRealEstateGuideOpen(true);
   };
 
   /** Subcategory choice refines the nearby search and tags the payload keywords. */
@@ -720,81 +737,6 @@ function PostScreen() {
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
             {step === 1 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
-                <div className="rounded-lg border border-border bg-background p-3 focus-within:border-signal">
-                  <div className="flex items-start gap-3">
-                    <Search className="mt-1 size-5 shrink-0 text-signal" />
-                    <textarea
-                      value={prompt}
-                      onChange={(event) => setPrompt(event.target.value)}
-                      rows={4}
-                      autoFocus
-                      placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
-                      className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
-                    />
-                    <Button
-                      type="button"
-                      variant={voice.listening ? "default" : "outline"}
-                      size="icon"
-                      aria-pressed={voice.listening}
-                      aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
-                      title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
-                      onClick={voice.toggle}
-                      disabled={!voice.supported}
-                      className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
-                    >
-                      {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
-                    </Button>
-                  </div>
-                  {voice.listening && (
-                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {[
-                      "Show me the line at South Coast Plaza",
-                      "I want a 5-minute clip of Fashion Island",
-                      "Spontaneous meetup at Orange Coast College",
-                    ].map((example) => (
-                      <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
-                        {example}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {prompt.trim().length >= 8 && (
-                  <div className="rounded-lg border border-border bg-background p-4">
-                    <p className="text-xs font-bold uppercase text-muted-foreground">Understood</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="rounded-full bg-signal px-3 py-1 text-xs font-extrabold text-signal-foreground">
-                        {ACTIONS.find((item) => item.id === parsed.action)?.label}
-                      </span>
-                      {parsed.durationMinutes && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.durationMinutes} min</span>}
-                      {parsed.venue && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.venue}</span>}
-                    </div>
-                  </div>
-                )}
-
-                <div className="relative">
-                  <Search className="absolute left-3 top-3.5 size-4 text-signal" />
-                  <input
-                    value={venueQuery}
-                    onChange={(event) => setVenueQuery(event.target.value)}
-                    placeholder="Search a mall, park, school, library…"
-                    className="field pl-10"
-                  />
-                  {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
-                </div>
-                {signedIn === false && (
-                  <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
-                    <ShieldCheck className="size-4 shrink-0 text-signal" />
-                    <span className="flex-1">Sign in to search places by name. You can still drop a pin on the map or use your current location.</span>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
-                  </div>
-                )}
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
                   <Select
@@ -888,89 +830,147 @@ function PostScreen() {
                     searches nearby places of that type.
                   </p>
 
-                  {category === "realestate" && (
-                    <div className="space-y-3">
-                      <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
-                        <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
-                        <span>
-                          <strong className="block">6-digit PIN handshake required</strong>
-                          A unique 6-digit PIN is generated when you post and sent automatically to
-                          the agent below. The onlooker types it in on site, and footage plus payout
-                          stay locked until it matches.
-                        </span>
-                      </p>
-                      <div className="space-y-2 rounded-lg border border-border bg-background p-3">
-                        <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
-                          Agent / property contact
-                        </p>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Listing agent name</span>
-                          <input
-                            value={agentName}
-                            onChange={(event) => setAgentName(event.target.value)}
-                            maxLength={120}
-                            autoComplete="off"
-                            placeholder="e.g. Dana Reyes"
-                            className="field"
-                          />
-                        </label>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Agent phone number (for SMS)</span>
-                          <input
-                            value={agentPhone}
-                            onChange={(event) => setAgentPhone(event.target.value)}
-                            maxLength={32}
-                            inputMode="tel"
-                            autoComplete="off"
-                            placeholder="+1 310 555 0123"
-                            className="field"
-                          />
-                        </label>
-                        <label className="block space-y-1">
-                          <span className="text-xs font-bold text-foreground/85">Agent email</span>
-                          <input
-                            value={agentEmail}
-                            onChange={(event) => setAgentEmail(event.target.value)}
-                            maxLength={255}
-                            inputMode="email"
-                            autoComplete="off"
-                            placeholder="agent@brokerage.com"
-                            className="field"
-                          />
-                        </label>
-                        <p className="text-[0.7rem] text-muted-foreground">
-                          Add a phone or email and we text or email the PIN and claim link the moment
-                          the bounty goes live.
-                        </p>
-                      </div>
-                      {permissionNeeded && (
-                        <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
-                          <input
-                            type="checkbox"
-                            checked={permissionOk}
-                            onChange={(event) => setPermissionOk(event.target.checked)}
-                            className="mt-0.5 size-4 shrink-0 accent-signal"
-                          />
-                          <span>
-                            <strong className="block">Authorization required</strong>
-                            Confirm explicit authorization from the seller, listing agent, property
-                            manager, or other authorized party to photograph or film this property.
-                          </span>
-                        </label>
-                      )}
-                    </div>
-                  )}
-                  {placeCategoryId === "emergency-safety" && (
-                    <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
-                      <Timer className="mt-0.5 size-4 shrink-0 text-live" />
+                </div>
+
+                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    Address, landmark, or coordinates
+                  </p>
+                  <AddressSearchField
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setSearchOrigin({ latitude: next.latitude, longitude: next.longitude });
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                  <LocationPreviewMap
+                    address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
+                    selectedLocation={spot}
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                </div>
+
+                {category === "realestate" && (
+                  <div className="space-y-3 rounded-xl border border-signal/40 bg-signal/5 p-3">
+                    <p className="flex gap-2 text-xs font-medium text-foreground">
+                      <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
                       <span>
-                        <strong className="block">Fast Catch priority timer on</strong>
-                        This request goes live to nearby onlookers first with a 15-minute window. You
-                        can change the tier and timer on the reward step.
+                        <strong className="block">6-digit PIN handshake required</strong>
+                        The agent receives the private PIN and claim link when this bounty goes live.
                       </span>
                     </p>
+                    <div className="space-y-2 rounded-lg border border-border bg-background p-3">
+                      <p className="text-xs font-extrabold uppercase text-muted-foreground">Agent / property contact</p>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Listing agent name</span>
+                        <input value={agentName} onChange={(event) => setAgentName(event.target.value)} maxLength={120} autoComplete="off" placeholder="e.g. Dana Reyes" className="field" />
+                      </label>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Agent phone number (for SMS)</span>
+                        <input value={agentPhone} onChange={(event) => setAgentPhone(event.target.value)} maxLength={32} inputMode="tel" autoComplete="off" placeholder="+1 310 555 0123" className="field" />
+                      </label>
+                      <label className="block space-y-1">
+                        <span className="text-xs font-bold text-foreground">Agent email</span>
+                        <input value={agentEmail} onChange={(event) => setAgentEmail(event.target.value)} maxLength={255} inputMode="email" autoComplete="off" placeholder="agent@brokerage.com" className="field" />
+                      </label>
+                      <p className="text-xs text-muted-foreground">Add a phone or email for automatic PIN delivery.</p>
+                    </div>
+                    {permissionNeeded && (
+                      <label className="flex cursor-pointer gap-3 rounded-lg border border-signal/50 bg-background p-3 text-xs text-foreground">
+                        <input type="checkbox" checked={permissionOk} onChange={(event) => setPermissionOk(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-signal" />
+                        <span><strong className="block">Authorization required</strong>Confirm explicit authorization from the seller, listing agent, property manager, or other authorized party to photograph or film this property.</span>
+                      </label>
+                    )}
+                  </div>
+                )}
+                {placeCategoryId === "emergency-safety" && (
+                  <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
+                    <Timer className="mt-0.5 size-4 shrink-0 text-live" />
+                    <span><strong className="block">Fast Catch priority timer on</strong>This request starts with a 15-minute priority window. You can change it on the reward step.</span>
+                  </p>
+                )}
+
+                <div className="rounded-lg border border-border bg-background p-3 focus-within:border-signal">
+                  <div className="flex items-start gap-3">
+                    <Search className="mt-1 size-5 shrink-0 text-signal" />
+                    <textarea
+                      value={prompt}
+                      onChange={(event) => setPrompt(event.target.value)}
+                      rows={4}
+                      autoFocus
+                      placeholder="I want a 5-minute live clip of Neiman Marcus at Fashion Island"
+                      className="min-h-28 w-full resize-none bg-transparent text-lg font-bold leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                    <Button
+                      type="button"
+                      variant={voice.listening ? "default" : "outline"}
+                      size="icon"
+                      aria-pressed={voice.listening}
+                      aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
+                      title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
+                      onClick={voice.toggle}
+                      disabled={!voice.supported}
+                      className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
+                    >
+                      {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
+                    </Button>
+                  </div>
+                  {voice.listening && (
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
                   )}
                 </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {[
+                      "Show me the line at South Coast Plaza",
+                      "I want a 5-minute clip of Fashion Island",
+                      "Spontaneous meetup at Orange Coast College",
+                    ].map((example) => (
+                      <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
+                        {example}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {prompt.trim().length >= 8 && (
+                  <div className="rounded-lg border border-border bg-background p-4">
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Understood</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-signal px-3 py-1 text-xs font-extrabold text-signal-foreground">
+                        {ACTIONS.find((item) => item.id === parsed.action)?.label}
+                      </span>
+                      {parsed.durationMinutes && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.durationMinutes} min</span>}
+                      {parsed.venue && <span className="rounded-full border border-border px-3 py-1 text-xs font-bold text-foreground">{parsed.venue}</span>}
+                    </div>
+                  </div>
+                )}
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-3.5 size-4 text-signal" />
+                  <input
+                    value={venueQuery}
+                    onChange={(event) => setVenueQuery(event.target.value)}
+                    placeholder="Search a mall, park, school, library…"
+                    className="field pl-10"
+                  />
+                  {venueBusy && <span className="absolute right-3 top-3.5 size-4 animate-spin rounded-full border-2 border-signal border-t-transparent" />}
+                </div>
+                {signedIn === false && (
+                  <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
+                    <ShieldCheck className="size-4 shrink-0 text-signal" />
+                    <span className="flex-1">Sign in to search places by name. You can still drop a pin on the map or use your current location.</span>
+                    <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
+                  </div>
+                )}
+
 
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {VENUE_QUICK_SEARCHES.map((venue) => (
@@ -1021,28 +1021,7 @@ function PostScreen() {
                     ))}
                   </div>
                 )}
-                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
-                  <p className="text-xs font-bold uppercase text-muted-foreground">
-                    Address, landmark, or coordinates
-                  </p>
-                  <AddressSearchField
-                    onPick={(next) => {
-                      setSpot(next);
-                      setPlace(next.formatted);
-                      setSearchOrigin({ latitude: next.latitude, longitude: next.longitude });
-                      setRecent(rememberRecentPlace(next));
-                    }}
-                  />
-                  <LocationPreviewMap
-                    address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
-                    selectedLocation={spot}
-                    onPick={(next) => {
-                      setSpot(next);
-                      setPlace(next.formatted);
-                      setRecent(rememberRecentPlace(next));
-                    }}
-                  />
-                </div>
+
 
               </div>
             )}
@@ -1397,6 +1376,22 @@ function PostScreen() {
         </form>
         )}
       </section>
+
+      <FirstPostGuide
+        open={firstPostGuideOpen}
+        hideNextTime={hideFirstPostGuide}
+        onHideNextTimeChange={(checked) => {
+          setHideFirstPostGuide(checked);
+          try {
+            if (checked) window.localStorage.setItem("onlooker:bounty-introduction-hidden", "1");
+            else window.localStorage.removeItem("onlooker:bounty-introduction-hidden");
+          } catch {
+            // The guide still works when browser storage is unavailable.
+          }
+        }}
+        onOpenChange={setFirstPostGuideOpen}
+      />
+      <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
 
       <DeadlinePickerDialog
         open={deadlineOpen}
