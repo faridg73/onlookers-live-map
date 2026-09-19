@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
+import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play, Siren } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
@@ -12,6 +12,7 @@ import { formatCredits } from "@/lib/credits";
 import { REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 import type { CommunityPost } from "@/lib/community";
+import { incidentById } from "@/lib/trust-tiers";
 import { readMapViewport, writeSessionState } from "@/lib/session-state";
 
 /**
@@ -25,6 +26,7 @@ export function GlobalFeedMap({
   subcategory,
   reports = [],
   viewportStorageKey,
+  emergencyOnly = false,
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
@@ -33,6 +35,8 @@ export function GlobalFeedMap({
   subcategory?: string | null;
   reports?: CommunityPost[];
   viewportStorageKey?: string;
+  /** Emergency Alert Map mode: only Level 3 emergency lanes (fire/police/medical), no clips. */
+  emergencyOnly?: boolean;
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -77,6 +81,7 @@ export function GlobalFeedMap({
   }, [viewportStorageKey]);
 
   const filteredClips = useMemo(() => {
+    if (emergencyOnly) return [];
     const categoryNeedle = categoryLabel?.toLowerCase().trim();
     const categoryIdNeedle = categoryId?.toLowerCase().trim();
     const vibeNeedle = subcategory?.toLowerCase().trim();
@@ -87,7 +92,7 @@ export function GlobalFeedMap({
         : !categoryNeedle || haystack.includes(categoryNeedle) || Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
       return categoryMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
     });
-  }, [clips, categoryId, categoryLabel, subcategory]);
+  }, [clips, categoryId, categoryLabel, subcategory, emergencyOnly]);
   const pinned = useMemo(
     () => filteredClips.filter((c) => c.latitude !== null && c.longitude !== null),
     [filteredClips],
@@ -112,10 +117,18 @@ export function GlobalFeedMap({
     };
   }, [focus, mapReady]);
 
-  // Every located report, whatever its community-verification status.
+  // Every located report, whatever its community-verification status. The
+  // emergency view keeps only Level 3 lanes (fire, police, medical).
   const pinnedReports = useMemo(
-    () => reports.filter((post) => post.reportIncidentType && post.latitude !== null && post.longitude !== null),
-    [reports],
+    () =>
+      reports.filter(
+        (post) =>
+          post.reportIncidentType &&
+          post.latitude !== null &&
+          post.longitude !== null &&
+          (!emergencyOnly || incidentById(post.reportIncidentType)?.emergency === true),
+      ),
+    [reports, emergencyOnly],
   );
 
   // Draw one marker per located clip.
@@ -161,11 +174,13 @@ export function GlobalFeedMap({
     reportMarkers.current = pinnedReports.map((post) => {
       const status = post.reportStatus ?? "unverified";
       const styles = getComputedStyle(document.documentElement);
-      const color = status === "confirmed"
-        ? styles.getPropertyValue("--signal").trim()
-        : status === "disputed"
-          ? styles.getPropertyValue("--crisis").trim()
-          : styles.getPropertyValue("--muted-foreground").trim();
+      const color = emergencyOnly
+        ? styles.getPropertyValue("--crisis").trim()
+        : status === "confirmed"
+          ? styles.getPropertyValue("--signal").trim()
+          : status === "disputed"
+            ? styles.getPropertyValue("--crisis").trim()
+            : styles.getPropertyValue("--muted-foreground").trim();
       const strokeColor = styles.getPropertyValue("--background").trim();
       return new google.maps.Marker({
         map: map.current,
@@ -179,7 +194,7 @@ export function GlobalFeedMap({
       reportMarkers.current.forEach((marker) => marker.setMap(null));
       reportMarkers.current = [];
     };
-  }, [pinnedReports, mapReady]);
+  }, [pinnedReports, mapReady, emergencyOnly]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
 
@@ -188,30 +203,48 @@ export function GlobalFeedMap({
       <div className="relative h-64 overflow-hidden rounded-3xl border border-border bg-surface-raised">
         <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
         <span className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-surface/90 px-3 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur">
-          <Globe2 className="size-3 text-signal" /> {pinned.length} unlocked clips worldwide
+          {emergencyOnly ? (
+            <>
+              <Siren className="size-3 text-crisis" /> {pinnedReports.length} active emergency {pinnedReports.length === 1 ? "alert" : "alerts"}
+            </>
+          ) : (
+            <>
+              <Globe2 className="size-3 text-signal" /> {pinned.length} unlocked clips worldwide
+            </>
+          )}
         </span>
       </div>
 
-      {clips === null && (
-        <p className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Loading the global feed…
-        </p>
-      )}
-
-      {active && <GlobalClipBubble clip={active} />}
-
-      <div className="mt-5 space-y-4">
-        {filteredClips.map((clip) => (
-          <GlobalClipBubble key={clip.id} clip={clip} compact={clip.id !== activeId} />
-        ))}
-        {clips !== null && filteredClips.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            {categoryLabel
-              ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
-              : "No unlocked clips yet. Once requesters approve footage it shows up here."}
+      {emergencyOnly ? (
+        pinnedReports.length === 0 && (
+          <p className="mt-5 rounded-2xl border border-dashed border-crisis/40 p-8 text-center text-sm text-muted-foreground">
+            No active emergency alerts in this area. Verified Level 3 creators can file fire, police and medical reports.
           </p>
-        )}
-      </div>
+        )
+      ) : (
+        <>
+          {clips === null && (
+            <p className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Loading the global feed…
+            </p>
+          )}
+
+          {active && <GlobalClipBubble clip={active} />}
+
+          <div className="mt-5 space-y-4">
+            {filteredClips.map((clip) => (
+              <GlobalClipBubble key={clip.id} clip={clip} compact={clip.id !== activeId} />
+            ))}
+            {clips !== null && filteredClips.length === 0 && (
+              <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                {categoryLabel
+                  ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
+                  : "No unlocked clips yet. Once requesters approve footage it shows up here."}
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
