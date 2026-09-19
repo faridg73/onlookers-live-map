@@ -92,7 +92,12 @@ import {
   subcategoriesFor,
   type MainCategoryId,
 } from "@/lib/category-subcategories";
-import { bountyPromptContext } from "@/lib/bounty-prompt-examples";
+import {
+  QUICK_TAGS,
+  bountyPromptContext,
+  promptHasKeyword,
+  togglePromptKeyword,
+} from "@/lib/bounty-prompt-examples";
 import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sightings";
 
 import { useOnlooker } from "@/lib/onlooker-store";
@@ -939,16 +944,56 @@ function PostScreen() {
 
                 <div
                   key={`examples:${promptContextKey}`}
-                  className="animate-fade-in motion-reduce:animate-none"
+                  className="animate-fade-in space-y-3 motion-reduce:animate-none"
                   aria-live="polite"
                 >
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {promptContext.examples.map((example) => (
-                      <Button key={example} type="button" variant="outline" size="sm" onClick={() => setPrompt(example)} className="h-auto whitespace-normal py-2 text-left">
-                        {example}
-                      </Button>
-                    ))}
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Quick tags</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {QUICK_TAGS[mainCategoryId].map((tag) => {
+                        const active = promptHasKeyword(prompt, tag);
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => setPrompt((current) => togglePromptKeyword(current, tag))}
+                            className={`rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition-all duration-200 active:scale-95 motion-reduce:active:transform-none ${
+                              active
+                                ? "border-signal bg-signal text-signal-foreground shadow-[0_0_18px_color-mix(in_oklab,var(--signal)_35%,transparent)]"
+                                : "border-border bg-background text-muted-foreground hover:border-signal hover:text-signal"
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase text-muted-foreground">Try one</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {promptContext.examples.map((example) => {
+                        const active = prompt.trim() === example;
+                        return (
+                          <Button
+                            key={example}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            aria-pressed={active}
+                            onClick={() => setPrompt(active ? "" : example)}
+                            className={`h-auto whitespace-normal py-2 text-left transition-all duration-200 active:scale-[0.98] motion-reduce:active:transform-none ${
+                              active
+                                ? "border-signal bg-signal text-signal-foreground shadow-[0_0_18px_color-mix(in_oklab,var(--signal)_35%,transparent)] hover:bg-signal hover:text-signal-foreground"
+                                : "hover:border-signal hover:text-signal"
+                            }`}
+                          >
+                            {example}
+                          </Button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
