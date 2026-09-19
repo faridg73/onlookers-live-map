@@ -64,6 +64,7 @@ export function CreateCommunityReportModal({
   const [details, setDetails] = useState("");
   const [radius, setRadius] = useState(500);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [approximate, setApproximate] = useState(false);
   const [mediaPath, setMediaPath] = useState<string | null>(null);
   const [mediaPreview, setMediaPreview] = useState<{
     url: string;
