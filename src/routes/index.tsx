@@ -702,7 +702,7 @@ function MapScreen() {
                       <h2 className="truncate text-base font-extrabold text-foreground">Strange Sightings &amp; UFO</h2>
                     </div>
                   </div>
-                  <Button type="button" variant="ghost" size="icon" aria-label="Close mystery watch" onClick={() => setCategoryTile(null)} className="size-8 shrink-0 text-muted-foreground">
+                  <Button type="button" variant="secondary" size="icon" aria-label="Close mystery watch" onClick={() => setCategoryTile(null)} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 text-foreground shadow-sm">
                     <X className="size-4" />
                   </Button>
                 </div>

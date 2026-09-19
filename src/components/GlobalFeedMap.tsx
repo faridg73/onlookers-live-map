@@ -297,9 +297,9 @@ function ReportDetailCard({ post, onClose }: { post: CommunityPost; onClose: () 
           type="button"
           onClick={onClose}
           aria-label="Close report details"
-          className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-raised text-muted-foreground transition-colors hover:text-foreground"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary"
         >
-          <X className="size-3.5" />
+          <X className="size-4" />
         </button>
       </div>
 

@@ -464,9 +464,9 @@ export function MapCanvas({
               type="button"
               onClick={() => setActivePlaceId(null)}
               aria-label="Close place details"
-              className="rounded-full border border-border bg-surface p-1 text-muted-foreground hover:bg-surface-raised"
+              className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm hover:bg-secondary"
             >
-              <X className="size-3" />
+              <X className="size-4" />
             </button>
           </div>
         </div>
