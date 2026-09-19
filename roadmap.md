@@ -162,3 +162,7 @@ Home Events & Arts neon category artwork
 - [x] Award 10 XP per completed bounty with 500 XP required per level
 - [x] Show live reputation points with high-contrast Level 3 details
 - [x] Award safety points only after completing the interactive tutorial
+
+## Profile management
+- [x] Let members upload a profile photo and edit their name, location, and bio
+- [x] Require typed confirmation before securely deleting an account and its linked data

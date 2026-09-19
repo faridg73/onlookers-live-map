@@ -49,6 +49,7 @@ import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { SocialLinks } from "@/components/Footer";
 import { AccountCenter } from "@/components/AccountCenter";
+import { AccountDeletion, ProfileEditor } from "@/components/ProfileEditor";
 
 
 export const Route = createFileRoute("/profile")({
@@ -151,9 +152,11 @@ function ProfileScreen() {
   return (
     <div className="app-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
-        <div className="flex size-16 items-center justify-center rounded-2xl bg-signal font-display text-2xl text-signal-foreground">
-          {(profile?.display_name ?? user?.email ?? "ON").slice(0, 2).toUpperCase()}
-        </div>
+        <ProfileEditor
+          profile={profile}
+          fallbackName={user?.email?.split("@")[0] ?? "Onlooker"}
+          onSaved={setProfile}
+        />
         <div className="min-w-0">
           <h1 className="flex min-w-0 items-center gap-2 font-display text-2xl tracking-tight text-foreground">
             <span className="truncate">
@@ -161,7 +164,12 @@ function ProfileScreen() {
             </span>
             {verified && <VerifiedBadge className="size-5" />}
           </h1>
-          <p className="text-sm text-muted-foreground">Onlooker since 2025 · Harbor District</p>
+          <p className="text-sm text-muted-foreground">
+            {profile?.location?.trim() || "Location not added"}
+          </p>
+          {profile?.bio?.trim() && (
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{profile.bio}</p>
+          )}
         </div>
       </div>
 
@@ -346,6 +354,13 @@ function ProfileScreen() {
           <ChevronRight className="size-4 text-destructive" />
         </button>
       </div>
+
+      <AccountDeletion
+        onDeleted={() => {
+          queryClient.clear();
+          navigate({ to: "/auth", replace: true });
+        }}
+      />
 
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent className="max-w-md">
