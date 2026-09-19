@@ -25,6 +25,7 @@ export function GlobalFeedMap({
   subcategory,
   reports = [],
   viewportStorageKey,
+  emergencyOnly = false,
 }: {
   /** Optional spot to centre on, sent from a Discover card. */
   focus?: { lat: number; lng: number; label: string } | null;
@@ -33,6 +34,8 @@ export function GlobalFeedMap({
   subcategory?: string | null;
   reports?: CommunityPost[];
   viewportStorageKey?: string;
+  /** Emergency Alert Map mode: only Level 3 emergency lanes (fire/police/medical), no clips. */
+  emergencyOnly?: boolean;
 }) {
   const [clips, setClips] = useState<GlobalClip[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
