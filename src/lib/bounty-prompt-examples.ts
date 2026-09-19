@@ -88,12 +88,12 @@ const PROMPT_BLUEPRINTS: Record<MainCategoryId, PromptBlueprint> = {
     ],
   },
   "real-estate": {
-    helper: (focus) => `Describe the rooms, exterior details, or neighborhood views needed for this ${focus.toLowerCase()} request.`,
-    placeholder: (focus) => `Walk through the ${focus.toLowerCase()} and show the kitchen, bedrooms, and exterior…`,
+    helper: (focus) => `Describe the rooms, exterior details, or neighborhood views needed for ${focus.toLowerCase()}.`,
+    placeholder: (focus) => `Show the property with a walkthrough focused on ${focus.toLowerCase()}…`,
     examples: (focus) => [
-      `Give me a room-by-room walkthrough of this ${focus.toLowerCase()}`,
-      `Show the exterior, street, parking, and nearby surroundings for this ${focus.toLowerCase()}`,
-      `Capture the kitchen, bathrooms, storage, and visible condition of this ${focus.toLowerCase()}`,
+      `Give me a room-by-room walkthrough focused on ${focus.toLowerCase()}`,
+      `Show the exterior, street, parking, and surroundings for this property`,
+      `Capture the kitchen, bathrooms, storage, and visible property condition`,
     ],
   },
   nightlife: {
