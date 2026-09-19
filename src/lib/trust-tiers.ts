@@ -38,7 +38,7 @@ export const TRUST_TIERS: TrustTierDef[] = [
     blurb: "Verified mark or responder grant",
     unlocks: "File emergency and live alerts: fire, police, medical and hazard.",
     nextStep: null,
-    badge: "border-crisis/60 bg-crisis/15 text-crisis",
+    badge: "border-crisis/60 bg-crisis/25 text-foreground",
   },
 ];
 
