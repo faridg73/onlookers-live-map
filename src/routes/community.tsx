@@ -475,24 +475,6 @@ function CommunityHub() {
                       </small>
                     </span>
                   </button>
-                  {active && (
-                    <div className="mt-2 flex flex-wrap gap-1.5" aria-label={`${lane.label} vibes`}>
-                      {lane.subcategories.map((sub) => {
-                        const on = (tag ?? "").toLowerCase() === sub.toLowerCase();
-                        return (
-                          <button
-                            key={sub}
-                            type="button"
-                            onClick={() => setTag(on ? null : sub)}
-                            aria-pressed={on}
-                            className={`rounded-full border px-2.5 py-1 text-[0.7rem] font-bold transition-colors ${on ? "border-signal bg-signal text-signal-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}
-                          >
-                            {sub}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
               );
             })}
