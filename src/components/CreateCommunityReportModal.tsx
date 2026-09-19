@@ -137,7 +137,12 @@ export function CreateCommunityReportModal({
 
   const submit = async () => {
     if (!picked || !ready) return;
+    if (signedIn === false) {
+      setFormError("Sign in to file a report — tap Sign in below.");
+      return;
+    }
     setBusy(true);
+    setFormError(null);
     try {
       await createCommunityPost({
         category: picked.category,
