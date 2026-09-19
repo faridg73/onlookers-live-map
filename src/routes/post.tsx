@@ -416,6 +416,7 @@ function PostScreen() {
     if (!picked) return;
     setPlaceCategoryId(picked.id);
     setCategoryId(picked.lane);
+    setMainCategoryId(picked.lane);
     setSubcategory(null);
     setPermissionOk(false);
     setVenueQuery(`${picked.query} near me`);
@@ -425,6 +426,24 @@ function PostScreen() {
       setCustomDeadline(null);
     }
   };
+
+  /** Picking one of the 17 main categories directly, outside the place presets. */
+  const chooseMainCategory = (next: MainCategoryId) => {
+    setPlaceCategoryId(null);
+    setMainCategoryId(next);
+    setCategoryId(next === STRANGE_SIGHTINGS_ID ? "breaking-incidents" : next);
+    setSubcategory(null);
+    setPermissionOk(false);
+  };
+
+  /** Subcategory choice refines the nearby search and tags the payload keywords. */
+  const chooseSubcategory = (label: string) => {
+    setSubcategory(label);
+    const keywords = keywordsForSubcategory(mainCategoryId, label);
+    const seed = keywords[0] ?? label;
+    setVenueQuery(`${label} ${seed}`.trim());
+  };
+
 
 
   const chooseVenue = (venue: DiscoveredPlace) => {
