@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { PrivacyBody } from "@/components/legal/legal-content";
 
 export const Route = createFileRoute("/privacy")({
