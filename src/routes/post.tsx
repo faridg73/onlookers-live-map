@@ -10,20 +10,25 @@ import {
   CloudRain,
   CoinsIcon,
   GraduationCap,
+  Home,
   Info,
+  KeyRound,
   MapPin,
   Mic,
   MicOff,
   Radio,
   Search,
+  ShieldAlert,
   ShieldCheck,
   Smartphone,
   Store,
+  Timer,
   Trees,
   Video,
   X,
   Zap,
 } from "lucide-react";
+
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +44,14 @@ import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
 import {
@@ -109,12 +122,60 @@ const DEADLINES = [
   { minutes: 1440, label: "24 hours" },
 ] as const;
 
-const VENUE_FILTERS = [
-  { label: "Malls & retail", query: "shopping malls and department stores", icon: Store },
-  { label: "Parks & outdoors", query: "parks trailheads beaches recreation centers", icon: Trees },
-  { label: "Schools & colleges", query: "high schools community colleges universities", icon: GraduationCap },
-  { label: "Community hubs", query: "libraries civic centers public plazas", icon: Building2 },
+/** Every place type a bounty can target, with the lane and search each one uses. */
+const PLACE_CATEGORIES = [
+  {
+    id: "real-estate",
+    label: "Real Estate",
+    blurb: "Open houses, listings, property tours",
+    query: "homes for sale open houses apartment tours",
+    icon: Home,
+    lane: "real-estate" as BroadcastCategoryId,
+  },
+  {
+    id: "malls-retail",
+    label: "Malls & retail",
+    blurb: "Shopping centers, stores, sales",
+    query: "shopping malls and department stores",
+    icon: Store,
+    lane: "shopping-retail" as BroadcastCategoryId,
+  },
+  {
+    id: "parks-outdoors",
+    label: "Parks & outdoors",
+    blurb: "Trails, beaches, recreation areas",
+    query: "parks trailheads beaches recreation centers",
+    icon: Trees,
+    lane: "nature-wildlife" as BroadcastCategoryId,
+  },
+  {
+    id: "schools-colleges",
+    label: "Schools & colleges",
+    blurb: "Campuses, games, public events",
+    query: "high schools community colleges universities",
+    icon: GraduationCap,
+    lane: "events-sports" as BroadcastCategoryId,
+  },
+  {
+    id: "community-hubs",
+    label: "Community hubs",
+    blurb: "Libraries, civic centers, plazas",
+    query: "libraries civic centers public plazas",
+    icon: Building2,
+    lane: "community-culture" as BroadcastCategoryId,
+  },
+  {
+    id: "emergency-safety",
+    label: "Emergency / Safety",
+    blurb: "Incidents, hazards, road closures",
+    query: "emergency services hospitals fire stations",
+    icon: ShieldAlert,
+    lane: "breaking-incidents" as BroadcastCategoryId,
+  },
 ] as const;
+
+type PlaceCategoryId = (typeof PLACE_CATEGORIES)[number]["id"];
+
 
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
   { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
@@ -172,6 +233,8 @@ function PostScreen() {
   const [weather, setWeather] = useState(1);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
   const [subcategory, setSubcategory] = useState<string | null>(null);
+  const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
+
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [moderationOpen, setModerationOpen] = useState(false);
@@ -325,6 +388,23 @@ function PostScreen() {
     }
     setStep(3);
   };
+
+  /** Picking a category sets the Flash lane, the nearby search, and any extra fields it needs. */
+  const choosePlaceCategory = (next: PlaceCategoryId) => {
+    const picked = PLACE_CATEGORIES.find((entry) => entry.id === next);
+    if (!picked) return;
+    setPlaceCategoryId(picked.id);
+    setCategoryId(picked.lane);
+    setSubcategory(null);
+    setPermissionOk(false);
+    setVenueQuery(`${picked.query} near me`);
+    if (picked.id === "emergency-safety") {
+      setTier("fast_catch");
+      setMinutes(15);
+      setCustomDeadline(null);
+    }
+  };
+
 
   const chooseVenue = (venue: DiscoveredPlace) => {
     const formatted = venue.address ? `${venue.name}, ${venue.address}` : venue.name;
@@ -649,13 +729,73 @@ function PostScreen() {
                     <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-2">
-                  {VENUE_FILTERS.map(({ label, query, icon: Icon }) => (
-                    <Button key={label} type="button" variant="outline" onClick={() => setVenueQuery(`${query} near me`)} className="h-auto justify-start gap-2 py-3 text-left">
-                      <Icon className="size-4 text-signal" /> {label}
-                    </Button>
-                  ))}
+                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
+                  <Select
+                    {...(placeCategoryId ? { value: placeCategoryId } : {})}
+                    onValueChange={(next: string) => choosePlaceCategory(next as PlaceCategoryId)}
+                  >
+
+                    <SelectTrigger className="h-auto min-h-14 w-full py-2.5 text-left">
+                      <SelectValue placeholder="Choose a category (Real Estate, Malls, Parks…)" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
+                        <SelectItem key={id} value={id} className="py-2.5">
+                          <span className="flex items-start gap-2.5 text-left">
+                            <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
+                            <span>
+                              <span className="block font-extrabold text-foreground">{label}</span>
+                              <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                            </span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Picking a category sets the Flash lane and searches nearby places of that type.
+                  </p>
+                  {category === "realestate" && (
+                    <div className="space-y-3">
+                      <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
+                        <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
+                        <span>
+                          <strong className="block">6-digit PIN handshake required</strong>
+                          A unique 6-digit PIN is generated when you post. Give it to the on-site
+                          seller or agent, the onlooker types it in on site, and footage plus payout
+                          stay locked until it matches.
+                        </span>
+                      </p>
+                      {permissionNeeded && (
+                        <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={permissionOk}
+                            onChange={(event) => setPermissionOk(event.target.checked)}
+                            className="mt-0.5 size-4 shrink-0 accent-signal"
+                          />
+                          <span>
+                            <strong className="block">Authorization required</strong>
+                            Confirm explicit authorization from the seller, listing agent, property
+                            manager, or other authorized party to photograph or film this property.
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  )}
+                  {placeCategoryId === "emergency-safety" && (
+                    <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
+                      <Timer className="mt-0.5 size-4 shrink-0 text-live" />
+                      <span>
+                        <strong className="block">Fast Catch priority timer on</strong>
+                        This request goes live to nearby onlookers first with a 15-minute window. You
+                        can change the tier and timer on the reward step.
+                      </span>
+                    </p>
+                  )}
                 </div>
+
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {VENUE_QUICK_SEARCHES.map((venue) => (
                     <Button key={venue.label} type="button" variant="secondary" size="sm" onClick={() => setVenueQuery(venue.query)} className="shrink-0">
