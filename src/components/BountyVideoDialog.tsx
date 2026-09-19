@@ -240,7 +240,7 @@ export function BountyVideoDialog({
               <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
                 {PUBLIC_SPACES_DISCLAIMER}
               </p>
-              {capturing && !closed && (
+              {capturing && !closed && !pinLocked && (
                 <VideoRecorder
                   onClose={() => setCapturing(false)}
                   onRecorded={(file) => void onCaptured(file)}
