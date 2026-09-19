@@ -715,9 +715,10 @@ function PostScreen() {
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
                   <Select
-                    value={placeCategoryId ?? undefined}
-                    onValueChange={(next) => choosePlaceCategory(next as PlaceCategoryId)}
+                    {...(placeCategoryId ? { value: placeCategoryId } : {})}
+                    onValueChange={(next: string) => choosePlaceCategory(next as PlaceCategoryId)}
                   >
+
                     <SelectTrigger className="h-auto min-h-14 w-full py-2.5 text-left">
                       <SelectValue placeholder="Choose a category (Real Estate, Malls, Parks…)" />
                     </SelectTrigger>
