@@ -169,7 +169,7 @@ export function CreateCommunityReportModal({
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end justify-center bg-background/90 p-0 sm:items-center sm:p-6">
       <div className="flex max-h-[96dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl border border-signal/40 bg-surface shadow-2xl sm:rounded-2xl">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
+        <header className="z-10 flex shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
           <Button type="button" variant="ghost" size="icon" aria-label="Back" onClick={() => onOpenChange(false)}>
             <ArrowLeft className="size-5 text-signal" />
           </Button>
@@ -181,7 +181,7 @@ export function CreateCommunityReportModal({
           </Button>
         </header>
 
-        <div className="grid flex-1 gap-3 overflow-y-auto overscroll-contain p-3 min-[440px]:grid-cols-2 sm:p-4">
+        <div className="grid min-h-0 flex-1 gap-3 overflow-y-auto overscroll-contain p-3 min-[440px]:grid-cols-2 sm:p-4">
           <div className="grid content-start gap-3">
           {/* 1. Incident type */}
           <section className="rounded-md border border-signal/50 bg-surface-raised p-3">
@@ -325,7 +325,7 @@ export function CreateCommunityReportModal({
           </div>
         </div>
 
-        <footer className="sticky bottom-0 border-t border-border bg-surface p-3 sm:px-4">
+        <footer className="shrink-0 border-t border-border bg-surface p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-4">
           <section className="rounded-md border border-crisis/70 bg-crisis/10 p-3">
             <p className="flex items-center justify-between text-[0.68rem] font-extrabold uppercase text-crisis">
               Legal warning &amp; agreement
