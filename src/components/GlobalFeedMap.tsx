@@ -254,6 +254,85 @@ export function GlobalFeedMap({
   );
 }
 
+function formatAlertTime(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const minutes = Math.round((Date.now() - date.getTime()) / 60000);
+  const relative =
+    minutes < 1 ? "just now"
+      : minutes < 60 ? `${minutes} min ago`
+        : minutes < 1440 ? `${Math.round(minutes / 60)} hr ago`
+          : `${Math.round(minutes / 1440)} d ago`;
+  return { relative, absolute: date.toLocaleString() };
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  confirmed: "Confirmed",
+  disputed: "Disputed",
+  unverified: "Unverified",
+  expired: "Expired",
+};
+
+/** Popup shown when a red report pin is tapped: category, details, time, creator. */
+function ReportDetailCard({ post, onClose }: { post: CommunityPost; onClose: () => void }) {
+  const incident = post.reportIncidentType ? incidentById(post.reportIncidentType) : undefined;
+  const time = formatAlertTime(post.createdAt);
+  const isEmergency = incident?.emergency === true;
+
+  return (
+    <div className="absolute inset-x-2 bottom-2 z-10 max-h-[85%] overflow-y-auto rounded-2xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+        <div className="min-w-0">
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] ${
+              isEmergency ? "bg-crisis text-crisis-foreground" : "bg-surface-raised text-foreground"
+            }`}
+          >
+            {isEmergency && <Siren className="size-3" />}
+            {incident?.label ?? "Community report"}
+          </span>
+          <h3 className="mt-1.5 truncate font-display text-sm leading-tight text-foreground">{post.title}</h3>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close report details"
+          className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-raised text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+
+      {post.body && <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{post.body}</p>}
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.68rem] text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <BadgeCheck className="size-3.5 text-signal" />
+          {post.authorName}
+          {post.authorVerified && <span className="font-bold text-signal"> · verified</span>}
+          <span className="text-muted-foreground/70"> · Lv {post.hunterLevel}</span>
+        </span>
+        {time && (
+          <span className="inline-flex items-center gap-1" title={time.absolute}>
+            <Clock className="size-3" /> {time.relative}
+          </span>
+        )}
+        <span
+          className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] ${
+            post.reportStatus === "confirmed"
+              ? "bg-signal/15 text-signal"
+              : post.reportStatus === "disputed"
+                ? "bg-crisis/15 text-crisis"
+                : "bg-surface-raised text-muted-foreground"
+          }`}
+        >
+          {STATUS_LABEL[post.reportStatus ?? "unverified"]}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact?: boolean }) {
   const { user } = useAuth();
   const [playing, setPlaying] = useState(!compact);
