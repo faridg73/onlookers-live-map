@@ -14,7 +14,7 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "Answers to common questions about posting bounties, earning as an Onlooker LLC, payouts, expiration, cancellations, and real estate permissions.",
+          "Answers to common questions about posting bounties, earning as an onlooker, payouts, expiration, cancellations, and real estate permissions.",
       },
       { property: "og:title", content: "Onlooker LLC FAQ" },
       {
@@ -34,16 +34,16 @@ const SECTIONS = [
 
 • Posters drop a pin on the map, choose a media type (photo, short clip, or live walkthrough), set a cash bounty, and lock the funds in escrow.
 • Onlookers browse nearby requests, claim one, go to the pinned location, and capture exactly what was asked for.
-• Once the media is accepted, the bounty is released to the Onlooker LLC and the request is marked complete.`
+• Once the media is accepted, the bounty is released to the onlooker and the request is marked complete.`
   },
   {
     question: "How are payments and payouts split?",
     answer: `When a bounty is fulfilled and accepted, the locked funds are split automatically:
 
-• 85% goes to the Onlooker LLC who captured the media.
+• 85% goes to the onlooker who captured the media.
 • 15% is retained by Onlooker LLC as a platform fee.
 
-For example, an 80 Credits bounty pays the Onlooker LLC 68 Credits. Credits land in the Onlooker LLC's wallet immediately, and 4 Credits are always worth $1.00 when cashed out to a connected bank account (40 Credits minimum).`
+For example, an 80 Credits bounty pays the onlooker 68 Credits. Credits land in the onlooker's wallet immediately, and 4 Credits are always worth $1.00 when cashed out to a connected bank account (40 Credits minimum).`
   },
   {
     question: "When does a bounty expire?",
@@ -63,14 +63,14 @@ Expired bounties are removed from the active map and feed.`
 • The bounty has zero claims.
 • There are zero active submissions or uploaded clips.
 
-Once an Onlooker LLC claims the bounty or submits media, cancellation is locked to protect the fulfillment process and the reporter's expected payout.`
+Once an onlooker claims the bounty or submits media, cancellation is locked to protect the fulfillment process and the reporter's expected payout.`
   },
   {
     question: "What is the 2-hour review window?",
-    answer: `After an Onlooker LLC submits media, the Poster has 2 hours to review it:
+    answer: `After an onlooker submits media, the Poster has 2 hours to review it:
 
 • If the media matches the request, the Poster can accept it and release payment.
-• If the Poster does nothing, the submission is auto-approved at the end of the 2-hour window and the Onlooker LLC is paid.
+• If the Poster does nothing, the submission is auto-approved at the end of the 2-hour window and the onlooker is paid.
 • If the Poster disputes the submission within the window, the escrow is held securely until the dispute is resolved by our moderation team.
 
 This window protects both sides and keeps payouts moving fairly.`
@@ -87,7 +87,7 @@ Posting a real estate bounty requires checking the authorization box in the requ
   },
   {
     question: "Can I boost an existing bounty?",
-    answer: `Yes. Anyone can chip in 4, 8 or 20 Credits to increase a bounty pool. Boosts raise the payout for the Onlooker LLC who ultimately fulfills the request, making the request more attractive. Boosts are added to the bounty total and are not refundable once the bounty is fulfilled or expired.`
+    answer: `Yes. Anyone can chip in 4, 8 or 20 Credits to increase a bounty pool. Boosts raise the payout for the onlooker who ultimately fulfills the request, making the request more attractive. Boosts are added to the bounty total and are not refundable once the bounty is fulfilled or expired.`
   },
   {
     question: "What happens if my submission is rejected?",
