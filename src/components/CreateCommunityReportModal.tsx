@@ -74,12 +74,17 @@ export function CreateCommunityReportModal({
   const [analyzing, setAnalyzing] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const { unit } = useDistanceUnit(coords ? { lat: coords.latitude, lng: coords.longitude } : null);
 
   useEffect(() => {
     if (!open) return;
+    setFormError(null);
     void fetchMyTrustLevel().then(setLevel);
+    void supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
     if (typeof navigator !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
