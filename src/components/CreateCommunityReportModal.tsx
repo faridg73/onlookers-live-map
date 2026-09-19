@@ -354,11 +354,12 @@ export function CreateCommunityReportModal({
               />
               <span>{LEGAL_LINE}</span>
             </label>
-            <p className="mt-2 text-center text-[0.7rem] font-extrabold uppercase leading-snug text-foreground">
+            <p className="mt-2 text-center text-[0.7rem] font-extrabold uppercase leading-snug text-warning-note">
               Warning: this report is community-driven. Do not put yourself in danger.
               <br />
-              <span className="text-crisis">For life-threatening emergencies, call 911.</span>
+              <span className="text-warning-note">For life-threatening emergencies, call 911.</span>
             </p>
+
           </section>
 
           {formError ? (
