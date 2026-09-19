@@ -18,6 +18,7 @@ const createSchema = z.object({
   locationName: safeText(160, 2),
   bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
   category: z.string().trim().max(40).nullable().optional(),
+  authorizationConfirmed: z.boolean().optional().default(false),
   accessCode: z.string().trim().min(4).max(40).nullable().optional(),
   minutes: z.number().int().min(15).max(1440).default(60),
   latitude: z.number().min(-90).max(90).default(0),
@@ -82,6 +83,12 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         source: "request",
       });
       throw new Error(BLOCKED_REQUEST_MESSAGE);
+    }
+
+    if (data.category === "realestate" && !data.authorizationConfirmed) {
+      throw new Error(
+        "Confirm explicit authorization from the seller, listing agent, or property manager before posting a real estate bounty.",
+      );
     }
 
     // The escrow trigger debits the wallet in the same transaction, so check the

@@ -44,6 +44,8 @@ export async function lockBounty(input: {
   locationName: string;
   bounty: number;
   category?: string | null;
+  /** Required attestation for filming requests involving private real estate. */
+  authorizationConfirmed?: boolean;
   accessCode?: string | null;
   latitude?: number | undefined;
   longitude?: number | undefined;
