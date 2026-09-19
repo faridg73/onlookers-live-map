@@ -61,7 +61,7 @@ export const INCIDENT_TYPES: IncidentType[] = [
   { id: "police", label: "Police", emergency: true, tag: "incident:police", category: "breaking" },
   { id: "medical", label: "Medical", emergency: true, tag: "incident:medical", category: "breaking" },
   { id: "traffic", label: "Traffic", emergency: false, tag: "incident:traffic", category: "traffic" },
-  { id: "hazard", label: "Hazard", emergency: true, tag: "incident:hazard", category: "breaking" },
+  { id: "hazard", label: "Hazard", emergency: false, tag: "incident:hazard", category: "traffic" },
   { id: "general", label: "Community", emergency: false, tag: "incident:general", category: "general" },
 ];
 

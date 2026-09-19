@@ -12,6 +12,7 @@ import {
   Lock,
   MapPin,
   Shield,
+  Users,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -35,10 +36,10 @@ const ICONS: Record<IncidentType["id"], typeof Flame> = {
   medical: HeartPulse,
   traffic: Car,
   hazard: AlertTriangle,
-  general: AlertTriangle,
+  general: Users,
 };
 
-const REPORT_INCIDENTS = INCIDENT_TYPES.filter((type) => type.id !== "general");
+const REPORT_INCIDENTS = INCIDENT_TYPES;
 
 const LEGAL_LINE =
   "I understand that intentional false reports or pranks result in immediate account suspension and a permanent platform ban.";
