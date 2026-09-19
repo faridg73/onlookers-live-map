@@ -114,12 +114,60 @@ const DEADLINES = [
   { minutes: 1440, label: "24 hours" },
 ] as const;
 
-const VENUE_FILTERS = [
-  { label: "Malls & retail", query: "shopping malls and department stores", icon: Store },
-  { label: "Parks & outdoors", query: "parks trailheads beaches recreation centers", icon: Trees },
-  { label: "Schools & colleges", query: "high schools community colleges universities", icon: GraduationCap },
-  { label: "Community hubs", query: "libraries civic centers public plazas", icon: Building2 },
+/** Every place type a bounty can target, with the lane and search each one uses. */
+const PLACE_CATEGORIES = [
+  {
+    id: "real-estate",
+    label: "Real Estate",
+    blurb: "Open houses, listings, property tours",
+    query: "homes for sale open houses apartment tours",
+    icon: Home,
+    lane: "real-estate" as BroadcastCategoryId,
+  },
+  {
+    id: "malls-retail",
+    label: "Malls & retail",
+    blurb: "Shopping centers, stores, sales",
+    query: "shopping malls and department stores",
+    icon: Store,
+    lane: "shopping-retail" as BroadcastCategoryId,
+  },
+  {
+    id: "parks-outdoors",
+    label: "Parks & outdoors",
+    blurb: "Trails, beaches, recreation areas",
+    query: "parks trailheads beaches recreation centers",
+    icon: Trees,
+    lane: "nature-wildlife" as BroadcastCategoryId,
+  },
+  {
+    id: "schools-colleges",
+    label: "Schools & colleges",
+    blurb: "Campuses, games, public events",
+    query: "high schools community colleges universities",
+    icon: GraduationCap,
+    lane: "events-sports" as BroadcastCategoryId,
+  },
+  {
+    id: "community-hubs",
+    label: "Community hubs",
+    blurb: "Libraries, civic centers, plazas",
+    query: "libraries civic centers public plazas",
+    icon: Building2,
+    lane: "community-culture" as BroadcastCategoryId,
+  },
+  {
+    id: "emergency-safety",
+    label: "Emergency / Safety",
+    blurb: "Incidents, hazards, road closures",
+    query: "emergency services hospitals fire stations",
+    icon: ShieldAlert,
+    lane: "breaking-incidents" as BroadcastCategoryId,
+  },
 ] as const;
+
+type PlaceCategoryId = (typeof PLACE_CATEGORIES)[number]["id"];
+
 
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
   { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
