@@ -159,6 +159,6 @@ Home Events & Arts neon category artwork
 
 ## Profile progression and safety tutorial
 - [x] Keep the Profile header below the phone status area
-- [x] Scale completed bounties to 10 XP and level progression to 50 XP
+- [x] Award 10 XP per completed bounty with 500 XP required per level
 - [x] Show live reputation points with high-contrast Level 3 details
 - [x] Award safety points only after completing the interactive tutorial
