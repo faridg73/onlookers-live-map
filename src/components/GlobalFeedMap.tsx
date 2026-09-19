@@ -215,26 +215,36 @@ export function GlobalFeedMap({
         </span>
       </div>
 
-      {clips === null && (
-        <p className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Loading the global feed…
-        </p>
-      )}
-
-      {active && <GlobalClipBubble clip={active} />}
-
-      <div className="mt-5 space-y-4">
-        {filteredClips.map((clip) => (
-          <GlobalClipBubble key={clip.id} clip={clip} compact={clip.id !== activeId} />
-        ))}
-        {clips !== null && filteredClips.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            {categoryLabel
-              ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
-              : "No unlocked clips yet. Once requesters approve footage it shows up here."}
+      {emergencyOnly ? (
+        pinnedReports.length === 0 && (
+          <p className="mt-5 rounded-2xl border border-dashed border-crisis/40 p-8 text-center text-sm text-muted-foreground">
+            No active emergency alerts in this area. Verified Level 3 creators can file fire, police and medical reports.
           </p>
-        )}
-      </div>
+        )
+      ) : (
+        <>
+          {clips === null && (
+            <p className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Loading the global feed…
+            </p>
+          )}
+
+          {active && <GlobalClipBubble clip={active} />}
+
+          <div className="mt-5 space-y-4">
+            {filteredClips.map((clip) => (
+              <GlobalClipBubble key={clip.id} clip={clip} compact={clip.id !== activeId} />
+            ))}
+            {clips !== null && filteredClips.length === 0 && (
+              <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                {categoryLabel
+                  ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
+                  : "No unlocked clips yet. Once requesters approve footage it shows up here."}
+              </p>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
