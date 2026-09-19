@@ -11,26 +11,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-type Props = {
+type ProfileEditorProps = {
   profile: MyProfile | null;
   fallbackName: string;
   onSaved: (profile: MyProfile) => void;
-  onDeleted: () => void;
 };
 
-export function ProfileEditor({ profile, fallbackName, onSaved, onDeleted }: Props) {
+export function ProfileEditor({ profile, fallbackName, onSaved }: ProfileEditorProps) {
   const [editing, setEditing] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [fullName, setFullName] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-  const removeAccount = useServerFn(deleteMyAccount);
 
   useEffect(() => {
     setDisplayName(profile?.display_name ?? fallbackName);
@@ -66,19 +62,6 @@ export function ProfileEditor({ profile, fallbackName, onSaved, onDeleted }: Pro
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not update your profile.");
     } finally {
-      setBusy(false);
-    }
-  }
-
-  async function confirmDeletion() {
-    if (confirmation !== "DELETE") return;
-    setBusy(true);
-    try {
-      await removeAccount({ data: { confirmation } });
-      await supabase.auth.signOut({ scope: "local" });
-      onDeleted();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete your account.");
       setBusy(false);
     }
   }
@@ -125,22 +108,44 @@ export function ProfileEditor({ profile, fallbackName, onSaved, onDeleted }: Pro
         </DialogContent>
       </Dialog>
 
-      <section className="mt-8 border-t border-destructive/30 pt-6">
-        <h2 className="font-display text-lg text-foreground">Delete account</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Permanently remove your profile, activity, uploads, and account access.</p>
-        <Button type="button" variant="destructive" onClick={() => setDeleting(true)} className="mt-3 w-full sm:w-auto"><Trash2 />Delete Account</Button>
-      </section>
+    </>
+  );
+}
 
-      <Dialog open={deleting} onOpenChange={(open) => { setDeleting(open); if (!open) setConfirmation(""); }}>
+export function AccountDeletion({ onDeleted }: { onDeleted: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [confirmation, setConfirmation] = useState("");
+  const [busy, setBusy] = useState(false);
+  const removeAccount = useServerFn(deleteMyAccount);
+
+  async function confirmDeletion() {
+    if (confirmation !== "DELETE") return;
+    setBusy(true);
+    try {
+      await removeAccount({ data: { confirmation } });
+      await supabase.auth.signOut({ scope: "local" });
+      onDeleted();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not delete your account.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="mt-8 border-t border-destructive/30 pt-6">
+      <h2 className="font-display text-lg text-foreground">Delete account</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Permanently remove your profile, activity, uploads, wallet history, and account access.</p>
+      <Button type="button" variant="destructive" onClick={() => setOpen(true)} className="mt-3 w-full sm:w-auto"><Trash2 />Delete Account</Button>
+      <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setConfirmation(""); }}>
         <DialogContent className="max-w-md border-destructive/50">
           <DialogHeader><DialogTitle className="text-destructive">Permanently delete account?</DialogTitle><DialogDescription>This cannot be undone. Your profile, posts, bounties, uploads, wallet history, and account access will be permanently removed.</DialogDescription></DialogHeader>
           <label className="grid gap-2 text-sm font-medium text-foreground">Type DELETE to confirm<Input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder="DELETE" autoCapitalize="characters" autoComplete="off" /></label>
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" onClick={() => setDeleting(false)} disabled={busy}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
             <Button type="button" variant="destructive" onClick={() => void confirmDeletion()} disabled={confirmation !== "DELETE" || busy}>{busy ? <Loader2 className="animate-spin" /> : <Trash2 />}Delete permanently</Button>
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </section>
   );
 }
