@@ -4,17 +4,17 @@ import { TermsBody } from "@/components/legal/legal-content";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service | Onlooker live view bounties" },
+      { title: "Terms of Service | Onlooker LLC live view bounties" },
       {
         name: "description",
         content:
-          "Onlooker's Terms of Service: platform role, lawful recording rules, content rights, assumption of risk, liability waiver and indemnification.",
+          "Onlooker LLC's Terms of Service: platform role, lawful recording rules, content rights, assumption of risk, liability waiver and indemnification.",
       },
-      { property: "og:title", content: "Onlooker Terms of Service" },
+      { property: "og:title", content: "Onlooker LLC Terms of Service" },
       {
         property: "og:description",
         content:
-          "Read the rules for posting and fulfilling live view bounties on Onlooker, including safety, privacy and liability terms.",
+          "Read the rules for posting and fulfilling live view bounties on Onlooker LLC, including safety, privacy and liability terms.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -27,7 +27,7 @@ function TermsPage() {
   return (
     <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
-        Onlooker Terms of Service &amp; Legal Disclaimer
+        Onlooker LLC Terms of Service &amp; Legal Disclaimer
       </h1>
       <div className="mt-3">
         <TermsBody />

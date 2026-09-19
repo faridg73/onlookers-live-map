@@ -56,7 +56,7 @@ export function TrustLevelBadge({ className = "" }: { className?: string }) {
     },
     {
       title: "Emergencies come first",
-      body: "Onlooker reports do not replace emergency services. For immediate danger or a life-threatening emergency, call 911 first.",
+      body: "Onlooker LLC reports do not replace emergency services. For immediate danger or a life-threatening emergency, call 911 first.",
     },
   ];
 

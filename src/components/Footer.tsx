@@ -145,7 +145,7 @@ export function Footer() {
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Onlooker. All rights reserved.
+            © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
           </p>
           <p className="text-xs font-semibold tracking-wide text-signal">
             #OnlookerLive

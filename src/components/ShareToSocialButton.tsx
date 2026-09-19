@@ -61,7 +61,7 @@ export function ShareToSocialButton({
           </DialogTitle>
           <DialogDescription className="break-words">
             Anywhere you paste this link it shows a preview card with the title, the location pin
-            and Onlooker branding.
+            and Onlooker LLC branding.
           </DialogDescription>
         </DialogHeader>
 

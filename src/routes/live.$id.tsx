@@ -24,10 +24,10 @@ export const Route = createFileRoute("/live/$id")({
   }),
   head: ({ match, params }) => {
     const { title, place } = match.search as Search;
-    const heading = `🔴 Live now${place ? `, ${place}` : ""} · Onlooker`;
+    const heading = `🔴 Live now${place ? `, ${place}` : ""} · Onlooker LLC`;
     const desc = `${title ?? "A live view is streaming right now"}${
       place ? ` at ${place}` : ""
-    }. Watch it live on Onlooker. #Onlooker`;
+    }. Watch it live on Onlooker LLC. #Onlooker`;
     const url = `${SITE}/live/${params["id"]}`;
     return {
       meta: [
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/live/$id")({
         { property: "og:type", content: "video.other" },
         { property: "og:url", content: url },
         { property: "og:image", content: OG_IMAGE },
-        { property: "og:site_name", content: "Onlooker" },
+        { property: "og:site_name", content: "Onlooker LLC" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: OG_IMAGE },
       ],
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/live/$id")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BroadcastEvent",
-            name: title ?? "Onlooker live view",
+            name: title ?? "Onlooker LLC live view",
             isLiveBroadcast: true,
             location: place ? { "@type": "Place", name: place } : undefined,
             url,
@@ -72,7 +72,7 @@ function LiveSharePage() {
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">
             <Zap className="size-4" strokeWidth={2.4} />
           </span>
-          <span className="font-display text-base tracking-tight text-foreground">Onlooker</span>
+          <span className="font-display text-base tracking-tight text-foreground">Onlooker LLC</span>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-red-400">
             <Radio className="size-3" /> live
           </span>
@@ -90,7 +90,7 @@ function LiveSharePage() {
             <p className="mt-3 font-display text-2xl text-signal">{Math.round(credits)} Credits</p>
           ) : null}
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Watch the stream on the Onlooker live map, or request your own view from anywhere in the
+            Watch the stream on the Onlooker LLC live map, or request your own view from anywhere in the
             world.
           </p>
           <Link
@@ -98,15 +98,15 @@ function LiveSharePage() {
             search={{ b: id }}
             className="mt-6 block rounded-full bg-signal px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.12em] text-signal-foreground"
           >
-            Watch live on Onlooker
+            Watch live on Onlooker LLC
           </Link>
           <div className="mt-3">
             <ShareToSocialButton
               subject={{
                 kind: "live",
                 id,
-                title: title ?? "Live on Onlooker",
-                place: place ?? "Onlooker live map",
+                title: title ?? "Live on Onlooker LLC",
+                place: place ?? "Onlooker LLC live map",
                 credits,
                 latitude: lat ?? null,
                 longitude: lng ?? null,

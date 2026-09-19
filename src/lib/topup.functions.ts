@@ -54,8 +54,8 @@ export const startWalletTopUp = createServerFn({ method: "POST" })
               currency: "usd",
               unit_amount: cents,
               product_data: {
-                name: "Onlooker wallet top-up",
-                description: "Money added to your Onlooker wallet to fund bounties.",
+                name: "Onlooker LLC wallet top-up",
+                description: "Money added to your Onlooker LLC wallet to fund bounties.",
               },
             },
           },

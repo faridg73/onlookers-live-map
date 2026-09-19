@@ -1,6 +1,6 @@
 # Onlooker LLC
 
-"Build a crowdsourced live-view app called Onlooker with a full-screen interactive map, a bottom navigation bar (Map, Live Requests Feed, Post Request, and User Profile), real-time request cards with bounty rewards, and a floating action button to create a new live photo request."
+"Build a crowdsourced live-view app called Onlooker LLC with a full-screen interactive map, a bottom navigation bar (Map, Live Requests Feed, Post Request, and User Profile), real-time request cards with bounty rewards, and a floating action button to create a new live photo request."
 
 This project was built with [Lovable](https://lovable.dev).
 

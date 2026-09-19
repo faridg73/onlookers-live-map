@@ -24,13 +24,13 @@ import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 export const Route = createFileRoute("/feed")({
   head: () => ({
     meta: [
-      { title: "Live Requests Feed | Onlooker" },
+      { title: "Live Requests Feed | Onlooker LLC" },
       {
         name: "description",
         content:
           "Every open live photo request near you, ranked by bounty and time left. Claim one and shoot it.",
       },
-      { property: "og:title", content: "Live Requests Feed | Onlooker" },
+      { property: "og:title", content: "Live Requests Feed | Onlooker LLC" },
       {
         property: "og:description",
         content: "Open live photo requests near you, ranked by bounty and time left.",

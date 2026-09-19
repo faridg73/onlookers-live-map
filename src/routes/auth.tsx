@@ -16,13 +16,13 @@ import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in to Onlooker, post and fulfil live bounties" },
+      { title: "Sign in to Onlooker LLC, post and fulfil live bounties" },
       {
         name: "description",
         content:
-          "Sign in to Onlooker to post live view bounties, upload fulfilment videos and replay them any time.",
+          "Sign in to Onlooker LLC to post live view bounties, upload fulfilment videos and replay them any time.",
       },
-      { property: "og:title", content: "Sign in to Onlooker" },
+      { property: "og:title", content: "Sign in to Onlooker LLC" },
       {
         property: "og:description",
         content: "Sign in to post live view bounties and upload fulfilment videos.",

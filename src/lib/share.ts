@@ -15,8 +15,8 @@ export async function shareBountyVideo(video: BountyVideo) {
     return;
   }
 
-  const title = video.request_title || "Onlooker live view";
-  const text = `${title}${video.request_place ? `, ${video.request_place}` : ""} · captured on Onlooker`;
+  const title = video.request_title || "Onlooker LLC live view";
+  const text = `${title}${video.request_place ? `, ${video.request_place}` : ""} · captured on Onlooker LLC`;
 
   const nav = typeof navigator === "undefined" ? null : navigator;
   if (nav?.share) {

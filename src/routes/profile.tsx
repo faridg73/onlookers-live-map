@@ -55,13 +55,13 @@ import { AccountDeletion, ProfileEditor } from "@/components/ProfileEditor";
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "Your Onlooker Profile: earnings and requests" },
+      { title: "Your Onlooker LLC Profile: earnings and requests" },
       {
         name: "description",
         content:
           "Track the bounties you earned as an onlooker and every live request you posted.",
       },
-      { property: "og:title", content: "Your Onlooker Profile" },
+      { property: "og:title", content: "Your Onlooker LLC Profile" },
       {
         property: "og:description",
         content: "Bounties earned as an onlooker and every live request you posted.",
@@ -377,7 +377,7 @@ function ProfileScreen() {
               Onlooker LLC is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
             </p>
             <p>
-              The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.
+              The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker LLC so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.
             </p>
             <p>
               Made for creators, trusted by viewers, and designed for instant connection. Welcome to the live view network.
@@ -385,7 +385,7 @@ function ProfileScreen() {
           </div>
           <div className="border-t border-border pt-4">
             <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-              Follow Onlooker
+              Follow Onlooker LLC
             </p>
             <SocialLinks className="flex items-center gap-3" />
           </div>

@@ -16,13 +16,13 @@ import { PageBackButton } from "@/components/PageBackButton";
 export const Route = createFileRoute("/balance")({
   head: () => ({
     meta: [
-      { title: "Balance & Cashout | Onlooker" },
+      { title: "Balance & Cashout | Onlooker LLC" },
       {
         name: "description",
         content:
-          "See your Onlooker credit balance, every credit pack you bought, and cash your credits out to your bank.",
+          "See your Onlooker LLC credit balance, every credit pack you bought, and cash your credits out to your bank.",
       },
-      { property: "og:title", content: "Balance & Cashout | Onlooker" },
+      { property: "og:title", content: "Balance & Cashout | Onlooker LLC" },
       {
         property: "og:description",
         content: "Credits balance, purchase history and bank cash out in one place.",
