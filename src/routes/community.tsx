@@ -456,9 +456,9 @@ function CommunityHub() {
                       setStrangeSightings(false);
                     }}
                     aria-pressed={active}
-                    className={`group flex h-full w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-signal/30 hover:border-signal/60"}`}
+                    className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none sm:h-44 md:h-48 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-signal/30 hover:border-signal/60"}`}
                   >
-                    <span className="relative block aspect-square w-full overflow-hidden">
+                    <span className="relative block min-h-0 w-full flex-1 overflow-hidden">
                       <LoopingPreview
                         videoUrl={previewUrl}
                         imageUrl={previewUrl ? undefined : visual.image}
@@ -508,9 +508,9 @@ function CommunityHub() {
                   setTag(null);
                 }}
                 aria-pressed={strangeSightings}
-                className={`group flex w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
+                className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none sm:h-44 md:h-48 ${strangeSightings ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_var(--color-signal)]" : "border-signal/30 hover:border-signal/60"}`}
               >
-                <span className="relative block aspect-square w-full overflow-hidden bg-background">
+                <span className="relative block min-h-0 w-full flex-1 overflow-hidden bg-background">
                   <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="Neon UFO above a glowing spiral" className="size-full object-cover" />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
