@@ -1,12 +1,11 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthContext, type AuthState } from "@/hooks/auth-context";
 
-type AuthState = { user: User | null; loading: boolean };
-
-const AuthContext = createContext<AuthState | null>(null);
+const SIGNED_OUT: AuthState = { user: null, loading: true };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -60,8 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return createElement(AuthContext.Provider, { value: { user, loading } }, children);
 }
 
-export function useAuth() {
-  const state = useContext(AuthContext);
-  if (!state) throw new Error("useAuth must be used inside AuthProvider");
-  return state;
+export function useAuth(): AuthState {
+  // Fall back to a loading/signed-out state instead of crashing the page if a
+  // component ever renders outside the provider (e.g. during a hot reload).
+  return useContext(AuthContext) ?? SIGNED_OUT;
 }
