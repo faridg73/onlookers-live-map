@@ -43,7 +43,7 @@ export function FirstPostGuide({
 }: FirstPostGuideProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden border-signal/30 bg-surface/95 p-0 shadow-[0_24px_80px_color-mix(in_oklab,var(--signal)_14%,transparent)] backdrop-blur-xl sm:max-w-lg">
+      <DialogContent className="overflow-y-auto border-signal/30 bg-surface p-0 shadow-[0_24px_80px_color-mix(in_oklab,var(--signal)_14%,transparent)] backdrop-blur-xl sm:max-w-lg">
         <div className="border-b border-border bg-signal/5 px-5 pb-5 pt-6 pr-16 sm:px-7 sm:pb-6 sm:pt-7">
           <div className="mb-4 grid size-11 place-items-center rounded-full border border-signal/40 bg-signal/10 text-signal shadow-[0_0_28px_color-mix(in_oklab,var(--signal)_22%,transparent)]">
             <Sparkles className="size-5" />
@@ -101,7 +101,7 @@ type RealEstateSecurityDialogProps = {
 export function RealEstateSecurityDialog({ open, onOpenChange }: RealEstateSecurityDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden border-signal/30 bg-surface/95 p-0 shadow-[0_24px_80px_color-mix(in_oklab,var(--signal)_14%,transparent)] backdrop-blur-xl sm:max-w-md">
+      <DialogContent className="overflow-y-auto border-signal/30 bg-surface p-0 shadow-[0_24px_80px_color-mix(in_oklab,var(--signal)_14%,transparent)] backdrop-blur-xl sm:max-w-md">
         <div className="border-b border-border bg-signal/5 px-5 pb-5 pt-6 pr-16 sm:px-7 sm:pt-7">
           <div className="mb-4 grid size-12 place-items-center rounded-full border border-signal/40 bg-signal/10 text-signal shadow-[0_0_28px_color-mix(in_oklab,var(--signal)_22%,transparent)]">
             <KeyRound className="size-6" />

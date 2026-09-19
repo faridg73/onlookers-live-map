@@ -193,4 +193,4 @@ Home Events & Arts neon category artwork
 - [x] Place address search and map immediately after category selection
 - [x] Add a dismissible first-time bounty guide with a persistent opt-out
 - [x] Add the Real Estate escrow and PIN security guide on selection
-- [ ] Verify both dialogs and the reordered layout on phone and desktop
+- [x] Verify both dialogs and the reordered layout on phone and desktop
