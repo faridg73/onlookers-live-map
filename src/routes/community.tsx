@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { BadgeCheck, CircleDollarSign, Compass, HandCoins, LockKeyhole, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -16,7 +16,6 @@ import {
   type RadiusChoiceId,
 } from "@/components/CommunityFeedFilters";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
-import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
@@ -37,8 +36,7 @@ import {
   type CommunityPost,
 } from "@/lib/community";
 import { CategoryExampleCards } from "@/components/CategoryExampleCards";
-import { fetchMyEarnings, type EarningsSummary } from "@/lib/earnings";
-import { isClosed, useOnlooker } from "@/lib/onlooker-store";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 import {
@@ -61,13 +59,13 @@ export const Route = createFileRoute("/community")({
       : {},
   head: () => ({
     meta: [
-      { title: "Community impact and verified earnings | Onlooker LLC" },
+      { title: "Community feed and local activity | Onlooker LLC" },
       {
         name: "description",
         content:
           "Help with real-world requests, complete verified captures, and earn through transparent bounties backed by locked credits.",
       },
-      { property: "og:title", content: "Community impact and verified earnings | Onlooker LLC" },
+      { property: "og:title", content: "Community feed and local activity | Onlooker LLC" },
       {
         property: "og:description",
         content:
@@ -98,13 +96,9 @@ function CommunityHub() {
   const [source, setSource] = useState<"all" | "following">("all");
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [impactView, setImpactView] = useState<"help" | "mine">("help");
-  const [earnings, setEarnings] = useState<EarningsSummary | null>(null);
-  const [earningsLoading, setEarningsLoading] = useState(false);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
@@ -180,7 +174,6 @@ function CommunityHub() {
       strangeSightings?: boolean;
       view?: "feed" | "map" | "alerts";
       source?: "all" | "following";
-      impactView?: "help" | "mine";
       radius?: RadiusChoiceId;
       vibeGridOpen?: boolean;
       focus?: { lat: number; lng: number; label: string } | null;
@@ -193,7 +186,6 @@ function CommunityHub() {
     setStrangeSightings(Boolean(saved.strangeSightings));
     if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
-    if (saved.impactView === "help" || saved.impactView === "mine") setImpactView(saved.impactView);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
     setVibeGridOpen(Boolean(saved.vibeGridOpen));
     setFocus(saved.focus ?? null);
@@ -209,12 +201,11 @@ function CommunityHub() {
       strangeSightings,
       view,
       source,
-      impactView,
       radius,
       vibeGridOpen,
       focus,
     });
-  }, [category, tag, categoryId, strangeSightings, view, source, impactView, radius, vibeGridOpen, focus]);
+  }, [category, tag, categoryId, strangeSightings, view, source, radius, vibeGridOpen, focus]);
 
   useEffect(() => {
     if (!mystery) return;
@@ -228,34 +219,6 @@ function CommunityHub() {
       setComposing(true);
     }
   }, [mystery]);
-
-  useEffect(() => {
-    let alive = true;
-    if (!user) {
-      setEarnings(null);
-      setEarningsLoading(false);
-      return;
-    }
-    setEarningsLoading(true);
-    fetchMyEarnings()
-      .then((summary) => {
-        if (alive) setEarnings(summary);
-      })
-      .catch(() => {
-        if (alive) setEarnings(null);
-      })
-      .finally(() => {
-        if (alive) setEarningsLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [user?.id]);
-
-  const openBounties = useMemo(
-    () => requests.filter((request) => request.status === "open" && !isClosed(request)),
-    [requests],
-  );
 
   useEffect(() => {
     try {
@@ -431,98 +394,6 @@ function CommunityHub() {
           />
         </div>
       </header>
-
-      <section aria-labelledby="community-impact-title" className="mt-6 border-y border-border bg-surface/55 px-5 py-5 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
-              <HandCoins className="size-4" /> Community impact
-            </p>
-            <h2 id="community-impact-title" className="mt-1 text-xl font-extrabold text-foreground">
-              Help someone. Earn when the work is verified.
-            </h2>
-          </div>
-          <div className="flex rounded-md border border-border bg-background p-0.5" role="tablist" aria-label="Community impact views">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              role="tab"
-              aria-selected={impactView === "help"}
-              onClick={() => setImpactView("help")}
-              className={impactView === "help" ? "bg-signal text-signal-foreground" : "text-muted-foreground"}
-            >
-              Help others earn
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              role="tab"
-              aria-selected={impactView === "mine"}
-              onClick={() => setImpactView("mine")}
-              className={impactView === "mine" ? "bg-signal text-signal-foreground" : "text-muted-foreground"}
-            >
-              My impact
-            </Button>
-          </div>
-        </div>
-
-        {impactView === "help" ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { icon: CircleDollarSign, value: openBounties.length.toString(), label: "Open now" },
-                { icon: LockKeyhole, value: "Protected", label: "Credits locked" },
-                { icon: BadgeCheck, value: "Verified", label: "Proof before pay" },
-              ].map(({ icon: Icon, value, label }) => (
-                <article key={label} className="rounded-md border border-border bg-background p-3">
-                  <Icon className="size-4 text-signal" aria-hidden />
-                  <p className="mt-2 break-words text-sm font-extrabold text-foreground">{value}</p>
-                  <p className="mt-0.5 text-[0.65rem] text-muted-foreground">{label}</p>
-                </article>
-              ))}
-            </div>
-            <Button asChild className="w-full sm:w-auto">
-              <Link to="/">View bounty map</Link>
-            </Button>
-          </div>
-        ) : (
-          <div className="mt-4">
-            {!user ? (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-background p-4">
-                <p className="text-sm text-muted-foreground">Sign in to see your verified earnings and completed work.</p>
-                <Button asChild size="sm"><Link to="/auth">Sign in</Link></Button>
-              </div>
-            ) : earningsLoading ? (
-              <p className="text-sm text-muted-foreground">Loading your impact…</p>
-            ) : (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {[
-                  { value: `${earnings?.grossCredits ?? 0}`, label: "Credits earned" },
-                  { value: `${earnings?.feeCredits ?? 0}`, label: "Platform fee" },
-                  { value: `${earnings?.netCredits ?? 0}`, label: "Credits paid" },
-                  { value: `${earnings?.entries ?? 0}`, label: "Verified earnings" },
-                ].map((metric) => (
-                  <article key={metric.label} className="rounded-md border border-border bg-background p-3">
-                    <p className="text-lg font-extrabold text-signal">{metric.value}</p>
-                    <p className="mt-0.5 text-[0.68rem] text-muted-foreground">{metric.label}</p>
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        <ol className="mt-4 grid grid-cols-4 gap-1 border-t border-border pt-3" aria-label="How verified earning works">
-          {["Claim", "Capture", "Requester verifies", "Credits release"].map((label, index) => (
-            <li key={label} className="flex min-w-0 items-center gap-1.5 text-[0.62rem] font-bold text-muted-foreground">
-              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-signal/15 text-[0.6rem] text-signal">{index + 1}</span>
-              <span className="leading-tight">{label}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
 
       <section aria-label="Discover categories" className="mt-6">
         <div className="mb-3 flex items-center justify-between gap-2 px-5 sm:px-8">
@@ -715,14 +586,6 @@ function CommunityHub() {
 
 
       </section>
-
-      <div className="mx-5 mt-4 sm:mx-8">
-        <Button type="button" variant="outline" onClick={() => setReportOpen(true)} className="h-11 w-full justify-center rounded-xl border-crisis/60 text-sm font-extrabold uppercase tracking-[0.1em] text-crisis">
-          Create community report
-        </Button>
-      </div>
-
-      <CreateCommunityReportModal open={reportOpen} onOpenChange={setReportOpen} onPosted={() => setView("feed")} />
 
       {strangeSightings && (
         <section className="mx-5 mt-4 border-y border-signal/45 bg-surface px-4 py-4 shadow-[0_0_24px_var(--color-signal)] sm:mx-8">
