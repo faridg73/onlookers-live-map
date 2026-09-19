@@ -32,13 +32,13 @@ import {
 export const Route = createFileRoute("/admin-control")({
   head: () => ({
     meta: [
-      { title: "Onlooker control center, moderation, cash-outs, metrics" },
+      { title: "Onlooker LLC control center, moderation, cash-outs, metrics" },
       {
         name: "description",
         content:
           "Admin control center for Onlooker LLC: review flagged content, approve hunter cash-outs and track platform volume.",
       },
-      { property: "og:title", content: "Onlooker control center" },
+      { property: "og:title", content: "Onlooker LLC control center" },
       {
         property: "og:description",
         content: "Moderate flagged content, settle cash-outs and watch platform volume in one place.",
@@ -131,7 +131,7 @@ function ControlCenter() {
         <ShieldAlert className="size-10 text-live" />
         <h1 className="text-xl font-bold text-foreground">Control center is admin-only</h1>
         <p className="text-sm text-muted-foreground">
-          This area is reserved for the Onlooker review team.
+          This area is reserved for the Onlooker LLC review team.
         </p>
         <Link to="/" className="text-sm font-semibold text-live underline">
           Back to the map

@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.onlooker.app',
-  appName: 'Onlooker',
+  appName: 'Onlooker LLC',
   webDir: 'mobile-shell',
   server: { url: 'https://onlookerlive.com' },
   ios: {

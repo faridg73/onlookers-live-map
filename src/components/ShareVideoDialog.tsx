@@ -27,8 +27,8 @@ export function ShareVideoDialog({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const title = video.request_title || "Onlooker live view";
-  const caption = `${title}${video.request_place ? `, ${video.request_place}` : ""} · captured on Onlooker\n${BRAND_TAG_TEXT}`;
+  const title = video.request_title || "Onlooker LLC live view";
+  const caption = `${title}${video.request_place ? `, ${video.request_place}` : ""} · captured on Onlooker LLC\n${BRAND_TAG_TEXT}`;
 
   /** Signed link, valid for 7 days so the recipient can still watch. */
   async function link(): Promise<string | null> {

@@ -114,7 +114,7 @@ export function BountyChat({
     if (body !== raw) {
       toast.warning("Contact details hidden", {
         description:
-          "Phone numbers, emails and outside links stay masked. Keep the whole job in Onlooker so your payment is protected.",
+          "Phone numbers, emails and outside links stay masked. Keep the whole job in Onlooker LLC so your payment is protected.",
       });
     }
     setSending(true);

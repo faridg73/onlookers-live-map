@@ -1,6 +1,6 @@
-# Onlooker — Store Submission Kit
+# Onlooker LLC — Store Submission Kit
 
-Everything you need to publish **Onlooker** on Google Play and the App Store.
+Everything you need to publish **Onlooker LLC** on Google Play and the App Store.
 Copy the text into the store consoles. Files in this folder:
 
 | File | Purpose |
@@ -29,8 +29,8 @@ are already updated in the repo and ship with the next build.
 
 ## App name
 
-- **Display name:** Onlooker
-- **Short name (Android):** Onlooker
+- **Display name:** Onlooker LLC
+- **Short name (Android):** Onlooker LLC
 
 ## Short description (Google Play — 80 chars max)
 
@@ -38,7 +38,7 @@ are already updated in the repo and ship with the next build.
 
 ## Full description (Google Play)
 
-> Onlooker is a live-view community for your city. Need to know if the night market is still open, how long the ferry line is, or what the sunset looks like from the east ridge right now? Post a live photo request, set a bounty, and nearby onlookers send you real-time shots.
+> Onlooker LLC is a live-view community for your city. Need to know if the night market is still open, how long the ferry line is, or what the sunset looks like from the east ridge right now? Post a live photo request, set a bounty, and nearby onlookers send you real-time shots.
 >
 > **How it works**
 > - POST A REQUEST — ask for any live view, anywhere in the city.
@@ -50,14 +50,14 @@ are already updated in the repo and ship with the next build.
 > - Interactive live map of every open request in your city
 > - Real-time request feed with bounties, watchers and countdowns
 > - One-tap request creation with photo details
-> - Onlooker profile with earnings, balance and activity
+> - Onlooker LLC profile with earnings, balance and activity
 > - Fast, lightweight and works on any phone
 >
-> Privacy: Onlooker lets you share your live location only while you are actively delivering a request. You control what you share, and you can turn it off at any time.
+> Privacy: Onlooker LLC lets you share your live location only while you are actively delivering a request. You control what you share, and you can turn it off at any time.
 
 ## App Store description (up to 4000 chars — use the Google Play text above, plus:)
 
-> Onlooker turns your city into a live camera network. Someone, somewhere, is always looking. Post a request, set a bounty, and get the shot in minutes.
+> Onlooker LLC turns your city into a live camera network. Someone, somewhere, is always looking. Post a request, set a bounty, and get the shot in minutes.
 
 ## Keywords (App Store, 100 chars max)
 
@@ -89,12 +89,12 @@ are already updated in the repo and ship with the next build.
 ## Upload checklist
 
 ### Google Play
-1. Play Console → Create app → name **Onlooker**, category Photography.
+1. Play Console → Create app → name **Onlooker LLC**, category Photography.
 2. Store listing: paste short + full description, upload feature graphic, icon, 2+ screenshots (`play-*`), set category/content rating/contact.
 3. App bundle: in Android Studio, Build → Generate Signed App Bundle → upload the `.aab` to Production → review → rollout.
 
 ### App Store
-1. App Store Connect → My Apps → + → New App → name **Onlooker**.
+1. App Store Connect → My Apps → + → New App → name **Onlooker LLC**.
 2. App Information: category Photo & Video, privacy policy URL, content rating.
 3. Screenshots: upload `ios67-*` and `ios65-*` for the right device sizes.
 4. Build: Xcode → Product → Archive → Distribute → App Store Connect. Then select the build under TestFlight/App Store and submit for review.

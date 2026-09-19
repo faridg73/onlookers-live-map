@@ -20,13 +20,13 @@ import { moderationReasonLabel } from "@/lib/moderation-reasons";
 export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [
-      { title: "Onlooker admin dashboard, payouts and disputes" },
+      { title: "Onlooker LLC admin dashboard, payouts and disputes" },
       {
         name: "description",
         content:
-          "Admin control panel for Onlooker: review open disputes and approve or deny hunter payout requests.",
+          "Admin control panel for Onlooker LLC: review open disputes and approve or deny hunter payout requests.",
       },
-      { property: "og:title", content: "Onlooker admin dashboard" },
+      { property: "og:title", content: "Onlooker LLC admin dashboard" },
       {
         property: "og:description",
         content: "Review open disputes and settle hunter payout requests.",
@@ -111,7 +111,7 @@ function AdminDashboard() {
         <ShieldCheck className="mx-auto size-8 text-signal" />
         <h1 className="mt-4 font-display text-2xl text-foreground">Admins only</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This dashboard is limited to Onlooker admin accounts.
+          This dashboard is limited to Onlooker LLC admin accounts.
         </p>
         <Link
           to={user ? "/profile" : "/auth"}

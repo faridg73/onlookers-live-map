@@ -177,7 +177,7 @@ export function MapCanvas({
         setReady(true);
       })
       .catch((error) => {
-        console.error("[Onlooker map] Google Maps failed to load", error);
+        console.error("[Onlooker LLC map] Google Maps failed to load", error);
         setFailed(true);
       });
     return () => {

@@ -88,10 +88,10 @@ export function DmcaReportModal({
             <Copyright className="size-4 text-signal" /> Copyright policy
           </h3>
           <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-            Onlooker respects the intellectual property rights of others and complies with the
+            Onlooker LLC respects the intellectual property rights of others and complies with the
             Digital Millennium Copyright Act (DMCA). We respond to valid notices of alleged
             infringement by removing or disabling access to the reported material, and repeat
-            infringers may have their accounts suspended or terminated. All media on Onlooker must
+            infringers may have their accounts suspended or terminated. All media on Onlooker LLC must
             be filmed live by the uploader's own device camera in public spaces.{" "}
             <Link to="/copyright" className="text-signal underline underline-offset-2">
               Read the full Copyright Policy
@@ -102,7 +102,7 @@ export function DmcaReportModal({
 
         <section>
           <h3 className="flex items-center gap-2 text-sm font-semibold">
-            <Ban className="size-4 text-destructive" /> Prohibited on Onlooker
+            <Ban className="size-4 text-destructive" /> Prohibited on Onlooker LLC
           </h3>
           <ul className="mt-1.5 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
             {PROHIBITED.map((item) => (

@@ -6,13 +6,13 @@ import { PageBackButton } from "@/components/PageBackButton";
 export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
-      { title: "Top Reporters | Onlooker bounty payout ranking" },
+      { title: "Top Reporters | Onlooker LLC bounty payout ranking" },
       {
         name: "description",
         content:
-          "The full Onlooker ranking of onlookers by bounty cash earned, with clips sent and lifetime payouts.",
+          "The full Onlooker LLC ranking of onlookers by bounty cash earned, with clips sent and lifetime payouts.",
       },
-      { property: "og:title", content: "Top Reporters on Onlooker" },
+      { property: "og:title", content: "Top Reporters on Onlooker LLC" },
       {
         property: "og:description",
         content: "See which onlookers have collected the most bounty cash for live views.",

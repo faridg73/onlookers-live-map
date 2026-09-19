@@ -18,7 +18,7 @@ export function TermsBody() {
   return (
     <>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        By downloading, installing, accessing, or signing into Onlooker (the &ldquo;Platform&rdquo;),
+        By downloading, installing, accessing, or signing into Onlooker LLC (the &ldquo;Platform&rdquo;),
         you (&ldquo;User&rdquo;, &ldquo;Creator&rdquo;, or &ldquo;Participant&rdquo;) unconditionally
         accept and agree to be bound by these Terms of Service. If you do not agree, you must
         immediately uninstall the app and cease all use.
@@ -26,9 +26,9 @@ export function TermsBody() {
 
       <Section title="Platform Role as Passive Host">
         <p>
-          Onlooker operates exclusively as a peer-to-peer software platform and technological
+          Onlooker LLC operates exclusively as a peer-to-peer software platform and technological
           intermediary that connects individuals posting media requests (&ldquo;Posters&rdquo;) with
-          individuals fulfilling requests (&ldquo;Fulfillers&rdquo;). Onlooker is not a publisher,
+          individuals fulfilling requests (&ldquo;Fulfillers&rdquo;). Onlooker LLC is not a publisher,
           employer, agent, or security supervisor of its users, exercises no control over physical
           field activities, and disclaims all liability arising from real-world interactions.
         </p>
@@ -65,7 +65,7 @@ export function TermsBody() {
         </p>
         <p>
           <strong className="text-foreground">Prohibition of harassment &amp; illegal acts.</strong>{" "}
-          Users agree not to use Onlooker to stalk, harass, intimidate, threaten, or record
+          Users agree not to use Onlooker LLC to stalk, harass, intimidate, threaten, or record
           individuals in a manner that violates personal rights, privacy torts, or anti-harassment
           statutes.
         </p>
@@ -79,7 +79,7 @@ export function TermsBody() {
         </p>
         <p>
           <strong className="text-foreground">License you grant us.</strong> By uploading UGC you
-          grant Onlooker a worldwide, non-exclusive, royalty-free, transferable and sublicensable
+          grant Onlooker LLC a worldwide, non-exclusive, royalty-free, transferable and sublicensable
           license to host, store, reproduce, modify (for formatting, thumbnails, and compression),
           publicly display, publicly perform, stream, and distribute that UGC in connection with
           operating, providing, improving, and promoting the Platform. This license ends for a piece
@@ -94,7 +94,7 @@ export function TermsBody() {
         </p>
         <p>
           <strong className="text-foreground">Zero-tolerance moderation &amp; content removal.</strong>{" "}
-          Onlooker reserves the right, but assumes no obligation, to review, moderate, flag, suspend,
+          Onlooker LLC reserves the right, but assumes no obligation, to review, moderate, flag, suspend,
           or permanently delete any bounty, user profile, or uploaded video that violates these
           terms, depicts illegal acts, or exposes the Platform to legal risk, without prior notice
           or compensation.
@@ -130,7 +130,7 @@ export function TermsBody() {
       <Section title="Copyright and DMCA Takedown Policy">
         <p>
           <strong className="text-foreground">Reporting infringement.</strong> If you believe
-          content on Onlooker infringes your copyright, send a written notice containing: (1) your
+          content on Onlooker LLC infringes your copyright, send a written notice containing: (1) your
           physical or electronic signature; (2) identification of the copyrighted work claimed to be
           infringed; (3) identification of the infringing material and its location on the Platform
           (a link or the bounty/video reference); (4) your name, address, telephone number, and
@@ -162,14 +162,14 @@ export function TermsBody() {
         </p>
         <p>
           <strong className="text-foreground">Full release of liability.</strong> To the maximum
-          extent permitted by law, Onlooker, its creators, founders, officers, employees, and
+          extent permitted by law, Onlooker LLC, its creators, founders, officers, employees, and
           partners shall not be held liable for any direct, indirect, incidental, special,
           consequential, or punitive damages, including personal injury, property loss, legal fees,
           or financial penalties, arising out of or in connection with app usage or field activities.
         </p>
         <p>
           <strong className="text-foreground">Mandatory indemnification.</strong> You agree to
-          defend, indemnify, and hold harmless Onlooker and its affiliates from and against any
+          defend, indemnify, and hold harmless Onlooker LLC and its affiliates from and against any
           claims, liabilities, damages, judgments, awards, losses, costs, or expenses (including
           reasonable attorneys&rsquo; fees) resulting from your violation of these terms,
           infringement of third-party rights, or any unlawful actions taken while using the
@@ -231,9 +231,9 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
         Last updated: September 2026
       </p>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        This Privacy Policy explains what Onlooker (&ldquo;we&rdquo;, &ldquo;us&rdquo;) collects when
-        you use the Onlooker app and website, why we collect it, who it is shared with, and the
-        control you have over it. Onlooker is a peer-to-peer platform where people post paid
+        This Privacy Policy explains what Onlooker LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;) collects when
+        you use the Onlooker LLC app and website, why we collect it, who it is shared with, and the
+        control you have over it. Onlooker LLC is a peer-to-peer platform where people post paid
         requests for live photos and video and other people fulfil them. Using the app means you
         accept this policy and our {termsRef}.
       </p>
@@ -248,10 +248,10 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
         <p>
           If you earn or spend money on the platform we store wallet balances, bounty amounts, boost
           contributions, payout requests and transaction history. Card details are never stored by
-          Onlooker; card payments are processed by our payment provider under its own privacy terms.
+          Onlooker LLC; card payments are processed by our payment provider under its own privacy terms.
         </p>
         <p>
-          Onlooker is not intended for children under 13 (or the minimum age in your country) and we
+          Onlooker LLC is not intended for children under 13 (or the minimum age in your country) and we
           do not knowingly collect data from them.
         </p>
       </Section>
@@ -266,7 +266,7 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
         </p>
         <p>
           <strong className="text-foreground">When we collect it.</strong> Location is read only
-          while the app is open and in use. Onlooker does not track your location in the background
+          while the app is open and in use. Onlooker LLC does not track your location in the background
           and does not build a continuous movement history of you.
         </p>
         <p>
@@ -321,7 +321,7 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
         </p>
         <p>
           We may disclose data where legally required by valid legal process, or where necessary to
-          protect the rights, safety or property of users or the public. If Onlooker is acquired or
+          protect the rights, safety or property of users or the public. If Onlooker LLC is acquired or
           merged, account data may transfer to the successor entity under this policy.
         </p>
       </Section>

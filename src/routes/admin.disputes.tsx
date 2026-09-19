@@ -22,13 +22,13 @@ import { moderationReasonLabel } from "@/lib/moderation-reasons";
 export const Route = createFileRoute("/admin/disputes")({
   head: () => ({
     meta: [
-      { title: "Onlooker moderator dashboard, dispute review" },
+      { title: "Onlooker LLC moderator dashboard, dispute review" },
       {
         name: "description",
         content:
-          "Moderator tools for Onlooker: review disputed bounties, watch the submitted clips, read evidence, and release or refund the escrowed payout.",
+          "Moderator tools for Onlooker LLC: review disputed bounties, watch the submitted clips, read evidence, and release or refund the escrowed payout.",
       },
-      { property: "og:title", content: "Onlooker moderator dashboard" },
+      { property: "og:title", content: "Onlooker LLC moderator dashboard" },
       {
         property: "og:description",
         content: "Review disputed bounties and settle escrow payouts fairly.",
@@ -82,7 +82,7 @@ function ModeratorDashboard() {
         <ShieldCheck className="mx-auto size-8 text-signal" />
         <h1 className="mt-4 font-display text-2xl text-foreground">Moderators only</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This dashboard is for designated Onlooker moderators.
+          This dashboard is for designated Onlooker LLC moderators.
         </p>
         <Link
           to={user ? "/disputes" : "/auth"}

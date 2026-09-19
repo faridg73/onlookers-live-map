@@ -31,7 +31,7 @@ export function LegalConsent({
         />
         <span id="accept-legal-text">
           <label htmlFor="accept-legal" className="cursor-pointer">
-            I agree to Onlooker&rsquo;s{" "}
+            I agree to Onlooker LLC&rsquo;s{" "}
           </label>
           <button
             type="button"
@@ -50,7 +50,7 @@ export function LegalConsent({
           </button>
           <label htmlFor="accept-legal" className="cursor-pointer">
             , acknowledging that I operate independently, assume all legal and physical liability,
-            will only record in lawful public spaces without trespassing, and hold Onlooker harmless
+            will only record in lawful public spaces without trespassing, and hold Onlooker LLC harmless
             from any legal actions.
           </label>
         </span>

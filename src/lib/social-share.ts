@@ -11,7 +11,7 @@ import { toast } from "sonner";
  */
 
 export const SITE_URL = "https://onlookerlive.com";
-export const BRAND_HASHTAGS = ["Onlooker", "OnlookerLive"] as const;
+export const BRAND_HASHTAGS = ["Onlooker LLC", "OnlookerLive"] as const;
 
 export type ShareSubject = {
   /** A live broadcast, or a funded pin on the map. */
@@ -183,18 +183,18 @@ export function embedSnippet(subject: ShareSubject): string {
   const src = embedLink(subject);
   return [
     `<iframe src="${src}"`,
-    `  title="Onlooker live view, ${subject.place.replace(/"/g, "&quot;")}"`,
+    `  title="Onlooker LLC live view, ${subject.place.replace(/"/g, "&quot;")}"`,
     '  width="100%" height="480" loading="lazy"',
     '  style="border:0;border-radius:16px;max-width:640px"',
     '  allow="fullscreen"></iframe>',
   ].join("\n");
 }
 
-/** Ready-to-paste iframe of every active Onlooker feed. */
+/** Ready-to-paste iframe of every active Onlooker LLC feed. */
 export function mapEmbedSnippet(): string {
   return [
     `<iframe src="${mapEmbedLink()}"`,
-    '  title="Onlooker live map" width="100%" height="560" loading="lazy"',
+    '  title="Onlooker LLC live map" width="100%" height="560" loading="lazy"',
     '  style="border:0;border-radius:16px" allow="fullscreen"></iframe>',
   ].join("\n");
 }

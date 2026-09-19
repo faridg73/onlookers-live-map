@@ -12,7 +12,7 @@ interface Props {
 const Email = ({ name, subject, message, ticketId }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>We received your message — Onlooker support</Preview>
+    <Preview>We received your message — Onlooker LLC support</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={heading}>Thanks for reaching out</Heading>

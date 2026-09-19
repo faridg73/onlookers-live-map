@@ -1,6 +1,6 @@
-# Onlooker — Mobile & App Store Guide
+# Onlooker LLC — Mobile & App Store Guide
 
-Onlooker ships two mobile paths:
+Onlooker LLC ships two mobile paths:
 
 1. **Installable web app (PWA)** — works today, no store needed.
 2. **Native shell (Capacitor)** — what you submit to the App Store and Google Play.
@@ -63,7 +63,7 @@ release**, then re-run `npx cap sync` so the app ships the bundled web assets.
 2. Add app icons and a launch screen (icons live in `public/`).
 3. Product → Archive → Distribute App → App Store Connect.
 4. In App Store Connect fill in the listing, screenshots, privacy details
-   (Onlooker uses camera and location if you enable those plugins), then submit.
+   (Onlooker LLC uses camera and location if you enable those plugins), then submit.
 
 ### Google Play
 
@@ -78,7 +78,7 @@ npm i @capacitor/camera @capacitor/geolocation @capacitor/push-notifications
 npx cap sync
 ```
 
-These map directly onto Onlooker's core flows: taking a live shot, pinning your
+These map directly onto Onlooker LLC's core flows: taking a live shot, pinning your
 position on the map, and getting notified when a bounty lands near you.
 
 ## 5. Store submission kit (already prepared)

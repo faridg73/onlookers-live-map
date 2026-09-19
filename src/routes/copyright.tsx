@@ -42,7 +42,7 @@ function CopyrightPage() {
       </p>
 
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-        Onlooker LLC (&ldquo;Onlooker,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
+        Onlooker LLC (&ldquo;Company,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;)
         respects the intellectual property rights of others and expects its users to do the same. In
         accordance with the Digital Millennium Copyright Act (&ldquo;DMCA&rdquo;), Pub. L. 105-304, we
         will respond expeditiously to clear notices of alleged copyright infringement that are reported

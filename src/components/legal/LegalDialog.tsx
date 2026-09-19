@@ -16,7 +16,7 @@ const TITLES: Record<LegalDoc, string> = {
 };
 
 const BLURBS: Record<LegalDoc, string> = {
-  terms: "The rules for posting and filming live requests on Onlooker.",
+  terms: "The rules for posting and filming live requests on Onlooker LLC.",
   privacy: "What we collect, why, and the control you keep over it.",
 };
 
