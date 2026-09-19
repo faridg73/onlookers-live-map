@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/dialog";
 import { isClosed } from "@/lib/onlooker-store";
 import { AccessPasscode } from "@/components/AccessPasscode";
+import { SitePinVerification } from "@/components/SitePinVerification";
+import type { SitePinState } from "@/lib/site-pin";
+
 import { BountyChat } from "@/components/BountyChat";
 import { chatKey } from "@/lib/chat";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,7 +61,11 @@ export function BountyVideoDialog({
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [shareLabel, setShareLabel] = useState("");
   const [justSent, setJustSent] = useState<BountyVideo | null>(null);
+  const [pinState, setPinState] = useState<SitePinState | null>(null);
   const closed = isClosed(request);
+  /** Real estate bounties stay locked until the on-site PIN handshake passes. */
+  const pinLocked = Boolean(pinState?.required) && !pinState?.verifiedByMe && !pinState?.mine;
+
 
   async function shareClip(video: BountyVideo) {
     setSharingId(video.id);
