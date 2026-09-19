@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Camera, Loader2, MapPin, Pencil, Trash2, UserRound } from "lucide-react";
+import { Camera, Loader2, MapPin, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteMyAccount } from "@/lib/account.functions";
@@ -80,10 +80,6 @@ export function ProfileEditor({ profile, fallbackName, onSaved }: ProfileEditorP
           <Camera className="size-5" />
         </button>
       </div>
-
-      <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)} className="mt-3">
-        <Pencil className="size-4" /> Edit profile
-      </Button>
 
       <Dialog open={editing} onOpenChange={setEditing}>
         <DialogContent className="max-w-md">
