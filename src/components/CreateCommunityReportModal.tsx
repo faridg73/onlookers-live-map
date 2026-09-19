@@ -360,18 +360,37 @@ export function CreateCommunityReportModal({
             </p>
           </section>
 
-          <Button
-            type="button"
-            disabled={!ready || busy}
-            onClick={() => void submit()}
-            className={`mt-3 h-12 w-full border-2 text-sm font-extrabold uppercase ${
-              ready
-                ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_18px_var(--color-crisis)] hover:bg-crisis/20"
-                : "border-border bg-surface-raised text-muted-foreground shadow-none"
-            }`}
-          >
-            {busy ? "Submitting…" : "Submit Report"}
-          </Button>
+          {formError ? (
+            <p role="alert" className="mt-2 rounded-md border border-crisis bg-crisis/15 px-3 py-2 text-xs font-bold text-crisis">
+              {formError}
+            </p>
+          ) : null}
+
+          {signedIn === false ? (
+            <Button
+              type="button"
+              onClick={() => {
+                onOpenChange(false);
+                void navigate({ to: "/auth" });
+              }}
+              className="mt-3 h-12 w-full border-2 border-signal bg-signal/15 text-sm font-extrabold uppercase text-signal shadow-[0_0_18px_var(--color-signal)] hover:bg-signal/20"
+            >
+              Sign in to submit
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              disabled={!ready || busy}
+              onClick={() => void submit()}
+              className={`mt-3 h-12 w-full border-2 text-sm font-extrabold uppercase ${
+                ready
+                  ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_18px_var(--color-crisis)] hover:bg-crisis/20"
+                  : "border-border bg-surface-raised text-muted-foreground shadow-none"
+              }`}
+            >
+              {busy ? "Submitting…" : "Submit Report"}
+            </Button>
+          )}
         </footer>
       </div>
     </div>,
