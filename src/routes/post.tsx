@@ -233,6 +233,8 @@ function PostScreen() {
   const [weather, setWeather] = useState(1);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
   const [subcategory, setSubcategory] = useState<string | null>(null);
+  const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
+
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [moderationOpen, setModerationOpen] = useState(false);
