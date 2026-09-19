@@ -240,6 +240,7 @@ export function BountyBottomSheet({
             </div>
           </>
         )}
+        </div>
       </SheetContent>
     </Sheet>
   );
