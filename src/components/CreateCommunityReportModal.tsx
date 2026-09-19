@@ -130,6 +130,7 @@ export function CreateCommunityReportModal({
         : `${(radius / 1000).toFixed(1)} km`;
 
   const handleFile = (file: File) => {
+    setFormError(null);
     const previewUrl = URL.createObjectURL(file);
     setMediaPreview({
       url: previewUrl,
@@ -240,7 +241,10 @@ export function CreateCommunityReportModal({
                     variant="ghost"
                     aria-pressed={on}
                     disabled={isLocked}
-                    onClick={() => setIncident(type.id)}
+                    onClick={() => {
+                      setIncident(type.id);
+                      setFormError(null);
+                    }}
                     className={`h-[4.75rem] min-w-0 flex-col gap-1 rounded-md border px-1 py-2 text-[0.68rem] font-bold ${
                       on
                         ? "border-crisis bg-crisis/15 text-crisis shadow-[0_0_16px_var(--color-crisis)]"
@@ -341,7 +345,10 @@ export function CreateCommunityReportModal({
               step={100}
               value={radius}
               aria-label={`Active geo-radius, ${radiusLabel}`}
-              onChange={(e) => setRadius(Number(e.target.value))}
+              onChange={(e) => {
+                setRadius(Number(e.target.value));
+                setFormError(null);
+              }}
               className="mt-2 w-full accent-signal"
             />
             <p className="mt-1 text-[0.68rem] text-muted-foreground">
