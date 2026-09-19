@@ -96,13 +96,9 @@ function CommunityHub() {
   const [source, setSource] = useState<"all" | "following">("all");
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [impactView, setImpactView] = useState<"help" | "mine">("help");
-  const [earnings, setEarnings] = useState<EarningsSummary | null>(null);
-  const [earningsLoading, setEarningsLoading] = useState(false);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
@@ -226,34 +222,6 @@ function CommunityHub() {
       setComposing(true);
     }
   }, [mystery]);
-
-  useEffect(() => {
-    let alive = true;
-    if (!user) {
-      setEarnings(null);
-      setEarningsLoading(false);
-      return;
-    }
-    setEarningsLoading(true);
-    fetchMyEarnings()
-      .then((summary) => {
-        if (alive) setEarnings(summary);
-      })
-      .catch(() => {
-        if (alive) setEarnings(null);
-      })
-      .finally(() => {
-        if (alive) setEarningsLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [user?.id]);
-
-  const openBounties = useMemo(
-    () => requests.filter((request) => request.status === "open" && !isClosed(request)),
-    [requests],
-  );
 
   useEffect(() => {
     try {
