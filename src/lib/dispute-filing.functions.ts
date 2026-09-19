@@ -53,12 +53,12 @@ export const listEligibleDisputeBounties = createServerFn({ method: "GET" })
     return data.map((row) => {
       const value = row as Record<string, unknown>;
       return {
-        requestId: String(value.request_id),
-        prompt: String(value.prompt),
-        locationName: String(value.location_name),
-        amount: Number(value.amount),
-        submittedAt: String(value.submitted_at),
-        reviewEndsAt: value.review_ends_at ? String(value.review_ends_at) : null,
+        requestId: String(value["request_id"]),
+        prompt: String(value["prompt"]),
+        locationName: String(value["location_name"]),
+        amount: Number(value["amount"]),
+        submittedAt: String(value["submitted_at"]),
+        reviewEndsAt: value["review_ends_at"] ? String(value["review_ends_at"]) : null,
       };
     });
   });
