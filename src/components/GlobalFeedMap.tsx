@@ -1,6 +1,6 @@
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play } from "lucide-react";
+import { CoinsIcon, Eye, Globe2, Loader2, MapPin, Play, Siren } from "lucide-react";
 import { toast } from "sonner";
 import { HunterBadge } from "@/components/HunterBadge";
 import { useAuth } from "@/hooks/use-auth";
@@ -194,7 +194,7 @@ export function GlobalFeedMap({
       reportMarkers.current.forEach((marker) => marker.setMap(null));
       reportMarkers.current = [];
     };
-  }, [pinnedReports, mapReady]);
+  }, [pinnedReports, mapReady, emergencyOnly]);
 
   const active = filteredClips.find((c) => c.id === activeId) ?? null;
 
@@ -203,7 +203,15 @@ export function GlobalFeedMap({
       <div className="relative h-64 overflow-hidden rounded-3xl border border-border bg-surface-raised">
         <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
         <span className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-surface/90 px-3 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur">
-          <Globe2 className="size-3 text-signal" /> {pinned.length} unlocked clips worldwide
+          {emergencyOnly ? (
+            <>
+              <Siren className="size-3 text-crisis" /> {pinnedReports.length} active emergency {pinnedReports.length === 1 ? "alert" : "alerts"}
+            </>
+          ) : (
+            <>
+              <Globe2 className="size-3 text-signal" /> {pinned.length} unlocked clips worldwide
+            </>
+          )}
         </span>
       </div>
 
