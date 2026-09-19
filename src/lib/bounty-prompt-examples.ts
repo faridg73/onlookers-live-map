@@ -183,3 +183,45 @@ export function bountyPromptContext(
     examples: blueprint.examples(focus),
   };
 }
+
+/** Short one-tap keyword pills shown under the instruction box, keyed by category. */
+export const QUICK_TAGS: Record<MainCategoryId, readonly string[]> = {
+  "breaking-incidents": ["Active now", "Roads closed", "Safe distance", "Wide view"],
+  "traffic-updates": ["Traffic", "Parking", "Transit", "Road closure"],
+  "arts-performances": ["Line", "Crowd", "Soundcheck", "Doors open"],
+  "food-dining": ["Line out the door", "Seating", "Menu", "Atmosphere"],
+  "car-culture": ["Arrivals", "Parking", "Display", "Crowd"],
+  "street-fashion": ["Storefront", "Drops", "Crowd", "Street style"],
+  "events-sports": ["Entrance line", "Crowd", "Score", "Parking"],
+  "nature-wildlife": ["Conditions", "Trail access", "Crowd", "Panorama"],
+  "real-estate": ["Open house", "Interior", "Exterior", "Price sign"],
+  nightlife: ["Line", "Cover", "Crowd", "Atmosphere"],
+  "tech-innovation": ["Demo", "Booth", "Crowd", "Hands-on"],
+  "shopping-retail": ["In stock", "Sold out", "Restock", "Shelf check"],
+  "fitness-outdoors": ["Busy", "Conditions", "Equipment", "Space"],
+  "pets-animals": ["Safe distance", "Activity", "Signs", "Entrance"],
+  "community-culture": ["Attendance", "Access", "Services", "Atmosphere"],
+  "casual-irl": ["Walkthrough", "Street view", "Crowd", "Now"],
+  "strange-sightings-ufo": ["Direction", "Movement", "Duration", "Landmarks"],
+};
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+export function promptHasKeyword(current: string, keyword: string): boolean {
+  if (!keyword) return false;
+  const pattern = new RegExp(`(^|[\\s,.;])${escapeRegExp(keyword)}([\\s,.;]|$)`, "i");
+  return pattern.test(current);
+}
+
+/** Toggle a quick tag inside the instruction text: appends it, or removes it when already present. */
+export function togglePromptKeyword(current: string, keyword: string): string {
+  if (promptHasKeyword(current, keyword)) {
+    return current
+      .replace(new RegExp(`(^|[\\s,.;])${escapeRegExp(keyword)}(?=[\\s,.;]|$)`, "i"), "$1")
+      .replace(/[\s,.;]{2,}/g, " ")
+      .replace(/^[\s,.;]+|[\s,.;]+$/g, "");
+  }
+  const trimmed = current.trimEnd();
+  if (!trimmed) return keyword;
+  return `${trimmed}${/[,.;]$/.test(trimmed) ? " " : ", "}${keyword}`;
+}
