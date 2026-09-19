@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;

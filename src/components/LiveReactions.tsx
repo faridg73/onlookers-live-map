@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { HandCoins } from "lucide-react";
 import { toast } from "sonner";

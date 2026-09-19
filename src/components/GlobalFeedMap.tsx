@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BadgeCheck, Clock, CoinsIcon, Eye, Globe2, Loader2, MapPin, Play, Siren, X } from "lucide-react";

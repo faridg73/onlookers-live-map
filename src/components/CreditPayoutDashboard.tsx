@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";

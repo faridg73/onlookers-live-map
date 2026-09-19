@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createCommunityPost, type CommunityCategory } from "@/lib/community";
 import { fetchTrustStats } from "@/lib/trust";
 import { fetchMyVerification } from "@/lib/verification";

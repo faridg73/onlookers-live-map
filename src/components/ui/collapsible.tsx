@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 "use client";
 
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";

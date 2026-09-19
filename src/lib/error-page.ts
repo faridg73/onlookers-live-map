@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="en">

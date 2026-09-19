@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { submitEarningsPayout } from "@/lib/cashout.functions";
 

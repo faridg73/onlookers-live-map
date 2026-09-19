@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Check, Coins, KeyRound, MapPin, ShieldCheck, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

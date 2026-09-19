@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export const MODERATION_REASONS = [
   { code: "gps_mismatch", label: "Location does not match", description: "The capture appears to come from a different place than claimed." },
   { code: "timestamp_implausible", label: "Time does not match", description: "The capture time appears inconsistent with when it was posted." },

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { CalendarDays, ExternalLink, MapPin, Radio, Ticket, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
 import { PlacePhoto } from "@/components/PlacePhoto";

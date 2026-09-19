@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 
 /** Daily engagement streak, milestone Credits and free post-boost passes. */

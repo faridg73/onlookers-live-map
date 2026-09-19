@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { GripVertical } from "lucide-react";
 import { Group, Panel, Separator } from "react-resizable-panels";
 

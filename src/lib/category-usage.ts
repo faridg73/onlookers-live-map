@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Lightweight local (device-only) tap tracking for the Home explore drawer
  * category grid. Stores timestamps in localStorage and keeps a rolling

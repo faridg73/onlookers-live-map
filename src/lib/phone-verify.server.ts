@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Server-only phone verification through Twilio Verify, called via the Lovable
  * connector gateway. The app never handles Twilio credentials directly — the

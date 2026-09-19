@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowRight, CircleDollarSign, Inbox, Loader2, MapPin, MessageCircle, Radio, Users } from "lucide-react";

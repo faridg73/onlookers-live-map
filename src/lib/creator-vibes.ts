@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import type { CommunityCategory } from "@/lib/community";
 
 export type CreatorVibe = {

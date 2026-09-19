@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Receipt } from "lucide-react";
 import type { BountyQuote } from "@/lib/bounty-pricing";
 

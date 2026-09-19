@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /// <reference types="google.maps" />
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CoinsIcon, LocateFixed, Share2, Star, X } from "lucide-react";

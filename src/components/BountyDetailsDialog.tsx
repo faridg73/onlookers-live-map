@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState, type ReactNode } from "react";
 import { CircleOff, HandCoins, Radar, ShieldCheck } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";

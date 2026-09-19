@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export type RequestAction = "live" | "clip" | "meetup";
 
 export type ParsedRequestIntent = {

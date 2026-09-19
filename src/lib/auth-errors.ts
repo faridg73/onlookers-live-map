@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Plain-language mappers for auth failures and password rules, shared by the
  * /auth screen and the inline sign-in card so both surfaces speak the same

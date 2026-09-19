@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /// <reference types="google.maps" />
 /** Loads the Maps JavaScript API once, asynchronously, and resolves when ready. */
 let loader: Promise<typeof google.maps> | null = null;

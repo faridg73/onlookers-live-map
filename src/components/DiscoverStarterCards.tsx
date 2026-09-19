@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { ArrowRight, BookOpen, CalendarDays, Sparkles } from "lucide-react";
 import meetupImage from "@/assets/discover-starter-meetup.jpg";
 import tutorialImage from "@/assets/discover-starter-tutorial.jpg";

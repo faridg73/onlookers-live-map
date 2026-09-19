@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Crosshair, Loader2, MapPin, Search } from "lucide-react";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";

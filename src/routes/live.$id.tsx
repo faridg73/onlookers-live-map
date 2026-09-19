@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin, Radio, Zap } from "lucide-react";
 

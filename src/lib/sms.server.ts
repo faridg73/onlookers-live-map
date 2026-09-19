@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Server-only text messaging through the Twilio connector gateway. The app
  * never sees Twilio credentials — the gateway signs each request.

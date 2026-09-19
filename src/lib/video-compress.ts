@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export const MAX_CLIP_SECONDS = 60;
 
 /** Reads how long a video file runs, in seconds. */

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { UserPlus } from "lucide-react";
 import { FollowButton } from "@/components/FollowButton";

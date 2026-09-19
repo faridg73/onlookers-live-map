@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { BadgeCheck, Clock, Target } from "lucide-react";
 import { HunterBadge } from "@/components/HunterBadge";
 import { responseLabel, type TrustStats } from "@/lib/trust";

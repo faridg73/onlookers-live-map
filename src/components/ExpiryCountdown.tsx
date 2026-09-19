@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useMemo, useState } from "react";
 import { Clock, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";

@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import strangeSightingsAsset from "@/assets/strange-sightings-ufo.jpg.asset.json";
 
 export const STRANGE_SIGHTINGS_ID = "strange-sightings-ufo" as const;

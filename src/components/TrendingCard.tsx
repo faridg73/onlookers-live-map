@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Link } from "@tanstack/react-router";
 import { MapPin, Radio, Star, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";

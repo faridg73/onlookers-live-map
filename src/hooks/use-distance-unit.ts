@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import type { MapPosition } from "@/lib/onlooker";

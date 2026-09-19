@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { toast } from "sonner";
 
 /** Shown whenever someone tries to bring in a file instead of filming live. */

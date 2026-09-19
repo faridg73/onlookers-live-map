@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 
 /** Whether the signed-in user follows this creator, plus the live follower count. */

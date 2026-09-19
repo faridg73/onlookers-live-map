@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { TrendingViewRequests } from "@/components/TrendingViewRequests";

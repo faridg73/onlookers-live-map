@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
 /** Sandbox in preview, live on the published site — derived from the token prefix. */

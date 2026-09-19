@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { AlertTriangle, BadgeCheck, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";

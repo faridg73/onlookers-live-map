@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { acceptBountyVideo } from "@/lib/bounty-videos";
 import { sendMessage } from "@/lib/chat";

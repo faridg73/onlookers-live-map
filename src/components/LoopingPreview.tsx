@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import { cn } from "@/lib/utils";
 

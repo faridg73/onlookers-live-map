@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 export type SavedMapViewport = { lat: number; lng: number; zoom: number };
 
 export function readSessionState<T>(key: string, fallback: T): T {

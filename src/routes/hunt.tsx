@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Clock, DollarSign, Navigation, Radio, X } from "lucide-react";

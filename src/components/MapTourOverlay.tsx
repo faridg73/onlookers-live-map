@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Coins, Globe2, Radio, Zap } from "lucide-react";

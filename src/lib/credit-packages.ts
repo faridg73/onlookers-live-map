@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
  * Buyable Credits packs. Every tier follows the fixed platform rate of
  * 4 Credits per $1 USD, so the dollar value is always baseCredits / 4.

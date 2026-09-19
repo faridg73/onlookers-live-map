@@ -1,3 +1,4 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { sendLovableEmail } from "@lovable.dev/email-js";
 
 import { normalizePhone, sendSms } from "@/lib/sms.server";
