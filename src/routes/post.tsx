@@ -953,15 +953,29 @@ function PostScreen() {
                     ))}
                   </div>
                 )}
-                <LocationPreviewMap
-                  address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
-                  selectedLocation={spot}
-                  onPick={(next) => {
-                    setSpot(next);
-                    setPlace(next.formatted);
-                    setRecent(rememberRecentPlace(next));
-                  }}
-                />
+                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    Address, landmark, or coordinates
+                  </p>
+                  <AddressSearchField
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setSearchOrigin({ latitude: next.latitude, longitude: next.longitude });
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                  <LocationPreviewMap
+                    address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
+                    selectedLocation={spot}
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                </div>
+
               </div>
             )}
 
