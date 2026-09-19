@@ -702,13 +702,72 @@ function PostScreen() {
                     <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-2">
-                  {VENUE_FILTERS.map(({ label, query, icon: Icon }) => (
-                    <Button key={label} type="button" variant="outline" onClick={() => setVenueQuery(`${query} near me`)} className="h-auto justify-start gap-2 py-3 text-left">
-                      <Icon className="size-4 text-signal" /> {label}
-                    </Button>
-                  ))}
+                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
+                  <Select
+                    value={placeCategoryId ?? undefined}
+                    onValueChange={(next) => choosePlaceCategory(next as PlaceCategoryId)}
+                  >
+                    <SelectTrigger className="h-auto min-h-14 w-full py-2.5 text-left">
+                      <SelectValue placeholder="Choose a category (Real Estate, Malls, Parks…)" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-72">
+                      {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
+                        <SelectItem key={id} value={id} className="py-2.5">
+                          <span className="flex items-start gap-2.5 text-left">
+                            <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
+                            <span>
+                              <span className="block font-extrabold text-foreground">{label}</span>
+                              <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                            </span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Picking a category sets the Flash lane and searches nearby places of that type.
+                  </p>
+                  {category === "realestate" && (
+                    <div className="space-y-3">
+                      <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
+                        <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
+                        <span>
+                          <strong className="block">6-digit PIN handshake required</strong>
+                          A unique 6-digit PIN is generated when you post. Give it to the on-site
+                          seller or agent, the onlooker types it in on site, and footage plus payout
+                          stay locked until it matches.
+                        </span>
+                      </p>
+                      {permissionNeeded && (
+                        <label className="flex cursor-pointer gap-3 rounded-lg border-2 border-signal/50 bg-signal/5 p-3 text-xs text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={permissionOk}
+                            onChange={(event) => setPermissionOk(event.target.checked)}
+                            className="mt-0.5 size-4 shrink-0 accent-signal"
+                          />
+                          <span>
+                            <strong className="block">Authorization required</strong>
+                            Confirm explicit authorization from the seller, listing agent, property
+                            manager, or other authorized party to photograph or film this property.
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  )}
+                  {placeCategoryId === "emergency-safety" && (
+                    <p className="flex gap-2 rounded-lg border border-live/50 bg-live/5 p-3 text-xs font-medium text-foreground">
+                      <Timer className="mt-0.5 size-4 shrink-0 text-live" />
+                      <span>
+                        <strong className="block">Fast Catch priority timer on</strong>
+                        This request goes live to nearby onlookers first with a 15-minute window. You
+                        can change the tier and timer on the reward step.
+                      </span>
+                    </p>
+                  )}
                 </div>
+
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {VENUE_QUICK_SEARCHES.map((venue) => (
                     <Button key={venue.label} type="button" variant="secondary" size="sm" onClick={() => setVenueQuery(venue.query)} className="shrink-0">
