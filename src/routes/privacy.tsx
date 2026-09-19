@@ -26,12 +26,30 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+
+  const close = () => {
+    if (canGoBack) router.history.back();
+    else void router.navigate({ to: "/" });
+  };
+
   return (
     <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
-      <h1 className="font-display text-3xl tracking-tight text-foreground">
-        Onlooker LLC Privacy Policy
-      </h1>
-      <div className="mt-2">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
+          Onlooker LLC Privacy Policy
+        </h1>
+        <button
+          type="button"
+          aria-label="Close Privacy Policy"
+          onClick={close}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-5" />
+        </button>
+      </header>
+      <div className="mt-4">
         <PrivacyBody />
       </div>
 
