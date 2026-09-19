@@ -11,6 +11,17 @@ import { assertHuman } from "@/lib/turnstile.functions";
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
 export const MIN_BOUNTY = 20;
 
+/**
+ * Unique 6-digit on-site PIN for a real estate bounty, drawn from the crypto
+ * random source so it cannot be guessed from the posting time.
+ */
+function generateSitePin(): string {
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
+  return String(100000 + ((bytes[0] ?? 0) % 900000));
+}
+
+
 const createSchema = z.object({
   prompt: safeText(300, 3),
   /** Camera instructions and capture format, stored with the request. */
