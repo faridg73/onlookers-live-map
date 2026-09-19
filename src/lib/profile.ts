@@ -86,7 +86,6 @@ export async function uploadAvatarFile(file: File): Promise<string> {
 
   const { data: existing } = await supabase.storage.from("avatars").list(user.id);
   const oldPaths = (existing ?? []).map((entry) => `${user.id}/${entry.name}`);
-  if (oldPaths.length > 0) await supabase.storage.from("avatars").remove(oldPaths);
 
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
   const path = `${user.id}/avatar-${Date.now()}.${ext || "jpg"}`;
@@ -100,6 +99,7 @@ export async function uploadAvatarFile(file: File): Promise<string> {
     .from("avatars")
     .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
   if (signError || !signed?.signedUrl) throw signError ?? new Error("Could not link your photo.");
+  if (oldPaths.length > 0) await supabase.storage.from("avatars").remove(oldPaths);
   return signed.signedUrl;
 }
 
