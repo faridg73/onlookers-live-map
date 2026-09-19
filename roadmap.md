@@ -187,3 +187,10 @@ Home Events & Arts neon category artwork
 - [x] Update user-facing company and platform references to Onlooker LLC
 - [x] Update legal pages, FAQs, safety copy, footers, metadata, and release materials
 - [x] Preserve Onlooker Live, Onlooker+, hashtags, URLs, identifiers, and creator-name fallbacks
+
+## Paid bounty Step 1 education
+- [x] Move category and subcategory selection to the top of Step 1
+- [x] Place address search and map immediately after category selection
+- [x] Add a dismissible first-time bounty guide with a persistent opt-out
+- [x] Add the Real Estate escrow and PIN security guide on selection
+- [ ] Verify both dialogs and the reordered layout on phone and desktop
