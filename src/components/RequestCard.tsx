@@ -10,6 +10,8 @@ import { ShareBountyButton } from "@/components/ShareBountyButton";
 import { useBoosts } from "@/lib/boosts-store";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { AccessPasscode } from "@/components/AccessPasscode";
+import { SitePinVerification } from "@/components/SitePinVerification";
+
 import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
@@ -196,6 +198,8 @@ export function RequestCard({
       )}
 
       <AccessPasscode request={request} />
+      <SitePinVerification requestId={request.dbId ?? null} />
+
 
       <ChatDrawer
         requestKey={chatKey(request)}

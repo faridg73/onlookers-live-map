@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/dialog";
 import { isClosed } from "@/lib/onlooker-store";
 import { AccessPasscode } from "@/components/AccessPasscode";
+import { SitePinVerification } from "@/components/SitePinVerification";
+import type { SitePinState } from "@/lib/site-pin";
+
 import { BountyChat } from "@/components/BountyChat";
 import { chatKey } from "@/lib/chat";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,7 +61,11 @@ export function BountyVideoDialog({
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [shareLabel, setShareLabel] = useState("");
   const [justSent, setJustSent] = useState<BountyVideo | null>(null);
+  const [pinState, setPinState] = useState<SitePinState | null>(null);
   const closed = isClosed(request);
+  /** Real estate bounties stay locked until the on-site PIN handshake passes. */
+  const pinLocked = Boolean(pinState?.required) && !pinState?.verifiedByMe && !pinState?.mine;
+
 
   async function shareClip(video: BountyVideo) {
     setSharingId(video.id);
@@ -178,6 +185,8 @@ export function BountyVideoDialog({
           </DialogDescription>
         </DialogHeader>
         <AccessPasscode request={request} />
+        <SitePinVerification requestId={request.dbId ?? null} onState={setPinState} />
+
         <BountyChat requestKey={chatKey(request)} />
 
         {!user ? (
@@ -204,7 +213,7 @@ export function BountyVideoDialog({
               />
               <button
                 type="button"
-                disabled={uploading || closed}
+                disabled={uploading || closed || pinLocked}
                 onClick={() => setCapturing(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
               >
@@ -214,10 +223,16 @@ export function BountyVideoDialog({
                   </>
                 ) : (
                   <>
-                    <Camera className="size-4" /> {closed ? "Submissions closed" : "Film live video"}
+                    <Camera className="size-4" />{" "}
+                    {closed
+                      ? "Submissions closed"
+                      : pinLocked
+                        ? "Enter the on-site PIN first"
+                        : "Film live video"}
                   </>
                 )}
               </button>
+
               <p className="text-center text-[0.68rem] text-muted-foreground">
                 Live camera captures only, gallery videos and screenshots can't be submitted.
                 Film the crowd, street, tailgate, or venue surroundings.
@@ -225,7 +240,7 @@ export function BountyVideoDialog({
               <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
                 {PUBLIC_SPACES_DISCLAIMER}
               </p>
-              {capturing && !closed && (
+              {capturing && !closed && !pinLocked && (
                 <VideoRecorder
                   onClose={() => setCapturing(false)}
                   onRecorded={(file) => void onCaptured(file)}

@@ -11,6 +11,17 @@ import { assertHuman } from "@/lib/turnstile.functions";
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
 export const MIN_BOUNTY = 20;
 
+/**
+ * Unique 6-digit on-site PIN for a real estate bounty, drawn from the crypto
+ * random source so it cannot be guessed from the posting time.
+ */
+function generateSitePin(): string {
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
+  return String(100000 + ((bytes[0] ?? 0) % 900000));
+}
+
+
 const createSchema = z.object({
   prompt: safeText(300, 3),
   /** Camera instructions and capture format, stored with the request. */
@@ -156,6 +167,18 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         code: data.accessCode,
       });
     }
+
+    // Real estate bounties get a unique 6-digit on-site PIN. Only the poster
+    // ever sees it; the onlooker has to get it from the agent standing at the
+    // property, which is what unlocks footage submission and the payout.
+    if (data.category === "realestate") {
+      await supabaseAdmin.from("request_site_pins").insert({
+        request_id: row.id,
+        requester_id: context.userId,
+        pin: generateSitePin(),
+      });
+    }
+
 
     // Text the nearby onlookers who asked for text alerts. A texting problem
     // must never stop a paid request from going live.
