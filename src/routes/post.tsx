@@ -44,13 +44,17 @@ import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AddressSearchField } from "@/components/AddressSearchField";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 
 import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
 import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
@@ -78,9 +82,17 @@ import {
   type CategoryId,
 } from "@/lib/onlooker";
 import {
+  BROADCAST_CATEGORIES,
   broadcastCategoryById,
   type BroadcastCategoryId,
 } from "@/lib/broadcast-categories";
+import {
+  keywordsForSubcategory,
+  subcategoriesFor,
+  type MainCategoryId,
+} from "@/lib/category-subcategories";
+import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sightings";
+
 import { useOnlooker } from "@/lib/onlooker-store";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
@@ -234,6 +246,9 @@ function PostScreen() {
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId>("breaking-incidents");
   const [subcategory, setSubcategory] = useState<string | null>(null);
   const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
+  /** The main category the subcategory list hangs off (17 in total). */
+  const [mainCategoryId, setMainCategoryId] = useState<MainCategoryId>("breaking-incidents");
+
 
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
@@ -247,6 +262,12 @@ function PostScreen() {
   const voice = useVoiceInput((text) => setPrompt(text));
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
+  const subcategoryOptions = subcategoriesFor(mainCategoryId);
+  const mainCategoryLabel =
+    mainCategoryId === STRANGE_SIGHTINGS_ID ? STRANGE_SIGHTINGS_LABEL : selectedCategory.label;
+  /** Keyword metadata carried into the payload for search and analytics. */
+  const subcategoryKeywords = keywordsForSubcategory(mainCategoryId, subcategory);
+
   const permissionNeeded = needsPermissionConfirmation(category);
   const codeNeeded = needsAccessCode(category);
 
@@ -395,6 +416,7 @@ function PostScreen() {
     if (!picked) return;
     setPlaceCategoryId(picked.id);
     setCategoryId(picked.lane);
+    setMainCategoryId(picked.lane);
     setSubcategory(null);
     setPermissionOk(false);
     setVenueQuery(`${picked.query} near me`);
@@ -404,6 +426,24 @@ function PostScreen() {
       setCustomDeadline(null);
     }
   };
+
+  /** Picking one of the 17 main categories directly, outside the place presets. */
+  const chooseMainCategory = (next: MainCategoryId) => {
+    setPlaceCategoryId(null);
+    setMainCategoryId(next);
+    setCategoryId(next === STRANGE_SIGHTINGS_ID ? "breaking-incidents" : next);
+    setSubcategory(null);
+    setPermissionOk(false);
+  };
+
+  /** Subcategory choice refines the nearby search and tags the payload keywords. */
+  const chooseSubcategory = (label: string) => {
+    setSubcategory(label);
+    const keywords = keywordsForSubcategory(mainCategoryId, label);
+    const seed = keywords[0] ?? label;
+    setVenueQuery(`${label} ${seed}`.trim());
+  };
+
 
 
   const chooseVenue = (venue: DiscoveredPlace) => {
@@ -499,8 +539,10 @@ function PostScreen() {
         `Requested capture: ${captureDurationLabel(capture, action === "live")}`,
         `Camera: ${angleLabel} · ${orientationLabel}`,
         scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
-        `Category: ${selectedCategory.label}`,
-        subcategory ? `Vibe: ${subcategory}` : "",
+        `Category: ${mainCategoryLabel}`,
+        subcategory ? `Subcategory: ${subcategory}` : "",
+        subcategoryKeywords.length ? `Keywords: ${subcategoryKeywords.join(", ")}` : "",
+
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
       ].filter(Boolean);
@@ -732,30 +774,96 @@ function PostScreen() {
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
                   <Select
-                    {...(placeCategoryId ? { value: placeCategoryId } : {})}
-                    onValueChange={(next: string) => choosePlaceCategory(next as PlaceCategoryId)}
+                    value={placeCategoryId ? `place:${placeCategoryId}` : `main:${mainCategoryId}`}
+                    onValueChange={(next: string) => {
+                      if (next.startsWith("place:")) {
+                        choosePlaceCategory(next.slice(6) as PlaceCategoryId);
+                        return;
+                      }
+                      chooseMainCategory(next.slice(5) as MainCategoryId);
+                    }}
                   >
-
                     <SelectTrigger className="h-auto min-h-14 w-full py-2.5 text-left">
                       <SelectValue placeholder="Choose a category (Real Estate, Malls, Parks…)" />
                     </SelectTrigger>
                     <SelectContent className="max-h-72">
-                      {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
-                        <SelectItem key={id} value={id} className="py-2.5">
-                          <span className="flex items-start gap-2.5 text-left">
-                            <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
-                            <span>
-                              <span className="block font-extrabold text-foreground">{label}</span>
-                              <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                      <SelectGroup>
+                        <SelectLabel>Popular places</SelectLabel>
+                        {PLACE_CATEGORIES.map(({ id, label, blurb, icon: Icon }) => (
+                          <SelectItem key={id} value={`place:${id}`} className="py-2.5">
+                            <span className="flex items-start gap-2.5 text-left">
+                              <Icon className="mt-0.5 size-4 shrink-0 text-signal" />
+                              <span>
+                                <span className="block font-extrabold text-foreground">{label}</span>
+                                <span className="block text-xs font-medium text-muted-foreground">{blurb}</span>
+                              </span>
                             </span>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel>All categories</SelectLabel>
+                        {BROADCAST_CATEGORIES.map((lane) => (
+                          <SelectItem key={lane.id} value={`main:${lane.id}`} className="py-2.5">
+                            <span className="flex items-center gap-2.5 text-left font-extrabold text-foreground">
+                              <span aria-hidden>{lane.icon}</span>
+                              {lane.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                        <SelectItem value={`main:${STRANGE_SIGHTINGS_ID}`} className="py-2.5">
+                          <span className="flex items-center gap-2.5 text-left font-extrabold text-foreground">
+                            <span aria-hidden>🛸</span>
+                            {STRANGE_SIGHTINGS_LABEL}
                           </span>
                         </SelectItem>
-                      ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
+                  {subcategoryOptions.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-bold uppercase text-muted-foreground">
+                        Subcategory
+                      </p>
+                      <Select
+                        {...(subcategory ? { value: subcategory } : {})}
+                        onValueChange={(next: string) => chooseSubcategory(next)}
+                      >
+                        <SelectTrigger className="h-auto min-h-12 w-full py-2.5 text-left">
+                          <SelectValue placeholder={`Narrow down ${mainCategoryLabel}`} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-72">
+                          {subcategoryOptions.map((option) => (
+                            <SelectItem key={option.label} value={option.label} className="py-2.5">
+                              <span className="block text-left">
+                                <span className="block font-extrabold text-foreground">{option.label}</span>
+                                <span className="block text-xs font-medium text-muted-foreground">
+                                  {option.keywords.slice(0, 3).join(" · ")}
+                                </span>
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {subcategoryKeywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {subcategoryKeywords.map((keyword) => (
+                            <span
+                              key={keyword}
+                              className="rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <p className="text-xs font-medium text-muted-foreground">
-                    Picking a category sets the Flash lane and searches nearby places of that type.
+                    Picking a category and subcategory sets the lane, tags the request for search, and
+                    searches nearby places of that type.
                   </p>
+
                   {category === "realestate" && (
                     <div className="space-y-3">
                       <p className="flex gap-2 rounded-lg border border-signal/40 bg-signal/5 p-3 text-xs font-medium text-foreground">
@@ -845,15 +953,29 @@ function PostScreen() {
                     ))}
                   </div>
                 )}
-                <LocationPreviewMap
-                  address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
-                  selectedLocation={spot}
-                  onPick={(next) => {
-                    setSpot(next);
-                    setPlace(next.formatted);
-                    setRecent(rememberRecentPlace(next));
-                  }}
-                />
+                <div className="space-y-3 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    Address, landmark, or coordinates
+                  </p>
+                  <AddressSearchField
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setSearchOrigin({ latitude: next.latitude, longitude: next.longitude });
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                  <LocationPreviewMap
+                    address={place || venueQuery || [parsed.venue, parsed.locationContext].filter(Boolean).join(" ")}
+                    selectedLocation={spot}
+                    onPick={(next) => {
+                      setSpot(next);
+                      setPlace(next.formatted);
+                      setRecent(rememberRecentPlace(next));
+                    }}
+                  />
+                </div>
+
               </div>
             )}
 
