@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { TermsBody } from "@/components/legal/legal-content";
 
 export const Route = createFileRoute("/terms")({
@@ -25,12 +26,30 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+
+  const close = () => {
+    if (canGoBack) router.history.back();
+    else void router.navigate({ to: "/" });
+  };
+
   return (
     <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
-      <h1 className="font-display text-3xl tracking-tight text-foreground">
-        Onlooker LLC Terms of Service &amp; Legal Disclaimer
-      </h1>
-      <div className="mt-3">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
+          Onlooker LLC Terms of Service &amp; Legal Disclaimer
+        </h1>
+        <button
+          type="button"
+          aria-label="Close Terms of Service"
+          onClick={close}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-5" />
+        </button>
+      </header>
+      <div className="mt-4">
         <TermsBody />
       </div>
 
