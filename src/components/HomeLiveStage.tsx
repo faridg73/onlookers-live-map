@@ -61,6 +61,13 @@ export function HomeLiveStage({
               <span>{activeRequests.length} bounties</span>
             </div>
           </div>
+          <div className="mt-1 flex items-center gap-2 text-[0.58rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
+            <span>{liveCount} live</span>
+            <span className="text-border">/</span>
+            <span>{emergencyCount} alerts</span>
+            <span className="text-border">/</span>
+            <span>{activeRequests.length} bounties</span>
+          </div>
 
           <h2 id="home-live-stage-title" className="mt-2 max-w-xl font-display-impact text-[clamp(1.3rem,4.2vw,2.5rem)] uppercase leading-[0.98] text-foreground">
             See what&apos;s happening. <span className="text-signal">Right now.</span>
