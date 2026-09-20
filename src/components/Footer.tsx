@@ -118,7 +118,7 @@ export function Footer() {
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
   return (
-    <footer className="border-t border-border bg-surface px-4 py-8">
+    <footer className="border-t border-border bg-surface px-4 pt-8 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
       <div className="mx-auto w-full max-w-7xl">
         <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
           {LINKS.map(({ to, label, icon: Icon }) => (
