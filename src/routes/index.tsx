@@ -46,6 +46,8 @@ import {
   type MapPosition,
 } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
+import { PlaceSearchInput } from "@/components/PlaceSearchInput";
+import type { GeocodeResult } from "@/lib/geocode.functions";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { useSessionElementScroll } from "@/hooks/use-session-scroll";
 import { saveMyLocation } from "@/lib/hunter-location";
