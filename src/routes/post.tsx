@@ -330,7 +330,7 @@ function PostScreen() {
   }, []);
 
   useEffect(() => {
-    if (mode !== "bounty") return;
+    if (mode !== "bounty" || rewardFirst) return;
     try {
       if (window.localStorage.getItem("onlooker:bounty-introduction-hidden") !== "1") {
         setFirstPostGuideOpen(true);
@@ -338,7 +338,7 @@ function PostScreen() {
     } catch {
       setFirstPostGuideOpen(true);
     }
-  }, [mode]);
+  }, [mode, rewardFirst]);
 
   useEffect(() => {
     if (mystery !== "1") return;
