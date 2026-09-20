@@ -285,6 +285,8 @@ function MapScreen() {
   const [guidesOpen, setGuidesOpen] = useState(false);
   // Full-map mode: hero + Explore Nearby tuck away so pins and clusters take over.
   const [mapExpanded, setMapExpanded] = useState(false);
+  // Google labels stay hidden by default on Home; the Labels checkbox opts in.
+  const [labelsVisible, setLabelsVisible] = useState(false);
   const activeHome = useMemo(
     () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
     [requests],
@@ -477,6 +479,7 @@ function MapScreen() {
           select(null);
         }}
         mapTypeId="hybrid"
+        styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
       />
 
       <button
