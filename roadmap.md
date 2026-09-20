@@ -223,4 +223,4 @@ Home Events & Arts neon category artwork
 - [x] Add a high-impact introduction for live streams, emergency reports, and local bounties
 - [x] Add a real-data activity ticker and live preview without sample media
 - [x] Move Go Live and Post a Bounty actions into the first-screen focal area
-- [ ] Verify Home interactions and layout on phone and desktop
+- [x] Verify Home interactions and layout on phone and desktop
