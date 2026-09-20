@@ -46,6 +46,7 @@ import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
+import { SignInDialog } from "@/components/SignInDialog";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { AddressSearchField } from "@/components/AddressSearchField";
