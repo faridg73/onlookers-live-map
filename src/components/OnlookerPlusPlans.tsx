@@ -54,7 +54,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                 type="button"
                 aria-pressed={cycle === option}
                 onClick={() => setCycle(option)}
-                className={`rounded-full px-3 py-1 text-xs font-semibold capitalize transition ${
+                className={`min-h-9 rounded-full px-4 py-1.5 text-xs font-semibold capitalize transition ${
                   cycle === option
                     ? "bg-signal text-signal-foreground"
                     : "text-muted-foreground hover:text-foreground"

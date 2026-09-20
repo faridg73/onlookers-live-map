@@ -227,7 +227,7 @@ function FeedScreen() {
               onClick={() => setRadiusChoice(o.miles)}
               aria-pressed={radiusChoice === o.miles}
               className={
-                "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+                "min-h-9 rounded-full px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
                 (radiusChoice === o.miles
                   ? "bg-signal text-signal-foreground"
                   : "text-muted-foreground hover:text-foreground")
@@ -241,7 +241,7 @@ function FeedScreen() {
             onClick={() => setRadiusChoice("custom")}
             aria-pressed={radiusChoice === "custom"}
             className={
-              "rounded-full px-2.5 py-1 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              "min-h-9 rounded-full px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
               (radiusChoice === "custom"
                 ? "bg-signal text-signal-foreground"
                 : "text-muted-foreground hover:text-foreground")

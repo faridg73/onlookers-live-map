@@ -586,13 +586,13 @@ function MapScreen() {
         )}
       </div>
 
-      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3rem)] z-[65] flex h-7 items-center gap-1 rounded-full border border-border bg-surface/90 pl-1.5 pr-1 shadow-md backdrop-blur-xl md:left-4">
+      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3rem)] z-[65] flex h-8 items-center gap-1 rounded-full border border-border bg-surface/90 pl-1.5 pr-1 shadow-md backdrop-blur-xl md:left-4">
         <label className="flex items-center gap-1" aria-label="Show map labels">
           <input
             type="checkbox"
             checked={labelsVisible}
             onChange={(event) => setLabelsVisible(event.target.checked)}
-            className="size-3 accent-signal"
+            className="tap-compact size-3.5 accent-signal"
           />
           <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-foreground/80">
             Labels
@@ -608,7 +608,7 @@ function MapScreen() {
                 type="button"
                 onClick={() => setHomeMapType(type)}
                 aria-pressed={active}
-                className={`rounded-full px-1.5 py-0.5 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] transition-colors ${
+                className={`tap-compact rounded-full px-2 py-1 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] transition-colors ${
                   active
                     ? "bg-signal text-signal-foreground"
                     : "text-foreground/70 hover:text-signal"
