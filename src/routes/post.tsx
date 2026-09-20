@@ -859,14 +859,24 @@ function PostScreen() {
                       </Select>
                       {subcategoryKeywords.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {subcategoryKeywords.map((keyword) => (
-                            <span
-                              key={keyword}
-                              className="rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
-                            >
-                              {keyword}
-                            </span>
-                          ))}
+                          {subcategoryKeywords.map((keyword) => {
+                            const on = selectedKeywords.includes(keyword);
+                            return (
+                              <button
+                                key={keyword}
+                                type="button"
+                                onClick={() => toggleKeyword(keyword)}
+                                aria-pressed={on}
+                                className={
+                                  on
+                                    ? "rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.7rem] font-extrabold text-signal-foreground shadow-[0_0_12px_-2px_var(--signal)]"
+                                    : "rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
+                                }
+                              >
+                                {keyword}
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
