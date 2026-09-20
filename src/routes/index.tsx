@@ -349,6 +349,20 @@ function MapScreen() {
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
+  // Closest active pin to the viewer, powering the "Hot Spot Near You" ticker card.
+  const hotSpotRequest = useMemo(() => {
+    if (!userPosition) return null;
+    const active = requests.filter((request) => !isClosed(request));
+    if (active.length === 0) return null;
+    return active.reduce<LiveRequest | null>((closest, request) => {
+      if (!closest) return request;
+      return distanceMiles(userPosition, requestMapPosition(request)) <
+        distanceMiles(userPosition, requestMapPosition(closest))
+        ? request
+        : closest;
+    }, null);
+  }, [requests, userPosition]);
+
   // The Home sheet filters the live map immediately without changing the underlying request data.
   const statusFiltered = useMemo(
     () =>
