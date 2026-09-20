@@ -1,16 +1,29 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { CircleDollarSign, Eye, Flame, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { CircleDollarSign, Clock, Eye, Flame, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type HomeLiveStageProps = {
   requests: LiveRequest[];
   poolOf: (request: LiveRequest) => number;
   isCrisis: (request: LiveRequest) => boolean;
+  /** Nearest active request to the viewer, when their location is known */
+  hotSpot?: LiveRequest | null;
   onOpenRequest: (request: LiveRequest) => void;
-  onOpenHighBounty: (request: LiveRequest | null) => void;
-  onOpenLive: (request: LiveRequest | null) => void;
-  onOpenEmergency: (request: LiveRequest | null) => void;
+  onOpenHighBounty: (request: LiveRequest) => void;
+  onOpenLive: (request: LiveRequest) => void;
+  onOpenEmergency: (request: LiveRequest) => void;
+  onOpenDispatches: (request: LiveRequest) => void;
+  onOpenHotSpot: (request: LiveRequest) => void;
   onGoLive: () => void;
   onPostBounty: () => void;
 };
@@ -23,13 +36,17 @@ export function HomeLiveStage({
   requests,
   poolOf,
   isCrisis,
+  hotSpot = null,
   onOpenRequest,
   onOpenHighBounty,
   onOpenLive,
   onOpenEmergency,
+  onOpenDispatches,
+  onOpenHotSpot,
   onGoLive,
   onPostBounty,
 }: HomeLiveStageProps) {
+  const [emptyLabel, setEmptyLabel] = useState<string | null>(null);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -38,32 +55,58 @@ export function HomeLiveStage({
     (highest, request) => (!highest || poolOf(request) > poolOf(highest) ? request : highest),
     null,
   );
-  const liveRequest = activeRequests.find(isLiveRequest) ?? null;
+  const liveRequest =
+    activeRequests.filter(isLiveRequest).sort((a, b) => b.watchers - a.watchers)[0] ?? null;
   const emergencyRequest = activeRequests.find(isCrisis) ?? null;
+  const latestRequest =
+    [...activeRequests].sort((a, b) => a.minutesAgo - b.minutesAgo)[0] ?? null;
+
   const trends = [
     {
-      key: "bounty",
-      label: "High Bounty Zone",
-      icon: Flame,
-      request: highestBounty,
-      onActivate: onOpenHighBounty,
-      tone: "border-signal bg-signal text-signal-foreground shadow-[0_0_14px_color-mix(in_oklab,var(--color-signal)_38%,transparent)] hover:bg-signal/90",
-    },
-    {
-      key: "live",
-      label: "Live Stream",
-      icon: Radio,
-      request: liveRequest,
-      onActivate: onOpenLive,
-      tone: "border-live bg-live text-background shadow-[0_0_14px_color-mix(in_oklab,var(--color-live)_34%,transparent)] hover:bg-live/90",
-    },
-    {
       key: "emergency",
-      label: "Active Emergency Report",
+      label: "Live Emergency",
       icon: Siren,
       request: emergencyRequest,
       onActivate: onOpenEmergency,
       tone: "border-crisis bg-crisis text-foreground shadow-[0_0_14px_color-mix(in_oklab,var(--color-crisis)_38%,transparent)] hover:bg-crisis/90",
+      detail: (request: LiveRequest) => request.place,
+    },
+    {
+      key: "bounty",
+      label: "High Bounty",
+      icon: CircleDollarSign,
+      request: highestBounty,
+      onActivate: onOpenHighBounty,
+      tone: "border-amber-300 bg-amber-300 text-black shadow-[0_0_14px_rgba(252,211,77,0.4)] hover:bg-amber-200",
+      detail: (request: LiveRequest) => `${poolOf(request)} cr`,
+    },
+    {
+      key: "stream",
+      label: "Trending Stream",
+      icon: Radio,
+      request: liveRequest,
+      onActivate: onOpenLive,
+      tone: "border-live bg-live text-background shadow-[0_0_14px_color-mix(in_oklab,var(--color-live)_34%,transparent)] hover:bg-live/90",
+      detail: (request: LiveRequest) => `${request.watchers} watching`,
+    },
+    {
+      key: "dispatches",
+      label: "Recent Dispatches",
+      icon: Clock,
+      request: latestRequest,
+      onActivate: onOpenDispatches,
+      tone: "border-sky-400 bg-sky-400 text-black shadow-[0_0_14px_rgba(56,189,248,0.4)] hover:bg-sky-300",
+      detail: (request: LiveRequest) =>
+        request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`,
+    },
+    {
+      key: "hotspot",
+      label: "Hot Spot Near You",
+      icon: Flame,
+      request: hotSpot,
+      onActivate: onOpenHotSpot,
+      tone: "border-signal bg-signal text-signal-foreground shadow-[0_0_14px_color-mix(in_oklab,var(--color-signal)_38%,transparent)] hover:bg-signal/90",
+      detail: (request: LiveRequest) => request.place,
     },
   ];
 
@@ -148,18 +191,55 @@ export function HomeLiveStage({
                 key={`${trend.key}-${index}`}
                 type="button"
                 variant="outline"
-                onClick={() => trend.onActivate(trend.request)}
-                aria-label={`${trend.label}${trend.request ? `: ${trend.request.title}` : ": show this map view"}`}
+                onClick={() => {
+                  if (trend.request) trend.onActivate(trend.request);
+                  else setEmptyLabel(trend.label);
+                }}
+                aria-label={`${trend.label}${trend.request ? `: ${trend.request.title}` : ": nothing active right now"}`}
                 className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-extrabold uppercase transition-[transform,background-color] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-foreground/80 motion-reduce:transform-none ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
-                {trend.request && <span className="opacity-80">· {trend.key === "bounty" ? `${poolOf(trend.request)} cr` : trend.request.place}</span>}
+                {trend.request && <span className="opacity-80">· {trend.detail(trend.request)}</span>}
               </Button>
             );
           })}
         </div>
       </div>
+
+      <Dialog open={emptyLabel !== null} onOpenChange={(open) => !open && setEmptyLabel(null)}>
+        <DialogContent className="max-w-sm border-signal/45">
+          <DialogHeader>
+            <DialogTitle className="font-display-impact uppercase">{emptyLabel}</DialogTitle>
+            <DialogDescription className="text-white">
+              No active items right now—tap below to start one!
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="grid grid-cols-2 gap-2 sm:flex">
+            <Button
+              type="button"
+              onClick={() => {
+                setEmptyLabel(null);
+                onGoLive();
+              }}
+              className="h-11 font-extrabold uppercase"
+            >
+              <Radio className="size-4" /> Go live
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setEmptyLabel(null);
+                onPostBounty();
+              }}
+              className="h-11 border-signal/60 font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground"
+            >
+              <CircleDollarSign className="size-4 text-signal" /> Post a bounty
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
