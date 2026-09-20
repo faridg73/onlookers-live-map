@@ -12,6 +12,7 @@ import {
   Minimize2,
   Martini,
   Radio,
+  Search,
   ShieldCheck,
   Siren,
   Sparkles,
