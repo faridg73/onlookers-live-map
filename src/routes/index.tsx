@@ -673,7 +673,7 @@ function MapScreen() {
       />
 
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex h-[min(70dvh,42rem)] w-full flex-col overflow-hidden rounded-t-xl border border-b-0 border-border bg-surface/95 shadow-2xl backdrop-blur-xl will-change-transform sm:inset-x-auto sm:right-5 sm:w-[25rem] ${mapExpanded ? "hidden" : ""} ${drawerDragging ? "transition-none" : "transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0"} ${drawerOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)]"}`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-[55] mx-auto flex h-[min(70dvh,42rem)] w-full flex-col overflow-hidden rounded-t-xl border border-b-0 border-border bg-surface/95 shadow-2xl backdrop-blur-xl will-change-transform sm:inset-x-auto sm:right-5 sm:w-[25rem] ${mapExpanded ? "hidden" : ""} ${drawerDragging ? "transition-none" : "transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0"} ${drawerOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)]"}`}
         style={
           drawerDragOffset === 0
             ? undefined
