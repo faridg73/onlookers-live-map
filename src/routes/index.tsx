@@ -6,7 +6,6 @@ import {
   ChevronDown,
   CircleDollarSign,
   Compass,
-  HelpCircle,
   Map,
   MapPin,
   Martini,
