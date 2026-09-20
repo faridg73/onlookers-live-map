@@ -8,6 +8,8 @@ import {
   Compass,
   Map,
   MapPin,
+  Maximize2,
+  Minimize2,
   Martini,
   Radio,
   ShieldCheck,
@@ -281,6 +283,12 @@ function MapScreen() {
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
+  // Full-map mode: hero + Explore Nearby tuck away so pins and clusters take over.
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const activeHome = useMemo(
+    () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
+    [requests],
+  );
   const dragStartY = useRef<number | null>(null);
   const drawerDragged = useRef(false);
   const homeStateRestored = useRef(false);
