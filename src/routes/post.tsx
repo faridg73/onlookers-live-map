@@ -697,10 +697,7 @@ function PostScreen() {
       const deadlineLabel = customDeadline
         ? format(customDeadline, "MMM d, h:mm a")
         : (DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`);
-      toast.success("Request is live", {
-        description: `${total} Credits held in escrow. Expires ${customDeadline ? "at" : "in"} ${deadlineLabel} if nobody claims it.`,
-      });
-      await navigate({ to: "/feed" });
+      setLiveDialog({ title: title.trim(), credits: total, deadlineLabel });
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message === BLOCKED_REQUEST_MESSAGE) setModerationOpen(true);
