@@ -114,11 +114,14 @@ import {
 } from "@/lib/request-intent";
 
 export const Route = createFileRoute("/post")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "1"; mode?: "broadcast" | "bounty" } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mystery?: "1"; mode?: "broadcast" | "bounty"; focus?: "reward" } => ({
     ...(search["mystery"] === "1" ? { mystery: "1" as const } : {}),
     ...(search["mode"] === "broadcast" || search["mode"] === "bounty"
       ? { mode: search["mode"] as "broadcast" | "bounty" }
       : {}),
+    ...(search["focus"] === "reward" ? { focus: "reward" as const } : {}),
   }),
   head: () => ({
     meta: [
