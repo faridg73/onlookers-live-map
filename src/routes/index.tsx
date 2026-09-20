@@ -288,7 +288,7 @@ function MapScreen() {
   const drawerScrollRef = useSessionElementScroll<HTMLDivElement>("onlooker:scroll:home-drawer");
 
   const { boostOf } = useBoosts();
-  const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
+  const { radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
   useEffect(() => {
     const saved = readSessionState<{
@@ -438,17 +438,6 @@ function MapScreen() {
   }, [creatorsMode]);
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
-  const nearby = useMemo(() => {
-    if (!userPosition) return [];
-    return requests
-      .filter((request) => request.status === "open" && !isClosed(request))
-      .map((request) => ({
-        request,
-        distance: distanceMiles(userPosition, requestMapPosition(request)),
-      }))
-      .filter(({ distance }) => distance <= radiusMiles)
-      .sort((a, b) => a.distance - b.distance || b.request.bounty - a.request.bounty);
-  }, [requests, userPosition, radiusMiles]);
   return (
     <div className="fixed inset-0">
       <MapCanvas
@@ -578,39 +567,6 @@ function MapScreen() {
         </Button>
 
         <div ref={drawerScrollRef} className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
-          <div className="border-t border-border py-3">
-            <div className="flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
-                {(
-                  [
-                    ["all", "All"],
-                    ["live", "Live now"],
-                    ["nearby", `Nearby ${nearby.length}`],
-                    ["high", "High bounty"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <Button
-                    key={key}
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    aria-pressed={mapFilter === key}
-                    onClick={() => setMapFilter(key)}
-                    className={`h-8 shrink-0 rounded-full border px-3 text-[0.75rem] font-extrabold transition-colors duration-150 ${
-                      mapFilter === key
-                        ? "border-signal bg-signal text-background shadow-[0_0_0_1px_var(--color-signal)]"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {label}
-                  </Button>
-                ))}
-            </div>
-            <p className="mt-2 text-[0.75rem] text-muted-foreground" aria-live="polite">
-              {mapFilter === "nearby" && !userPosition
-                ? `Allow location access to see requests within ${radius} ${unit}.`
-                : `${visible.length} ${visible.length === 1 ? "request" : "requests"} shown live`}
-            </p>
-          </div>
 
           <div className="border-t border-border py-3">
             <div className={`grid grid-cols-3 gap-2 ${activeCategoryTile ? "hidden" : ""}`} aria-label="Map categories">
