@@ -120,8 +120,8 @@ export function MapCanvas({
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
-          // Street-level default so business, shop and landmark labels are
-          // visible like the standard Google city map.
+          // Neighborhood-level default keeps aerial detail and hybrid labels
+          // legible while preserving the existing nearby marker density.
           zoom: savedViewport?.zoom ?? 15,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.
