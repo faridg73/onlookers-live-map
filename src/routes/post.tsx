@@ -15,6 +15,7 @@ import {
   Info,
   KeyRound,
   MapPin,
+  Flame,
   Mic,
   MicOff,
   Radio,
@@ -1334,8 +1335,13 @@ function PostScreen() {
                         variant="outline"
                         aria-pressed={tier === option.id}
                         onClick={() => setTier(option.id)}
-                        className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
+                        className={`relative h-auto items-start justify-start gap-3 whitespace-normal p-3 pr-7 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
                       >
+                        {option.id === "fast_catch" && (
+                          <span className="absolute -top-2 right-2 inline-flex items-center gap-1 rounded-full bg-live px-2 py-0.5 text-[0.55rem] font-extrabold uppercase tracking-[0.12em] text-background">
+                            <Flame className="size-2.5" strokeWidth={3} /> Popular
+                          </span>
+                        )}
                         <Zap className="mt-0.5 size-4 shrink-0 text-signal" />
                         <span>
                           <span className="block font-extrabold text-foreground">{option.label}</span>
