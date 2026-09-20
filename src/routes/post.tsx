@@ -269,6 +269,8 @@ function PostScreen() {
   const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
   /** The main category the subcategory list hangs off (17 in total). */
   const [mainCategoryId, setMainCategoryId] = useState<MainCategoryId>("breaking-incidents");
+  /** Search tags the requester switched on, used for search, map and feed matching. */
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
 
   const [balance, setBalance] = useState<number | null>(null);
@@ -295,6 +297,9 @@ function PostScreen() {
     mainCategoryId === STRANGE_SIGHTINGS_ID ? STRANGE_SIGHTINGS_LABEL : selectedCategory.label;
   /** Keyword metadata carried into the payload for search and analytics. */
   const subcategoryKeywords = keywordsForSubcategory(mainCategoryId, subcategory);
+  /** Tags the requester actively selected; they drive search, map and feed relevance. */
+  const activeKeywords = subcategoryKeywords.filter((keyword) => selectedKeywords.includes(keyword));
+  const taggedKeywords = activeKeywords.length > 0 ? activeKeywords : subcategoryKeywords;
   const promptContext = useMemo(
     () => bountyPromptContext(mainCategoryId, mainCategoryLabel, subcategory),
     [mainCategoryId, mainCategoryLabel, subcategory],
@@ -481,6 +486,7 @@ function PostScreen() {
     setMainCategoryId(next);
     setCategoryId(next === STRANGE_SIGHTINGS_ID ? "breaking-incidents" : next);
     setSubcategory(null);
+    setSelectedKeywords([]);
     setPermissionOk(false);
     if (next === "real-estate") setRealEstateGuideOpen(true);
   };
@@ -489,8 +495,20 @@ function PostScreen() {
   const chooseSubcategory = (label: string) => {
     setSubcategory(label);
     const keywords = keywordsForSubcategory(mainCategoryId, label);
+    setSelectedKeywords([...keywords]);
     const seed = keywords[0] ?? label;
     setVenueQuery(`${label} ${seed}`.trim());
+  };
+
+  /** Chips are live filters: toggling one retags the request and re-runs the nearby search. */
+  const toggleKeyword = (keyword: string) => {
+    const next = selectedKeywords.includes(keyword)
+      ? selectedKeywords.filter((item) => item !== keyword)
+      : [...selectedKeywords, keyword];
+    setSelectedKeywords(next);
+    const base = subcategory ?? mainCategoryLabel;
+    const active = subcategoryKeywords.filter((item) => next.includes(item));
+    setVenueQuery(`${base} ${active.slice(0, 3).join(" ")}`.trim());
   };
 
 
@@ -606,7 +624,7 @@ function PostScreen() {
         scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
         `Category: ${mainCategoryLabel}`,
         subcategory ? `Subcategory: ${subcategory}` : "",
-        subcategoryKeywords.length ? `Keywords: ${subcategoryKeywords.join(", ")}` : "",
+        taggedKeywords.length ? `Keywords: ${taggedKeywords.join(", ")}` : "",
 
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
@@ -841,14 +859,24 @@ function PostScreen() {
                       </Select>
                       {subcategoryKeywords.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {subcategoryKeywords.map((keyword) => (
-                            <span
-                              key={keyword}
-                              className="rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
-                            >
-                              {keyword}
-                            </span>
-                          ))}
+                          {subcategoryKeywords.map((keyword) => {
+                            const on = selectedKeywords.includes(keyword);
+                            return (
+                              <button
+                                key={keyword}
+                                type="button"
+                                onClick={() => toggleKeyword(keyword)}
+                                aria-pressed={on}
+                                className={
+                                  on
+                                    ? "rounded-full border border-signal bg-signal px-2.5 py-1 text-[0.7rem] font-extrabold text-signal-foreground shadow-[0_0_12px_-2px_var(--signal)]"
+                                    : "rounded-full border border-signal/40 bg-signal/5 px-2.5 py-1 text-[0.7rem] font-bold text-foreground"
+                                }
+                              >
+                                {keyword}
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
