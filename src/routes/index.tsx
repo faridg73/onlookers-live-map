@@ -249,13 +249,13 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "Onlooker LLC, Live views from people already there" },
+      { title: "Onlooker, Live views from people already there" },
       {
         name: "description",
         content:
-          "Onlooker LLC connects live streaming with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
+          "Onlooker connects live streaming with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
       },
-      { property: "og:title", content: "Onlooker LLC | Live proof backed by locked credits" },
+      { property: "og:title", content: "Onlooker | Live proof backed by locked credits" },
       {
         property: "og:description",
         content: "Post a bounty, lock credits, and release them only after real-world proof is verified.",
@@ -497,11 +497,11 @@ function MapScreen() {
         <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
           <img
             src="/icon-192.png"
-            alt="Onlooker LLC logo"
+            alt="Onlooker logo"
             className="size-10 rounded-lg object-cover md:size-12"
           />
           <h1 className="text-xs font-extrabold leading-none tracking-tight text-foreground md:text-sm">
-            Onlooker LLC
+            Onlooker
           </h1>
           <p className="whitespace-nowrap text-[0.55rem] font-bold leading-none text-muted-foreground md:text-[0.6rem]">
             Live eyes, anywhere
@@ -1318,7 +1318,7 @@ function MapScreen() {
                 {label}
               </Link>
             ))}
-            <span className="ml-auto text-[0.65rem] text-muted-foreground">© 2026 Onlooker LLC</span>
+            <span className="ml-auto text-[0.65rem] text-muted-foreground">© 2026 Onlooker</span>
           </nav>
         </div>
 
@@ -1364,7 +1364,7 @@ const GUIDES: Array<{
   {
     icon: Compass,
     kicker: "Platform guide",
-    title: "How Onlooker LLC works",
+    title: "How Onlooker works",
     body: "Ever wished you could see a place right now? Someone out there is already standing in it. That's the whole idea.",
     points: [
       "Post a bounty, pick the spot and say what you'd love to see.",
@@ -1402,7 +1402,7 @@ const GUIDES: Array<{
     points: [
       "Skip private homes, gated property and anywhere you're not meant to be.",
       "Leave live shows, performances and games alone, that's someone else's work.",
-      "Keep chats and payments on Onlooker LLC. It's how we've got your back.",
+      "Keep chats and payments on Onlooker. It's how we've got your back.",
     ],
   },
 ];
@@ -1440,7 +1440,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
               Learning &amp; Guides
             </h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              A few friendly pointers to help you get the most out of Onlooker LLC.
+              A few friendly pointers to help you get the most out of Onlooker.
             </p>
           </div>
           <Button

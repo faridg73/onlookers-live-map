@@ -86,7 +86,7 @@ export function ProfileEditor({ profile, fallbackName, onSaved }: ProfileEditorP
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>Update the details people see across Onlooker LLC.</DialogDescription>
+            <DialogDescription>Update the details people see across Onlooker.</DialogDescription>
           </DialogHeader>
           <form onSubmit={save} className="space-y-4">
             <div className="flex items-center gap-4">

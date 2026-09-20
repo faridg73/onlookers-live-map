@@ -29,13 +29,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export const Route = createFileRoute("/disputes")({
   head: () => ({
     meta: [
-      { title: "Onlooker LLC Disputes, submit evidence & get a ruling" },
+      { title: "Onlooker Disputes, submit evidence & get a ruling" },
       {
         name: "description",
         content:
-          "Track disputed Onlooker LLC bounties, add written evidence about a submitted clip, and see how the moderation team settles the escrowed payout.",
+          "Track disputed Onlooker bounties, add written evidence about a submitted clip, and see how the moderation team settles the escrowed payout.",
       },
-      { property: "og:title", content: "Onlooker LLC dispute center" },
+      { property: "og:title", content: "Onlooker dispute center" },
       {
         property: "og:description",
         content: "Submit evidence on a disputed bounty and follow the moderator's payout decision.",

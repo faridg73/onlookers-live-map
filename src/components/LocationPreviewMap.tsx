@@ -175,15 +175,15 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
         <div ref={holder} className="absolute inset-0" style={{ touchAction: "none" }} />
         <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
           <div className="overflow-hidden rounded-md border border-border bg-surface/90 shadow-lg backdrop-blur">
-            <Button type="button" variant="ghost" size="icon" onClick={() => zoomBy(1)} aria-label="Zoom in" className="rounded-none border-b border-border">
-              <Plus />
+            <Button type="button" variant="ghost" size="icon" onClick={() => zoomBy(1)} aria-label="Zoom in" className="size-9 rounded-none border-b border-border">
+              <Plus className="size-4" />
             </Button>
-            <Button type="button" variant="ghost" size="icon" onClick={() => zoomBy(-1)} aria-label="Zoom out" className="rounded-none">
-              <Minus />
+            <Button type="button" variant="ghost" size="icon" onClick={() => zoomBy(-1)} aria-label="Zoom out" className="size-9 rounded-none">
+              <Minus className="size-4" />
             </Button>
           </div>
-          <Button type="button" variant="secondary" size="icon" onClick={() => void locateMe()} aria-label="Use my current location" title="Use my current location">
-            <LocateFixed className={locating ? "animate-pulse text-signal" : "text-signal"} />
+          <Button type="button" variant="secondary" size="icon" onClick={() => void locateMe()} aria-label="Use my current location" title="Use my current location" className="size-9">
+            <LocateFixed className={locating ? "size-4 animate-pulse text-signal" : "size-4 text-signal"} />
           </Button>
         </div>
       </div>

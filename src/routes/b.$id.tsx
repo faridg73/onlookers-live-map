@@ -17,11 +17,11 @@ export const Route = createFileRoute("/b/$id")({
   head: ({ match }) => {
     const { amt, place, title } = match.search as Search;
     const heading = amt
-      ? `$${amt} bounty${place ? `, ${place}` : ""} · Onlooker LLC`
-      : "Live view bounty · Onlooker LLC";
+      ? `$${amt} bounty${place ? `, ${place}` : ""} · Onlooker`
+      : "Live view bounty · Onlooker";
     const desc = title
       ? `${title}${place ? ` at ${place}` : ""}. Capture a live photo or clip and claim the bounty.`
-      : "Open this bounty on the Onlooker LLC map and claim it with a live photo or clip.";
+      : "Open this bounty on the Onlooker map and claim it with a live photo or clip.";
     const url = `https://onlookerlive.com/b/${match.params.id}`;
     const image = "https://onlookerlive.com/og-onlooker.jpg";
     return {
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/b/$id")({
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
         { property: "og:image", content: image },
-        { property: "og:site_name", content: "Onlooker LLC" },
+        { property: "og:site_name", content: "Onlooker" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:image", content: image },
       ],
@@ -54,7 +54,7 @@ function BountyPreview() {
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">
             <Zap className="size-4" strokeWidth={2.4} />
           </span>
-          <span className="font-display text-base tracking-tight text-foreground">Onlooker LLC</span>
+          <span className="font-display text-base tracking-tight text-foreground">Onlooker</span>
         </div>
         <div className="px-5 py-6">
           <div className="font-display text-5xl leading-none text-signal">${amt ?? "0"}</div>

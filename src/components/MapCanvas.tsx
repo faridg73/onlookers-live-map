@@ -178,7 +178,7 @@ export function MapCanvas({
         setReady(true);
       })
       .catch((error) => {
-        console.error("[Onlooker LLC map] Google Maps failed to load", error);
+        console.error("[Onlooker map] Google Maps failed to load", error);
         setFailed(true);
       });
     return () => {
@@ -730,7 +730,7 @@ export function MapCanvas({
               type="button"
               onClick={b.fn}
               aria-label={b.label === "+" ? "Zoom in" : "Zoom out"}
-              className="flex size-11 items-center justify-center border-b border-border text-xl font-bold leading-none text-foreground transition-colors last:border-b-0 hover:bg-surface-raised"
+              className="flex size-9 items-center justify-center border-b border-border text-base font-bold leading-none text-foreground transition-colors last:border-b-0 hover:bg-surface-raised"
             >
               {b.label}
             </button>
@@ -741,7 +741,7 @@ export function MapCanvas({
           onClick={locateMe}
           aria-label="Recenter to my location"
           title={geoMessage ?? "Recenter to my location"}
-          className="flex size-11 items-center justify-center rounded-lg border border-border bg-surface/90 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-surface-raised"
+          className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface/90 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-surface-raised"
         >
           <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
         </button>

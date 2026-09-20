@@ -23,13 +23,13 @@ import { PageBackButton } from "@/components/PageBackButton";
 export const Route = createFileRoute("/discover/trending")({
   head: () => ({
     meta: [
-      { title: "Trending Feeds & Live Events Near You | Onlooker LLC" },
+      { title: "Trending Feeds & Live Events Near You | Onlooker" },
       {
         name: "description",
         content:
           "Live sports, concerts, fight nights and public gatherings happening around your city this weekend, launch a bounty and get a live view in minutes.",
       },
-      { property: "og:title", content: "Trending Feeds & Live Events Near You | Onlooker LLC" },
+      { property: "og:title", content: "Trending Feeds & Live Events Near You | Onlooker" },
       {
         property: "og:description",
         content:

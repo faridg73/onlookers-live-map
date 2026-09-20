@@ -15,7 +15,7 @@ interface Props {
 const Email = ({ name, email, subject, message, ticketId, userId }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>New support message from the Onlooker LLC contact form</Preview>
+    <Preview>New support message from the Onlooker contact form</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={heading}>New contact form message</Heading>
@@ -38,7 +38,7 @@ const Email = ({ name, email, subject, message, ticketId, userId }: Props) => (
 
 export const template = {
   component: Email,
-  subject: 'New support message | Onlooker LLC',
+  subject: 'New support message | Onlooker',
   displayName: 'Support ticket alert',
   to: 'support@onlookerlive.com',
   previewData: {

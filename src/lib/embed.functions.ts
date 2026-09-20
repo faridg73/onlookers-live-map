@@ -15,7 +15,7 @@ export type EmbedMarker = {
 };
 
 /**
- * Active Onlooker LLC feeds for the public embed, read with the publishable key so
+ * Active Onlooker feeds for the public embed, read with the publishable key so
  * a news site's readers see it without signing in. Coordinates are the same
  * approximate ones the public map shows — never an exact person's position.
  */

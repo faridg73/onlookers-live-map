@@ -118,12 +118,12 @@ export const Route = createFileRoute("/post")({
     search["mystery"] === "1" ? { mystery: "1" } : {},
   head: () => ({
     meta: [
-      { title: "Post a Live Request | Onlooker LLC" },
+      { title: "Post a Live Request | Onlooker" },
       {
         name: "description",
         content: "Describe what you need, choose the exact place, and post a secure live request.",
       },
-      { property: "og:title", content: "Post a Live Request | Onlooker LLC" },
+      { property: "og:title", content: "Post a Live Request | Onlooker" },
       {
         property: "og:description",
         content: "Describe what you need, choose the exact place, and post a secure live request.",

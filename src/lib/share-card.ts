@@ -144,7 +144,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
   // Footer wordmark + invite
   ctx.fillStyle = BRAND;
   ctx.font = "800 56px sans-serif";
-  ctx.fillText("ONLOOKER LLC", pad, height - 220);
+  ctx.fillText("ONLOOKER", pad, height - 220);
   ctx.fillStyle = "rgba(255,255,255,0.78)";
   ctx.font = "600 36px sans-serif";
   ctx.fillText("See what's happening near you, right now.", pad, height - 146);
@@ -158,7 +158,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
 export async function shareCaption(artifact: ShareArtifact): Promise<string> {
   const link = await referralLink();
   const bits = [artifact.title, artifact.place].filter(Boolean).join(", ");
-  return `${bits}\nLive on Onlooker LLC 👀 ${link}\n#OnlookerLive #LiveView`;
+  return `${bits}\nLive on Onlooker 👀 ${link}\n#OnlookerLive #LiveView`;
 }
 
 /**
@@ -170,7 +170,7 @@ export async function shareArtifact(artifact: ShareArtifact): Promise<"shared" |
 
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], text: caption, title: "Onlooker LLC" });
+      await navigator.share({ files: [file], text: caption, title: "Onlooker" });
       return "shared";
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return "shared";

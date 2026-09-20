@@ -13,7 +13,7 @@ interface Props {
 const Email = ({ name, subject, message, ticketId }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>We received your message — Onlooker LLC support</Preview>
+    <Preview>We received your message — Onlooker support</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={heading}>Thanks for reaching out</Heading>
@@ -38,7 +38,7 @@ const Email = ({ name, subject, message, ticketId }: Props) => (
 
 export const template = {
   component: Email,
-  subject: 'We received your message | Onlooker LLC',
+  subject: 'We received your message | Onlooker',
   displayName: 'Support message received',
   previewData: {
     name: 'Jane',

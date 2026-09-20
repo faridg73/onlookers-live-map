@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 /** Shown whenever someone tries to bring in a file instead of filming live. */
 export const CAMERA_ONLY_MESSAGE =
-  "For security and verification, Onlooker LLC only accepts live captures from your physical camera.";
+  "For security and verification, Onlooker only accepts live captures from your physical camera.";
 
 /** Shown on every capture screen — captures must be crowd/street/public views only. */
 export const PUBLIC_SPACES_DISCLAIMER =
@@ -11,7 +11,7 @@ export const PUBLIC_SPACES_DISCLAIMER =
 
 /** Shown on every request template — venue exteriors and logistics only. */
 export const VENUE_EXTERIOR_DISCLAIMER =
-  "Onlooker LLC protects creator rights. Requests targeting live musical performances or internal ticketing platforms are automatically rejected. Keep your camera focused on public property, venue lines, and pre-show atmosphere.";
+  "Onlooker protects creator rights. Requests targeting live musical performances or internal ticketing platforms are automatically rejected. Keep your camera focused on public property, venue lines, and pre-show atmosphere.";
 
 /**
  * Extra guardrail for the spontaneous-happening categories (street & park

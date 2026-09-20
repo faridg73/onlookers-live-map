@@ -40,9 +40,9 @@ export const Route = createFileRoute("/discover/$group/$venue")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Not found | Onlooker LLC" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Not found | Onlooker" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} Live Views | Onlooker LLC`;
+    const title = `${loaderData.name} Live Views | Onlooker`;
     const description = `${loaderData.blurb} Post a bounty and get a live view from ${loaderData.name}, ${loaderData.area}.`;
     return {
       meta: [

@@ -23,16 +23,16 @@ import {
 export const Route = createFileRoute("/explore")({
   head: () => ({
     meta: [
-      { title: "Explore live views from around the world | Onlooker LLC" },
+      { title: "Explore live views from around the world | Onlooker" },
       {
         name: "description",
         content:
           "Watch real bounty clips captured by Onlookers worldwide and in your neighborhood. Comment, review and see what is happening right now.",
       },
-      { property: "og:title", content: "Explore live views from around the world | Onlooker LLC" },
+      { property: "og:title", content: "Explore live views from around the world | Onlooker" },
       {
         property: "og:description",
-        content: "Real places, captured live by people nearby. Watch, comment and review on Onlooker LLC.",
+        content: "Real places, captured live by people nearby. Watch, comment and review on Onlooker.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

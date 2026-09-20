@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
- * Every deal, clip and status update has to stay inside Onlooker LLC, so chat
+ * Every deal, clip and status update has to stay inside Onlooker, so chat
  * messages get contact details masked before they are stored or shown.
  */
 const PATTERNS: { re: RegExp; replacement: string }[] = [
@@ -33,4 +33,4 @@ export function hasMaskedContactInfo(text: string) {
 }
 
 export const CHAT_SAFETY_NOTE =
-  "Keep it in Onlooker LLC: phone numbers, emails and outside links are hidden automatically. Payment is only protected while the clip and chat stay in the app.";
+  "Keep it in Onlooker: phone numbers, emails and outside links are hidden automatically. Payment is only protected while the clip and chat stay in the app.";
