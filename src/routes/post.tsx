@@ -622,6 +622,8 @@ function PostScreen() {
       return;
     }
     // Credits only leave a wallet once the number behind the account is confirmed.
+    // Signed-out people get an overlay here, never a redirect that would wipe the form.
+    if (!requireSignIn(() => void runSubmit())) return;
     if (!(await phoneGate.ensureVerified(() => void runSubmit()))) return;
     const funds = await readWalletBalance();
     setBalance(funds);
