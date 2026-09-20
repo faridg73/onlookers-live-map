@@ -288,7 +288,7 @@ function MapScreen() {
   const drawerScrollRef = useSessionElementScroll<HTMLDivElement>("onlooker:scroll:home-drawer");
 
   const { boostOf } = useBoosts();
-  const { unit, radius, radiusMiles, formatDistance } = useDistanceUnit(userPosition);
+  const { radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
   useEffect(() => {
     const saved = readSessionState<{
@@ -438,17 +438,6 @@ function MapScreen() {
   }, [creatorsMode]);
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
-  const nearby = useMemo(() => {
-    if (!userPosition) return [];
-    return requests
-      .filter((request) => request.status === "open" && !isClosed(request))
-      .map((request) => ({
-        request,
-        distance: distanceMiles(userPosition, requestMapPosition(request)),
-      }))
-      .filter(({ distance }) => distance <= radiusMiles)
-      .sort((a, b) => a.distance - b.distance || b.request.bounty - a.request.bounty);
-  }, [requests, userPosition, radiusMiles]);
   return (
     <div className="fixed inset-0">
       <MapCanvas
