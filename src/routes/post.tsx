@@ -236,6 +236,10 @@ function PostScreen() {
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
   const [step, setStep] = useState<1 | 2 | 3>(rewardFirst ? 3 : 1);
   const formScrollRef = useRef<HTMLDivElement | null>(null);
+  /** Every step change (and the first landing) starts the form scrolled to the top. */
+  useEffect(() => {
+    formScrollRef.current?.scrollTo({ top: 0 });
+  }, [step]);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
