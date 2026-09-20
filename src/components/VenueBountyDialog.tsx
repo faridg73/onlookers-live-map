@@ -469,6 +469,7 @@ export function VenueBountyDialog({
                   aria-pressed={weather === c.multiplier}
                   className={`${pill(weather === c.multiplier)} min-w-[7.5rem] leading-tight`}
                 >
+                  <BountyConditionIcon id={c.id} className="mx-auto mb-1 size-4 shrink-0" />
                   {c.label}
                   <span className="mt-0.5 block text-[0.65rem] font-semibold opacity-80">
                     {c.multiplier === 1 ? "no extra" : `+${Math.round((c.multiplier - 1) * 100)}%`}

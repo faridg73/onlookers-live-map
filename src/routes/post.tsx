@@ -1379,10 +1379,17 @@ function PostScreen() {
                         variant="outline"
                         aria-pressed={weather === condition.multiplier}
                         onClick={() => setWeather(condition.multiplier)}
-                        className={`${pill(weather === condition.multiplier)} h-auto whitespace-normal py-2`}
+                        className={`${pill(weather === condition.multiplier)} flex h-auto flex-col items-center gap-1 whitespace-normal py-2.5`}
                       >
-                        {condition.label}
-                        {condition.multiplier > 1 && ` +${Math.round((condition.multiplier - 1) * 100)}%`}
+                        <BountyConditionIcon
+                          id={condition.id}
+                          className="size-4 shrink-0"
+                        />
+                        <span>
+                          {condition.label}
+                          {condition.multiplier > 1 &&
+                            ` +${Math.round((condition.multiplier - 1) * 100)}%`}
+                        </span>
                       </Button>
                     ))}
                   </div>
