@@ -8,7 +8,7 @@ const PRESETS: { amount: number; tag?: string; icon?: "popular" | "fast" }[] = [
   { amount: 20 },
   { amount: 40 },
   { amount: 80 },
-  { amount: 160 },
+  { amount: 100 },
 ];
 
 /** Preset bounty chips plus a custom amount box with a minimum. */
