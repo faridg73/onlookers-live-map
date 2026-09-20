@@ -41,6 +41,8 @@ export function MapCanvas({
   gatheringMode = false,
   onGatheringClusterSelect,
   viewportStorageKey,
+  mapTypeId,
+  showNativeMapTypeControl = true,
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -61,6 +63,10 @@ export function MapCanvas({
   gatheringMode?: boolean;
   onGatheringClusterSelect?: (requestIds: string[]) => void;
   viewportStorageKey?: string;
+  /** Optional controlled base-map style for screens with app-owned controls. */
+  mapTypeId?: "hybrid" | "satellite" | "roadmap";
+  /** Hide Google's control when a screen provides its own compact selector. */
+  showNativeMapTypeControl?: boolean;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -119,6 +125,8 @@ export function MapCanvas({
         restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
+          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
+          mapTypeControl: showNativeMapTypeControl,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
           // Neighborhood-level default keeps aerial detail and hybrid labels
           // legible while preserving the existing nearby marker density.
@@ -187,6 +195,11 @@ export function MapCanvas({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewportStorageKey]);
+
+  useEffect(() => {
+    if (!ready || !map.current || !mapTypeId) return;
+    map.current.setMapTypeId(mapTypeId);
+  }, [mapTypeId, ready]);
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);

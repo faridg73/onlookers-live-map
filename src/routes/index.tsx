@@ -274,6 +274,7 @@ function MapScreen() {
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [homeMapType, setHomeMapType] = useState<"hybrid" | "roadmap">("hybrid");
   const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
@@ -491,6 +492,8 @@ function MapScreen() {
           setDrawerOpen(true);
           select(null);
         }}
+        mapTypeId={homeMapType}
+        showNativeMapTypeControl={false}
       />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
@@ -507,18 +510,16 @@ function MapScreen() {
             Live eyes, anywhere
           </p>
         </div>
-        <div
-          className={`pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] md:left-1/2 md:-translate-x-1/2 ${
-            searchOpen ? "w-[min(21rem,calc(100vw-6.25rem))] md:w-[min(32rem,calc(100vw-14rem))]" : ""
-          }`}
-        >
+        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] w-[min(22.5rem,calc(100vw-7.25rem))] min-w-0 md:left-6 md:w-[22.5rem]">
           {searchOpen ? (
-            <div className="flex w-full origin-left animate-search-slide items-start gap-1.5 motion-reduce:animate-none">
-              <div className="min-w-0 flex-1 rounded-full border border-border bg-surface/95 p-1 shadow-2xl backdrop-blur-xl">
+            <div className="grid h-12 w-full origin-left animate-search-slide grid-cols-[minmax(0,1fr)_auto] items-center gap-1 rounded-full border border-border/80 bg-surface/80 p-1 shadow-2xl backdrop-blur-xl motion-reduce:animate-none">
+              <div className="min-w-0">
                 <PlaceSearchInput
                   autoFocus
-                  placeholder="Search a city, place or landmark"
+                  searchIconPosition="right"
+                  placeholder="Search address..."
                   onPick={focusPlace}
+                  className="[&>div:first-child]:h-10 [&>div:first-child]:rounded-full [&>div:first-child]:border-0 [&>div:first-child]:bg-transparent [&_input]:h-9 [&_input]:min-w-0 [&_input]:text-xs"
                 />
               </div>
               <Button
@@ -527,22 +528,24 @@ function MapScreen() {
                 size="icon"
                 aria-label="Close search"
                 onClick={() => setSearchOpen(false)}
-                className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-surface/95 text-foreground shadow-lg backdrop-blur-xl md:hidden"
+                className="grid size-10 shrink-0 place-items-center rounded-full border-0 bg-surface-raised/80 text-foreground shadow-none"
               >
                 <X className="size-4" />
               </Button>
             </div>
           ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Search for a place"
-              onClick={() => setSearchOpen(true)}
-              className="grid size-11 place-items-center rounded-full border border-border bg-surface/95 text-foreground shadow-2xl backdrop-blur-xl"
-            >
-              <Search className="size-4 shrink-0 text-signal" />
-            </Button>
+            <div className="grid h-12 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 rounded-full border border-border/80 bg-surface/80 p-1.5 shadow-2xl backdrop-blur-xl">
+              <div className="flex shrink-0 items-center rounded-full bg-surface-raised/75 p-0.5" aria-label="Map style">
+                <Button type="button" variant="ghost" onClick={() => setHomeMapType("hybrid")} aria-pressed={homeMapType === "hybrid"} className={`h-8 rounded-full px-2.5 text-[11px] font-semibold ${homeMapType === "hybrid" ? "bg-foreground text-background shadow-sm hover:bg-foreground" : "text-muted-foreground"}`}>Satellite</Button>
+                <Button type="button" variant="ghost" onClick={() => setHomeMapType("roadmap")} aria-pressed={homeMapType === "roadmap"} className={`h-8 rounded-full px-2.5 text-[11px] font-semibold ${homeMapType === "roadmap" ? "bg-foreground text-background shadow-sm hover:bg-foreground" : "text-muted-foreground"}`}>Map</Button>
+              </div>
+              <Button type="button" variant="ghost" onClick={() => setSearchOpen(true)} className="min-w-0 justify-start truncate rounded-full px-2 text-xs font-medium text-muted-foreground">
+                Search...
+              </Button>
+              <Button type="button" size="icon" aria-label="Search for a place" onClick={() => setSearchOpen(true)} className="grid size-9 shrink-0 place-items-center rounded-full shadow-lg active:scale-95">
+                <Search className="size-4 shrink-0" />
+              </Button>
+            </div>
           )}
         </div>
       </header>
