@@ -118,7 +118,7 @@ export function HomeLiveStage({
   if (mapExpanded) {
     return (
       <section
-        className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 flex items-center justify-between gap-3 rounded-full border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-lg backdrop-blur-xl sm:left-6 sm:right-auto sm:w-fit"
+        className="pointer-events-auto absolute left-3 right-[7.75rem] top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 flex items-center justify-between gap-3 rounded-full border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-lg backdrop-blur-xl sm:left-6 sm:right-auto sm:w-fit"
         aria-label="Full map view"
       >
         <p className="flex items-center gap-2 whitespace-nowrap font-display-impact text-[0.6rem] uppercase text-signal">
