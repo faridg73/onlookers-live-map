@@ -226,11 +226,13 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
-  const { mystery, mode: initialMode } = Route.useSearch();
+  const { mystery, mode: initialMode, focus } = Route.useSearch();
+  /** True when the visitor jumped straight to the reward tiers before describing the bounty. */
+  const rewardFirst = focus === "reward" && initialMode === "bounty";
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(rewardFirst ? 3 : 1);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
