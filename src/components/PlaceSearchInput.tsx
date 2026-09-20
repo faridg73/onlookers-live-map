@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Loader2, MapPin, Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   autocompletePlaces,
   geocodeAddress,
@@ -21,6 +22,7 @@ export function PlaceSearchInput({
   className = "",
   autoFocus = false,
   value,
+  searchIconPosition = "left",
 }: {
   placeholder?: string;
   onPick: (place: GeocodeResult) => void;
@@ -28,6 +30,7 @@ export function PlaceSearchInput({
   className?: string;
   autoFocus?: boolean;
   value?: string;
+  searchIconPosition?: "left" | "right";
 }) {
   const [internalQuery, setInternalQuery] = useState(value ?? "");
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
@@ -120,8 +123,10 @@ export function PlaceSearchInput({
 
   return (
     <div className={`relative ${className}`}>
-      <div className="flex items-center gap-2 rounded-xl border-2 border-border bg-surface px-3">
-        <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <div className="flex items-center gap-1.5 rounded-xl border-2 border-border bg-surface px-2">
+        {searchIconPosition === "left" && (
+          <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+        )}
         <input
           value={query}
           autoFocus={autoFocus}
@@ -155,18 +160,31 @@ export function PlaceSearchInput({
           <Loader2 className="size-4 shrink-0 animate-spin text-signal" aria-hidden />
         ) : (
           query && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => {
                 update("");
                 reset();
               }}
               aria-label="Clear search"
-              className="shrink-0 text-muted-foreground hover:text-foreground"
+              className="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
             >
               <X className="size-4" />
-            </button>
+            </Button>
           )
+        )}
+        {searchIconPosition === "right" && !busy && (
+          <Button
+            type="button"
+            size="icon"
+            onClick={submit}
+            aria-label="Search places"
+            className="size-9 shrink-0 rounded-full shadow-lg active:scale-95"
+          >
+            <Search className="size-4" aria-hidden />
+          </Button>
         )}
       </div>
 
