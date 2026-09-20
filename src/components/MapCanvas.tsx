@@ -69,7 +69,7 @@ export function MapCanvas({
   /** Hide Google's control when a screen provides its own compact selector. */
   showNativeMapTypeControl?: boolean;
   /** Optional Google style array to override the default base-map appearance. */
-  styles?: google.maps.MapTypeStyle[];
+  styles?: google.maps.MapTypeStyle[] | undefined;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
