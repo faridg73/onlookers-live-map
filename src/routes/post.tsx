@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyConditionIcon } from "@/components/BountyConditionIcon";
 import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyConditionIcon } from "@/components/BountyConditionIcon";
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { lockBounty, readWalletBalance, MIN_BOUNTY } from "@/lib/bounty-escrow";
 import {
