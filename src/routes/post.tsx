@@ -249,6 +249,7 @@ function PostScreen() {
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [liveDialog, setLiveDialog] = useState<{ title: string; credits: number; deadlineLabel: string } | null>(null);
   // What to pick back up once the overlay sign-in succeeds.
   const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
