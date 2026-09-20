@@ -200,10 +200,6 @@ export function MapCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewportStorageKey]);
 
-  useEffect(() => {
-    if (!ready || !map.current) return;
-    map.current.setOptions({ styles: styles ?? null });
-  }, [ready, styles]);
 
   useEffect(() => {
     if (!ready || !map.current || !mapTypeId) return;
