@@ -1225,23 +1225,6 @@ function MapScreen() {
             )}
           </div>
 
-          <nav aria-label="Legal" className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
-            {[
-              { label: "Terms", to: "/terms" },
-              { label: "Privacy", to: "/privacy" },
-              { label: "Copyright", to: "/copyright" },
-              { label: "Contact", to: "/contact" },
-            ].map(({ label, to }) => (
-              <Link
-                key={to}
-                to={to}
-                className="inline-flex min-h-11 items-center rounded-full px-3 text-xs font-semibold text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
-              >
-                {label}
-              </Link>
-            ))}
-            <span className="ml-auto text-[0.65rem] text-muted-foreground">© 2026 Onlooker</span>
-          </nav>
         </div>
 
       </section>
