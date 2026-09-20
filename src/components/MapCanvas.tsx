@@ -125,7 +125,7 @@ export function MapCanvas({
         restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
-          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId,
+          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
           mapTypeControl: showNativeMapTypeControl,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
           // Neighborhood-level default keeps aerial detail and hybrid labels
