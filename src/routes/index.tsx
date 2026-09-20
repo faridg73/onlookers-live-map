@@ -478,6 +478,7 @@ function MapScreen() {
           select(null);
         }}
         mapTypeId="hybrid"
+        showNativeMapTypeControl={false}
       />
 
       <button
