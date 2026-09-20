@@ -53,7 +53,7 @@ export function HomeLiveStage({
               </span>
               The city is live
             </p>
-            <div className="flex items-center gap-2 text-[0.6rem] font-bold uppercase text-muted-foreground sm:text-[0.7rem]">
+            <div className="hidden items-center gap-2 text-[0.6rem] font-bold uppercase text-muted-foreground md:flex md:text-[0.7rem]">
               <span>{liveCount} live</span>
               <span className="text-border">/</span>
               <span>{emergencyCount} alerts</span>
