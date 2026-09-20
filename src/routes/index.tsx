@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { MapCanvas } from "@/components/MapCanvas";
+import { HIDE_LABELS_MAP_STYLE } from "@/lib/map-style";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
