@@ -18,3 +18,18 @@ export const SHARED_MAP_OPTIONS: google.maps.MapOptions = {
   },
 };
 
+/**
+ * Home default: aerial imagery with every Google label layer hidden (roads,
+ * places, businesses, transit) so only Onlooker pins are visible. Toggled
+ * back on from the Home map's Labels checkbox.
+ */
+export const HIDE_LABELS_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "poi.business", stylers: [{ visibility: "off" }] },
+  { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "road", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { featureType: "landscape", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] },
+];
+

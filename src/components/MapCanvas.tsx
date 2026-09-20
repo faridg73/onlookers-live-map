@@ -206,6 +206,13 @@ export function MapCanvas({
     map.current.setMapTypeId(mapTypeId);
   }, [mapTypeId, ready]);
 
+  // Keep the base-map style in sync so screens with a labels toggle can
+  // flip Google's label layers on and off after the map has booted.
+  useEffect(() => {
+    if (!ready || !map.current) return;
+    map.current.setOptions({ styles: styles ?? null });
+  }, [ready, styles]);
+
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
 
