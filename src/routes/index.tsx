@@ -274,7 +274,7 @@ function MapScreen() {
   const navigate = useNavigate();
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [scannerNotice, setScannerNotice] = useState(false);
@@ -329,6 +329,8 @@ function MapScreen() {
   );
   const dragStartY = useRef<number | null>(null);
   const drawerDragged = useRef(false);
+  const [drawerDragOffset, setDrawerDragOffset] = useState(0);
+  const [drawerDragging, setDrawerDragging] = useState(false);
   const homeStateRestored = useRef(false);
   const drawerScrollRef = useSessionElementScroll<HTMLDivElement>("onlooker:scroll:home-drawer");
 
@@ -338,10 +340,13 @@ function MapScreen() {
   useEffect(() => {
     const saved = readSessionState<{
       drawerOpen?: boolean;
+      sheetVersion?: number;
       mapFilter?: "all" | "live" | "nearby" | "high";
       categoryTile?: string | null;
     }>("onlooker:view:home", {});
-    if (typeof saved.drawerOpen === "boolean") setDrawerOpen(saved.drawerOpen);
+    if (saved.sheetVersion === 2 && typeof saved.drawerOpen === "boolean") {
+      setDrawerOpen(saved.drawerOpen);
+    }
     if (saved.mapFilter === "all" || saved.mapFilter === "live" || saved.mapFilter === "nearby" || saved.mapFilter === "high") {
       setMapFilter(saved.mapFilter);
     }
@@ -353,7 +358,7 @@ function MapScreen() {
 
   useEffect(() => {
     if (!homeStateRestored.current) return;
-    writeSessionState("onlooker:view:home", { drawerOpen, mapFilter, categoryTile });
+    writeSessionState("onlooker:view:home", { drawerOpen, sheetVersion: 2, mapFilter, categoryTile });
   }, [drawerOpen, mapFilter, categoryTile]);
 
   // Send expired, unfulfilled deposits back to their requesters.
@@ -389,8 +394,10 @@ function MapScreen() {
     if (dragStartY.current === null) return;
     const distance = clientY - dragStartY.current;
     drawerDragged.current = Math.abs(distance) > 12;
-    if (Math.abs(distance) > 36) setDrawerOpen(distance < 0);
+    if (Math.abs(distance) > 42) setDrawerOpen(distance < 0);
     dragStartY.current = null;
+    setDrawerDragOffset(0);
+    setDrawerDragging(false);
   }, []);
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
@@ -666,8 +673,17 @@ function MapScreen() {
       />
 
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${mapExpanded ? "hidden" : drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
-        aria-label="Map actions"
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-[55] mx-auto flex h-[min(70dvh,42rem)] w-full flex-col overflow-hidden rounded-t-xl border border-b-0 border-border bg-surface/95 shadow-2xl backdrop-blur-xl will-change-transform sm:inset-x-auto sm:right-5 sm:w-[25rem] ${mapExpanded ? "hidden" : ""} ${drawerDragging ? "transition-none" : "transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0"} ${drawerOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)]"}`}
+        style={
+          drawerDragOffset === 0
+            ? undefined
+            : {
+                transform: drawerOpen
+                  ? `translateY(${Math.max(0, drawerDragOffset)}px)`
+                  : `translateY(calc(100% - 4rem + ${Math.min(0, drawerDragOffset)}px))`,
+              }
+        }
+        aria-label="Explore Nearby categories"
       >
         <Button
           type="button"
@@ -684,27 +700,42 @@ function MapScreen() {
           onPointerDown={(event) => {
             dragStartY.current = event.clientY;
             drawerDragged.current = false;
+            setDrawerDragging(true);
             event.currentTarget.setPointerCapture(event.pointerId);
           }}
           onPointerMove={(event) => {
-            if (dragStartY.current !== null && Math.abs(event.clientY - dragStartY.current) > 12) {
-              drawerDragged.current = true;
-            }
+            if (dragStartY.current === null) return;
+            const distance = event.clientY - dragStartY.current;
+            if (Math.abs(distance) > 12) drawerDragged.current = true;
+            setDrawerDragOffset(drawerOpen ? Math.max(0, distance) : Math.min(0, distance));
           }}
           onPointerUp={(event) => finishDrawerDrag(event.clientY)}
           onPointerCancel={() => {
             dragStartY.current = null;
+            setDrawerDragOffset(0);
+            setDrawerDragging(false);
           }}
-          className="flex h-12 w-full shrink-0 touch-none flex-col items-center justify-center gap-1 rounded-none text-foreground hover:bg-surface-raised"
+          className="group flex h-16 w-full shrink-0 touch-none items-center justify-between rounded-none border-b border-border/70 px-4 text-foreground hover:bg-surface-raised"
         >
-          <span className="h-1 w-10 rounded-full bg-muted-foreground/55" aria-hidden />
-          <span className="flex w-full items-center justify-between px-4 text-xs font-extrabold uppercase tracking-[0.1em]">
-            Explore nearby
-            <ChevronDown className={`size-4 text-signal transition-transform ${drawerOpen ? "rotate-180" : ""}`} />
+          <span className="flex min-w-0 items-center gap-3 text-left">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-signal/10 shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_28%,transparent)]" aria-hidden>
+              <Map className="size-4 text-signal" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xs font-extrabold uppercase tracking-[0.1em]">Explore nearby</span>
+              <span className="block text-[0.68rem] font-bold text-muted-foreground">17 live categories</span>
+            </span>
+          </span>
+          <span className="grid size-10 shrink-0 place-items-center rounded-full border border-signal bg-signal text-signal-foreground shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_48%,transparent)] transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none">
+            <ChevronDown className={`size-5 transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0 ${drawerOpen ? "rotate-180" : ""}`} />
           </span>
         </Button>
 
-        <div ref={drawerScrollRef} className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
+        <div
+          ref={drawerScrollRef}
+          aria-hidden={!drawerOpen}
+          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] transition-opacity duration-300 motion-reduce:duration-0 ${drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        >
 
           <div className="border-t border-border py-3">
             <div className={`grid grid-cols-3 gap-2 ${activeCategoryTile ? "hidden" : ""}`} aria-label="Map categories">
