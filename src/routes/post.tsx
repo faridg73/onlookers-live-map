@@ -118,12 +118,11 @@ import {
 export const Route = createFileRoute("/post")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { mystery?: "1"; mode?: "broadcast" | "bounty"; focus?: "reward" } => ({
+  ): { mystery?: "1"; mode?: "broadcast" | "bounty" } => ({
     ...(search["mystery"] === "1" ? { mystery: "1" as const } : {}),
     ...(search["mode"] === "broadcast" || search["mode"] === "bounty"
       ? { mode: search["mode"] as "broadcast" | "bounty" }
       : {}),
-    ...(search["focus"] === "reward" ? { focus: "reward" as const } : {}),
   }),
   head: () => ({
     meta: [
@@ -228,13 +227,11 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
-  const { mystery, mode: initialMode, focus } = Route.useSearch();
-  /** True when the visitor jumped straight to the reward tiers before describing the bounty. */
-  const rewardFirst = focus === "reward" && initialMode === "bounty";
+  const { mystery, mode: initialMode } = Route.useSearch();
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
-  const [step, setStep] = useState<1 | 2 | 3>(rewardFirst ? 3 : 1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const formScrollRef = useRef<HTMLDivElement | null>(null);
   /** Every step change (and the first landing) starts the form scrolled to the top. */
   useEffect(() => {
@@ -340,7 +337,7 @@ function PostScreen() {
   }, []);
 
   useEffect(() => {
-    if (mode !== "bounty" || rewardFirst) return;
+    if (mode !== "bounty") return;
     try {
       if (window.localStorage.getItem("onlooker:bounty-introduction-hidden") !== "1") {
         setFirstPostGuideOpen(true);
@@ -348,7 +345,7 @@ function PostScreen() {
     } catch {
       setFirstPostGuideOpen(true);
     }
-  }, [mode, rewardFirst]);
+  }, [mode]);
 
   useEffect(() => {
     if (mystery !== "1") return;
