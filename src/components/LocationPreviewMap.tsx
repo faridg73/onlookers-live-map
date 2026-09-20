@@ -190,7 +190,7 @@ export function LocationPreviewMap({ address, selectedLocation, onPick, compact 
       <div className="border-t border-border px-3 py-3">
         <div className="flex items-start gap-2">
           <MapPin className="mt-0.5 size-4 shrink-0 text-signal" />
-          <p className="text-xs font-semibold text-foreground/80">
+          <p className="text-xs font-semibold text-foreground">
             {status ?? pinned?.formatted ?? "Search above, tap the map, or drag the pin to the exact spot."}
           </p>
         </div>

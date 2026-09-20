@@ -61,7 +61,7 @@ export function VideoRecorder({
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-black">
       <div className="flex items-center justify-between px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/80">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">
           Camera · max {MAX_CLIP_SECONDS}s
         </p>
         <button
@@ -77,12 +77,12 @@ export function VideoRecorder({
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 text-center">
         {isMobile ? (
           <>
-            <Video className="size-10 text-white/70" />
+            <Video className="size-10 text-white" />
             <p className="text-sm font-semibold text-white">
               Tap open camera and your phone's camera app takes over, so the clip keeps its full
               quality.
             </p>
-            <p className="text-xs text-white/60">Film it, then tap use or done to send it here.</p>
+            <p className="text-xs text-white">Film it, then tap use or done to send it here.</p>
           </>
         ) : (
           <div className="w-full max-w-md text-left">

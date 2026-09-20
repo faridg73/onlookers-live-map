@@ -105,7 +105,7 @@ export function BountyAmountPicker({
         </p>
       )}
       {!tooLow && !shortFall && (
-        <p className="text-xs font-medium text-foreground/70">
+        <p className="text-xs font-medium text-foreground">
           {formatCredits(Number.isFinite(value) ? value : 0)} ({formatCreditCash(value)} value) is held
           from your credit wallet until the request is fulfilled, cancelled, or expires.
           {balance != null && ` Balance: ${formatCredits(balance)}.`}

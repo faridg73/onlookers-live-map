@@ -47,7 +47,7 @@ export function BountyNoteDetails({ note, className = "" }: { note: string; clas
               <p className="text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
                 {row.label}
               </p>
-              <p className="text-sm leading-relaxed text-foreground/90">{row.value}</p>
+              <p className="text-sm leading-relaxed text-foreground">{row.value}</p>
             </div>
           </li>
         );

@@ -116,7 +116,7 @@ export function RequestCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-foreground/70">
+          <div className="flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-foreground">
             <span
               className={cn(
                 "inline-flex items-center gap-1.5 font-bold",
@@ -134,7 +134,7 @@ export function RequestCard({
             <span>{formatAgo(request.minutesAgo)}</span>
           </div>
           <h3 className="mt-2 font-display text-lg font-bold leading-tight text-foreground">{request.title}</h3>
-          <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-foreground/70">
+          <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-foreground">
             <MapPin className="size-3.5" /> {request.place}
           </p>
         </div>

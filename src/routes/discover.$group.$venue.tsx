@@ -154,7 +154,7 @@ function VenueScreen() {
           {place.ratingCount ? ` · ${place.ratingCount} reviews` : ""}
         </p>
       )}
-      <p className="mt-2 text-sm text-foreground/80">{venue.blurb}</p>
+      <p className="mt-2 text-sm text-foreground">{venue.blurb}</p>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border">
         <LocationPreviewMap address={`${venue.name}, ${venue.area}`} />
