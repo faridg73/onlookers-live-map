@@ -69,7 +69,7 @@ export function MapCanvas({
   /** Hide Google's control when a screen provides its own compact selector. */
   showNativeMapTypeControl?: boolean;
   /** Optional Google style array to override the default base-map appearance. */
-  styles?: google.maps.MapTypeStyle[];
+  styles?: google.maps.MapTypeStyle[] | undefined;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -205,6 +205,13 @@ export function MapCanvas({
     if (!ready || !map.current || !mapTypeId) return;
     map.current.setMapTypeId(mapTypeId);
   }, [mapTypeId, ready]);
+
+  // Keep the base-map style in sync so screens with a labels toggle can
+  // flip Google's label layers on and off after the map has booted.
+  useEffect(() => {
+    if (!ready || !map.current) return;
+    map.current.setOptions({ styles: styles ?? null });
+  }, [ready, styles]);
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
