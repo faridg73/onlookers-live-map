@@ -303,7 +303,7 @@ export function HomeLiveStage({
                         </span>
                       </Button>
                       <Button type="button" variant={openFeed === "bounty" ? "default" : "outline"} onClick={() => openFeed && openItem(openFeed, request)} className="h-8 shrink-0 rounded-full px-3 text-[0.65rem] font-extrabold uppercase">
-                        {openFeed === "bounty" ? "Hunt" : openFeed === "stream" ? "Watch" : "View"}
+                        {openFeed === "bounty" && request.status === "open" ? "Hunt" : openFeed === "stream" ? "Watch" : "View"}
                       </Button>
                     </div>
                   ))}
