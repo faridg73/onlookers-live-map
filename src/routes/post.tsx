@@ -269,6 +269,8 @@ function PostScreen() {
   const [placeCategoryId, setPlaceCategoryId] = useState<PlaceCategoryId | null>(null);
   /** The main category the subcategory list hangs off (17 in total). */
   const [mainCategoryId, setMainCategoryId] = useState<MainCategoryId>("breaking-incidents");
+  /** Search tags the requester switched on, used for search, map and feed matching. */
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
 
   const [balance, setBalance] = useState<number | null>(null);
