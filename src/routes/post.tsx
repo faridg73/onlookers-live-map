@@ -114,8 +114,12 @@ import {
 } from "@/lib/request-intent";
 
 export const Route = createFileRoute("/post")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "1" } =>
-    search["mystery"] === "1" ? { mystery: "1" } : {},
+  validateSearch: (search: Record<string, unknown>): { mystery?: "1"; mode?: "broadcast" | "bounty" } => ({
+    ...(search["mystery"] === "1" ? { mystery: "1" as const } : {}),
+    ...(search["mode"] === "broadcast" || search["mode"] === "bounty"
+      ? { mode: search["mode"] as "broadcast" | "bounty" }
+      : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Post a Live Request | Onlooker" },
@@ -219,10 +223,10 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
-  const { mystery } = Route.useSearch();
+  const { mystery, mode: initialMode } = Route.useSearch();
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
-  const [mode, setMode] = useState<"broadcast" | "bounty" | null>(null);
+  const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
