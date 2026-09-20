@@ -199,3 +199,9 @@ Home Events & Arts neon category artwork
 - [x] Map helper text, placeholders, and examples to all 17 categories
 - [x] Refine examples immediately when a subcategory changes
 - [x] Fade updated guidance in while respecting reduced-motion settings
+
+## Platform-wide hybrid aerial maps
+- [x] Default Home, Discover, feed, report, and location maps to Google hybrid aerial imagery
+- [x] Keep road and place labels visible over satellite photography
+- [x] Preserve map gestures, markers, app controls, and interactive map-type switching
+- [x] Verify Home and Discover maps on phone and desktop without browser errors
