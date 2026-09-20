@@ -476,7 +476,8 @@ function MapScreen() {
           setDrawerOpen(true);
           select(null);
         }}
-        mapTypeId="hybrid"
+        mapTypeId="roadmap"
+        styles={HIDE_LABELS_MAP_STYLE}
         showNativeMapTypeControl={false}
       />
 

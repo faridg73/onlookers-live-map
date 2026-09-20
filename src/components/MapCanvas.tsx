@@ -42,6 +42,7 @@ export function MapCanvas({
   onGatheringClusterSelect,
   viewportStorageKey,
   mapTypeId,
+  styles,
   showNativeMapTypeControl = true,
 }: {
   requests: LiveRequest[];
@@ -65,6 +66,8 @@ export function MapCanvas({
   viewportStorageKey?: string;
   /** Optional controlled base-map style for screens with app-owned controls. */
   mapTypeId?: "hybrid" | "satellite" | "roadmap";
+  /** Optional Google style array, e.g. the dark label-free Home base map. */
+  styles?: google.maps.MapTypeStyle[];
   /** Hide Google's control when a screen provides its own compact selector. */
   showNativeMapTypeControl?: boolean;
 }) {
@@ -127,6 +130,7 @@ export function MapCanvas({
           ...SHARED_MAP_OPTIONS,
           mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
           mapTypeControl: showNativeMapTypeControl,
+          styles,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
           // Neighborhood-level default keeps aerial detail and hybrid labels
           // legible while preserving the existing nearby marker density.
@@ -195,6 +199,11 @@ export function MapCanvas({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewportStorageKey]);
+
+  useEffect(() => {
+    if (!ready || !map.current) return;
+    map.current.setOptions({ styles: styles ?? null });
+  }, [ready, styles]);
 
   useEffect(() => {
     if (!ready || !map.current || !mapTypeId) return;
