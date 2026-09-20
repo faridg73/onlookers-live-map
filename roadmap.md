@@ -217,4 +217,4 @@ Home Events & Arts neon category artwork
 - [x] Replace overlapping native controls with one low-profile glass pill
 - [x] Keep Satellite and Map switching interactive
 - [x] Move the search action to the right and protect map-edge spacing
-- [ ] Verify the toolbar on phone and desktop
+- [x] Verify the toolbar on phone and desktop
