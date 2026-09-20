@@ -46,6 +46,7 @@ import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
+import { BountyLiveDialog } from "@/components/BountyLiveDialog";
 import { SignInDialog } from "@/components/SignInDialog";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -248,6 +249,7 @@ function PostScreen() {
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [liveDialog, setLiveDialog] = useState<{ title: string; credits: number; deadlineLabel: string } | null>(null);
   // What to pick back up once the overlay sign-in succeeds.
   const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -696,10 +698,7 @@ function PostScreen() {
       const deadlineLabel = customDeadline
         ? format(customDeadline, "MMM d, h:mm a")
         : (DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`);
-      toast.success("Request is live", {
-        description: `${total} Credits held in escrow. Expires ${customDeadline ? "at" : "in"} ${deadlineLabel} if nobody claims it.`,
-      });
-      await navigate({ to: "/feed" });
+      setLiveDialog({ title: title.trim(), credits: total, deadlineLabel });
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message === BLOCKED_REQUEST_MESSAGE) setModerationOpen(true);
@@ -1552,6 +1551,19 @@ function PostScreen() {
         onOpenChange={setFirstPostGuideOpen}
       />
       <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
+
+      <BountyLiveDialog
+        open={liveDialog !== null}
+        onOpenChange={(next) => {
+          if (!next) {
+            setLiveDialog(null);
+            void navigate({ to: "/feed" });
+          }
+        }}
+        title={liveDialog?.title ?? ""}
+        credits={liveDialog?.credits ?? total}
+        deadlineLabel={liveDialog?.deadlineLabel ?? ""}
+      />
 
       <SignInDialog
         open={signInOpen}
