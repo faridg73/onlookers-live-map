@@ -110,9 +110,10 @@ export function HomeLiveStage({
           {[...trends, ...trends].map((trend, index) => {
             const Icon = trend.icon;
             return (
-              <button
+              <Button
                 key={`${trend.key}-${index}`}
                 type="button"
+                variant="outline"
                 onClick={() => trend.request && onOpenRequest(trend.request)}
                 disabled={!trend.request}
                 className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border bg-background/85 px-3 text-[0.65rem] font-extrabold uppercase transition-colors enabled:hover:bg-surface-raised disabled:opacity-55 ${trend.tone}`}
@@ -120,7 +121,7 @@ export function HomeLiveStage({
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
                 {trend.request && <span className="text-foreground">· {trend.key === "bounty" ? `${poolOf(trend.request)} cr` : trend.request.place}</span>}
-              </button>
+              </Button>
             );
           })}
         </div>
