@@ -324,6 +324,9 @@ function PostScreen() {
 
   const total = quote.total + (Number.isFinite(tip) ? tip : 0);
 
+  /** Whether the bounty description is complete enough to lock escrow. */
+  const detailsReady = note.trim().length >= 10;
+
   useEffect(() => {
     void readWalletBalance().then(setBalance);
     setRecent(readRecentPlaces());
