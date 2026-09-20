@@ -1215,16 +1215,6 @@ function MapScreen() {
           </nav>
         </div>
 
-        <div className="shrink-0 border-t border-border bg-surface px-4 py-3">
-          <Button
-            type="button"
-            onClick={() => void navigate({ to: "/post" })}
-            className="h-12 w-full justify-center rounded-md bg-signal px-4 text-signal-foreground shadow-[0_0_24px_0_color-mix(in_oklab,var(--color-signal)_38%,transparent)] transition-colors hover:bg-signal/90"
-          >
-            <CircleDollarSign className="size-5" />
-            <span className="text-sm font-extrabold uppercase tracking-[0.08em]">Post a Bounty</span>
-          </Button>
-        </div>
       </section>
 
 
