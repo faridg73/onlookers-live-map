@@ -1552,6 +1552,19 @@ function PostScreen() {
       />
       <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
 
+      <BountyLiveDialog
+        open={liveDialog !== null}
+        onOpenChange={(next) => {
+          if (!next) {
+            setLiveDialog(null);
+            void navigate({ to: "/feed" });
+          }
+        }}
+        title={liveDialog?.title ?? ""}
+        credits={liveDialog?.credits ?? total}
+        deadlineLabel={liveDialog?.deadlineLabel ?? ""}
+      />
+
       <SignInDialog
         open={signInOpen}
         onOpenChange={(next) => {
