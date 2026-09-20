@@ -211,4 +211,4 @@ Home Events & Arts neon category artwork
 - [x] Keep Onlooker LLC only in legal notices, copyright, FAQ, Terms, Privacy, and required policy copy
 - [x] Change the Home top-right logo to Onlooker
 - [x] Reduce custom map zoom control sizes across the platform
-- [ ] Verify key pages and map controls on phone and desktop
+- [x] Verify key pages and map controls on phone and desktop
