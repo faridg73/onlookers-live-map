@@ -15,7 +15,5 @@ export const SHARED_MAP_OPTIONS: google.maps.MapOptions = {
   mapTypeControl: true,
   mapTypeControlOptions: {
     mapTypeIds: ["hybrid", "satellite", "roadmap"],
-    position: google.maps.ControlPosition.TOP_RIGHT,
-    style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
   },
 };
