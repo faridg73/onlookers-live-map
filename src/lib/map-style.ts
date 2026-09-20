@@ -31,5 +31,8 @@ export const HIDE_LABELS_MAP_STYLE: google.maps.MapTypeStyle[] = [
   { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
   { featureType: "landscape", elementType: "labels", stylers: [{ visibility: "off" }] },
   { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative.neighborhood", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative.locality", elementType: "labels", stylers: [{ visibility: "off" }] },
+  { featureType: "administrative.land_parcel", elementType: "labels", stylers: [{ visibility: "off" }] },
 ];
 
