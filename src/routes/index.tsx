@@ -293,6 +293,36 @@ function MapScreen() {
   const [labelsVisible, setLabelsVisible] = useState(false);
   // Compact app-owned base-map switcher (Satellite = hybrid aerial, Map = roadmap).
   const [homeMapType, setHomeMapType] = useState<"hybrid" | "roadmap">("hybrid");
+  // Expandable magnifier search: icon collapses into a place/category search field.
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchPick = useCallback((place: GeocodeResult) => {
+    setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+    setSearchOpen(false);
+    setSearchQuery("");
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  }, []);
+
+  const searchCategoryMatches = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (q.length < 2) return [];
+    return MAP_CATEGORY_TILES.filter((tile) => tile.label.toLowerCase().includes(q))
+      .slice(0, 3)
+      .map((tile) => ({
+        id: `category-${tile.id}`,
+        text: `Filter map: ${tile.label}`,
+        onSelect: () => {
+          setCategoryTile(tile.id);
+          setDrawerOpen(true);
+          closeSearch();
+        },
+      }));
+  }, [searchQuery, closeSearch]);
   const activeHome = useMemo(
     () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
     [requests],
