@@ -59,7 +59,12 @@ export function BountyAmountPicker({
                   {tag}
                 </span>
               )}
-              <span className="block font-display text-xl font-extrabold leading-none tabular-nums">
+              <span className="flex items-center justify-center gap-1 font-display text-xl font-extrabold leading-none tabular-nums">
+                <CoinsIcon
+                  className={cn("size-3.5", !on && "text-signal")}
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
                 {amount}
               </span>
               <span className="mt-0.5 block text-[0.55rem] font-bold uppercase tracking-[0.14em] opacity-70">
