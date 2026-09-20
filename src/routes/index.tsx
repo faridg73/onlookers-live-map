@@ -525,7 +525,7 @@ function MapScreen() {
           onClick={() => setMapExpanded((value) => !value)}
           aria-pressed={mapExpanded}
           aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
-          className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal"
+          className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110"
         >
           {mapExpanded ? (
             <Minimize2 className="size-4" aria-hidden />
@@ -560,7 +560,7 @@ function MapScreen() {
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="Search places or categories"
-            className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal"
+            className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110"
           >
             <Search className="size-4" aria-hidden />
           </button>
