@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { MapCanvas } from "@/components/MapCanvas";
+import { HIDE_LABELS_MAP_STYLE } from "@/lib/map-style";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
 import { isGoldBounty } from "@/lib/bounty-tiers";
 import { useBoosts } from "@/lib/boosts-store";
@@ -495,6 +496,20 @@ function MapScreen() {
           <Maximize2 className="size-4" aria-hidden />
         )}
       </button>
+
+      <label className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.25rem)] z-[65] flex h-9 items-center gap-1.5 rounded-full border border-border bg-surface/90 px-2.5 shadow-md backdrop-blur-xl md:left-4">
+        <input
+          type="checkbox"
+          checked={labelsVisible}
+          onChange={(event) => setLabelsVisible(event.target.checked)}
+          aria-label="Show map labels"
+          className="size-3.5 accent-signal"
+        />
+        <span className="text-[0.6rem] font-extrabold uppercase tracking-[0.08em] text-foreground/80">
+          Labels
+        </span>
+      </label>
+
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
         <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
