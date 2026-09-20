@@ -1354,7 +1354,7 @@ function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }
               <p className="mt-1 text-xs text-muted-foreground">{body}</p>
               <ul className="mt-2.5 space-y-1.5">
                 {points.map((point) => (
-                  <li key={point} className="flex gap-2 text-xs text-foreground/85">
+                  <li key={point} className="flex gap-2 text-xs text-foreground">
                     <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-signal" />
                     <span>{point}</span>
                   </li>

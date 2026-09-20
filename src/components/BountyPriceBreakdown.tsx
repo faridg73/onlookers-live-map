@@ -6,7 +6,7 @@ import type { BountyQuote } from "@/lib/bounty-pricing";
 export function BountyPriceBreakdown({ quote }: { quote: BountyQuote }) {
   return (
     <div className="rounded-2xl border-2 border-border bg-surface-raised p-3">
-      <p className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+      <p className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
         <Receipt className="size-3.5 text-signal" />
         Cost breakdown
       </p>

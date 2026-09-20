@@ -42,7 +42,7 @@ export function BountyBriefBadges({
   if (!tier && !minutes && !start && weather <= 1 && !request.bountyType) return null;
 
   const chip = cn(
-    "inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-raised font-bold uppercase tracking-[0.1em] text-foreground/80",
+    "inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-raised font-bold uppercase tracking-[0.1em] text-foreground",
     compact ? "px-2 py-0.5 text-[0.58rem]" : "px-2.5 py-1 text-[0.65rem]",
   );
   const icon = compact ? "size-3" : "size-3.5";

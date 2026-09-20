@@ -117,7 +117,7 @@ export function LiveBroadcastStage({
         <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-red-400">
           <Radio className="size-3" /> capture
         </span>
-        <span className="ml-auto truncate text-xs font-medium text-white/70">{place}</span>
+        <span className="ml-auto truncate text-xs font-medium text-white">{place}</span>
         <button
           type="button"
           aria-label="Close capture"
@@ -131,12 +131,12 @@ export function LiveBroadcastStage({
 
       <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
         {saving ? (
-          <Loader2 className="size-9 animate-spin text-white/80" />
+          <Loader2 className="size-9 animate-spin text-white" />
         ) : (
-          <Video className="size-10 text-white/70" />
+          <Video className="size-10 text-white" />
         )}
         <p className="text-sm font-extrabold text-white">{title}</p>
-        <p className="text-xs leading-relaxed text-white/65">
+        <p className="text-xs leading-relaxed text-white">
           {saving
             ? "Saving your clip…"
             : isMobile
@@ -152,7 +152,7 @@ export function LiveBroadcastStage({
           </div>
         )}
         {instructions?.trim() && (
-          <p className="rounded-xl border border-signal/40 bg-black/60 px-3 py-2 text-[0.7rem] font-medium leading-snug text-white/85">
+          <p className="rounded-xl border border-signal/40 bg-black/60 px-3 py-2 text-[0.7rem] font-medium leading-snug text-white">
             <span className="font-extrabold text-signal">Instructions: </span>
             {instructions.trim()}
           </p>

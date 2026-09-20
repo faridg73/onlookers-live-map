@@ -217,7 +217,7 @@ function ControlCenter() {
                   ) : null}
                 </div>
                 {flag.details ? (
-                  <p className="mt-2 line-clamp-3 text-xs text-foreground/80">{flag.details}</p>
+                  <p className="mt-2 line-clamp-3 text-xs text-foreground">{flag.details}</p>
                 ) : null}
                 {flag.matched_terms.length > 0 ? (
                   <div className="mt-2 flex flex-wrap gap-1.5">

@@ -285,7 +285,7 @@ export function VenueBountyDialog({
           </div>
 
           <label className="block space-y-1.5">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               Title
             </span>
             <input
@@ -299,7 +299,7 @@ export function VenueBountyDialog({
           </label>
 
           <label className="block space-y-1.5">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               Camera instructions
             </span>
             <textarea
@@ -314,7 +314,7 @@ export function VenueBountyDialog({
           </label>
 
           <div className="space-y-2">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               {mode === "live" ? "Start window" : "Delivery deadline"}
             </span>
             <div className="flex flex-wrap gap-2">
@@ -351,7 +351,7 @@ export function VenueBountyDialog({
           </div>
 
           <div className="space-y-2">
-            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               {mode === "live" ? "Stream length" : "Clip length"}
             </span>
             <div className="flex flex-wrap gap-2">
@@ -396,7 +396,7 @@ export function VenueBountyDialog({
 
           {mode === "clip" && (
             <div className="space-y-2">
-              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
                 Recording start (optional)
               </span>
               <button
@@ -422,7 +422,7 @@ export function VenueBountyDialog({
           )}
 
           <div className="space-y-2">
-            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               <Zap className="size-3.5 text-signal" />
               Reward tier
             </span>
@@ -447,7 +447,7 @@ export function VenueBountyDialog({
 
           {tierById(tier).baseCredits === null && (
             <div className="space-y-2">
-              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+              <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
                 Base reward
               </span>
               <BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} />
@@ -455,7 +455,7 @@ export function VenueBountyDialog({
           )}
 
           <div className="space-y-2">
-            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="flex items-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               <CloudRain className="size-3.5 text-signal" />
               Filming conditions
             </span>

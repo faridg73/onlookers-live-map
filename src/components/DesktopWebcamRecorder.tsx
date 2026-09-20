@@ -132,15 +132,15 @@ export function DesktopWebcamRecorder({
           className={`aspect-video w-full object-cover ${state === "idle" || state === "failed" ? "opacity-0" : ""}`}
         />
         {state === "idle" && (
-          <p className="absolute inset-0 grid place-items-center px-4 text-center text-xs text-white/60">
+          <p className="absolute inset-0 grid place-items-center px-4 text-center text-xs text-white">
             Your computer's webcam will appear here once you start it.
           </p>
         )}
         {state === "failed" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
-            <CameraOff className="size-8 text-white/50" />
+            <CameraOff className="size-8 text-white" />
             <p className="text-xs font-semibold text-white">Your camera couldn't be opened.</p>
-            <p className="text-[0.7rem] leading-relaxed text-white/60">
+            <p className="text-[0.7rem] leading-relaxed text-white">
               Check that your browser is allowed to use the camera (the padlock icon in the address
               bar), close other apps using the webcam, then retry — or choose a video file instead.
             </p>

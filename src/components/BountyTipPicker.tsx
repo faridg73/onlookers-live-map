@@ -72,7 +72,7 @@ export function BountyTipPicker({
         />
       </div>
 
-      <p className="flex items-start gap-2 text-xs font-medium text-foreground/75">
+      <p className="flex items-start gap-2 text-xs font-medium text-foreground">
         <CoinsIcon className="mt-0.5 size-4 shrink-0 text-signal" />
         <span>
           Optional tip in Credits from your wallet. It rides along with the reward, shows as

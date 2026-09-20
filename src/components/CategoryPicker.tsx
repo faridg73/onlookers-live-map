@@ -107,7 +107,7 @@ export function CategoryPicker({
               <span
                 className={cn(
                   "text-[0.68rem] font-extrabold leading-tight tracking-tight",
-                  on ? "text-foreground" : "text-foreground/80",
+                  on ? "text-foreground" : "text-foreground",
                 )}
               >
                 {c.short}
@@ -135,7 +135,7 @@ export function CategoryPicker({
                     "inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[0.72rem] font-bold transition-colors",
                     on
                       ? "border-signal bg-signal text-signal-foreground"
-                      : "border-border bg-surface-raised text-foreground/80",
+                      : "border-border bg-surface-raised text-foreground",
                   )}
                 >
                   {on && <Check className="size-3" strokeWidth={3.2} aria-hidden />}

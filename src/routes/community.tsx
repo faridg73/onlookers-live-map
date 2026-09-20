@@ -516,7 +516,7 @@ function CommunityHub() {
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                 <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
                   <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
-                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground/75">{c.blurb}</small></span>
+                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground">{c.blurb}</small></span>
                 </span>
               </button>
             );
