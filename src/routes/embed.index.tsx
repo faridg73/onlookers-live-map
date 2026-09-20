@@ -6,18 +6,18 @@ import { listEmbedMarkers } from "@/lib/embed.functions";
 
 const SITE = "https://onlookerlive.com";
 
-/** Iframe-friendly board of every active Onlooker LLC feed, for external sites. */
+/** Iframe-friendly board of every active Onlooker feed, for external sites. */
 export const Route = createFileRoute("/embed/")({
   loader: () => listEmbedMarkers(),
   head: () => ({
     meta: [
-      { title: "Onlooker LLC live map, embed" },
+      { title: "Onlooker live map, embed" },
       {
         name: "description",
-        content: "Embeddable board of active Onlooker LLC live views around the world.",
+        content: "Embeddable board of active Onlooker live views around the world.",
       },
-      { property: "og:title", content: "Onlooker LLC live map, embed" },
-      { property: "og:description", content: "Active Onlooker LLC live views around the world." },
+      { property: "og:title", content: "Onlooker live map, embed" },
+      { property: "og:description", content: "Active Onlooker live views around the world." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -35,7 +35,7 @@ function EmbedBoard() {
             <Zap className="size-3.5" strokeWidth={2.4} />
           </span>
           <span className="font-display text-sm tracking-tight text-foreground">
-            Onlooker LLC live views
+            Onlooker live views
           </span>
           <a
             href={SITE}
@@ -73,7 +73,7 @@ function EmbedBoard() {
           </div>
         )}
         <p className="mt-4 text-center text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
-          Powered by Onlooker LLC · #Onlooker
+          Powered by Onlooker · #Onlooker
         </p>
       </div>
     </div>

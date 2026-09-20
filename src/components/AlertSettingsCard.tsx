@@ -111,7 +111,7 @@ export function AlertSettingsCard() {
           loading: false,
           registered: true,
           message:
-            "Alerts are on for this device. Background alerts while the app is fully closed are coming soon. Keep Onlooker LLC open or add it to your home screen for the fastest pings.",
+            "Alerts are on for this device. Background alerts while the app is fully closed are coming soon. Keep Onlooker open or add it to your home screen for the fastest pings.",
         });
         set("push_enabled", true);
         toast.success("Device alerts enabled");
@@ -119,9 +119,9 @@ export function AlertSettingsCard() {
         setPushState({
           loading: false,
           registered: false,
-          message: "Open Onlooker LLC in its own tab (or from your home screen) to allow notifications.",
+          message: "Open Onlooker in its own tab (or from your home screen) to allow notifications.",
         });
-        toast("Open Onlooker LLC in its own tab to allow notifications", { icon: "🔔" });
+        toast("Open Onlooker in its own tab to allow notifications", { icon: "🔔" });
       } else if (fallback.status === "unsupported") {
         setPushState({
           loading: false,
@@ -164,7 +164,7 @@ export function AlertSettingsCard() {
         toast.error("Notification permission denied");
       } else if (result.status === "open-in-new-tab") {
         setPushState({ loading: false, registered: false, message: "Open the app in its own tab (not the Lovable preview iframe) to allow notification permission." });
-        toast("Open Onlooker LLC in its own tab to enable push alerts", { icon: "🔔" });
+        toast("Open Onlooker in its own tab to enable push alerts", { icon: "🔔" });
       } else if (result.status === "unsupported") {
         setPushState({ loading: false, registered: false, message: "This browser/device does not support Firebase push notifications." });
         toast.error("Push not supported on this device");

@@ -27,7 +27,7 @@ const GUIDE_STEPS = [
   {
     icon: Coins,
     label: "Fund it securely",
-    copy: "Your reward is held by Onlooker LLC while a nearby creator completes the bounty.",
+    copy: "Your reward is held by Onlooker while a nearby creator completes the bounty.",
   },
   {
     icon: ShieldCheck,
@@ -120,7 +120,7 @@ export function RealEstateSecurityDialog({ open, onOpenChange }: RealEstateSecur
 
         <div className="space-y-3 px-5 sm:px-7">
           {[
-            ["Escrow lock", "Onlooker LLC securely holds the bounty reward when the request goes live."],
+            ["Escrow lock", "Onlooker securely holds the bounty reward when the request goes live."],
             ["Private 6-digit PIN", "A unique code and claim link are sent to your authorized property contact."],
             ["On-site verification", "The creator must receive and enter the PIN at the property before capture and payout unlock."],
           ].map(([label, copy], index) => (

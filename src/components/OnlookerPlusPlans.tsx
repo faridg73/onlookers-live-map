@@ -18,7 +18,7 @@ import type { SubscriptionTier } from "@/lib/wallet-ledger";
 export function PlusMark({ className = "", label }: { className?: string; label?: string }) {
   return (
     <span className={`inline-flex items-baseline font-display tracking-tight ${className}`}>
-      Onlooker LLC
+      Onlooker
       <span className="text-signal">+</span>
       {label ? <span className="ml-1">{label}</span> : null}
     </span>

@@ -17,13 +17,13 @@ import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onloo
 export const Route = createFileRoute("/hunt")({
   head: () => ({
     meta: [
-      { title: "Hunter Dashboard, Earn on Onlooker LLC" },
+      { title: "Hunter Dashboard, Earn on Onlooker" },
       {
         name: "description",
         content:
           "See every open bounty near you with the payout, the time left and how far you have to walk.",
       },
-      { property: "og:title", content: "Hunter Dashboard, Earn on Onlooker LLC" },
+      { property: "og:title", content: "Hunter Dashboard, Earn on Onlooker" },
       {
         property: "og:description",
         content: "Open bounties near you with payout, time left and distance.",

@@ -27,13 +27,13 @@ import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 export const Route = createFileRoute("/discover/")({
   head: () => ({
     meta: [
-      { title: "Browse Places Near You | Onlooker LLC Views" },
+      { title: "Browse Places Near You | Onlooker Views" },
       {
         name: "description",
         content:
           "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a live view.",
       },
-      { property: "og:title", content: "Browse Places Near You | Onlooker LLC Views" },
+      { property: "og:title", content: "Browse Places Near You | Onlooker Views" },
       {
         property: "og:description",
         content:

@@ -18,7 +18,7 @@ const SLIDES = [
     alt: "Illustration representing ordinary video conversations",
   },
   {
-    step: "The Onlooker LLC network",
+    step: "The Onlooker network",
     title: "A real request, backed by locked credits",
     body: "Post a bounty for something happening in the real world. Your credits stay protected while an onlooker claims the request and captures what you asked to see.",
     art: creditsArt,

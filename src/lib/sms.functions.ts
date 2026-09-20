@@ -60,7 +60,7 @@ export async function textNearbyHunters(requestId: string, skipUserId: string): 
   const pin = { lat: Number(request.latitude), lng: Number(request.longitude) };
   const payout = Number(request.bounty_amount).toFixed(0);
   const category = request.category ? ` (${request.category})` : "";
-  const body = `Onlooker LLC: New bounty nearby! ${request.prompt} at ${request.location_name}${category}, $${payout}. Claim it: ${SITE_URL}/?b=${request.id}`;
+  const body = `Onlooker: New bounty nearby! ${request.prompt} at ${request.location_name}${category}, $${payout}. Claim it: ${SITE_URL}/?b=${request.id}`;
 
   let sent = 0;
   for (const location of locations ?? []) {
@@ -106,7 +106,7 @@ export const sendTestAlertText = createServerFn({ method: "POST" })
     const { sendSms } = await import("@/lib/sms.server");
     const result = await sendSms(
       data.phone,
-      "Onlooker LLC: your number is confirmed. You'll get a text the moment a bounty lands near you.",
+      "Onlooker: your number is confirmed. You'll get a text the moment a bounty lands near you.",
     );
     return result.ok ? { ok: true } : { ok: false, error: result.error };
   });

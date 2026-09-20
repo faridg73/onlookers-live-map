@@ -19,7 +19,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Onlooker LLC"
+const SITE_NAME = "Onlooker"
 const ROOT_DOMAIN = "onlookerlive.com"
 
 // Sample data for preview mode ONLY (not used in actual email sending).

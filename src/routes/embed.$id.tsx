@@ -23,16 +23,16 @@ export const Route = createFileRoute("/embed/$id")({
   }),
   head: ({ match }) => {
     const { place } = match.search as Search;
-    const heading = `Onlooker LLC live view${place ? `, ${place}` : ""}`;
+    const heading = `Onlooker live view${place ? `, ${place}` : ""}`;
     return {
       meta: [
         { title: heading },
         {
           name: "description",
-          content: "Embeddable Onlooker LLC live view card for news sites and blogs.",
+          content: "Embeddable Onlooker live view card for news sites and blogs.",
         },
         { property: "og:title", content: heading },
-        { property: "og:description", content: "Embeddable Onlooker LLC live view card." },
+        { property: "og:description", content: "Embeddable Onlooker live view card." },
         { name: "robots", content: "noindex" },
       ],
     };
@@ -56,14 +56,14 @@ function EmbedCard() {
           <span className="flex size-7 items-center justify-center rounded-lg bg-signal text-signal-foreground">
             <Zap className="size-3.5" strokeWidth={2.4} />
           </span>
-          <span className="font-display text-sm tracking-tight text-foreground">Onlooker LLC</span>
+          <span className="font-display text-sm tracking-tight text-foreground">Onlooker</span>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-red-500/15 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-red-400">
             <Radio className="size-3" /> live
           </span>
         </div>
         <div className="px-4 py-5">
           <h1 className="font-display text-xl leading-tight text-foreground">
-            {title ?? "Live view on Onlooker LLC"}
+            {title ?? "Live view on Onlooker"}
           </h1>
           {place && (
             <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -84,10 +84,10 @@ function EmbedCard() {
             rel="noopener noreferrer"
             className="mt-5 block rounded-full bg-signal px-4 py-2.5 text-center text-xs font-bold uppercase tracking-[0.12em] text-signal-foreground"
           >
-            Watch live on Onlooker LLC
+            Watch live on Onlooker
           </a>
           <p className="mt-3 text-center text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
-            Powered by Onlooker LLC · #Onlooker
+            Powered by Onlooker · #Onlooker
           </p>
         </div>
       </div>

@@ -10,7 +10,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "Onlooker LLC"
+const SITE_NAME = "Onlooker"
 const SENDER_DOMAIN = "notify.onlookerlive.com"
 const ROOT_DOMAIN = "onlookerlive.com"
 const FROM_DOMAIN = "onlookerlive.com"

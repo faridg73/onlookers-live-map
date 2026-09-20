@@ -9,13 +9,13 @@ import { submitSupportTicket } from "@/lib/support.functions";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Onlooker LLC Support" },
+      { title: "Contact Onlooker Support" },
       {
         name: "description",
         content:
-          "Get help with Onlooker LLC. Send a message to our support team or email us directly.",
+          "Get help with Onlooker. Send a message to our support team or email us directly.",
       },
-      { property: "og:title", content: "Contact Onlooker LLC Support" },
+      { property: "og:title", content: "Contact Onlooker Support" },
       {
         property: "og:description",
         content: "Get help with bounties, payouts, disputes, and account questions.",
@@ -110,7 +110,7 @@ function ContactScreen() {
           .
         </p>
         <a
-          href="mailto:support@onlookerlive.com?subject=Onlooker LLC%20Support%20Request"
+          href="mailto:support@onlookerlive.com?subject=Onlooker%20Support%20Request"
           className="mt-4 inline-flex items-center gap-2 rounded-full bg-signal px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground"
         >
           <Mail className="size-3.5" /> Open email app

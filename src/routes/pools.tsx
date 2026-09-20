@@ -28,13 +28,13 @@ import { fetchCreditWallet, formatCreditCash } from "@/lib/credits";
 export const Route = createFileRoute("/pools")({
   head: () => ({
     meta: [
-      { title: "Group Pools, fund a bounty together on Onlooker LLC" },
+      { title: "Group Pools, fund a bounty together on Onlooker" },
       {
         name: "description",
         content:
           "Chip in Credits with other people to fund bigger community bounties and sponsor local flash meetups.",
       },
-      { property: "og:title", content: "Group Pools on Onlooker LLC" },
+      { property: "og:title", content: "Group Pools on Onlooker" },
       {
         property: "og:description",
         content: "Pool Credits with your city to fund bigger bounties and flash meetups.",

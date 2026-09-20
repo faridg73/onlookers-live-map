@@ -60,7 +60,7 @@ export function MapTourOverlay() {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Welcome to Onlooker LLC"
+      aria-label="Welcome to Onlooker"
       className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 backdrop-blur-sm sm:items-center"
     >
       <div className="pointer-events-auto mx-4 mb-[calc(env(safe-area-inset-bottom)+1.5rem)] w-full max-w-md rounded-2xl border border-border bg-surface p-5 shadow-2xl sm:mb-0">

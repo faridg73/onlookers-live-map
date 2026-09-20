@@ -5,7 +5,7 @@ import { z } from "zod";
 /**
  * Every piece of text a person types — bounty titles, instructions, post
  * bodies, chat lines, comments, reports — passes through here before it is
- * stored or shown. Onlooker LLC never renders user HTML, so the safest thing
+ * stored or shown. Onlooker never renders user HTML, so the safest thing
  * is to keep plain text only: markup, scripts and control characters are
  * removed rather than escaped.
  *

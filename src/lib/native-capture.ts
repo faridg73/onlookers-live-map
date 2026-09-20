@@ -2,7 +2,7 @@
 /**
  * Native camera capture.
  *
- * Onlooker LLC no longer runs its own in-app camera preview. Every capture is
+ * Onlooker no longer runs its own in-app camera preview. Every capture is
  * handed to the phone's real camera app through a file input with
  * `capture="environment"`, so clips keep full native quality, stabilisation and
  * the familiar system camera UI on both iOS and Android.

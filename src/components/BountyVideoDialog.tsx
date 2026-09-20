@@ -76,7 +76,7 @@ export function BountyVideoDialog({
       if (result === "downloaded") {
         toast.success("Watermarked clip saved, post it with the copied hashtags.");
       } else {
-        toast.success("Shared with Onlooker LLC branding.");
+        toast.success("Shared with Onlooker branding.");
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
@@ -255,7 +255,7 @@ export function BountyVideoDialog({
                   <CheckCircle2 className="size-4" /> Your live clip is in!
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Share it with Onlooker LLC branding and viral hashtags to bring in more fans.
+                  Share it with Onlooker branding and viral hashtags to bring in more fans.
                 </p>
                 <button
                   type="button"

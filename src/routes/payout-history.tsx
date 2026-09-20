@@ -11,12 +11,12 @@ import { PageBackButton } from "@/components/PageBackButton";
 export const Route = createFileRoute("/payout-history")({
   head: () => ({
     meta: [
-      { title: "Payout History | Onlooker LLC" },
+      { title: "Payout History | Onlooker" },
       {
         name: "description",
         content: "Every accepted clip, the platform fee, and the payout that landed in your wallet.",
       },
-      { property: "og:title", content: "Onlooker LLC Payout History" },
+      { property: "og:title", content: "Onlooker Payout History" },
       { property: "og:description", content: "Track each accepted clip payout and fee." },
     ],
   }),

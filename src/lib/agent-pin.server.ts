@@ -20,7 +20,7 @@ export type AgentPinDelivery = {
 
 function smsBody(opts: { pin: string; requestId: string; locationName: string }) {
   return (
-    `Onlooker LLC: the 6-digit on-site PIN for "${opts.locationName}" is ${opts.pin}. ` +
+    `Onlooker: the 6-digit on-site PIN for "${opts.locationName}" is ${opts.pin}. ` +
     `Give it only to the onlooker filming your property. Bounty: ${SITE_URL}/?b=${opts.requestId}`
   );
 }
@@ -29,7 +29,7 @@ function emailBody(opts: { pin: string; requestId: string; locationName: string;
   const greeting = opts.name ? `Hi ${opts.name},` : "Hello,";
   return `<!doctype html><html><body style="margin:0;background:#0f0f0f;padding:32px;font-family:Arial,Helvetica,sans-serif;color:#e5e5e5;">
   <div style="max-width:520px;margin:0 auto;background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:28px;">
-    <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#ccff00;font-weight:bold;">ONLOOKER LLC · ON-SITE VERIFICATION</p>
+    <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#ccff00;font-weight:bold;">ONLOOKER · ON-SITE VERIFICATION</p>
     <h1 style="margin:0 0 16px;font-size:22px;color:#ffffff;">Your 6-digit PIN</h1>
     <p style="margin:0 0 16px;font-size:14px;line-height:1.6;">${greeting} a paid Onlooker bounty was posted for
     <strong style="color:#ffffff;">${opts.locationName}</strong>. Hand this PIN only to the onlooker filming
@@ -44,7 +44,7 @@ function emailBody(opts: { pin: string; requestId: string; locationName: string;
 function emailText(opts: { pin: string; requestId: string; locationName: string; name: string }) {
   const greeting = opts.name ? `Hi ${opts.name},` : "Hello,";
   return (
-    `${greeting} a paid Onlooker LLC bounty was posted for "${opts.locationName}".\n\n` +
+    `${greeting} a paid Onlooker bounty was posted for "${opts.locationName}".\n\n` +
     `Your 6-digit on-site PIN: ${opts.pin}\n\n` +
     `Give it only to the onlooker filming your property — they type it in on site to unlock ` +
     `footage submission and payout.\n\nBounty: ${SITE_URL}/?b=${opts.requestId}`
@@ -83,9 +83,9 @@ export async function sendAgentPin(
       const response = await sendLovableEmail(
         {
           to: email,
-          from: "Onlooker LLC <noreply@onlookerlive.com>",
+          from: "Onlooker <noreply@onlookerlive.com>",
           sender_domain: "notify.onlookerlive.com",
-          subject: `Onlooker LLC on-site PIN: ${opts.pin}`,
+          subject: `Onlooker on-site PIN: ${opts.pin}`,
           html: emailBody({ ...opts, name }),
           text: emailText({ ...opts, name }),
           purpose: "transactional",
