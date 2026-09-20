@@ -479,7 +479,8 @@ function MapScreen() {
           setDrawerOpen(true);
           select(null);
         }}
-        mapTypeId="hybrid"
+        mapTypeId={homeMapType}
+        showNativeMapTypeControl={false}
         styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
       />
 
