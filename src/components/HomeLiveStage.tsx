@@ -140,7 +140,7 @@ export function HomeLiveStage({
 
       <div className="relative flex h-11 items-center overflow-x-auto border-t border-border bg-surface/95 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Trending live ticker">
         <span className="sticky left-0 z-10 flex h-full shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
-        <div className="flex w-max min-w-full animate-live-ticker items-center gap-2 px-2 whitespace-nowrap motion-reduce:animate-none">
+        <div className="flex w-max min-w-full items-center gap-2 px-2 whitespace-nowrap md:animate-live-ticker md:hover:[animation-play-state:paused] md:focus-within:[animation-play-state:paused] motion-reduce:animate-none">
           {[...trends, ...trends].map((trend, index) => {
             const Icon = trend.icon;
             return (
