@@ -395,6 +395,26 @@
   }
 }
 
+@utility scrollbar-neon {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-signal) var(--color-surface-raised);
+
+  &::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-surface-raised);
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-signal);
+    border-radius: 9999px;
+    box-shadow: 0 0 8px color-mix(in oklab, var(--color-signal) 55%, transparent);
+  }
+}
+
 @utility no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
