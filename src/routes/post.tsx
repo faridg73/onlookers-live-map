@@ -295,6 +295,9 @@ function PostScreen() {
     mainCategoryId === STRANGE_SIGHTINGS_ID ? STRANGE_SIGHTINGS_LABEL : selectedCategory.label;
   /** Keyword metadata carried into the payload for search and analytics. */
   const subcategoryKeywords = keywordsForSubcategory(mainCategoryId, subcategory);
+  /** Tags the requester actively selected; they drive search, map and feed relevance. */
+  const activeKeywords = subcategoryKeywords.filter((keyword) => selectedKeywords.includes(keyword));
+  const taggedKeywords = activeKeywords.length > 0 ? activeKeywords : subcategoryKeywords;
   const promptContext = useMemo(
     () => bountyPromptContext(mainCategoryId, mainCategoryLabel, subcategory),
     [mainCategoryId, mainCategoryLabel, subcategory],
