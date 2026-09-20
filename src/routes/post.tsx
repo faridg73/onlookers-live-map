@@ -1552,6 +1552,15 @@ function PostScreen() {
       />
       <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
 
+      <SignInDialog
+        open={signInOpen}
+        onOpenChange={(next) => {
+          setSignInOpen(next);
+          if (!next) pendingAfterSignIn.current = null;
+        }}
+        message="Sign in to lock credits. Everything you filled in stays exactly as it is."
+      />
+
       <DeadlinePickerDialog
         open={deadlineOpen}
         value={customDeadline}
