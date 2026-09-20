@@ -288,6 +288,8 @@ function MapScreen() {
   const [mapExpanded, setMapExpanded] = useState(false);
   // Google labels stay hidden by default on Home; the Labels checkbox opts in.
   const [labelsVisible, setLabelsVisible] = useState(false);
+  // Compact app-owned base-map switcher (Satellite = hybrid aerial, Map = roadmap).
+  const [homeMapType, setHomeMapType] = useState<"hybrid" | "roadmap">("hybrid");
   const activeHome = useMemo(
     () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
     [requests],
