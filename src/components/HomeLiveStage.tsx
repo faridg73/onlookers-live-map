@@ -288,7 +288,7 @@ export function HomeLiveStage({
               </div>
 
               {activeItems.length > 0 ? (
-                <div className="max-h-[min(34dvh,16rem)] space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
+                <div className="max-h-[min(20dvh,14rem)] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(32dvh,16rem)]" aria-label={`${activeTrend.label} active items`}>
                   {activeItems.map((request) => (
                     <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-border bg-background/90 p-2.5">
                       <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start p-0 text-left hover:bg-transparent">
