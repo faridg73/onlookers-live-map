@@ -99,7 +99,7 @@ export function HomeLiveStage({
           <h2 id="home-live-stage-title" className="mt-2 max-w-xl font-display-impact text-[clamp(1.3rem,4.2vw,2.5rem)] uppercase leading-[0.98] text-foreground">
             See what&apos;s happening. <span className="text-signal">Right now.</span>
           </h2>
-          <p className="mt-2 max-w-xl text-[0.78rem] font-medium leading-relaxed text-foreground/85 sm:text-sm">
+          <p className="mt-2 max-w-xl text-[0.78rem] font-medium leading-relaxed text-white sm:text-sm">
             Watch real-time streams, follow trusted emergency reports, or post a local bounty for the view you need.
           </p>
 
