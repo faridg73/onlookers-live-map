@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const PRESETS: { amount: number; tag?: string; icon?: "popular" | "fast" }[] = [
   { amount: 20 },
   { amount: 40 },
-  { amount: 80, tag: "Fastest", icon: "fast" },
+  { amount: 80 },
   { amount: 160 },
 ];
 
