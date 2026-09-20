@@ -514,6 +514,8 @@ function MapScreen() {
         requests={requests}
         poolOf={poolOf}
         isCrisis={isCrisisRequest}
+        mapExpanded={mapExpanded}
+        onExitMap={() => setMapExpanded(false)}
         onGoLive={() => void navigate({ to: "/post", search: { mode: "broadcast" } })}
         onPostBounty={() => void navigate({ to: "/post", search: { mode: "bounty" } })}
         onOpenRequest={(request) => {
@@ -555,7 +557,7 @@ function MapScreen() {
       />
 
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${mapExpanded ? "hidden" : drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
         aria-label="Map actions"
       >
         <Button
