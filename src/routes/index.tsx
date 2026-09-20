@@ -519,19 +519,53 @@ function MapScreen() {
         styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
       />
 
-      <button
-        type="button"
-        onClick={() => setMapExpanded((value) => !value)}
-        aria-pressed={mapExpanded}
-        aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
-        className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] grid size-9 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal md:left-4"
-      >
-        {mapExpanded ? (
-          <Minimize2 className="size-4" aria-hidden />
+      <div className="pointer-events-none absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] flex items-center gap-2 md:left-4">
+        <button
+          type="button"
+          onClick={() => setMapExpanded((value) => !value)}
+          aria-pressed={mapExpanded}
+          aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
+          className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal"
+        >
+          {mapExpanded ? (
+            <Minimize2 className="size-4" aria-hidden />
+          ) : (
+            <Maximize2 className="size-4" aria-hidden />
+          )}
+        </button>
+        {searchOpen ? (
+          <div className="pointer-events-auto flex w-[15rem] max-w-[calc(100vw-6.75rem)] items-center rounded-full border border-border bg-surface/90 py-0.5 pl-3 pr-1 shadow-md backdrop-blur-xl transition-all duration-300 sm:w-[17rem]">
+            <Search className="mr-1.5 size-3.5 shrink-0 text-signal" aria-hidden />
+            <PlaceSearchInput
+              variant="bare"
+              autoFocus
+              placeholder="Search places or categories"
+              value={searchQuery}
+              onQueryChange={setSearchQuery}
+              onPick={handleSearchPick}
+              additionalResults={searchCategoryMatches}
+              className="min-w-0 flex-1"
+            />
+            <button
+              type="button"
+              onClick={closeSearch}
+              aria-label="Close search"
+              className="grid size-7 shrink-0 place-items-center rounded-full text-foreground/70 transition-colors hover:text-signal"
+            >
+              <X className="size-3.5" aria-hidden />
+            </button>
+          </div>
         ) : (
-          <Maximize2 className="size-4" aria-hidden />
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search places or categories"
+            className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal"
+          >
+            <Search className="size-4" aria-hidden />
+          </button>
         )}
-      </button>
+      </div>
 
       <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3rem)] z-[65] flex h-7 items-center gap-1 rounded-full border border-border bg-surface/90 pl-1.5 pr-1 shadow-md backdrop-blur-xl md:left-4">
         <label className="flex items-center gap-1" aria-label="Show map labels">
