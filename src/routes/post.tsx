@@ -479,6 +479,7 @@ function PostScreen() {
       toast.error(`Pick a capture length between 1 and ${MAX_CAPTURE_MINUTES} minutes.`);
       return;
     }
+    if (!requireSignIn(() => continueFromDetails())) return;
     setStep(3);
   };
 
