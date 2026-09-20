@@ -486,6 +486,7 @@ function PostScreen() {
     setMainCategoryId(next);
     setCategoryId(next === STRANGE_SIGHTINGS_ID ? "breaking-incidents" : next);
     setSubcategory(null);
+    setSelectedKeywords([]);
     setPermissionOk(false);
     if (next === "real-estate") setRealEstateGuideOpen(true);
   };
@@ -494,8 +495,20 @@ function PostScreen() {
   const chooseSubcategory = (label: string) => {
     setSubcategory(label);
     const keywords = keywordsForSubcategory(mainCategoryId, label);
+    setSelectedKeywords([...keywords]);
     const seed = keywords[0] ?? label;
     setVenueQuery(`${label} ${seed}`.trim());
+  };
+
+  /** Chips are live filters: toggling one retags the request and re-runs the nearby search. */
+  const toggleKeyword = (keyword: string) => {
+    const next = selectedKeywords.includes(keyword)
+      ? selectedKeywords.filter((item) => item !== keyword)
+      : [...selectedKeywords, keyword];
+    setSelectedKeywords(next);
+    const base = subcategory ?? mainCategoryLabel;
+    const active = subcategoryKeywords.filter((item) => next.includes(item));
+    setVenueQuery(`${base} ${active.slice(0, 3).join(" ")}`.trim());
   };
 
 
