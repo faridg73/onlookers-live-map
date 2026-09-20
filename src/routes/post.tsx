@@ -114,11 +114,14 @@ import {
 } from "@/lib/request-intent";
 
 export const Route = createFileRoute("/post")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "1"; mode?: "broadcast" | "bounty" } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mystery?: "1"; mode?: "broadcast" | "bounty"; focus?: "reward" } => ({
     ...(search["mystery"] === "1" ? { mystery: "1" as const } : {}),
     ...(search["mode"] === "broadcast" || search["mode"] === "bounty"
       ? { mode: search["mode"] as "broadcast" | "bounty" }
       : {}),
+    ...(search["focus"] === "reward" ? { focus: "reward" as const } : {}),
   }),
   head: () => ({
     meta: [
@@ -223,11 +226,13 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
-  const { mystery, mode: initialMode } = Route.useSearch();
+  const { mystery, mode: initialMode, focus } = Route.useSearch();
+  /** True when the visitor jumped straight to the reward tiers before describing the bounty. */
+  const rewardFirst = focus === "reward" && initialMode === "bounty";
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(rewardFirst ? 3 : 1);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
@@ -319,13 +324,16 @@ function PostScreen() {
 
   const total = quote.total + (Number.isFinite(tip) ? tip : 0);
 
+  /** Whether the bounty description is complete enough to lock escrow. */
+  const detailsReady = note.trim().length >= 10;
+
   useEffect(() => {
     void readWalletBalance().then(setBalance);
     setRecent(readRecentPlaces());
   }, []);
 
   useEffect(() => {
-    if (mode !== "bounty") return;
+    if (mode !== "bounty" || rewardFirst) return;
     try {
       if (window.localStorage.getItem("onlooker:bounty-introduction-hidden") !== "1") {
         setFirstPostGuideOpen(true);
@@ -333,7 +341,7 @@ function PostScreen() {
     } catch {
       setFirstPostGuideOpen(true);
     }
-  }, [mode]);
+  }, [mode, rewardFirst]);
 
   useEffect(() => {
     if (mystery !== "1") return;
@@ -1429,10 +1437,27 @@ function PostScreen() {
               </div>
             )}
             <div className="flex gap-2">
-              <Button type="button" variant="outline" size="icon" aria-label="Previous step" onClick={() => (step > 1 ? setStep((step - 1) as 1 | 2) : setMode(null))}><ArrowLeft className="size-5" /></Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                aria-label="Previous step"
+                onClick={() =>
+                  step > 1
+                    ? setStep((step - 1) as 1 | 2)
+                    : setMode(null)
+                }
+              >
+                <ArrowLeft className="size-5" />
+              </Button>
               {step === 1 && <Button type="button" onClick={continueFromPrompt} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Continue</Button>}
               {step === 2 && <Button type="button" onClick={continueFromDetails} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">Set the reward</Button>}
-              {step === 3 && <Button type="submit" disabled={posting || total < MIN_BOUNTY || note.trim().length < 10 || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
+              {step === 3 && !detailsReady && (
+                <Button type="button" onClick={() => setStep(1)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">
+                  Next: describe the bounty
+                </Button>
+              )}
+              {step === 3 && detailsReady && <Button type="submit" disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
             </div>
           </footer>
         </form>

@@ -493,7 +493,7 @@ function MapScreen() {
         poolOf={poolOf}
         isCrisis={isCrisisRequest}
         onGoLive={() => void navigate({ to: "/post", search: { mode: "broadcast" } })}
-        onPostBounty={() => void navigate({ to: "/post", search: { mode: "bounty" } })}
+        onPostBounty={() => void navigate({ to: "/post", search: { mode: "bounty", focus: "reward" } })}
         onOpenRequest={(request) => {
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
