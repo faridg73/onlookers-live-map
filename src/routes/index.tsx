@@ -8,6 +8,8 @@ import {
   Compass,
   Map,
   MapPin,
+  Maximize2,
+  Minimize2,
   Martini,
   Radio,
   ShieldCheck,
@@ -281,6 +283,12 @@ function MapScreen() {
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
   const [guidesOpen, setGuidesOpen] = useState(false);
+  // Full-map mode: hero + Explore Nearby tuck away so pins and clusters take over.
+  const [mapExpanded, setMapExpanded] = useState(false);
+  const activeHome = useMemo(
+    () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
+    [requests],
+  );
   const dragStartY = useRef<number | null>(null);
   const drawerDragged = useRef(false);
   const homeStateRestored = useRef(false);
@@ -472,6 +480,20 @@ function MapScreen() {
         showNativeMapTypeControl={false}
       />
 
+      <button
+        type="button"
+        onClick={() => setMapExpanded((value) => !value)}
+        aria-pressed={mapExpanded}
+        aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
+        className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] grid size-9 place-items-center rounded-full border border-border bg-surface/90 text-foreground/80 shadow-md backdrop-blur-xl transition-colors hover:border-signal hover:text-signal md:left-4"
+      >
+        {mapExpanded ? (
+          <Minimize2 className="size-4" aria-hidden />
+        ) : (
+          <Maximize2 className="size-4" aria-hidden />
+        )}
+      </button>
+
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
         <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
           <img
@@ -492,6 +514,8 @@ function MapScreen() {
         requests={requests}
         poolOf={poolOf}
         isCrisis={isCrisisRequest}
+        mapExpanded={mapExpanded}
+        onExitMap={() => setMapExpanded(false)}
         onGoLive={() => void navigate({ to: "/post", search: { mode: "broadcast" } })}
         onPostBounty={() => void navigate({ to: "/post", search: { mode: "bounty" } })}
         onOpenRequest={(request) => {
@@ -533,7 +557,7 @@ function MapScreen() {
       />
 
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${mapExpanded ? "hidden" : drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
         aria-label="Map actions"
       >
         <Button

@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
-import { CircleDollarSign, Clock, Eye, Flame, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { ChevronDown, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,9 @@ type HomeLiveStageProps = {
   onOpenHotSpot: (request: LiveRequest) => void;
   onGoLive: () => void;
   onPostBounty: () => void;
+  /** Full-map mode: swap the hero for a compact restore strip */
+  mapExpanded?: boolean;
+  onExitMap?: () => void;
 };
 
 function isLiveRequest(request: LiveRequest) {
@@ -45,6 +48,8 @@ export function HomeLiveStage({
   onOpenHotSpot,
   onGoLive,
   onPostBounty,
+  mapExpanded = false,
+  onExitMap,
 }: HomeLiveStageProps) {
   const [emptyLabel, setEmptyLabel] = useState<string | null>(null);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
@@ -109,6 +114,30 @@ export function HomeLiveStage({
       detail: (request: LiveRequest) => request.place,
     },
   ];
+
+  if (mapExpanded) {
+    return (
+      <section
+        className="pointer-events-auto absolute left-3 right-[7.75rem] top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 flex items-center justify-between gap-3 rounded-full border border-border bg-surface/95 py-2 pl-4 pr-2 shadow-lg backdrop-blur-xl sm:left-6 sm:right-auto sm:w-fit"
+        aria-label="Full map view"
+      >
+        <p className="flex items-center gap-2 whitespace-nowrap font-display-impact text-[0.6rem] uppercase text-signal">
+          <Map className="size-3.5" aria-hidden /> Full map
+        </p>
+        <span className="whitespace-nowrap text-[0.6rem] font-bold uppercase text-foreground/80">
+          {liveCount} live · {emergencyCount} alerts · {activeRequests.length} bounties
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onExitMap}
+          className="h-8 shrink-0 rounded-full border-signal/50 px-3 text-[0.62rem] font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground"
+        >
+          <ChevronDown className="size-3.5" aria-hidden /> Show feed
+        </Button>
+      </section>
+    );
+  }
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 overflow-hidden rounded-md border border-signal/45 bg-background/92 shadow-[0_20px_60px_color-mix(in_oklab,var(--color-background)_72%,transparent)] backdrop-blur-xl sm:left-6 sm:right-auto sm:w-[min(43rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
