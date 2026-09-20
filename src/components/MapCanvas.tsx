@@ -66,10 +66,10 @@ export function MapCanvas({
   viewportStorageKey?: string;
   /** Optional controlled base-map style for screens with app-owned controls. */
   mapTypeId?: "hybrid" | "satellite" | "roadmap";
-  /** Optional Google style array, e.g. the dark label-free Home base map. */
-  styles?: google.maps.MapTypeStyle[];
   /** Hide Google's control when a screen provides its own compact selector. */
   showNativeMapTypeControl?: boolean;
+  /** Optional Google style array to override the default base-map appearance. */
+  styles?: google.maps.MapTypeStyle[];
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -200,10 +200,6 @@ export function MapCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewportStorageKey]);
 
-  useEffect(() => {
-    if (!ready || !map.current) return;
-    map.current.setOptions({ styles: styles ?? null });
-  }, [ready, styles]);
 
   useEffect(() => {
     if (!ready || !map.current || !mapTypeId) return;
