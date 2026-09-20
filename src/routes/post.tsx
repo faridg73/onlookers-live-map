@@ -624,7 +624,7 @@ function PostScreen() {
         scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
         `Category: ${mainCategoryLabel}`,
         subcategory ? `Subcategory: ${subcategory}` : "",
-        subcategoryKeywords.length ? `Keywords: ${subcategoryKeywords.join(", ")}` : "",
+        taggedKeywords.length ? `Keywords: ${taggedKeywords.join(", ")}` : "",
 
         note.trim(),
         tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
