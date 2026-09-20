@@ -416,6 +416,18 @@ function MapScreen() {
     }, null);
   }, [requests, userPosition]);
 
+  const hotSpotRequests = useMemo(() => {
+    if (!userPosition) return [];
+    return requests
+      .filter((request) => !isClosed(request))
+      .sort(
+        (a, b) =>
+          distanceMiles(userPosition, requestMapPosition(a)) -
+          distanceMiles(userPosition, requestMapPosition(b)),
+      )
+      .slice(0, 12);
+  }, [requests, userPosition]);
+
   // The Home sheet filters the live map immediately without changing the underlying request data.
   const statusFiltered = useMemo(
     () =>
@@ -640,6 +652,7 @@ function MapScreen() {
           setDrawerOpen(false);
         }}
         hotSpot={hotSpotRequest}
+        hotSpotRequests={hotSpotRequests}
         onOpenHighBounty={(request) => {
           setMapFilter("high");
           setCategoryTile(null);

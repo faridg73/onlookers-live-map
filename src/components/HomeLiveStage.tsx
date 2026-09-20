@@ -1,16 +1,10 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useState } from "react";
-import { ChevronDown, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
+type LiveFeedKey = "emergency" | "bounty" | "stream" | "dispatches" | "hotspot";
 
 type HomeLiveStageProps = {
   requests: LiveRequest[];
@@ -18,6 +12,7 @@ type HomeLiveStageProps = {
   isCrisis: (request: LiveRequest) => boolean;
   /** Nearest active request to the viewer, when their location is known */
   hotSpot?: LiveRequest | null;
+  hotSpotRequests?: LiveRequest[];
   onOpenRequest: (request: LiveRequest) => void;
   onOpenHighBounty: (request: LiveRequest) => void;
   onOpenLive: (request: LiveRequest) => void;
@@ -40,6 +35,7 @@ export function HomeLiveStage({
   poolOf,
   isCrisis,
   hotSpot = null,
+  hotSpotRequests = [],
   onOpenRequest,
   onOpenHighBounty,
   onOpenLive,
@@ -51,7 +47,7 @@ export function HomeLiveStage({
   mapExpanded = false,
   onExitMap,
 }: HomeLiveStageProps) {
-  const [emptyLabel, setEmptyLabel] = useState<string | null>(null);
+  const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -66,7 +62,36 @@ export function HomeLiveStage({
   const latestRequest =
     [...activeRequests].sort((a, b) => a.minutesAgo - b.minutesAgo)[0] ?? null;
 
-  const trends = [
+  const feedItems = useMemo<Record<LiveFeedKey, LiveRequest[]>>(() => {
+    const emergencies = activeRequests
+      .filter(isCrisis)
+      .sort((a, b) => a.minutesAgo - b.minutesAgo);
+    const bounties = activeRequests
+      .filter((request) => request.bountyType !== "live_stream")
+      .sort((a, b) => poolOf(b) - poolOf(a));
+    const streams = activeRequests
+      .filter(isLiveRequest)
+      .sort((a, b) => b.watchers - a.watchers);
+    const dispatches = [...activeRequests].sort((a, b) => a.minutesAgo - b.minutesAgo);
+
+    return {
+      emergency: emergencies,
+      bounty: bounties,
+      stream: streams,
+      dispatches,
+      hotspot: hotSpotRequests.filter((request) => activeRequests.some((active) => active.id === request.id)),
+    };
+  }, [activeRequests, hotSpotRequests, isCrisis, poolOf]);
+
+  const trends: Array<{
+    key: LiveFeedKey;
+    label: string;
+    icon: typeof Siren;
+    request: LiveRequest | null;
+    onActivate: (request: LiveRequest) => void;
+    tone: string;
+    detail: (request: LiveRequest) => string;
+  }> = [
     {
       key: "emergency",
       label: "Live Emergency",
@@ -114,6 +139,13 @@ export function HomeLiveStage({
       detail: (request: LiveRequest) => request.place,
     },
   ];
+  const activeTrend = trends.find((trend) => trend.key === openFeed) ?? null;
+  const activeItems = openFeed ? feedItems[openFeed] : [];
+
+  const openItem = (feed: LiveFeedKey, request: LiveRequest) => {
+    const trend = trends.find((candidate) => candidate.key === feed);
+    trend?.onActivate(request);
+  };
 
   if (mapExpanded) {
     return (
@@ -212,7 +244,7 @@ export function HomeLiveStage({
 
       <div className="relative flex h-11 items-center overflow-hidden border-t border-border bg-surface/95" aria-label="Trending live ticker">
         <span className="sticky left-0 z-10 flex h-full shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
-        <div className="flex w-max min-w-full items-center gap-2 px-2 whitespace-nowrap animate-live-ticker hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none">
+        <div className={`flex w-max min-w-full items-center gap-2 px-2 whitespace-nowrap animate-live-ticker hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none ${openFeed ? "[animation-play-state:paused]" : ""}`}>
           {[...trends, ...trends].map((trend, index) => {
             const Icon = trend.icon;
             return (
@@ -220,55 +252,79 @@ export function HomeLiveStage({
                 key={`${trend.key}-${index}`}
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  if (trend.request) trend.onActivate(trend.request);
-                  else setEmptyLabel(trend.label);
-                }}
-                aria-label={`${trend.label}${trend.request ? `: ${trend.request.title}` : ": nothing active right now"}`}
+                onClick={() => setOpenFeed((current) => current === trend.key ? null : trend.key)}
+                aria-expanded={openFeed === trend.key}
+                aria-controls="home-live-feed-drawer"
+                aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
                 className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-extrabold uppercase transition-[transform,background-color] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-foreground/80 motion-reduce:transform-none ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
-                {trend.request && <span className="opacity-80">· {trend.detail(trend.request)}</span>}
+                {openFeed === trend.key ? <ChevronUp className="size-3" aria-hidden /> : <ChevronDown className="size-3" aria-hidden />}
               </Button>
             );
           })}
         </div>
       </div>
 
-      <Dialog open={emptyLabel !== null} onOpenChange={(open) => !open && setEmptyLabel(null)}>
-        <DialogContent className="max-w-sm border-signal/45">
-          <DialogHeader>
-            <DialogTitle className="font-display-impact uppercase">{emptyLabel}</DialogTitle>
-            <DialogDescription className="text-white">
-              No active items right now—tap below to start one!
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="grid grid-cols-2 gap-2 sm:flex">
-            <Button
-              type="button"
-              onClick={() => {
-                setEmptyLabel(null);
-                onGoLive();
-              }}
-              className="h-11 font-extrabold uppercase"
-            >
-              <Radio className="size-4" /> Go live
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setEmptyLabel(null);
-                onPostBounty();
-              }}
-              className="h-11 border-signal/60 font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground"
-            >
-              <CircleDollarSign className="size-4 text-signal" /> Post a bounty
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <div
+        id="home-live-feed-drawer"
+        className={`grid border-t border-border bg-surface/98 transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          {activeTrend && (
+            <div className="px-3 pb-3 pt-2.5 sm:px-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <activeTrend.icon className="size-4 shrink-0 text-signal" aria-hidden />
+                  <h3 className="truncate font-display-impact text-xs uppercase text-foreground">{activeTrend.label}</h3>
+                  <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[0.62rem] font-extrabold text-foreground">
+                    {activeItems.length}
+                  </span>
+                </div>
+                <Button type="button" variant="ghost" size="icon" onClick={() => setOpenFeed(null)} aria-label={`Close ${activeTrend.label}`} className="size-8 shrink-0 rounded-full text-foreground hover:text-signal">
+                  <ChevronUp className="size-4" aria-hidden />
+                </Button>
+              </div>
+
+              {activeItems.length > 0 ? (
+                <div className="max-h-[min(34dvh,16rem)] space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
+                  {activeItems.map((request) => (
+                    <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-border bg-background/90 p-2.5">
+                      <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start p-0 text-left hover:bg-transparent">
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-extrabold text-foreground">{request.title}</span>
+                          <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[0.7rem] font-bold text-muted-foreground">
+                            <MapPin className="size-3 shrink-0 text-signal" aria-hidden />
+                            <span className="truncate">{request.place}</span>
+                            <span aria-hidden>·</span>
+                            <span className="shrink-0">{activeTrend.detail(request)}</span>
+                          </span>
+                        </span>
+                      </Button>
+                      <Button type="button" variant={openFeed === "bounty" ? "default" : "outline"} onClick={() => openFeed && openItem(openFeed, request)} className="h-8 shrink-0 rounded-full px-3 text-[0.65rem] font-extrabold uppercase">
+                        {openFeed === "bounty" ? "Hunt" : openFeed === "stream" ? "Watch" : "View"}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-md border border-dashed border-signal/45 bg-background/80 p-3 text-center">
+                  <p className="text-xs font-bold text-foreground">No active items right now—tap below to start one!</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
+                      <Radio className="size-3.5" /> Go live
+                    </Button>
+                    <Button type="button" variant="outline" onClick={onPostBounty} className="h-9 border-signal/60 font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground">
+                      <CircleDollarSign className="size-3.5 text-signal" /> Post bounty
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </section>
   );
 }
