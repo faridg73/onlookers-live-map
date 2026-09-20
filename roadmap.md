@@ -14,6 +14,8 @@ Responsive Home map controls
 Home trending ticker simplification
 - [x] Remove the Home map-style toggle, place search, and recent searches
 - [x] Add a dynamic horizontal ticker for high bounties, live streams, and emergencies
+- [x] Turn all five live-feed tabs into static-title toggles with filtered, scrollable drawers
+- [x] Connect drawer items to map details, live viewing, and bounty hunting actions
 
 Home map category filtering
 - [x] Add state for six category tiles
