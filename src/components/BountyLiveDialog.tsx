@@ -45,7 +45,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
           </div>
 
           <p className="text-xs font-medium leading-relaxed text-white/90">
-            Your {formatCredits(credits)} Credits are locked and safe — no one can spend them while hunters work on your bounty.
+            Your {formatCredits(credits)} are locked and safe — no one can spend them while hunters work on your bounty.
           </p>
 
           <div>
@@ -61,7 +61,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
               </li>
               <li className="flex items-start gap-2 text-xs font-medium leading-relaxed text-white/90">
                 <TimerReset className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden />
-                If nobody completes it, the bounty expires {deadlineLabel} and your Credits return to your wallet automatically.
+                If nobody completes it, the bounty expires in {deadlineLabel} and your Credits return to your wallet automatically.
               </li>
             </ul>
           </div>
