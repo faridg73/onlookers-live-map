@@ -46,6 +46,7 @@ import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
+import { SignInDialog } from "@/components/SignInDialog";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { AddressSearchField } from "@/components/AddressSearchField";
@@ -246,6 +247,9 @@ function PostScreen() {
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
+  // What to pick back up once the overlay sign-in succeeds.
+  const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [action, setAction] = useState<RequestAction>("clip");
@@ -376,6 +380,12 @@ function PostScreen() {
       });
     const { data: authSub } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(Boolean(session));
+      if (!session) return;
+      // Close the overlay and carry on exactly where they left off.
+      setSignInOpen(false);
+      const resume = pendingAfterSignIn.current;
+      pendingAfterSignIn.current = null;
+      if (resume) window.setTimeout(resume, 60);
     });
     return () => {
       active = false;
@@ -419,6 +429,17 @@ function PostScreen() {
     setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
   };
 
+  /**
+   * Opens the sign-in overlay instead of navigating away, keeping every field
+   * on this page untouched. Returns false when the caller should pause.
+   */
+  const requireSignIn = (resume: () => void) => {
+    if (signedIn !== false) return true;
+    pendingAfterSignIn.current = resume;
+    setSignInOpen(true);
+    return false;
+  };
+
   const continueFromPrompt = () => {
     if (prompt.trim().length < 8) {
       toast.error("Describe the live view you want in one short sentence.");
@@ -459,6 +480,7 @@ function PostScreen() {
       toast.error(`Pick a capture length between 1 and ${MAX_CAPTURE_MINUTES} minutes.`);
       return;
     }
+    if (!requireSignIn(() => continueFromDetails())) return;
     setStep(3);
   };
 
@@ -601,6 +623,8 @@ function PostScreen() {
       return;
     }
     // Credits only leave a wallet once the number behind the account is confirmed.
+    // Signed-out people get an overlay here, never a redirect that would wipe the form.
+    if (!requireSignIn(() => void runSubmit())) return;
     if (!(await phoneGate.ensureVerified(() => void runSubmit()))) return;
     const funds = await readWalletBalance();
     setBalance(funds);
@@ -1069,7 +1093,7 @@ function PostScreen() {
                   <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
                     <ShieldCheck className="size-4 shrink-0 text-signal" />
                     <span className="flex-1">Sign in to search places by name. You can still drop a pin on the map or use your current location.</span>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => setSignInOpen(true)}>Sign in</Button>
                   </div>
                 )}
 
@@ -1528,6 +1552,15 @@ function PostScreen() {
         onOpenChange={setFirstPostGuideOpen}
       />
       <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
+
+      <SignInDialog
+        open={signInOpen}
+        onOpenChange={(next) => {
+          setSignInOpen(next);
+          if (!next) pendingAfterSignIn.current = null;
+        }}
+        message="Sign in to lock credits. Everything you filled in stays exactly as it is."
+      />
 
       <DeadlinePickerDialog
         open={deadlineOpen}
