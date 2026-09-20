@@ -1092,7 +1092,7 @@ function PostScreen() {
                   <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
                     <ShieldCheck className="size-4 shrink-0 text-signal" />
                     <span className="flex-1">Sign in to search places by name. You can still drop a pin on the map or use your current location.</span>
-                    <Button type="button" size="sm" variant="outline" onClick={() => void navigate({ to: "/auth" })}>Sign in</Button>
+                    <Button type="button" size="sm" variant="outline" onClick={() => setSignInOpen(true)}>Sign in</Button>
                   </div>
                 )}
 
