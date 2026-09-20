@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { CircleDollarSign, Eye, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { CircleDollarSign, Eye, Flame, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 
@@ -28,7 +28,17 @@ export function HomeLiveStage({
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
   const featured = activeRequests.find(isLiveRequest) ?? activeRequests[0] ?? null;
-  const tickerItems = activeRequests.slice(0, 6);
+  const highestBounty = activeRequests.reduce<LiveRequest | null>(
+    (highest, request) => (!highest || poolOf(request) > poolOf(highest) ? request : highest),
+    null,
+  );
+  const liveRequest = activeRequests.find(isLiveRequest) ?? null;
+  const emergencyRequest = activeRequests.find(isCrisis) ?? null;
+  const trends = [
+    { key: "bounty", label: "High Bounty Zone", icon: Flame, request: highestBounty, tone: "text-signal border-signal/55" },
+    { key: "live", label: "Live Stream", icon: Radio, request: liveRequest, tone: "text-live border-live/55" },
+    { key: "emergency", label: "Active Emergency Report", icon: Siren, request: emergencyRequest, tone: "text-crisis border-crisis/55" },
+  ];
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 overflow-hidden rounded-md border border-signal/45 bg-background/92 shadow-[0_20px_60px_color-mix(in_oklab,var(--color-background)_72%,transparent)] backdrop-blur-xl sm:left-6 sm:right-auto sm:w-[min(43rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
@@ -94,20 +104,26 @@ export function HomeLiveStage({
         </div>
       </div>
 
-      <div className="relative flex h-8 items-center overflow-hidden border-t border-border bg-signal text-signal-foreground" aria-label="Live activity ticker">
-        <span className="relative z-10 flex h-full shrink-0 items-center bg-signal px-3 font-display-impact text-[0.6rem] uppercase shadow-[8px_0_12px_color-mix(in_oklab,var(--color-signal)_70%,transparent)] sm:text-[0.68rem]">Live wire</span>
-        {tickerItems.length > 0 ? (
-          <div className="flex w-max min-w-full animate-live-ticker items-center whitespace-nowrap motion-reduce:animate-none">
-            {[...tickerItems, ...tickerItems].map((request, index) => (
-              <span key={`${request.id}-${index}`} className="mx-5 inline-flex items-center gap-2 text-[0.65rem] font-extrabold uppercase sm:text-[0.72rem]">
-                <span className={`size-1.5 rounded-full ${isCrisis(request) ? "bg-crisis" : "bg-signal-foreground"}`} />
-                {request.title} · {request.place}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="px-4 text-[0.65rem] font-extrabold uppercase sm:text-[0.72rem]">Your city&apos;s next live view can start here.</p>
-        )}
+      <div className="relative flex h-11 items-center overflow-x-auto border-t border-border bg-surface/95 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Trending live ticker">
+        <span className="sticky left-0 z-10 flex h-full shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
+        <div className="flex w-max min-w-full animate-live-ticker items-center gap-2 px-2 whitespace-nowrap motion-reduce:animate-none">
+          {[...trends, ...trends].map((trend, index) => {
+            const Icon = trend.icon;
+            return (
+              <button
+                key={`${trend.key}-${index}`}
+                type="button"
+                onClick={() => trend.request && onOpenRequest(trend.request)}
+                disabled={!trend.request}
+                className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border bg-background/85 px-3 text-[0.65rem] font-extrabold uppercase transition-colors enabled:hover:bg-surface-raised disabled:opacity-55 ${trend.tone}`}
+              >
+                <Icon className="size-3.5" aria-hidden />
+                {trend.label}
+                {trend.request && <span className="text-foreground">· {trend.key === "bounty" ? `${poolOf(trend.request)} cr` : trend.request.place}</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

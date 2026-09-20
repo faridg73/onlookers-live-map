@@ -6,13 +6,11 @@ import {
   ChevronDown,
   CircleDollarSign,
   Compass,
-  History,
   HelpCircle,
   Map,
   MapPin,
   Martini,
   Radio,
-  Search,
   ShieldCheck,
   Siren,
   Sparkles,
@@ -50,11 +48,9 @@ import { useSessionElementScroll } from "@/hooks/use-session-scroll";
 import { saveMyLocation } from "@/lib/hunter-location";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 
-import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { HomeLiveStage } from "@/components/HomeLiveStage";
-import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { listTopCreators, type TopCreator } from "@/lib/top-creators";
@@ -274,9 +270,6 @@ function MapScreen() {
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [homeMapType, setHomeMapType] = useState<"hybrid" | "roadmap">("hybrid");
-  const [recentPlaces, setRecentPlaces] = useState<RecentPlace[]>([]);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [categoryTile, setCategoryTile] = useState<string | null>(null);
   const [scannerNotice, setScannerNotice] = useState(false);
@@ -346,26 +339,6 @@ function MapScreen() {
   useEffect(() => {
     if (b) select(b);
   }, [b, select]);
-
-  useEffect(() => {
-    setRecentPlaces(readRecentPlaces());
-  }, []);
-
-  const focusPlace = useCallback(
-    (place: { formatted: string; latitude: number; longitude: number; label?: string }) => {
-      setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
-      setRecentPlaces(
-        rememberRecentPlace({
-          formatted: place.formatted,
-          latitude: place.latitude,
-          longitude: place.longitude,
-          ...(place.label ? { label: place.label } : {}),
-        }),
-      );
-      setSearchOpen(false);
-    },
-    [],
-  );
 
   const finishDrawerDrag = useCallback((clientY: number) => {
     if (dragStartY.current === null) return;
@@ -493,7 +466,7 @@ function MapScreen() {
           setDrawerOpen(true);
           select(null);
         }}
-        mapTypeId={homeMapType}
+        mapTypeId="hybrid"
         showNativeMapTypeControl={false}
       />
 
@@ -510,44 +483,6 @@ function MapScreen() {
           <p className="whitespace-nowrap text-[0.55rem] font-bold leading-none text-muted-foreground md:text-[0.6rem]">
             Live eyes, anywhere
           </p>
-        </div>
-        <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] w-[min(22.5rem,calc(100vw-7.25rem))] min-w-0 md:left-6 md:w-[22.5rem]">
-          {searchOpen ? (
-            <div className="grid h-12 w-full origin-left animate-search-slide grid-cols-[minmax(0,1fr)_auto] items-center gap-1 rounded-full border border-border/80 bg-surface/80 p-1 shadow-2xl backdrop-blur-xl motion-reduce:animate-none">
-              <div className="min-w-0">
-                <PlaceSearchInput
-                  autoFocus
-                  searchIconPosition="right"
-                  placeholder="Search address..."
-                  onPick={focusPlace}
-                  className="[&>div:first-child]:h-10 [&>div:first-child]:rounded-full [&>div:first-child]:border-0 [&>div:first-child]:bg-transparent [&_input]:h-9 [&_input]:min-w-0 [&_input]:text-xs"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                aria-label="Close search"
-                onClick={() => setSearchOpen(false)}
-                className="grid size-10 shrink-0 place-items-center rounded-full border-0 bg-surface-raised/80 text-foreground shadow-none"
-              >
-                <X className="size-4" />
-              </Button>
-            </div>
-          ) : (
-            <div className="grid h-12 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 rounded-full border border-border/80 bg-surface/80 p-1.5 shadow-2xl backdrop-blur-xl">
-              <div className="flex shrink-0 items-center rounded-full bg-surface-raised/75 p-0.5" aria-label="Map style">
-                <Button type="button" variant="ghost" onClick={() => setHomeMapType("hybrid")} aria-pressed={homeMapType === "hybrid"} className={`h-8 rounded-full px-2.5 text-[11px] font-semibold ${homeMapType === "hybrid" ? "bg-foreground text-background shadow-sm hover:bg-foreground" : "text-muted-foreground"}`}>Satellite</Button>
-                <Button type="button" variant="ghost" onClick={() => setHomeMapType("roadmap")} aria-pressed={homeMapType === "roadmap"} className={`h-8 rounded-full px-2.5 text-[11px] font-semibold ${homeMapType === "roadmap" ? "bg-foreground text-background shadow-sm hover:bg-foreground" : "text-muted-foreground"}`}>Map</Button>
-              </div>
-              <Button type="button" variant="ghost" onClick={() => setSearchOpen(true)} className="min-w-0 justify-start truncate rounded-full px-2 text-xs font-medium text-muted-foreground">
-                Search...
-              </Button>
-              <Button type="button" size="icon" aria-label="Search for a place" onClick={() => setSearchOpen(true)} className="grid size-9 shrink-0 place-items-center rounded-full shadow-lg active:scale-95">
-                <Search className="size-4 shrink-0" />
-              </Button>
-            </div>
-          )}
         </div>
       </header>
 
@@ -604,39 +539,6 @@ function MapScreen() {
         </Button>
 
         <div ref={drawerScrollRef} className={`min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 transition-[max-height,opacity] duration-300 ${drawerOpen ? "max-h-[calc(min(68dvh,36rem)-8.75rem)] opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}>
-          <div className="border-t border-border pb-3 pt-3">
-            <div className="mb-2 flex items-center gap-2">
-              <History className="size-4 text-signal" aria-hidden />
-              <h2 className="text-xs font-extrabold uppercase tracking-[0.1em] text-foreground">Recent searches</h2>
-            </div>
-            {recentPlaces.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {recentPlaces.map((place) => (
-                  <Button
-                    key={`${place.formatted}-${place.at}`}
-                    type="button"
-                    variant="outline"
-                    onClick={() => focusPlace(place)}
-                    className="h-9 max-w-48 shrink-0 gap-1.5 rounded-full border-border bg-background px-3 text-xs text-foreground"
-                  >
-                    <MapPin className="size-3.5 shrink-0 text-signal" />
-                    <span className="truncate">{place.label}</span>
-                  </Button>
-                ))}
-              </div>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setSearchOpen(true)}
-                className="flex h-auto w-full items-center justify-start gap-2 rounded-md border border-dashed border-border bg-background px-3 py-2 text-left text-xs font-normal text-muted-foreground"
-              >
-                <Search className="size-4 shrink-0 text-signal" />
-                Search for a place to build your history.
-              </Button>
-            )}
-          </div>
-
           <div className="border-t border-border py-3">
             <div className="flex gap-1.5 overflow-x-auto" aria-label="Live map filters">
                 {(
