@@ -235,6 +235,11 @@ function PostScreen() {
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
   const [step, setStep] = useState<1 | 2 | 3>(rewardFirst ? 3 : 1);
+  const formScrollRef = useRef<HTMLDivElement | null>(null);
+  /** Every step change (and the first landing) starts the form scrolled to the top. */
+  useEffect(() => {
+    formScrollRef.current?.scrollTo({ top: 0 });
+  }, [step]);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
@@ -760,7 +765,7 @@ function PostScreen() {
 
 
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
+          <div ref={formScrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
             {step === 1 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
