@@ -15,6 +15,7 @@ import {
   Info,
   KeyRound,
   MapPin,
+  Flame,
   Mic,
   MicOff,
   Radio,
