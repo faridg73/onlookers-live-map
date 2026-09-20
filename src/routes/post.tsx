@@ -246,6 +246,9 @@ function PostScreen() {
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
+  // What to pick back up once the overlay sign-in succeeds.
+  const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
   const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [action, setAction] = useState<RequestAction>("clip");
