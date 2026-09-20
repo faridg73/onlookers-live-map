@@ -500,18 +500,40 @@ function MapScreen() {
         )}
       </button>
 
-      <label className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.25rem)] z-[65] flex h-9 items-center gap-1.5 rounded-full border border-border bg-surface/90 px-2.5 shadow-md backdrop-blur-xl md:left-4">
-        <input
-          type="checkbox"
-          checked={labelsVisible}
-          onChange={(event) => setLabelsVisible(event.target.checked)}
-          aria-label="Show map labels"
-          className="size-3.5 accent-signal"
-        />
-        <span className="text-[0.6rem] font-extrabold uppercase tracking-[0.08em] text-foreground/80">
-          Labels
-        </span>
-      </label>
+      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3rem)] z-[65] flex h-7 items-center gap-1 rounded-full border border-border bg-surface/90 pl-1.5 pr-1 shadow-md backdrop-blur-xl md:left-4">
+        <label className="flex items-center gap-1" aria-label="Show map labels">
+          <input
+            type="checkbox"
+            checked={labelsVisible}
+            onChange={(event) => setLabelsVisible(event.target.checked)}
+            className="size-3 accent-signal"
+          />
+          <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-foreground/80">
+            Labels
+          </span>
+        </label>
+        <span className="mx-0.5 h-3.5 w-px bg-border" aria-hidden />
+        <div className="flex items-center gap-0.5" role="group" aria-label="Map style">
+          {(["hybrid", "roadmap"] as const).map((type) => {
+            const active = homeMapType === type;
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setHomeMapType(type)}
+                aria-pressed={active}
+                className={`rounded-full px-1.5 py-0.5 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] transition-colors ${
+                  active
+                    ? "bg-signal text-signal-foreground"
+                    : "text-foreground/70 hover:text-signal"
+                }`}
+              >
+                {type === "hybrid" ? "Satellite" : "Map"}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
