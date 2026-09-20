@@ -11,6 +11,10 @@ Responsive Home map controls
 - [x] Keep Post a Bounty visible as the primary drawer action
 - [x] Verify mobile and desktop interactions
 
+Home trending ticker simplification
+- [x] Remove the Home map-style toggle, place search, and recent searches
+- [x] Add a dynamic horizontal ticker for high bounties, live streams, and emergencies
+
 Home map category filtering
 - [x] Add state for six category tiles
 - [x] Filter map markers by the active category lane
