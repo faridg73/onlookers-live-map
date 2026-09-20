@@ -207,8 +207,8 @@ Home Events & Arts neon category artwork
 - [x] Verify Home and Discover maps on phone and desktop without browser errors
 
 ## Brand cleanup and compact map controls
-- [ ] Remove Onlooker LLC from non-legal user-facing branding and active UI
-- [ ] Keep Onlooker LLC only in legal notices, copyright, FAQ, Terms, Privacy, and required policy copy
-- [ ] Change the Home top-right logo to Onlooker
-- [ ] Reduce custom map zoom control sizes across the platform
+- [x] Remove Onlooker LLC from non-legal user-facing branding and active UI
+- [x] Keep Onlooker LLC only in legal notices, copyright, FAQ, Terms, Privacy, and required policy copy
+- [x] Change the Home top-right logo to Onlooker
+- [x] Reduce custom map zoom control sizes across the platform
 - [ ] Verify key pages and map controls on phone and desktop
