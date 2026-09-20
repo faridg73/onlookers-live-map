@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,8 @@ export function HomeLiveStage({
   onExitMap,
 }: HomeLiveStageProps) {
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
+  const [tickerHovered, setTickerHovered] = useState(false);
+  const tickerRef = useRef<HTMLDivElement>(null);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -61,6 +63,24 @@ export function HomeLiveStage({
   const emergencyRequest = activeRequests.find(isCrisis) ?? null;
   const latestRequest =
     [...activeRequests].sort((a, b) => a.minutesAgo - b.minutesAgo)[0] ?? null;
+
+  useEffect(() => {
+    const ticker = tickerRef.current;
+    if (!ticker || tickerHovered || openFeed || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+    let previous = performance.now();
+    const move = (now: number) => {
+      const elapsed = Math.min(now - previous, 32);
+      previous = now;
+      ticker.scrollLeft += elapsed * 0.025;
+      const loopPoint = ticker.scrollWidth / 2;
+      if (ticker.scrollLeft >= loopPoint) ticker.scrollLeft -= loopPoint;
+      frame = requestAnimationFrame(move);
+    };
+    frame = requestAnimationFrame(move);
+    return () => cancelAnimationFrame(frame);
+  }, [openFeed, tickerHovered]);
 
   const feedItems = useMemo<Record<LiveFeedKey, LiveRequest[]>>(() => {
     const emergencies = activeRequests
@@ -242,9 +262,23 @@ export function HomeLiveStage({
         </div>
       </div>
 
-      <div className="relative flex h-11 items-center overflow-hidden border-t border-border bg-surface/95" aria-label="Trending live ticker">
-        <span className="sticky left-0 z-10 flex h-full shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
-        <div className={`flex w-max min-w-full items-center gap-2 px-2 whitespace-nowrap animate-live-ticker hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none ${openFeed ? "[animation-play-state:paused]" : ""}`}>
+      <div className="relative flex h-12 items-stretch border-t border-border bg-surface/95" aria-label="Trending live ticker">
+        <span className="z-10 flex shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
+        <div
+          ref={tickerRef}
+          className="scrollbar-neon flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
+          onPointerEnter={() => setTickerHovered(true)}
+          onPointerLeave={() => setTickerHovered(false)}
+          onFocusCapture={() => setTickerHovered(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setTickerHovered(false);
+          }}
+          onWheel={(event) => {
+            if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+            event.currentTarget.scrollBy({ left: event.deltaY, behavior: "smooth" });
+          }}
+          aria-label="Browse trending live feeds"
+        >
           {[...trends, ...trends].map((trend, index) => {
             const Icon = trend.icon;
             return (
