@@ -1028,10 +1028,10 @@ function PostScreen() {
                             size="sm"
                             aria-pressed={active}
                             onClick={() => setPrompt(active ? "" : example)}
-                            className={`h-auto whitespace-normal py-2 text-left transition-all duration-200 active:scale-[0.98] motion-reduce:active:transform-none ${
+                            className={`h-auto whitespace-normal rounded-full border px-3.5 py-1.5 text-xs font-extrabold transition-all duration-200 active:scale-95 motion-reduce:active:transform-none ${
                               active
                                 ? "border-signal bg-signal text-signal-foreground shadow-[0_0_18px_color-mix(in_oklab,var(--signal)_35%,transparent)] hover:bg-signal hover:text-signal-foreground"
-                                : "hover:border-signal hover:text-signal"
+                                : "border-border bg-background text-muted-foreground hover:border-signal hover:text-signal"
                             }`}
                           >
                             {example}
