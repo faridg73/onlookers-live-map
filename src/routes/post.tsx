@@ -428,6 +428,17 @@ function PostScreen() {
     setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
   };
 
+  /**
+   * Opens the sign-in overlay instead of navigating away, keeping every field
+   * on this page untouched. Returns false when the caller should pause.
+   */
+  const requireSignIn = (resume: () => void) => {
+    if (signedIn !== false) return true;
+    pendingAfterSignIn.current = resume;
+    setSignInOpen(true);
+    return false;
+  };
+
   const continueFromPrompt = () => {
     if (prompt.trim().length < 8) {
       toast.error("Describe the live view you want in one short sentence.");
