@@ -53,6 +53,7 @@ import { readSessionState, writeSessionState } from "@/lib/session-state";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import { FlashBountyButton } from "@/components/FlashBountyButton";
 import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
+import { HomeLiveStage } from "@/components/HomeLiveStage";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -496,7 +497,7 @@ function MapScreen() {
         showNativeMapTypeControl={false}
       />
 
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
         <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
           <img
             src="/icon-192.png"
@@ -550,8 +551,21 @@ function MapScreen() {
         </div>
       </header>
 
+      <HomeLiveStage
+        requests={requests}
+        poolOf={poolOf}
+        isCrisis={isCrisisRequest}
+        onGoLive={() => void navigate({ to: "/post" })}
+        onPostBounty={() => void navigate({ to: "/post" })}
+        onOpenRequest={(request) => {
+          select(request.id);
+          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+          setDrawerOpen(false);
+        }}
+      />
+
       <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
+        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-40 mx-auto flex w-full flex-col overflow-hidden border-t border-border bg-surface/95 shadow-2xl backdrop-blur-xl transition-[max-height] duration-300 ease-out motion-reduce:transition-none sm:inset-x-auto sm:right-5 sm:w-[25rem] sm:rounded-t-xl sm:border-x ${drawerOpen ? "max-h-[min(36dvh,36rem)] sm:max-h-[min(68dvh,36rem)]" : "max-h-[8.75rem]"}`}
         aria-label="Map actions"
       >
         <Button

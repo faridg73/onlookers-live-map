@@ -20,7 +20,8 @@
 
 @theme inline {
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display-impact: "Archivo Black", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Hind", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   /* One-step larger app-wide type scale for comfortable mobile and desktop reading. */
   --text-xs: 0.875rem;
   --text-xs--line-height: 1.25rem;
@@ -92,6 +93,16 @@
   --animate-shimmer: shimmer 2.6s ease-in-out infinite;
   --animate-slow-pan: slow-pan 18s ease-in-out infinite alternate;
   --animate-search-slide: search-slide 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-live-ticker: live-ticker 28s linear infinite;
+}
+
+@keyframes live-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes search-slide {
