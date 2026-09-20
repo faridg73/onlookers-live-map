@@ -485,44 +485,36 @@ function MapScreen() {
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
           setDrawerOpen(false);
         }}
+        hotSpot={hotSpotRequest}
         onOpenHighBounty={(request) => {
           setMapFilter("high");
           setCategoryTile(null);
           setGatheringClusterIds([]);
-          if (request) {
-            select(request.id);
-            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-            setDrawerOpen(false);
-          } else {
-            select(null);
-            setDrawerOpen(true);
-          }
+          select(request.id);
+          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+          setDrawerOpen(false);
         }}
         onOpenLive={(request) => {
-          setMapFilter("live");
-          setCategoryTile(null);
-          setGatheringClusterIds([]);
-          if (request) {
-            select(request.id);
-            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-            setDrawerOpen(false);
-          } else {
-            select(null);
-            setDrawerOpen(true);
-          }
+          void navigate({ to: "/live/$id", params: { id: request.id } });
         }}
         onOpenEmergency={(request) => {
           setMapFilter("all");
           setCategoryTile("emergencies");
           setGatheringClusterIds([]);
-          if (request) {
-            select(request.id);
-            setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
-            setDrawerOpen(false);
-          } else {
-            select(null);
-            setDrawerOpen(true);
-          }
+          select(request.id);
+          setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
+          setDrawerOpen(false);
+        }}
+        onOpenDispatches={() => {
+          void navigate({ to: "/hunt" });
+        }}
+        onOpenHotSpot={(request) => {
+          setMapFilter("nearby");
+          setCategoryTile(null);
+          setGatheringClusterIds([]);
+          select(request.id);
+          setCenterTarget({ ...requestMapPosition(request), zoom: 14 });
+          setDrawerOpen(false);
         }}
       />
 
