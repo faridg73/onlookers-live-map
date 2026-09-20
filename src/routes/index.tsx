@@ -6,7 +6,6 @@ import {
   ChevronDown,
   CircleDollarSign,
   Compass,
-  HelpCircle,
   Map,
   MapPin,
   Martini,
@@ -1195,26 +1194,6 @@ function MapScreen() {
                 </div>
               </div>
             )}
-          </div>
-
-          <div className={`grid grid-cols-2 gap-2 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
-            {[
-              { label: "FAQ", icon: HelpCircle, action: () => void navigate({ to: "/faq" }) },
-              { label: "Community", icon: Users, action: () => void navigate({ to: "/community" }) },
-              { label: "Guides", icon: BookOpen, action: () => setGuidesOpen(true) },
-              { label: "Go live", icon: Radio, action: () => void navigate({ to: "/post" }) },
-            ].map(({ label, icon: Icon, action }) => (
-              <Button
-                key={label}
-                type="button"
-                variant="outline"
-                onClick={action}
-                className="h-16 min-w-0 flex-col gap-1 rounded-md border-border bg-background px-1 text-[0.75rem] font-bold text-foreground"
-              >
-                <Icon className="size-4 text-signal" />
-                <span className="w-full truncate">{label}</span>
-              </Button>
-            ))}
           </div>
 
           <nav aria-label="Legal" className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-border py-3 ${activeCategoryTile ? "hidden" : ""}`}>
