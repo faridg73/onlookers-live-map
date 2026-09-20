@@ -497,6 +497,45 @@ function MapScreen() {
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
           setDrawerOpen(false);
         }}
+        onOpenHighBounty={(request) => {
+          setMapFilter("high");
+          setCategoryTile(null);
+          setGatheringClusterIds([]);
+          if (request) {
+            select(request.id);
+            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+            setDrawerOpen(false);
+          } else {
+            select(null);
+            setDrawerOpen(true);
+          }
+        }}
+        onOpenLive={(request) => {
+          setMapFilter("live");
+          setCategoryTile(null);
+          setGatheringClusterIds([]);
+          if (request) {
+            select(request.id);
+            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
+            setDrawerOpen(false);
+          } else {
+            select(null);
+            setDrawerOpen(true);
+          }
+        }}
+        onOpenEmergency={(request) => {
+          setMapFilter("all");
+          setCategoryTile("emergencies");
+          setGatheringClusterIds([]);
+          if (request) {
+            select(request.id);
+            setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
+            setDrawerOpen(false);
+          } else {
+            select(null);
+            setDrawerOpen(true);
+          }
+        }}
       />
 
       <section

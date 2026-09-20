@@ -8,6 +8,9 @@ type HomeLiveStageProps = {
   poolOf: (request: LiveRequest) => number;
   isCrisis: (request: LiveRequest) => boolean;
   onOpenRequest: (request: LiveRequest) => void;
+  onOpenHighBounty: (request: LiveRequest | null) => void;
+  onOpenLive: (request: LiveRequest | null) => void;
+  onOpenEmergency: (request: LiveRequest | null) => void;
   onGoLive: () => void;
   onPostBounty: () => void;
 };
@@ -21,6 +24,9 @@ export function HomeLiveStage({
   poolOf,
   isCrisis,
   onOpenRequest,
+  onOpenHighBounty,
+  onOpenLive,
+  onOpenEmergency,
   onGoLive,
   onPostBounty,
 }: HomeLiveStageProps) {
@@ -35,9 +41,30 @@ export function HomeLiveStage({
   const liveRequest = activeRequests.find(isLiveRequest) ?? null;
   const emergencyRequest = activeRequests.find(isCrisis) ?? null;
   const trends = [
-    { key: "bounty", label: "High Bounty Zone", icon: Flame, request: highestBounty, tone: "text-signal border-signal/55" },
-    { key: "live", label: "Live Stream", icon: Radio, request: liveRequest, tone: "text-live border-live/55" },
-    { key: "emergency", label: "Active Emergency Report", icon: Siren, request: emergencyRequest, tone: "text-crisis border-crisis/55" },
+    {
+      key: "bounty",
+      label: "High Bounty Zone",
+      icon: Flame,
+      request: highestBounty,
+      onActivate: onOpenHighBounty,
+      tone: "border-signal bg-signal text-signal-foreground shadow-[0_0_14px_color-mix(in_oklab,var(--color-signal)_38%,transparent)] hover:bg-signal/90",
+    },
+    {
+      key: "live",
+      label: "Live Stream",
+      icon: Radio,
+      request: liveRequest,
+      onActivate: onOpenLive,
+      tone: "border-live bg-live text-background shadow-[0_0_14px_color-mix(in_oklab,var(--color-live)_34%,transparent)] hover:bg-live/90",
+    },
+    {
+      key: "emergency",
+      label: "Active Emergency Report",
+      icon: Siren,
+      request: emergencyRequest,
+      onActivate: onOpenEmergency,
+      tone: "border-crisis bg-crisis text-foreground shadow-[0_0_14px_color-mix(in_oklab,var(--color-crisis)_38%,transparent)] hover:bg-crisis/90",
+    },
   ];
 
   return (
@@ -113,7 +140,7 @@ export function HomeLiveStage({
 
       <div className="relative flex h-11 items-center overflow-x-auto border-t border-border bg-surface/95 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Trending live ticker">
         <span className="sticky left-0 z-10 flex h-full shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
-        <div className="flex w-max min-w-full animate-live-ticker items-center gap-2 px-2 whitespace-nowrap motion-reduce:animate-none">
+        <div className="flex w-max min-w-full items-center gap-2 px-2 whitespace-nowrap md:animate-live-ticker md:hover:[animation-play-state:paused] md:focus-within:[animation-play-state:paused] motion-reduce:animate-none">
           {[...trends, ...trends].map((trend, index) => {
             const Icon = trend.icon;
             return (
@@ -121,13 +148,13 @@ export function HomeLiveStage({
                 key={`${trend.key}-${index}`}
                 type="button"
                 variant="outline"
-                onClick={() => trend.request && onOpenRequest(trend.request)}
-                disabled={!trend.request}
-                className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full border bg-background/85 px-3 text-[0.65rem] font-extrabold uppercase transition-colors enabled:hover:bg-surface-raised disabled:opacity-55 ${trend.tone}`}
+                onClick={() => trend.onActivate(trend.request)}
+                aria-label={`${trend.label}${trend.request ? `: ${trend.request.title}` : ": show this map view"}`}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-extrabold uppercase transition-[transform,background-color] hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-foreground/80 motion-reduce:transform-none ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
-                {trend.request && <span className="text-foreground">· {trend.key === "bounty" ? `${poolOf(trend.request)} cr` : trend.request.place}</span>}
+                {trend.request && <span className="opacity-80">· {trend.key === "bounty" ? `${poolOf(trend.request)} cr` : trend.request.place}</span>}
               </Button>
             );
           })}
