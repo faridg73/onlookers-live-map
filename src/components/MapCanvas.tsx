@@ -130,7 +130,7 @@ export function MapCanvas({
           ...SHARED_MAP_OPTIONS,
           mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
           mapTypeControl: showNativeMapTypeControl,
-          styles,
+          styles: styles ?? null,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
           // Neighborhood-level default keeps aerial detail and hybrid labels
           // legible while preserving the existing nearby marker density.
