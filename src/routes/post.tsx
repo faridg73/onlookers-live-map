@@ -379,6 +379,12 @@ function PostScreen() {
       });
     const { data: authSub } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(Boolean(session));
+      if (!session) return;
+      // Close the overlay and carry on exactly where they left off.
+      setSignInOpen(false);
+      const resume = pendingAfterSignIn.current;
+      pendingAfterSignIn.current = null;
+      if (resume) window.setTimeout(resume, 60);
     });
     return () => {
       active = false;
