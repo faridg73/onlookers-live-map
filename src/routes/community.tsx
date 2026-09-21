@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { CalendarPlus, Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -94,6 +95,7 @@ function CommunityHub() {
   const [source, setSource] = useState<"all" | "following">("all");
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
+  const [listingEvent, setListingEvent] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -326,6 +328,15 @@ function CommunityHub() {
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
 
+  /** A hashtag behaves exactly like a vibe card: it opens the map filtered to it. */
+  const openTagOnMap = useCallback((wanted: string) => {
+    setTag(wanted);
+    setStrangeSightings(false);
+    setFocus(null);
+    setView("map");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const renderCard = ({ post, miles }: { post: CommunityPost; miles: number | null }) => (
     <CommunityPostCard
       key={post.id}
@@ -339,6 +350,7 @@ function CommunityHub() {
         setView("map");
         window.scrollTo({ top: 0, behavior: "smooth" });
       }}
+      onTagClick={openTagOnMap}
       onChanged={() => void load()}
     />
   );
@@ -558,7 +570,15 @@ function CommunityHub() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setTag(tag === t ? null : t)}
+            title={`Open the map filtered to #${t}`}
+            onClick={() => {
+              if (tag === t && view === "map") {
+                setTag(null);
+                setView("feed");
+                return;
+              }
+              openTagOnMap(t);
+            }}
             className={`h-9 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold text-signal ${
               tag === t ? "border-signal bg-signal/10" : "border-signal/40"
             }`}
@@ -644,7 +664,7 @@ function CommunityHub() {
             <UserCheck className="size-3.5" /> Following
           </Button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             type="button"
             variant="outline"
@@ -656,6 +676,15 @@ function CommunityHub() {
             className="rounded-full border-signal/60 bg-signal/10 text-xs font-extrabold uppercase tracking-[0.1em] text-signal"
           >
             <Radio className="size-4" /> Start live stream
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setListingEvent(true)}
+            className="rounded-full border-signal/60 bg-signal/10 text-xs font-extrabold uppercase tracking-[0.1em] text-signal"
+          >
+            <CalendarPlus className="size-4" /> List an event
           </Button>
           <Button
             type="button"
@@ -798,6 +827,12 @@ function CommunityHub() {
           </SectionBoundary>
         </section>
       )}
+
+      <NewLocalEventDialog
+        open={listingEvent}
+        onOpenChange={setListingEvent}
+        onPosted={() => void load()}
+      />
 
       <NewCommunityPostDialog
         open={composing}
