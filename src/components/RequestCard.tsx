@@ -195,9 +195,31 @@ export function RequestCard({
           <div className="text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground/70">
             Instructions
           </div>
-          <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-            {request.instructions || request.note}
-          </p>
+          <div className="mt-1 space-y-1">
+            {(request.instructions || request.note)
+              .split(/\r?\n+/)
+              .filter((line) => line.trim())
+              .map((line, index) => {
+                // "Label: value" brief lines — label white, value lime.
+                const match = line.trim().match(/^([^:]{1,28}):\s+(.+)$/);
+                if (match) {
+                  return (
+                    <p
+                      key={index}
+                      className="text-sm leading-relaxed text-foreground"
+                    >
+                      <span className="font-bold text-foreground">{match[1]}: </span>
+                      <span className="font-bold text-signal">{match[2]}</span>
+                    </p>
+                  );
+                }
+                return (
+                  <p key={index} className="text-sm leading-relaxed text-foreground/90">
+                    {line.trim()}
+                  </p>
+                );
+              })}
+          </div>
         </div>
       )}
 
