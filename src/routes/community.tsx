@@ -612,8 +612,8 @@ function CommunityHub() {
             variant="ghost"
             size="sm"
             onClick={() => setView("alerts")}
-            className={`rounded-full text-xs font-bold ${
-              view === "alerts" ? "bg-crisis text-white" : "text-crisis"
+            className={`rounded-full border-2 animate-red-flash motion-reduce:animate-none text-xs font-bold ${
+              view === "alerts" ? "border-signal bg-signal text-signal-foreground" : "border-signal bg-surface text-crisis"
             }`}
           >
             <Siren className="size-3.5" /> Alerts
@@ -674,7 +674,7 @@ function CommunityHub() {
       {view === "alerts" ? (
         <div className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="Emergency alert map">
-            <div className="animate-red-flash mt-6 rounded-2xl border-2 border-signal/60 bg-crisis/10 px-4 py-3 motion-reduce:animate-none">
+            <div className="mt-6 rounded-2xl border-2 border-signal/60 bg-crisis/10 px-4 py-3">
 
 
               <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-crisis">

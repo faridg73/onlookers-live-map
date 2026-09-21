@@ -26,16 +26,14 @@ export function CategoryExampleCards({
 
   return (
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
-            <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
-          </p>
-          <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
-            Stories waiting to happen
-          </h2>
-        </div>
-        <span className="shrink-0 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">Starter feed</span>
+      <div className="flex flex-col items-center text-center">
+        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
+          <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
+        </p>
+        <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
+          Stories waiting to happen
+        </h2>
+        <span className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-muted-foreground">Starter feed</span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
