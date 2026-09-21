@@ -107,7 +107,7 @@ export function HomeLiveStage({
       icon: CircleDollarSign,
       request: highestBounty,
       onActivate: onOpenHighBounty,
-      tone: "border-home-line bg-home-glass text-foreground hover:border-home-accent/60",
+      tone: "border-signal/45 bg-home-glass text-foreground hover:border-signal",
       detail: (request: LiveRequest) => `${poolOf(request)} cr`,
     },
     {
@@ -125,7 +125,7 @@ export function HomeLiveStage({
       icon: Clock,
       request: latestRequest,
       onActivate: onOpenDispatches,
-      tone: "border-home-line bg-home-glass text-foreground hover:border-home-accent/60",
+      tone: "border-signal/45 bg-home-glass text-foreground hover:border-signal",
       detail: (request: LiveRequest) =>
         request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`,
     },
@@ -135,7 +135,7 @@ export function HomeLiveStage({
       icon: Flame,
       request: hotSpot,
       onActivate: onOpenHotSpot,
-      tone: "border-home-accent/35 bg-home-accent/10 text-home-accent hover:border-home-accent/70",
+      tone: "border-signal/60 bg-signal/10 text-signal hover:border-signal",
       detail: (request: LiveRequest) => request.place,
     },
   ];
@@ -172,7 +172,7 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 sm:left-6 sm:right-auto sm:w-[min(42rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
+    <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
       <div className="overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong shadow-2xl backdrop-blur-2xl">
       <div className="grid min-h-[11rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
         <div className="relative min-w-0 overflow-hidden px-5 pb-5 pt-5 sm:px-7 sm:pb-6 sm:pt-6 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
@@ -203,7 +203,7 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-3 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-foreground [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-3 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-signal drop-shadow-[0_0_16px_color-mix(in_oklab,var(--color-signal)_24%,transparent)] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
@@ -212,11 +212,11 @@ export function HomeLiveStage({
           </p>
 
           <div className="mt-4 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap [@media(max-height:520px)]:mt-2">
-            <Button type="button" variant="outline" onClick={onGoLive} className="h-11 rounded-xl border-home-accent/50 bg-home-accent/12 px-4 font-bold uppercase text-home-accent shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent hover:bg-home-accent/20 hover:text-home-accent active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
+            <Button type="button" onClick={onGoLive} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
               <Radio className="size-4" /> Go live
             </Button>
-            <Button type="button" variant="outline" onClick={onPostBounty} className="h-11 rounded-xl border-home-line bg-home-glass px-4 font-bold uppercase text-foreground shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/60 hover:bg-home-accent/10 hover:text-home-accent active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
-              <CircleDollarSign className="size-4 text-home-accent" /> Post bounty
+            <Button type="button" onClick={onPostBounty} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
+              <CircleDollarSign className="size-4" /> Post bounty
             </Button>
           </div>
         </div>

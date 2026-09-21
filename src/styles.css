@@ -292,7 +292,7 @@
   --ring: oklch(0.93071 0.22858 123.09);
 
   /* Home marketplace: a quieter, finance-grade glass layer over the live map. */
-  --home-accent: oklch(0.723 0.191 149.58); /* #22c55e */
+  --home-accent: var(--signal);
   --home-glass: oklch(0.16 0.006 150 / 0.76);
   --home-glass-strong: oklch(0.13 0.004 150 / 0.9);
   --home-line: oklch(0.86 0.01 150 / 0.2);
