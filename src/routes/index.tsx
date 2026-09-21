@@ -71,7 +71,7 @@ export const Route = createFileRoute("/")({
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
   const navigate = useNavigate();
-  const { b } = Route.useSearch();
+  const { b, at } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
