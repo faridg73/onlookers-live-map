@@ -5,9 +5,9 @@ import { Clock, DollarSign, Navigation, Radio, X } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
-import { RecentActivityFeed } from "@/components/RecentActivityFeed";
-import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
+import { LiveBountyMapBox, type LiveBountyPin } from "@/components/LiveBountyMapBox";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { formatCredits } from "@/lib/credits";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
@@ -99,6 +99,22 @@ function HuntScreen() {
 
   const potential = list.reduce((sum, row) => sum + row.payout, 0);
   const nearby = list.filter((row) => row.miles !== null && row.miles <= radius).length;
+
+  /** Open bounties that have real coordinates, shown on the compact live map. */
+  const pins = useMemo<LiveBountyPin[]>(
+    () =>
+      list.map(({ request, payout }) => {
+        const spot = requestMapPosition(request);
+        return {
+          id: request.dbId ?? request.id,
+          title: request.title,
+          credits: payout,
+          lat: spot.lat,
+          lng: spot.lng,
+        };
+      }),
+    [list],
+  );
 
   const stat = "rounded-2xl border border-border bg-surface p-3";
 
@@ -209,18 +225,20 @@ function HuntScreen() {
             </div>
           ))}
           {list.length === 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4 md:col-span-2 xl:col-span-3">
               <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No open bounties right now. Watch the archive while you wait.
+                No open bounties right now. Keep an eye on the live map.
               </p>
-              <RecentCapturesFeed blurb="Finished streams from hunters near you, still watchable." />
-              <RecentActivityFeed />
+              <LiveBountyMapBox pins={pins} center={position} />
             </div>
           )}
           {list.length > 0 && nearby === 0 && position && (
-            <div className="space-y-4">
-              <RecentCapturesFeed blurb="Nothing live in your radius, here's what already wrapped." />
-              <RecentActivityFeed />
+            <div className="space-y-4 md:col-span-2 xl:col-span-3">
+              <LiveBountyMapBox
+                pins={pins}
+                center={position}
+                label="Live bounties on the map"
+              />
             </div>
           )}
         </div>
