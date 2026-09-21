@@ -373,8 +373,8 @@ export function HomeLiveStage({
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                    <activeTrend.icon className="size-4 shrink-0 text-home-accent" aria-hidden />
-                   <h3 className="home-display truncate text-xs font-semibold uppercase text-foreground">{activeTrend.label}</h3>
-                   <span className="rounded-full border border-home-line bg-home-glass px-2 py-0.5 text-[0.62rem] font-bold text-foreground">
+                   <h3 className="home-display truncate text-xs font-semibold uppercase text-home-accent">{activeTrend.label}</h3>
+                   <span className="rounded-full border border-signal/50 bg-signal/10 px-2 py-0.5 text-[0.62rem] font-bold text-signal">
                     {activeItems.length}
                   </span>
                 </div>
