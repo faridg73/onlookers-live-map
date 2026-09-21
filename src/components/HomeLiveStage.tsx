@@ -31,6 +31,54 @@ function isLiveRequest(request: LiveRequest) {
   return request.bountyType === "live_stream" && request.status === "claimed";
 }
 
+/**
+ * Showcase prompts used when nothing is active nearby. These are clearly framed as
+ * invitations (not fake listings) so the dashboard still feels alive and clickable.
+ */
+const SHOWCASE: Array<{ key: string; category: string; kind: "live" | "bounty"; label: string; title: string; place: string; credits: number }> = [
+  { key: "sc-street", category: "street", kind: "live", label: "Be first live", title: "Go live from the busiest block in your city", place: "Your neighborhood", credits: 40 },
+  { key: "sc-food", category: "food", kind: "bounty", label: "Open a bounty", title: "Ask for the line at tonight's hot spot", place: "Nearby restaurants", credits: 60 },
+  { key: "sc-events", category: "events", kind: "live", label: "Be first live", title: "Stream the crowd before the show starts", place: "Local venues", credits: 80 },
+  { key: "sc-vehicles", category: "vehicles", kind: "bounty", label: "Open a bounty", title: "Pay for a quick look at traffic ahead", place: "Main routes", credits: 100 },
+];
+
+function ShowcaseCard({
+  item,
+  onGoLive,
+  onPostBounty,
+}: {
+  item: (typeof SHOWCASE)[number];
+  onGoLive: () => void;
+  onPostBounty: () => void;
+}) {
+  const live = item.kind === "live";
+  return (
+    <button
+      type="button"
+      onClick={live ? onGoLive : onPostBounty}
+      className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none lg:w-auto"
+    >
+      <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35">
+        <img src={requestCategoryArt(item.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+        <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col justify-between gap-1">
+        <span className="flex items-center justify-between gap-1">
+          <span className={`flex items-center gap-1 text-[0.55rem] font-extrabold uppercase ${live ? "text-live" : "text-signal"}`}>
+            {live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <Sparkles className="size-3" />}
+            {item.label}
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full border border-signal bg-signal/15 px-1.5 py-[1px] font-mono text-[0.55rem] font-bold tabular-nums text-signal shadow-[0_0_12px_color-mix(in_oklab,var(--color-signal)_35%,transparent)]">
+            <CircleDollarSign className="size-2.5" aria-hidden /> {item.credits}+
+          </span>
+        </span>
+        <span className="line-clamp-2 text-[0.72rem] font-bold leading-tight text-foreground group-hover:text-signal">{item.title}</span>
+        <span className="flex items-center gap-1 truncate text-[0.55rem] font-medium text-signal"><MapPin className="size-3 shrink-0" aria-hidden /> <span className="truncate">{item.place}</span></span>
+      </span>
+    </button>
+  );
+}
+
 export function HomeLiveStage({
   requests,
   poolOf,
@@ -206,7 +254,7 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
+    <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
       {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
       <div
         className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
@@ -299,9 +347,20 @@ export function HomeLiveStage({
               <span className="flex items-center gap-1 text-[0.68rem] font-bold uppercase text-foreground/75 group-hover:text-home-accent"><Eye className="size-3.5" /> Open on map</span>
             </button>
           ) : (
-            <div className="mt-2 flex h-[calc(100%-1.4rem)] items-center rounded-xl border border-dashed border-home-line bg-home-glass px-4 text-xs text-foreground/55">
-              No active posts nearby yet. Start the first live view or local bounty.
-            </div>
+            <button type="button" onClick={onGoLive} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between overflow-hidden rounded-xl border border-signal/35 bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">
+              <span className="relative -mx-1 -mt-1 mb-2 block h-20 overflow-hidden rounded-lg border border-home-line">
+                <img src={requestCategoryArt("street")} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-background/75 via-background/10 to-transparent" aria-hidden />
+              </span>
+              <span className="flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase text-live">
+                <Radio className="size-3.5 animate-pulse motion-reduce:animate-none" /> Be first live here
+              </span>
+              <span>
+                <span className="line-clamp-2 block text-sm font-extrabold text-foreground">Your city is quiet right now</span>
+                <span className="mt-1 block text-[0.68rem] font-semibold text-signal">Start a live view and watchers come to you</span>
+              </span>
+              <span className="flex items-center gap-1 text-[0.68rem] font-bold uppercase text-foreground/75 group-hover:text-signal"><Eye className="size-3.5" /> Go live</span>
+            </button>
           )}
         </div>
       </div>
@@ -320,7 +379,7 @@ export function HomeLiveStage({
           <span className="text-[0.58rem] font-bold uppercase text-signal">Live city feed</span>
         </div>
         {discoveryItems.length > 0 ? (
-          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1" aria-label="Active live streams and high-value bounties">
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Active live streams and high-value bounties">
             {discoveryItems.map((request) => {
               const live = isLiveRequest(request);
               const initials = (request.requester || "?")
@@ -335,7 +394,7 @@ export function HomeLiveStage({
                   key={`discover-${request.id}`}
                   type="button"
                   onClick={() => live ? onOpenLive(request) : onOpenRequest(request)}
-                  className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
+                  className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none lg:w-auto"
                 >
                   {/* Visual preview: category cover art with creator initials badge. */}
                   <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35">
@@ -366,15 +425,19 @@ export function HomeLiveStage({
             })}
           </div>
         ) : (
-          <p className="px-3 py-2 text-xs text-foreground/55">No active streams or bounties nearby yet.</p>
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Ways to start the first stream or bounty nearby">
+            {SHOWCASE.map((item) => (
+              <ShowcaseCard key={item.key} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
+            ))}
+          </div>
         )}
       </div>
 
-      <div className="relative mt-2 flex h-12 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
+      <div className="relative mt-2 flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
           ref={trendScrollerRef}
-          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
+          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-2 pt-1 whitespace-nowrap"
           onScroll={updateTrendScroll}
           onWheel={(event) => {
             if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -457,8 +520,13 @@ export function HomeLiveStage({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-md border border-dashed border-signal/45 bg-background/80 p-3 text-center">
-                  <p className="text-xs font-bold text-foreground">No active items right now—tap below to start one!</p>
+                <div className="rounded-md border border-signal/45 bg-background/80 p-3 text-center">
+                  <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
+                  <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
+                    {SHOWCASE.map((item) => (
+                      <ShowcaseCard key={`drawer-${item.key}`} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
+                    ))}
+                  </div>
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
                       <Radio className="size-3.5" /> Go live
