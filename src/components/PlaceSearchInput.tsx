@@ -34,6 +34,7 @@ export function PlaceSearchInput({
   searchIconPosition = "left",
   variant = "box",
   additionalResults,
+  boxClassName = "",
 }: {
   placeholder?: string;
   onPick: (place: GeocodeResult) => void;
@@ -240,7 +241,7 @@ export function PlaceSearchInput({
 
   return (
     <div className={`relative ${className}`}>
-      <div className="flex items-center gap-1.5 rounded-xl border-2 border-border bg-surface px-2">
+      <div className={`flex items-center gap-1.5 rounded-xl border-2 border-border bg-surface px-2 ${boxClassName}`}>
         {searchIconPosition === "left" && (
           <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         )}

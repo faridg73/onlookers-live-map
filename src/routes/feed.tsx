@@ -322,6 +322,7 @@ function FeedScreen() {
       <div className="mt-3">
         <PlaceSearchInput
           placeholder="Filter by city, venue, landmark or address"
+          boxClassName="border-signal shadow-[0_0_12px_rgba(204,255,0,0.25)]"
           onQueryChange={setPlaceQuery}
           onPick={(place) => {
             setPlaceQuery("");
