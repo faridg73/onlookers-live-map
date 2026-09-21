@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
-import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ScrollableLane } from "@/components/ScrollableLane";
