@@ -22,9 +22,10 @@ interface BountyLiveDialogProps {
 export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineLabel }: BountyLiveDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88dvh] overflow-y-auto border-signal/40 bg-surface p-0 sm:max-w-md">
-        <DialogHeader className="items-start gap-1 border-b border-border px-5 pb-4 pt-2 text-left">
-          <DialogTitle className="flex items-center gap-2 pr-8 text-lg font-display font-extrabold leading-tight text-white">
+      {/* Close button pinned to the very top corner so it never sits on the title. */}
+      <DialogContent className="max-h-[88dvh] overflow-y-auto border-signal/40 bg-surface p-0 sm:max-w-md [&>button]:right-2 [&>button]:top-2">
+        <DialogHeader className="items-start gap-1 border-b border-border px-5 pb-4 pt-6 text-left">
+          <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-display font-extrabold leading-tight text-white">
             <CheckCircle2 className="size-6 shrink-0 text-signal" aria-hidden />
             Your bounty is live
           </DialogTitle>
@@ -39,7 +40,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
               <Coins className="size-4 text-signal" aria-hidden />
               Credits held in escrow
             </span>
-            <span className="font-display text-base font-extrabold text-signal">
+            <span className="font-display text-base font-extrabold tabular-nums text-signal">
               {formatCredits(credits)} · {formatCreditCash(credits)}
             </span>
           </div>
@@ -73,7 +74,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
             onClick={() => onOpenChange(false)}
             className="h-11 flex-1 bg-signal font-extrabold text-signal-foreground hover:bg-signal hover:text-signal-foreground"
           >
-            View it on the map
+            View my bounty
           </Button>
         </div>
       </DialogContent>
