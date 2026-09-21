@@ -59,6 +59,16 @@ function eventMatchesTag(
   return meta.keywords.some((word) => haystack.includes(word));
 }
 
+/** Words that mark a listed event as belonging to a creator vibe. */
+const VIBE_EVENT_KEYWORDS: Record<string, string[]> = {
+  foodie: ["food", "wine", "beer", "taste", "culinary", "restaurant", "brunch", "dining", "chef"],
+  "car-spotters": ["auto", "car", "motor", "racing", "nascar", "monster", "truck", "bike"],
+  "style-scout": ["fashion", "style", "pop-up", "market", "expo", "design", "beauty"],
+  "street-music": ["music", "concert", "band", "dj", "jazz", "acoustic", "hip", "rock", "latin", "pop"],
+  "match-day": ["sport", "basketball", "football", "baseball", "soccer", "hockey", "game", "match"],
+  "market-finds": ["market", "flea", "swap", "craft", "vintage", "bazaar", "fair", "expo"],
+};
+
 const WEEKEND = [0, 5, 6];
 
 function TrendingScreen() {
