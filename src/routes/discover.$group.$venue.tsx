@@ -145,7 +145,7 @@ function VenueScreen() {
       </div>
 
       <h1 className="mt-4 font-display text-3xl tracking-tight"><TwoToneName name={venue.name} /></h1>
-      <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+      <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-signal">
         <MapPin className="size-3.5" aria-hidden /> {venue.area}
       </p>
       {place?.rating && (
