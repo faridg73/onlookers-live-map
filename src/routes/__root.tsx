@@ -16,6 +16,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { OnlookerProvider } from "@/lib/onlooker-store";
 import { BoostProvider } from "@/lib/boosts-store";
 import { BottomNav } from "../components/BottomNav";
+import { AppMenu } from "../components/AppMenu";
 import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { ProfileSetup } from "../components/ProfileSetup";
@@ -156,6 +157,7 @@ function RootComponent() {
             )}
             {!embedded && (
               <>
+                <AppMenu />
                 <BottomNav />
                 <ProfileSetup />
                 <OnboardingWalkthrough />
