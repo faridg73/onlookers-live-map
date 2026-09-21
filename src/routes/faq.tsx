@@ -357,7 +357,7 @@ function FAQScreen() {
         </Accordion>
       </section>
 
-      <aside className="mt-8 border-t border-border pt-6">
+      <aside className="mt-8 border-t border-border pt-6 text-center">
         <h2 className="font-display text-lg text-foreground">Still need help?</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           <Link to="/contact" className="font-semibold text-signal underline underline-offset-4">Contact support</Link>
