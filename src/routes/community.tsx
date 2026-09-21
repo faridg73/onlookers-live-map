@@ -407,20 +407,6 @@ function CommunityHub() {
             >
               {vibeGridOpen ? "Hide" : "See All"}
             </Button>
-            <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setCategory("all");
-              setTag(null);
-              setCategoryId(null);
-              setStrangeSightings(false);
-            }}
-            className={category === "all" ? "text-signal" : "text-muted-foreground"}
-          >
-            Everything
-          </Button>
           </div>
         </div>
         {/* Mobile keeps the sideways carousel; "See All" opens every browse category. */}
