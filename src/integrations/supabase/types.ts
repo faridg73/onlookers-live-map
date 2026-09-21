@@ -271,6 +271,7 @@ export type Database = {
           body: string
           category: string
           created_at: string
+          event_starts_at: string | null
           expires_at: string | null
           flag_count: number
           id: string
@@ -300,6 +301,7 @@ export type Database = {
           body?: string
           category: string
           created_at?: string
+          event_starts_at?: string | null
           expires_at?: string | null
           flag_count?: number
           id?: string
@@ -329,6 +331,7 @@ export type Database = {
           body?: string
           category?: string
           created_at?: string
+          event_starts_at?: string | null
           expires_at?: string | null
           flag_count?: number
           id?: string
@@ -2387,6 +2390,7 @@ export type Database = {
           body: string
           category: string
           created_at: string
+          event_starts_at: string
           expires_at: string
           flag_count: number
           hunter_level: number
