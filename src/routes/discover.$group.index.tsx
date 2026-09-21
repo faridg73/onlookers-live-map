@@ -75,7 +75,7 @@ function GroupScreen() {
       : [];
 
   return (
-    <div className="app-shell pb-28 pt-safe">
+    <div className="discover-inter app-shell pb-28 pt-safe">
       <PageBackButton label="All places" fallback="/discover" />
       <h1 className="mt-2 font-display text-3xl tracking-tight"><TwoToneName name={heading} /></h1>
       <p className="mt-1 text-sm font-semibold text-signal">{tagline}</p>
