@@ -163,7 +163,7 @@ function TrendingScreen() {
       <h1 className="mt-3 inline-flex items-center gap-2 font-display text-3xl tracking-tight text-foreground">
         <Flame className="size-6 text-signal" aria-hidden /> Trending feeds
       </h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="mt-1 text-sm font-semibold text-signal">
         {activeVibe
           ? `${activeVibe.label} streams and places around ${area.label}.`
           : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label}, tap any card to launch a live view from that exact spot.`}
@@ -223,7 +223,7 @@ function TrendingScreen() {
             <Ticket className="size-4 text-signal" aria-hidden />{" "}
             {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs font-semibold text-signal">
             {activeVibe
               ? `${visibleEvents.length} ${activeVibe.label.toLowerCase()} listings around ${area.label}.`
               : activeTag
