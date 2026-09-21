@@ -24,7 +24,8 @@ const EB_URL = "https://www.eventbriteapi.com/v3";
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
-export type EventSource = "ticketmaster" | "seatgeek" | "eventbrite";
+/** "onlooker" events are real listings posted by members inside the app. */
+export type EventSource = "ticketmaster" | "seatgeek" | "eventbrite" | "onlooker";
 
 /** "major" = arena/stadium scale, "local" = neighbourhood scale. */
 export type EventScope = "major" | "local";

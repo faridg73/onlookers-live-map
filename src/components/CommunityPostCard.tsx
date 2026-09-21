@@ -35,6 +35,7 @@ export function CommunityPostCard({
   isMine,
   distanceLabel,
   onShowOnMap,
+  onTagClick,
   onChanged,
 }: {
   post: CommunityPost;
@@ -42,6 +43,8 @@ export function CommunityPostCard({
   isMine: boolean;
   distanceLabel?: string;
   onShowOnMap?: () => void;
+  /** Opens the map filtered to that hashtag, same as picking a vibe. */
+  onTagClick?: (tag: string) => void;
   onChanged: () => void;
 }) {
   const { user } = useAuth();
@@ -187,14 +190,26 @@ export function CommunityPostCard({
 
         {post.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {post.tags.slice(0, 2).map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
-              >
-                #{t}
-              </span>
-            ))}
+            {post.tags.slice(0, 4).map((t) =>
+              onTagClick ? (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => onTagClick(t)}
+                  title={`Open the map filtered to #${t}`}
+                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal transition-colors hover:border-signal hover:bg-signal/15"
+                >
+                  #{t}
+                </button>
+              ) : (
+                <span
+                  key={t}
+                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
+                >
+                  #{t}
+                </span>
+              ),
+            )}
           </div>
         )}
 
