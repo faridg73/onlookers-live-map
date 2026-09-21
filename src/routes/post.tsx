@@ -1529,7 +1529,16 @@ function PostScreen() {
                   <CollapsibleContent className="mt-3"><BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} /></CollapsibleContent>
                 </Collapsible>
 
-                <BountyPriceBreakdown quote={quote} />
+                <GigCostBreakdown
+                  gig={gig}
+                  live={capture === null}
+                  rewardCredits={quote.baseCredits}
+                  rewardMatchesGig={rewardMatchesGig}
+                  urgencyFactor={quote.urgencyFactor}
+                  weatherFactor={quote.weatherFactor}
+                  tipCredits={Number.isFinite(tip) ? tip : 0}
+                  totalCredits={total}
+                />
                 {tip > 0 && (
                   <p className="text-xs font-medium text-muted-foreground">
                     Plus a {formatCredits(tip)} tip, {formatCredits(total)} leaves your wallet.
@@ -1570,7 +1579,7 @@ function PostScreen() {
                   Next: describe the bounty
                 </Button>
               )}
-              {step === 3 && detailsReady && <Button type="submit" disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
+              {step === 3 && detailsReady && <Button type="submit" disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Publish Bounty & Fund Escrow · ${formatCredits(total)}`}</Button>}
             </div>
           </footer>
         </form>
