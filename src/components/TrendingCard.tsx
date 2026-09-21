@@ -51,7 +51,7 @@ export function TrendingCard({ place, group, tag, photoUrl, liveCount, weekend }
             {place.name}
           </Link>
 
-          <p className="mt-0.5 flex items-center gap-1 truncate text-[0.68rem] text-muted-foreground">
+          <p className="mt-0.5 flex items-center gap-1 truncate text-[0.68rem] font-semibold text-signal">
             <MapPin className="size-3 shrink-0" aria-hidden />
             <span className="truncate">{venue.area}</span>
             {place.rating ? (

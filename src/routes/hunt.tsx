@@ -131,7 +131,7 @@ function HuntScreen() {
           <X className="size-5" aria-hidden />
         </button>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="mt-1 text-sm font-semibold text-signal">
         Open bounties you can claim right now, ranked for the fastest payout.
       </p>
 
