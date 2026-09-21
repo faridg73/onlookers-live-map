@@ -68,7 +68,7 @@ export function HomeLiveStage({
     updateTrendScroll();
     window.addEventListener("resize", updateTrendScroll);
     return () => window.removeEventListener("resize", updateTrendScroll);
-  }, [updateTrendScroll]);
+  }, [updateTrendScroll, mapExpanded]);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
