@@ -171,11 +171,12 @@ function DiscoverHome() {
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
-                    <Flame className="size-4 text-signal" aria-hidden /> Trending events & live
-                    sports
+                    <Flame className="size-4 text-signal" aria-hidden /> Trending events &amp;{" "}
+                    <span className="text-signal">live sports</span>
                   </h2>
-                  <p className="text-xs text-muted-foreground">
-                    {isWeekend ? "On this weekend" : "Coming up"} around {area.label}
+                  <p className="text-xs text-foreground/90">
+                    {isWeekend ? "On this weekend" : "Coming up"} around{" "}
+                    <span className="font-bold text-signal">{area.label}</span>
                   </p>
                 </div>
                 <Link
@@ -271,12 +272,12 @@ function DiscoverHome() {
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
         <p className="inline-flex items-center gap-2 font-display text-base text-foreground">
-          <Radar className="size-4 text-signal" aria-hidden /> Bounty Radar
+          <Radar className="size-4 text-signal" aria-hidden /> Bounty <span className="text-signal">Radar</span>
         </p>
         {spots.length === 0 ? (
-          <p className="mt-1 text-xs text-muted-foreground">
-            Follow a spot from any place page and we'll alert you when a new bounty is posted
-            within five miles of it.
+          <p className="mt-1 text-xs text-foreground/90">
+            Follow a spot from any place page and we&apos;ll alert you when a new bounty is posted{" "}
+            <span className="font-bold text-signal">within five miles</span> of it.
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -306,13 +307,13 @@ function DiscoverHome() {
       <div className="mt-6 flex gap-2">
         <Link
           to="/feed"
-          className="flex-1 rounded-xl border border-border bg-surface py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-foreground"
+          className="flex-1 rounded-xl border border-signal/40 bg-surface py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-signal transition-colors hover:bg-signal/10"
         >
           Live feed
         </Link>
         <Link
           to="/explore"
-          className="flex-1 rounded-xl border border-border bg-surface py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-foreground"
+          className="flex-1 rounded-xl border border-signal/40 bg-surface py-3 text-center text-xs font-bold uppercase tracking-[0.12em] text-signal transition-colors hover:bg-signal/10"
         >
           Explore clips
         </Link>

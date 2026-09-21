@@ -218,8 +218,8 @@ export function LocationSearchBar({ className = "" }: { className?: string }) {
         </button>
       </form>
 
-      <p className="mt-1.5 truncate text-[0.68rem] text-muted-foreground">
-        Browsing <span className="font-bold text-foreground">{area.label}</span>
+      <p className="mt-1.5 truncate text-[0.68rem] text-foreground/90">
+        Browsing <span className="font-bold text-signal">{area.label}</span>
       </p>
       {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
