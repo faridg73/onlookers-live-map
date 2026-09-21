@@ -29,9 +29,11 @@ export function HunterEarningBanner() {
           <p className="inline-flex items-center gap-2 font-display text-base font-bold text-foreground">
             <Zap className="size-4 fill-signal text-signal" aria-hidden /> How hunting works
           </p>
-          <p className="mt-1 max-w-[16rem] text-xs leading-relaxed text-muted-foreground">
-            Turn your phone into a paycheck. Hunters keep 100% of the bounty and
-            receive fast Stripe payouts straight to their bank.
+          <p className="mt-1 max-w-[16rem] text-xs leading-relaxed text-foreground/90">
+            Turn your phone into a paycheck. Hunters keep{" "}
+            <span className="font-bold text-signal">100% of the bounty</span> and receive{" "}
+            <span className="font-bold text-signal">fast Stripe payouts</span> straight to
+            their bank.
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-signal/15 px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.08em] text-signal">
