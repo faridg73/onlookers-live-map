@@ -139,7 +139,8 @@ function GroupScreen() {
               <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
                 <PlacePhoto
                   src={photoOf(place)}
-                  fallbackSrc={groupImage}
+                  identity={place.name}
+                  identityNote={place.primaryType ?? area.label}
                   alt={`${place.name} in ${place.address ?? area.label}`}
                 />
               </span>
@@ -181,7 +182,8 @@ function GroupScreen() {
             <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
               <PlacePhoto
                 src={null}
-                fallbackSrc={groupImage}
+                identity={venue.name}
+                identityNote={venue.area}
                 alt={`${venue.name} in ${venue.area}`}
               />
             </span>

@@ -138,7 +138,8 @@ function VenueScreen() {
       <div className="mt-3 aspect-[16/7] overflow-hidden rounded-2xl bg-surface-raised">
         <PlacePhoto
           src={venuePhoto}
-          fallbackSrc={fallbackImage}
+          identity={venue.name}
+          identityNote={venue.area}
           alt={`${venue.name} in ${venue.area}`}
           eager
         />

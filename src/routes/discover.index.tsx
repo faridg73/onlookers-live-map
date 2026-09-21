@@ -212,7 +212,8 @@ function DiscoverHome() {
                           <div className="h-20 overflow-hidden bg-surface-raised">
                             <PlacePhoto
                               src={eventPhoto(place)}
-                              fallbackSrc={discoveryImage(eventsGroup.slug)}
+                              identity={place.name}
+                              identityNote={place.primaryType ?? area.label}
                               alt={`${place.name} venue`}
                             />
                           </div>
@@ -254,7 +255,8 @@ function DiscoverHome() {
                 <div className="relative h-28 overflow-hidden">
                   <PlacePhoto
                     src={discoveryImage(group.slug)}
-                    fallbackSrc={discoveryImage(group.slug)}
+                    identity={group.name}
+                    identityNote={group.short}
                     alt={`${group.name} near ${area.label}`}
                   />
                   <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />

@@ -116,7 +116,7 @@ function TrendingScreen() {
 
   items.sort((a, b) => (b.place.ratingCount ?? 0) - (a.place.ratingCount ?? 0));
 
-  const photoOf = usePlacePhotos(items.slice(0, 16).map((item) => item.place));
+  const photoOf = usePlacePhotos(items.map((item) => item.place));
   const weekend = WEEKEND.includes(new Date().getDay());
 
   const liveNear = (name: string) =>

@@ -4,7 +4,6 @@ import { MapPin, Radio, Star, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
 import { PlacePhoto } from "@/components/PlacePhoto";
 import { venueFromPlace, placeSlug, type DiscoveryGroup } from "@/lib/discovery";
-import { discoveryImage } from "@/lib/discovery-visuals";
 import type { DiscoveredPlace } from "@/lib/places.functions";
 
 type Props = {
@@ -26,7 +25,8 @@ export function TrendingCard({ place, group, tag, photoUrl, liveCount, weekend }
         <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
           <PlacePhoto
             src={photoUrl}
-            fallbackSrc={discoveryImage(group.slug)}
+            identity={place.name}
+            identityNote={place.primaryType ?? venue.area}
             alt={`${place.name} in ${venue.area}`}
           />
         </div>
