@@ -78,12 +78,12 @@ function TrendingScreen() {
   const mallsGroup = discoveryGroupBySlug("malls");
   const performancesGroup = discoveryGroupBySlug("performances");
   const marketsGroup = discoveryGroupBySlug("markets");
-  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 20, enabled: vibeId === "foodie" });
+  const foodie = usePlaceList(foodGroup, null, area, { maxResults: 20, enabled: vibeId === "foodie" });
   const cars = usePlaceList(transitGroup, null, area, { maxResults: 20, enabled: vibeId === "car-spotters" });
   const style = usePlaceList(mallsGroup, null, area, { maxResults: 20, enabled: vibeId === "style-scout" });
-  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 20, enabled: vibeId === "street-music" });
+  const music = usePlaceList(performancesGroup, null, area, { maxResults: 20, enabled: vibeId === "street-music" });
   const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 20, enabled: vibeId === "match-day" });
-  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 20, enabled: vibeId === "market-finds" });
+  const marketFinds = usePlaceList(marketsGroup, null, area, { maxResults: 20, enabled: vibeId === "market-finds" });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
@@ -91,8 +91,12 @@ function TrendingScreen() {
   });
 
   const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
+  const vibeKeywords = activeVibe ? (VIBE_EVENT_KEYWORDS[activeVibe.id] ?? []) : [];
   const visibleEvents = activeVibe
-    ? []
+    ? events.filter((event) => {
+        const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
+        return vibeKeywords.some((word) => haystack.includes(word));
+      })
     : activeTag
       ? events.filter((event) => eventMatchesTag(event, activeTag))
       : events;
