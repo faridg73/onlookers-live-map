@@ -222,10 +222,9 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-2 font-display-hero text-[clamp(1.1rem,4.2vw,2.1rem)] font-black italic uppercase leading-[0.95] tracking-tight text-foreground whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-2 font-display-hero text-[clamp(1.1rem,4.2vw,2.1rem)] font-black italic uppercase leading-[0.95] tracking-tight text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)] whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
-            See what&apos;s happening.{" "}
-            <span className="text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)]">Right now.</span>
+            See what&apos;s happening. Right now.
           </h2>
           <p className="mt-2 max-w-xl whitespace-nowrap text-[0.72rem] font-medium leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.7rem]">
             Watch live streams, follow trusted alerts, or post local bounties.
