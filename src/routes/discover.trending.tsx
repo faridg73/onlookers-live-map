@@ -217,11 +217,11 @@ function TrendingScreen() {
         ))}
       </div>}
 
-      {!activeVibe && (eventsLoading || visibleEvents.length > 0) && (
+      {(eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
             <Ticket className="size-4 text-signal" aria-hidden />{" "}
-            {activeTag ? activeTag.tag : "Live events this weekend"}
+            {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
           <p className="text-xs text-muted-foreground">
             {activeTag
