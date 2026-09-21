@@ -62,7 +62,7 @@ function PayoutHistoryScreen() {
       <PageBackButton label="Profile" fallback="/profile" />
 
       <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">
-        Payout history
+        <span className="text-signal">Payout</span> history
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Every accepted clip, the 15% platform fee, and the cash that landed in your wallet.

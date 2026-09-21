@@ -38,7 +38,7 @@ function PrivacyPage() {
     <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Onlooker LLC Privacy Policy
+          Onlooker LLC <span className="text-signal">Privacy Policy</span>
         </h1>
         <button
           type="button"
