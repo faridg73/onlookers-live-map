@@ -36,3 +36,26 @@ export const BROADCAST_CATEGORY_ART: Record<BroadcastCategoryId, string> = {
   "community-culture": communityImage,
   "casual-irl": casualImage,
 };
+
+/** Cover art for bounty/request categories (LiveRequest.category ids). */
+export const REQUEST_CATEGORY_ART: Record<string, string> = {
+  food: foodImage,
+  vehicles: carsImage,
+  outdoors: natureImage,
+  nightlife: nightlifeImage,
+  transit: trafficImage,
+  events: sportsImage,
+  parking: trafficImage,
+  weather: natureImage,
+  realestate: realestateImage,
+  art: artsImage,
+  sports: sportsImage,
+  street: artsImage,
+  community: petsImage,
+  markets: shoppingImage,
+};
+
+/** Resolves a request category to its cover art, with a neutral fallback. */
+export function requestCategoryArt(category?: string | null): string {
+  return (category && REQUEST_CATEGORY_ART[category]) || communityImage;
+}
