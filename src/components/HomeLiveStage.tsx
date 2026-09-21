@@ -264,7 +264,7 @@ export function HomeLiveStage({
           <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
           <span className="relative size-2 rounded-full bg-signal" />
         </span>
-        <div className="scrollbar-thin flex min-w-0 flex-1 items-center gap-3 overflow-x-auto whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.18em] tabular-nums text-foreground/70 sm:text-[0.66rem]">
+        <div className="scrollbar-thin flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.18em] tabular-nums text-foreground/70 sm:text-[0.66rem]">
           <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
           <span className="text-border">|</span>
           <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
@@ -315,7 +315,7 @@ export function HomeLiveStage({
             Watch live streams, follow trusted alerts, or post local bounties.
           </p>
 
-          <div className="mt-3 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap [@media(max-height:520px)]:mt-2">
+          <div className="mt-3 flex flex-wrap justify-center gap-2.5 [@media(max-height:520px)]:mt-2">
             <Button type="button" onClick={onGoLive} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
               <Radio className="size-4" /> Go live
             </Button>
