@@ -57,7 +57,7 @@ export function CategoryExampleCards({
               <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
                 <Icon className="size-3.5" /> {seed.kicker}
               </span>
-              <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2 py-0.5 text-[0.62rem] font-bold text-foreground backdrop-blur-md">
+              <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2 py-0.5 text-[0.62rem] font-bold text-signal backdrop-blur-md">
                 #{seed.tag}
               </span>
             </div>

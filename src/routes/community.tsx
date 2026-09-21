@@ -559,8 +559,8 @@ function CommunityHub() {
             variant="outline"
             size="sm"
             onClick={() => setTag(tag === t ? null : t)}
-            className={`h-9 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold ${
-              tag === t ? "border-signal bg-signal/10 text-signal" : "text-muted-foreground"
+            className={`h-9 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold text-signal ${
+              tag === t ? "border-signal bg-signal/10" : "border-signal/40"
             }`}
           >
             #{t}
