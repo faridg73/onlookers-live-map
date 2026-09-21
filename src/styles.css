@@ -95,6 +95,7 @@
   --animate-slow-pan: slow-pan 18s ease-in-out infinite alternate;
   --animate-search-slide: search-slide 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   --animate-live-ticker: live-ticker 28s linear infinite;
+  --animate-red-flash: red-flash 1.6s ease-in-out infinite;
 }
 
 @keyframes live-ticker {
@@ -158,6 +159,18 @@
   100% {
     opacity: 0;
     transform: translateY(110vh) rotate(720deg);
+  }
+}
+
+@keyframes red-flash {
+  0%,
+  100% {
+    border-color: oklch(0.64 0.24 27 / 0.55);
+    box-shadow: 0 0 0 0 oklch(0.64 0.24 27 / 0);
+  }
+  50% {
+    border-color: oklch(0.64 0.24 27);
+    box-shadow: 0 0 18px 2px oklch(0.64 0.24 27 / 0.55);
   }
 }
 
