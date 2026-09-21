@@ -42,6 +42,43 @@ const SHOWCASE: Array<{ key: string; category: string; kind: "live" | "bounty"; 
   { key: "sc-vehicles", category: "vehicles", kind: "bounty", label: "Open a bounty", title: "Pay for a quick look at traffic ahead", place: "Main routes", credits: 100 },
 ];
 
+function ShowcaseCard({
+  item,
+  onGoLive,
+  onPostBounty,
+}: {
+  item: (typeof SHOWCASE)[number];
+  onGoLive: () => void;
+  onPostBounty: () => void;
+}) {
+  const live = item.kind === "live";
+  return (
+    <button
+      type="button"
+      onClick={live ? onGoLive : onPostBounty}
+      className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none lg:w-auto"
+    >
+      <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35">
+        <img src={requestCategoryArt(item.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+        <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col justify-between gap-1">
+        <span className="flex items-center justify-between gap-1">
+          <span className={`flex items-center gap-1 text-[0.55rem] font-extrabold uppercase ${live ? "text-live" : "text-signal"}`}>
+            {live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <Sparkles className="size-3" />}
+            {item.label}
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full border border-signal bg-signal/15 px-1.5 py-[1px] font-mono text-[0.55rem] font-bold tabular-nums text-signal shadow-[0_0_12px_color-mix(in_oklab,var(--color-signal)_35%,transparent)]">
+            <CircleDollarSign className="size-2.5" aria-hidden /> {item.credits}+
+          </span>
+        </span>
+        <span className="line-clamp-2 text-[0.72rem] font-bold leading-tight text-foreground group-hover:text-signal">{item.title}</span>
+        <span className="flex items-center gap-1 truncate text-[0.55rem] font-medium text-signal"><MapPin className="size-3 shrink-0" aria-hidden /> <span className="truncate">{item.place}</span></span>
+      </span>
+    </button>
+  );
+}
+
 export function HomeLiveStage({
   requests,
   poolOf,
