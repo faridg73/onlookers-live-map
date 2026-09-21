@@ -160,6 +160,19 @@ function VenueScreen() {
         <LocationPreviewMap address={`${venue.name}, ${venue.area}`} />
       </div>
 
+      <Link
+        to="/discover"
+        search={{
+          view: "map" as const,
+          lat: venue.latitude,
+          lng: venue.longitude,
+          label: venue.name,
+        }}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-signal bg-surface py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/10"
+      >
+        <MapPin className="size-4" aria-hidden /> See on live map
+      </Link>
+
       <VenueBountyDialog venue={venue}>
         <button
           type="button"
