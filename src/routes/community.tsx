@@ -366,8 +366,8 @@ function CommunityHub() {
             <X className="size-5" />
           </button>
         </div>
-        <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-foreground sm:text-4xl">
-          See what your <span className="text-signal">city</span> is doing <span className="text-signal">now</span>
+        <h1 className="mt-2 whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
+          See what your city is doing now
         </h1>
         <p className="mt-1 text-sm font-semibold text-signal">
           A live local stream, tap a lane, tighten the radius, or open the map.
