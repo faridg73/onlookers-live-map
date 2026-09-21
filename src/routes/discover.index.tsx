@@ -44,6 +44,19 @@ export const Route = createFileRoute("/discover/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  // Deep link from a place or category: /discover?view=map&lat=..&lng=..&label=..
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { view?: "map"; lat?: number; lng?: number; label?: string } => {
+    const lat = Number(search["lat"]);
+    const lng = Number(search["lng"]);
+    const label = typeof search["label"] === "string" ? search["label"] : undefined;
+    return {
+      ...(search["view"] === "map" ? { view: "map" as const } : {}),
+      ...(Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : {}),
+      ...(label ? { label } : {}),
+    };
+  },
   component: DiscoverHome,
   errorComponent: RouteErrorPanel,
 });
