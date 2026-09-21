@@ -69,21 +69,21 @@ function TrendingScreen() {
   const [vibeId, setVibeId] = useState<string | null>(null);
   const activeVibe = CREATOR_VIBES.find((vibe) => vibe.id === vibeId) ?? null;
 
-  const sports = usePlaceList(group, "stadiums", area, { maxResults: 8 });
-  const concerts = usePlaceList(group, "concerts", area, { maxResults: 8 });
-  const fights = usePlaceList(group, "fights", area, { maxResults: 8 });
-  const gatherings = usePlaceList(group, "festivals", area, { maxResults: 8 });
+  const sports = usePlaceList(group, "stadiums", area, { maxResults: 20 });
+  const concerts = usePlaceList(group, "concerts", area, { maxResults: 20 });
+  const fights = usePlaceList(group, "fights", area, { maxResults: 20 });
+  const gatherings = usePlaceList(group, "festivals", area, { maxResults: 20 });
   const foodGroup = discoveryGroupBySlug("food");
   const transitGroup = discoveryGroupBySlug("transit");
   const mallsGroup = discoveryGroupBySlug("malls");
   const performancesGroup = discoveryGroupBySlug("performances");
   const marketsGroup = discoveryGroupBySlug("markets");
-  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 8, enabled: vibeId === "foodie" });
-  const cars = usePlaceList(transitGroup, null, area, { maxResults: 8, enabled: vibeId === "car-spotters" });
-  const style = usePlaceList(mallsGroup, null, area, { maxResults: 8, enabled: vibeId === "style-scout" });
-  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 8, enabled: vibeId === "street-music" });
-  const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 8, enabled: vibeId === "match-day" });
-  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 8, enabled: vibeId === "market-finds" });
+  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 20, enabled: vibeId === "foodie" });
+  const cars = usePlaceList(transitGroup, null, area, { maxResults: 20, enabled: vibeId === "car-spotters" });
+  const style = usePlaceList(mallsGroup, null, area, { maxResults: 20, enabled: vibeId === "style-scout" });
+  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 20, enabled: vibeId === "street-music" });
+  const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 20, enabled: vibeId === "match-day" });
+  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 20, enabled: vibeId === "market-finds" });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
