@@ -674,7 +674,8 @@ function CommunityHub() {
       {view === "alerts" ? (
         <div className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="Emergency alert map">
-            <div className="mt-6 rounded-2xl border border-crisis/40 bg-crisis/10 px-4 py-3">
+            <div className="animate-red-flash rounded-2xl border-2 border-signal/60 bg-crisis/10 px-4 py-3 motion-reduce:animate-none">
+
               <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-crisis">
                 <Siren className="size-4" /> Emergency alerts only
               </p>
