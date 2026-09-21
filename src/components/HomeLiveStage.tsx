@@ -281,6 +281,10 @@ export function HomeLiveStage({
           <p className="home-display text-[0.62rem] font-semibold uppercase text-foreground/45">Live feed preview</p>
           {featured ? (
             <button type="button" onClick={() => onOpenRequest(featured)} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between rounded-xl border border-home-line bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/50 hover:bg-home-accent/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-home-accent">
+              <span className="relative -mx-1 -mt-1 mb-2 block h-20 overflow-hidden rounded-lg border border-home-line">
+                <img src={requestCategoryArt(featured.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-background/75 via-background/10 to-transparent" aria-hidden />
+              </span>
               <span className="flex items-center justify-between gap-2">
                 <span className={`flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase ${isCrisis(featured) ? "text-crisis" : isLiveRequest(featured) ? "text-live" : "text-signal"}`}>
                   {isCrisis(featured) ? <Siren className="size-3.5" /> : isLiveRequest(featured) ? <Radio className="size-3.5 animate-pulse motion-reduce:animate-none" /> : <Sparkles className="size-3.5" />}
