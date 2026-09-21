@@ -11,7 +11,6 @@ import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
-import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
 import { PageBackButton } from "@/components/PageBackButton";
 import { TwoToneName } from "@/components/TwoTone";
@@ -59,7 +58,6 @@ function GroupScreen() {
 
   const heading = group?.name ?? curated?.name ?? "Places";
   const tagline = group?.tagline ?? curated?.tagline ?? "";
-  const groupImage = discoveryImage(slug);
   const photoOf = usePlacePhotos(places);
 
   const liveCount = (keywords: string[]) =>
@@ -139,7 +137,8 @@ function GroupScreen() {
               <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
                 <PlacePhoto
                   src={photoOf(place)}
-                  fallbackSrc={groupImage}
+                  identity={place.name}
+                  identityNote={place.primaryType ?? area.label}
                   alt={`${place.name} in ${place.address ?? area.label}`}
                 />
               </span>
@@ -181,7 +180,8 @@ function GroupScreen() {
             <span className="size-16 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
               <PlacePhoto
                 src={null}
-                fallbackSrc={groupImage}
+                identity={venue.name}
+                identityNote={venue.area}
                 alt={`${venue.name} in ${venue.area}`}
               />
             </span>

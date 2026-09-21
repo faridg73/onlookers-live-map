@@ -18,7 +18,6 @@ import {
   placeIdFromSlug,
   venueFromPlace,
 } from "@/lib/discovery";
-import { discoveryImage } from "@/lib/discovery-visuals";
 import { PageBackButton } from "@/components/PageBackButton";
 import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
@@ -94,7 +93,6 @@ function VenueScreen() {
   const venue: Venue | null = curatedVenue ?? (place ? venueFromPlace(place, group) : null);
   const backLabel = dynamicGroup?.name ?? curatedGroup?.name ?? "All places";
   const venuePhoto = place ? photoOf(place) : null;
-  const fallbackImage = discoveryImage(params.group);
 
   if (!venue) {
     return (
@@ -138,7 +136,8 @@ function VenueScreen() {
       <div className="mt-3 aspect-[16/7] overflow-hidden rounded-2xl bg-surface-raised">
         <PlacePhoto
           src={venuePhoto}
-          fallbackSrc={fallbackImage}
+          identity={venue.name}
+          identityNote={venue.area}
           alt={`${venue.name} in ${venue.area}`}
           eager
         />

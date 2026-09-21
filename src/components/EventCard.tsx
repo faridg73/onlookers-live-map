@@ -2,7 +2,6 @@
 import { CalendarDays, ExternalLink, MapPin, Radio, Ticket, Video } from "lucide-react";
 import { VenueBountyDialog } from "@/components/VenueBountyDialog";
 import { PlacePhoto } from "@/components/PlacePhoto";
-import { discoveryImage } from "@/lib/discovery-visuals";
 import type { LiveEvent } from "@/lib/events.functions";
 import type { Venue } from "@/lib/venues";
 
@@ -65,7 +64,8 @@ export function EventCard({ event, liveCount }: Props) {
         <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-surface-raised">
           <PlacePhoto
             src={event.imageUrl}
-            fallbackSrc={discoveryImage("events")}
+            identity={event.name}
+            identityNote={event.venueName ?? event.city}
             alt={`${event.name}${event.venueName ? ` at ${event.venueName}` : ""}`}
           />
         </div>

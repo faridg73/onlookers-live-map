@@ -29,12 +29,18 @@ export function usePlacePhotos(places: DiscoveredPlace[]) {
     if (missing.length === 0) return;
 
     let cancelled = false;
-    void fetchPlacePhotoUrls({ data: { photoNames: missing.slice(0, 16), maxWidthPx: 480 } })
-      .then((result) => {
-        for (const [name, url] of Object.entries(result)) cache.set(name, url);
-        if (!cancelled) setUrls((prev) => ({ ...prev, ...result }));
-      })
-      .catch((error) => console.error("[discovery] place photos failed", error));
+    // Google's media endpoint is batched 16 at a time, so walk every chunk instead of
+    // dropping the tail: each card must resolve its own verified photo.
+    const chunks: string[][] = [];
+    for (let i = 0; i < missing.length; i += 16) chunks.push(missing.slice(i, i + 16));
+    for (const chunk of chunks) {
+      void fetchPlacePhotoUrls({ data: { photoNames: chunk, maxWidthPx: 480 } })
+        .then((result) => {
+          for (const [name, url] of Object.entries(result)) cache.set(name, url);
+          if (!cancelled) setUrls((prev) => ({ ...prev, ...result }));
+        })
+        .catch((error) => console.error("[discovery] place photos failed", error));
+    }
 
     return () => {
       cancelled = true;
