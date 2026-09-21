@@ -99,24 +99,48 @@ export function HomeLiveStage({
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
   const trendScrollerRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
-  const [drawerMax, setDrawerMax] = useState(384);
-  // Keep the floating dropdown fully above the bottom tab bar on every screen size.
+  // Anchor the dropdown to the viewport off the ticker rect so it can never be
+  // clipped by the stage, the map frame or the bottom tab dock on any device.
+  const [panel, setPanel] = useState<{
+    left: number;
+    width: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+  }>({ left: 12, width: 320, top: 0, maxHeight: 384 });
   useEffect(() => {
     const update = () => {
       const el = tickerRef.current;
       if (!el) return;
-      const bottom = el.getBoundingClientRect().bottom;
-      const navAllowance = 92;
-      setDrawerMax(Math.max(160, Math.min(window.innerHeight - bottom - 12 - navAllowance, 416)));
+      const rect = el.getBoundingClientRect();
+      const navAllowance = window.innerWidth >= 1024 ? 104 : 96;
+      const gap = 8;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - navAllowance;
+      const spaceAbove = rect.top - gap - 12;
+      const width = Math.min(rect.width, window.innerWidth - 16);
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+      if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+        setPanel({ left, width, top: rect.bottom + gap, maxHeight: Math.max(160, Math.min(spaceBelow, 416)) });
+      } else {
+        setPanel({
+          left,
+          width,
+          bottom: window.innerHeight - rect.top + gap,
+          maxHeight: Math.max(160, Math.min(spaceAbove, 416)),
+        });
+      }
     };
     update();
     window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
     const timer = window.setTimeout(update, 350);
     return () => {
       window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
       window.clearTimeout(timer);
     };
   }, [mapExpanded, openFeed]);
+
   const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
   const updateTrendScroll = useCallback(() => {
     const el = trendScrollerRef.current;
