@@ -358,8 +358,8 @@ function FAQScreen() {
       </section>
 
       <aside className="mt-8 border-t border-border pt-6 text-center">
-        <h2 className="font-display text-lg text-foreground">Still need help?</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <h2 className="font-display text-base text-foreground">Still need help?</h2>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
           <Link to="/contact" className="font-semibold text-signal underline underline-offset-4">Contact support</Link>
           {" or read the complete "}
           <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">Terms of Service</Link>
