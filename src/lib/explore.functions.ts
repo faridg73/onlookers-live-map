@@ -131,3 +131,32 @@ export const listClipComments = createServerFn({ method: "GET" })
       authorAvatar: byId.get(r.user_id)?.avatar_url ?? null,
     }));
   });
+
+/**
+ * Lets the clip's owner remove their capture: deletes the stored files and
+ * the row (comments, reviews and tips cascade away with it).
+ */
+export const deleteExploreClip = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ videoId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: owned, error: readError } = await context.supabase
+      .from("bounty_videos")
+      .select("id, storage_path, thumb_path")
+      .eq("id", data.videoId)
+      .eq("uploader_id", context.userId)
+      .maybeSingle();
+    if (readError || !owned) throw new Error("Clip not found or not yours.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const paths = [owned.storage_path, owned.thumb_path].filter((p): p is string => Boolean(p));
+    if (paths.length) await supabaseAdmin.storage.from(BUCKET).remove(paths);
+
+    const { error: delError } = await supabaseAdmin
+      .from("bounty_videos")
+      .delete()
+      .eq("id", owned.id)
+      .eq("uploader_id", context.userId);
+    if (delError) throw new Error(delError.message);
+    return { ok: true };
+  });
