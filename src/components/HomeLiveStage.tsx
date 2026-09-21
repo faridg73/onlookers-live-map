@@ -99,24 +99,51 @@ export function HomeLiveStage({
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
   const trendScrollerRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
-  const [drawerMax, setDrawerMax] = useState(384);
-  // Keep the floating dropdown fully above the bottom tab bar on every screen size.
+  // Anchor the dropdown to the viewport off the ticker rect so it can never be
+  // clipped by the stage, the map frame or the bottom tab dock on any device.
+  const [panel, setPanel] = useState<{
+    left: number;
+    width: number;
+    top?: number;
+    bottom?: number;
+    maxHeight: number;
+  }>({ left: 12, width: 320, top: 0, maxHeight: 384 });
   useEffect(() => {
     const update = () => {
       const el = tickerRef.current;
       if (!el) return;
-      const bottom = el.getBoundingClientRect().bottom;
-      const navAllowance = 92;
-      setDrawerMax(Math.max(160, Math.min(window.innerHeight - bottom - 12 - navAllowance, 416)));
+      const rect = el.getBoundingClientRect();
+      const nav = document.querySelector("nav");
+      const navRect = nav?.getBoundingClientRect();
+      const navAllowance = navRect && navRect.height > 0 ? Math.max(0, window.innerHeight - navRect.top) + 8 : 96;
+      const gap = 8;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - navAllowance;
+
+      const spaceAbove = rect.top - gap - 12;
+      const width = Math.min(rect.width, window.innerWidth - 16);
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
+      if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+        setPanel({ left, width, top: rect.bottom + gap, maxHeight: Math.max(160, Math.min(spaceBelow, 416)) });
+      } else {
+        setPanel({
+          left,
+          width,
+          bottom: window.innerHeight - rect.top + gap,
+          maxHeight: Math.max(160, Math.min(spaceAbove, 416)),
+        });
+      }
     };
     update();
     window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
     const timer = window.setTimeout(update, 350);
     return () => {
       window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
       window.clearTimeout(timer);
     };
   }, [mapExpanded, openFeed]);
+
   const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
   const updateTrendScroll = useCallback(() => {
     const el = trendScrollerRef.current;
@@ -273,7 +300,7 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
+    <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
       {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
       <div
         className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
@@ -496,9 +523,15 @@ export function HomeLiveStage({
 
       <div
         id="home-live-feed-drawer"
-        className={`absolute inset-x-0 top-full z-50 mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
+        style={{
+          left: panel.left,
+          width: panel.width,
+          ...(panel.top !== undefined ? { top: panel.top } : { bottom: panel.bottom }),
+        }}
+        className={`fixed z-[60] grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
       >
-        <div className="min-h-0 overflow-hidden" style={{ maxHeight: drawerMax }}>
+        <div className="min-h-0 overflow-hidden" style={{ maxHeight: panel.maxHeight }}>
+
           {activeTrend && (
             <div className="flex max-h-[inherit] flex-col px-3 pb-3 pt-2.5 sm:px-4">
               <div className="mb-2 flex items-center justify-between gap-3">
