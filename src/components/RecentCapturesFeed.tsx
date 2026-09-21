@@ -33,6 +33,66 @@ export function RecentCapturesFeed({
   const [clips, setClips] = useState<ExploreClip[] | null>(null);
   /** Which card the person tapped — that one swaps the loop for the real player. */
   const [playingId, setPlayingId] = useState<string | null>(null);
+  /** Signed-in user, so owners see the Delete option on their own captures. */
+  const [myId, setMyId] = useState<string | null>(null);
+  /** Which card's options menu is open (by clip id). */
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => setMyId(data.user?.id ?? null));
+  }, []);
+
+  // Tap anywhere outside the open menu closes it.
+  useEffect(() => {
+    if (!menuFor) return;
+    const close = (e: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuFor(null);
+    };
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
+  }, [menuFor]);
+
+  const shareClip = async (clip: ExploreClip) => {
+    const url = `${window.location.origin}/explore?clip=${clip.id}`;
+    const payload = { title: clip.title, text: `Watch "${clip.title}" on Onlooker`, url };
+    try {
+      if (navigator.share) await navigator.share(payload);
+      else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied.");
+      }
+    } catch {
+      /* share sheet dismissed */
+    }
+    setMenuFor(null);
+  };
+
+  const viewOnMap = (clip: ExploreClip) => {
+    setMenuFor(null);
+    if (clip.latitude != null && clip.longitude != null) {
+      void navigate({ to: "/", search: { at: `${clip.latitude},${clip.longitude}` } });
+    } else {
+      toast.info("This capture has no location to show.");
+    }
+  };
+
+  const deleteClip = async (clip: ExploreClip) => {
+    setMenuFor(null);
+    if (!window.confirm(`Delete "${clip.title}"? This can't be undone.`)) return;
+    setDeletingId(clip.id);
+    try {
+      await deleteExploreClip({ data: { videoId: clip.id } });
+      setClips((prev) => (prev ? prev.filter((c) => c.id !== clip.id) : prev));
+      toast.success("Capture deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete that capture.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
