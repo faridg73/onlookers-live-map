@@ -97,6 +97,32 @@
   --animate-search-slide: search-slide 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   --animate-live-ticker: live-ticker 28s linear infinite;
   --animate-red-flash: red-flash 1.6s ease-in-out infinite;
+  --animate-vibe-hint: vibe-hint 1.8s ease-in-out infinite;
+  --animate-all-vibes-flash: all-vibes-flash 1.4s ease-in-out infinite;
+}
+
+@keyframes vibe-hint {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateX(3px);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translateX(0);
+  }
+}
+
+@keyframes all-vibes-flash {
+  0%,
+  100% {
+    border-color: rgba(250, 204, 21, 0.5);
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+  }
+  50% {
+    border-color: rgba(250, 204, 21, 1);
+    box-shadow: 0 0 16px 2px rgba(250, 204, 21, 0.55);
+  }
 }
 
 @keyframes live-ticker {
