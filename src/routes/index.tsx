@@ -195,6 +195,7 @@ function MapScreen() {
         viewportStorageKey="onlooker:map:home"
         mapTypeId={homeMapType}
         showNativeMapTypeControl={false}
+        controlsTopClass="top-[calc(env(safe-area-inset-top,0px)+9.75rem)]"
         styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
       />
 
