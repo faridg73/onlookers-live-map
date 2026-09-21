@@ -241,8 +241,10 @@ export function CommunityFeedFilters({
             size="sm"
             onClick={() => onChange(choice.id)}
             aria-pressed={value === choice.id}
-            className={`h-7 rounded-full px-3 text-[0.68rem] font-bold ${
-              value === choice.id ? "border-signal bg-signal/10 text-signal" : "text-muted-foreground"
+            className={`h-8 rounded-full border-2 px-3 text-[0.8rem] font-extrabold shadow-[0_0_8px_rgba(204,255,0,0.3)] ${
+              value === choice.id
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-signal bg-surface text-signal hover:bg-signal/10"
             }`}
           >
             {radiusLabel(choice.id, unit)}
