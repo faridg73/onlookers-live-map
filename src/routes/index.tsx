@@ -89,6 +89,7 @@ function MapScreen() {
   useEffect(() => {
     if (!at) return;
     const [lat, lng] = at.split(",").map((n) => Number.parseFloat(n)) as [number, number];
+    if (Number.isFinite(lat) && Number.isFinite(lng)) setCenterTarget({ lat, lng, zoom: 16 });
   }, [at]);
 
   const handleSearchPick = useCallback((place: GeocodeResult) => {
