@@ -297,8 +297,11 @@ function FAQScreen() {
                   variant={active ? "default" : "secondary"}
                   onClick={() => setActiveCategory(category.id)}
                   className={cn(
-                    "h-11 gap-2 rounded-full border px-4 text-sm",
-                    active ? "border-signal" : "border-border bg-surface text-muted-foreground",
+                    "h-11 gap-2 rounded-full border-2 border-signal px-4 text-sm",
+                    "animate-red-flash motion-reduce:animate-none",
+                    active
+                      ? "bg-signal text-signal-foreground"
+                      : "bg-surface text-muted-foreground",
                   )}
                 >
                   <Icon className="size-4" aria-hidden="true" />
