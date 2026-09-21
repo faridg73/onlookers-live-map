@@ -196,7 +196,7 @@ export function HomeLiveStage({
       <div className="grid min-h-[9.75rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)]">
         <div className="relative min-w-0 overflow-hidden px-4 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4 [@media(max-height:520px)]:pb-2 [@media(max-height:520px)]:pt-2">
           <div className="absolute inset-y-0 left-0 w-1 bg-signal" aria-hidden />
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-center gap-3">
             <p className="flex items-center gap-2 font-display-impact text-[0.62rem] uppercase text-signal sm:text-xs">
               <span className="relative flex size-2" aria-hidden>
                 <span className="absolute inset-0 animate-ping-slow rounded-full bg-live motion-reduce:animate-none" />
@@ -212,7 +212,7 @@ export function HomeLiveStage({
               <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
             </div>
           </div>
-          <div className="mt-1 flex items-center gap-2 text-[0.78rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
+          <div className="mt-1 flex items-center justify-center gap-2 text-[0.78rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
             <span className="whitespace-nowrap">{liveCount} live</span>
             <span className="text-border">/</span>
             <span className="whitespace-nowrap">{emergencyCount} alerts</span>
@@ -222,7 +222,7 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-2 font-inter text-[clamp(1.1rem,4.2vw,2.1rem)] font-normal leading-[0.95] tracking-tight text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)] whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-2 text-center font-inter text-[clamp(1.1rem,4.2vw,2.1rem)] font-normal leading-[0.95] tracking-tight text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)] whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
