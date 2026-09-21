@@ -149,10 +149,10 @@ export function BroadcastCategoryPicker({
             aria-pressed={subcategory === null}
             onClick={() => onSubcategoryChange(null)}
             className={cn(
-              "h-8 rounded-full px-3 text-[0.65rem] font-extrabold uppercase",
+              "h-8 rounded-full border-2 px-3 text-[0.65rem] font-extrabold uppercase shadow-[0_0_8px_rgba(204,255,0,0.3)]",
               subcategory === null
                 ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface text-muted-foreground",
+                : "border-signal bg-surface text-signal hover:bg-signal/10",
             )}
           >
             No vibe
@@ -168,10 +168,10 @@ export function BroadcastCategoryPicker({
                 aria-pressed={active}
                 onClick={() => onSubcategoryChange(active ? null : option)}
                 className={cn(
-                  "h-8 rounded-full px-3 text-[0.65rem] font-extrabold uppercase",
+                  "h-8 rounded-full border-2 px-3 text-[0.65rem] font-extrabold uppercase shadow-[0_0_8px_rgba(204,255,0,0.3)]",
                   active
                     ? "border-signal bg-signal text-signal-foreground"
-                    : "border-border bg-surface text-muted-foreground hover:border-signal/60 hover:text-foreground",
+                    : "border-signal bg-surface text-signal hover:bg-signal/10",
                 )}
               >
                 {active && <Check className="size-3" strokeWidth={3} />}
