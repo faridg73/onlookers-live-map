@@ -44,7 +44,7 @@ export function CategoryExampleCards({
           return (
           <article
             key={seed.id}
-            className="overflow-hidden rounded-xl border border-border bg-surface"
+            className="overflow-hidden rounded-xl border border-border bg-surface animate-red-flash motion-reduce:animate-none"
           >
             <div className={`relative aspect-[16/9] overflow-hidden ${visual.coverClass}`}>
               <LoopingPreview
