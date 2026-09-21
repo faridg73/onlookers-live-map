@@ -138,10 +138,10 @@ export function BroadcastCategoryPicker({
       )}
 
       {selected && <div className="mt-3 rounded-xl border-2 border-signal p-3 shadow-[0_0_10px_rgba(204,255,0,0.35)]">
-        <p className="text-[0.62rem] font-extrabold uppercase text-signal">
+        <p className="text-center text-[0.62rem] font-extrabold uppercase text-signal">
           Refine your vibe
         </p>
-        <div className="mt-2 flex flex-wrap gap-2" aria-label={`${selected.label} subcategories`}>
+        <div className="mt-2 flex flex-wrap justify-center gap-2" aria-label={`${selected.label} subcategories`}>
           <Button
             type="button"
             size="sm"
