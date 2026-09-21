@@ -301,10 +301,12 @@
   background: var(--discover-events);
 }
 
-/* Home page renders entirely in Inter; this unlayered scope outranks every
-   per-element font utility (font-display-impact, font-sans, etc.). */
+/* Home and Discover pages render entirely in Inter; this unlayered scope
+   outranks every per-element font utility (font-display-impact, font-sans, etc.). */
 .home-inter,
-.home-inter * {
+.home-inter *,
+.discover-inter,
+.discover-inter * {
   font-family: var(--font-inter);
 }
 
