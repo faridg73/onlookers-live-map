@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
+import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
 
 type LiveFeedKey = "emergency" | "bounty" | "stream" | "dispatches" | "hotspot";
@@ -280,6 +281,10 @@ export function HomeLiveStage({
           <p className="home-display text-[0.62rem] font-semibold uppercase text-foreground/45">Live feed preview</p>
           {featured ? (
             <button type="button" onClick={() => onOpenRequest(featured)} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between rounded-xl border border-home-line bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/50 hover:bg-home-accent/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-home-accent">
+              <span className="relative -mx-1 -mt-1 mb-2 block h-20 overflow-hidden rounded-lg border border-home-line">
+                <img src={requestCategoryArt(featured.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-background/75 via-background/10 to-transparent" aria-hidden />
+              </span>
               <span className="flex items-center justify-between gap-2">
                 <span className={`flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase ${isCrisis(featured) ? "text-crisis" : isLiveRequest(featured) ? "text-live" : "text-signal"}`}>
                   {isCrisis(featured) ? <Siren className="size-3.5" /> : isLiveRequest(featured) ? <Radio className="size-3.5 animate-pulse motion-reduce:animate-none" /> : <Sparkles className="size-3.5" />}
@@ -332,9 +337,11 @@ export function HomeLiveStage({
                   onClick={() => live ? onOpenLive(request) : onOpenRequest(request)}
                   className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
                 >
-                  {/* Creator tile: real handle initials, no placeholder media. */}
-                  <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-signal)_22%,transparent),transparent_70%)]">
-                    <span className="font-mono text-[0.72rem] font-bold tracking-tight text-signal">{initials}</span>
+                  {/* Visual preview: category cover art with creator initials badge. */}
+                  <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35">
+                    <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                    <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden />
+                    <span className="absolute left-1 top-1 rounded-md border border-signal/50 bg-background/75 px-1 py-px font-mono text-[0.55rem] font-bold tracking-tight text-signal backdrop-blur-sm">{initials}</span>
                     {live && (
                       <span className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-0.5 bg-live/85 py-[1px] text-[0.45rem] font-extrabold uppercase tracking-widest text-background">
                         <span className="size-1 animate-pulse rounded-full bg-background motion-reduce:animate-none" aria-hidden /> live
@@ -429,8 +436,11 @@ export function HomeLiveStage({
                 <div className="max-h-[min(20dvh,14rem)] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(32dvh,16rem)]" aria-label={`${activeTrend.label} active items`}>
                   {activeItems.map((request) => (
                      <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
-                      <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start p-0 text-left hover:bg-transparent">
-                        <span className="min-w-0">
+                       <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
+                         <span className="relative block size-10 shrink-0 overflow-hidden rounded-lg border border-signal/30">
+                           <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                         </span>
+                         <span className="min-w-0">
                           <span className="block truncate text-sm font-extrabold text-foreground">{request.title}</span>
                           <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[0.7rem] font-bold text-muted-foreground">
                              <MapPin className="size-3 shrink-0 text-home-accent" aria-hidden />
