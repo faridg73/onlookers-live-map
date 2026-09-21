@@ -3,6 +3,7 @@ import { Receipt } from "lucide-react";
 import {
   GIG_MIN_PAYOUT_USD,
   GIG_RATE_USD_PER_HOUR,
+  GIG_RATE_USD_PER_MINUTE,
   type GigQuote,
 } from "@/lib/capture-format";
 import { formatCredits, formatCreditCash } from "@/lib/credits";

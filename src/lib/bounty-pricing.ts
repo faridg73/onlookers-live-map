@@ -124,6 +124,11 @@ export function quoteBounty(input: {
   /** Minutes from now until the deadline / start window. */
   minutesUntilDue: number;
   weatherMultiplier: number;
+  /**
+   * When true, the gig algorithm already priced the minutes into the base
+   * reward, so no duration multiplier is applied on top (no double charge).
+   */
+  durationPricedInBase?: boolean;
 }): BountyQuote {
   const tier = tierById(input.tier);
   const rawBase = tier.baseCredits ?? input.customBase;
