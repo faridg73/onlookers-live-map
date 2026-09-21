@@ -9,7 +9,7 @@ import {
   type ActiveRequestRow,
 } from "@/lib/requests.functions";
 
-export const MIN_BOUNTY = 20;
+export const MIN_BOUNTY = 40;
 
 function message(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
