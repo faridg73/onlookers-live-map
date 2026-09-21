@@ -81,10 +81,11 @@ function ContactScreen() {
   }
 
   function handleClose() {
+    console.log("[contact] handleClose called");
     if (window.history.length > 1 && window.history.state?.idx > 0) {
       window.history.back();
     } else {
-      router.navigate({ to: "/" });
+      router.navigate({ to: "/" }).then(() => console.log("[contact] navigated home"), (e) => console.error("[contact] nav failed", e));
     }
   }
 
