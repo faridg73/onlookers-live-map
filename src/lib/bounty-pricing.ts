@@ -136,7 +136,9 @@ export function quoteBounty(input: {
     0,
     Math.round(Number.isFinite(rawBase) ? rawBase : 0),
   );
-  const durationFactor = durationMultiplier(input.durationMinutes);
+  const durationFactor = input.durationPricedInBase
+    ? 1
+    : durationMultiplier(input.durationMinutes);
   const urgencyFactor = urgencyMultiplier(input.minutesUntilDue);
   const weatherFactor = Number.isFinite(input.weatherMultiplier)
     ? round2(input.weatherMultiplier)
@@ -165,9 +167,11 @@ export function quoteBounty(input: {
     {
       label: lengthLabel,
       detail:
-        durationFactor === 1
-          ? "Base length, no extra"
-          : `${pct(durationFactor)} for the extra minutes`,
+        input.durationPricedInBase
+          ? "Priced into the gig rate"
+          : durationFactor === 1
+            ? "Base length, no extra"
+            : `${pct(durationFactor)} for the extra minutes`,
       multiplier: durationFactor,
       runningTotal: Math.round(exactAfterDuration),
     },
