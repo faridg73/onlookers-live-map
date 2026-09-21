@@ -330,7 +330,7 @@ function PostScreen() {
       quoteBounty({
         tier,
         customBase: Number.isFinite(bounty) ? bounty : 0,
-        durationMinutes: capture ?? 30,
+        durationMinutes: capture,
         minutesUntilDue,
         weatherMultiplier: weather,
       }),
@@ -423,12 +423,15 @@ function PostScreen() {
     };
   }, [searchOrigin, searchVenues, signedIn, step, venueQuery]);
 
-  /** Locks in a capture length and scales the reward up to match it. */
+  /**
+   * Locks in a capture length. The reward itself is NOT bumped here — length is
+   * already priced by the quote's duration multiplier, and raising the base too
+   * would charge for the extra minutes twice.
+   */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
     if (next === null && nextAction !== "meetup") setAction("live");
     if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
-    setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
   };
 
   /**
@@ -1253,8 +1256,13 @@ function PostScreen() {
                       <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
                     </label>
                   )}
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">
-                    {captureDurationLabel(capture, action === "live")} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
+                  {/* Same quote the escrow step uses, so the number never changes on you. */}
+                  <p className="mt-3 text-xs font-medium tabular-nums text-muted-foreground">
+                    {captureDurationLabel(capture, action === "live")} · reward at this length{" "}
+                    <span className="font-extrabold text-signal">{formatCredits(quote.total)}</span>{" "}
+                    ({formatCreditCash(quote.total)})
+                    {quote.durationFactor > 1 &&
+                      ` · includes +${Math.round((quote.durationFactor - 1) * 100)}% for the extra minutes`}
                     {capture === null && ", the onlooker streams until you end the session."}
                   </p>
                 </div>
