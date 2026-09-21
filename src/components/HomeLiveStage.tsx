@@ -193,8 +193,8 @@ export function HomeLiveStage({
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+4.75rem)] z-50 overflow-hidden rounded-md border border-signal/45 bg-background/92 shadow-[0_20px_60px_color-mix(in_oklab,var(--color-background)_72%,transparent)] backdrop-blur-xl sm:left-6 sm:right-auto sm:w-[min(43rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
-      <div className="grid min-h-[9.75rem] grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)]">
-        <div className="relative min-w-0 overflow-hidden px-4 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4">
+      <div className="grid min-h-[9.75rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)]">
+        <div className="relative min-w-0 overflow-hidden px-4 pb-3 pt-3 sm:px-5 sm:pb-4 sm:pt-4 [@media(max-height:520px)]:pb-2 [@media(max-height:520px)]:pt-2">
           <div className="absolute inset-y-0 left-0 w-1 bg-signal" aria-hidden />
           <div className="flex items-center justify-between gap-3">
             <p className="flex items-center gap-2 font-display-impact text-[0.62rem] uppercase text-signal sm:text-xs">
@@ -220,18 +220,21 @@ export function HomeLiveStage({
             <span>{activeRequests.length} bounties</span>
           </div>
 
-          <h2 id="home-live-stage-title" className="mt-2 max-w-xl font-display-impact text-[clamp(1.3rem,4.2vw,2.5rem)] uppercase leading-[0.98] text-foreground">
+          <h2
+            id="home-live-stage-title"
+            className="mt-2 max-w-xl font-display-impact text-[clamp(1.3rem,4.2vw,2.5rem)] uppercase leading-[0.98] text-foreground [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.15rem]"
+          >
             See what&apos;s happening. <span className="text-signal">Right now.</span>
           </h2>
-          <p className="mt-2 max-w-xl whitespace-nowrap text-[0.72rem] font-medium leading-relaxed text-white sm:text-sm">
+          <p className="mt-2 max-w-xl whitespace-nowrap text-[0.72rem] font-medium leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.7rem]">
             Watch live streams, follow trusted alerts, or post local bounties.
           </p>
 
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-            <Button type="button" onClick={onGoLive} className="h-10 rounded-md px-3 font-extrabold uppercase sm:h-11 sm:px-5">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap [@media(max-height:520px)]:mt-2">
+            <Button type="button" onClick={onGoLive} className="h-10 rounded-md px-3 font-extrabold uppercase sm:h-11 sm:px-5 [@media(max-height:520px)]:h-9">
               <Radio className="size-4" /> Go live
             </Button>
-            <Button type="button" variant="outline" onClick={onPostBounty} className="h-10 rounded-md border-signal/60 bg-surface/85 px-3 font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground sm:h-11 sm:px-5">
+            <Button type="button" variant="outline" onClick={onPostBounty} className="h-10 rounded-md border-signal/60 bg-surface/85 px-3 font-extrabold uppercase text-foreground hover:bg-signal hover:text-signal-foreground sm:h-11 sm:px-5 [@media(max-height:520px)]:h-9">
               <CircleDollarSign className="size-4 text-signal" /> Post bounty
             </Button>
           </div>
