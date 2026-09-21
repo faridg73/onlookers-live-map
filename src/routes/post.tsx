@@ -233,10 +233,13 @@ function PostScreen() {
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const formScrollRef = useRef<HTMLDivElement | null>(null);
-  /** Every step change (and the first landing) starts the form scrolled to the top. */
+  /** Every step change — and leaving the "Choose how you go live" picker — starts the form at the absolute top. */
   useEffect(() => {
-    formScrollRef.current?.scrollTo({ top: 0 });
-  }, [step]);
+    formScrollRef.current?.scrollTo({ top: 0, left: 0 });
+    window.scrollTo({ top: 0, left: 0 });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [step, mode]);
   const [prompt, setPrompt] = useState("");
   const parsed = useMemo(() => parseRequestIntent(prompt), [prompt]);
   const [title, setTitle] = useState("");
