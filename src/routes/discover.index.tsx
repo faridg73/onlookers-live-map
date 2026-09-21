@@ -264,13 +264,16 @@ function DiscoverHome() {
                 </div>
                 <div className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-lg text-foreground">
-                      <span className="text-signal">{group.name.split(" ")[0]}</span>
-                      {group.name.includes(" ") ? ` ${group.name.split(" ").slice(1).join(" ")}` : ""}
+                    <p className="truncate font-display text-lg">
+                      <TwoToneName name={group.name} />
                     </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      <span className="font-bold text-signal">{group.tagline.split(",")[0]}</span>
-                      {group.tagline.includes(",") ? `, ${group.tagline.split(",").slice(1).join(",").trim()}` : ""}
+                    <p className="truncate text-xs text-foreground/90">
+                      {group.tagline.split(",")[0]}
+                      {group.tagline.includes(",") ? (
+                        <span className="font-bold text-signal">
+                          , {group.tagline.split(",").slice(1).join(",").trim()}
+                        </span>
+                      ) : null}
                     </p>
                   </div>
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
