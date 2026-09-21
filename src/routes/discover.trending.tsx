@@ -59,6 +59,16 @@ function eventMatchesTag(
   return meta.keywords.some((word) => haystack.includes(word));
 }
 
+/** Words that mark a listed event as belonging to a creator vibe. */
+const VIBE_EVENT_KEYWORDS: Record<string, string[]> = {
+  foodie: ["food", "wine", "beer", "taste", "culinary", "restaurant", "brunch", "dining", "chef"],
+  "car-spotters": ["auto", "car", "motor", "racing", "nascar", "monster", "truck", "bike"],
+  "style-scout": ["fashion", "style", "pop-up", "market", "expo", "design", "beauty"],
+  "street-music": ["music", "concert", "band", "dj", "jazz", "acoustic", "hip", "rock", "latin", "pop"],
+  "match-day": ["sport", "basketball", "football", "baseball", "soccer", "hockey", "game", "match"],
+  "market-finds": ["market", "flea", "swap", "craft", "vintage", "bazaar", "fair", "expo"],
+};
+
 const WEEKEND = [0, 5, 6];
 
 function TrendingScreen() {
@@ -78,12 +88,12 @@ function TrendingScreen() {
   const mallsGroup = discoveryGroupBySlug("malls");
   const performancesGroup = discoveryGroupBySlug("performances");
   const marketsGroup = discoveryGroupBySlug("markets");
-  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 20, enabled: vibeId === "foodie" });
+  const foodie = usePlaceList(foodGroup, null, area, { maxResults: 20, enabled: vibeId === "foodie" });
   const cars = usePlaceList(transitGroup, null, area, { maxResults: 20, enabled: vibeId === "car-spotters" });
   const style = usePlaceList(mallsGroup, null, area, { maxResults: 20, enabled: vibeId === "style-scout" });
-  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 20, enabled: vibeId === "street-music" });
+  const music = usePlaceList(performancesGroup, null, area, { maxResults: 20, enabled: vibeId === "street-music" });
   const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 20, enabled: vibeId === "match-day" });
-  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 20, enabled: vibeId === "market-finds" });
+  const marketFinds = usePlaceList(marketsGroup, null, area, { maxResults: 20, enabled: vibeId === "market-finds" });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
@@ -91,8 +101,12 @@ function TrendingScreen() {
   });
 
   const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
+  const vibeKeywords = activeVibe ? (VIBE_EVENT_KEYWORDS[activeVibe.id] ?? []) : [];
   const visibleEvents = activeVibe
-    ? []
+    ? events.filter((event) => {
+        const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
+        return vibeKeywords.some((word) => haystack.includes(word));
+      })
     : activeTag
       ? events.filter((event) => eventMatchesTag(event, activeTag))
       : events;
@@ -203,16 +217,18 @@ function TrendingScreen() {
         ))}
       </div>}
 
-      {!activeVibe && (eventsLoading || visibleEvents.length > 0) && (
+      {(eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
             <Ticket className="size-4 text-signal" aria-hidden />{" "}
-            {activeTag ? activeTag.tag : "Live events this weekend"}
+            {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            {activeTag
-              ? `${visibleEvents.length} ${activeTag.tag.toLowerCase()} listings around ${area.label}.`
-              : `Real games, concerts and shows on sale around ${area.label}.`}
+            {activeVibe
+              ? `${visibleEvents.length} ${activeVibe.label.toLowerCase()} listings around ${area.label}.`
+              : activeTag
+                ? `${visibleEvents.length} ${activeTag.tag.toLowerCase()} listings around ${area.label}.`
+                : `Real games, concerts and shows on sale around ${area.label}.`}
           </p>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
