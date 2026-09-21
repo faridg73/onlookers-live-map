@@ -538,5 +538,15 @@
   padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
 }
 
+/* ============= Global pill accent =============
+   Every fully-rounded pill (category, transport, vibe, distance, filter
+   chips — "All", "Airports", "Train Stations", "Food", "Venues", …)
+   inherits a crisp vibrant lime border automatically, wherever it uses
+   the default border token. Selected pills already use border-signal and
+   are unaffected. No per-pill edits needed anywhere in the app. */
+.rounded-full.border-border {
+  border-color: var(--color-signal);
+}
+
 
 
