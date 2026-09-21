@@ -31,6 +31,17 @@ function isLiveRequest(request: LiveRequest) {
   return request.bountyType === "live_stream" && request.status === "claimed";
 }
 
+/**
+ * Showcase prompts used when nothing is active nearby. These are clearly framed as
+ * invitations (not fake listings) so the dashboard still feels alive and clickable.
+ */
+const SHOWCASE: Array<{ key: string; category: string; kind: "live" | "bounty"; label: string; title: string; place: string; credits: number }> = [
+  { key: "sc-street", category: "street", kind: "live", label: "Be first live", title: "Go live from the busiest block in your city", place: "Your neighborhood", credits: 40 },
+  { key: "sc-food", category: "food", kind: "bounty", label: "Open a bounty", title: "Ask for the line at tonight's hot spot", place: "Nearby restaurants", credits: 60 },
+  { key: "sc-events", category: "events", kind: "live", label: "Be first live", title: "Stream the crowd before the show starts", place: "Local venues", credits: 80 },
+  { key: "sc-vehicles", category: "vehicles", kind: "bounty", label: "Open a bounty", title: "Pay for a quick look at traffic ahead", place: "Main routes", credits: 100 },
+];
+
 export function HomeLiveStage({
   requests,
   poolOf,
