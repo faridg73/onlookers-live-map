@@ -329,6 +329,7 @@ export function MapCanvas({
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
+  const focusPixel = ready && focusPin ? toPixel(focusPin) : null;
   const activePlace = places.find((place) => place.id === activePlaceId) ?? null;
   const requestMarkers = ready
     ? requests.flatMap((request) => {
