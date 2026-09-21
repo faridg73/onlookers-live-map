@@ -95,7 +95,9 @@ function BalanceScreen() {
 
       <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">Balance &amp; <span className="text-signal">Cashout</span></h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Your credits, purchase history, top-up packs and bank cash out, all in one place.
+        Your <span className="font-semibold text-signal">credits</span>,{" "}
+        <span className="font-semibold text-signal">purchase history</span>, top-up packs and{" "}
+        <span className="font-semibold text-signal">bank cash out</span>, all in one place.
       </p>
 
       {!loading && !user ? (
@@ -136,7 +138,8 @@ function BalanceScreen() {
                     >
                       <span className="min-w-0">
                         <span className="block font-semibold text-foreground">
-                          {purchase.credits} credits{pack ? ` · ${pack.name}` : ""}
+                          <span className="text-signal">{purchase.credits} credits</span>
+                          {pack ? ` · ${pack.name}` : ""}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {new Date(purchase.createdAt).toLocaleDateString(undefined, {
