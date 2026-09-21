@@ -462,7 +462,7 @@ function CommunityHub() {
                         {lane.icon}
                       </span>
                     </span>
-                    <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
+                    <span className="flex min-w-0 flex-1 flex-col items-center gap-0.5 px-2 py-2 text-center">
                       <strong className="line-clamp-2 text-[0.9rem] font-extrabold leading-tight text-foreground">{lane.label}</strong>
                       <small className="line-clamp-2 text-[0.72rem] font-semibold leading-snug text-signal">
                         {lane.subcategories.slice(0, 2).join(" · ")}
