@@ -192,10 +192,15 @@ function MapScreen() {
   );
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
+  // A deep-linked bounty must always show its pin, even if a map filter would hide it.
+  const mapRequests = useMemo(() => {
+    if (!selected || statusFiltered.some((r) => r.id === selected.id)) return statusFiltered;
+    return [...statusFiltered, selected];
+  }, [statusFiltered, selected]);
   return (
     <div className="home-inter fixed inset-0">
       <MapCanvas
-        requests={statusFiltered}
+        requests={mapRequests}
         selectedId={selectedId}
         onSelect={select}
         onUserPositionChange={setUserPosition}
