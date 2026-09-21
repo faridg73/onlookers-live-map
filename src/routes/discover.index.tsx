@@ -88,9 +88,12 @@ function DiscoverHome() {
     <div className="app-shell pb-28 pt-safe">
       <RadarAlerts />
 
-      <h1 className="font-display text-3xl tracking-tight text-foreground">Browse places</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Pulled live from the area you're browsing, pick a spot and ask for a view.
+      <h1 className="font-display text-3xl tracking-tight text-foreground">
+        Browse <span className="text-signal">places</span>
+      </h1>
+      <p className="mt-1 text-sm text-foreground/90">
+        Pulled <span className="font-bold text-signal">live</span> from the area you&apos;re
+        browsing, pick a spot and ask for a view.
       </p>
 
       <LocationSearchBar className="mt-4" />
@@ -105,7 +108,8 @@ function DiscoverHome() {
         className="mt-3 flex items-center justify-between gap-3 rounded-2xl border-2 border-signal/50 bg-signal/10 px-4 py-3"
       >
         <span className="inline-flex items-center gap-2 text-sm font-extrabold text-foreground">
-          <Flame className="size-4 text-signal" aria-hidden /> Trending feeds & live events
+          <Flame className="size-4 text-signal" aria-hidden /> Trending feeds &amp;{" "}
+          <span className="text-signal">live events</span>
         </span>
         <ChevronRight className="size-4 text-signal" aria-hidden />
       </Link>
