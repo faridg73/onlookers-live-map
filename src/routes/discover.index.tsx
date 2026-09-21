@@ -91,6 +91,25 @@ function DiscoverHome() {
     if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId, mapType });
   }, [view, selectedId, mapType]);
 
+  // A deep-linked place wins; otherwise the map focuses the browsing area.
+  const search = Route.useSearch();
+  const target =
+    typeof search.lat === "number" && typeof search.lng === "number"
+      ? { lat: search.lat, lng: search.lng, label: search.label ?? "Chosen spot" }
+      : { lat: area.latitude, lng: area.longitude, label: area.label };
+
+  // Opening the map (or changing the chosen spot) re-centers and re-pins it.
+  const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const targetKey = `${target.lat.toFixed(5)}:${target.lng.toFixed(5)}:${target.label}`;
+  useEffect(() => {
+    if (search.view === "map") setView("map");
+  }, [search.view]);
+  useEffect(() => {
+    if (view !== "map") return;
+    setFocus({ ...target, label: target.label });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, targetKey]);
+
   const eventsGroup = discoveryGroupBySlug("events");
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
     maxResults: 20,
