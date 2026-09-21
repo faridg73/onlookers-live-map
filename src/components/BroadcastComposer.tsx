@@ -206,7 +206,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
             <ShieldCheck className="size-4 text-signal" /> Free broadcasting isn&apos;t open yet
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">{gate.reason}</p>
+          <p className="mt-2 text-sm text-signal">{gate.reason}</p>
         </div>
         {gate.signedIn ? (
           <div className="space-y-2">
