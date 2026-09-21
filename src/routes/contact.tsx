@@ -81,8 +81,8 @@ function ContactScreen() {
   }
 
   function handleClose() {
-    if (window.history.length > 1) {
-      router.history.back();
+    if (window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
     } else {
       router.navigate({ to: "/" });
     }
