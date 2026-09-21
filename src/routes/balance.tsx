@@ -93,7 +93,7 @@ function BalanceScreen() {
     <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
       <PageBackButton label="Profile" fallback="/profile" />
 
-      <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">Balance &amp; Cashout</h1>
+      <h1 className="mt-3 font-display text-2xl tracking-tight text-foreground">Balance &amp; <span className="text-signal">Cashout</span></h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Your credits, purchase history, top-up packs and bank cash out, all in one place.
       </p>

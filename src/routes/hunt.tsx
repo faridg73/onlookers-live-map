@@ -121,7 +121,7 @@ function HuntScreen() {
   return (
     <div className="app-shell pb-28 pt-safe">
       <div className="flex items-start justify-between gap-3">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">Hunter dashboard</h1>
+        <h1 className="font-display text-3xl tracking-tight text-foreground"><span className="text-signal">Hunter</span> dashboard</h1>
         <button
           type="button"
           onClick={close}
