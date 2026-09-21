@@ -1567,8 +1567,22 @@ function PostScreen() {
         open={liveDialog !== null}
         onOpenChange={(next) => {
           if (!next) {
+            const posted = liveDialog;
             setLiveDialog(null);
-            void navigate({ to: "/feed" });
+            /* Straight to the live request page, which has its own back arrow. */
+            if (posted) {
+              void navigate({
+                to: "/b/$id",
+                params: { id: posted.requestId },
+                search: {
+                  amt: posted.credits,
+                  place: posted.place || undefined,
+                  title: posted.title || undefined,
+                },
+              });
+            } else {
+              void navigate({ to: "/feed" });
+            }
           }
         }}
         title={liveDialog?.title ?? ""}
