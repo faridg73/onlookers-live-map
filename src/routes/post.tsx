@@ -1268,11 +1268,17 @@ function PostScreen() {
                   )}
                   {/* Same quote the escrow step uses, so the number never changes on you. */}
                   <p className="mt-3 text-xs font-medium tabular-nums text-muted-foreground">
-                    {captureDurationLabel(capture, action === "live")} · reward at this length{" "}
+                    {captureDurationLabel(capture, action === "live")} · your reward{" "}
+                    {formatCredits(quote.baseCredits)}
+                    {quote.durationFactor > 1 &&
+                      ` +${Math.round((quote.durationFactor - 1) * 100)}% length`}
+                    {quote.urgencyFactor > 1 &&
+                      ` +${Math.round((quote.urgencyFactor - 1) * 100)}% urgency`}
+                    {quote.weatherFactor > 1 &&
+                      ` +${Math.round((quote.weatherFactor - 1) * 100)}% conditions`}
+                    {" = "}
                     <span className="font-extrabold text-signal">{formatCredits(quote.total)}</span>{" "}
                     ({formatCreditCash(quote.total)})
-                    {quote.durationFactor > 1 &&
-                      ` · includes +${Math.round((quote.durationFactor - 1) * 100)}% for the extra minutes`}
                     {capture === null && ", the onlooker streams until you end the session."}
                   </p>
                 </div>
