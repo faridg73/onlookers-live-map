@@ -515,7 +515,7 @@ export function HomeLiveStage({
               </div>
 
               {activeItems.length > 0 ? (
-                <div className="max-h-[min(20dvh,14rem)] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(32dvh,16rem)]" aria-label={`${activeTrend.label} active items`}>
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
                   {activeItems.map((request) => (
                      <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
                        <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
@@ -539,7 +539,7 @@ export function HomeLiveStage({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-md border border-signal/45 bg-background/80 p-3 text-center">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md border border-signal/45 bg-background/80 p-3 text-center">
                   <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
                   <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
                     {SHOWCASE.map((item) => (
