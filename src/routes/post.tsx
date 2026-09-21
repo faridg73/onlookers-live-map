@@ -247,7 +247,13 @@ function PostScreen() {
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [liveDialog, setLiveDialog] = useState<{ title: string; credits: number; deadlineLabel: string } | null>(null);
+  const [liveDialog, setLiveDialog] = useState<{
+    title: string;
+    credits: number;
+    deadlineLabel: string;
+    requestId: string;
+    place: string;
+  } | null>(null);
   // What to pick back up once the overlay sign-in succeeds.
   const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -699,7 +705,13 @@ function PostScreen() {
       const deadlineLabel = customDeadline
         ? format(customDeadline, "MMM d, h:mm a")
         : (DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`);
-      setLiveDialog({ title: title.trim(), credits: total, deadlineLabel });
+      setLiveDialog({
+        title: title.trim(),
+        credits: total,
+        deadlineLabel,
+        requestId: locked.id,
+        place: place.trim(),
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message === BLOCKED_REQUEST_MESSAGE) setModerationOpen(true);
