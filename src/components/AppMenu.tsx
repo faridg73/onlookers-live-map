@@ -66,7 +66,7 @@ export function AppMenu() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={unread > 0 ? `More, ${unread} unread messages` : "More"}
-        className={`fixed z-[70] grid size-9 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110 ${
+        className={`absolute z-[70] grid size-9 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110 ${
           open ? "hidden" : ""
         } ${
           onHome
