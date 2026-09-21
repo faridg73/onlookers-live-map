@@ -149,7 +149,7 @@ export function AreaPicker() {
                 aria-controls="area-picker-suggestions"
                 aria-activedescendant={highlight >= 0 ? `area-picker-suggestion-${highlight}` : undefined}
                 autoComplete="off"
-                className="w-full rounded-xl border border-border bg-surface-raised px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground"
+                className="location-search-highlight w-full rounded-xl bg-surface-raised px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground"
               />
               {listOpen && suggestions.length > 0 && (
                 <ul
