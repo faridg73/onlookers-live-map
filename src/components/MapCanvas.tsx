@@ -57,6 +57,8 @@ export function MapCanvas({
   draftPin?: MapPosition | null;
   /** A place searched for in pin mode; the map flies there when it changes. */
   centerTarget?: (MapPosition & { zoom?: number }) | null;
+  /** A chosen location or category area: the map focuses it and pins it. */
+  focusPin?: (MapPosition & { zoom?: number; label?: string }) | null;
   /** Emergency mode keeps every crisis request visible as a pulsing red marker. */
   crisisMode?: boolean;
   /** Traffic mode adds Google's live traffic layer and incident heat halos. */
