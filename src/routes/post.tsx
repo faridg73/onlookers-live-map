@@ -1429,7 +1429,12 @@ function PostScreen() {
                         type="button"
                         variant="outline"
                         aria-pressed={tier === option.id}
-                        onClick={() => setTier(option.id)}
+                        onClick={() => {
+                          setTier(option.id);
+                          // Coming back to Standard restores the gig price for the
+                          // clip length picked on Step 2 instead of a stale amount.
+                          if (option.id === "standard") setBounty(gig.totalCredits);
+                        }}
                         className={`relative h-auto items-start justify-start gap-3 whitespace-normal p-3 pr-7 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
                       >
                         {option.id === "fast_catch" && (
@@ -1458,6 +1463,23 @@ function PostScreen() {
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
                     <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                    {!rewardMatchesGig && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+                        <span>
+                          Gig price for {captureDurationLabel(capture, action === "live")} is{" "}
+                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setBounty(gig.totalCredits)}
+                          className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
+                        >
+                          Use gig price
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1491,6 +1513,10 @@ function PostScreen() {
 
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Request deadline</p>
+                  <p className="mt-1 text-xs font-medium text-signal">
+                    How soon you need it — this does not change your{" "}
+                    {captureDurationLabel(capture, action === "live")} clip length.
+                  </p>
                   <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
                     {DEADLINES.map((deadline) => {
                       const on = !customDeadline && minutes === deadline.minutes;
