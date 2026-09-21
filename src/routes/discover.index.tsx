@@ -56,20 +56,27 @@ function DiscoverHome() {
   const { area } = useDiscoveryArea();
   const [view, setView] = useState<"grid" | "map">("grid");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // App-owned base-map switcher (Satellite = hybrid aerial, Map = plain roads).
+  const [mapType, setMapType] = useState<"hybrid" | "roadmap">("hybrid");
   const restored = useRef(false);
 
   useSessionScroll("onlooker:scroll:discover");
 
   useEffect(() => {
-    const saved = readSessionState<{ view?: "grid" | "map"; selectedId?: string | null }>("onlooker:view:discover", {});
+    const saved = readSessionState<{
+      view?: "grid" | "map";
+      selectedId?: string | null;
+      mapType?: "hybrid" | "roadmap";
+    }>("onlooker:view:discover", {});
     if (saved.view === "grid" || saved.view === "map") setView(saved.view);
     setSelectedId(saved.selectedId ?? null);
+    if (saved.mapType === "hybrid" || saved.mapType === "roadmap") setMapType(saved.mapType);
     restored.current = true;
   }, []);
 
   useEffect(() => {
-    if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId });
-  }, [view, selectedId]);
+    if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId, mapType });
+  }, [view, selectedId, mapType]);
 
   const eventsGroup = discoveryGroupBySlug("events");
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
