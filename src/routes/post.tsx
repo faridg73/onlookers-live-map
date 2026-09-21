@@ -38,7 +38,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyConditionIcon } from "@/components/BountyConditionIcon";
 import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
-import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
+import { GigCostBreakdown } from "@/components/GigCostBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
@@ -74,8 +74,11 @@ import { requestCurrentPosition } from "@/lib/geolocation";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   CAPTURE_OPTIONS,
+  GIG_LIVE_BLOCK_MINUTES,
+  GIG_MIN_PAYOUT_CREDITS,
   MAX_CAPTURE_MINUTES,
   captureDurationLabel,
+  gigQuoteForMinutes,
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
