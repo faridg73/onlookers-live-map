@@ -152,19 +152,54 @@ function DiscoverHome() {
 
       {view === "map" ? (
         <div className="mt-4 space-y-3">
-          <button
-            type="button"
-            onClick={() => setView("grid")}
-            aria-label="Back to Browse places"
-            className="relative z-10 inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-secondary/80 px-3 py-2 text-sm font-bold text-foreground shadow-sm transition-colors hover:border-signal/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <ArrowLeft className="size-4 text-signal" aria-hidden />
-            Browse places
-          </button>
-          <div className="h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
+          <div className="relative h-[22rem] overflow-hidden rounded-2xl border border-border sm:h-[30rem] lg:h-[38rem]">
             <SectionBoundary label="The map">
-              <MapCanvas requests={requests} selectedId={selectedId} onSelect={setSelectedId} viewportStorageKey="onlooker:map:discover" />
+              <MapCanvas
+                requests={requests}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                viewportStorageKey="onlooker:map:discover"
+                mapTypeId={mapType}
+                showNativeMapTypeControl={false}
+              />
             </SectionBoundary>
+
+            {/* compact back pill, docked to the map's top-left corner */}
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-label="Back to Browse places"
+              className="absolute left-2.5 top-2.5 z-10 inline-flex h-8 items-center gap-1.5 rounded-md border border-signal/60 bg-black/85 px-2.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden />
+              Browse places
+            </button>
+
+            {/* terminal-grade base-map switcher, top-right corner */}
+            <div className="absolute right-2.5 top-2.5 z-10 flex overflow-hidden rounded-md border border-signal/50 bg-black/85 shadow-md shadow-signal/20 backdrop-blur-xl">
+              {(
+                [
+                  { id: "hybrid", label: "Satellite", icon: Satellite },
+                  { id: "roadmap", label: "Map", icon: MapIcon },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setMapType(option.id)}
+                  aria-pressed={mapType === option.id}
+                  className={cn(
+                    "flex h-8 items-center gap-1.5 px-2.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&:not(:first-child)]:border-l [&:not(:first-child)]:border-signal/40",
+                    mapType === option.id
+                      ? "bg-signal text-signal-foreground"
+                      : "text-signal hover:bg-signal/15",
+                  )}
+                >
+                  <option.icon className="size-3.5" aria-hidden />
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>
