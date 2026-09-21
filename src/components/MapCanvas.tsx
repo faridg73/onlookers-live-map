@@ -779,7 +779,7 @@ export function MapCanvas({
         })}
 
       <div className={`absolute right-4 z-40 flex flex-col items-end gap-2 ${controlsTopClass}`}>
-        <div className="grid grid-rows-2 overflow-hidden rounded-lg border border-border bg-surface/90 shadow-lg backdrop-blur">
+        <div className="grid grid-rows-2 overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl">
           {[
             { label: "+", fn: () => zoomBy(1) },
             { label: "−", fn: () => zoomBy(-1) },
@@ -789,7 +789,7 @@ export function MapCanvas({
               type="button"
               onClick={b.fn}
               aria-label={b.label === "+" ? "Zoom in" : "Zoom out"}
-              className="flex size-9 items-center justify-center border-b border-border text-base font-bold leading-none text-foreground transition-colors last:border-b-0 hover:bg-surface-raised"
+              className="flex size-10 items-center justify-center border-b border-home-line text-base font-semibold leading-none text-foreground transition-colors last:border-b-0 hover:bg-home-accent/12 hover:text-home-accent"
             >
               {b.label}
             </button>
@@ -800,12 +800,12 @@ export function MapCanvas({
           onClick={locateMe}
           aria-label="Recenter to my location"
           title={geoMessage ?? "Recenter to my location"}
-          className="flex size-9 items-center justify-center rounded-lg border border-border bg-surface/90 text-foreground shadow-lg backdrop-blur transition-colors hover:bg-surface-raised"
+          className="flex size-10 items-center justify-center rounded-xl border border-home-line bg-home-glass-strong text-foreground shadow-xl backdrop-blur-2xl transition-colors hover:border-home-accent/50 hover:bg-home-accent/12 hover:text-home-accent"
         >
           <LocateFixed className={geoState === "pending" ? "size-4 animate-pulse" : "size-4"} />
         </button>
         {(geoState === "unavailable" || geoState === "denied") && (
-          <p className="w-28 rounded-lg border border-border bg-surface/90 px-2 py-1 text-[10px] font-medium leading-tight text-muted-foreground backdrop-blur">
+          <p className="w-28 rounded-xl border border-home-line bg-home-glass-strong px-2 py-1 text-[10px] font-medium leading-tight text-foreground/65 backdrop-blur-2xl">
             {geoState === "denied" ? "Allow location in device settings" : "Location unavailable, tap to retry"}
           </p>
         )}
