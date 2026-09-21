@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Camera, MapPin, Radar, Radio, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useRadar } from "@/hooks/use-radar";
@@ -159,6 +159,19 @@ function VenueScreen() {
       <div className="mt-4 overflow-hidden rounded-2xl border border-border">
         <LocationPreviewMap address={`${venue.name}, ${venue.area}`} />
       </div>
+
+      <Link
+        to="/discover"
+        search={{
+          view: "map" as const,
+          lat: venue.latitude,
+          lng: venue.longitude,
+          label: venue.name,
+        }}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-signal bg-surface py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/10"
+      >
+        <MapPin className="size-4" aria-hidden /> See on live map
+      </Link>
 
       <VenueBountyDialog venue={venue}>
         <button

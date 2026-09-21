@@ -84,6 +84,19 @@ function GroupScreen() {
         <AreaPicker />
       </div>
 
+      <Link
+        to="/discover"
+        search={{
+          view: "map" as const,
+          lat: area.latitude,
+          lng: area.longitude,
+          label: `${heading} · ${area.label}`,
+        }}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-signal bg-surface py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/10"
+      >
+        <MapPin className="size-4" aria-hidden /> See this category on the live map
+      </Link>
+
       {group && (
         <div className="mt-3 flex flex-wrap gap-2">
           <button

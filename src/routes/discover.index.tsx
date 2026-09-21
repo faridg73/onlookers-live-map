@@ -44,6 +44,19 @@ export const Route = createFileRoute("/discover/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  // Deep link from a place or category: /discover?view=map&lat=..&lng=..&label=..
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { view?: "map"; lat?: number; lng?: number; label?: string } => {
+    const lat = Number(search["lat"]);
+    const lng = Number(search["lng"]);
+    const label = typeof search["label"] === "string" ? search["label"] : undefined;
+    return {
+      ...(search["view"] === "map" ? { view: "map" as const } : {}),
+      ...(Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : {}),
+      ...(label ? { label } : {}),
+    };
+  },
   component: DiscoverHome,
   errorComponent: RouteErrorPanel,
 });
@@ -77,6 +90,25 @@ function DiscoverHome() {
   useEffect(() => {
     if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId, mapType });
   }, [view, selectedId, mapType]);
+
+  // A deep-linked place wins; otherwise the map focuses the browsing area.
+  const search = Route.useSearch();
+  const target =
+    typeof search.lat === "number" && typeof search.lng === "number"
+      ? { lat: search.lat, lng: search.lng, label: search.label ?? "Chosen spot" }
+      : { lat: area.latitude, lng: area.longitude, label: area.label };
+
+  // Opening the map (or changing the chosen spot) re-centers and re-pins it.
+  const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
+  const targetKey = `${target.lat.toFixed(5)}:${target.lng.toFixed(5)}:${target.label}`;
+  useEffect(() => {
+    if (search.view === "map") setView("map");
+  }, [search.view]);
+  useEffect(() => {
+    if (view !== "map") return;
+    setFocus({ ...target, label: target.label });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, targetKey]);
 
   const eventsGroup = discoveryGroupBySlug("events");
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
@@ -160,6 +192,8 @@ function DiscoverHome() {
                 onSelect={setSelectedId}
                 viewportStorageKey="onlooker:map:discover"
                 mapTypeId={mapType}
+                focusPin={focus ? { ...focus, zoom: 15 } : null}
+                centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
                 showNativeMapTypeControl={false}
               />
             </SectionBoundary>

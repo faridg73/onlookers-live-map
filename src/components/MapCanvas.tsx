@@ -36,6 +36,7 @@ export function MapCanvas({
   onMapPin,
   draftPin = null,
   centerTarget = null,
+  focusPin = null,
   crisisMode = false,
   trafficMode = false,
   gatheringMode = false,
@@ -56,6 +57,8 @@ export function MapCanvas({
   draftPin?: MapPosition | null;
   /** A place searched for in pin mode; the map flies there when it changes. */
   centerTarget?: (MapPosition & { zoom?: number }) | null;
+  /** A chosen location or category area: the map focuses it and pins it. */
+  focusPin?: (MapPosition & { zoom?: number; label?: string }) | null;
   /** Emergency mode keeps every crisis request visible as a pulsing red marker. */
   crisisMode?: boolean;
   /** Traffic mode adds Google's live traffic layer and incident heat halos. */
@@ -283,6 +286,14 @@ export function MapCanvas({
     map.current.setZoom(centerTarget.zoom ?? 14);
   }, [ready, centerTarget]);
 
+  // A chosen place or category area: fly there and keep its own labelled pin.
+  useEffect(() => {
+    if (!ready || !focusPin || !map.current) return;
+    map.current.panTo({ lat: focusPin.lat, lng: focusPin.lng });
+    const current = map.current.getZoom() ?? 0;
+    if (current < (focusPin.zoom ?? 15)) map.current.setZoom(focusPin.zoom ?? 15);
+  }, [ready, focusPin]);
+
   /**
    * Real businesses for the settled view: names, ratings and addresses straight
    * from Google Places. Only fetched close in, and debounced, to stay cheap.
@@ -318,6 +329,7 @@ export function MapCanvas({
   void tick;
   const userPixel = ready && userPos ? toPixel(userPos) : null;
   const draftPixel = ready && draftPin ? toPixel(draftPin) : null;
+  const focusPixel = ready && focusPin ? toPixel(focusPin) : null;
   const activePlace = places.find((place) => place.id === activePlaceId) ?? null;
   const requestMarkers = ready
     ? requests.flatMap((request) => {
@@ -421,6 +433,23 @@ export function MapCanvas({
               Your pin
             </span>
             <span className="mt-0.5 size-2 rotate-45 bg-signal" />
+          </span>
+        </span>
+      )}
+
+      {/* the place or area the viewer chose */}
+      {focusPixel && (
+        <span
+          className="pointer-events-none absolute z-[5] -translate-x-1/2 -translate-y-full"
+          style={{ left: focusPixel.left, top: focusPixel.top }}
+          aria-label={focusPin?.label ? `Chosen spot: ${focusPin.label}` : "Chosen spot"}
+        >
+          <span className="flex flex-col items-center">
+            <span className="max-w-[11rem] truncate rounded-full border border-signal bg-black/85 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-signal shadow-lg shadow-signal/30 backdrop-blur-md">
+              {focusPin?.label ?? "Chosen spot"}
+            </span>
+            <span className="mt-0.5 size-2.5 rotate-45 border border-signal bg-signal" />
+            <span className="mt-1 size-2 rounded-full bg-signal/50 blur-[2px]" />
           </span>
         </span>
       )}
