@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Camera, MapPin, Radar, Radio, Star } from "lucide-react";
 import { toast } from "sonner";
 import { useRadar } from "@/hooks/use-radar";
