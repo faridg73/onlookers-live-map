@@ -347,9 +347,20 @@ export function HomeLiveStage({
               <span className="flex items-center gap-1 text-[0.68rem] font-bold uppercase text-foreground/75 group-hover:text-home-accent"><Eye className="size-3.5" /> Open on map</span>
             </button>
           ) : (
-            <div className="mt-2 flex h-[calc(100%-1.4rem)] items-center rounded-xl border border-dashed border-home-line bg-home-glass px-4 text-xs text-foreground/55">
-              No active posts nearby yet. Start the first live view or local bounty.
-            </div>
+            <button type="button" onClick={onGoLive} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between overflow-hidden rounded-xl border border-signal/35 bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal">
+              <span className="relative -mx-1 -mt-1 mb-2 block h-20 overflow-hidden rounded-lg border border-home-line">
+                <img src={requestCategoryArt("street")} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                <span className="absolute inset-0 bg-gradient-to-t from-background/75 via-background/10 to-transparent" aria-hidden />
+              </span>
+              <span className="flex items-center gap-1.5 text-[0.65rem] font-extrabold uppercase text-live">
+                <Radio className="size-3.5 animate-pulse motion-reduce:animate-none" /> Be first live here
+              </span>
+              <span>
+                <span className="line-clamp-2 block text-sm font-extrabold text-foreground">Your city is quiet right now</span>
+                <span className="mt-1 block text-[0.68rem] font-semibold text-signal">Start a live view and watchers come to you</span>
+              </span>
+              <span className="flex items-center gap-1 text-[0.68rem] font-bold uppercase text-foreground/75 group-hover:text-signal"><Eye className="size-3.5" /> Go live</span>
+            </button>
           )}
         </div>
       </div>
