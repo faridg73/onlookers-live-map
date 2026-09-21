@@ -358,9 +358,9 @@ function FeedScreen() {
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={
-              "min-w-0 rounded-lg border-2 px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors shadow-signal/30 " +
+              "min-w-0 rounded-lg border-2 px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
               (filter === f.key
-                ? "border-signal bg-signal text-signal-foreground"
+                ? "border-signal bg-signal text-signal-foreground shadow-signal/40"
                 : "border-signal bg-surface text-muted-foreground hover:text-foreground shadow-signal/20")
             }
           >
