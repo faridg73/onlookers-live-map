@@ -64,16 +64,15 @@ export function CreditWalletCard() {
         <span className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
           Credits
         </span>
-        <CoinsIcon className="size-4 text-signal" />
+        <CoinsIcon className="size-4 text-live" />
       </div>
 
       <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-display text-4xl text-signal">{wallet.creditBalance}</span>
+        <span className="font-display text-4xl text-foreground">{wallet.creditBalance}</span>
         <span className="text-sm text-muted-foreground">credits</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Send credits to onlookers who film for you,{" "}
-        <span className="font-semibold text-signal">20% platform fee</span> applies to each transfer.
+        Send credits to onlookers who film for you, 20% platform fee applies to each transfer.
       </p>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -81,7 +80,7 @@ export function CreditWalletCard() {
           <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
             Received
           </p>
-          <p className="font-display text-lg text-signal">+{earned}</p>
+          <p className="font-display text-lg text-live">+{earned}</p>
         </div>
         <div className="rounded-xl border border-border bg-surface px-3 py-2">
           <p className="text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">Sent</p>
@@ -109,7 +108,7 @@ export function CreditWalletCard() {
                 >
                   <span
                     className={`grid size-8 shrink-0 place-items-center rounded-full ${
-                      incoming ? "bg-signal/15 text-signal" : "bg-muted text-muted-foreground"
+                      incoming ? "bg-live/15 text-live" : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {incoming ? (
