@@ -144,6 +144,7 @@ export function AppMenu() {
                   key={to}
                   to={to}
                   onClick={() => setOpen(false)}
+                  ref={active ? activeLinkRef : undefined}
                   aria-current={active ? "page" : undefined}
                   className={
                     "flex items-center gap-3 rounded-2xl border p-3 transition-colors " +
