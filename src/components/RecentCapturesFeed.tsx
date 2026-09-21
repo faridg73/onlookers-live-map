@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Clock, Eye, MapPin, Video } from "lucide-react";
+import { Clock, Eye, MapPin, Play, Video } from "lucide-react";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { fetchExploreClips, type ExploreClip } from "@/lib/explore";
 import { formatCredits } from "@/lib/credits";
@@ -28,6 +28,8 @@ export function RecentCapturesFeed({
   blurb?: string;
 }) {
   const [clips, setClips] = useState<ExploreClip[] | null>(null);
+  /** Which card the person tapped — that one swaps the loop for the real player. */
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -61,40 +63,65 @@ export function RecentCapturesFeed({
       <p className="mt-1 text-xs text-muted-foreground">{blurb}</p>
 
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-        {clips.map((clip) => (
-          <li
-            key={clip.id}
-            className="overflow-hidden rounded-xl border border-border bg-background/50"
-          >
-            <div className="aspect-video w-full">
-              <LoopingPreview
-                videoUrl={clip.videoUrl}
-                imageUrl={clip.thumbUrl}
-                alt={`Clip from ${clip.title}`}
-              />
-            </div>
-            <div className="p-3">
-              <p className="truncate text-sm font-bold text-foreground">{clip.title}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-2 text-[0.62rem] text-muted-foreground">
-                {clip.place && (
-                  <span className="inline-flex min-w-0 items-center gap-1">
-                    <MapPin className="size-3" aria-hidden />
-                    <span className="truncate">{clip.place}</span>
-                  </span>
+        {clips.map((clip) => {
+          const playing = playingId === clip.id && Boolean(clip.videoUrl);
+          return (
+            <li
+              key={clip.id}
+              className="overflow-hidden rounded-xl border border-border bg-background/50"
+            >
+              <div className="relative aspect-video w-full">
+                {playing ? (
+                  <video
+                    src={clip.videoUrl ?? undefined}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="size-full bg-black object-contain"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPlayingId(clip.id)}
+                    aria-label={`Play ${clip.title}`}
+                    className="group block size-full cursor-pointer active:opacity-90"
+                  >
+                    <LoopingPreview
+                      videoUrl={clip.videoUrl}
+                      imageUrl={clip.thumbUrl}
+                      alt={`Clip from ${clip.title}`}
+                    />
+                    <span className="pointer-events-none absolute inset-0 grid place-items-center">
+                      <span className="grid size-11 place-items-center rounded-full bg-black/55 text-signal ring-1 ring-signal/50 backdrop-blur-sm transition-transform group-hover:scale-105">
+                        <Play className="size-5 translate-x-[1px]" aria-hidden />
+                      </span>
+                    </span>
+                  </button>
                 )}
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="size-3" aria-hidden /> {ago(clip.createdAt)}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Eye className="size-3" aria-hidden /> {clip.views}
-                </span>
-              </p>
-              <p className="mt-2 text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal">
-                Paid out {formatCredits(clip.bounty)}
-              </p>
-            </div>
-          </li>
-        ))}
+              </div>
+              <div className="p-3">
+                <p className="truncate text-sm font-bold text-foreground">{clip.title}</p>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-[0.62rem] text-muted-foreground">
+                  {clip.place && (
+                    <span className="inline-flex min-w-0 items-center gap-1">
+                      <MapPin className="size-3" aria-hidden />
+                      <span className="truncate">{clip.place}</span>
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1 tabular-nums">
+                    <Clock className="size-3" aria-hidden /> {ago(clip.createdAt)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 tabular-nums">
+                    <Eye className="size-3" aria-hidden /> {clip.views}
+                  </span>
+                </p>
+                <p className="mt-2 text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal tabular-nums">
+                  Paid out {formatCredits(clip.bounty)}
+                </p>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
