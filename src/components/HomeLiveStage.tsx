@@ -436,8 +436,11 @@ export function HomeLiveStage({
                 <div className="max-h-[min(20dvh,14rem)] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(32dvh,16rem)]" aria-label={`${activeTrend.label} active items`}>
                   {activeItems.map((request) => (
                      <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
-                      <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start p-0 text-left hover:bg-transparent">
-                        <span className="min-w-0">
+                       <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
+                         <span className="relative block size-10 shrink-0 overflow-hidden rounded-lg border border-signal/30">
+                           <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                         </span>
+                         <span className="min-w-0">
                           <span className="block truncate text-sm font-extrabold text-foreground">{request.title}</span>
                           <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[0.7rem] font-bold text-muted-foreground">
                              <MapPin className="size-3 shrink-0 text-home-accent" aria-hidden />
