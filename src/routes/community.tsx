@@ -369,7 +369,7 @@ function CommunityHub() {
         <h1 className="mt-2 max-w-2xl text-3xl font-extrabold text-foreground sm:text-4xl">
           See what your <span className="text-signal">city</span> is doing <span className="text-signal">now</span>
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-sm font-semibold text-signal">
           A live local stream, tap a lane, tighten the radius, or open the map.
         </p>
         <Link
@@ -464,7 +464,7 @@ function CommunityHub() {
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-0.5 px-2 py-2">
                       <strong className="line-clamp-2 text-[0.72rem] font-extrabold leading-tight text-foreground">{lane.label}</strong>
-                      <small className="line-clamp-2 text-[0.58rem] leading-snug text-muted-foreground">
+                      <small className="line-clamp-2 text-[0.58rem] font-semibold leading-snug text-signal">
                         {lane.subcategories.slice(0, 2).join(" · ")}
                       </small>
                     </span>
@@ -510,7 +510,7 @@ function CommunityHub() {
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                 <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
                   <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
-                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] text-foreground">{c.blurb}</small></span>
+                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] font-semibold text-signal">{c.blurb}</small></span>
                 </span>
               </button>
             );
