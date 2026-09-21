@@ -222,7 +222,7 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-2 font-sans text-[clamp(1.1rem,4.2vw,2.1rem)] font-normal leading-[0.95] tracking-tight text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)] whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-2 font-inter text-[clamp(1.1rem,4.2vw,2.1rem)] font-normal leading-[0.95] tracking-tight text-signal drop-shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_45%,transparent)] whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
