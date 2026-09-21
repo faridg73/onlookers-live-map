@@ -1153,58 +1153,51 @@ function PostScreen() {
 
             {step === 2 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {ACTIONS.map(({ id, label, copy, icon: Icon }) => (
-                    <Button
-                      key={id}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={action === id}
-                      onClick={() => {
-                        setAction(id);
-                        if (id === "live") {
-                          setMinutes(15);
-                          setCustomCapture(false);
-                          setScheduledStart(null);
-                          applyCapture(null, id);
-                        }
-                        if (id === "clip" && capture === null) {
-                          setCustomCapture(false);
-                          applyCapture(5, id);
-                        }
-                        if (id === "meetup") {
-                          setMinutes(60);
-                          setScheduledStart(null);
-                          setCategoryId("community-culture");
-                          setSubcategory("Gatherings");
-                        }
-                      }}
-                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left transition-all ${action === id ? "border-signal bg-signal/10 shadow-lg shadow-signal/10" : ""}`}
-                    >
-                      <Icon className="mt-0.5 size-5 shrink-0 text-signal" />
-                      <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
-                    </Button>
-                  ))}
+                {/* One compact dropdown instead of three tall cards. */}
+                <div className="rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Request type</p>
+                  <Select
+                    value={action}
+                    onValueChange={(value) => {
+                      const id = value as RequestAction;
+                      setAction(id);
+                      if (id === "live") {
+                        setMinutes(15);
+                        setCustomCapture(false);
+                        setScheduledStart(null);
+                        applyCapture(null, id);
+                      }
+                      if (id === "clip" && capture === null) {
+                        setCustomCapture(false);
+                        applyCapture(5, id);
+                      }
+                      if (id === "meetup") {
+                        setMinutes(60);
+                        setScheduledStart(null);
+                        setCategoryId("community-culture");
+                        setSubcategory("Gatherings");
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="mt-3 h-11 w-full" aria-label="Request type">
+                      <SelectValue placeholder="Choose a request type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ACTIONS.map(({ id, label, icon: Icon }) => (
+                        <SelectItem key={id} value={id}>
+                          <span className="flex items-center gap-2">
+                            <Icon className="size-4 text-signal" aria-hidden />
+                            {label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-2 text-xs font-medium text-muted-foreground">
+                    {ACTIONS.find((item) => item.id === action)?.copy}
+                  </p>
                 </div>
 
-                <div>
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Category & focus</p>
-                  <div className="mt-3">
-                    <BroadcastCategoryPicker
-                      categoryId={categoryId}
-                      subcategory={subcategory}
-                      onCategoryChange={(next) => {
-                        if (next) {
-                          setCategoryId(next);
-                          setPermissionOk(false);
-                        }
-                      }}
-                      onSubcategoryChange={setSubcategory}
-                      laneLabel="Flash lane"
-                      menuLabel="Choose a Flash lane"
-                    />
-                  </div>
-                </div>
 
                 <div className="rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">
