@@ -131,9 +131,11 @@ export const creditsToUsdValue = (credits: number) =>
 
 export const usdToCredits = (usd: number) => Math.round(usd * CREDITS_PER_USD);
 
-/** Compact badge form, e.g. "120 Credits". */
-export const formatCredits = (credits: number) =>
-  `${Math.round(Number.isFinite(credits) ? credits : 0).toLocaleString()} Credits`;
+/** Compact badge form, e.g. "120 Credits" (and "1 Credit" for a single one). */
+export const formatCredits = (credits: number) => {
+  const n = Math.round(Number.isFinite(credits) ? credits : 0);
+  return `${n.toLocaleString()} Credit${n === 1 ? "" : "s"}`;
+};
 
 /** Spelled-out form for sentences, e.g. "120 Credits". */
 export const formatCreditWords = (credits: number) => {
