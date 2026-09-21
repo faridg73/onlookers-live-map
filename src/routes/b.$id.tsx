@@ -19,7 +19,7 @@ export const Route = createFileRoute("/b/$id")({
   head: ({ match }) => {
     const { amt, place, title } = match.search as Search;
     const heading = amt
-      ? `$${amt} bounty${place ? `, ${place}` : ""} · Onlooker`
+      ? `${Math.round(amt).toLocaleString()} Credits bounty${place ? `, ${place}` : ""} · Onlooker`
       : "Live view bounty · Onlooker";
     const desc = title
       ? `${title}${place ? ` at ${place}` : ""}. Capture a live photo or clip and claim the bounty.`
