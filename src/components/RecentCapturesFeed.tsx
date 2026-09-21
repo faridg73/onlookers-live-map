@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Clock, Eye, MapPin, Play, Video } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Clock, Eye, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { toast } from "sonner";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { fetchExploreClips, type ExploreClip } from "@/lib/explore";
+import { deleteExploreClip } from "@/lib/explore.functions";
 import { formatCredits } from "@/lib/credits";
+import { supabase } from "@/integrations/supabase/client";
 
 function ago(iso: string) {
   const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
