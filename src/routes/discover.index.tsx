@@ -220,7 +220,7 @@ function DiscoverHome() {
                             <span className="line-clamp-2 text-sm font-bold">
                               <TwoToneName name={place.name} />
                             </span>
-                            <span className="mt-1 block truncate text-[0.68rem] text-muted-foreground">
+                            <span className="mt-1 block truncate text-[0.68rem] font-semibold text-signal">
                               {place.primaryType ?? "Venue"}
                               {place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}
                             </span>
@@ -267,14 +267,8 @@ function DiscoverHome() {
                     <p className="truncate font-display text-lg">
                       <TwoToneName name={group.name} />
                     </p>
-                    <p className="truncate text-xs text-foreground/90">
-                      {group.tagline.split(",")[0]}
-                      {group.tagline.includes(",") ? (
-                        <span className="font-bold text-signal">
-                          , {group.tagline.split(",").slice(1).join(",").trim()}
-                        </span>
-                      ) : null}
-                    </p>
+                    <p className="truncate text-xs font-semibold text-signal">{group.tagline}</p>
+
                   </div>
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                 </div>

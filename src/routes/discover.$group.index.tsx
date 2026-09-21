@@ -80,7 +80,7 @@ function GroupScreen() {
     <div className="app-shell pb-28 pt-safe">
       <PageBackButton label="All places" fallback="/discover" />
       <h1 className="mt-2 font-display text-3xl tracking-tight"><TwoToneName name={heading} /></h1>
-      <p className="mt-1 text-sm text-muted-foreground">{tagline}</p>
+      <p className="mt-1 text-sm font-semibold text-signal">{tagline}</p>
 
       <div className="mt-4">
         <AreaPicker />
@@ -145,7 +145,8 @@ function GroupScreen() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-display text-base"><TwoToneName name={place.name} /></p>
-                <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+                <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-semibold text-signal">
+
                   <MapPin className="size-3 shrink-0" aria-hidden />
                   {place.address ?? area.label}
                 </p>
@@ -186,7 +187,7 @@ function GroupScreen() {
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-base"><TwoToneName name={venue.name} /></p>
-              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+              <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-semibold text-signal">
                 <MapPin className="size-3 shrink-0" aria-hidden />
                 {venue.area}
               </p>
