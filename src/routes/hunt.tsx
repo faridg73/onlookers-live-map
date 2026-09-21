@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Clock, DollarSign, Navigation, Radio, X } from "lucide-react";
+import { Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
@@ -137,8 +137,10 @@ function HuntScreen() {
 
       <div className="mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
         <div className={stat}>
-          <DollarSign className="size-4 text-signal" aria-hidden />
-          <p className="mt-1 font-display text-xl text-foreground">${potential}</p>
+          <CoinsIcon className="size-4 text-signal" aria-hidden />
+          <p className="mt-1 font-display text-xl tabular-nums text-foreground">
+            {Math.round(potential).toLocaleString()}
+          </p>
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
             On the table
           </p>
@@ -201,7 +203,7 @@ function HuntScreen() {
               <div key={request.id} className="min-w-0">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-1 pb-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.1em]">
                 <span className="flex min-w-0 flex-wrap items-center gap-2">
-                  <span className="text-signal">Earn ${payout}</span>
+                  <span className="tabular-nums text-signal">Earn {formatCredits(payout)}</span>
                   <UrgencyBadge minutesLeft={left} bounty={payout} compact />
                 </span>
                 <span className="flex shrink-0 flex-col items-end gap-1 text-muted-foreground sm:flex-row sm:gap-2">
