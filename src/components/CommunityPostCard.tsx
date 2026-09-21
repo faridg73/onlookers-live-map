@@ -155,7 +155,7 @@ export function CommunityPostCard({
         </div>
 
         <h3 className="mt-2.5 text-sm font-extrabold leading-snug text-foreground">{post.title}</h3>
-        {post.body && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{post.body}</p>}
+        {post.body && <p className="mt-1 line-clamp-2 text-xs font-semibold text-signal">{post.body}</p>}
         {isReport && (
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[0.62rem] font-extrabold uppercase ${reportStatusClass}`}>
