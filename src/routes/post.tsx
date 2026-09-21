@@ -38,7 +38,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyConditionIcon } from "@/components/BountyConditionIcon";
 import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
-import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
+import { GigCostBreakdown } from "@/components/GigCostBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
 import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
@@ -74,8 +74,11 @@ import { requestCurrentPosition } from "@/lib/geolocation";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   CAPTURE_OPTIONS,
+  GIG_LIVE_BLOCK_MINUTES,
+  GIG_MIN_PAYOUT_CREDITS,
   MAX_CAPTURE_MINUTES,
   captureDurationLabel,
+  gigQuoteForMinutes,
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
@@ -264,7 +267,7 @@ function PostScreen() {
   const [action, setAction] = useState<RequestAction>("clip");
   const [note, setNote] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
-  const [bounty, setBounty] = useState(20);
+  const [bounty, setBounty] = useState(GIG_MIN_PAYOUT_CREDITS);
   const [tip, setTip] = useState(0);
   const [minutes, setMinutes] = useState(60);
   const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
@@ -340,9 +343,20 @@ function PostScreen() {
         durationMinutes: capture,
         minutesUntilDue,
         weatherMultiplier: weather,
+        // The gig algorithm already priced the minutes into the base reward.
+        durationPricedInBase: true,
       }),
     [bounty, capture, minutesUntilDue, tier, weather],
   );
+
+  /** Gig pricing for the selected capture length, shown in the breakdown card. */
+  const gig = useMemo(
+    () => gigQuoteForMinutes(capture ?? GIG_LIVE_BLOCK_MINUTES),
+    [capture],
+  );
+  /** True while the reward still tracks the gig price for the picked duration. */
+  const rewardMatchesGig =
+    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gig.totalCredits;
 
   const total = quote.total + (Number.isFinite(tip) ? tip : 0);
 
@@ -431,12 +445,15 @@ function PostScreen() {
   }, [searchOrigin, searchVenues, signedIn, step, venueQuery]);
 
   /**
-   * Locks in a capture length. The reward itself is NOT bumped here — length is
-   * already priced by the quote's duration multiplier, and raising the base too
-   * would charge for the extra minutes twice.
+   * Locks in a capture length and prices it with the gig algorithm: the $5
+   * dispatch fee plus the $50/hour time rate (with the $10 minimum floor)
+   * becomes the suggested reward, so the duration pills drive the total.
    */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
+    if (tier === "standard") {
+      setBounty(gigQuoteForMinutes(next ?? GIG_LIVE_BLOCK_MINUTES).totalCredits);
+    }
     if (next === null && nextAction !== "meetup") setAction("live");
     if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
   };
@@ -1222,7 +1239,7 @@ function PostScreen() {
                   <p className="text-xs font-bold uppercase text-muted-foreground">
                     {action === "live" ? "Stream length" : "Clip length"}
                   </p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
                     {CAPTURE_OPTIONS.map((option) => {
                       const on = !customCapture && capture === option.minutes;
                       return (
@@ -1272,21 +1289,22 @@ function PostScreen() {
                       <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
                     </label>
                   )}
-                  {/* Same quote the escrow step uses, so the number never changes on you. */}
-                  <p className="mt-3 text-xs font-medium tabular-nums text-muted-foreground">
-                    {captureDurationLabel(capture, action === "live")} · your reward{" "}
-                    {formatCredits(quote.baseCredits)}
-                    {quote.durationFactor > 1 &&
-                      ` +${Math.round((quote.durationFactor - 1) * 100)}% length`}
-                    {quote.urgencyFactor > 1 &&
-                      ` +${Math.round((quote.urgencyFactor - 1) * 100)}% urgency`}
-                    {quote.weatherFactor > 1 &&
-                      ` +${Math.round((quote.weatherFactor - 1) * 100)}% conditions`}
-                    {" = "}
-                    <span className="font-extrabold text-signal">{formatCredits(quote.total)}</span>{" "}
-                    ({formatCreditCash(quote.total)})
-                    {capture === null && ", the onlooker streams until you end the session."}
-                  </p>
+                  {/* Same gig quote the escrow step uses, so the number never changes on you. */}
+                  <div className="mt-3">
+                    <GigCostBreakdown
+                      gig={gig}
+                      live={capture === null}
+                      rewardCredits={quote.baseCredits}
+                      rewardMatchesGig={rewardMatchesGig}
+                      urgencyFactor={quote.urgencyFactor}
+                      weatherFactor={quote.weatherFactor}
+                      totalCredits={quote.total}
+                    />
+                    <p className="mt-2 text-xs font-medium text-muted-foreground">
+                      {captureDurationLabel(capture, action === "live")}
+                      {capture === null && " — the onlooker streams until you end the session."}
+                    </p>
+                  </div>
                 </div>
 
                 {action === "clip" && (
@@ -1511,7 +1529,16 @@ function PostScreen() {
                   <CollapsibleContent className="mt-3"><BountyTipPicker value={tip} onChange={setTip} balance={balance} total={total} /></CollapsibleContent>
                 </Collapsible>
 
-                <BountyPriceBreakdown quote={quote} />
+                <GigCostBreakdown
+                  gig={gig}
+                  live={capture === null}
+                  rewardCredits={quote.baseCredits}
+                  rewardMatchesGig={rewardMatchesGig}
+                  urgencyFactor={quote.urgencyFactor}
+                  weatherFactor={quote.weatherFactor}
+                  tipCredits={Number.isFinite(tip) ? tip : 0}
+                  totalCredits={total}
+                />
                 {tip > 0 && (
                   <p className="text-xs font-medium text-muted-foreground">
                     Plus a {formatCredits(tip)} tip, {formatCredits(total)} leaves your wallet.
@@ -1552,7 +1579,7 @@ function PostScreen() {
                   Next: describe the bounty
                 </Button>
               )}
-              {step === 3 && detailsReady && <Button type="submit" disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Lock ${formatCredits(total)}`}</Button>}
+              {step === 3 && detailsReady && <Button type="submit" disabled={posting || total < MIN_BOUNTY || (permissionNeeded && !permissionOk) || (codeNeeded && accessCode.trim().length < 4)} className="h-12 flex-1 bg-signal font-extrabold text-signal-foreground">{posting ? "Posting…" : `Publish Bounty & Fund Escrow · ${formatCredits(total)}`}</Button>}
             </div>
           </footer>
         </form>
