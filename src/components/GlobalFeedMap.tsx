@@ -229,7 +229,10 @@ export function GlobalFeedMap({
             </>
           ) : (
             <>
-              <Globe2 className="size-3 text-signal" /> {pinned.length} unlocked clips worldwide
+              <Globe2 className="size-3 text-signal" /> {pinned.length} clips
+              {subcategory
+                ? ` · ${pinnedReports.length} #${subcategory} ${pinnedReports.length === 1 ? "post" : "posts"}`
+                : " worldwide"}
             </>
           )}
         </span>

@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { AlertTriangle, BadgeCheck, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertTriangle, BadgeCheck, CalendarDays, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { ShareToSocialButton } from "@/components/ShareToSocialButton";
@@ -174,6 +174,19 @@ export function CommunityPostCard({
               </span>
             )}
           </div>
+        )}
+
+        {post.eventStartsAt && (
+          <p className="mt-2 inline-flex items-center gap-1 rounded-md border border-signal/60 bg-signal/10 px-2 py-1 text-[0.65rem] font-extrabold text-signal">
+            <CalendarDays className="size-3" />
+            {new Date(post.eventStartsAt).toLocaleString(undefined, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </p>
         )}
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.68rem] text-muted-foreground">
