@@ -23,6 +23,7 @@ import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
+import { TwoToneName } from "@/components/TwoTone";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
