@@ -135,10 +135,18 @@ function MapScreen() {
     void saveMyLocation(userPosition.lat, userPosition.lng);
   }, [userPosition]);
 
-  // Opening a shared bounty link lands straight on that pin.
+  // Opening a shared bounty link lands straight on that pin: select it so the
+  // callout opens, then center and zoom the map onto its exact coordinates.
+  const centeredOnBounty = useRef<string | null>(null);
   useEffect(() => {
-    if (b) select(b);
-  }, [b, select]);
+    if (!b) return;
+    select(b);
+    if (centeredOnBounty.current === b) return;
+    const target = requests.find((r) => r.id === b);
+    if (!target) return;
+    centeredOnBounty.current = b;
+    setCenterTarget({ ...requestMapPosition(target), zoom: 16 });
+  }, [b, requests, select]);
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
