@@ -98,6 +98,25 @@ export function HomeLiveStage({
 }: HomeLiveStageProps) {
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
   const trendScrollerRef = useRef<HTMLDivElement>(null);
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const [drawerMax, setDrawerMax] = useState(384);
+  // Keep the floating dropdown fully above the bottom tab bar on every screen size.
+  useEffect(() => {
+    const update = () => {
+      const el = tickerRef.current;
+      if (!el) return;
+      const bottom = el.getBoundingClientRect().bottom;
+      const navAllowance = 92;
+      setDrawerMax(Math.max(160, Math.min(window.innerHeight - bottom - 12 - navAllowance, 416)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    const timer = window.setTimeout(update, 350);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.clearTimeout(timer);
+    };
+  }, [mapExpanded, openFeed]);
   const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
   const updateTrendScroll = useCallback(() => {
     const el = trendScrollerRef.current;
