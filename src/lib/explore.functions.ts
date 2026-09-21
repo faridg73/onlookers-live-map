@@ -54,6 +54,22 @@ export const listExploreClips = createServerFn({ method: "GET" })
     });
     if (error || !rows) return [];
 
+    // Ownership + capture spot for the per-card Delete / View-on-map options.
+    const ids = rows.map((r) => r.id);
+    const { data: videos } = await supabaseAdmin
+      .from("bounty_videos")
+      .select("id, uploader_id, request_id")
+      .in("id", ids);
+    const videoById = new Map((videos ?? []).map((v) => [v.id, v]));
+
+    const requestIds = [
+      ...new Set((videos ?? []).map((v) => v.request_id).filter((x): x is string => Boolean(x))),
+    ];
+    const { data: reqs } = requestIds.length
+      ? await supabaseAdmin.from("requests").select("id, latitude, longitude").in("id", requestIds)
+      : { data: [] as { id: string; latitude: number; longitude: number }[] };
+    const reqById = new Map((reqs ?? []).map((r) => [r.id, r]));
+
     return Promise.all(
       rows.map(async (r) => {
         const [video, thumb] = await Promise.all([
