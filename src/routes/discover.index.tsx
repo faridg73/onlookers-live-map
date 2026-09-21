@@ -192,6 +192,8 @@ function DiscoverHome() {
                 onSelect={setSelectedId}
                 viewportStorageKey="onlooker:map:discover"
                 mapTypeId={mapType}
+                focusPin={focus ? { ...focus, zoom: 15 } : null}
+                centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
                 showNativeMapTypeControl={false}
               />
             </SectionBoundary>
