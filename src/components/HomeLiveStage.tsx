@@ -98,6 +98,25 @@ export function HomeLiveStage({
 }: HomeLiveStageProps) {
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
   const trendScrollerRef = useRef<HTMLDivElement>(null);
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const [drawerMax, setDrawerMax] = useState(384);
+  // Keep the floating dropdown fully above the bottom tab bar on every screen size.
+  useEffect(() => {
+    const update = () => {
+      const el = tickerRef.current;
+      if (!el) return;
+      const bottom = el.getBoundingClientRect().bottom;
+      const navAllowance = 92;
+      setDrawerMax(Math.max(160, Math.min(window.innerHeight - bottom - 12 - navAllowance, 416)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    const timer = window.setTimeout(update, 350);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.clearTimeout(timer);
+    };
+  }, [mapExpanded, openFeed]);
   const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
   const updateTrendScroll = useCallback(() => {
     const el = trendScrollerRef.current;
@@ -433,7 +452,7 @@ export function HomeLiveStage({
         )}
       </div>
 
-      <div className="relative mt-2 flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
+      <div ref={tickerRef} className="relative mt-2 flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
           ref={trendScrollerRef}
@@ -477,11 +496,11 @@ export function HomeLiveStage({
 
       <div
         id="home-live-feed-drawer"
-        className={`mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
+        className={`absolute inset-x-0 top-full z-50 mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
       >
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0 overflow-hidden" style={{ maxHeight: drawerMax }}>
           {activeTrend && (
-            <div className="px-3 pb-3 pt-2.5 sm:px-4">
+            <div className="flex max-h-[inherit] flex-col px-3 pb-3 pt-2.5 sm:px-4">
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                    <activeTrend.icon className="size-4 shrink-0 text-home-accent" aria-hidden />
@@ -496,7 +515,7 @@ export function HomeLiveStage({
               </div>
 
               {activeItems.length > 0 ? (
-                <div className="max-h-[min(20dvh,14rem)] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:max-h-[min(32dvh,16rem)]" aria-label={`${activeTrend.label} active items`}>
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
                   {activeItems.map((request) => (
                      <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
                        <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
@@ -520,7 +539,7 @@ export function HomeLiveStage({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-md border border-signal/45 bg-background/80 p-3 text-center">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md border border-signal/45 bg-background/80 p-3 text-center">
                   <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
                   <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
                     {SHOWCASE.map((item) => (
