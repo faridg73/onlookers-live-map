@@ -243,11 +243,11 @@ function FAQScreen() {
   return (
     <main className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 flex-col items-center text-center">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--signal)_22%,transparent)] animate-red-flash motion-reduce:animate-none">
             <HelpCircle className="size-6" aria-hidden="true" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 mt-2">
             <p className="text-xs font-bold uppercase text-signal">Onlooker</p>
             <h1 className="font-display text-2xl text-foreground">Help <span className="text-signal">Center</span></h1>
             <p className="mt-1 text-sm text-muted-foreground">Clear answers for every part of the platform.</p>
