@@ -36,6 +36,7 @@ export function MapCanvas({
   onMapPin,
   draftPin = null,
   centerTarget = null,
+  focusPin = null,
   crisisMode = false,
   trafficMode = false,
   gatheringMode = false,
