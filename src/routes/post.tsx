@@ -1289,21 +1289,22 @@ function PostScreen() {
                       <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
                     </label>
                   )}
-                  {/* Same quote the escrow step uses, so the number never changes on you. */}
-                  <p className="mt-3 text-xs font-medium tabular-nums text-muted-foreground">
-                    {captureDurationLabel(capture, action === "live")} · your reward{" "}
-                    {formatCredits(quote.baseCredits)}
-                    {quote.durationFactor > 1 &&
-                      ` +${Math.round((quote.durationFactor - 1) * 100)}% length`}
-                    {quote.urgencyFactor > 1 &&
-                      ` +${Math.round((quote.urgencyFactor - 1) * 100)}% urgency`}
-                    {quote.weatherFactor > 1 &&
-                      ` +${Math.round((quote.weatherFactor - 1) * 100)}% conditions`}
-                    {" = "}
-                    <span className="font-extrabold text-signal">{formatCredits(quote.total)}</span>{" "}
-                    ({formatCreditCash(quote.total)})
-                    {capture === null && ", the onlooker streams until you end the session."}
-                  </p>
+                  {/* Same gig quote the escrow step uses, so the number never changes on you. */}
+                  <div className="mt-3">
+                    <GigCostBreakdown
+                      gig={gig}
+                      live={capture === null}
+                      rewardCredits={quote.baseCredits}
+                      rewardMatchesGig={rewardMatchesGig}
+                      urgencyFactor={quote.urgencyFactor}
+                      weatherFactor={quote.weatherFactor}
+                      totalCredits={quote.total}
+                    />
+                    <p className="mt-2 text-xs font-medium text-muted-foreground">
+                      {captureDurationLabel(capture, action === "live")}
+                      {capture === null && " — the onlooker streams until you end the session."}
+                    </p>
+                  </div>
                 </div>
 
                 {action === "clip" && (
