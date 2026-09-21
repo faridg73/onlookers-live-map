@@ -414,7 +414,11 @@ export function HomeLiveStage({
             })}
           </div>
         ) : (
-          <p className="px-3 py-2 text-xs text-foreground/55">No active streams or bounties nearby yet.</p>
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Ways to start the first stream or bounty nearby">
+            {SHOWCASE.map((item) => (
+              <ShowcaseCard key={item.key} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
+            ))}
+          </div>
         )}
       </div>
 
