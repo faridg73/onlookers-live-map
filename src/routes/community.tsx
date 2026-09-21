@@ -24,6 +24,7 @@ import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { FOLLOWS_CHANGED_EVENT, listFollowedCreatorIds } from "@/lib/follows";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
+import { BROADCAST_CATEGORY_ART } from "@/lib/category-art";
 import { distanceMiles, type MapPosition } from "@/lib/onlooker";
 import {
   COMMUNITY_CATEGORIES,
@@ -452,7 +453,7 @@ function CommunityHub() {
                     <span className="relative block min-h-0 w-full flex-1 overflow-hidden">
                       <LoopingPreview
                         videoUrl={previewUrl}
-                        imageUrl={previewUrl ? undefined : visual.image}
+                        imageUrl={previewUrl ? undefined : BROADCAST_CATEGORY_ART[lane.id]}
                         alt={previewUrl ? `Live preview for ${lane.label}` : `${lane.label} category`}
                         icon={Icon}
                         coverClass={visual.coverClass}
