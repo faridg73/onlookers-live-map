@@ -706,6 +706,20 @@ function CommunityHub() {
         <section className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="The community feed">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
+          {!loading && loadError && (
+            <div className="rounded-2xl border border-dashed border-border bg-surface p-5 text-center">
+              <p className="text-sm font-semibold text-foreground">We couldn't load the feed</p>
+              <p className="mt-1 text-xs text-muted-foreground">{loadError}</p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void load()}
+                className="mt-3 h-10 rounded-full px-4 text-xs font-extrabold"
+              >
+                Try again
+              </Button>
+            </div>
+          )}
           {!loading && source === "following" && visible.length === 0 && (
             <div className="mb-6 rounded-2xl border border-dashed border-signal/45 bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
