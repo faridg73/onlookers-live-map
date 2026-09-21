@@ -26,8 +26,8 @@ export function BottomNav() {
               className={`${linkClass} ${"primary" in item ? "font-extrabold text-signal" : ""}`}
             >
               <span
-                className={`relative grid size-9 place-items-center rounded-full ${
-                  "primary" in item ? "bg-signal text-signal-foreground" : ""
+                className={`relative grid size-9 place-items-center rounded-full border-2 border-signal/70 shadow-[0_0_10px_rgba(204,255,0,0.25)] transition-all group-data-[status=active]:border-signal group-data-[status=active]:shadow-[0_0_14px_rgba(204,255,0,0.5)] ${
+                  "primary" in item ? "bg-signal text-signal-foreground border-signal" : ""
                 }`}
               >
                 <Icon className="size-5" strokeWidth={1.75} />
