@@ -368,7 +368,7 @@ export function HomeLiveStage({
           <span className="text-[0.58rem] font-bold uppercase text-signal">Live city feed</span>
         </div>
         {discoveryItems.length > 0 ? (
-          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1" aria-label="Active live streams and high-value bounties">
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Active live streams and high-value bounties">
             {discoveryItems.map((request) => {
               const live = isLiveRequest(request);
               const initials = (request.requester || "?")
