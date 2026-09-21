@@ -41,7 +41,6 @@ import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEdu
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
-import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
@@ -77,7 +76,6 @@ import {
   CAPTURE_OPTIONS,
   MAX_CAPTURE_MINUTES,
   captureDurationLabel,
-  suggestedBountyForCapture,
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
@@ -249,7 +247,13 @@ function PostScreen() {
   const [venueBusy, setVenueBusy] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [liveDialog, setLiveDialog] = useState<{ title: string; credits: number; deadlineLabel: string } | null>(null);
+  const [liveDialog, setLiveDialog] = useState<{
+    title: string;
+    credits: number;
+    deadlineLabel: string;
+    requestId: string;
+    place: string;
+  } | null>(null);
   // What to pick back up once the overlay sign-in succeeds.
   const pendingAfterSignIn = useRef<(() => void) | null>(null);
   const [searchOrigin, setSearchOrigin] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -330,7 +334,7 @@ function PostScreen() {
       quoteBounty({
         tier,
         customBase: Number.isFinite(bounty) ? bounty : 0,
-        durationMinutes: capture ?? 30,
+        durationMinutes: capture,
         minutesUntilDue,
         weatherMultiplier: weather,
       }),
@@ -423,12 +427,15 @@ function PostScreen() {
     };
   }, [searchOrigin, searchVenues, signedIn, step, venueQuery]);
 
-  /** Locks in a capture length and scales the reward up to match it. */
+  /**
+   * Locks in a capture length. The reward itself is NOT bumped here — length is
+   * already priced by the quote's duration multiplier, and raising the base too
+   * would charge for the extra minutes twice.
+   */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
     if (next === null && nextAction !== "meetup") setAction("live");
     if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
-    setBounty((current) => Math.max(current, suggestedBountyForCapture(next)));
   };
 
   /**
@@ -698,7 +705,13 @@ function PostScreen() {
       const deadlineLabel = customDeadline
         ? format(customDeadline, "MMM d, h:mm a")
         : (DEADLINES.find((item) => item.minutes === minutes)?.label ?? `${minutes} min`);
-      setLiveDialog({ title: title.trim(), credits: total, deadlineLabel });
+      setLiveDialog({
+        title: title.trim(),
+        credits: total,
+        deadlineLabel,
+        requestId: locked.id,
+        place: place.trim(),
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
       if (message === BLOCKED_REQUEST_MESSAGE) setModerationOpen(true);
@@ -1153,58 +1166,51 @@ function PostScreen() {
 
             {step === 2 && (
               <div className="mx-auto max-w-2xl animate-rise space-y-5">
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {ACTIONS.map(({ id, label, copy, icon: Icon }) => (
-                    <Button
-                      key={id}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={action === id}
-                      onClick={() => {
-                        setAction(id);
-                        if (id === "live") {
-                          setMinutes(15);
-                          setCustomCapture(false);
-                          setScheduledStart(null);
-                          applyCapture(null, id);
-                        }
-                        if (id === "clip" && capture === null) {
-                          setCustomCapture(false);
-                          applyCapture(5, id);
-                        }
-                        if (id === "meetup") {
-                          setMinutes(60);
-                          setScheduledStart(null);
-                          setCategoryId("community-culture");
-                          setSubcategory("Gatherings");
-                        }
-                      }}
-                      className={`h-auto items-start justify-start gap-3 whitespace-normal p-3 text-left transition-all ${action === id ? "border-signal bg-signal/10 shadow-lg shadow-signal/10" : ""}`}
-                    >
-                      <Icon className="mt-0.5 size-5 shrink-0 text-signal" />
-                      <span><span className="block font-extrabold text-foreground">{label}</span><span className="mt-1 block text-xs font-medium text-muted-foreground">{copy}</span></span>
-                    </Button>
-                  ))}
+                {/* One compact dropdown instead of three tall cards. */}
+                <div className="rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">Request type</p>
+                  <Select
+                    value={action}
+                    onValueChange={(value) => {
+                      const id = value as RequestAction;
+                      setAction(id);
+                      if (id === "live") {
+                        setMinutes(15);
+                        setCustomCapture(false);
+                        setScheduledStart(null);
+                        applyCapture(null, id);
+                      }
+                      if (id === "clip" && capture === null) {
+                        setCustomCapture(false);
+                        applyCapture(5, id);
+                      }
+                      if (id === "meetup") {
+                        setMinutes(60);
+                        setScheduledStart(null);
+                        setCategoryId("community-culture");
+                        setSubcategory("Gatherings");
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="mt-3 h-11 w-full" aria-label="Request type">
+                      <SelectValue placeholder="Choose a request type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ACTIONS.map(({ id, label, icon: Icon }) => (
+                        <SelectItem key={id} value={id}>
+                          <span className="flex items-center gap-2">
+                            <Icon className="size-4 text-signal" aria-hidden />
+                            {label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-2 text-xs font-medium text-muted-foreground">
+                    {ACTIONS.find((item) => item.id === action)?.copy}
+                  </p>
                 </div>
 
-                <div>
-                  <p className="text-xs font-bold uppercase text-muted-foreground">Category & focus</p>
-                  <div className="mt-3">
-                    <BroadcastCategoryPicker
-                      categoryId={categoryId}
-                      subcategory={subcategory}
-                      onCategoryChange={(next) => {
-                        if (next) {
-                          setCategoryId(next);
-                          setPermissionOk(false);
-                        }
-                      }}
-                      onSubcategoryChange={setSubcategory}
-                      laneLabel="Flash lane"
-                      menuLabel="Choose a Flash lane"
-                    />
-                  </div>
-                </div>
 
                 <div className="rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">
@@ -1260,8 +1266,13 @@ function PostScreen() {
                       <span className="text-xs font-medium text-muted-foreground">minutes (up to {MAX_CAPTURE_MINUTES})</span>
                     </label>
                   )}
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">
-                    {captureDurationLabel(capture, action === "live")} · suggested reward {formatCredits(suggestedBountyForCapture(capture))} ({formatCreditCash(suggestedBountyForCapture(capture))})
+                  {/* Same quote the escrow step uses, so the number never changes on you. */}
+                  <p className="mt-3 text-xs font-medium tabular-nums text-muted-foreground">
+                    {captureDurationLabel(capture, action === "live")} · reward at this length{" "}
+                    <span className="font-extrabold text-signal">{formatCredits(quote.total)}</span>{" "}
+                    ({formatCreditCash(quote.total)})
+                    {quote.durationFactor > 1 &&
+                      ` · includes +${Math.round((quote.durationFactor - 1) * 100)}% for the extra minutes`}
                     {capture === null && ", the onlooker streams until you end the session."}
                   </p>
                 </div>
@@ -1556,8 +1567,22 @@ function PostScreen() {
         open={liveDialog !== null}
         onOpenChange={(next) => {
           if (!next) {
+            const posted = liveDialog;
             setLiveDialog(null);
-            void navigate({ to: "/feed" });
+            /* Straight to the live request page, which has its own back arrow. */
+            if (posted) {
+              void navigate({
+                to: "/b/$id",
+                params: { id: posted.requestId },
+                search: {
+                  amt: posted.credits,
+                  place: posted.place || undefined,
+                  title: posted.title || undefined,
+                },
+              });
+            } else {
+              void navigate({ to: "/feed" });
+            }
           }
         }}
         title={liveDialog?.title ?? ""}

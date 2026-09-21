@@ -1,17 +1,15 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { CoinsIcon, Flame, Zap } from "lucide-react";
+import { CoinsIcon, Minus, Plus } from "lucide-react";
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCreditWords, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";
 
-const PRESETS: { amount: number; tag?: string; icon?: "popular" | "fast" }[] = [
-  { amount: 20 },
-  { amount: 40 },
-  { amount: 80 },
-  { amount: 100 },
-];
+const PRESETS = [20, 40, 80, 100];
 
-/** Preset bounty chips plus a custom amount box with a minimum. */
+/** How much the +/- buttons move the custom amount. */
+const STEP = 5;
+
+/** Preset bounty chips plus one tidy custom amount box with a minimum. */
 export function BountyAmountPicker({
   value,
   onChange,
@@ -21,57 +19,34 @@ export function BountyAmountPicker({
   onChange: (v: number) => void;
   balance?: number | null;
 }) {
-  const custom = !PRESETS.some((p) => p.amount === value);
-  const tooLow = value < MIN_BOUNTY;
-  const shortFall = balance != null && value > balance;
+  const safe = Number.isFinite(value) ? value : 0;
+  const custom = !PRESETS.includes(safe);
+  const tooLow = safe < MIN_BOUNTY;
+  const shortFall = balance != null && safe > balance;
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {PRESETS.map(({ amount, tag, icon }) => {
-          const on = value === amount;
+      <div className="grid grid-cols-4 gap-2">
+        {PRESETS.map((amount) => {
+          const on = safe === amount;
           return (
             <button
               key={amount}
               type="button"
               onClick={() => onChange(amount)}
+              aria-pressed={on}
               className={cn(
-                "relative rounded-2xl border-2 pb-2.5 pt-4 text-center transition-all",
+                "rounded-xl border px-1 py-2.5 text-center transition-colors",
                 on
-                  ? "border-signal bg-signal text-signal-foreground shadow-[0_10px_30px_-12px_var(--signal)]"
+                  ? "border-signal bg-signal text-signal-foreground"
                   : "border-border bg-surface-raised text-foreground hover:border-signal/60",
               )}
             >
-              {tag && (
-                <span
-                  className={cn(
-                    "absolute -top-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[0.55rem] font-extrabold uppercase tracking-[0.12em]",
-                    icon === "popular"
-                      ? "bg-live text-background"
-                      : "bg-foreground text-background",
-                  )}
-                >
-                  {icon === "popular" ? (
-                    <Flame className="size-2.5" strokeWidth={3} />
-                  ) : (
-                    <Zap className="size-2.5" strokeWidth={3} />
-                  )}
-                  {tag}
-                </span>
-              )}
-              <span className="flex items-center justify-center gap-1 font-display text-xl font-extrabold leading-none tabular-nums">
-                <CoinsIcon
-                  className={cn("size-3.5", !on && "text-signal")}
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                />
+              <span className="block font-display text-lg font-extrabold leading-none tabular-nums">
                 {amount}
               </span>
-              <span className="mt-0.5 block text-[0.55rem] font-bold uppercase tracking-[0.14em] opacity-70">
+              <span className="mt-1 block text-[0.55rem] font-bold uppercase tracking-[0.1em] opacity-70">
                 Credits
-              </span>
-              <span className="mt-1 block text-[0.62rem] font-extrabold tabular-nums opacity-80">
-                {formatCreditCash(amount)}
               </span>
             </button>
           );
@@ -80,22 +55,45 @@ export function BountyAmountPicker({
 
       <div
         className={cn(
-          "flex items-center gap-2 rounded-2xl border-2 px-3 py-2.5",
+          "rounded-xl border px-3 py-2.5",
           custom ? "border-signal bg-surface-raised" : "border-border bg-surface-raised",
         )}
       >
-        <CoinsIcon className="size-5 shrink-0 text-signal" strokeWidth={2.5} />
-        <input
-          type="number"
-          inputMode="decimal"
-          min={MIN_BOUNTY}
-          step="1"
-          value={Number.isFinite(value) ? value : ""}
-          onChange={(e) => onChange(Number(e.target.value))}
-          placeholder={`Custom credits (min ${MIN_BOUNTY} Credits)`}
-          className="w-full bg-transparent font-display text-lg font-bold text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
-          aria-label="Custom bounty amount"
-        />
+        <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+          Custom amount
+        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onChange(Math.max(MIN_BOUNTY, safe - STEP))}
+            aria-label="Lower the bounty"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-foreground"
+          >
+            <Minus className="size-4" />
+          </button>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <CoinsIcon className="size-4 shrink-0 text-signal" strokeWidth={2.5} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={MIN_BOUNTY}
+              step="1"
+              value={Number.isFinite(value) ? value : ""}
+              onChange={(e) => onChange(Number(e.target.value))}
+              placeholder={`Min ${MIN_BOUNTY}`}
+              className="w-full bg-transparent font-display text-lg font-bold tabular-nums text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
+              aria-label="Custom bounty amount in credits"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange(safe + STEP)}
+            aria-label="Raise the bounty"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-foreground"
+          >
+            <Plus className="size-4" />
+          </button>
+        </div>
       </div>
 
       {tooLow && (
@@ -104,15 +102,15 @@ export function BountyAmountPicker({
         </p>
       )}
       {!tooLow && shortFall && (
-        <p className="text-xs font-bold text-destructive">
+        <p className="text-xs font-bold tabular-nums text-destructive">
           Your wallet has {formatCredits(balance ?? 0)}, buy credits before locking{" "}
-          {formatCredits(value)}.
+          {formatCredits(safe)}.
         </p>
       )}
       {!tooLow && !shortFall && (
-        <p className="text-xs font-medium text-foreground">
-          {formatCredits(Number.isFinite(value) ? value : 0)} ({formatCreditCash(value)} value) is held
-          from your credit wallet until the request is fulfilled, cancelled, or expires.
+        <p className="text-xs font-medium tabular-nums text-foreground">
+          {formatCredits(safe)} ({formatCreditCash(safe)} value) is held from your credit wallet
+          until the request is fulfilled, cancelled, or expires.
           {balance != null && ` Balance: ${formatCredits(balance)}.`}
         </p>
       )}

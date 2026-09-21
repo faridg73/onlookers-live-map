@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
-import { toast } from "sonner";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -97,6 +96,8 @@ function CommunityHub() {
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
+  /** Shown inline with a retry, so a failed load never leaves a blank page. */
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
@@ -125,12 +126,18 @@ function CommunityHub() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const rows = await listCommunityPosts();
       setPosts(rows);
-      setMedia(await communityMediaUrls(rows));
+      /* Media URLs are a nice-to-have: a failure here must not empty the feed. */
+      try {
+        setMedia(await communityMediaUrls(rows));
+      } catch {
+        setMedia({});
+      }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't load Discover.");
+      setLoadError(err instanceof Error ? err.message : "Couldn't load Discover.");
     } finally {
       setLoading(false);
     }
@@ -407,20 +414,6 @@ function CommunityHub() {
             >
               {vibeGridOpen ? "Hide" : "See All"}
             </Button>
-            <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setCategory("all");
-              setTag(null);
-              setCategoryId(null);
-              setStrangeSightings(false);
-            }}
-            className={category === "all" ? "text-signal" : "text-muted-foreground"}
-          >
-            Everything
-          </Button>
           </div>
         </div>
         {/* Mobile keeps the sideways carousel; "See All" opens every browse category. */}
@@ -712,6 +705,20 @@ function CommunityHub() {
         <section className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="The community feed">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
+          {!loading && loadError && (
+            <div className="rounded-2xl border border-dashed border-border bg-surface p-5 text-center">
+              <p className="text-sm font-semibold text-foreground">We couldn't load the feed</p>
+              <p className="mt-1 text-xs text-muted-foreground">{loadError}</p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void load()}
+                className="mt-3 h-10 rounded-full px-4 text-xs font-extrabold"
+              >
+                Try again
+              </Button>
+            </div>
+          )}
           {!loading && source === "following" && visible.length === 0 && (
             <div className="mb-6 rounded-2xl border border-dashed border-signal/45 bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">

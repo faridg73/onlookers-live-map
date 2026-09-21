@@ -90,8 +90,7 @@ function DiscoverHome() {
 
       <h1 className="font-display text-3xl tracking-tight text-foreground">Browse places</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Everything here is pulled live from the area you're browsing, pick a spot and ask for a
-        view.
+        Pulled live from the area you're browsing, pick a spot and ask for a view.
       </p>
 
       <LocationSearchBar className="mt-4" />

@@ -118,23 +118,35 @@ async function fetchFollowerCount(creatorId: string): Promise<number> {
   return data?.[0]?.follower_count ?? 0;
 }
 
-/** Realtime subscription to a creator's follower count. Returns an unsubscribe fn. */
+/**
+ * Realtime subscription to a creator's follower count. Returns an unsubscribe fn.
+ *
+ * The channel topic is unique per call: reusing a topic hands back an already
+ * subscribed channel, and adding a listener to that throws and blanks the page.
+ * Live counts are also a nice-to-have, so any failure degrades silently.
+ */
 export function watchFollowerCount(
   creatorId: string,
   onCount: (count: number) => void,
 ): () => void {
-  const channel = supabase
-    .channel(`follower-count:${creatorId}`)
-    .on(
-      "postgres_changes",
-      { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${creatorId}` },
-      (payload) => {
-        const next = (payload.new as { follower_count?: number }).follower_count;
-        if (typeof next === "number") onCount(next);
-      },
-    )
-    .subscribe();
+  let channel: ReturnType<typeof supabase.channel> | null = null;
+  try {
+    channel = supabase
+      .channel(`follower-count:${creatorId}:${Math.random().toString(36).slice(2)}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${creatorId}` },
+        (payload) => {
+          const next = (payload.new as { follower_count?: number }).follower_count;
+          if (typeof next === "number") onCount(next);
+        },
+      );
+    channel.subscribe();
+  } catch (err) {
+    console.error("[follows] live follower count unavailable", err);
+  }
+  const active = channel;
   return () => {
-    void supabase.removeChannel(channel);
+    if (active) void supabase.removeChannel(active);
   };
 }

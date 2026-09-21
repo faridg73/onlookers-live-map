@@ -113,35 +113,42 @@ export function SocialLinks({ className }: { className?: string }) {
   );
 }
 
-export function Footer() {
+/**
+ * The long link list makes every page tall, so it only appears on the profile
+ * page. Everywhere else keeps just the social icons and the copyright line.
+ */
+export function Footer({ showLinks = false }: { showLinks?: boolean }) {
 
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
   return (
-    <footer className="border-t border-border bg-surface px-4 pt-8 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
+    <footer className="border-t border-border bg-surface px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
       <div className="mx-auto w-full max-w-7xl">
-        <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
-          {LINKS.map(({ to, label, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+        {showLinks && (
+          <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+            {LINKS.map(({ to, label, icon: Icon }) => (
+              <Link
+                key={to}
+                to={to}
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+              >
+                <Icon className="size-4 text-signal" />
+                {label}
+              </Link>
+            ))}
+            <button
+              type="button"
+              onClick={() => setDmcaOpen(true)}
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
             >
-              <Icon className="size-4 text-signal" />
-              {label}
-            </Link>
-          ))}
-          <button
-            type="button"
-            onClick={() => setDmcaOpen(true)}
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
-          >
-            <ShieldAlert className="size-4 text-signal" />
-            DMCA / Report Infringement
-          </button>
-        </nav>
+              <ShieldAlert className="size-4 text-signal" />
+              DMCA / Report Infringement
+            </button>
+          </nav>
+        )}
 
-        <SocialLinks className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:justify-start" />
+        <SocialLinks className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-start" />
+
 
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">

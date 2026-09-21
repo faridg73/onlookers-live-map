@@ -68,10 +68,18 @@ export function conditionByMultiplier(multiplier: number): WeatherCondition {
 /** Shortest capture we price, so the base always buys something usable. */
 export const BASE_DURATION_MIN = 5;
 
+/**
+ * Open-ended live feeds have no set length, so they are priced as a fixed
+ * session block instead of guessing a number of minutes.
+ */
+export const LIVE_FEED_DURATION_MINUTES = 15;
+
 /** Every 5 minutes past the base adds 10% for the onlooker's time. */
-export function durationMultiplier(minutes: number): number {
-  const extra = Math.max(0, minutes - BASE_DURATION_MIN);
-  return 1 + Math.ceil(extra / 5) * 0.1;
+export function durationMultiplier(minutes: number | null): number {
+  const mins = minutes === null ? LIVE_FEED_DURATION_MINUTES : minutes;
+  if (!Number.isFinite(mins) || mins <= BASE_DURATION_MIN) return 1;
+  const extra = Math.max(0, Math.round(mins) - BASE_DURATION_MIN);
+  return round2(1 + Math.ceil(extra / 5) * 0.1);
 }
 
 /** Tighter windows pay more, because someone has to drop everything. */
@@ -81,6 +89,11 @@ export function urgencyMultiplier(minutesUntilDue: number): number {
   if (minutesUntilDue <= 60) return 1.15;
   if (minutesUntilDue <= 180) return 1.05;
   return 1;
+}
+
+/** Keeps every multiplier at two decimals so the shown percentage is the real one. */
+function round2(value: number) {
+  return Math.round(value * 100) / 100;
 }
 
 export type PriceLine = {
@@ -106,23 +119,36 @@ export function quoteBounty(input: {
   tier: BountyTierId;
   /** Requester-named amount, used only on the Standard tier. */
   customBase: number;
-  /** Live stream or recording length in minutes. */
-  durationMinutes: number;
+  /** Live stream or recording length in minutes; null = open-ended live feed. */
+  durationMinutes: number | null;
   /** Minutes from now until the deadline / start window. */
   minutesUntilDue: number;
   weatherMultiplier: number;
 }): BountyQuote {
   const tier = tierById(input.tier);
-  const baseCredits = Math.round(tier.baseCredits ?? Math.max(0, input.customBase));
+  const rawBase = tier.baseCredits ?? input.customBase;
+  const baseCredits = Math.max(
+    0,
+    Math.round(Number.isFinite(rawBase) ? rawBase : 0),
+  );
   const durationFactor = durationMultiplier(input.durationMinutes);
   const urgencyFactor = urgencyMultiplier(input.minutesUntilDue);
-  const weatherFactor = input.weatherMultiplier;
+  const weatherFactor = Number.isFinite(input.weatherMultiplier)
+    ? round2(input.weatherMultiplier)
+    : 1;
 
-  const afterDuration = Math.round(baseCredits * durationFactor);
-  const afterUrgency = Math.round(afterDuration * urgencyFactor);
-  const total = Math.round(afterUrgency * weatherFactor);
+  /* Multiply exactly once at full precision, then round only what is shown.
+     Rounding each step would compound and inflate the final escrow. */
+  const exactAfterDuration = baseCredits * durationFactor;
+  const exactAfterUrgency = exactAfterDuration * urgencyFactor;
+  const exactTotal = exactAfterUrgency * weatherFactor;
+  const total = Math.round(exactTotal);
 
   const pct = (m: number) => `${m >= 1 ? "+" : ""}${Math.round((m - 1) * 100)}%`;
+  const lengthLabel =
+    input.durationMinutes === null
+      ? "Open-ended live feed"
+      : `${Math.round(input.durationMinutes)} min capture`;
 
   const lines: PriceLine[] = [
     {
@@ -132,13 +158,13 @@ export function quoteBounty(input: {
       runningTotal: baseCredits,
     },
     {
-      label: `${input.durationMinutes} min capture`,
+      label: lengthLabel,
       detail:
         durationFactor === 1
           ? "Base length, no extra"
           : `${pct(durationFactor)} for the extra minutes`,
       multiplier: durationFactor,
-      runningTotal: afterDuration,
+      runningTotal: Math.round(exactAfterDuration),
     },
     {
       label: "Schedule urgency",
@@ -147,7 +173,7 @@ export function quoteBounty(input: {
           ? "Relaxed window, no extra"
           : `${pct(urgencyFactor)} for a tight window`,
       multiplier: urgencyFactor,
-      runningTotal: afterUrgency,
+      runningTotal: Math.round(exactAfterUrgency),
     },
     {
       label: "Conditions",

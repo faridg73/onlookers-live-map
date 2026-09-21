@@ -81,8 +81,11 @@ export function RequestCard({
             <BountyBriefBadges request={request} compact />
           </div>
           <div className="shrink-0 text-right">
-            <div className="font-display text-2xl font-extrabold leading-none text-signal">
-              {formatCredits(pool)}
+            <div className="font-display text-xl font-extrabold leading-none tabular-nums text-signal sm:text-2xl">
+              {Math.round(pool).toLocaleString()}
+            </div>
+            <div className="text-[0.55rem] font-bold uppercase tracking-[0.12em] text-signal/80">
+              credits
             </div>
             {!done && (
               <div className="mt-2 flex flex-col items-end gap-1">
@@ -139,12 +142,12 @@ export function RequestCard({
           </p>
         </div>
 
-        <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-3 py-2 text-center">
-          <div className="font-display text-2xl font-extrabold leading-none tabular-nums text-signal">
-            {formatCredits(pool)}
+        <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-2.5 py-2 text-center">
+          <div className="font-display text-xl font-extrabold leading-none tabular-nums text-signal sm:text-2xl">
+            {Math.round(pool).toLocaleString()}
           </div>
-          <div className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-signal">
-            {boosted > 0 ? `+${boosted} Credits boosted` : "bounty"}
+          <div className="mt-1 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-signal">
+            {boosted > 0 ? `+${boosted} boosted` : "credits"}
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
   Minimize2,
   Martini,
   Radio,
+  Satellite,
   Search,
   ShieldCheck,
   Siren,
@@ -599,26 +600,25 @@ function MapScreen() {
           </span>
         </label>
         <span className="mx-0.5 h-3.5 w-px bg-border" aria-hidden />
-        <div className="flex items-center gap-0.5" role="group" aria-label="Map style">
-          {(["hybrid", "roadmap"] as const).map((type) => {
-            const active = homeMapType === type;
-            return (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setHomeMapType(type)}
-                aria-pressed={active}
-                className={`tap-compact rounded-full px-2 py-1 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] transition-colors ${
-                  active
-                    ? "bg-signal text-signal-foreground"
-                    : "text-foreground/70 hover:text-signal"
-                }`}
-              >
-                {type === "hybrid" ? "Satellite" : "Map"}
-              </button>
-            );
-          })}
-        </div>
+        {/* One switch instead of two chips: shows the view you'll get next. */}
+        <button
+          type="button"
+          onClick={() => setHomeMapType(homeMapType === "hybrid" ? "roadmap" : "hybrid")}
+          aria-label={
+            homeMapType === "hybrid" ? "Switch to the plain map view" : "Switch to satellite view"
+          }
+          className="tap-compact flex items-center gap-1 rounded-full bg-signal px-2 py-1 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-signal-foreground transition-opacity hover:opacity-90"
+        >
+          {homeMapType === "hybrid" ? (
+            <>
+              <Satellite className="size-3" aria-hidden /> Satellite
+            </>
+          ) : (
+            <>
+              <Map className="size-3" aria-hidden /> Map
+            </>
+          )}
+        </button>
       </div>
 
 

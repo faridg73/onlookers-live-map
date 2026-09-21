@@ -27,15 +27,19 @@ export function ExpiryCountdown({
 
   const msLeft = Math.max(0, endsAt - now);
   const totalSeconds = Math.floor(msLeft / 1000);
-  const mins = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
   const secs = totalSeconds % 60;
   const expired = msLeft === 0;
   const urgent = !expired && totalSeconds <= 5 * 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  /* Always h:mm:ss (or m:ss under an hour) so the digits never jump around. */
+  const clock = hours > 0 ? `${hours}:${pad(mins)}:${pad(secs)}` : `${mins}:${pad(secs)}`;
 
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-bold tabular-nums",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-bold tabular-nums [font-variant-numeric:tabular-nums_slashed-zero] [font-feature-settings:'tnum'_1]",
         highlight ? "border-2" : "text-foreground",
         className,
       )}
@@ -55,14 +59,18 @@ export function ExpiryCountdown({
               }
             : undefined
       }
-      aria-label={expired ? "This request has expired" : `${mins} minutes ${secs} seconds left`}
+      aria-label={
+        expired
+          ? "This request has expired"
+          : `${hours > 0 ? `${hours} hours ` : ""}${mins} minutes ${secs} seconds left`
+      }
     >
       {urgent ? (
         <Flame className={cn("size-3.5", !expired && "animate-pulse")} />
       ) : (
         <Clock className="size-3.5" />
       )}
-      {expired ? "Expired" : `${mins}:${String(secs).padStart(2, "0")} left`}
+      {expired ? "Expired" : `${clock} left`}
     </span>
   );
 }
