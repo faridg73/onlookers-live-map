@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,27 @@ export function HomeLiveStage({
   onExitMap,
 }: HomeLiveStageProps) {
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
+  const trendScrollerRef = useRef<HTMLDivElement>(null);
+  const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
+  const updateTrendScroll = useCallback(() => {
+    const el = trendScrollerRef.current;
+    if (!el) return;
+    const visible = el.clientWidth;
+    const total = el.scrollWidth;
+    if (total <= visible + 4) {
+      setTrendScroll({ thumbWidth: 100, thumbLeft: 0 });
+      return;
+    }
+    const thumbWidth = Math.max(14, (visible / total) * 100);
+    const maxScroll = total - visible;
+    const thumbLeft = maxScroll > 0 ? (el.scrollLeft / maxScroll) * (100 - thumbWidth) : 0;
+    setTrendScroll({ thumbWidth, thumbLeft });
+  }, []);
+  useEffect(() => {
+    updateTrendScroll();
+    window.addEventListener("resize", updateTrendScroll);
+    return () => window.removeEventListener("resize", updateTrendScroll);
+  }, [updateTrendScroll, mapExpanded]);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -303,7 +324,9 @@ export function HomeLiveStage({
       <div className="relative mt-2 flex h-12 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
-          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 whitespace-nowrap"
+          ref={trendScrollerRef}
+          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
+          onScroll={updateTrendScroll}
           onWheel={(event) => {
             if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
             event.currentTarget.scrollBy({ left: event.deltaY, behavior: "smooth" });
@@ -321,7 +344,7 @@ export function HomeLiveStage({
                 aria-expanded={openFeed === trend.key}
                 aria-controls="home-live-feed-drawer"
                 aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none ${trend.tone}`}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
@@ -330,11 +353,19 @@ export function HomeLiveStage({
             );
           })}
         </div>
+        <div className="pointer-events-none absolute inset-x-2 bottom-[3px] z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
+          {trendScroll.thumbWidth < 100 && (
+            <div
+              className="h-full rounded-full bg-signal shadow-[0_0_10px_rgba(204,255,0,0.75)] transition-[width,margin-left] duration-150 ease-out motion-reduce:transition-none"
+              style={{ width: `${trendScroll.thumbWidth}%`, marginLeft: `${trendScroll.thumbLeft}%` }}
+            />
+          )}
+        </div>
       </div>
 
       <div
         id="home-live-feed-drawer"
-        className={`mt-2 grid overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
+        className={`mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
       >
         <div className="min-h-0 overflow-hidden">
           {activeTrend && (
@@ -342,8 +373,8 @@ export function HomeLiveStage({
               <div className="mb-2 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                    <activeTrend.icon className="size-4 shrink-0 text-home-accent" aria-hidden />
-                   <h3 className="home-display truncate text-xs font-semibold uppercase text-foreground">{activeTrend.label}</h3>
-                   <span className="rounded-full border border-home-line bg-home-glass px-2 py-0.5 text-[0.62rem] font-bold text-foreground">
+                   <h3 className="home-display truncate text-xs font-semibold uppercase text-home-accent">{activeTrend.label}</h3>
+                   <span className="rounded-full border border-signal/50 bg-signal/10 px-2 py-0.5 text-[0.62rem] font-bold text-signal">
                     {activeItems.length}
                   </span>
                 </div>
