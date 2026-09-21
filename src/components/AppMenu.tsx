@@ -42,6 +42,8 @@ export function AppMenu() {
   const { unread } = useChatAlerts();
   const [open, setOpen] = useState(false);
   const [inboxOpen, setInboxOpen] = useState(false);
+  // Points at the "You're here" link so the drawer can scroll to it on open.
+  const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
   // Home's logo card owns the top-right corner, so the launcher tucks under it.
   const onHome = useRouterState({ select: (state) => state.location.pathname === "/" });
   // Current path so the drawer highlights the page you're on when reopened.
