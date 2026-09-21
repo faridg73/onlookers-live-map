@@ -1239,7 +1239,7 @@ function PostScreen() {
                   <p className="text-xs font-bold uppercase text-muted-foreground">
                     {action === "live" ? "Stream length" : "Clip length"}
                   </p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
                     {CAPTURE_OPTIONS.map((option) => {
                       const on = !customCapture && capture === option.minutes;
                       return (
