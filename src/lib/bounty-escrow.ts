@@ -15,12 +15,17 @@ function message(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-/** Signed-out visitors must never hit the authenticated server functions. */
+/**
+ * Signed-out visitors must never hit the authenticated server functions.
+ * We require a usable access token, not just a cached user: when a refresh
+ * token has already been used the session is gone and every authenticated
+ * call would 401 with "No authorization header provided".
+ */
 export async function isSignedIn() {
   try {
     const { supabase } = await import("@/integrations/supabase/client");
-    const { data, error } = await supabase.auth.getUser();
-    return !error && Boolean(data.user);
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.access_token);
   } catch {
     return false;
   }
