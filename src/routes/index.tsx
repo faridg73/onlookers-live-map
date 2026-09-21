@@ -88,8 +88,7 @@ function MapScreen() {
   // Deep links like /?at=34.05,-118.24 (e.g. "View on map" from a capture) center the map there.
   useEffect(() => {
     if (!at) return;
-    const [lat, lng] = at.split(",").map((n) => Number.parseFloat(n));
-    if (Number.isFinite(lat) && Number.isFinite(lng)) setCenterTarget({ lat, lng, zoom: 16 });
+    const [lat, lng] = at.split(",").map((n) => Number.parseFloat(n)) as [number, number];
   }, [at]);
 
   const handleSearchPick = useCallback((place: GeocodeResult) => {
