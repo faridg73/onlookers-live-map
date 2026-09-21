@@ -96,7 +96,7 @@ function VenueScreen() {
 
   if (!venue) {
     return (
-      <div className="app-shell pb-28 pt-safe">
+      <div className="discover-inter app-shell pb-28 pt-safe">
         <PageBackButton label="All places" fallback="/discover" />
         <div className="mt-6 h-28 animate-pulse rounded-2xl border border-border bg-surface" />
         <p className="mt-4 text-sm text-muted-foreground">
@@ -130,7 +130,7 @@ function VenueScreen() {
   const past = related.filter((r) => r.status === "fulfilled");
 
   return (
-    <div className="app-shell pb-32 pt-safe">
+    <div className="discover-inter app-shell pb-32 pt-safe">
       <PageBackButton label={backLabel} fallback="/discover" />
 
       <div className="mt-3 aspect-[16/7] overflow-hidden rounded-2xl bg-surface-raised">

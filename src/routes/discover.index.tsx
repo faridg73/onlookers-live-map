@@ -90,7 +90,7 @@ function DiscoverHome() {
     ).length;
 
   return (
-    <div className="app-shell pb-28 pt-safe">
+    <div className="discover-inter app-shell pb-28 pt-safe">
       <RadarAlerts />
 
       <h1 className="font-display text-3xl tracking-tight text-foreground">
