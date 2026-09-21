@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,27 @@ export function HomeLiveStage({
   onExitMap,
 }: HomeLiveStageProps) {
   const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
+  const trendScrollerRef = useRef<HTMLDivElement>(null);
+  const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
+  const updateTrendScroll = useCallback(() => {
+    const el = trendScrollerRef.current;
+    if (!el) return;
+    const visible = el.clientWidth;
+    const total = el.scrollWidth;
+    if (total <= visible + 4) {
+      setTrendScroll({ thumbWidth: 100, thumbLeft: 0 });
+      return;
+    }
+    const thumbWidth = Math.max(14, (visible / total) * 100);
+    const maxScroll = total - visible;
+    const thumbLeft = maxScroll > 0 ? (el.scrollLeft / maxScroll) * (100 - thumbWidth) : 0;
+    setTrendScroll({ thumbWidth, thumbLeft });
+  }, []);
+  useEffect(() => {
+    updateTrendScroll();
+    window.addEventListener("resize", updateTrendScroll);
+    return () => window.removeEventListener("resize", updateTrendScroll);
+  }, [updateTrendScroll]);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
