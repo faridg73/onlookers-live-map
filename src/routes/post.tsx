@@ -267,7 +267,7 @@ function PostScreen() {
   const [action, setAction] = useState<RequestAction>("clip");
   const [note, setNote] = useState("");
   const noteRef = useRef<HTMLTextAreaElement>(null);
-  const [bounty, setBounty] = useState(20);
+  const [bounty, setBounty] = useState(GIG_MIN_PAYOUT_CREDITS);
   const [tip, setTip] = useState(0);
   const [minutes, setMinutes] = useState(60);
   const [customDeadline, setCustomDeadline] = useState<Date | null>(null);
@@ -343,9 +343,20 @@ function PostScreen() {
         durationMinutes: capture,
         minutesUntilDue,
         weatherMultiplier: weather,
+        // The gig algorithm already priced the minutes into the base reward.
+        durationPricedInBase: true,
       }),
     [bounty, capture, minutesUntilDue, tier, weather],
   );
+
+  /** Gig pricing for the selected capture length, shown in the breakdown card. */
+  const gig = useMemo(
+    () => gigQuoteForMinutes(capture ?? GIG_LIVE_BLOCK_MINUTES),
+    [capture],
+  );
+  /** True while the reward still tracks the gig price for the picked duration. */
+  const rewardMatchesGig =
+    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gig.totalCredits;
 
   const total = quote.total + (Number.isFinite(tip) ? tip : 0);
 
@@ -434,12 +445,15 @@ function PostScreen() {
   }, [searchOrigin, searchVenues, signedIn, step, venueQuery]);
 
   /**
-   * Locks in a capture length. The reward itself is NOT bumped here — length is
-   * already priced by the quote's duration multiplier, and raising the base too
-   * would charge for the extra minutes twice.
+   * Locks in a capture length and prices it with the gig algorithm: the $5
+   * dispatch fee plus the $50/hour time rate (with the $10 minimum floor)
+   * becomes the suggested reward, so the duration pills drive the total.
    */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
+    if (tier === "standard") {
+      setBounty(gigQuoteForMinutes(next ?? GIG_LIVE_BLOCK_MINUTES).totalCredits);
+    }
     if (next === null && nextAction !== "meetup") setAction("live");
     if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
   };
