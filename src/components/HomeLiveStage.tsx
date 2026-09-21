@@ -418,11 +418,11 @@ export function HomeLiveStage({
         )}
       </div>
 
-      <div className="relative mt-2 flex h-12 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
+      <div className="relative mt-2 flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
           ref={trendScrollerRef}
-          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
+          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-2 pt-1 whitespace-nowrap"
           onScroll={updateTrendScroll}
           onWheel={(event) => {
             if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
