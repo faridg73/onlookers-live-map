@@ -40,6 +40,7 @@ const SUBJECTS = [
 
 function ContactScreen() {
   const { user } = useAuth();
+  const router = useRouter();
   const [form, setForm] = useState({
     name: user?.user_metadata?.["full_name"] ?? "",
     email: user?.email ?? "",
@@ -79,13 +80,21 @@ function ContactScreen() {
     }
   }
 
+  function handleClose() {
+    if (window.history.length > 1) {
+      router.history.back();
+    } else {
+      router.navigate({ to: "/" });
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
       <header className="flex items-start gap-3">
         <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
           <Headphones className="size-6" />
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h1 className="font-display text-2xl tracking-tight text-foreground">
             Contact &amp; <span className="text-signal">Support</span>
           </h1>
@@ -93,6 +102,14 @@ function ContactScreen() {
             Questions about bounties, payouts, disputes, or your account? Send us a message.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Close and go back"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-signal bg-signal/10 text-signal shadow-[0_0_12px_rgba(204,255,0,0.35)] transition hover:bg-signal hover:text-signal-foreground active:scale-95"
+        >
+          <X className="size-5" strokeWidth={2.5} />
+        </button>
       </header>
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
