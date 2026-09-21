@@ -45,6 +45,9 @@ export function MapCanvas({
   mapTypeId,
   styles,
   showNativeMapTypeControl = true,
+  /** Vertical position of the app's zoom/locate column; screens with a tall
+   *  top-right stack (logo card + menu) push it below that stack. */
+  controlsTopClass = "top-[calc(env(safe-area-inset-top,0px)+7.5rem)]",
 }: {
   requests: LiveRequest[];
   selectedId: string | null;
@@ -71,6 +74,8 @@ export function MapCanvas({
   mapTypeId?: "hybrid" | "satellite" | "roadmap";
   /** Hide Google's control when a screen provides its own compact selector. */
   showNativeMapTypeControl?: boolean;
+  /** Tailwind top-position class overriding the default zoom-column offset. */
+  controlsTopClass?: string;
   /** Optional Google style array to override the default base-map appearance. */
   styles?: google.maps.MapTypeStyle[] | undefined;
 }) {
@@ -773,7 +778,7 @@ export function MapCanvas({
           );
         })}
 
-      <div className="absolute right-4 z-40 flex flex-col gap-2 top-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
+      <div className={`absolute right-4 z-40 flex flex-col items-end gap-2 ${controlsTopClass}`}>
         <div className="grid grid-rows-2 overflow-hidden rounded-lg border border-border bg-surface/90 shadow-lg backdrop-blur">
           {[
             { label: "+", fn: () => zoomBy(1) },
