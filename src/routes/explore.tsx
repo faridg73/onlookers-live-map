@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { LiveReactions } from "@/components/LiveReactions";
 import { LoopingPreview } from "@/components/LoopingPreview";
@@ -42,6 +42,14 @@ export const Route = createFileRoute("/explore")({
 });
 
 function ExplorePage() {
+  const router = useRouter();
+  const handleClose = useCallback(() => {
+    if (typeof window !== "undefined" && window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
+    } else {
+      void router.navigate({ to: "/" });
+    }
+  }, [router]);
   const [clips, setClips] = useState<ExploreClip[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"nearby" | "global">("nearby");
@@ -68,10 +76,20 @@ function ExplorePage() {
 
   return (
     <main className="app-shell pb-28 pt-[max(env(safe-area-inset-top),2rem)]">
-      <h1 className="font-display text-3xl text-foreground"><span className="text-signal">Explore</span></h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Live views captured by Onlookers around the world and down the street.
-      </p>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Go back to the previous screen"
+          className="absolute left-0 top-1 inline-flex size-9 items-center justify-center rounded-full border border-signal bg-surface text-signal shadow-[0_0_10px_rgba(204,255,0,0.35)] transition-colors hover:bg-signal/10"
+        >
+          <ArrowLeft className="size-5" />
+        </button>
+        <h1 className="text-center font-display text-3xl text-foreground"><span className="text-signal">Explore</span></h1>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          Live views captured by Onlookers around the world and down the street.
+        </p>
+      </div>
 
       <div className="mt-5 grid grid-cols-2 gap-2 rounded-full border border-border bg-surface p-1">
         {([
