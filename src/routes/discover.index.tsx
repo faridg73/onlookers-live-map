@@ -216,8 +216,8 @@ function DiscoverHome() {
                             />
                           </div>
                           <div className="p-3">
-                            <span className="line-clamp-2 text-sm font-bold text-foreground">
-                              {place.name}
+                            <span className="line-clamp-2 text-sm font-bold">
+                              <TwoToneName name={place.name} />
                             </span>
                             <span className="mt-1 block truncate text-[0.68rem] text-muted-foreground">
                               {place.primaryType ?? "Venue"}
