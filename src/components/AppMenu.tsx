@@ -44,6 +44,8 @@ export function AppMenu() {
   const [inboxOpen, setInboxOpen] = useState(false);
   // Home's logo card owns the top-right corner, so the launcher tucks under it.
   const onHome = useRouterState({ select: (state) => state.location.pathname === "/" });
+  // Current path so the drawer highlights the page you're on when reopened.
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
     <>
@@ -120,22 +122,45 @@ export function AppMenu() {
           </div>
 
           <nav className="flex-1 space-y-2 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-            {LINKS.map(({ to, label, note, icon: Icon }) => (
-              <Link
-                key={to}
-                to={to}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-surface-raised p-3 transition-colors hover:border-signal/60"
-              >
-                <span className="grid size-9 shrink-0 place-items-center rounded-full border border-signal/40 text-signal">
-                  <Icon className="size-4" aria-hidden />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-extrabold text-foreground">{label}</span>
-                  <span className="block text-xs font-semibold text-signal">{note}</span>
-                </span>
-              </Link>
-            ))}
+            {LINKS.map(({ to, label, note, icon: Icon }) => {
+              // Stays highlighted while you're on that page (or a page under
+              // it), so context never resets between secondary tools.
+              const active = pathname === to || pathname.startsWith(`${to}/`);
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={
+                    "flex items-center gap-3 rounded-2xl border p-3 transition-colors " +
+                    (active
+                      ? "border-signal bg-signal/10 shadow-[0_0_10px_rgba(204,255,0,0.25)]"
+                      : "border-border bg-surface-raised hover:border-signal/60")
+                  }
+                >
+                  <span
+                    className={
+                      "grid size-9 shrink-0 place-items-center rounded-full border " +
+                      (active
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-signal/40 text-signal")
+                    }
+                  >
+                    <Icon className="size-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-extrabold text-foreground">{label}</span>
+                    <span className="block text-xs font-semibold text-signal">{note}</span>
+                  </span>
+                  {active && (
+                    <span className="ml-auto shrink-0 text-[0.6rem] font-extrabold uppercase text-signal">
+                      You're here
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </nav>
         </SheetContent>
       </Sheet>
