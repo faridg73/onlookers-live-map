@@ -120,18 +120,33 @@ export function GlobalFeedMap({
   }, [focus, mapReady]);
 
   // Every located report, whatever its community-verification status. The
-  // emergency view keeps only Level 3 lanes (fire, police, medical).
-  const pinnedReports = useMemo(
-    () =>
-      reports.filter(
+  // emergency view keeps only Level 3 lanes (fire, police, medical). Outside the
+  // emergency view a chosen lane or hashtag also pins the matching posts, so a
+  // hashtag map shows exactly the stories behind that tag.
+  const pinnedReports = useMemo(() => {
+    const located = reports.filter((post) => post.latitude !== null && post.longitude !== null);
+    if (emergencyOnly) {
+      return located.filter(
         (post) =>
-          post.reportIncidentType &&
-          post.latitude !== null &&
-          post.longitude !== null &&
-          (!emergencyOnly || incidentById(post.reportIncidentType)?.emergency === true),
-      ),
-    [reports, emergencyOnly],
-  );
+          post.reportIncidentType && incidentById(post.reportIncidentType)?.emergency === true,
+      );
+    }
+    const vibeNeedle = subcategory?.toLowerCase().trim();
+    const categoryNeedle = categoryLabel?.toLowerCase().trim();
+    const categoryIdNeedle = categoryId?.toLowerCase().trim();
+    if (!vibeNeedle && !categoryNeedle && !categoryIdNeedle) {
+      return located.filter((post) => post.reportIncidentType);
+    }
+    return located.filter((post) => {
+      const haystack = `${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`.toLowerCase();
+      if (categoryIdNeedle === STRANGE_SIGHTINGS_ID) return matchesStrangeSighting(haystack);
+      const laneMatches =
+        (!categoryNeedle && !categoryIdNeedle) ||
+        haystack.includes(categoryNeedle ?? "") ||
+        Boolean(categoryIdNeedle && haystack.includes(categoryIdNeedle));
+      return laneMatches && (!vibeNeedle || haystack.includes(vibeNeedle));
+    });
+  }, [reports, emergencyOnly, subcategory, categoryLabel, categoryId]);
 
   // Draw one marker per located clip.
   useEffect(() => {
