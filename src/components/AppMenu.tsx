@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   CircleDollarSign,
@@ -42,10 +42,23 @@ export function AppMenu() {
   const { unread } = useChatAlerts();
   const [open, setOpen] = useState(false);
   const [inboxOpen, setInboxOpen] = useState(false);
+  // Points at the "You're here" link so the drawer can scroll to it on open.
+  const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
   // Home's logo card owns the top-right corner, so the launcher tucks under it.
   const onHome = useRouterState({ select: (state) => state.location.pathname === "/" });
   // Current path so the drawer highlights the page you're on when reopened.
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  // Reopening the drawer keeps your place: the active item is scrolled into
+  // view instead of the list resetting to the top. Wait for the sheet to
+  // finish mounting so the scroll lands after layout.
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => {
+      activeLinkRef.current?.scrollIntoView({ block: "center" });
+    }, 60);
+    return () => window.clearTimeout(id);
+  }, [open]);
 
   return (
     <>
@@ -131,6 +144,7 @@ export function AppMenu() {
                   key={to}
                   to={to}
                   onClick={() => setOpen(false)}
+                  ref={active ? activeLinkRef : undefined}
                   aria-current={active ? "page" : undefined}
                   className={
                     "flex items-center gap-3 rounded-2xl border p-3 transition-colors " +
