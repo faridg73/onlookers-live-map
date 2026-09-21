@@ -2,36 +2,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  BookOpen,
-  ChevronDown,
-  CircleDollarSign,
-  Compass,
   Map,
-  MapPin,
   Maximize2,
   Minimize2,
-  Martini,
-  Radio,
   Satellite,
   Search,
-  ShieldCheck,
-  Siren,
-  Sparkles,
-  Ticket,
-  TrafficCone,
-  Trees,
-  Utensils,
-  Users,
-  Video,
-  Volume2,
-  Clock3,
-  Eye,
-  Flame,
-  Image,
-  Trophy,
   X,
 } from "lucide-react";
-import { createPortal } from "react-dom";
 import { MapCanvas } from "@/components/MapCanvas";
 import { HIDE_LABELS_MAP_STYLE } from "@/lib/map-style";
 import { BountyBottomSheet } from "@/components/BountyBottomSheet";
@@ -42,205 +19,25 @@ import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import {
   distanceMiles,
   requestMapPosition,
-  type CategoryId,
   type LiveRequest,
   type MapPosition,
 } from "@/lib/onlooker";
-import { Button } from "@/components/ui/button";
 import { PlaceSearchInput } from "@/components/PlaceSearchInput";
 import type { GeocodeResult } from "@/lib/geocode.functions";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
-import { useSessionElementScroll } from "@/hooks/use-session-scroll";
 import { saveMyLocation } from "@/lib/hunter-location";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 
-import { FlashBountyButton } from "@/components/FlashBountyButton";
-import { CreateCommunityReportModal } from "@/components/CreateCommunityReportModal";
 import { HomeLiveStage } from "@/components/HomeLiveStage";
-import { communityMediaUrls, listCommunityPosts, type CommunityPost } from "@/lib/community";
-import { VerifiedBadge } from "@/components/VerifiedBadge";
-import { listTopCreators, type TopCreator } from "@/lib/top-creators";
-import { FollowButton } from "@/components/FollowButton";
-import {
-  readCategoryTapCounts,
-  recordCategoryTap,
-  sortCategoriesByUsage,
-} from "@/lib/category-usage";
-import {
-  STRANGE_SIGHTINGS_IMAGE_URL,
-  matchesStrangeSighting,
-} from "@/lib/strange-sightings";
-import breakingNewsAsset from "@/assets/breaking-news-live.jpg.asset.json";
-import trafficUpdatesAsset from "@/assets/traffic-public-updates.jpg.asset.json";
-import emergenciesAsset from "@/assets/emergencies-category.jpg.asset.json";
-import crimeReportsAsset from "@/assets/crime-reports-badge.jpg.asset.json";
-import liveStreamAsset from "@/assets/live-stream-badge.jpg.asset.json";
-import foodMarketsAsset from "@/assets/food-markets-badge.jpg.asset.json";
-import publicGatheringAsset from "@/assets/public-gathering-badge.jpg.asset.json";
-import trendingNearYouAsset from "@/assets/trending-near-you.jpg.asset.json";
-import eventsArtsAsset from "@/assets/events-arts-badge.jpg.asset.json";
-import communityUnityAsset from "@/assets/community-unity-badge.jpg.asset.json";
-import outdoorRecreationAsset from "@/assets/outdoor-recreation-badge.jpg.asset.json";
-import nightlifeAsset from "@/assets/nightlife-badge.jpg.asset.json";
-import topCreatorsAsset from "@/assets/top-creators-badge.jpg.asset.json";
-import scannerAsset from "@/assets/scanner-badge.jpg.asset.json";
-import bountyMapAsset from "@/assets/bounty-map-badge.jpg.asset.json";
-import guidesAsset from "@/assets/guides-badge.jpg.asset.json";
-
-const TRENDING_RADIUS_MILES = 2;
-
-const MAP_CATEGORY_TILES: Array<{
-  id: string;
-  label: string;
-  icon: typeof Utensils;
-  categories: CategoryId[];
-  crisis?: boolean;
-  gathering?: boolean;
-  trending?: boolean;
-  viral?: boolean;
-  creators?: boolean;
-  crime?: boolean;
-  scanner?: boolean;
-  liveStreams?: boolean;
-  bountyMap?: boolean;
-  communityLink?: boolean;
-  guidesLink?: boolean;
-  sightings?: boolean;
-  theme?: { emoji?: string; imageUrl?: string; active: string; badge: string };
-}> = [
-  {
-    id: "food", label: "Food & Markets", icon: Utensils, categories: ["food", "markets"],
-    theme: { imageUrl: foodMarketsAsset.url, active: "border-orange-500 bg-orange-500/20 text-orange-50", badge: "text-orange-400" },
-  },
-  {
-    id: "events", label: "Events & Arts", icon: Ticket, categories: ["events", "sports", "art"],
-    theme: { imageUrl: eventsArtsAsset.url, active: "border-purple-500 bg-purple-500/20 text-purple-50", badge: "text-purple-400" },
-  },
-  {
-    id: "outdoors", label: "Outdoors", icon: Trees, categories: ["outdoors", "weather"],
-    theme: { imageUrl: outdoorRecreationAsset.url, active: "border-green-500 bg-green-500/20 text-green-50", badge: "text-green-400" },
-  },
-  {
-    id: "traffic", label: "Traffic & Transit", icon: TrafficCone, categories: ["transit", "parking", "vehicles"],
-    theme: { imageUrl: trafficUpdatesAsset.url, active: "border-amber-400 bg-amber-400/20 text-amber-50", badge: "text-amber-400" },
-  },
-  {
-    id: "nightlife", label: "Nightlife", icon: Martini, categories: ["nightlife"],
-    theme: { imageUrl: nightlifeAsset.url, active: "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-50", badge: "text-fuchsia-400" },
-  },
-  {
-    id: "emergencies", label: "Emergencies", icon: Siren, categories: ["community", "weather"], crisis: true,
-    theme: { imageUrl: emergenciesAsset.url, active: "border-red-500 bg-red-500/20 text-red-50", badge: "text-red-500" },
-  },
-  {
-    id: "gatherings", label: "Public Gathering", icon: Users, categories: ["events", "sports", "art", "community", "markets"], gathering: true,
-    theme: { imageUrl: publicGatheringAsset.url, active: "border-blue-400 bg-blue-400/20 text-blue-50", badge: "text-blue-400" },
-  },
-  {
-    id: "trending", label: "Trending Near You", icon: Flame, categories: [], trending: true,
-    theme: { imageUrl: trendingNearYouAsset.url, active: "border-[#FF7F50] bg-[#FF7F50]/20 text-[#FFE4DC]", badge: "text-[#FF7F50]" },
-  },
-  {
-    id: "viral", label: "Viral & Breaking", icon: Sparkles, categories: [], viral: true,
-    theme: { imageUrl: breakingNewsAsset.url, active: "border-cyan-400 bg-linear-to-br from-cyan-500/40 to-sky-500/20 text-cyan-50", badge: "text-cyan-400" },
-  },
-  {
-    id: "creators", label: "Top Creators", icon: Trophy, categories: [], creators: true,
-    theme: { imageUrl: topCreatorsAsset.url, active: "border-yellow-500 bg-yellow-500/20 text-yellow-50", badge: "text-yellow-500" },
-  },
-  {
-    id: "crime", label: "Crime Reports", icon: Siren, categories: [],
-    crime: true,
-    theme: { imageUrl: crimeReportsAsset.url, active: "border-rose-500 bg-rose-500/20 text-rose-50", badge: "text-rose-400" },
-  },
-  {
-    id: "scanner", label: "Scanner", icon: Radio, categories: [],
-    scanner: true,
-    theme: { imageUrl: scannerAsset.url, active: "border-violet-500 bg-violet-500/20 text-violet-50", badge: "text-violet-400" },
-  },
-  {
-    id: "livestream", label: "Live Stream", icon: Video, categories: [],
-    liveStreams: true,
-    theme: { imageUrl: liveStreamAsset.url, active: "border-lime-400 bg-lime-400/20 text-lime-50", badge: "text-lime-400" },
-  },
-  {
-    id: "bountymap", label: "Bounty Map", icon: Map, categories: [],
-    bountyMap: true,
-    theme: { imageUrl: bountyMapAsset.url, active: "border-teal-500 bg-teal-500/20 text-teal-50", badge: "text-teal-400" },
-  },
-  {
-    id: "community", label: "Community", icon: Users, categories: ["community"],
-    communityLink: true,
-    theme: { imageUrl: communityUnityAsset.url, active: "border-sky-400 bg-sky-400/20 text-sky-50", badge: "text-sky-400" },
-  },
-  {
-    id: "guides", label: "Guides", icon: BookOpen, categories: [],
-    guidesLink: true,
-    theme: { imageUrl: guidesAsset.url, active: "border-indigo-400 bg-indigo-400/20 text-indigo-50", badge: "text-indigo-400" },
-  },
-  {
-    id: "strange-sightings", label: "Strange Sightings & UFO", icon: Eye, categories: [],
-    sightings: true,
-    theme: { imageUrl: STRANGE_SIGHTINGS_IMAGE_URL, active: "border-signal bg-signal/15 text-foreground", badge: "text-signal" },
-  },
-];
 
 const CRISIS_TERMS = [
   "accident", "crash", "collision", "emergency", "fire", "flood", "hazard", "rescue", "smoke", "storm",
 ];
 
-function trafficIncidentType(request: LiveRequest) {
-  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
-  if (/clos|detour|blocked/.test(text)) return "Road closure";
-  if (/crash|accident|collision|vehicle/.test(text)) return "Vehicle incident";
-  if (/train|bus|transit|station/.test(text)) return "Transit update";
-  return "Heavy traffic";
-}
-
-function liveTimestamp(minutesAgo: number) {
-  if (minutesAgo < 1) return "Updated now";
-  return `Updated ${minutesAgo}m ago`;
-}
-
 function isCrisisRequest(request: LiveRequest) {
   if (request.category !== "community" && request.category !== "weather") return false;
   const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
   return CRISIS_TERMS.some((term) => text.includes(term));
-}
-
-const CRIME_TERMS = [
-  "crime", "theft", "stolen", "robbery", "police", "cops", "arrest", "shooting", "vandalism", "suspicious", "mugging", "assault", "broke into",
-];
-
-function isCrimeRequest(request: LiveRequest) {
-  const text = `${request.title} ${request.note} ${request.instructions ?? ""}`.toLowerCase();
-  return CRIME_TERMS.some((term) => text.includes(term));
-}
-
-const SCANNER_CATEGORIES: Array<CategoryId> = ["transit", "parking", "vehicles"];
-
-function tileMatches(
-  tile: (typeof MAP_CATEGORY_TILES)[number],
-  request: LiveRequest,
-  userPosition: MapPosition | null,
-): boolean {
-  if (tile.creators) return false;
-  if (tile.trending) {
-    return Boolean(userPosition && distanceMiles(userPosition, requestMapPosition(request)) <= TRENDING_RADIUS_MILES);
-  }
-  if (tile.viral || tile.bountyMap) return true;
-  if (tile.crisis) return isCrisisRequest(request);
-  if (tile.crime) return isCrimeRequest(request);
-  if (tile.scanner) {
-    return isCrisisRequest(request) || (request.category !== undefined && SCANNER_CATEGORIES.includes(request.category));
-  }
-  if (tile.liveStreams) {
-    return request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
-  }
-  if (tile.sightings) {
-    return matchesStrangeSighting(`${request.title} ${request.note} ${request.instructions ?? ""} ${request.place}`);
-  }
-  return Boolean(request.category && tile.categories.includes(request.category));
 }
 
 export const Route = createFileRoute("/")({
@@ -275,26 +72,15 @@ function MapScreen() {
   const navigate = useNavigate();
   const { b } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
-  const [categoryTile, setCategoryTile] = useState<string | null>(null);
-  const [scannerNotice, setScannerNotice] = useState(false);
-  const [reportOpen, setReportOpen] = useState(false);
-  const [gatheringClusterIds, setGatheringClusterIds] = useState<string[]>([]);
-  const [nearbyPosts, setNearbyPosts] = useState<CommunityPost[]>([]);
-  const [nearbyPostMedia, setNearbyPostMedia] = useState<Record<string, string>>({});
-  const [trendingLoading, setTrendingLoading] = useState(false);
-  const [topCreators, setTopCreators] = useState<TopCreator[]>([]);
-  const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
-  const [guidesOpen, setGuidesOpen] = useState(false);
-  // Full-map mode: hero + Explore Nearby tuck away so pins and clusters take over.
+  // Full-map mode: the hero tucks away so pins take over the whole screen.
   const [mapExpanded, setMapExpanded] = useState(false);
   // Google labels stay hidden by default on Home; the Labels checkbox opts in.
   const [labelsVisible, setLabelsVisible] = useState(false);
   // Compact app-owned base-map switcher (Satellite = hybrid aerial, Map = roadmap).
   const [homeMapType, setHomeMapType] = useState<"hybrid" | "roadmap">("hybrid");
-  // Expandable magnifier search: icon collapses into a place/category search field.
+  // Expandable magnifier search: icon collapses into a place search field.
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -309,76 +95,31 @@ function MapScreen() {
     setSearchQuery("");
   }, []);
 
-  const searchCategoryMatches = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (q.length < 2) return [];
-    return MAP_CATEGORY_TILES.filter((tile) => tile.label.toLowerCase().includes(q))
-      .slice(0, 3)
-      .map((tile) => ({
-        id: `category-${tile.id}`,
-        text: `Filter map: ${tile.label}`,
-        onSelect: () => {
-          setCategoryTile(tile.id);
-          setDrawerOpen(true);
-          closeSearch();
-        },
-      }));
-  }, [searchQuery, closeSearch]);
-  const activeHome = useMemo(
-    () => requests.filter((request) => request.status === "open" || request.status === "claimed"),
-    [requests],
-  );
-  const dragStartY = useRef<number | null>(null);
-  const drawerDragged = useRef(false);
-  const [drawerDragOffset, setDrawerDragOffset] = useState(0);
-  const [drawerDragging, setDrawerDragging] = useState(false);
   const homeStateRestored = useRef(false);
-  const drawerScrollRef = useSessionElementScroll<HTMLDivElement>("onlooker:scroll:home-drawer");
 
   const { boostOf } = useBoosts();
   const { radiusMiles, formatDistance } = useDistanceUnit(userPosition);
 
   useEffect(() => {
     const saved = readSessionState<{
-      drawerOpen?: boolean;
       sheetVersion?: number;
       mapFilter?: "all" | "live" | "nearby" | "high";
-      categoryTile?: string | null;
     }>("onlooker:view:home", {});
-    if (saved.sheetVersion === 2 && typeof saved.drawerOpen === "boolean") {
-      setDrawerOpen(saved.drawerOpen);
-    }
-    if (saved.mapFilter === "all" || saved.mapFilter === "live" || saved.mapFilter === "nearby" || saved.mapFilter === "high") {
+    if (saved.sheetVersion === 2 && (saved.mapFilter === "all" || saved.mapFilter === "live" || saved.mapFilter === "nearby" || saved.mapFilter === "high")) {
       setMapFilter(saved.mapFilter);
-    }
-    if (saved.categoryTile === null || MAP_CATEGORY_TILES.some((tile) => tile.id === saved.categoryTile)) {
-      setCategoryTile(saved.categoryTile ?? null);
     }
     homeStateRestored.current = true;
   }, []);
 
   useEffect(() => {
     if (!homeStateRestored.current) return;
-    writeSessionState("onlooker:view:home", { drawerOpen, sheetVersion: 2, mapFilter, categoryTile });
-  }, [drawerOpen, mapFilter, categoryTile]);
+    writeSessionState("onlooker:view:home", { sheetVersion: 2, mapFilter });
+  }, [mapFilter]);
 
   // Send expired, unfulfilled deposits back to their requesters.
   useEffect(() => {
     void refundExpiredBounties();
   }, []);
-
-  // Device-only tap history so the grid favours the lanes this person uses.
-  const [categoryTaps, setCategoryTaps] = useState<Record<string, number>>({});
-  // Re-read after hydration and whenever the drawer closes, so tiles never
-  // shuffle under the user's finger mid-session.
-  useEffect(() => {
-    if (drawerOpen) return;
-    setCategoryTaps(readCategoryTapCounts());
-  }, [drawerOpen]);
-  const orderedCategoryTiles = useMemo(
-    () => sortCategoriesByUsage(MAP_CATEGORY_TILES, categoryTaps),
-    [categoryTaps],
-  );
 
   // Remember where this person is so nearby bounty alerts can reach them.
   useEffect(() => {
@@ -390,16 +131,6 @@ function MapScreen() {
   useEffect(() => {
     if (b) select(b);
   }, [b, select]);
-
-  const finishDrawerDrag = useCallback((clientY: number) => {
-    if (dragStartY.current === null) return;
-    const distance = clientY - dragStartY.current;
-    drawerDragged.current = Math.abs(distance) > 12;
-    if (Math.abs(distance) > 42) setDrawerOpen(distance < 0);
-    dragStartY.current = null;
-    setDrawerDragOffset(0);
-    setDrawerDragging(false);
-  }, []);
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
@@ -429,7 +160,7 @@ function MapScreen() {
       .slice(0, 12);
   }, [requests, userPosition]);
 
-  // The Home sheet filters the live map immediately without changing the underlying request data.
+  // The map filters the live requests immediately without changing the underlying data.
   const statusFiltered = useMemo(
     () =>
       requests.filter((request) => {
@@ -444,96 +175,16 @@ function MapScreen() {
     [requests, mapFilter, poolOf, radiusMiles, userPosition],
   );
 
-  const activeCategoryTile = MAP_CATEGORY_TILES.find((tile) => tile.id === categoryTile) ?? null;
-  const crisisMode = activeCategoryTile?.crisis === true;
-  const trafficMode = activeCategoryTile?.id === "traffic";
-  const gatheringMode = activeCategoryTile?.gathering === true;
-  const trendingMode = activeCategoryTile?.trending === true;
-  const viralMode = activeCategoryTile?.viral === true;
-  const creatorsMode = activeCategoryTile?.creators === true;
-  const scannerMode = activeCategoryTile?.scanner === true;
-  const bountyMapMode = activeCategoryTile?.bountyMap === true;
-  const sightingsMode = activeCategoryTile?.sightings === true;
-  const bountyMapRanked = useMemo(
-    () =>
-      bountyMapMode
-        ? [...requests].filter((request) => !isClosed(request)).sort((a, b) => poolOf(b) - poolOf(a)).slice(0, 6)
-        : [],
-    [bountyMapMode, requests],
-  );
-  const visible = useMemo(() => {
-    if (!activeCategoryTile) return statusFiltered;
-    if (activeCategoryTile.creators) return [];
-    const pool = activeCategoryTile.viral ? requests : statusFiltered;
-    return pool.filter((request) => tileMatches(activeCategoryTile, request, userPosition));
-  }, [activeCategoryTile, requests, statusFiltered, userPosition]);
-
-  useEffect(() => {
-    if (!trendingMode || !userPosition) return;
-    let alive = true;
-    setTrendingLoading(true);
-    void listCommunityPosts()
-      .then(async (posts) => {
-        if (!alive) return;
-        const local = posts
-          .filter((post) => post.latitude !== null && post.longitude !== null)
-          .filter((post) => distanceMiles(userPosition, { lat: post.latitude ?? 0, lng: post.longitude ?? 0 }) <= TRENDING_RADIUS_MILES)
-          .sort((a, b) => {
-            const score = (post: CommunityPost) =>
-              (post.isFlash ? 100 : 0) + post.pinnedCredits * 2 - (Date.now() - new Date(post.createdAt).getTime()) / 60_000;
-            return score(b) - score(a);
-          });
-        setNearbyPosts(local);
-        setNearbyPostMedia(await communityMediaUrls(local));
-      })
-      .catch(() => {
-        if (alive) setNearbyPosts([]);
-      })
-      .finally(() => {
-        if (alive) setTrendingLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [trendingMode, userPosition]);
-
-  useEffect(() => {
-    if (!creatorsMode) return;
-    let alive = true;
-    setCreatorsLoading(true);
-    void listTopCreators()
-      .then((creators) => {
-        if (alive) setTopCreators(creators);
-      })
-      .catch(() => {
-        if (alive) setTopCreators([]);
-      })
-      .finally(() => {
-        if (alive) setCreatorsLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, [creatorsMode]);
-
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   return (
     <div className="fixed inset-0">
       <MapCanvas
-        requests={visible}
+        requests={statusFiltered}
         selectedId={selectedId}
         onSelect={select}
         onUserPositionChange={setUserPosition}
         centerTarget={centerTarget}
         viewportStorageKey="onlooker:map:home"
-        crisisMode={crisisMode}
-        trafficMode={trafficMode}
-        gatheringMode={gatheringMode}
-        onGatheringClusterSelect={(ids) => {
-          setGatheringClusterIds(ids);
-          setDrawerOpen(true);
-          select(null);
-        }}
         mapTypeId={homeMapType}
         showNativeMapTypeControl={false}
         styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
@@ -559,11 +210,10 @@ function MapScreen() {
             <PlaceSearchInput
               variant="bare"
               autoFocus
-              placeholder="Search places or categories"
+              placeholder="Search places"
               value={searchQuery}
               onQueryChange={setSearchQuery}
               onPick={handleSearchPick}
-              additionalResults={searchCategoryMatches}
               className="min-w-0 flex-1"
             />
             <button
@@ -579,7 +229,7 @@ function MapScreen() {
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            aria-label="Search places or categories"
+            aria-label="Search places"
             className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110"
           >
             <Search className="size-4" aria-hidden />
@@ -649,740 +299,31 @@ function MapScreen() {
         onOpenRequest={(request) => {
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-          setDrawerOpen(false);
         }}
         hotSpot={hotSpotRequest}
         hotSpotRequests={hotSpotRequests}
         onOpenHighBounty={(request) => {
           setMapFilter("high");
-          setCategoryTile(null);
-          setGatheringClusterIds([]);
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-          setDrawerOpen(false);
         }}
         onOpenLive={(request) => {
           void navigate({ to: "/live/$id", params: { id: request.id } });
         }}
         onOpenEmergency={(request) => {
           setMapFilter("all");
-          setCategoryTile("emergencies");
-          setGatheringClusterIds([]);
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
-          setDrawerOpen(false);
         }}
         onOpenDispatches={() => {
           void navigate({ to: "/hunt" });
         }}
         onOpenHotSpot={(request) => {
           setMapFilter("nearby");
-          setCategoryTile(null);
-          setGatheringClusterIds([]);
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 14 });
-          setDrawerOpen(false);
         }}
       />
-
-      <section
-        className={`pointer-events-auto absolute inset-x-0 bottom-[5.85rem] z-[55] mx-auto flex h-[min(70dvh,42rem)] w-full flex-col overflow-hidden rounded-t-xl border border-b-0 border-border bg-surface/95 shadow-2xl backdrop-blur-xl will-change-transform sm:inset-x-auto sm:right-5 sm:w-[25rem] ${mapExpanded ? "hidden" : ""} ${drawerDragging ? "transition-none" : "transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0"} ${drawerOpen ? "translate-y-0" : "translate-y-[calc(100%-4rem)]"}`}
-        style={
-          drawerDragOffset === 0
-            ? undefined
-            : {
-                transform: drawerOpen
-                  ? `translateY(${Math.max(0, drawerDragOffset)}px)`
-                  : `translateY(calc(100% - 4rem + ${Math.min(0, drawerDragOffset)}px))`,
-              }
-        }
-        aria-label="Explore Nearby categories"
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          aria-expanded={drawerOpen}
-          aria-label={drawerOpen ? "Collapse map drawer" : "Expand map drawer"}
-          onClick={() => {
-            if (drawerDragged.current) {
-              drawerDragged.current = false;
-              return;
-            }
-            setDrawerOpen((open) => !open);
-          }}
-          onPointerDown={(event) => {
-            dragStartY.current = event.clientY;
-            drawerDragged.current = false;
-            setDrawerDragging(true);
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (dragStartY.current === null) return;
-            const distance = event.clientY - dragStartY.current;
-            if (Math.abs(distance) > 12) drawerDragged.current = true;
-            setDrawerDragOffset(drawerOpen ? Math.max(0, distance) : Math.min(0, distance));
-          }}
-          onPointerUp={(event) => finishDrawerDrag(event.clientY)}
-          onPointerCancel={() => {
-            dragStartY.current = null;
-            setDrawerDragOffset(0);
-            setDrawerDragging(false);
-          }}
-          className="group flex h-16 w-full shrink-0 touch-none items-center justify-between rounded-none border-b border-border/70 px-4 text-foreground hover:bg-surface-raised"
-        >
-          <span className="flex min-w-0 items-center gap-3 text-left">
-            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-signal/10 shadow-[0_0_18px_color-mix(in_oklab,var(--color-signal)_28%,transparent)]" aria-hidden>
-              <Map className="size-4 text-signal" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-xs font-extrabold uppercase tracking-[0.1em]">Explore nearby</span>
-              <span className="block text-[0.68rem] font-bold text-muted-foreground">17 live categories</span>
-            </span>
-          </span>
-          <span className="grid size-10 shrink-0 place-items-center rounded-full border border-signal bg-signal text-signal-foreground shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_48%,transparent)] transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none">
-            <ChevronDown className={`size-5 transition-transform duration-500 ease-[cubic-bezier(0.22,1.18,0.36,1)] motion-reduce:duration-0 ${drawerOpen ? "rotate-180" : ""}`} />
-          </span>
-        </Button>
-
-        <div
-          ref={drawerScrollRef}
-          aria-hidden={!drawerOpen}
-          className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] transition-opacity duration-300 motion-reduce:duration-0 ${drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
-        >
-
-          <div className="border-t border-border py-3">
-            <div className={`grid grid-cols-3 gap-2 ${activeCategoryTile ? "hidden" : ""}`} aria-label="Map categories">
-              {orderedCategoryTiles.map((tile) => {
-                const Icon = tile.icon;
-                const active = categoryTile === tile.id;
-                const count = tile.creators
-                  ? topCreators.length
-                  : tile.guidesLink
-                  ? GUIDES.length
-                  : (tile.viral ? requests : statusFiltered).filter((request) =>
-                      tileMatches(tile, request, userPosition),
-                    ).length;
-                return (
-                  <Button
-                    key={tile.id}
-                    type="button"
-                    variant="outline"
-                    aria-pressed={active}
-                    onClick={() => {
-                      recordCategoryTap(tile.id);
-                      if (tile.communityLink) {
-                        void navigate({ to: "/community" });
-                        return;
-                      }
-                      if (tile.guidesLink) {
-                        setGuidesOpen(true);
-                        return;
-                      }
-                      setCategoryTile(active ? null : tile.id);
-                      setDrawerOpen(true);
-                      select(null);
-                      setGatheringClusterIds([]);
-                    }}
-                    className={`relative h-32 min-w-0 flex-col gap-1.5 overflow-hidden rounded-md px-1 pb-2 pt-2 text-[0.75rem] font-bold ${
-                      active
-                        ? tile.theme
-                          ? tile.theme.active
-                          : tile.crisis
-                            ? "border-crisis bg-crisis text-crisis-foreground"
-                            : "border-signal bg-signal text-signal-foreground"
-                        : "border-border bg-background text-foreground"
-                    }`}
-                  >
-                    {tile.theme?.imageUrl ? (
-                      <span className="size-[4.5rem] overflow-hidden rounded-md border border-signal/50 bg-surface-raised shadow-[0_0_18px_var(--color-signal)]" aria-hidden="true">
-                        <img src={tile.theme.imageUrl} alt="" className="size-full object-cover object-center" />
-                      </span>
-                    ) : tile.theme?.emoji ? (
-                      <span className="text-2xl leading-none" aria-hidden="true">{tile.theme.emoji}</span>
-                    ) : (
-                      <Icon className={`size-5 ${active ? "text-signal-foreground" : tile.crisis ? "text-crisis" : "text-signal"}`} />
-                    )}
-                    <span className="line-clamp-2 w-full whitespace-normal px-1 leading-tight">{tile.label}</span>
-                    <span className={`absolute right-1.5 top-1.5 text-[0.7rem] font-extrabold ${
-                      active
-                        ? tile.theme ? "text-current" : "text-signal-foreground"
-                        : tile.theme ? tile.theme.badge : "text-muted-foreground"
-                    }`}>
-                      {count}
-                    </span>
-                  </Button>
-                );
-              })}
-            </div>
-
-            {sightingsMode && (
-              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <img src={STRANGE_SIGHTINGS_IMAGE_URL} alt="" className="size-12 rounded-md border border-signal/50 object-cover shadow-[0_0_18px_var(--color-signal)]" />
-                    <div className="min-w-0">
-                      <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">Mystery watch</p>
-                      <h2 className="truncate text-base font-extrabold text-foreground">Strange Sightings &amp; UFO</h2>
-                    </div>
-                  </div>
-                  <Button type="button" variant="secondary" size="icon" aria-label="Close mystery watch" onClick={() => setCategoryTile(null)} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 text-foreground shadow-sm">
-                    <X className="size-4" />
-                  </Button>
-                </div>
-
-                {visible.length > 0 ? (
-                  <div className="mt-3 space-y-2">
-                    {visible.slice(0, 5).map((request) => (
-                      <Button key={`sighting-${request.id}`} type="button" variant="outline" onClick={() => {
-                        select(request.id);
-                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                        setDrawerOpen(false);
-                      }} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-md border-signal/35 bg-background px-3 py-2.5 text-left">
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place}</span>
-                        </span>
-                        <span className="text-[0.68rem] font-extrabold uppercase text-signal">View</span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-signal/40 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No mystery bounties are active nearby. Be the first to report one.
-                  </p>
-                )}
-
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <Button type="button" onClick={() => void navigate({ to: "/community", search: { mystery: "report" } })} className="h-auto min-h-10 whitespace-normal px-2 py-2 text-xs">Report Sighting</Button>
-                  <Button type="button" variant="outline" onClick={() => void navigate({ to: "/community", search: { mystery: "logs" } })} className="h-auto min-h-10 whitespace-normal border-signal/45 px-2 py-2 text-xs">View Community Logs</Button>
-                  <Button type="button" variant="outline" onClick={() => void navigate({ to: "/post", search: { mystery: "1" } })} className="h-auto min-h-10 whitespace-normal border-signal/45 px-2 py-2 text-xs">Request a Mystery Bounty</Button>
-                </div>
-              </div>
-            )}
-
-            {bountyMapMode && (
-              <div className="mt-3 border-t border-border pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.75rem] font-extrabold uppercase tracking-[0.12em] text-signal">
-                      <Map className="size-3.5" /> Every open bounty
-                    </p>
-                    <h2 className="truncate text-base font-extrabold uppercase tracking-[0.08em] text-foreground">
-                      Ranked by reward
-                    </h2>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCategoryTile(null)}
-                    className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground"
-                  >
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-                {bountyMapRanked.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {bountyMapRanked.map((request) => (
-                      <Button
-                        key={`bountymap-${request.id}`}
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          select(request.id);
-                          setCenterTarget({ ...requestMapPosition(request), zoom: 14 });
-                          setDrawerOpen(false);
-                        }}
-                        className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
-                            {request.place}
-                          </span>
-                        </span>
-                        <span className="shrink-0 text-sm font-extrabold text-signal">
-                          {poolOf(request)} cr
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No open bounties on the network yet — post the first one.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {activeCategoryTile && !crisisMode && !trafficMode && !gatheringMode && !trendingMode && !viralMode && !creatorsMode && !scannerMode && !bountyMapMode && (
-              <div className="mt-3 border-t border-border pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="truncate text-sm font-extrabold uppercase tracking-[0.1em] text-foreground">
-                    {activeCategoryTile.label} nearby
-                  </h2>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCategoryTile(null)}
-                    className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-signal"
-                  >
-                    Show all
-                  </Button>
-                </div>
-                {visible.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {visible.slice(0, 4).map((request) => (
-                      <Button
-                        key={request.id}
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          select(request.id);
-                          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                          setDrawerOpen(false);
-                        }}
-                        className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md border-border bg-background px-3 py-2.5 text-left"
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
-                            {request.place}
-                          </span>
-                        </span>
-                        <span className="shrink-0 text-xs font-extrabold text-signal">
-                          {poolOf(request)} cr
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-2 rounded-md border border-dashed border-border bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No {activeCategoryTile.label.toLowerCase()} bounties match these map filters yet.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {trendingMode && (
-              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">
-                      <Flame className="size-3.5" /> Rising within 2 miles
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Trending Near You</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {!userPosition ? (
-                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    Allow location access to load fast-rising activity within 2 miles.
-                  </p>
-                ) : trendingLoading ? (
-                  <p className="mt-3 text-center text-xs font-bold text-muted-foreground">Loading nearby activity…</p>
-                ) : visible.length + nearbyPosts.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {[...visible]
-                      .sort((a, b) => (b.watchers + b.responses) - (a.watchers + a.responses) || a.minutesAgo - b.minutesAgo)
-                      .slice(0, 4)
-                      .map((request) => {
-                        const live = request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
-                        return (
-                          <Button key={`request-${request.id}`} type="button" variant="outline" onClick={() => {
-                            select(request.id);
-                            setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
-                          }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-signal/30 bg-background px-3 py-2.5 text-left">
-                            {live ? <Radio className="size-4 animate-pulse text-live" /> : <CircleDollarSign className="size-4 text-signal" />}
-                            <span className="min-w-0">
-                              <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                              <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{live ? "Live broadcast" : `${poolOf(request)} credit bounty`} · {request.place}</span>
-                            </span>
-                            <span className="shrink-0 text-[0.7rem] font-bold text-muted-foreground">{liveTimestamp(request.minutesAgo).replace("Updated ", "")}</span>
-                          </Button>
-                        );
-                      })}
-                    {nearbyPosts.slice(0, Math.max(0, 6 - visible.length)).map((post) => (
-                      <Button key={`post-${post.id}`} type="button" variant="outline" onClick={() => {
-                        if (post.latitude !== null && post.longitude !== null) setCenterTarget({ lat: post.latitude, lng: post.longitude, zoom: 16 });
-                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-signal/30 bg-background px-3 py-2.5 text-left">
-                        {post.mediaPath && nearbyPostMedia[post.mediaPath]
-                          ? <img src={nearbyPostMedia[post.mediaPath]} alt="" className="size-8 rounded object-cover" />
-                          : <Image className="size-4 text-signal" />}
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{post.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">Media post · {post.place || "Nearby"}</span>
-                        </span>
-                        <span className="shrink-0 text-[0.7rem] font-bold text-muted-foreground">{liveTimestamp(Math.max(0, Math.floor((Date.now() - new Date(post.createdAt).getTime()) / 60_000))).replace("Updated ", "")}</span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    Nothing is rising within 2 miles yet. Check back soon.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {viralMode && (
-              <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
-                      <Sparkles className="size-3.5" /> Network-wide momentum
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Viral &amp; Breaking</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {visible.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {[...visible]
-                      .sort((a, b) => {
-                        const velocity = (request: LiveRequest) => (request.watchers + request.responses) / Math.max(1, request.minutesAgo);
-                        return velocity(b) - velocity(a) || (b.watchers + b.responses) - (a.watchers + a.responses);
-                      })
-                      .slice(0, 4)
-                      .map((request) => {
-                        const velocity = (request.watchers + request.responses) / Math.max(1, request.minutesAgo);
-                        const breaking = isCrisisRequest(request) || (request.minutesAgo <= 15 && velocity >= 1);
-                        return (
-                          <Button key={`viral-request-${request.id}`} type="button" variant="outline" onClick={() => {
-                            select(request.id);
-                            setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                          }} className="grid h-auto w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/30 bg-background px-3 py-2.5 text-left">
-                            <span className="min-w-0">
-                              <span className="flex min-w-0 items-center gap-1.5">
-                                {breaking && <span className="shrink-0 rounded-sm bg-crisis px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase text-crisis-foreground">Breaking</span>}
-                                <span className="truncate text-sm font-bold text-foreground">{request.title}</span>
-                              </span>
-                              <span className="mt-1 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} engagements</span>
-                            </span>
-                            <span className="flex shrink-0 items-center gap-1 text-[0.72rem] font-extrabold text-crisis">
-                              <Eye className="size-3.5" /> +{velocity.toFixed(1)}/min
-                            </span>
-                          </Button>
-                        );
-                      })}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No network-wide stories are accelerating right now.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {scannerMode && (
-              <div className="mt-3 border-t border-violet-500/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-violet-400">
-                      <Volume2 className="size-3.5" /> Live scanner feed
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Scanner</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {visible.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {visible.slice(0, 5).map((request) => {
-                      const emergency = isCrisisRequest(request);
-                      return (
-                        <Button key={request.id} type="button" variant="outline" onClick={() => {
-                          select(request.id);
-                          setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                        }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-violet-500/35 bg-background px-3 py-2.5 text-left">
-                          <span className={`size-2 rounded-full ${emergency ? "animate-pulse bg-crisis" : "bg-violet-400"}`} />
-                          <span className="min-w-0">
-                            <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                            <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">
-                              {emergency ? "Emergency channel" : "Traffic channel"} · {request.place}
-                            </span>
-                          </span>
-                          <span className="flex shrink-0 items-center gap-1 text-[0.7rem] font-bold text-muted-foreground">
-                            <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
-                          </span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-violet-500/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No emergency or traffic chatter is hitting the scanner right now.
-                  </p>
-                )}
-
-                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-bold text-foreground">
-                  <Volume2 className="size-4 text-violet-400" /> Open scanner audio
-                </Button>
-                {scannerNotice && (
-                  <p className="mt-2 text-center text-[0.75rem] text-muted-foreground">
-                    No verified public scanner audio is linked to these alerts yet.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {creatorsMode && (
-              <div className="mt-3 border-t border-signal/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-signal">
-                      <Trophy className="size-3.5" /> Network leaderboard
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Top Creators</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {creatorsLoading ? (
-                  <p className="mt-3 text-center text-xs font-bold text-muted-foreground">Loading creator rankings…</p>
-                ) : topCreators.length > 0 ? (
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {topCreators.slice(0, 8).map((creator, index) => (
-                      <div key={creator.id} className="relative min-w-0 rounded-md border border-border bg-background p-3">
-                        <span className="absolute right-2 top-2 text-[0.7rem] font-extrabold text-muted-foreground">#{index + 1}</span>
-                        <div className="flex items-center gap-2 pr-5">
-                          <div className="relative shrink-0">
-                            {creator.avatarUrl ? (
-                              <img src={creator.avatarUrl} alt="" className="size-9 rounded-full object-cover" />
-                            ) : (
-                              <span className="grid size-9 place-items-center rounded-full bg-surface-raised text-xs font-extrabold text-signal">
-                                {creator.name.slice(0, 2).toUpperCase()}
-                              </span>
-                            )}
-                            {creator.live && <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background bg-live" aria-label="Live now" />}
-                          </div>
-                          <span className="min-w-0">
-                            <span className="flex min-w-0 items-center gap-1">
-                              <span className="truncate text-base font-extrabold text-foreground">{creator.name}</span>
-                              {creator.verified && <VerifiedBadge className="size-3.5" />}
-                            </span>
-                            <span className={`mt-0.5 block text-[0.7rem] font-extrabold uppercase ${creator.live ? "text-live" : "text-muted-foreground"}`}>
-                              {creator.live ? "Live now" : "Creator"}
-                            </span>
-                          </span>
-                        </div>
-                        <div className="mt-2 flex items-center justify-between gap-2 border-t border-border pt-2 text-[0.72rem]">
-                          <span className="font-bold text-foreground">{creator.followerCount.toLocaleString()} followers</span>
-                          <span className="text-muted-foreground">{creator.totalViews.toLocaleString()} views</span>
-                        </div>
-                        <FollowButton
-                          creatorId={creator.id}
-                          creatorName={creator.name}
-                          size="md"
-                          className="mt-2 w-full justify-center"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-signal/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    Creator rankings will appear as the network grows.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {gatheringMode && (
-              <div className="mt-3 border-t border-gathering-high/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-gathering-high">
-                      <span className="size-2 animate-pulse rounded-full bg-gathering-high" /> Crowd activity
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">
-                      {gatheringClusterIds.length > 0 ? "Gathering cluster details" : "Public gatherings nearby"}
-                    </h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => {
-                    setCategoryTile(null);
-                    setGatheringClusterIds([]);
-                  }} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {(() => {
-                  const clusterRequests = gatheringClusterIds.length > 0
-                    ? visible.filter((request) => gatheringClusterIds.includes(request.id))
-                    : visible;
-                  const headcount = clusterRequests.reduce((sum, request) => sum + request.watchers + request.responses, 0);
-                  const liveStreams = clusterRequests.filter((request) => request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request));
-                  return (
-                    <>
-                      <div className="mt-2 grid grid-cols-2 gap-2">
-                        <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
-                          <p className="text-[0.7rem] font-bold uppercase text-muted-foreground">Estimated headcount</p>
-                          <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{headcount}</p>
-                        </div>
-                        <div className="rounded-md border border-gathering-low/35 bg-background px-3 py-2">
-                          <p className="text-[0.7rem] font-bold uppercase text-muted-foreground">Live onlookers</p>
-                          <p className="mt-0.5 text-lg font-extrabold tabular-nums text-gathering-high">{liveStreams.length}</p>
-                        </div>
-                      </div>
-
-                      {clusterRequests.length > 0 ? (
-                        <div className="mt-2 space-y-2">
-                          {clusterRequests.slice(0, 5).map((request) => {
-                            const live = request.bountyType === "live_stream" && request.status === "claimed" && !isClosed(request);
-                            return (
-                              <Button key={request.id} type="button" variant="outline" onClick={() => {
-                                select(request.id);
-                                setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
-                              }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-gathering-low/35 bg-background px-3 py-2.5 text-left">
-                                <MapPin className="size-4 text-gathering-high" />
-                                <span className="min-w-0">
-                                  <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                                  <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place} · {request.watchers + request.responses} people</span>
-                                </span>
-                                <span className={`flex shrink-0 items-center gap-1 text-[0.7rem] font-extrabold uppercase ${live ? "text-live" : "text-muted-foreground"}`}>
-                                  <Eye className="size-3" /> {live ? "Live" : liveTimestamp(request.minutesAgo).replace("Updated ", "")}
-                                </span>
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p className="mt-3 rounded-md border border-dashed border-gathering-low/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                          No public gatherings are active in this area.
-                        </p>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-            )}
-
-            {trafficMode && (
-              <div className="mt-3 border-t border-traffic-heavy/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-traffic-heavy">
-                      <span className="size-2 animate-pulse rounded-full bg-traffic-heavy" /> Live road conditions
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Traffic incidents &amp; closures</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                <div className="mt-2 flex items-center gap-3 text-[0.72rem] font-bold text-muted-foreground">
-                  <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-slow" /> Slow</span>
-                  <span className="flex items-center gap-1"><span className="size-2.5 rounded-full bg-traffic-heavy" /> Heavy</span>
-                </div>
-
-                {visible.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {visible.slice(0, 5).map((request) => (
-                      <Button key={request.id} type="button" variant="outline" onClick={() => {
-                        select(request.id);
-                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                        setDrawerOpen(false);
-                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-traffic-slow/35 bg-background px-3 py-2.5 text-left">
-                        <span className={`size-2.5 rounded-full ${request.minutesAgo <= 15 ? "bg-traffic-heavy" : "bg-traffic-slow"}`} />
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{trafficIncidentType(request)} · {request.place}</span>
-                        </span>
-                        <span className="flex shrink-0 items-center gap-1 text-[0.7rem] font-bold text-muted-foreground">
-                          <Clock3 className="size-3" /> {liveTimestamp(request.minutesAgo).replace("Updated ", "")}
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-md border border-dashed border-traffic-slow/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No vehicle incidents or road closures are reported in this area.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {crisisMode && (
-              <div className="mt-3 border-t border-crisis/45 pt-3" aria-live="polite">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.12em] text-crisis">
-                      <span className="size-2 animate-pulse rounded-full bg-crisis" /> Crisis watch
-                    </p>
-                    <h2 className="mt-1 truncate text-base font-extrabold text-foreground">Live crisis streams</h2>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => setCategoryTile(null)} className="h-7 shrink-0 px-2 text-[0.75rem] font-bold text-muted-foreground">
-                    <X className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Exit</span>
-                  </Button>
-                </div>
-
-                {visible.length > 0 ? (
-                  <div className="mt-2 space-y-2">
-                    {visible.slice(0, 4).map((request) => (
-                      <Button key={request.id} type="button" variant="outline" onClick={() => {
-                        select(request.id);
-                        setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
-                        setDrawerOpen(false);
-                      }} className="grid h-auto w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-crisis/45 bg-background px-3 py-2.5 text-left">
-                        <span className="size-2 animate-pulse rounded-full bg-crisis" />
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{request.title}</span>
-                          <span className="mt-0.5 block truncate text-[0.75rem] font-normal text-muted-foreground">{request.place}</span>
-                        </span>
-                        <span className="shrink-0 text-[0.72rem] font-extrabold uppercase text-crisis">
-                          {request.bountyType === "live_stream" && request.status === "claimed" ? "Live" : "Alert"}
-                        </span>
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-2 rounded-md border border-dashed border-crisis/45 bg-background px-3 py-3 text-center text-xs text-muted-foreground">
-                    No active crisis streams are reported in this area.
-                  </p>
-                )}
-
-                <Button type="button" variant="outline" onClick={() => setScannerNotice(true)} className="mt-2 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-bold text-foreground">
-                  <Volume2 className="size-4 text-crisis" /> Emergency scanner audio
-                </Button>
-                {scannerNotice && (
-                  <p className="mt-2 text-center text-[0.75rem] text-muted-foreground">
-                    No verified public scanner audio is linked to these alerts yet.
-                  </p>
-                )}
-                <Button type="button" onClick={() => setReportOpen(true)} className="mt-2 h-10 w-full justify-center rounded-md text-sm font-bold">
-                  Create community report
-                </Button>
-                <div className="mt-3">
-                  <FlashBountyButton variant="crisis" />
-                </div>
-              </div>
-            )}
-          </div>
-
-        </div>
-
-      </section>
-
 
       <BountyBottomSheet
         request={selected}
@@ -1395,136 +336,6 @@ function MapScreen() {
         onClaim={claim}
         onClose={() => select(null)}
       />
-
-      <GuidesOverlay open={guidesOpen} onClose={() => setGuidesOpen(false)} />
-
-      <CreateCommunityReportModal open={reportOpen} onOpenChange={setReportOpen} />
     </div>
-  );
-}
-
-const GUIDES: Array<{
-  icon: typeof Compass;
-  kicker: string;
-  title: string;
-  body: string;
-  points: string[];
-}> = [
-  {
-    icon: Compass,
-    kicker: "Platform guide",
-    title: "How Onlooker works",
-    body: "Ever wished you could see a place right now? Someone out there is already standing in it. That's the whole idea.",
-    points: [
-      "Post a bounty, pick the spot and say what you'd love to see.",
-      "Your credits stay safely held until your capture actually arrives.",
-      "Every pin on the map is a real request from a real person, right now.",
-    ],
-  },
-  {
-    icon: Sparkles,
-    kicker: "Hunter onboarding",
-    title: "Earn your first bounty",
-    body: "See a request near you? Claim it, film a quick live capture, and the money lands the moment it's accepted.",
-    points: [
-      "Verify your phone first, it shows people you're a real human.",
-      "Only claim what you can genuinely reach in time. No rushing needed.",
-      "A clear, steady capture builds trust, and brings repeat requests.",
-    ],
-  },
-  {
-    icon: Video,
-    kicker: "Live streaming",
-    title: "Streaming people stick around for",
-    body: "Nobody expects a film crew. Steady hands, decent light and a little chatter go a surprisingly long way.",
-    points: [
-      "Hold your phone with both hands and pan slowly, let people take the scene in.",
-      "Say where you are out loud; it helps everyone find their bearings.",
-      "Answer the chat. That's the fun part, and it's exactly what viewers are here for.",
-    ],
-  },
-  {
-    icon: ShieldCheck,
-    kicker: "Safety",
-    title: "Stay safe out there",
-    body: "Public places only, always. No bounty is ever worth putting yourself, or anyone else, in a tricky spot.",
-    points: [
-      "Skip private homes, gated property and anywhere you're not meant to be.",
-      "Leave live shows, performances and games alone, that's someone else's work.",
-      "Keep chats and payments on Onlooker. It's how we've got your back.",
-    ],
-  },
-];
-
-function GuidesOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-end justify-center">
-      <button
-        type="button"
-        aria-label="Close guides"
-        onClick={onClose}
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="guides-title"
-        className="relative flex max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-lg animate-in slide-in-from-bottom-8 flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl duration-300 sm:max-h-[85dvh]"
-      >
-        <div className="flex items-start gap-3 border-b border-border px-4 pb-3.5 pt-[max(0.875rem,env(safe-area-inset-top))] sm:pt-3.5">
-          <BookOpen className="mt-0.5 size-5 shrink-0 text-signal" />
-          <div className="min-w-0 flex-1">
-            <h2 id="guides-title" className="text-base font-extrabold text-foreground">
-              Learning &amp; Guides
-            </h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              A few friendly pointers to help you get the most out of Onlooker.
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Close guides"
-            className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 text-foreground shadow-sm hover:bg-secondary"
-          >
-            <X className="size-4" />
-          </Button>
-        </div>
-
-        <div className="min-h-0 max-h-[calc(85vh-4.5rem)] flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pt-4 [-webkit-overflow-scrolling:touch] pb-[calc(env(safe-area-inset-bottom)+3rem)]">
-          {GUIDES.map(({ icon: Icon, kicker, title, body, points }) => (
-            <article key={title} className="rounded-xl border border-border bg-surface-raised/70 p-4">
-              <p className="flex items-center gap-2 text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
-                <Icon className="size-3.5" /> {kicker}
-              </p>
-              <h3 className="mt-1.5 text-sm font-extrabold text-foreground">{title}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{body}</p>
-              <ul className="mt-2.5 space-y-1.5">
-                {points.map((point) => (
-                  <li key={point} className="flex gap-2 text-xs text-foreground">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-signal" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </div>
-    </div>,
-    document.body,
   );
 }
