@@ -80,6 +80,10 @@ export function BountyAmountPicker({
               step="1"
               value={Number.isFinite(value) ? value : ""}
               onChange={(e) => onChange(Number(e.target.value))}
+              onBlur={() => {
+                // A custom amount can never settle below the 40-credit floor.
+                if (Number.isFinite(value) && value < MIN_BOUNTY) onChange(MIN_BOUNTY);
+              }}
               placeholder={`Min ${MIN_BOUNTY}`}
               className="w-full bg-transparent font-display text-lg font-bold tabular-nums text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
               aria-label="Custom bounty amount in credits"
