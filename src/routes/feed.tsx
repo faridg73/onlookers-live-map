@@ -296,7 +296,7 @@ function FeedScreen() {
         />
       </div>
 
-      <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-surface px-3">
+      <div className="mt-3 flex items-center gap-2 rounded-xl border-2 border-signal bg-surface px-3 shadow-[0_0_12px_rgba(204,255,0,0.25)]">
         <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
         <input
           type="search"

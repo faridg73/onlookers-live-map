@@ -44,6 +44,8 @@ export function PlaceSearchInput({
   searchIconPosition?: "left" | "right";
   variant?: "box" | "bare";
   additionalResults?: AdditionalSearchResult[];
+  /** Extra classes for the bordered container in "box" variant (e.g. lime accent). */
+  boxClassName?: string;
 }) {
   const [internalQuery, setInternalQuery] = useState(value ?? "");
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
