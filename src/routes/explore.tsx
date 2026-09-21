@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Eye, Globe2, Loader2, MapPin, MessageCircle, Play, Star, Sparkle } from "lucide-react";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { LiveReactions } from "@/components/LiveReactions";
 import { LoopingPreview } from "@/components/LoopingPreview";
@@ -42,6 +42,14 @@ export const Route = createFileRoute("/explore")({
 });
 
 function ExplorePage() {
+  const router = useRouter();
+  const handleClose = useCallback(() => {
+    if (typeof window !== "undefined" && window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
+    } else {
+      void router.navigate({ to: "/" });
+    }
+  }, [router]);
   const [clips, setClips] = useState<ExploreClip[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"nearby" | "global">("nearby");
