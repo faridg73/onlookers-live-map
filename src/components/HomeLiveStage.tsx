@@ -324,7 +324,9 @@ export function HomeLiveStage({
       <div className="relative mt-2 flex h-12 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
-          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 whitespace-nowrap"
+          ref={trendScrollerRef}
+          className="scrollbar-thin flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
+          onScroll={updateTrendScroll}
           onWheel={(event) => {
             if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
             event.currentTarget.scrollBy({ left: event.deltaY, behavior: "smooth" });
@@ -351,11 +353,19 @@ export function HomeLiveStage({
             );
           })}
         </div>
+        <div className="pointer-events-none absolute inset-x-2 bottom-[3px] z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
+          {trendScroll.thumbWidth < 100 && (
+            <div
+              className="h-full rounded-full bg-signal shadow-[0_0_10px_rgba(204,255,0,0.75)] transition-[width,margin-left] duration-150 ease-out motion-reduce:transition-none"
+              style={{ width: `${trendScroll.thumbWidth}%`, marginLeft: `${trendScroll.thumbLeft}%` }}
+            />
+          )}
+        </div>
       </div>
 
       <div
         id="home-live-feed-drawer"
-        className={`mt-2 grid overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
+        className={`mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
       >
         <div className="min-h-0 overflow-hidden">
           {activeTrend && (
