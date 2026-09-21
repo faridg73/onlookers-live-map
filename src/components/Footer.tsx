@@ -158,12 +158,6 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
           <p className="text-xs font-semibold tracking-wide text-signal">
             #OnlookerLive
           </p>
-          <a
-            href="mailto:support@onlookerlive.com"
-            className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
-          >
-            support@onlookerlive.com
-          </a>
         </div>
       </div>
 

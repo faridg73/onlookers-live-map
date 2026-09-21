@@ -87,7 +87,7 @@ function DmcaPage() {
           <div className="mt-6 rounded-2xl border border-signal/40 bg-signal/10 p-5 text-sm text-foreground">
             <p className="font-semibold">Report submitted.</p>
             <p className="mt-1 text-muted-foreground">
-              We've logged your notice and alerted our support team at support@onlookerlive.com.
+              We've logged your notice and alerted our support team.
               We'll follow up at the email you provided.
             </p>
           </div>
@@ -182,7 +182,7 @@ function DmcaPage() {
 
             <p className="text-center text-[0.7rem] leading-relaxed text-muted-foreground">
               Submitting a false claim may carry legal consequences. Your report is sent to
-              support@onlookerlive.com and logged for admin review.
+              our support team and logged for admin review.
             </p>
           </form>
         )}

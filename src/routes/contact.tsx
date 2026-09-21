@@ -2,7 +2,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Mail, MessageSquare, Send, Headphones } from "lucide-react";
+import { MessageSquare, Send, Headphones } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { submitSupportTicket } from "@/lib/support.functions";
 
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Get help with Onlooker. Send a message to our support team or email us directly.",
+          "Get help with Onlooker. Send a message to our support team.",
       },
       { property: "og:title", content: "Contact Onlooker Support" },
       {
@@ -94,28 +94,6 @@ function ContactScreen() {
           </p>
         </div>
       </header>
-
-      <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
-        <h2 className="flex items-center gap-2 font-display text-base text-foreground">
-          <Mail className="size-4 text-signal" /> Email us directly
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          For urgent issues, email{" "}
-          <a
-            href="mailto:support@onlookerlive.com"
-            className="font-semibold text-foreground underline underline-offset-4"
-          >
-            support@onlookerlive.com
-          </a>
-          .
-        </p>
-        <a
-          href="mailto:support@onlookerlive.com?subject=Onlooker%20Support%20Request"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-signal px-5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground"
-        >
-          <Mail className="size-3.5" /> Open email app
-        </a>
-      </section>
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
         <h2 className="flex items-center gap-2 font-display text-base text-foreground">
