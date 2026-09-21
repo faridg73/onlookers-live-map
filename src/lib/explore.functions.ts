@@ -78,8 +78,13 @@ export const listExploreClips = createServerFn({ method: "GET" })
             ? supabaseAdmin.storage.from(BUCKET).createSignedUrl(r.thumb_path, 60 * 60)
             : Promise.resolve({ data: null }),
         ]);
+        const video = videoById.get(r.id);
+        const req = video?.request_id ? reqById.get(video.request_id) : undefined;
         return {
           id: r.id,
+          uploaderId: video?.uploader_id ?? "",
+          latitude: req?.latitude ?? null,
+          longitude: req?.longitude ?? null,
           title: r.request_title,
           place: r.request_place,
           note: r.note,
