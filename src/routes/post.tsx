@@ -41,7 +41,6 @@ import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEdu
 import { BountyPriceBreakdown } from "@/components/BountyPriceBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
-import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { BuyCreditsSheet } from "@/components/BuyCreditsSheet";
 import { ContentModerationAlertModal } from "@/components/ContentModerationAlertModal";
 import { DeadlinePickerDialog } from "@/components/DeadlinePickerDialog";
@@ -77,7 +76,6 @@ import {
   CAPTURE_OPTIONS,
   MAX_CAPTURE_MINUTES,
   captureDurationLabel,
-  suggestedBountyForCapture,
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
