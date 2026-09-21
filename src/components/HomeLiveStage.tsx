@@ -206,7 +206,29 @@ export function HomeLiveStage({
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
-      <div className="overflow-hidden rounded-2xl border border-signal/35 bg-home-glass-strong shadow-[0_20px_70px_color-mix(in_oklab,var(--color-background)_75%,transparent)] backdrop-blur-2xl">
+      {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
+      <div
+        className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
+        aria-label="Live city readout"
+      >
+        <span className="relative flex size-2 shrink-0" aria-hidden>
+          <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+          <span className="relative size-2 rounded-full bg-signal" />
+        </span>
+        <div className="scrollbar-thin flex min-w-0 flex-1 items-center gap-3 overflow-x-auto whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.18em] tabular-nums text-foreground/70 sm:text-[0.66rem]">
+          <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>
+            TOP POOL{" "}
+            <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
+          </span>
+        </div>
+      </div>
+      <div className="overflow-hidden rounded-3xl border border-signal/25 bg-home-glass shadow-[0_24px_80px_color-mix(in_oklab,var(--color-background)_70%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
         <div className="relative min-w-0 overflow-hidden px-5 pb-4 pt-4 sm:px-7 sm:pb-5 sm:pt-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent" aria-hidden />
@@ -281,7 +303,7 @@ export function HomeLiveStage({
 
       </div>
 
-      <div className="mt-2 overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong py-2.5 shadow-2xl backdrop-blur-2xl">
+      <div className="mt-2 overflow-hidden rounded-3xl border border-signal/25 bg-home-glass py-2.5 shadow-[0_24px_70px_color-mix(in_oklab,var(--color-background)_68%,transparent)] backdrop-blur-2xl">
         <div className="mb-2 flex items-center justify-between px-3">
           <div className="flex items-center gap-2">
             <span className="relative flex size-2" aria-hidden>
@@ -293,25 +315,45 @@ export function HomeLiveStage({
           <span className="text-[0.58rem] font-bold uppercase text-signal">Live city feed</span>
         </div>
         {discoveryItems.length > 0 ? (
-          <div className="scrollbar-thin flex snap-x gap-2 overflow-x-auto overscroll-x-contain px-3 pb-1" aria-label="Active live streams and high-value bounties">
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1" aria-label="Active live streams and high-value bounties">
             {discoveryItems.map((request) => {
               const live = isLiveRequest(request);
+              const initials = (request.requester || "?")
+                .replace(/[^a-zA-Z0-9]+/g, " ")
+                .trim()
+                .split(" ")
+                .map((part) => part.charAt(0).toUpperCase())
+                .slice(0, 2)
+                .join("");
               return (
                 <button
                   key={`discover-${request.id}`}
                   type="button"
                   onClick={() => live ? onOpenLive(request) : onOpenRequest(request)}
-                  className="group relative flex h-[5.25rem] w-[11.5rem] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-xl border border-signal/35 bg-background/85 p-2.5 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-signal hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
+                  className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
                 >
-                  <span className="flex items-center justify-between gap-2">
-                    <span className={`flex items-center gap-1 text-[0.58rem] font-extrabold uppercase ${live ? "text-live" : "text-signal"}`}>
-                      {live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <CircleDollarSign className="size-3" />}
-                      {live ? "Live now" : `${poolOf(request)} credits`}
-                    </span>
-                    <span className="text-[0.55rem] font-bold text-foreground/55">{live ? `${request.watchers} watching` : `${request.minutesAgo}m`}</span>
+                  {/* Creator tile: real handle initials, no placeholder media. */}
+                  <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-signal)_22%,transparent),transparent_70%)]">
+                    <span className="font-mono text-[0.72rem] font-bold tracking-tight text-signal">{initials}</span>
+                    {live && (
+                      <span className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-0.5 bg-live/85 py-[1px] text-[0.45rem] font-extrabold uppercase tracking-widest text-background">
+                        <span className="size-1 animate-pulse rounded-full bg-background motion-reduce:animate-none" aria-hidden /> live
+                      </span>
+                    )}
                   </span>
-                  <span className="line-clamp-2 text-[0.72rem] font-bold leading-tight text-foreground group-hover:text-signal">{request.title}</span>
-                  <span className="flex items-center gap-1 truncate text-[0.58rem] font-medium text-foreground/55"><MapPin className="size-3 shrink-0 text-signal" /> <span className="truncate">{request.place}</span></span>
+                  <span className="flex min-w-0 flex-1 flex-col justify-between gap-1">
+                    <span className="flex items-center justify-between gap-1">
+                      <span className={`flex items-center gap-1 text-[0.55rem] font-extrabold uppercase ${live ? "text-live" : "text-signal"}`}>
+                        {live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <Eye className="size-3" />}
+                        {live ? `${request.watchers} watching` : `${request.minutesAgo}m ago`}
+                      </span>
+                      <span className="relative inline-flex shrink-0 items-center gap-0.5 rounded-full border border-signal bg-signal/15 px-1.5 py-[1px] font-mono text-[0.55rem] font-bold tabular-nums text-signal shadow-[0_0_12px_color-mix(in_oklab,var(--color-signal)_35%,transparent)] animate-pulse motion-reduce:animate-none">
+                        <CircleDollarSign className="size-2.5" aria-hidden /> {poolOf(request)}
+                      </span>
+                    </span>
+                    <span className="line-clamp-2 text-[0.72rem] font-bold leading-tight text-foreground group-hover:text-signal">{request.title}</span>
+                    <span className="flex items-center gap-1 truncate text-[0.55rem] font-medium text-foreground/60"><MapPin className="size-3 shrink-0 text-signal" aria-hidden /> <span className="truncate">{request.place}</span></span>
+                  </span>
                 </button>
               );
             })}

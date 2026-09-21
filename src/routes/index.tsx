@@ -204,7 +204,8 @@ function MapScreen() {
   }, [statusFiltered, selected]);
   return (
     <div className="home-marketplace fixed inset-0 overflow-hidden bg-surface">
-      <div className="absolute inset-0 brightness-[0.58] contrast-[1.18] saturate-[0.82]">
+      {/* Full-bleed immersive canvas: the live map fills the screen edge to edge. */}
+      <div className="absolute inset-0 brightness-[0.66] contrast-[1.22] saturate-[0.88]">
         <MapCanvas
           requests={mapRequests}
           selectedId={selectedId}
@@ -218,7 +219,12 @@ function MapScreen() {
           styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
         />
       </div>
-      {!mapExpanded && <div className="pointer-events-none absolute inset-0 bg-background/20" aria-hidden />}
+      {!mapExpanded && (
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_0%,color-mix(in_oklab,var(--color-background)_72%,transparent),transparent_70%)]"
+          aria-hidden
+        />
+      )}
 
       <div className="pointer-events-none absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] flex items-center gap-2 md:left-4">
         <button
