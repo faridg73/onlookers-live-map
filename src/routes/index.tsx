@@ -89,11 +89,15 @@ function MapScreen() {
   useEffect(() => {
     if (!at) return;
     const [lat, lng] = at.split(",").map((n) => Number.parseFloat(n)) as [number, number];
-    if (Number.isFinite(lat) && Number.isFinite(lng)) setCenterTarget({ lat, lng, zoom: 16 });
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      setCenterTarget({ lat, lng, zoom: 16 });
+      setMapExpanded(true);
+    }
   }, [at]);
 
   const handleSearchPick = useCallback((place: GeocodeResult) => {
     setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
+    setMapExpanded(true);
     setSearchOpen(false);
     setSearchQuery("");
   }, []);
@@ -146,6 +150,7 @@ function MapScreen() {
     if (!target) return;
     centeredOnBounty.current = b;
     setCenterTarget({ ...requestMapPosition(target), zoom: 16 });
+    setMapExpanded(true);
   }, [b, requests, select]);
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
@@ -198,32 +203,36 @@ function MapScreen() {
     return [...statusFiltered, selected];
   }, [statusFiltered, selected]);
   return (
-    <div className="home-marketplace fixed inset-0">
-      <MapCanvas
-        requests={mapRequests}
-        selectedId={selectedId}
-        onSelect={select}
-        onUserPositionChange={setUserPosition}
-        centerTarget={centerTarget}
-        viewportStorageKey="onlooker:map:home"
-        mapTypeId={homeMapType}
-        showNativeMapTypeControl={false}
+    <div className="home-marketplace fixed inset-0 overflow-hidden bg-surface">
+      {mapExpanded ? (
+        <MapCanvas
+          requests={mapRequests}
+          selectedId={selectedId}
+          onSelect={select}
+          onUserPositionChange={setUserPosition}
+          centerTarget={centerTarget}
+          viewportStorageKey="onlooker:map:home"
+          mapTypeId={homeMapType}
+          showNativeMapTypeControl={false}
           controlsTopClass="top-[calc(env(safe-area-inset-top,0px)+10rem)] sm:top-[calc(env(safe-area-inset-top,0px)+8.5rem)]"
-        styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
-      />
+          styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
+        />
+      ) : (
+        <div className="absolute inset-0 bg-surface" aria-hidden />
+      )}
 
       <div className="pointer-events-none absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] flex items-center gap-2 md:left-4">
         <button
           type="button"
           onClick={() => setMapExpanded((value) => !value)}
           aria-pressed={mapExpanded}
-          aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
-          className="pointer-events-auto grid size-10 shrink-0 place-items-center rounded-xl border border-home-line bg-home-glass-strong text-home-accent shadow-xl backdrop-blur-2xl transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/60 hover:bg-home-glass active:translate-y-0"
+          aria-label={mapExpanded ? "Close map view" : "Open live map"}
+          className="pointer-events-auto grid size-10 shrink-0 place-items-center rounded-xl border border-signal/70 bg-background text-signal shadow-[0_0_16px_color-mix(in_oklab,var(--color-signal)_24%,transparent)] transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-signal hover:bg-signal/10 active:translate-y-0"
         >
           {mapExpanded ? (
             <Minimize2 className="size-4" aria-hidden />
           ) : (
-            <Maximize2 className="size-4" aria-hidden />
+            <Map className="size-4" aria-hidden />
           )}
         </button>
         {searchOpen ? (
@@ -259,7 +268,7 @@ function MapScreen() {
         )}
       </div>
 
-      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.35rem)] z-[65] flex h-8 items-center gap-1 rounded-lg border border-home-line bg-home-glass-strong pl-2 pr-1 shadow-xl backdrop-blur-2xl md:left-4">
+      {mapExpanded && <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.35rem)] z-[65] flex h-8 items-center gap-1 rounded-lg border border-home-line bg-home-glass-strong pl-2 pr-1 shadow-xl backdrop-blur-2xl md:left-4">
         <label className="flex items-center gap-1" aria-label="Show map labels">
           <input
             type="checkbox"
@@ -291,7 +300,7 @@ function MapScreen() {
             </>
           )}
         </button>
-      </div>
+      </div>}
 
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
@@ -319,12 +328,14 @@ function MapScreen() {
         onGoLive={() => void navigate({ to: "/post", search: { mode: "broadcast" } })}
         onPostBounty={() => void navigate({ to: "/post", search: { mode: "bounty" } })}
         onOpenRequest={(request) => {
+          setMapExpanded(true);
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
         }}
         hotSpot={hotSpotRequest}
         hotSpotRequests={hotSpotRequests}
         onOpenHighBounty={(request) => {
+          setMapExpanded(true);
           setMapFilter("high");
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 15 });
@@ -333,6 +344,7 @@ function MapScreen() {
           void navigate({ to: "/live/$id", params: { id: request.id } });
         }}
         onOpenEmergency={(request) => {
+          setMapExpanded(true);
           setMapFilter("all");
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 16 });
@@ -341,6 +353,7 @@ function MapScreen() {
           void navigate({ to: "/hunt" });
         }}
         onOpenHotSpot={(request) => {
+          setMapExpanded(true);
           setMapFilter("nearby");
           select(request.id);
           setCenterTarget({ ...requestMapPosition(request), zoom: 14 });
