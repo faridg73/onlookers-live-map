@@ -93,7 +93,7 @@ function DiscoverHome() {
     <div className="discover-inter app-shell pb-28 pt-safe">
       <RadarAlerts />
 
-      <h1 className="text-center font-display text-3xl tracking-tight text-foreground">
+      <h1 className="text-center font-display text-3xl tracking-tight text-signal">
         Browse <span className="text-signal">places</span>
       </h1>
       <p className="mt-1 text-center text-sm text-foreground/90">
