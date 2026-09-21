@@ -1,10 +1,15 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /** One publicly shared clip, with short-lived playback links attached. */
 export type ExploreClip = {
   id: string;
+  /** Owner id — powers the per-card Delete option; not shown publicly. */
+  uploaderId: string;
+  latitude: number | null;
+  longitude: number | null;
   title: string;
   place: string;
   note: string;
