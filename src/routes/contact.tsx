@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { MessageSquare, Send, Headphones } from "lucide-react";
+import { MessageSquare, Send, Headphones, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { submitSupportTicket } from "@/lib/support.functions";
 
@@ -40,6 +40,7 @@ const SUBJECTS = [
 
 function ContactScreen() {
   const { user } = useAuth();
+  const router = useRouter();
   const [form, setForm] = useState({
     name: user?.user_metadata?.["full_name"] ?? "",
     email: user?.email ?? "",
@@ -79,20 +80,34 @@ function ContactScreen() {
     }
   }
 
+  function handleClose() {
+    if (window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
+    } else {
+      void router.navigate({ to: "/" });
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
-      <header className="flex items-start gap-3">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
-          <Headphones className="size-6" />
+      <header className="relative flex flex-col items-center text-center">
+        <button
+          type="button"
+          onClick={handleClose}
+          aria-label="Close and go back"
+          className="absolute right-0 top-0 flex size-11 shrink-0 items-center justify-center rounded-full border border-signal bg-signal/10 text-signal shadow-[0_0_12px_rgba(204,255,0,0.35)] transition hover:bg-signal hover:text-signal-foreground active:scale-95"
+        >
+          <X className="size-5" strokeWidth={2.5} />
+        </button>
+        <div className="flex size-11 items-center justify-center rounded-2xl bg-signal text-signal-foreground">
+          <Headphones className="size-5" />
         </div>
-        <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground">
-            Contact &amp; <span className="text-signal">Support</span>
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Questions about bounties, payouts, disputes, or your account? Send us a message.
-          </p>
-        </div>
+        <h1 className="mt-2 font-display text-xl tracking-tight text-signal">
+          Contact &amp; Support
+        </h1>
+        <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
+          Questions about bounties, payouts, disputes, or your account? Send us a message.
+        </p>
       </header>
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
