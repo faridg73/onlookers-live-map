@@ -73,7 +73,7 @@ function DiscoverHome() {
 
   const eventsGroup = discoveryGroupBySlug("events");
   const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
-    maxResults: 8,
+    maxResults: 20,
   });
   const eventPhoto = usePlacePhotos(eventPlaces);
 
