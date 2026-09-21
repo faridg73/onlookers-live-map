@@ -4,7 +4,7 @@ import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCreditWords, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";
 
-const PRESETS = [20, 40, 80, 100];
+const PRESETS = [40, 80, 100, 150];
 
 /** How much the +/- buttons move the custom amount. */
 const STEP = 5;

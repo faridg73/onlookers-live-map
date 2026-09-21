@@ -10,7 +10,7 @@ import { safeMultiline, safeText } from "@/lib/sanitize";
 import { assertHuman } from "@/lib/turnstile.functions";
 
 /** Smallest bounty we accept, so a request is always worth someone's walk. */
-export const MIN_BOUNTY = 20;
+export const MIN_BOUNTY = 40;
 
 /**
  * Unique 6-digit on-site PIN for a real estate bounty, drawn from the crypto
