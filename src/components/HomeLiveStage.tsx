@@ -113,9 +113,12 @@ export function HomeLiveStage({
       const el = tickerRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const navAllowance = window.innerWidth >= 1024 ? 104 : 96;
+      const nav = document.querySelector("nav");
+      const navRect = nav?.getBoundingClientRect();
+      const navAllowance = navRect && navRect.height > 0 ? Math.max(0, window.innerHeight - navRect.top) + 8 : 96;
       const gap = 8;
       const spaceBelow = window.innerHeight - rect.bottom - gap - navAllowance;
+
       const spaceAbove = rect.top - gap - 12;
       const width = Math.min(rect.width, window.innerWidth - 16);
       const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
