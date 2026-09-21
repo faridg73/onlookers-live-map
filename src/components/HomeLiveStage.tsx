@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
+import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
 
 type LiveFeedKey = "emergency" | "bounty" | "stream" | "dispatches" | "hotspot";
@@ -332,9 +333,11 @@ export function HomeLiveStage({
                   onClick={() => live ? onOpenLive(request) : onOpenRequest(request)}
                   className="group relative flex w-[13.5rem] shrink-0 snap-start gap-2.5 overflow-hidden rounded-2xl border border-signal/30 bg-home-glass-strong p-2.5 text-left shadow-[0_10px_30px_color-mix(in_oklab,var(--color-background)_60%,transparent)] backdrop-blur-2xl transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
                 >
-                  {/* Creator tile: real handle initials, no placeholder media. */}
-                  <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--color-signal)_22%,transparent),transparent_70%)]">
-                    <span className="font-mono text-[0.72rem] font-bold tracking-tight text-signal">{initials}</span>
+                  {/* Visual preview: category cover art with creator initials badge. */}
+                  <span className="relative grid size-[3.25rem] shrink-0 place-items-center overflow-hidden rounded-xl border border-signal/35">
+                    <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                    <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden />
+                    <span className="absolute left-1 top-1 rounded-md border border-signal/50 bg-background/75 px-1 py-px font-mono text-[0.55rem] font-bold tracking-tight text-signal backdrop-blur-sm">{initials}</span>
                     {live && (
                       <span className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-0.5 bg-live/85 py-[1px] text-[0.45rem] font-extrabold uppercase tracking-widest text-background">
                         <span className="size-1 animate-pulse rounded-full bg-background motion-reduce:animate-none" aria-hidden /> live
