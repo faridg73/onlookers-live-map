@@ -80,7 +80,7 @@ export function AreaPicker() {
       <div className="flex items-center gap-2">
         <MapPin className="size-4 shrink-0 text-signal" aria-hidden />
         <div className="min-w-0 flex-1">
-          <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
             Showing spots near
           </p>
           <p className="truncate text-sm font-bold text-foreground">{area.label}</p>
