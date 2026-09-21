@@ -49,6 +49,17 @@ export function AppMenu() {
   // Current path so the drawer highlights the page you're on when reopened.
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
+  // Reopening the drawer keeps your place: the active item is scrolled into
+  // view instead of the list resetting to the top. Wait for the sheet to
+  // finish mounting so the scroll lands after layout.
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => {
+      activeLinkRef.current?.scrollIntoView({ block: "center" });
+    }, 60);
+    return () => window.clearTimeout(id);
+  }, [open]);
+
   return (
     <>
       <button
