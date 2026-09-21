@@ -125,6 +125,18 @@
   }
 }
 
+/* Bright yellow highlight for the location search box under "Use my location" */
+.location-search-highlight {
+  border: 2px solid rgba(250, 204, 21, 0.9);
+  box-shadow: 0 0 12px 1px rgba(250, 204, 21, 0.4);
+}
+
+.location-search-highlight:focus {
+  border-color: rgba(250, 204, 21, 1);
+  box-shadow: 0 0 18px 3px rgba(250, 204, 21, 0.6);
+  outline: none;
+}
+
 @keyframes live-ticker {
   from {
     transform: translateX(0);
