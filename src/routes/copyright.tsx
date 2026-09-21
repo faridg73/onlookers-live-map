@@ -115,27 +115,27 @@ function CopyrightPage() {
 
       <Section title="3. Where to submit your notice">
         <p>
-          Please deliver all infringement notifications to our Designated Agent at:{" "}
-          <a
-            href="mailto:support@onlookerlive.com?subject=DMCA%20Takedown%20Notice"
+          Please deliver all infringement notifications to our Designated Agent through the{" "}
+          <Link
+            to="/contact"
             className="font-semibold text-foreground underline underline-offset-4"
           >
-            support@onlookerlive.com
-          </a>{" "}
-          (Subject Line: DMCA Takedown Notice).
+            Contact &amp; Support page
+          </Link>{" "}
+          (Subject: DMCA Takedown Notice).
         </p>
       </Section>
 
       <Section title="4. Counter-notifications">
         <p>
           If you believe that your content was removed or disabled by mistake or misidentification, you
-          may file a counter-notification with us by sending a written communication to{" "}
-          <a
-            href="mailto:support@onlookerlive.com"
+          may file a counter-notification with us through the{" "}
+          <Link
+            to="/contact"
             className="font-semibold text-foreground underline underline-offset-4"
           >
-            support@onlookerlive.com
-          </a>
+            Contact &amp; Support page
+          </Link>
           . Your counter-notification must include your physical or electronic signature,
           identification of the material that was removed, and a statement under penalty of perjury
           that you have a good faith belief that the material was removed as a result of mistake or
