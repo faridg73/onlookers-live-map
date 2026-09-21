@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { fetchTrendingEvents, type LiveEvent } from "@/lib/events.functions";
+import { fetchLocalUserEvents } from "@/lib/local-events";
+import { distanceMiles } from "@/lib/onlooker";
 import type { DiscoveryArea } from "@/hooks/use-discovery-area";
 
 type Options = {
@@ -20,18 +22,32 @@ export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    void fetchTrendingEvents({
-      data: {
-        latitude: area.latitude,
-        longitude: area.longitude,
-        radiusMiles,
-        weekendOnly,
-        size,
-        scope,
-      },
-    })
-      .then((result) => {
-        if (!cancelled) setEvents(result);
+    const center = { lat: area.latitude, lng: area.longitude };
+    void Promise.all([
+      fetchTrendingEvents({
+        data: {
+          latitude: area.latitude,
+          longitude: area.longitude,
+          radiusMiles,
+          weekendOnly,
+          size,
+          scope,
+        },
+      }).catch(() => [] as LiveEvent[]),
+      // Real listings posted by members sit alongside the ticketed events.
+      scope === "major"
+        ? Promise.resolve([] as LiveEvent[])
+        : fetchLocalUserEvents().catch(() => [] as LiveEvent[]),
+    ])
+      .then(([provider, local]) => {
+        if (cancelled) return;
+        const nearby = local.filter((event) => {
+          if (event.latitude === null || event.longitude === null) return true;
+          return (
+            distanceMiles(center, { lat: event.latitude, lng: event.longitude }) <= radiusMiles
+          );
+        });
+        setEvents([...nearby, ...provider]);
       })
       .catch(() => {
         if (!cancelled) setEvents([]);

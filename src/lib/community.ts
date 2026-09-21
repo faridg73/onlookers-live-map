@@ -192,6 +192,8 @@ export type CommunityPost = {
   pinnedUntil: string | null;
   pinnedCredits: number;
   createdAt: string;
+  /** Set when the post is a real local event listing with a start date and time. */
+  eventStartsAt: string | null;
   authorName: string;
   authorAvatar: string | null;
   hunterLevel: number;
@@ -208,7 +210,7 @@ export type CommunityPost = {
 
 const BUCKET = "chat-attachments";
 const COLUMNS =
-  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at, report_incident_type, report_radius_m, media_analysis_status, reporter_trust_level, validation_count, flag_count, trust_score, report_status";
+  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at, event_starts_at, report_incident_type, report_radius_m, media_analysis_status, reporter_trust_level, validation_count, flag_count, trust_score, report_status";
 
 function isPinned(post: { pinnedUntil: string | null }) {
   return Boolean(post.pinnedUntil && new Date(post.pinnedUntil).getTime() > Date.now());
@@ -245,6 +247,7 @@ async function listPublicCommunityPosts(
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
+    eventStartsAt: r.event_starts_at ?? null,
     authorName: r.author_name ?? "Onlooker",
     authorAvatar: null,
     hunterLevel: r.hunter_level ?? 1,
@@ -310,6 +313,7 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
+    eventStartsAt: r.event_starts_at ?? null,
     authorName: authors.get(r.user_id)?.name ?? "Onlooker",
     authorAvatar: authors.get(r.user_id)?.avatar ?? null,
     hunterLevel: authors.get(r.user_id)?.level ?? 1,
@@ -374,6 +378,8 @@ export async function createCommunityPost(input: {
   reportIncidentType?: string | null;
   reportRadiusM?: number | null;
   mediaAnalysisStatus?: "not_required" | "analyzing" | "complete";
+  /** ISO start time when this post is a real local event listing. */
+  eventStartsAt?: string | null;
 }): Promise<string> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Sign in to post.");
@@ -400,6 +406,7 @@ export async function createCommunityPost(input: {
       report_incident_type: input.reportIncidentType ?? null,
       report_radius_m: input.reportRadiusM ?? null,
       media_analysis_status: input.mediaAnalysisStatus ?? "not_required",
+      event_starts_at: input.eventStartsAt ?? null,
     })
     .select("id")
     .single();

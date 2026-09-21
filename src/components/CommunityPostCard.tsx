@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { AlertTriangle, BadgeCheck, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertTriangle, BadgeCheck, CalendarDays, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { ShareToSocialButton } from "@/components/ShareToSocialButton";
@@ -35,6 +35,7 @@ export function CommunityPostCard({
   isMine,
   distanceLabel,
   onShowOnMap,
+  onTagClick,
   onChanged,
 }: {
   post: CommunityPost;
@@ -42,6 +43,8 @@ export function CommunityPostCard({
   isMine: boolean;
   distanceLabel?: string;
   onShowOnMap?: () => void;
+  /** Opens the map filtered to that hashtag, same as picking a vibe. */
+  onTagClick?: (tag: string) => void;
   onChanged: () => void;
 }) {
   const { user } = useAuth();
@@ -173,6 +176,19 @@ export function CommunityPostCard({
           </div>
         )}
 
+        {post.eventStartsAt && (
+          <p className="mt-2 inline-flex items-center gap-1 rounded-md border border-signal/60 bg-signal/10 px-2 py-1 text-[0.65rem] font-extrabold text-signal">
+            <CalendarDays className="size-3" />
+            {new Date(post.eventStartsAt).toLocaleString(undefined, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </p>
+        )}
+
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.68rem] text-muted-foreground">
           {post.place && (
             <span className="inline-flex min-w-0 items-center gap-1">
@@ -187,14 +203,26 @@ export function CommunityPostCard({
 
         {post.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {post.tags.slice(0, 2).map((t) => (
-              <span
-                key={t}
-                className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
-              >
-                #{t}
-              </span>
-            ))}
+            {post.tags.slice(0, 4).map((t) =>
+              onTagClick ? (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => onTagClick(t)}
+                  title={`Open the map filtered to #${t}`}
+                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal transition-colors hover:border-signal hover:bg-signal/15"
+                >
+                  #{t}
+                </button>
+              ) : (
+                <span
+                  key={t}
+                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
+                >
+                  #{t}
+                </span>
+              ),
+            )}
           </div>
         )}
 

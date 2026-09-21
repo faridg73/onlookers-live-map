@@ -14,6 +14,7 @@ const SOURCE_LABEL: Record<LiveEvent["source"], string> = {
   ticketmaster: "Ticketmaster",
   seatgeek: "SeatGeek",
   eventbrite: "Eventbrite",
+  onlooker: "Posted by a member",
 };
 
 function eventVenue(event: LiveEvent): Venue | null {
@@ -124,15 +125,24 @@ export function EventCard({ event, liveCount }: Props) {
           </span>
         )}
 
-        <a
-          href={event.ticketUrl}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-          className="flex items-center justify-center gap-2 border-l border-border py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-surface-raised"
-        >
-          <Ticket className="size-4" aria-hidden /> Tickets
-          <ExternalLink className="size-3" aria-hidden />
-        </a>
+        {event.source === "onlooker" ? (
+          <a
+            href={event.ticketUrl}
+            className="flex items-center justify-center gap-2 border-l border-border py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-surface-raised"
+          >
+            <MapPin className="size-4" aria-hidden /> See on map
+          </a>
+        ) : (
+          <a
+            href={event.ticketUrl}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="flex items-center justify-center gap-2 border-l border-border py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-surface-raised"
+          >
+            <Ticket className="size-4" aria-hidden /> Tickets
+            <ExternalLink className="size-3" aria-hidden />
+          </a>
+        )}
       </div>
     </article>
   );
