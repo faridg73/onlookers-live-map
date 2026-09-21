@@ -28,7 +28,7 @@ export function LegalConsent({
           checked={accepted}
           onChange={(e) => onChange(e.target.checked)}
           aria-describedby="accept-legal-text"
-          className="mt-0.5 h-4 w-4 shrink-0 accent-signal"
+          className="mt-0.5 size-5 shrink-0 accent-signal"
         />
         <span id="accept-legal-text">
           <label htmlFor="accept-legal" className="cursor-pointer">

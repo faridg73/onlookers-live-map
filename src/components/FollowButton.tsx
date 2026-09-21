@@ -119,7 +119,9 @@ export function FollowButton({
       aria-pressed={following}
       className={cn(
         "inline-flex shrink-0 items-center gap-1 rounded-full border font-extrabold uppercase tracking-wide transition-colors disabled:opacity-60",
-        size === "md" ? "px-3 py-1.5 text-[0.7rem]" : "px-2 py-0.5 text-[0.62rem]",
+        size === "md"
+          ? "min-h-9 px-3 py-1.5 text-[0.7rem]"
+          : "min-h-8 px-2.5 py-1 text-[0.62rem]",
         following
           ? "border-signal/50 bg-signal/15 text-signal"
           : "border-border bg-surface-raised text-foreground hover:border-signal/50 hover:text-signal",

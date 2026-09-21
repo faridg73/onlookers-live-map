@@ -336,7 +336,7 @@ function CommunityHub() {
   );
 
   return (
-    <main className="min-h-dvh overflow-x-hidden bg-background pb-28">
+    <main className="min-h-dvh overflow-x-hidden bg-background pb-[calc(9rem+env(safe-area-inset-bottom))]">
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <div className="flex items-start justify-between gap-3">
@@ -565,7 +565,7 @@ function CommunityHub() {
             variant="outline"
             size="sm"
             onClick={() => setTag(tag === t ? null : t)}
-            className={`h-7 shrink-0 rounded-full px-2.5 text-[0.68rem] font-semibold ${
+            className={`h-9 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold ${
               tag === t ? "border-signal bg-signal/10 text-signal" : "text-muted-foreground"
             }`}
           >
