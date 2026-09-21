@@ -234,14 +234,16 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
     <div className="mx-auto max-w-2xl animate-rise space-y-5">
       <div className="flex items-start gap-3 rounded-xl border border-signal/40 bg-signal/5 p-3">
         <Radio className="mt-0.5 size-5 shrink-0 text-signal" />
-        <p className="text-xs font-medium text-muted-foreground">
+        <p className="text-xs font-medium text-foreground/90">
           <span className="block font-extrabold text-foreground">Free social broadcast</span>
-          Nothing is held from your wallet. Your followers and people nearby get it on Discover.
+          <span className="text-signal">
+            Nothing is held from your wallet. Your followers and people nearby get it on Discover.
+          </span>
         </p>
       </div>
 
       <label className="block space-y-1.5">
-        <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-foreground">
           What are you showing?
         </span>
         <input
@@ -253,7 +255,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </label>
 
       <label className="block space-y-1.5">
-        <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-foreground">
           Details (optional)
         </span>
         <textarea
@@ -266,8 +268,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </label>
 
       <div className="rounded-xl border border-border bg-background p-3">
-        <p className="mb-2 text-[0.65rem] font-bold uppercase text-muted-foreground">
-          Category & vibe
+        <p className="mb-2 text-[0.65rem] font-bold uppercase text-foreground">
+          Category &amp; vibe
         </p>
         <BroadcastCategoryPicker
           categoryId={categoryId}
@@ -280,7 +282,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Audience visibility</p>
+        <p className="text-xs font-bold uppercase text-foreground">Audience visibility</p>
         <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {BROADCAST_AUDIENCES.map((option) => {
             const active = audience === option.id;
@@ -301,7 +303,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
                   {option.label}
                   <span
                     className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${
-                      active ? "text-signal/80" : "text-muted-foreground"
+                      active ? "text-signal/80" : "text-signal"
                     }`}
                   >
                     {option.hint}
@@ -314,7 +316,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Pre-broadcast checks</p>
+        <p className="text-xs font-bold uppercase text-foreground">Pre-broadcast checks</p>
         <div className="mt-2 flex items-center gap-3">
           <Button
             type="button"
@@ -337,8 +339,8 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           >
             <SwitchCamera className="size-4" />
           </Button>
-          <p className="text-xs font-medium text-muted-foreground">
-            <Camera className="mr-1 inline size-3.5 text-signal" />
+          <p className="text-xs font-medium text-signal">
+            <Camera className="mr-1 inline size-3.5" />
             {facing === "environment" ? "Rear camera" : "Front camera"} ·{" "}
             {micOn ? "Mic on" : "Mic muted"}
           </p>
@@ -346,7 +348,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Stay on the feed for</p>
+        <p className="text-xs font-bold uppercase text-foreground">Stay on the feed for</p>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {BROADCAST_WINDOWS.map((option) => (
             <Button
@@ -362,7 +364,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
               {option.label}
               <span
                 className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${
-                  hours === option.hours ? "text-signal-foreground/80" : "text-muted-foreground"
+                  hours === option.hours ? "text-signal-foreground/80" : "text-signal"
                 }`}
               >
                 {option.tier}
@@ -373,7 +375,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       </div>
 
       <div>
-        <p className="text-xs font-bold uppercase text-muted-foreground">Location tag</p>
+        <p className="text-xs font-bold uppercase text-foreground">Location tag</p>
         <p className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full border border-signal/40 bg-signal/10 px-2.5 py-1 text-xs font-extrabold text-signal">
           <MapPin className="size-3.5 shrink-0" />
           <span className="truncate">{place.trim() || "No spot picked yet"}</span>
@@ -417,7 +419,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           onChange={(event) => setAgreed(event.target.checked)}
           className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--signal))]"
         />
-        <span className="text-xs font-medium leading-snug text-muted-foreground">
+        <span className="text-xs font-medium leading-snug text-signal">
           <span className="font-extrabold uppercase tracking-[0.12em] text-foreground">
             Safety reminder
           </span>{" "}
@@ -434,7 +436,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         <Radio className="size-4" />
         {posting ? "Starting…" : "Go live free"}
       </Button>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-signal">
         Want targeted eyes on a place instead?{" "}
         <button type="button" onClick={onSwitchToBounty} className="font-bold text-signal underline">
           Post a paid flash bounty
