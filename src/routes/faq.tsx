@@ -23,13 +23,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "Help Center | Onlooker LLC" },
+      { title: "Help Center | Onlooker" },
       {
         name: "description",
         content:
-          "Get help with Onlooker LLC bounties, payouts, community reporting, live media, real estate verification, account safety, and compliance.",
+          "Get help with Onlooker bounties, payouts, community reporting, live media, real estate verification, account safety, and compliance.",
       },
-      { property: "og:title", content: "Onlooker LLC Help Center" },
+      { property: "og:title", content: "Onlooker Help Center" },
       {
         property: "og:description",
         content:
@@ -67,7 +67,7 @@ const CATEGORIES: FAQCategory[] = [
       },
       {
         question: "How are bounty payments split?",
-        answer: `For an accepted fulfillment, 85% of the bounty goes to the onlooker who captured the media and 15% is retained by Onlooker LLC as the platform fee. For example, an 80-Credit bounty pays 68 Credits to the onlooker. The complete amount and split are shown before the poster confirms the request.`,
+        answer: `For an accepted fulfillment, 85% of the bounty goes to the onlooker who captured the media and 15% is retained by Onlooker as the platform fee. For example, an 80-Credit bounty pays 68 Credits to the onlooker. The complete amount and split are shown before the poster confirms the request.`,
       },
       {
         question: "What is the two-hour review window?",
@@ -103,7 +103,7 @@ const CATEGORIES: FAQCategory[] = [
         answer: `Report only what you can observe accurately. Do not submit pranks, guesses presented as facts, staged incidents, private information, or content that puts anyone in danger. Every reporter must accept the false-report pledge before submitting. Intentional false reports may result in immediate suspension and a permanent platform ban.`,
       },
       {
-        question: "Does Onlooker LLC replace emergency services?",
+        question: "Does Onlooker replace emergency services?",
         answer: `No. Community reports are informational, community-driven updates and are not an emergency dispatch service. Do not approach danger or interfere with responders. For a life-threatening emergency, leave the area when appropriate and call 911 or the applicable local emergency number first.`,
       },
     ],
@@ -129,7 +129,7 @@ const CATEGORIES: FAQCategory[] = [
       },
       {
         question: "Who can see my broadcast or submitted media?",
-        answer: `Visibility follows the audience selected at posting and the purpose of the content. Public or nearby broadcasts may appear in discovery surfaces, while bounty media is shared through the request and review flow. Onlooker LLC may retain and review relevant media for safety, disputes, legal compliance, and enforcement as described in the Privacy Policy and Terms of Service.`,
+        answer: `Visibility follows the audience selected at posting and the purpose of the content. Public or nearby broadcasts may appear in discovery surfaces, while bounty media is shared through the request and review flow. Onlooker may retain and review relevant media for safety, disputes, legal compliance, and enforcement as described in the Privacy Policy and Terms of Service.`,
       },
     ],
   },
@@ -146,7 +146,7 @@ const CATEGORIES: FAQCategory[] = [
       },
       {
         question: "How does the six-digit agent PIN handshake work?",
-        answer: `When a qualifying real-estate bounty is posted, Onlooker LLC generates a unique six-digit on-site PIN for that bounty. The PIN is stored securely and sent to the supplied listing-agent phone number or email. The agent gives it directly to the onlooker at the property. The onlooker enters it in the check-in screen to prove an on-site handshake.`,
+        answer: `When a qualifying real-estate bounty is posted, Onlooker generates a unique six-digit on-site PIN for that bounty. The PIN is stored securely and sent to the supplied listing-agent phone number or email. The agent gives it directly to the onlooker at the property. The onlooker enters it in the check-in screen to prove an on-site handshake.`,
       },
       {
         question: "When is a real-estate payout unlocked?",
@@ -175,11 +175,11 @@ const CATEGORIES: FAQCategory[] = [
       },
       {
         question: "What happens to my account data and how can I delete it?",
-        answer: `You can update your profile information and photo from Profile. The Privacy Policy explains how Onlooker LLC handles account information, precise location, media, transactions, and safety records. Account deletion is available in Profile settings and requires typing DELETE to confirm permanent data loss. Some records may be retained when legally required or necessary for fraud, disputes, and platform safety.`,
+        answer: `You can update your profile information and photo from Profile. The Privacy Policy explains how Onlooker handles account information, precise location, media, transactions, and safety records. Account deletion is available in Profile settings and requires typing DELETE to confirm permanent data loss. Some records may be retained when legally required or necessary for fraud, disputes, and platform safety.`,
       },
       {
-        question: "What legal policies apply to using Onlooker LLC?",
-        answer: `Use of the platform is governed by the Terms of Service and Privacy Policy, including lawful recording, location use, content rights, risk, prohibited conduct, payment rules, and enforcement. Onlooker LLC respects intellectual-property rights and maintains a DMCA and Copyright Infringement Policy for takedown notices and counter-notifications. Users may not rebroadcast protected streams, tickets, barcodes, or third-party digital interfaces.`,
+        question: "What legal policies apply to using Onlooker?",
+        answer: `Use of the platform is governed by the Terms of Service and Privacy Policy, including lawful recording, location use, content rights, risk, prohibited conduct, payment rules, and enforcement. Onlooker respects intellectual-property rights and maintains a DMCA and Copyright Infringement Policy for takedown notices and counter-notifications. Users may not rebroadcast protected streams, tickets, barcodes, or third-party digital interfaces.`,
       },
       {
         question: "Where can I read the complete legal terms?",
@@ -248,7 +248,7 @@ function FAQScreen() {
             <HelpCircle className="size-6" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase text-signal">Onlooker LLC</p>
+            <p className="text-xs font-bold uppercase text-signal">Onlooker</p>
             <h1 className="font-display text-2xl text-foreground">Help <span className="text-signal">Center</span></h1>
             <p className="mt-1 text-sm text-muted-foreground">Clear answers for every part of the platform.</p>
           </div>
