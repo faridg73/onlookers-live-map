@@ -740,14 +740,14 @@ function PostScreen() {
               </p>
               <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
                 {mode === null
-                  ? "Broadcast or bounty?"
+                  ? <>Broadcast or <span className="text-signal">bounty?</span></>
                   : mode === "broadcast"
-                    ? "Stream to your followers"
+                    ? <>Stream to your <span className="text-signal">followers</span></>
                     : step === 1
-                      ? "What and where?"
+                      ? <>What and <span className="text-signal">where?</span></>
                       : step === 2
-                        ? "How should it be captured?"
-                        : "Reward & escrow"}
+                        ? <>How should it be <span className="text-signal">captured?</span></>
+                        : <>Reward &amp; <span className="text-signal">escrow</span></>}
               </h1>
             </div>
             <Button type="button" variant="secondary" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 shadow-sm">

@@ -89,7 +89,7 @@ function DisputesScreen() {
       <header className="flex items-start gap-3">
         <ShieldAlert className="mt-1 size-6 text-signal" />
         <div>
-          <h1 className="font-display text-2xl text-foreground">Dispute center</h1>
+          <h1 className="font-display text-2xl text-foreground"><span className="text-signal">Dispute</span> center</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             The bounty stays locked in escrow while a dispute is open. Add evidence here, a
             moderator reviews both sides and releases or refunds the money.

@@ -249,7 +249,7 @@ function FAQScreen() {
           </div>
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase text-signal">Onlooker LLC</p>
-            <h1 className="font-display text-2xl text-foreground">Help Center</h1>
+            <h1 className="font-display text-2xl text-foreground">Help <span className="text-signal">Center</span></h1>
             <p className="mt-1 text-sm text-muted-foreground">Clear answers for every part of the platform.</p>
           </div>
         </div>

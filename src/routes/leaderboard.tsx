@@ -35,7 +35,7 @@ function LeaderboardPage() {
           <Trophy className="size-6" />
         </span>
         <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground">Top reporters</h1>
+          <h1 className="font-display text-2xl tracking-tight text-foreground">Top <span className="text-signal">reporters</span></h1>
           <p className="text-sm text-muted-foreground">
             Ranked by real bounty cash paid out for live views.
           </p>

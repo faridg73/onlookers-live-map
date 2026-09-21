@@ -68,7 +68,7 @@ function ExplorePage() {
 
   return (
     <main className="app-shell pb-28 pt-[max(env(safe-area-inset-top),2rem)]">
-      <h1 className="font-display text-3xl text-foreground">Explore</h1>
+      <h1 className="font-display text-3xl text-foreground"><span className="text-signal">Explore</span></h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Live views captured by Onlookers around the world and down the street.
       </p>

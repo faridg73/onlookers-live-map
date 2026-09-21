@@ -38,7 +38,7 @@ function TermsPage() {
     <div className="reading-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Onlooker LLC Terms of Service &amp; Legal Disclaimer
+          Onlooker LLC <span className="text-signal">Terms of Service</span> &amp; Legal Disclaimer
         </h1>
         <button
           type="button"

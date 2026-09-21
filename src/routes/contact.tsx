@@ -87,7 +87,7 @@ function ContactScreen() {
         </div>
         <div>
           <h1 className="font-display text-2xl tracking-tight text-foreground">
-            Contact &amp; Support
+            Contact &amp; <span className="text-signal">Support</span>
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Questions about bounties, payouts, disputes, or your account? Send us a message.

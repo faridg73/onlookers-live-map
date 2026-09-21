@@ -66,7 +66,7 @@ function DmcaPage() {
             <ShieldAlert className="size-5" />
           </span>
           <h1 className="font-display text-xl font-extrabold text-foreground">
-            DMCA / Report Infringement
+            DMCA / <span className="text-signal">Report Infringement</span>
           </h1>
         </div>
 

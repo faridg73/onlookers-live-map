@@ -248,7 +248,11 @@ function AuthScreen() {
   return (
     <div className="mx-auto max-w-md px-4 pb-28 pt-10">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
-        {mode === "signin" ? "Sign in" : "Create your account"}
+        {mode === "signin" ? (
+          <>Sign <span className="text-signal">in</span></>
+        ) : (
+          <>Create your <span className="text-signal">account</span></>
+        )}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Sign in to request or film real-world views, entry lines, seat views, queues and venue
