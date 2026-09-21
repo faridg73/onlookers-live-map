@@ -198,7 +198,7 @@ function MapScreen() {
     return [...statusFiltered, selected];
   }, [statusFiltered, selected]);
   return (
-    <div className="home-inter fixed inset-0">
+    <div className="home-marketplace fixed inset-0">
       <MapCanvas
         requests={mapRequests}
         selectedId={selectedId}
@@ -208,7 +208,7 @@ function MapScreen() {
         viewportStorageKey="onlooker:map:home"
         mapTypeId={homeMapType}
         showNativeMapTypeControl={false}
-        controlsTopClass="top-[calc(env(safe-area-inset-top,0px)+9.75rem)]"
+          controlsTopClass="top-[calc(env(safe-area-inset-top,0px)+10rem)] sm:top-[calc(env(safe-area-inset-top,0px)+8.5rem)]"
         styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
       />
 
@@ -218,7 +218,7 @@ function MapScreen() {
           onClick={() => setMapExpanded((value) => !value)}
           aria-pressed={mapExpanded}
           aria-label={mapExpanded ? "Exit full map view" : "Expand map to full screen"}
-          className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110"
+          className="pointer-events-auto grid size-10 shrink-0 place-items-center rounded-xl border border-home-line bg-home-glass-strong text-home-accent shadow-xl backdrop-blur-2xl transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/60 hover:bg-home-glass active:translate-y-0"
         >
           {mapExpanded ? (
             <Minimize2 className="size-4" aria-hidden />
@@ -227,8 +227,8 @@ function MapScreen() {
           )}
         </button>
         {searchOpen ? (
-          <div className="pointer-events-auto flex w-[15rem] max-w-[calc(100vw-6.75rem)] items-center rounded-full border border-border bg-surface/90 py-0.5 pl-3 pr-1 shadow-md backdrop-blur-xl transition-all duration-300 sm:w-[17rem]">
-            <Search className="mr-1.5 size-3.5 shrink-0 text-signal" aria-hidden />
+          <div className="pointer-events-auto flex w-[15rem] max-w-[calc(100vw-6.75rem)] items-center rounded-xl border border-home-line bg-home-glass-strong py-0.5 pl-3 pr-1 shadow-xl backdrop-blur-2xl transition-all duration-300 sm:w-[17rem]">
+            <Search className="mr-1.5 size-3.5 shrink-0 text-home-accent" aria-hidden />
             <PlaceSearchInput
               variant="bare"
               autoFocus
@@ -242,7 +242,7 @@ function MapScreen() {
               type="button"
               onClick={closeSearch}
               aria-label="Close search"
-              className="grid size-7 shrink-0 place-items-center rounded-full text-foreground/70 transition-colors hover:text-signal"
+              className="grid size-7 shrink-0 place-items-center rounded-lg text-foreground/70 transition-colors hover:text-home-accent"
             >
               <X className="size-3.5" aria-hidden />
             </button>
@@ -252,14 +252,14 @@ function MapScreen() {
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="Search places"
-            className="pointer-events-auto grid size-9 shrink-0 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110"
+            className="pointer-events-auto grid size-10 shrink-0 place-items-center rounded-xl border border-home-line bg-home-glass-strong text-home-accent shadow-xl backdrop-blur-2xl transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/60 hover:bg-home-glass active:translate-y-0"
           >
             <Search className="size-4" aria-hidden />
           </button>
         )}
       </div>
 
-      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3rem)] z-[65] flex h-8 items-center gap-1 rounded-full border border-border bg-surface/90 pl-1.5 pr-1 shadow-md backdrop-blur-xl md:left-4">
+      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.35rem)] z-[65] flex h-8 items-center gap-1 rounded-lg border border-home-line bg-home-glass-strong pl-2 pr-1 shadow-xl backdrop-blur-2xl md:left-4">
         <label className="flex items-center gap-1" aria-label="Show map labels">
           <input
             type="checkbox"
@@ -267,7 +267,7 @@ function MapScreen() {
             onChange={(event) => setLabelsVisible(event.target.checked)}
             className="tap-compact size-3.5 accent-signal"
           />
-          <span className="text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-foreground/80">
+          <span className="text-[0.5rem] font-bold uppercase text-foreground/70">
             Labels
           </span>
         </label>
@@ -279,7 +279,7 @@ function MapScreen() {
           aria-label={
             homeMapType === "hybrid" ? "Switch to the plain map view" : "Switch to satellite view"
           }
-          className="tap-compact flex items-center gap-1 rounded-full bg-signal px-2 py-1 text-[0.5rem] font-extrabold uppercase tracking-[0.06em] text-signal-foreground transition-opacity hover:opacity-90"
+          className="tap-compact flex items-center gap-1 rounded-md border border-home-accent/35 bg-home-accent/12 px-2 py-1 text-[0.5rem] font-bold uppercase text-home-accent transition-colors hover:border-home-accent/70 hover:bg-home-accent/20"
         >
           {homeMapType === "hybrid" ? (
             <>
@@ -295,16 +295,16 @@ function MapScreen() {
 
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
-        <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-xl border border-border bg-surface/95 px-2.5 py-2 shadow-lg backdrop-blur-xl md:px-3 md:py-2.5 md:shadow-2xl">
+        <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-2xl border border-home-line bg-home-glass-strong px-2.5 py-2 shadow-2xl backdrop-blur-2xl md:px-3 md:py-2.5">
           <img
             src="/icon-192.png"
             alt="Onlooker logo"
             className="size-10 rounded-lg object-cover md:size-12"
           />
-          <h1 className="text-xs font-extrabold leading-none tracking-tight text-foreground md:text-sm">
+          <h1 className="text-xs font-bold leading-none text-foreground md:text-sm">
             Onlooker
           </h1>
-          <p className="whitespace-nowrap text-[0.55rem] font-bold leading-none text-muted-foreground md:text-[0.6rem]">
+          <p className="whitespace-nowrap text-[0.55rem] font-medium leading-none text-foreground/55 md:text-[0.6rem]">
             Live eyes, anywhere
           </p>
         </div>

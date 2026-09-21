@@ -88,6 +88,10 @@
   --color-pin-medium: var(--pin-medium);
   --color-pin-silver: var(--pin-silver);
   --color-pin-gold: var(--pin-gold);
+  --color-home-accent: var(--home-accent);
+  --color-home-glass: var(--home-glass);
+  --color-home-glass-strong: var(--home-glass-strong);
+  --color-home-line: var(--home-line);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
   --animate-confetti: confetti 2s linear forwards;
@@ -287,6 +291,12 @@
   --input: oklch(0.26862 0 0);
   --ring: oklch(0.93071 0.22858 123.09);
 
+  /* Home marketplace: a quieter, finance-grade glass layer over the live map. */
+  --home-accent: oklch(0.723 0.191 149.58); /* #22c55e */
+  --home-glass: oklch(0.16 0.006 150 / 0.76);
+  --home-glass-strong: oklch(0.13 0.004 150 / 0.9);
+  --home-line: oklch(0.86 0.01 150 / 0.2);
+
   /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
   /* All map markers render in the neon lime signal color; tiers stay
      distinguishable by size and badges. */
@@ -355,11 +365,22 @@
 
 /* Home and Discover pages render entirely in Inter; this unlayered scope
    outranks every per-element font utility (font-display-impact, font-sans, etc.). */
-.home-inter,
-.home-inter *,
 .discover-inter,
 .discover-inter * {
   font-family: var(--font-inter);
+}
+
+.home-marketplace,
+.home-marketplace * {
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.home-marketplace h1,
+.home-marketplace h2,
+.home-marketplace h3,
+.home-marketplace .home-display {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0;
 }
 
 @layer base {
