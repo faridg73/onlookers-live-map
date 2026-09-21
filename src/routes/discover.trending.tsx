@@ -87,8 +87,15 @@ function TrendingScreen() {
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
-    size: 12,
+    size: 50,
   });
+
+  const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
+  const visibleEvents = activeVibe
+    ? []
+    : activeTag
+      ? events.filter((event) => eventMatchesTag(event, activeTag))
+      : events;
 
 
   const buckets = [sports, concerts, fights, gatherings];
