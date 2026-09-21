@@ -226,7 +226,7 @@ export function HomeLiveStage({
           >
             See what&apos;s happening. Right now.
           </h2>
-          <p className="mt-2 max-w-xl whitespace-nowrap text-[0.72rem] font-medium leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.7rem]">
+          <p className="mt-2 max-w-xl whitespace-nowrap text-center text-[0.8rem] font-medium leading-relaxed text-signal sm:text-base [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.78rem]">
             Watch live streams, follow trusted alerts, or post local bounties.
           </p>
 
