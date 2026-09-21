@@ -56,18 +56,21 @@ export type LiveEvent = {
 /* ------------------------------------------------------------------ */
 
 const cache = new Map<string, { at: number; events: LiveEvent[] }>();
-const lastCallAt: Record<EventSource, number> = {
+/** Only the paid providers are rate limited; member listings come from our own data. */
+type ProviderSource = Exclude<EventSource, "onlooker">;
+
+const lastCallAt: Record<ProviderSource, number> = {
   ticketmaster: 0,
   seatgeek: 0,
   eventbrite: 0,
 };
-const MIN_GAP_MS: Record<EventSource, number> = {
+const MIN_GAP_MS: Record<ProviderSource, number> = {
   ticketmaster: 250, // <= 4 req/s, inside the documented 5 req/s
   seatgeek: 200,
   eventbrite: 300,
 };
 
-async function throttle(source: EventSource) {
+async function throttle(source: ProviderSource) {
   const wait = lastCallAt[source] + MIN_GAP_MS[source] - Date.now();
   if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
   lastCallAt[source] = Date.now();
