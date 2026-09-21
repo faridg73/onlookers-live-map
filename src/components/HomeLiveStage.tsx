@@ -266,7 +266,7 @@ export function HomeLiveStage({
       </div>
 
       <div className="relative flex h-12 items-stretch border-t border-border bg-surface/95" aria-label="Trending live ticker">
-        <span className="z-10 flex shrink-0 items-center border-r border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal sm:text-[0.68rem]">Trending live</span>
+        <span className="z-10 flex shrink-0 items-center animate-red-flash border-x border-signal/35 bg-surface px-3 font-display-impact text-[0.6rem] uppercase text-signal motion-reduce:animate-none sm:text-[0.68rem]">Trending live</span>
         <div
           ref={tickerRef}
           className="scrollbar-neon flex min-w-0 flex-1 items-center gap-2 overflow-x-auto overscroll-x-contain px-2 pb-1 whitespace-nowrap"
