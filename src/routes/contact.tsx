@@ -81,11 +81,10 @@ function ContactScreen() {
   }
 
   function handleClose() {
-    console.log("[contact] handleClose called");
     if (window.history.length > 1 && window.history.state?.idx > 0) {
       window.history.back();
     } else {
-      router.navigate({ to: "/" }).then(() => console.log("[contact] navigated home"), (e) => console.error("[contact] nav failed", e));
+      void router.navigate({ to: "/" });
     }
   }
 
@@ -96,8 +95,8 @@ function ContactScreen() {
           <Headphones className="size-6" />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl tracking-tight text-foreground">
-            Contact &amp; <span className="text-signal">Support</span>
+          <h1 className="font-display text-2xl tracking-tight text-signal">
+            Contact &amp; Support
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Questions about bounties, payouts, disputes, or your account? Send us a message.
