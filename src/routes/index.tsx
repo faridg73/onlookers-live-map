@@ -177,7 +177,7 @@ function MapScreen() {
 
   const selected = requests.find((r) => r.id === selectedId) ?? null;
   return (
-    <div className="fixed inset-0">
+    <div className="home-inter fixed inset-0">
       <MapCanvas
         requests={statusFiltered}
         selectedId={selectedId}
