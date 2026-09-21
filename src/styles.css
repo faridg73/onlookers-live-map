@@ -21,6 +21,7 @@
 @theme inline {
   --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display-impact: "Archivo Black", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display-hero: "Big Shoulders Display", "Archivo Black", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Hind", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   /* One-step larger app-wide type scale for comfortable mobile and desktop reading. */
   --text-xs: 0.875rem;
