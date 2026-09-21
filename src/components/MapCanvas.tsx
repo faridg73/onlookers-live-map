@@ -436,6 +436,23 @@ export function MapCanvas({
         </span>
       )}
 
+      {/* the place or area the viewer chose */}
+      {focusPixel && (
+        <span
+          className="pointer-events-none absolute z-[5] -translate-x-1/2 -translate-y-full"
+          style={{ left: focusPixel.left, top: focusPixel.top }}
+          aria-label={focusPin?.label ? `Chosen spot: ${focusPin.label}` : "Chosen spot"}
+        >
+          <span className="flex flex-col items-center">
+            <span className="max-w-[11rem] truncate rounded-full border border-signal bg-black/85 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-signal shadow-lg shadow-signal/30 backdrop-blur-md">
+              {focusPin?.label ?? "Chosen spot"}
+            </span>
+            <span className="mt-0.5 size-2.5 rotate-45 border border-signal bg-signal" />
+            <span className="mt-1 size-2 rounded-full bg-signal/50 blur-[2px]" />
+          </span>
+        </span>
+      )}
+
       {failed && (
         <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
           <p className="text-sm font-semibold text-muted-foreground">
