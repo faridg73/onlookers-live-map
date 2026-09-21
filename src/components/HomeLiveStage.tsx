@@ -206,7 +206,29 @@ export function HomeLiveStage({
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
-      <div className="overflow-hidden rounded-2xl border border-signal/35 bg-home-glass-strong shadow-[0_20px_70px_color-mix(in_oklab,var(--color-background)_75%,transparent)] backdrop-blur-2xl">
+      {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
+      <div
+        className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
+        aria-label="Live city readout"
+      >
+        <span className="relative flex size-2 shrink-0" aria-hidden>
+          <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+          <span className="relative size-2 rounded-full bg-signal" />
+        </span>
+        <div className="scrollbar-thin flex min-w-0 flex-1 items-center gap-3 overflow-x-auto whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.18em] tabular-nums text-foreground/70 sm:text-[0.66rem]">
+          <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span></span>
+          <span className="text-border">|</span>
+          <span>
+            TOP POOL{" "}
+            <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
+          </span>
+        </div>
+      </div>
+      <div className="overflow-hidden rounded-3xl border border-signal/25 bg-home-glass shadow-[0_24px_80px_color-mix(in_oklab,var(--color-background)_70%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
         <div className="relative min-w-0 overflow-hidden px-5 pb-4 pt-4 sm:px-7 sm:pb-5 sm:pt-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent" aria-hidden />
