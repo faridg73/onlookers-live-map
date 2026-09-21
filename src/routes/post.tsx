@@ -735,7 +735,7 @@ function PostScreen() {
         <header className="shrink-0 border-b border-border bg-surface px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[0.65rem] font-extrabold uppercase text-signal">
+              <p className="text-xs font-extrabold uppercase text-signal">
                 {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
               </p>
               <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
@@ -776,7 +776,7 @@ function PostScreen() {
                   <span className="block font-display text-lg font-extrabold text-foreground">
                     Free social broadcast
                   </span>
-                  <span className="mt-1 block text-sm text-muted-foreground">
+                  <span className="mt-1 block text-sm text-signal">
                     Verified creators stream to followers and people nearby. No credits, no escrow.
                   </span>
                 </span>
@@ -791,7 +791,7 @@ function PostScreen() {
                   <span className="block font-display text-lg font-extrabold text-foreground">
                     Paid flash bounty
                   </span>
-                  <span className="mt-1 block text-sm text-muted-foreground">
+                  <span className="mt-1 block text-sm text-signal">
                     Ask someone standing there for a live look. Fast Catch (500), Priority Hunt (1000)
                     or your own amount, held in escrow until you approve.
                   </span>
