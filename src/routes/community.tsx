@@ -97,6 +97,8 @@ function CommunityHub() {
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [loading, setLoading] = useState(true);
+  /** Shown inline with a retry, so a failed load never leaves a blank page. */
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [radius, setRadius] = useState<RadiusChoiceId>("near");
   const [focus, setFocus] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const vibeRowRef = useRef<HTMLDivElement | null>(null);
@@ -125,12 +127,18 @@ function CommunityHub() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const rows = await listCommunityPosts();
       setPosts(rows);
-      setMedia(await communityMediaUrls(rows));
+      /* Media URLs are a nice-to-have: a failure here must not empty the feed. */
+      try {
+        setMedia(await communityMediaUrls(rows));
+      } catch {
+        setMedia({});
+      }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't load Discover.");
+      setLoadError(err instanceof Error ? err.message : "Couldn't load Discover.");
     } finally {
       setLoading(false);
     }
