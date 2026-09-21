@@ -43,9 +43,10 @@ function isCrisisRequest(request: LiveRequest) {
 export const Route = createFileRoute("/")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { b?: string | undefined; snap?: string | undefined } => ({
+  ): { b?: string | undefined; snap?: string | undefined; at?: string | undefined } => ({
     b: typeof search["b"] === "string" ? search["b"] : undefined,
     snap: search["snap"] === "1" ? "1" : undefined,
+    at: typeof search["at"] === "string" ? search["at"] : undefined,
   }),
   head: () => ({
     meta: [
