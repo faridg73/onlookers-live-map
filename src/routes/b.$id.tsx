@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { MapPin, Zap } from "lucide-react";
+import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, MapPin, Zap } from "lucide-react";
+
+import { formatCreditCash } from "@/lib/credits";
 
 type Search = {
   amt?: number | undefined;
@@ -46,9 +48,33 @@ export const Route = createFileRoute("/b/$id")({
 function BountyPreview() {
   const { id } = Route.useParams();
   const { amt, place, title } = Route.useSearch();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+  const credits = Math.max(0, Math.round(amt ?? 0));
 
   return (
     <div className="mx-auto flex min-h-[80vh] w-full max-w-3xl flex-col justify-center px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6">
+      {/* Back arrow, top left — always a way out of this page. */}
+      <div className="mb-3 flex">
+        {canGoBack ? (
+          <button
+            type="button"
+            onClick={() => router.history.back()}
+            aria-label="Go back"
+            className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface text-foreground"
+          >
+            <ArrowLeft className="size-5" />
+          </button>
+        ) : (
+          <Link
+            to="/"
+            aria-label="Go back to the map"
+            className="inline-flex size-11 items-center justify-center rounded-full border border-border bg-surface text-foreground"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+        )}
+      </div>
       <div className="overflow-hidden rounded-3xl border border-border bg-surface">
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <span className="flex size-8 items-center justify-center rounded-lg bg-signal text-signal-foreground">
@@ -57,9 +83,11 @@ function BountyPreview() {
           <span className="font-display text-base tracking-tight text-foreground">Onlooker</span>
         </div>
         <div className="px-5 py-6">
-          <div className="font-display text-5xl leading-none text-signal">${amt ?? "0"}</div>
+          <div className="font-display text-5xl leading-none tabular-nums text-signal">
+            {credits.toLocaleString()}
+          </div>
           <div className="mt-2 text-[0.65rem] uppercase tracking-[0.18em] text-signal/70">
-            live view bounty
+            credits · live view bounty {credits > 0 && `(${formatCreditCash(credits)})`}
           </div>
           <h1 className="mt-4 font-display text-2xl leading-tight text-foreground">
             {title ?? "Someone wants a live view"}
