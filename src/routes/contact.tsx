@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { MessageSquare, Send, Headphones } from "lucide-react";
+import { MessageSquare, Send, Headphones, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { submitSupportTicket } from "@/lib/support.functions";
 
