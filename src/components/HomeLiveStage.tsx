@@ -468,8 +468,13 @@ export function HomeLiveStage({
                   ))}
                 </div>
               ) : (
-                <div className="rounded-md border border-dashed border-signal/45 bg-background/80 p-3 text-center">
-                  <p className="text-xs font-bold text-foreground">No active items right now—tap below to start one!</p>
+                <div className="rounded-md border border-signal/45 bg-background/80 p-3 text-center">
+                  <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
+                  <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
+                    {SHOWCASE.map((item) => (
+                      <ShowcaseCard key={`drawer-${item.key}`} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
+                    ))}
+                  </div>
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
                       <Radio className="size-3.5" /> Go live
