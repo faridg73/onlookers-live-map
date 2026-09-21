@@ -152,7 +152,7 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
 
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs font-semibold text-signal">
             © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
           </p>
           <p className="text-xs font-semibold tracking-wide text-signal">
