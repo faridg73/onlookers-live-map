@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Clock, Eye, MapPin, Play, Video } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Clock, Eye, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { toast } from "sonner";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { fetchExploreClips, type ExploreClip } from "@/lib/explore";
+import { deleteExploreClip } from "@/lib/explore.functions";
 import { formatCredits } from "@/lib/credits";
+import { supabase } from "@/integrations/supabase/client";
 
 function ago(iso: string) {
   const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000));
@@ -30,6 +33,66 @@ export function RecentCapturesFeed({
   const [clips, setClips] = useState<ExploreClip[] | null>(null);
   /** Which card the person tapped — that one swaps the loop for the real player. */
   const [playingId, setPlayingId] = useState<string | null>(null);
+  /** Signed-in user, so owners see the Delete option on their own captures. */
+  const [myId, setMyId] = useState<string | null>(null);
+  /** Which card's options menu is open (by clip id). */
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data }) => setMyId(data.user?.id ?? null));
+  }, []);
+
+  // Tap anywhere outside the open menu closes it.
+  useEffect(() => {
+    if (!menuFor) return;
+    const close = (e: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuFor(null);
+    };
+    window.addEventListener("pointerdown", close);
+    return () => window.removeEventListener("pointerdown", close);
+  }, [menuFor]);
+
+  const shareClip = async (clip: ExploreClip) => {
+    const url = `${window.location.origin}/explore?clip=${clip.id}`;
+    const payload = { title: clip.title, text: `Watch "${clip.title}" on Onlooker`, url };
+    try {
+      if (navigator.share) await navigator.share(payload);
+      else {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied.");
+      }
+    } catch {
+      /* share sheet dismissed */
+    }
+    setMenuFor(null);
+  };
+
+  const viewOnMap = (clip: ExploreClip) => {
+    setMenuFor(null);
+    if (clip.latitude != null && clip.longitude != null) {
+      void navigate({ to: "/", search: { at: `${clip.latitude},${clip.longitude}` } });
+    } else {
+      toast.info("This capture has no location to show.");
+    }
+  };
+
+  const deleteClip = async (clip: ExploreClip) => {
+    setMenuFor(null);
+    if (!window.confirm(`Delete "${clip.title}"? This can't be undone.`)) return;
+    setDeletingId(clip.id);
+    try {
+      await deleteExploreClip({ data: { videoId: clip.id } });
+      setClips((prev) => (prev ? prev.filter((c) => c.id !== clip.id) : prev));
+      toast.success("Capture deleted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete that capture.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
@@ -115,9 +178,60 @@ export function RecentCapturesFeed({
                     <Eye className="size-3" aria-hidden /> {clip.views}
                   </span>
                 </p>
-                <p className="mt-2 text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal tabular-nums">
-                  Paid out {formatCredits(clip.bounty)}
-                </p>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal tabular-nums">
+                    Paid out {formatCredits(clip.bounty)}
+                  </p>
+                  <div
+                    className="relative"
+                    ref={menuFor === clip.id ? menuRef : undefined}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setMenuFor((cur) => (cur === clip.id ? null : clip.id))}
+                      aria-label={`Options for ${clip.title}`}
+                      aria-expanded={menuFor === clip.id}
+                      className="grid size-8 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                    >
+                      <MoreVertical className="size-4" aria-hidden />
+                    </button>
+                    {menuFor === clip.id && (
+                      <div
+                        role="menu"
+                        className="absolute bottom-full right-0 z-20 mb-1 w-40 overflow-hidden rounded-xl border border-border bg-surface shadow-xl"
+                      >
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => void shareClip(clip)}
+                          className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-colors hover:bg-background"
+                        >
+                          <Share2 className="size-3.5 text-signal" aria-hidden /> Share
+                        </button>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => viewOnMap(clip)}
+                          className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-colors hover:bg-background"
+                        >
+                          <MapPin className="size-3.5 text-signal" aria-hidden /> View on map
+                        </button>
+                        {myId && myId === clip.uploaderId && (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            disabled={deletingId === clip.id}
+                            onClick={() => void deleteClip(clip)}
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-red-400 transition-colors hover:bg-background disabled:opacity-50"
+                          >
+                            <Trash2 className="size-3.5" aria-hidden />
+                            {deletingId === clip.id ? "Deleting…" : "Delete"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </li>
           );

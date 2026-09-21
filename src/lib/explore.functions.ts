@@ -1,10 +1,15 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /** One publicly shared clip, with short-lived playback links attached. */
 export type ExploreClip = {
   id: string;
+  /** Owner id — powers the per-card Delete option; not shown publicly. */
+  uploaderId: string;
+  latitude: number | null;
+  longitude: number | null;
   title: string;
   place: string;
   note: string;
@@ -49,6 +54,22 @@ export const listExploreClips = createServerFn({ method: "GET" })
     });
     if (error || !rows) return [];
 
+    // Ownership + capture spot for the per-card Delete / View-on-map options.
+    const ids = rows.map((r) => r.id);
+    const { data: videos } = await supabaseAdmin
+      .from("bounty_videos")
+      .select("id, uploader_id, request_id")
+      .in("id", ids);
+    const videoById = new Map((videos ?? []).map((v) => [v.id, v]));
+
+    const requestIds = [
+      ...new Set((videos ?? []).map((v) => v.request_id).filter((x): x is string => Boolean(x))),
+    ];
+    const { data: reqs } = requestIds.length
+      ? await supabaseAdmin.from("requests").select("id, latitude, longitude").in("id", requestIds)
+      : { data: [] as { id: string; latitude: number; longitude: number }[] };
+    const reqById = new Map((reqs ?? []).map((r) => [r.id, r]));
+
     return Promise.all(
       rows.map(async (r) => {
         const [video, thumb] = await Promise.all([
@@ -57,8 +78,13 @@ export const listExploreClips = createServerFn({ method: "GET" })
             ? supabaseAdmin.storage.from(BUCKET).createSignedUrl(r.thumb_path, 60 * 60)
             : Promise.resolve({ data: null }),
         ]);
+        const clipRow = videoById.get(r.id);
+        const req = clipRow?.request_id ? reqById.get(clipRow.request_id) : undefined;
         return {
           id: r.id,
+          uploaderId: clipRow?.uploader_id ?? "",
+          latitude: req?.latitude ?? null,
+          longitude: req?.longitude ?? null,
           title: r.request_title,
           place: r.request_place,
           note: r.note,
@@ -104,4 +130,33 @@ export const listClipComments = createServerFn({ method: "GET" })
       authorName: byId.get(r.user_id)?.display_name ?? "onlooker",
       authorAvatar: byId.get(r.user_id)?.avatar_url ?? null,
     }));
+  });
+
+/**
+ * Lets the clip's owner remove their capture: deletes the stored files and
+ * the row (comments, reviews and tips cascade away with it).
+ */
+export const deleteExploreClip = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ videoId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: owned, error: readError } = await context.supabase
+      .from("bounty_videos")
+      .select("id, storage_path, thumb_path")
+      .eq("id", data.videoId)
+      .eq("uploader_id", context.userId)
+      .maybeSingle();
+    if (readError || !owned) throw new Error("Clip not found or not yours.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const paths = [owned.storage_path, owned.thumb_path].filter((p): p is string => Boolean(p));
+    if (paths.length) await supabaseAdmin.storage.from(BUCKET).remove(paths);
+
+    const { error: delError } = await supabaseAdmin
+      .from("bounty_videos")
+      .delete()
+      .eq("id", owned.id)
+      .eq("uploader_id", context.userId);
+    if (delError) throw new Error(delError.message);
+    return { ok: true };
   });

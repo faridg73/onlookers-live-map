@@ -43,9 +43,10 @@ function isCrisisRequest(request: LiveRequest) {
 export const Route = createFileRoute("/")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { b?: string | undefined; snap?: string | undefined } => ({
+  ): { b?: string | undefined; snap?: string | undefined; at?: string | undefined } => ({
     b: typeof search["b"] === "string" ? search["b"] : undefined,
     snap: search["snap"] === "1" ? "1" : undefined,
+    at: typeof search["at"] === "string" ? search["at"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/")({
 function MapScreen() {
   const { requests, selectedId, select, claim } = useOnlooker();
   const navigate = useNavigate();
-  const { b } = Route.useSearch();
+  const { b, at } = Route.useSearch();
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const [mapFilter, setMapFilter] = useState<"all" | "live" | "nearby" | "high">("all");
   const [centerTarget, setCenterTarget] = useState<(MapPosition & { zoom?: number }) | null>(null);
@@ -83,6 +84,13 @@ function MapScreen() {
   // Expandable magnifier search: icon collapses into a place search field.
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Deep links like /?at=34.05,-118.24 (e.g. "View on map" from a capture) center the map there.
+  useEffect(() => {
+    if (!at) return;
+    const [lat, lng] = at.split(",").map((n) => Number.parseFloat(n)) as [number, number];
+    if (Number.isFinite(lat) && Number.isFinite(lng)) setCenterTarget({ lat, lng, zoom: 16 });
+  }, [at]);
 
   const handleSearchPick = useCallback((place: GeocodeResult) => {
     setCenterTarget({ lat: place.latitude, lng: place.longitude, zoom: 15 });
