@@ -44,6 +44,8 @@ export function AppMenu() {
   const [inboxOpen, setInboxOpen] = useState(false);
   // Home's logo card owns the top-right corner, so the launcher tucks under it.
   const onHome = useRouterState({ select: (state) => state.location.pathname === "/" });
+  // Current path so the drawer highlights the page you're on when reopened.
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
   return (
     <>
