@@ -477,9 +477,9 @@ export function HomeLiveStage({
 
       <div
         id="home-live-feed-drawer"
-        className={`mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-2xl backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
+        className={`absolute inset-x-0 top-full z-50 mt-2 grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
       >
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0 max-h-[min(58dvh,26rem)] overflow-hidden">
           {activeTrend && (
             <div className="px-3 pb-3 pt-2.5 sm:px-4">
               <div className="mb-2 flex items-center justify-between gap-3">
