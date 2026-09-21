@@ -1463,6 +1463,23 @@ function PostScreen() {
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
                     <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                    {!rewardMatchesGig && (
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+                        <span>
+                          Gig price for {captureDurationLabel(capture, action === "live")} is{" "}
+                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setBounty(gig.totalCredits)}
+                          className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
+                        >
+                          Use gig price
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
 
