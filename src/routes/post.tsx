@@ -1512,7 +1512,6 @@ function PostScreen() {
                 </div>
 
                 <div>
-                <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Request deadline</p>
                   <p className="mt-1 text-xs font-medium text-signal">
                     How soon you need it — this does not change your{" "}
