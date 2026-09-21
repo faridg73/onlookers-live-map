@@ -44,11 +44,20 @@ export const Route = createFileRoute("/discover/trending")({
 });
 
 const TAGS = [
-  { subId: "stadiums", tag: "Live Sports" },
-  { subId: "concerts", tag: "Concerts" },
-  { subId: "fights", tag: "Fight Nights" },
-  { subId: "festivals", tag: "Public Gatherings" },
+  { subId: "stadiums", tag: "Live Sports", keywords: ["sport", "basketball", "football", "baseball", "soccer", "hockey", "tennis", "golf", "motorsport", "racing"] },
+  { subId: "concerts", tag: "Concerts", keywords: ["music", "concert", "rock", "pop", "hip", "rap", "country", "jazz", "latin", "metal", "electronic", "r&b", "dance", "alternative", "blues", "folk"] },
+  { subId: "fights", tag: "Fight Nights", keywords: ["boxing", "mma", "ufc", "wrestling", "fight", "martial"] },
+  { subId: "festivals", tag: "Public Gatherings", keywords: ["festival", "fair", "community", "theatre", "theater", "arts", "comedy", "family", "misc", "expo", "parade", "film"] },
 ] as const;
+
+/** True when a listed event belongs to the selected tag. */
+function eventMatchesTag(
+  event: { category: string | null; name: string },
+  meta: (typeof TAGS)[number],
+) {
+  const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
+  return meta.keywords.some((word) => haystack.includes(word));
+}
 
 const WEEKEND = [0, 5, 6];
 
