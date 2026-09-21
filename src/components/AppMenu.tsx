@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
+  ChevronRight,
   CircleDollarSign,
   HelpCircle,
   LifeBuoy,
@@ -139,6 +140,9 @@ export function AppMenu() {
               // Stays highlighted while you're on that page (or a page under
               // it), so context never resets between secondary tools.
               const active = pathname === to || pathname.startsWith(`${to}/`);
+              // Venues & Events gets a bright yellow flashing border and a
+              // flashing forward arrow to signal more places to discover.
+              const featured = to === "/discover";
               return (
                 <Link
                   key={to}
@@ -150,7 +154,9 @@ export function AppMenu() {
                     "flex items-center gap-3 rounded-2xl border p-3 transition-colors " +
                     (active
                       ? "border-signal bg-signal/10 shadow-[0_0_10px_rgba(204,255,0,0.25)]"
-                      : "border-border bg-surface-raised hover:border-signal/60")
+                      : featured
+                        ? "border-yellow-400 bg-surface-raised hover:border-yellow-300 animate-all-vibes-flash motion-reduce:animate-none"
+                        : "border-border bg-surface-raised hover:border-signal/60")
                   }
                 >
                   <span
@@ -167,6 +173,13 @@ export function AppMenu() {
                     <span className="block text-sm font-extrabold text-foreground">{label}</span>
                     <span className="block text-xs font-semibold text-signal">{note}</span>
                   </span>
+                  {featured && !active && (
+                    <ChevronRight
+                      className="ml-auto size-5 shrink-0 text-yellow-400 animate-arrow-flash motion-reduce:animate-none"
+                      strokeWidth={3}
+                      aria-hidden
+                    />
+                  )}
                   {active && (
                     <span className="ml-auto shrink-0 text-[0.6rem] font-extrabold uppercase text-signal">
                       You're here

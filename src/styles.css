@@ -99,6 +99,20 @@
   --animate-red-flash: red-flash 1.6s ease-in-out infinite;
   --animate-vibe-hint: vibe-hint 1.8s ease-in-out infinite;
   --animate-all-vibes-flash: all-vibes-flash 1.4s ease-in-out infinite;
+  --animate-arrow-flash: arrow-flash 1.4s ease-in-out infinite;
+}
+
+/* Flashing forward arrow for the Venues & Events menu item */
+@keyframes arrow-flash {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
 }
 
 @keyframes vibe-hint {
