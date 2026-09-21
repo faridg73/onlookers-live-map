@@ -204,20 +204,20 @@ export function HomeLiveStage({
               </span>
               The city is live
             </p>
-            <div className="hidden items-center gap-2 text-[0.8rem] font-bold uppercase text-muted-foreground md:flex md:text-[0.9rem]">
-              <span>{liveCount} live</span>
+            <div className="hidden items-center gap-2 whitespace-nowrap text-[0.8rem] font-bold uppercase text-muted-foreground md:flex md:text-[0.9rem]">
+              <span className="whitespace-nowrap">{liveCount} live</span>
               <span className="text-border">/</span>
-              <span>{emergencyCount} alerts</span>
+              <span className="whitespace-nowrap">{emergencyCount} alerts</span>
               <span className="text-border">/</span>
-              <span>{activeRequests.length} bounties</span>
+              <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
             </div>
           </div>
           <div className="mt-1 flex items-center gap-2 text-[0.78rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
-            <span>{liveCount} live</span>
+            <span className="whitespace-nowrap">{liveCount} live</span>
             <span className="text-border">/</span>
-            <span>{emergencyCount} alerts</span>
+            <span className="whitespace-nowrap">{emergencyCount} alerts</span>
             <span className="text-border">/</span>
-            <span>{activeRequests.length} bounties</span>
+            <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
           </div>
 
           <h2
