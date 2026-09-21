@@ -190,7 +190,7 @@ export function CommunityPostCard({
             {post.tags.slice(0, 2).map((t) => (
               <span
                 key={t}
-                className="rounded-full border border-border px-2 py-0.5 text-[0.62rem] text-muted-foreground"
+                className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
               >
                 #{t}
               </span>
