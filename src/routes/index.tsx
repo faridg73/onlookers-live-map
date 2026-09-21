@@ -204,7 +204,7 @@ function MapScreen() {
   }, [statusFiltered, selected]);
   return (
     <div className="home-marketplace fixed inset-0 overflow-hidden bg-surface">
-      {mapExpanded ? (
+      <div className="absolute inset-0 brightness-[0.58] contrast-[1.18] saturate-[0.82]">
         <MapCanvas
           requests={mapRequests}
           selectedId={selectedId}
@@ -217,9 +217,8 @@ function MapScreen() {
           controlsTopClass="top-[calc(env(safe-area-inset-top,0px)+10rem)] sm:top-[calc(env(safe-area-inset-top,0px)+8.5rem)]"
           styles={labelsVisible ? undefined : HIDE_LABELS_MAP_STYLE}
         />
-      ) : (
-        <div className="absolute inset-0 bg-surface" aria-hidden />
-      )}
+      </div>
+      {!mapExpanded && <div className="pointer-events-none absolute inset-0 bg-background/20" aria-hidden />}
 
       <div className="pointer-events-none absolute left-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[65] flex items-center gap-2 md:left-4">
         <button
@@ -232,7 +231,7 @@ function MapScreen() {
           {mapExpanded ? (
             <Minimize2 className="size-4" aria-hidden />
           ) : (
-            <Map className="size-4" aria-hidden />
+            <Maximize2 className="size-4" aria-hidden />
           )}
         </button>
         {searchOpen ? (
@@ -268,7 +267,7 @@ function MapScreen() {
         )}
       </div>
 
-      {mapExpanded && <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.35rem)] z-[65] flex h-8 items-center gap-1 rounded-lg border border-home-line bg-home-glass-strong pl-2 pr-1 shadow-xl backdrop-blur-2xl md:left-4">
+      <div className="pointer-events-auto absolute left-3 top-[calc(env(safe-area-inset-top)+3.35rem)] z-[65] flex h-8 items-center gap-1 rounded-lg border border-signal/35 bg-home-glass-strong pl-2 pr-1 shadow-xl backdrop-blur-2xl md:left-4">
         <label className="flex items-center gap-1" aria-label="Show map labels">
           <input
             type="checkbox"
@@ -300,7 +299,7 @@ function MapScreen() {
             </>
           )}
         </button>
-      </div>}
+      </div>
 
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">

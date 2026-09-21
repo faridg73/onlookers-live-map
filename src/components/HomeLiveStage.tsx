@@ -61,6 +61,18 @@ export function HomeLiveStage({
   const emergencyRequest = activeRequests.find(isCrisis) ?? null;
   const latestRequest =
     [...activeRequests].sort((a, b) => a.minutesAgo - b.minutesAgo)[0] ?? null;
+  const discoveryItems = useMemo(
+    () =>
+      [...activeRequests]
+        .sort((a, b) => {
+          const aLive = isLiveRequest(a) ? 1 : 0;
+          const bLive = isLiveRequest(b) ? 1 : 0;
+          if (aLive !== bLive) return bLive - aLive;
+          return poolOf(b) - poolOf(a);
+        })
+        .slice(0, 8),
+    [activeRequests, poolOf],
+  );
 
   const feedItems = useMemo<Record<LiveFeedKey, LiveRequest[]>>(() => {
     const emergencies = activeRequests
@@ -173,9 +185,9 @@ export function HomeLiveStage({
 
   return (
     <section className="pointer-events-auto absolute inset-x-3 top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto sm:w-[min(68rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
-      <div className="overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong shadow-2xl backdrop-blur-2xl">
-      <div className="grid min-h-[11rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
-        <div className="relative min-w-0 overflow-hidden px-5 pb-5 pt-5 sm:px-7 sm:pb-6 sm:pt-6 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+      <div className="overflow-hidden rounded-2xl border border-signal/35 bg-home-glass-strong shadow-[0_20px_70px_color-mix(in_oklab,var(--color-background)_75%,transparent)] backdrop-blur-2xl">
+      <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
+        <div className="relative min-w-0 overflow-hidden px-5 pb-4 pt-4 sm:px-7 sm:pb-5 sm:pt-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
@@ -203,7 +215,7 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-3 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-signal drop-shadow-[0_0_16px_color-mix(in_oklab,var(--color-signal)_24%,transparent)] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-2 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-signal drop-shadow-[0_0_16px_color-mix(in_oklab,var(--color-signal)_24%,transparent)] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
@@ -211,7 +223,7 @@ export function HomeLiveStage({
             Watch live streams, follow trusted alerts, or post local bounties.
           </p>
 
-          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap [@media(max-height:520px)]:mt-2">
+          <div className="mt-3 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap [@media(max-height:520px)]:mt-2">
             <Button type="button" onClick={onGoLive} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
               <Radio className="size-4" /> Go live
             </Button>
@@ -248,6 +260,46 @@ export function HomeLiveStage({
 
       </div>
 
+      <div className="mt-2 overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong py-2.5 shadow-2xl backdrop-blur-2xl">
+        <div className="mb-2 flex items-center justify-between px-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex size-2" aria-hidden>
+              <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+              <span className="relative size-2 rounded-full bg-signal" />
+            </span>
+            <h3 className="home-display text-[0.68rem] font-bold uppercase text-foreground">Watch now & high bounties</h3>
+          </div>
+          <span className="text-[0.58rem] font-bold uppercase text-signal">Live city feed</span>
+        </div>
+        {discoveryItems.length > 0 ? (
+          <div className="scrollbar-thin flex snap-x gap-2 overflow-x-auto overscroll-x-contain px-3 pb-1" aria-label="Active live streams and high-value bounties">
+            {discoveryItems.map((request) => {
+              const live = isLiveRequest(request);
+              return (
+                <button
+                  key={`discover-${request.id}`}
+                  type="button"
+                  onClick={() => live ? onOpenLive(request) : onOpenRequest(request)}
+                  className="group relative flex h-[5.25rem] w-[11.5rem] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-xl border border-signal/35 bg-background/85 p-2.5 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-signal hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className={`flex items-center gap-1 text-[0.58rem] font-extrabold uppercase ${live ? "text-live" : "text-signal"}`}>
+                      {live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <CircleDollarSign className="size-3" />}
+                      {live ? "Live now" : `${poolOf(request)} credits`}
+                    </span>
+                    <span className="text-[0.55rem] font-bold text-foreground/55">{live ? `${request.watchers} watching` : `${request.minutesAgo}m`}</span>
+                  </span>
+                  <span className="line-clamp-2 text-[0.72rem] font-bold leading-tight text-foreground group-hover:text-signal">{request.title}</span>
+                  <span className="flex items-center gap-1 truncate text-[0.58rem] font-medium text-foreground/55"><MapPin className="size-3 shrink-0 text-signal" /> <span className="truncate">{request.place}</span></span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="px-3 py-2 text-xs text-foreground/55">No active streams or bounties nearby yet.</p>
+        )}
+      </div>
+
       <div className="relative mt-2 flex h-12 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
@@ -269,7 +321,7 @@ export function HomeLiveStage({
                 aria-expanded={openFeed === trend.key}
                 aria-controls="home-live-feed-drawer"
                 aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-home-accent/70 aria-expanded:border-home-accent/70 aria-expanded:bg-home-accent/14 aria-expanded:text-home-accent motion-reduce:transform-none ${trend.tone}`}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
