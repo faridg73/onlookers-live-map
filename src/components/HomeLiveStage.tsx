@@ -203,7 +203,7 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-3 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-foreground whitespace-nowrap [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="mt-3 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-foreground [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
