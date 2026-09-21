@@ -489,7 +489,10 @@ function PostScreen() {
       toast.error(`Pick a capture length between 1 and ${MAX_CAPTURE_MINUTES} minutes.`);
       return;
     }
-    if (!requireSignIn(() => continueFromDetails())) return;
+    // Everything above already passed, so after signing in we land straight on
+    // the reward step instead of replaying this check (which would otherwise
+    // see a stale signed-out state and reopen the prompt).
+    if (!requireSignIn(() => setStep(3))) return;
     setStep(3);
   };
 
