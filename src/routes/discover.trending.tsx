@@ -224,9 +224,11 @@ function TrendingScreen() {
             {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            {activeTag
-              ? `${visibleEvents.length} ${activeTag.tag.toLowerCase()} listings around ${area.label}.`
-              : `Real games, concerts and shows on sale around ${area.label}.`}
+            {activeVibe
+              ? `${visibleEvents.length} ${activeVibe.label.toLowerCase()} listings around ${area.label}.`
+              : activeTag
+                ? `${visibleEvents.length} ${activeTag.tag.toLowerCase()} listings around ${area.label}.`
+                : `Real games, concerts and shows on sale around ${area.label}.`}
           </p>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
