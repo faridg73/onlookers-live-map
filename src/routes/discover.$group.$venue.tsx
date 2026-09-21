@@ -22,6 +22,7 @@ import { discoveryImage } from "@/lib/discovery-visuals";
 import { PageBackButton } from "@/components/PageBackButton";
 import { fetchPlaceById, type DiscoveredPlace } from "@/lib/places.functions";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
+import { TwoToneName } from "@/components/TwoTone";
 
 export const Route = createFileRoute("/discover/$group/$venue")({
   loader: ({ params }) => {
@@ -143,7 +144,7 @@ function VenueScreen() {
         />
       </div>
 
-      <h1 className="mt-4 font-display text-3xl tracking-tight text-foreground">{venue.name}</h1>
+      <h1 className="mt-4 font-display text-3xl tracking-tight"><TwoToneName name={venue.name} /></h1>
       <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
         <MapPin className="size-3.5" aria-hidden /> {venue.area}
       </p>

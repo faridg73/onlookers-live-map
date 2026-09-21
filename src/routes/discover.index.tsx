@@ -23,6 +23,7 @@ import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
+import { TwoToneName } from "@/components/TwoTone";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
@@ -76,7 +77,11 @@ function DiscoverHome() {
   });
   const eventPhoto = usePlacePhotos(eventPlaces);
 
-  const isWeekend = WEEKEND.includes(new Date().getDay());
+  // Client-only: server and browser timezones differ, so decide after hydration.
+  const [isWeekend, setIsWeekend] = useState(false);
+  useEffect(() => {
+    setIsWeekend(WEEKEND.includes(new Date().getDay()));
+  }, []);
   const selected = requests.find((r) => r.id === selectedId) ?? null;
 
   const liveNear = (name: string) =>
@@ -175,8 +180,8 @@ function DiscoverHome() {
                     <span className="text-signal">live sports</span>
                   </h2>
                   <p className="text-xs text-foreground/90">
-                    {isWeekend ? "On this weekend" : "Coming up"} around{" "}
-                    <span className="font-bold text-signal">{area.label}</span>
+                    <span className="font-bold text-signal">{isWeekend ? "On this weekend" : "Coming up"}</span>{" "}
+                    around <span className="font-bold text-signal">{area.label}</span>
                   </p>
                 </div>
                 <Link
@@ -212,8 +217,8 @@ function DiscoverHome() {
                             />
                           </div>
                           <div className="p-3">
-                            <span className="line-clamp-2 text-sm font-bold text-foreground">
-                              {place.name}
+                            <span className="line-clamp-2 text-sm font-bold">
+                              <TwoToneName name={place.name} />
                             </span>
                             <span className="mt-1 block truncate text-[0.68rem] text-muted-foreground">
                               {place.primaryType ?? "Venue"}
@@ -259,8 +264,14 @@ function DiscoverHome() {
                 </div>
                 <div className="flex items-center gap-3 px-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-lg text-foreground">{group.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">{group.tagline}</p>
+                    <p className="truncate font-display text-lg text-foreground">
+                      <span className="text-signal">{group.name.split(" ")[0]}</span>
+                      {group.name.includes(" ") ? ` ${group.name.split(" ").slice(1).join(" ")}` : ""}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      <span className="font-bold text-signal">{group.tagline.split(",")[0]}</span>
+                      {group.tagline.includes(",") ? `, ${group.tagline.split(",").slice(1).join(",").trim()}` : ""}
+                    </p>
                   </div>
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                 </div>

@@ -14,6 +14,7 @@ import { PlacePhoto } from "@/components/PlacePhoto";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel } from "@/components/SectionBoundary";
 import { PageBackButton } from "@/components/PageBackButton";
+import { TwoToneName } from "@/components/TwoTone";
 
 export const Route = createFileRoute("/discover/$group/")({
   loader: ({ params }) => {
@@ -78,7 +79,7 @@ function GroupScreen() {
   return (
     <div className="app-shell pb-28 pt-safe">
       <PageBackButton label="All places" fallback="/discover" />
-      <h1 className="mt-2 font-display text-3xl tracking-tight text-foreground">{heading}</h1>
+      <h1 className="mt-2 font-display text-3xl tracking-tight"><TwoToneName name={heading} /></h1>
       <p className="mt-1 text-sm text-muted-foreground">{tagline}</p>
 
       <div className="mt-4">
@@ -143,7 +144,7 @@ function GroupScreen() {
                 />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-base text-foreground">{place.name}</p>
+                <p className="truncate font-display text-base"><TwoToneName name={place.name} /></p>
                 <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
                   <MapPin className="size-3 shrink-0" aria-hidden />
                   {place.address ?? area.label}
@@ -184,7 +185,7 @@ function GroupScreen() {
               />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-base text-foreground">{venue.name}</p>
+              <p className="truncate font-display text-base"><TwoToneName name={venue.name} /></p>
               <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
                 <MapPin className="size-3 shrink-0" aria-hidden />
                 {venue.area}
