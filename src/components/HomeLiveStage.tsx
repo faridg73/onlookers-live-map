@@ -342,7 +342,7 @@ export function HomeLiveStage({
                 aria-expanded={openFeed === trend.key}
                 aria-controls="home-live-feed-drawer"
                 aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none ${trend.tone}`}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
