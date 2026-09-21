@@ -81,8 +81,11 @@ export function RequestCard({
             <BountyBriefBadges request={request} compact />
           </div>
           <div className="shrink-0 text-right">
-            <div className="font-display text-2xl font-extrabold leading-none text-signal">
-              {formatCredits(pool)}
+            <div className="font-display text-xl font-extrabold leading-none tabular-nums text-signal sm:text-2xl">
+              {Math.round(pool).toLocaleString()}
+            </div>
+            <div className="text-[0.55rem] font-bold uppercase tracking-[0.12em] text-signal/80">
+              credits
             </div>
             {!done && (
               <div className="mt-2 flex flex-col items-end gap-1">
