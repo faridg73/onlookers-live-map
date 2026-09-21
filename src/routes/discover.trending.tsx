@@ -44,11 +44,20 @@ export const Route = createFileRoute("/discover/trending")({
 });
 
 const TAGS = [
-  { subId: "stadiums", tag: "Live Sports" },
-  { subId: "concerts", tag: "Concerts" },
-  { subId: "fights", tag: "Fight Nights" },
-  { subId: "festivals", tag: "Public Gatherings" },
+  { subId: "stadiums", tag: "Live Sports", keywords: ["sport", "basketball", "football", "baseball", "soccer", "hockey", "tennis", "golf", "motorsport", "racing"] },
+  { subId: "concerts", tag: "Concerts", keywords: ["music", "concert", "rock", "pop", "hip", "rap", "country", "jazz", "latin", "metal", "electronic", "r&b", "dance", "alternative", "blues", "folk"] },
+  { subId: "fights", tag: "Fight Nights", keywords: ["boxing", "mma", "ufc", "wrestling", "fight", "martial"] },
+  { subId: "festivals", tag: "Public Gatherings", keywords: ["festival", "fair", "community", "theatre", "theater", "arts", "comedy", "family", "misc", "expo", "parade", "film"] },
 ] as const;
+
+/** True when a listed event belongs to the selected tag. */
+function eventMatchesTag(
+  event: { category: string | null; name: string },
+  meta: (typeof TAGS)[number],
+) {
+  const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
+  return meta.keywords.some((word) => haystack.includes(word));
+}
 
 const WEEKEND = [0, 5, 6];
 
@@ -60,26 +69,33 @@ function TrendingScreen() {
   const [vibeId, setVibeId] = useState<string | null>(null);
   const activeVibe = CREATOR_VIBES.find((vibe) => vibe.id === vibeId) ?? null;
 
-  const sports = usePlaceList(group, "stadiums", area, { maxResults: 8 });
-  const concerts = usePlaceList(group, "concerts", area, { maxResults: 8 });
-  const fights = usePlaceList(group, "fights", area, { maxResults: 8 });
-  const gatherings = usePlaceList(group, "festivals", area, { maxResults: 8 });
+  const sports = usePlaceList(group, "stadiums", area, { maxResults: 20 });
+  const concerts = usePlaceList(group, "concerts", area, { maxResults: 20 });
+  const fights = usePlaceList(group, "fights", area, { maxResults: 20 });
+  const gatherings = usePlaceList(group, "festivals", area, { maxResults: 20 });
   const foodGroup = discoveryGroupBySlug("food");
   const transitGroup = discoveryGroupBySlug("transit");
   const mallsGroup = discoveryGroupBySlug("malls");
   const performancesGroup = discoveryGroupBySlug("performances");
   const marketsGroup = discoveryGroupBySlug("markets");
-  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 8, enabled: vibeId === "foodie" });
-  const cars = usePlaceList(transitGroup, null, area, { maxResults: 8, enabled: vibeId === "car-spotters" });
-  const style = usePlaceList(mallsGroup, null, area, { maxResults: 8, enabled: vibeId === "style-scout" });
-  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 8, enabled: vibeId === "street-music" });
-  const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 8, enabled: vibeId === "match-day" });
-  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 8, enabled: vibeId === "market-finds" });
+  const foodie = usePlaceList(foodGroup, "restaurants", area, { maxResults: 20, enabled: vibeId === "foodie" });
+  const cars = usePlaceList(transitGroup, null, area, { maxResults: 20, enabled: vibeId === "car-spotters" });
+  const style = usePlaceList(mallsGroup, null, area, { maxResults: 20, enabled: vibeId === "style-scout" });
+  const music = usePlaceList(performancesGroup, "buskers", area, { maxResults: 20, enabled: vibeId === "street-music" });
+  const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 20, enabled: vibeId === "match-day" });
+  const marketFinds = usePlaceList(marketsGroup, "fleamarkets", area, { maxResults: 20, enabled: vibeId === "market-finds" });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
-    size: 12,
+    size: 50,
   });
+
+  const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
+  const visibleEvents = activeVibe
+    ? []
+    : activeTag
+      ? events.filter((event) => eventMatchesTag(event, activeTag))
+      : events;
 
 
   const buckets = [sports, concerts, fights, gatherings];
@@ -187,24 +203,27 @@ function TrendingScreen() {
         ))}
       </div>}
 
-      {(eventsLoading || events.length > 0) && (
+      {!activeVibe && (eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
-            <Ticket className="size-4 text-signal" aria-hidden /> Live events this weekend
+            <Ticket className="size-4 text-signal" aria-hidden />{" "}
+            {activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Real games, concerts and shows on sale around {area.label}.
+            {activeTag
+              ? `${visibleEvents.length} ${activeTag.tag.toLowerCase()} listings around ${area.label}.`
+              : `Real games, concerts and shows on sale around ${area.label}.`}
           </p>
 
           <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {eventsLoading && events.length === 0
+            {eventsLoading && visibleEvents.length === 0
               ? [0, 1, 2].map((i) => (
                   <div
                     key={i}
                     className="h-32 animate-pulse rounded-2xl border border-border bg-surface"
                   />
                 ))
-              : events.map((event) => (
+              : visibleEvents.map((event) => (
                   <EventCard key={event.id} event={event} liveCount={liveNear(event.name)} />
                 ))}
           </div>

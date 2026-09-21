@@ -54,7 +54,7 @@ function GroupScreen() {
   const { area } = useDiscoveryArea();
   const [subId, setSubId] = useState<string | null>(null);
 
-  const { places, loading } = usePlaceList(group, subId, area);
+  const { places, loading } = usePlaceList(group, subId, area, { maxResults: 20 });
 
   const heading = group?.name ?? curated?.name ?? "Places";
   const tagline = group?.tagline ?? curated?.tagline ?? "";
