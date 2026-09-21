@@ -234,8 +234,8 @@ export function HomeLiveStage({
             <Button type="button" onClick={onGoLive} className="h-10 rounded-md px-3 font-extrabold uppercase sm:h-11 sm:px-5 [@media(max-height:520px)]:h-9">
               <Radio className="size-4" /> Go live
             </Button>
-            <Button type="button" variant="outline" onClick={onPostBounty} className="h-10 rounded-md border-signal/60 bg-surface/85 px-3 font-extrabold uppercase text-[#27AE60] hover:bg-signal hover:text-signal-foreground sm:h-11 sm:px-5 [@media(max-height:520px)]:h-9">
-              <CircleDollarSign className="size-9 text-signal" /> Post bounty
+            <Button type="button" variant="outline" onClick={onPostBounty} className="h-10 animate-red-flash rounded-md bg-surface/85 px-3 font-extrabold uppercase text-[#FF5A4E] hover:bg-signal hover:text-signal-foreground sm:h-11 sm:px-5 [@media(max-height:520px)]:h-9">
+              <CircleDollarSign className="size-9 text-[#FF5A4E]" /> Post bounty
             </Button>
           </div>
         </div>
@@ -352,8 +352,8 @@ export function HomeLiveStage({
                     <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
                       <Radio className="size-3.5" /> Go live
                     </Button>
-                    <Button type="button" variant="outline" onClick={onPostBounty} className="h-9 border-signal/60 font-extrabold uppercase text-[#27AE60] hover:bg-signal hover:text-signal-foreground">
-                      <CircleDollarSign className="size-8 text-signal" /> Post bounty
+                    <Button type="button" variant="outline" onClick={onPostBounty} className="h-9 animate-red-flash font-extrabold uppercase text-[#FF5A4E] hover:bg-signal hover:text-signal-foreground">
+                      <CircleDollarSign className="size-8 text-[#FF5A4E]" /> Post bounty
                     </Button>
                   </div>
                 </div>
