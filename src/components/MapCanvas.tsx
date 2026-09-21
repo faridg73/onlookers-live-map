@@ -283,6 +283,14 @@ export function MapCanvas({
     map.current.setZoom(centerTarget.zoom ?? 14);
   }, [ready, centerTarget]);
 
+  // A chosen place or category area: fly there and keep its own labelled pin.
+  useEffect(() => {
+    if (!ready || !focusPin || !map.current) return;
+    map.current.panTo({ lat: focusPin.lat, lng: focusPin.lng });
+    const current = map.current.getZoom() ?? 0;
+    if (current < (focusPin.zoom ?? 15)) map.current.setZoom(focusPin.zoom ?? 15);
+  }, [ready, focusPin]);
+
   /**
    * Real businesses for the settled view: names, ratings and addresses straight
    * from Google Places. Only fetched close in, and debounced, to stay cheap.
