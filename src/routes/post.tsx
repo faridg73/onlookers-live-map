@@ -1429,7 +1429,12 @@ function PostScreen() {
                         type="button"
                         variant="outline"
                         aria-pressed={tier === option.id}
-                        onClick={() => setTier(option.id)}
+                        onClick={() => {
+                          setTier(option.id);
+                          // Coming back to Standard restores the gig price for the
+                          // clip length picked on Step 2 instead of a stale amount.
+                          if (option.id === "standard") setBounty(gig.totalCredits);
+                        }}
                         className={`relative h-auto items-start justify-start gap-3 whitespace-normal p-3 pr-7 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
                       >
                         {option.id === "fast_catch" && (
