@@ -10,7 +10,7 @@ import { SHARED_MAP_OPTIONS } from "@/lib/map-style";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
-import { REGIONAL_CENTER } from "@/lib/onlooker";
+import { formatAgoISO, REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 import type { CommunityPost } from "@/lib/community";
 import { incidentById } from "@/lib/trust-tiers";
@@ -276,13 +276,7 @@ export function GlobalFeedMap({
 function formatAlertTime(iso: string) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  const minutes = Math.round((Date.now() - date.getTime()) / 60000);
-  const relative =
-    minutes < 1 ? "just now"
-      : minutes < 60 ? `${minutes} min ago`
-        : minutes < 1440 ? `${Math.round(minutes / 60)} hr ago`
-          : `${Math.round(minutes / 1440)} d ago`;
-  return { relative, absolute: date.toLocaleString() };
+  return { relative: formatAgoISO(iso), absolute: date.toLocaleString() };
 }
 
 const STATUS_LABEL: Record<string, string> = {

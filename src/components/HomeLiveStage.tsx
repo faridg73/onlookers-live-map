@@ -2,7 +2,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
-import type { LiveRequest } from "@/lib/onlooker";
+import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
 
@@ -377,7 +377,7 @@ export function HomeLiveStage({
                         <span className="flex items-center justify-between gap-1">
                           <span className={`flex items-center gap-1 text-[0.55rem] font-extrabold uppercase ${alert ? "text-crisis" : live ? "text-live" : "text-muted-foreground"}`}>
                             {alert ? <Siren className="size-3" /> : live ? <Radio className="size-3 animate-pulse motion-reduce:animate-none" /> : <Eye className="size-3" />}
-                            {alert ? "Alert" : live ? `${request.watchers} watching` : `${request.minutesAgo}m ago`}
+                            {alert ? "Alert" : live ? `${request.watchers} watching` : formatAgo(request.minutesAgo)}
                           </span>
                           <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-background/70 px-1.5 py-[1px] font-mono text-[0.55rem] font-bold tabular-nums text-muted-foreground">
                             <CircleDollarSign className="size-2.5" aria-hidden /> {poolOf(request)}

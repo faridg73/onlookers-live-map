@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useMemo } from "react";
 import { Banknote, Clock, MapPin, Video } from "lucide-react";
+import { formatAgo } from "@/lib/onlooker";
 
 export interface CaptureActivity {
   id: string;
@@ -54,11 +55,6 @@ const MOCK_ACTIVITY: CaptureActivity[] = [
   },
 ];
 
-function formatAgo(minutes: number) {
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
-}
 
 interface RecentActivityFeedProps {
   activity?: CaptureActivity[];
