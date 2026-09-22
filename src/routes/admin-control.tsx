@@ -153,7 +153,7 @@ function ControlCenter() {
     : flags;
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-8">
+    <main className="mx-auto min-h-dvh w-full max-w-7xl px-4 pb-32 pt-8 sm:px-6 lg:px-8">
       <header className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-foreground">Control center</h1>
         <p className="mt-1 text-sm text-muted-foreground">
