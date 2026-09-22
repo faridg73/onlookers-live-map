@@ -1,7 +1,15 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, LocateFixed, MapPin, Search } from "lucide-react";
+import { Check, ChevronDown, Loader2, LocateFixed, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import type { DistanceUnit } from "@/hooks/use-distance-unit";
 import { autocompletePlaces, resolvePlaceSuggestion, type PlaceSuggestion } from "@/lib/geocode.functions";
 
@@ -54,7 +62,6 @@ export function CommunityFeedFilters({
   onSearchArea: (query: string) => Promise<boolean>;
   onApplyPlace: (place: ResolvedPlace) => boolean;
 }) {
-  const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [suggesting, setSuggesting] = useState(false);
@@ -96,7 +103,6 @@ export function CommunityFeedFilters({
     setQuery("");
     setSuggestions([]);
     setOpen(false);
-    setSearching(false);
     sessionToken.current = crypto.randomUUID();
   };
 
@@ -125,38 +131,42 @@ export function CommunityFeedFilters({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="inline-flex max-w-full items-center gap-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
-          <MapPin className="size-3.5 shrink-0 text-signal" />
-          <span className="truncate">Near {areaLabel}</span>
-        </span>
+    <Sheet>
+      <SheetTrigger asChild>
         <Button
           type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setSearching((current) => !current)}
-          aria-expanded={searching}
-          className="h-7 rounded-full px-2 text-[0.68rem] font-bold text-signal"
+          variant="outline"
+          className="h-10 max-w-full rounded-full border-white/15 bg-zinc-900/70 px-3.5 text-sm font-bold text-foreground hover:border-signal/60 hover:bg-zinc-900"
+          aria-label={`Change location and radius. Current selection: ${areaLabel}, ${radiusLabel(value, unit)}`}
         >
-          <Search className="size-3.5" /> City or state
+          <MapPin className="size-4 shrink-0 text-signal" />
+          <span className="truncate">{areaLabel}</span>
+          <span className="shrink-0 text-muted-foreground">· {radiusLabel(value, unit).replace(" ", "")}</span>
+          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled={locationBusy}
-          onClick={() => void onUseMyLocation()}
-          className="h-7 rounded-full px-2 text-[0.68rem] font-bold text-signal"
-        >
-          {locationBusy ? <Loader2 className="size-3.5 animate-spin" /> : <LocateFixed className="size-3.5" />}
-          My location
-        </Button>
-      </div>
+      </SheetTrigger>
 
-      {searching && (
+      <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-xl border-border bg-surface">
+        <div className="mx-auto w-full max-w-xl">
+          <SheetHeader className="pr-12 text-left">
+            <SheetTitle>Location &amp; radius</SheetTitle>
+            <SheetDescription>Choose where to look and how far from that area.</SheetDescription>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-5">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={locationBusy}
+              onClick={() => void onUseMyLocation()}
+              className="w-full justify-center rounded-full border-white/15 bg-zinc-900/50 font-bold text-signal hover:border-signal/60"
+            >
+              {locationBusy ? <Loader2 className="size-4 animate-spin" /> : <LocateFixed className="size-4" />}
+              {locationBusy ? "Locating…" : "Use my location"}
+            </Button>
+
         <form
-          className="flex max-w-md gap-2"
+          className="flex gap-2"
           onSubmit={(event) => {
             event.preventDefault();
             if (highlight >= 0 && suggestions[highlight]) {
@@ -228,29 +238,34 @@ export function CommunityFeedFilters({
             {locationBusy || suggesting ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
           </Button>
         </form>
-      )}
+            {locationError && <p className="col-span-full text-xs text-destructive">{locationError}</p>}
+          </form>
 
-      {locationError && <p className="text-[0.68rem] text-destructive">{locationError}</p>}
-
-      <div className="flex flex-wrap items-center gap-2" aria-label="Distance from selected area">
-        {RADIUS_CHOICES.map((choice) => (
-          <Button
-            key={choice.id}
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onChange(choice.id)}
-            aria-pressed={value === choice.id}
-            className={`h-8 rounded-full border px-3 text-[0.8rem] font-extrabold ${
-              value === choice.id
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25"
-            }`}
-          >
-            {radiusLabel(choice.id, unit)}
-          </Button>
-        ))}
-      </div>
-    </div>
+          <div>
+            <p className="mb-2 text-xs font-extrabold uppercase text-muted-foreground">Radius</p>
+            <div className="grid grid-cols-4 gap-2" aria-label="Distance from selected area">
+              {RADIUS_CHOICES.map((choice) => (
+                <Button
+                  key={choice.id}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onChange(choice.id)}
+                  aria-pressed={value === choice.id}
+                  className={`h-9 min-w-0 rounded-full border px-2 text-xs font-extrabold ${
+                    value === choice.id
+                      ? "border-signal bg-signal text-signal-foreground"
+                      : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25"
+                  }`}
+                >
+                  {radiusLabel(choice.id, unit).replace(" ", "")}
+                </Button>
+              ))}
+            </div>
+          </div>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
