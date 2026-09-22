@@ -137,7 +137,7 @@ export function BroadcastCategoryPicker({
         </div>
       )}
 
-      {selected && <div className="mt-3 rounded-xl border-2 border-signal p-3 shadow-[0_0_10px_rgba(204,255,0,0.35)]">
+      {selected && <div className="mt-3 rounded-xl border border-white/10 bg-zinc-900/50 p-3 backdrop-blur-md">
         <p className="text-center text-[0.62rem] font-extrabold uppercase text-signal">
           Refine your vibe
         </p>
@@ -149,10 +149,10 @@ export function BroadcastCategoryPicker({
             aria-pressed={subcategory === null}
             onClick={() => onSubcategoryChange(null)}
             className={cn(
-              "h-8 rounded-full border-2 px-3 text-[0.65rem] font-extrabold uppercase shadow-[0_0_8px_rgba(204,255,0,0.3)]",
+              "h-8 rounded-full border px-3 text-[0.65rem] font-extrabold uppercase",
               subcategory === null
                 ? "border-signal bg-signal text-signal-foreground"
-                : "border-signal bg-surface text-signal hover:bg-signal/10",
+                : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25",
             )}
           >
             No vibe
@@ -167,12 +167,12 @@ export function BroadcastCategoryPicker({
                 variant="outline"
                 aria-pressed={active}
                 onClick={() => onSubcategoryChange(active ? null : option)}
-                className={cn(
-                  "h-8 rounded-full border-2 px-3 text-[0.65rem] font-extrabold uppercase shadow-[0_0_8px_rgba(204,255,0,0.3)]",
-                  active
-                    ? "border-signal bg-signal text-signal-foreground"
-                    : "border-signal bg-surface text-signal hover:bg-signal/10",
-                )}
+                 className={cn(
+                   "h-8 rounded-full border px-3 text-[0.65rem] font-extrabold uppercase",
+                   active
+                     ? "border-signal bg-signal text-signal-foreground"
+                     : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25",
+                 )}
               >
                 {active && <Check className="size-3" strokeWidth={3} />}
                 {option}
