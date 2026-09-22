@@ -194,6 +194,13 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     setSelectedId((cur) => (cur === id ? null : cur));
   }, []);
 
+  /** Re-tags the filming spot on a bounty the poster owns. */
+  const updateLocationType = useCallback((id: string, locationType: string) => {
+    setRequests((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, locationType } : r)),
+    );
+  }, []);
+
   const claim = useCallback((id: string) => {
     setRequests((prev) =>
       prev.map((r) => (r.id === id && !isClosed(r) ? { ...r, status: "claimed" as const, responses: r.responses + 1 } : r)),
