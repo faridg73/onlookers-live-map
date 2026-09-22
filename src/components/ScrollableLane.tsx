@@ -22,7 +22,7 @@ export function ScrollableLane({
   arrows = true,
   fade = true,
   fadeClassName = "from-background via-background/80 to-transparent",
-  arrowClassName = "border-border bg-background/90 text-foreground hover:border-signal hover:text-signal",
+  arrowClassName = "border-border bg-background/90 text-foreground hover:border-white/25 hover:text-foreground",
 }: ScrollableLaneProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

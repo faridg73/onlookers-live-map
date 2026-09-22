@@ -58,13 +58,13 @@ export function BroadcastCategoryPicker({
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="h-auto min-h-14 w-full justify-start gap-3 border-border bg-surface-raised px-3 py-2.5 text-left hover:border-signal/60 hover:bg-surface-raised"
+        className="h-auto min-h-14 w-full justify-start gap-3 border-border bg-surface-raised px-3 py-2.5 text-left hover:border-white/25 hover:bg-surface-raised"
       >
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-signal/30 bg-signal/10 text-lg">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-surface-raised text-lg">
           {selected?.icon ?? "🌐"}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[0.6rem] font-extrabold uppercase text-signal">
+          <span className="block text-[0.6rem] font-extrabold uppercase text-muted-foreground">
             {laneLabel}
           </span>
           <span className="block truncate text-sm font-extrabold text-foreground">
@@ -78,10 +78,10 @@ export function BroadcastCategoryPicker({
         <div
           role="listbox"
           aria-label="Broadcast categories"
-          className="absolute inset-x-0 top-[calc(100%+0.4rem)] z-50 max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-signal/35 bg-popover p-1.5 shadow-2xl"
+          className="absolute inset-x-0 top-[calc(100%+0.4rem)] z-50 max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-border bg-popover p-1.5 shadow-2xl"
         >
           <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-popover px-2 py-2 text-[0.62rem] font-extrabold uppercase text-muted-foreground">
-            <Layers3 className="size-3.5 text-signal" /> {menuLabel}
+            <Layers3 className="size-3.5 text-muted-foreground" /> {menuLabel}
           </div>
           {allowAll && (
             <Button
@@ -138,7 +138,7 @@ export function BroadcastCategoryPicker({
       )}
 
       {selected && <div className="mt-3 rounded-xl border border-white/10 bg-zinc-900/50 p-3 backdrop-blur-md">
-        <p className="text-center text-[0.62rem] font-extrabold uppercase text-signal">
+        <p className="text-center text-[0.62rem] font-extrabold uppercase text-muted-foreground">
           Refine your vibe
         </p>
         <div className="mt-2 flex flex-wrap justify-center gap-2" aria-label={`${selected.label} subcategories`}>

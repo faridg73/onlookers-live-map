@@ -113,7 +113,7 @@ export function CommunityPostCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/35" />
         <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-foreground backdrop-blur-md">
-          <CategoryIcon className="size-3 text-signal" /> {def.label}
+          <CategoryIcon className="size-3 text-muted-foreground" /> {def.label}
         </span>
         {pinned && (
           <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-md bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold uppercase text-signal-foreground">
@@ -142,7 +142,7 @@ export function CommunityPostCard({
               className="size-8 shrink-0 rounded-full border border-border object-cover"
             />
           ) : (
-            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-surface-raised text-xs font-extrabold text-signal">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-surface-raised text-xs font-extrabold text-muted-foreground">
               {initial}
             </span>
           )}
@@ -158,7 +158,7 @@ export function CommunityPostCard({
         </div>
 
         <h3 className="mt-2.5 text-sm font-extrabold leading-snug text-foreground">{post.title}</h3>
-        {post.body && <p className="mt-1 line-clamp-2 text-xs font-semibold text-signal">{post.body}</p>}
+        {post.body && <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted-foreground">{post.body}</p>}
         {isReport && (
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[0.62rem] font-extrabold uppercase ${reportStatusClass}`}>
@@ -169,7 +169,7 @@ export function CommunityPostCard({
               Trust {post.trustScore} · {post.validationCount} validations · {post.flagCount} flags
             </span>
             {post.mediaAnalysisStatus !== "not_required" && (
-              <span className="text-[0.65rem] font-bold text-signal">
+              <span className="text-[0.65rem] font-bold text-muted-foreground">
                 {post.mediaAnalysisStatus === "analyzing" ? "Analyzing media" : "Media analysis complete"}
               </span>
             )}
@@ -177,7 +177,7 @@ export function CommunityPostCard({
         )}
 
         {post.eventStartsAt && (
-          <p className="mt-2 inline-flex items-center gap-1 rounded-md border border-signal/60 bg-signal/10 px-2 py-1 text-[0.65rem] font-extrabold text-signal">
+          <p className="mt-2 inline-flex items-center gap-1 rounded-md border border-border bg-surface-raised px-2 py-1 text-[0.65rem] font-extrabold text-muted-foreground">
             <CalendarDays className="size-3" />
             {new Date(post.eventStartsAt).toLocaleString(undefined, {
               weekday: "short",
@@ -195,7 +195,7 @@ export function CommunityPostCard({
               <MapPin className="size-3" /> <span className="truncate">{post.place}</span>
             </span>
           )}
-          {distanceLabel && <span className="font-bold text-signal">{distanceLabel}</span>}
+          {distanceLabel && <span className="font-bold text-muted-foreground">{distanceLabel}</span>}
           {trust && trust.totalClaims > 0 && (
             <span className="font-bold text-foreground">{trust.completionRate}% rep</span>
           )}
@@ -210,14 +210,14 @@ export function CommunityPostCard({
                   type="button"
                   onClick={() => onTagClick(t)}
                   title={`Open the map filtered to #${t}`}
-                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal transition-colors hover:border-signal hover:bg-signal/15"
+                  className="rounded-full border border-white/15 px-2 py-0.5 text-[0.62rem] font-bold text-muted-foreground transition-colors hover:border-white/30 hover:text-foreground"
                 >
                   #{t}
                 </button>
               ) : (
                 <span
                   key={t}
-                  className="rounded-full border border-signal/60 px-2 py-0.5 text-[0.62rem] font-bold text-signal"
+                  className="rounded-full border border-white/15 px-2 py-0.5 text-[0.62rem] font-bold text-muted-foreground"
                 >
                   #{t}
                 </span>
@@ -281,7 +281,7 @@ export function CommunityPostCard({
                 variant="outline"
                 size="sm"
                 onClick={() => setBoosting((v) => !v)}
-                className="h-8 rounded-lg border-signal/60 bg-signal/10 px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-signal"
+                className="h-8 rounded-lg px-2.5 text-[0.65rem] font-bold uppercase tracking-[0.08em] text-muted-foreground"
               >
                 <Pin className="size-3.5" /> Boost
               </Button>
@@ -351,7 +351,7 @@ export function CommunityPostCard({
                         toast.error(err instanceof Error ? err.message : "Couldn't boost that."),
                       );
                   }}
-                  className="flex-1 rounded-lg border-signal/60 px-2 text-xs font-bold text-signal"
+                  className="flex-1 rounded-lg px-2 text-xs font-bold text-foreground"
                 >
                   {formatCredits(c)}
                 </Button>

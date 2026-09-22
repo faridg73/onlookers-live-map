@@ -27,7 +27,7 @@ export function CategoryExampleCards({
   return (
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
       <div className="flex flex-col items-center text-center">
-        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
+        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
           <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
         </p>
         <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
@@ -52,10 +52,10 @@ export function CategoryExampleCards({
                 coverClass={visual.coverClass}
               />
               <span className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-transparent" />
-              <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-signal px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-signal-foreground">
+              <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md bg-background/70 px-2 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.12em] text-foreground">
                 <Icon className="size-3.5" /> {seed.kicker}
               </span>
-              <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2 py-0.5 text-[0.62rem] font-bold text-signal backdrop-blur-md">
+              <span className="absolute bottom-3 left-3 rounded-full bg-background/70 px-2 py-0.5 text-[0.62rem] font-bold text-foreground backdrop-blur-md">
                 #{seed.tag}
               </span>
             </div>
@@ -66,7 +66,7 @@ export function CategoryExampleCards({
                 type="button"
                 variant="ghost"
                 onClick={() => onStart(category)}
-                className="mt-3 h-auto p-0 text-xs font-bold text-signal hover:bg-transparent hover:text-signal"
+                className="mt-3 h-auto p-0 text-xs font-bold text-muted-foreground hover:bg-transparent hover:text-foreground"
               >
                  Start a post <ArrowRight className="size-3.5" />
               </Button>

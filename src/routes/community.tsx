@@ -362,7 +362,7 @@ function CommunityHub() {
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <div className="flex items-start justify-between gap-3">
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-signal">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
             <Compass className="size-4" /> Discover
           </p>
           <button
@@ -375,7 +375,7 @@ function CommunityHub() {
               }
               void navigate({ to: "/" });
             }}
-            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:border-signal hover:bg-secondary hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:border-white/25 hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="size-5" />
           </button>
@@ -383,7 +383,7 @@ function CommunityHub() {
         <h1 className="mt-2 whitespace-nowrap text-center text-xl font-extrabold text-foreground sm:text-2xl">
           See what your city is doing now
         </h1>
-        <p className="mt-1 text-center text-sm font-semibold text-signal">
+        <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
           A live local stream, tap a lane, tighten the radius, or open the map.
         </p>
         <Link
@@ -425,7 +425,7 @@ function CommunityHub() {
               size="sm"
               onClick={() => setVibeGridOpen((open) => !open)}
               aria-expanded={vibeGridOpen}
-              className="h-auto p-0 text-xs font-bold text-signal underline decoration-signal/50 underline-offset-4 hover:bg-transparent hover:text-signal"
+              className="h-auto p-0 text-xs font-bold text-muted-foreground underline decoration-muted-foreground/40 underline-offset-4 hover:bg-transparent hover:text-foreground"
             >
               {vibeGridOpen ? "Hide" : "See All"}
             </Button>
@@ -478,7 +478,7 @@ function CommunityHub() {
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col items-center gap-0.5 px-2 py-2 text-center">
                       <strong className="line-clamp-2 text-[0.9rem] font-extrabold leading-tight text-foreground">{lane.label}</strong>
-                      <small className="line-clamp-2 text-[0.72rem] font-semibold leading-snug text-signal">
+                      <small className="line-clamp-2 text-[0.72rem] font-semibold leading-snug text-muted-foreground">
                         {lane.subcategories.slice(0, 2).join(" · ")}
                       </small>
                     </span>
@@ -523,7 +523,7 @@ function CommunityHub() {
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                 <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-signal-foreground"><Icon className="size-4" /></span>
+                  <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-signal text-signal-foreground" : "bg-white/10 text-foreground"}`}><Icon className="size-4" /></span>
                   <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] font-semibold text-signal">{c.blurb}</small></span>
                 </span>
               </button>
@@ -534,7 +534,7 @@ function CommunityHub() {
         {!vibeGridOpen && (
           <div className="mx-4 mt-1 h-1.5 rounded-full bg-surface-raised md:hidden" aria-hidden="true">
             <div
-              className="h-full rounded-full bg-signal/80 transition-[width,margin] duration-100"
+              className="h-full rounded-full bg-white/30 transition-[width,margin] duration-100"
               style={{
                 width: `${Math.max(vibeScroll.width, 12)}%`,
                 marginLeft: `${vibeScroll.left}%`,
@@ -549,12 +549,12 @@ function CommunityHub() {
 
       {strangeSightings && (
         <section className="mx-5 mt-4 rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3 backdrop-blur-md sm:mx-8">
-          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-signal">Mystery desk</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">Mystery desk</p>
           <h2 className="mt-1 text-lg font-extrabold text-foreground">Report, investigate, or request proof</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             <Button type="button" onClick={() => { setLiveFirst(false); setComposing(true); }} className="h-auto min-h-10 whitespace-normal text-xs">Report Sighting</Button>
-            <Button type="button" variant="outline" onClick={() => { setView("feed"); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }} className="h-auto min-h-10 whitespace-normal border-signal/45 text-xs">View Community Logs</Button>
-            <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal border-signal/45 text-xs"><Link to="/post" search={{ mystery: "1" }}>Request a Mystery Bounty</Link></Button>
+            <Button type="button" variant="outline" onClick={() => { setView("feed"); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }} className="h-auto min-h-10 whitespace-normal text-xs">View Community Logs</Button>
+            <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal text-xs"><Link to="/post" search={{ mystery: "1" }}>Request a Mystery Bounty</Link></Button>
           </div>
         </section>
       )}
@@ -708,7 +708,7 @@ function CommunityHub() {
               setLiveFirst(true);
               setComposing(true);
             }}
-            className="rounded-full border-signal/60 bg-signal/10 text-xs font-extrabold uppercase tracking-[0.1em] text-signal"
+            className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <Radio className="size-4" /> Start live stream
           </Button>
@@ -717,7 +717,7 @@ function CommunityHub() {
             variant="outline"
             size="sm"
             onClick={() => setListingEvent(true)}
-            className="rounded-full border-signal/60 bg-signal/10 text-xs font-extrabold uppercase tracking-[0.1em] text-signal"
+            className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <CalendarPlus className="size-4" /> List an event
           </Button>
@@ -787,7 +787,7 @@ function CommunityHub() {
             </div>
           )}
           {!loading && source === "following" && visible.length === 0 && (
-            <div className="mb-6 rounded-2xl border border-dashed border-signal/45 bg-card p-6 text-center">
+            <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 {followedIds.length === 0
                   ? "You don't follow anyone yet. Tap Follow on a creator and their posts land here first."
