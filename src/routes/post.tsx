@@ -1562,33 +1562,42 @@ function PostScreen() {
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
                     <p className="mt-1 text-xs font-medium text-muted-foreground">
-                      Starts at the calculated price for your{" "}
-                      {captureDurationLabel(capture, action === "live")}. Changing it{" "}
-                      <span className="font-extrabold text-foreground">replaces</span> that
-                      price — it is never added on top.
+                      Pre-set to the calculated total for your{" "}
+                      {captureDurationLabel(capture, action === "live")} — that's the{" "}
+                      <span className="font-extrabold text-foreground">minimum the onlooker earns</span>.
+                      You can raise it as a tip, but never go below it.
                     </p>
-                    <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                    <div className="mt-3">
+                      <BountyAmountPicker
+                        value={bounty}
+                        onChange={(next) => setBounty(Math.max(gigFloor, next))}
+                        balance={balance}
+                        min={gigFloor}
+                      />
+                    </div>
                     {rewardMatchesGig ? (
                       <p className="mt-2 text-xs font-medium text-muted-foreground">
-                        Matching the calculated price of{" "}
-                        <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                        Matching the calculated total of{" "}
+                        <span className="font-extrabold text-signal">{formatCredits(gigFloor)}</span> — held in
+                        escrow and paid to the onlooker.
                       </p>
                     ) : (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                         <span>
-                          You replaced the calculated price for{" "}
-                          {captureDurationLabel(capture, action === "live")} (
-                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>
-                          ).
+                          You're tipping{" "}
+                          <span className="font-extrabold text-signal">
+                            {formatCredits(Math.max(0, Math.round(bounty) - gigFloor))}
+                          </span>{" "}
+                          above the {formatCredits(gigFloor)} calculated minimum.
                         </span>
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
-                          onClick={() => setBounty(gig.totalCredits)}
+                          onClick={() => setBounty(gigFloor)}
                           className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
                         >
-                          Reset to calculated price
+                          Back to calculated total
                         </Button>
                       </div>
                     )}
