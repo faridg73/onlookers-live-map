@@ -374,3 +374,31 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       weatherMultiplier: Number(row.weather_multiplier ?? 1),
     }));
   });
+
+const locationTypeUpdateSchema = z.object({
+  requestId: z.string().uuid(),
+  locationType: z.enum(["public", "commercial", "event_venue", "owner_authorized"]),
+});
+
+/**
+ * Lets the poster re-tag the filming spot on their own bounty (e.g. a venue
+ * confirmed permission, so "public" becomes "owner_authorized"). The row
+ * guards allow the requester to change only this column, and the RLS policy
+ * plus the explicit requester check keep everyone else out.
+ */
+export const updateRequestLocationType = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((data: unknown) => locationTypeUpdateSchema.parse(data))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    const { data: rows, error } = await context.supabase
+      .from("requests")
+      .update({ location_type: data.locationType })
+      .eq("id", data.requestId)
+      .eq("requester_id", context.userId)
+      .select("id");
+    if (error) throw new Error(error.message);
+    if (!rows || rows.length === 0) {
+      throw new Error("Only the poster can change this bounty's location tag.");
+    }
+    return { ok: true };
+  });
