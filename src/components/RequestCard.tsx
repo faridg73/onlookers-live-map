@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Eye, MapPin, Camera, MessageCircle, Video, X } from "lucide-react";
+import { Check, Eye, MapPin, Camera, MessageCircle, Pencil, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
@@ -16,7 +16,14 @@ import { SitePinVerification } from "@/components/SitePinVerification";
 import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
-import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import {
+  LOCATION_TYPES,
+  formatAgo,
+  statusLabel,
+  type LiveRequest,
+  type LocationTypeId,
+} from "@/lib/onlooker";
+import { updateRequestLocationType } from "@/lib/requests.functions";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
@@ -43,10 +50,35 @@ export function RequestCard({
   const expired = request.status === "expired";
   const done = isClosed(request);
   const [cancelling, setCancelling] = useState(false);
-  const { remove } = useOnlooker();
+  const { remove, updateLocationType } = useOnlooker();
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
+
+  // The poster alone can re-tag the filming spot — e.g. a venue granted
+  // permission after posting, so "Public Space" becomes "Owner-Authorized".
+  const canEditLocationType = request.requester === "you" && Boolean(request.dbId) && !done;
+  const [editingLocationType, setEditingLocationType] = useState(false);
+  const [savingLocationType, setSavingLocationType] = useState(false);
+
+  async function saveLocationType(next: LocationTypeId) {
+    const dbId = request.dbId;
+    if (!dbId || next === request.locationType) {
+      setEditingLocationType(false);
+      return;
+    }
+    setSavingLocationType(true);
+    try {
+      await updateRequestLocationType({ data: { requestId: dbId, locationType: next } });
+      updateLocationType(request.id, next);
+      setEditingLocationType(false);
+      toast.success("Location tag updated.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update the location tag.");
+    } finally {
+      setSavingLocationType(false);
+    }
+  }
 
   if (compact) {
     return (
@@ -142,7 +174,56 @@ export function RequestCard({
           <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground">
             <MapPin className="size-3.5" /> {request.place}
             <LocationTypeBadge locationType={request.locationType} />
+            {canEditLocationType && !editingLocationType && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingLocationType(true);
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Pencil className="size-3" aria-hidden /> Edit
+              </button>
+            )}
           </p>
+          {canEditLocationType && editingLocationType && (
+            <div
+              className="mt-2 flex flex-wrap items-center gap-1.5 rounded-xl border border-border bg-surface-raised p-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {LOCATION_TYPES.map((type) => {
+                const selected = type.id === request.locationType;
+                return (
+                  <button
+                    key={type.id}
+                    type="button"
+                    disabled={savingLocationType}
+                    onClick={() => void saveLocationType(type.id)}
+                    title={type.blurb}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] transition-colors disabled:opacity-50",
+                      selected
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-border bg-background/70 text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {selected && <Check className="size-3" aria-hidden />}
+                    <span aria-hidden>{type.emoji}</span>
+                    {type.label}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                disabled={savingLocationType}
+                onClick={() => setEditingLocationType(false)}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+              >
+                {savingLocationType ? "Saving…" : "Close"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-2.5 py-2 text-center">

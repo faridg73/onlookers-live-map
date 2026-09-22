@@ -82,6 +82,7 @@ type Store = {
   addRequest: (input: NewRequest) => LiveRequest;
   claim: (id: string) => void;
   remove: (id: string) => void;
+  updateLocationType: (id: string, locationType: string) => void;
 };
 
 // Keep one context identity across Vite hot updates. Without this, the root
@@ -194,6 +195,13 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     setSelectedId((cur) => (cur === id ? null : cur));
   }, []);
 
+  /** Re-tags the filming spot on a bounty the poster owns. */
+  const updateLocationType = useCallback((id: string, locationType: string) => {
+    setRequests((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, locationType } : r)),
+    );
+  }, []);
+
   const claim = useCallback((id: string) => {
     setRequests((prev) =>
       prev.map((r) => (r.id === id && !isClosed(r) ? { ...r, status: "claimed" as const, responses: r.responses + 1 } : r)),
@@ -201,8 +209,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove }),
-    [requests, selectedId, addRequest, claim, remove],
+    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
+    [requests, selectedId, addRequest, claim, remove, updateLocationType],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
