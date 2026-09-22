@@ -1546,7 +1546,7 @@ function PostScreen() {
                           onClick={() => setBounty(gig.totalCredits)}
                           className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
                         >
-                          Use gig price
+                          Reset to calculated price
                         </Button>
                       </div>
                     )}
@@ -1650,7 +1650,9 @@ function PostScreen() {
           <footer className="shrink-0 border-t border-border bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6">
             {step === 3 && (
               <div className="mb-3 flex items-center justify-between gap-3 text-sm">
-                <span className="font-bold text-muted-foreground">Total escrow</span>
+                <span className="font-bold text-muted-foreground">
+                  Held in escrow · paid to the onlooker
+                </span>
                 <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
               </div>
             )}
