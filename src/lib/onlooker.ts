@@ -376,8 +376,23 @@ export const statusLabel: Record<RequestStatus, string> = {
   expired: "Expired",
 };
 
+/** Shared relative-time formatter: Xm → Xh → Xd → actual date (e.g. "Sep 15") past 7 days. */
 export function formatAgo(min: number) {
   if (min < 1) return "just now";
-  if (min < 60) return `${min}m ago`;
-  return `${Math.floor(min / 60)}h ago`;
+  if (min < 60) return `${Math.round(min)}m ago`;
+  const hours = Math.floor(min / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(Date.now() - min * 60_000).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/** Same formatting from an ISO timestamp. */
+export function formatAgoISO(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return formatAgo(Math.round((Date.now() - date.getTime()) / 60_000));
 }
