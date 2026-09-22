@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useBoosts } from "@/lib/boosts-store";
-import { isClosed, useOnlooker } from "@/lib/onlooker-store";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import {
   requestMapPosition,
@@ -87,12 +87,6 @@ function MapScreen() {
 
   const poolOf = useCallback((request: LiveRequest) => request.bounty + boostOf(request.id), [boostOf]);
 
-  const hotSpotRequests = useMemo(() => {
-    return requests
-      .filter((request) => !isClosed(request))
-      .sort((a, b) => b.watchers - a.watchers)
-      .slice(0, 12);
-  }, [requests]);
   return (
     <div className="home-marketplace fixed inset-0 overflow-hidden bg-surface">
       <HomeLiveStage
@@ -104,21 +98,10 @@ function MapScreen() {
         onOpenRequest={(request) => {
           openOnMap(request);
         }}
-        hotSpot={hotSpotRequests[0] ?? null}
-        hotSpotRequests={hotSpotRequests}
-        onOpenHighBounty={(request) => {
-          openOnMap(request);
-        }}
         onOpenLive={(request) => {
           void navigate({ to: "/live/$id", params: { id: request.id } });
         }}
         onOpenEmergency={(request) => {
-          openOnMap(request);
-        }}
-        onOpenDispatches={() => {
-          void navigate({ to: "/hunt" });
-        }}
-        onOpenHotSpot={(request) => {
           openOnMap(request);
         }}
       />
