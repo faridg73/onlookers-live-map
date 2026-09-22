@@ -16,12 +16,14 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   CATEGORIES,
+  LOCATION_TYPES,
   categoryById,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
   needsPublicSpacesNotice,
   type CategoryId,
+  type LocationTypeId,
 } from "@/lib/onlooker";
 import { PUBLIC_HAPPENINGS_DISCLAIMER } from "@/lib/camera-only";
 
@@ -30,6 +32,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState("");
+  const [locationType, setLocationType] = useState<LocationTypeId | null>(null);
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(20);
   const [category, setCategory] = useState<CategoryId>("food");
@@ -48,6 +51,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
+    if (!locationType) {
+      toast.error("Pick the location type so hunters know this spot is cleared for filming.");
+      return;
+    }
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
