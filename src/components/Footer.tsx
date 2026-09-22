@@ -122,7 +122,7 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
   return (
-    <footer className="border-t border-border bg-surface px-4 pt-6 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
+    <footer className="mt-8 border-t border-border bg-surface px-4 py-6">
       <div className="mx-auto w-full max-w-7xl">
         {showLinks && (
           <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
@@ -147,7 +147,7 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
           </nav>
         )}
 
-        <div className="my-8 flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-5">
           <SocialLinks className="flex items-center justify-center gap-2.5" />
           <div className="flex w-full flex-col items-center justify-between gap-1.5 sm:flex-row">
             <p className="text-xs font-semibold text-muted-foreground">
