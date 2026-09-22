@@ -157,7 +157,7 @@ function RootComponent() {
             )}
             {!embedded && (
               <>
-                <AppMenu />
+                {pathname.startsWith("/profile") && <AppMenu />}
                 <BottomNav />
                 <ProfileSetup />
                 <OnboardingWalkthrough />

@@ -45,8 +45,6 @@ export function AppMenu() {
   const [inboxOpen, setInboxOpen] = useState(false);
   // Points at the "You're here" link so the drawer can scroll to it on open.
   const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
-  // Home's logo card owns the top-right corner, so the launcher tucks under it.
-  const onHome = useRouterState({ select: (state) => state.location.pathname === "/" });
   // Current path so the drawer highlights the page you're on when reopened.
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
@@ -67,12 +65,8 @@ export function AppMenu() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={unread > 0 ? `More, ${unread} unread messages` : "More"}
-        className={`absolute z-[70] grid size-9 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110 ${
+        className={`absolute right-4 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[70] grid size-9 place-items-center rounded-full border border-signal/60 bg-surface/90 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:brightness-110 ${
           open ? "hidden" : ""
-        } ${
-          onHome
-            ? "right-3 top-[calc(env(safe-area-inset-top)+6.75rem)] md:right-4"
-            : "right-14 top-[calc(env(safe-area-inset-top)+0.75rem)]"
         }`}
       >
         <Menu className="size-4" aria-hidden />

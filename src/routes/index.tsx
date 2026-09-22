@@ -95,24 +95,6 @@ function MapScreen() {
   }, [requests]);
   return (
     <div className="home-marketplace fixed inset-0 overflow-hidden bg-surface">
-
-
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-[60] px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] md:px-6">
-        <div className="pointer-events-auto ml-auto flex w-fit flex-col items-center gap-1 rounded-2xl border border-home-line bg-home-glass-strong px-2.5 py-2 shadow-2xl backdrop-blur-2xl md:px-3 md:py-2.5">
-          <img
-            src="/icon-192.png"
-            alt="Onlooker logo"
-            className="size-10 rounded-lg object-cover md:size-12"
-          />
-          <h1 className="text-xs font-bold leading-none text-foreground md:text-sm">
-            Onlooker
-          </h1>
-          <p className="whitespace-nowrap text-[0.55rem] font-medium leading-none text-foreground/55 md:text-[0.6rem]">
-            Live eyes, anywhere
-          </p>
-        </div>
-      </header>
-
       <HomeLiveStage
         requests={requests}
         poolOf={poolOf}

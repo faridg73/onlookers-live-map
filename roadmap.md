@@ -8,3 +8,4 @@
 - [x] Responsive audit: trending dropdown pinned to viewport (flips above row), Home stage scrolls within viewport on short screens
 - [x] Publish updated version
 - [x] Home: remove map canvas and use premium charcoal glass background; restore standard road maps globally
+- [x] Navigation: remove the top-right logo globally and show the secondary menu only on Profile

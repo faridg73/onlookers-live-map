@@ -300,7 +300,7 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+5.3rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
+    <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
       {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
       <div
         className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
