@@ -19,10 +19,13 @@ export function RecentCapturesFeed({
   limit = 6,
   title = "Recent captures",
   blurb = "Streams that already wrapped, still watchable any time.",
+  emptyTeaser,
 }: {
   limit?: number;
   title?: string;
   blurb?: string;
+  /** Shown in place of the wall while there are no captures yet (Home teaser). */
+  emptyTeaser?: React.ReactNode;
 }) {
   const [clips, setClips] = useState<ExploreClip[] | null>(null);
   /** Which card the person tapped — that one swaps the loop for the real player. */
@@ -102,7 +105,31 @@ export function RecentCapturesFeed({
     };
   }, [limit]);
 
-  if (!clips || clips.length === 0) return null;
+  if (!clips) return null;
+
+  if (clips.length === 0) {
+    if (!emptyTeaser) return null;
+    return (
+      <section
+        className="rounded-2xl border border-border bg-surface p-4"
+        aria-label={`${title} — nothing here yet`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <p className="inline-flex items-center gap-2 font-display text-base font-bold text-foreground">
+            <Video className="size-4 text-signal" aria-hidden /> {title}
+          </p>
+          <Link
+            to="/explore"
+            className="text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-muted-foreground"
+          >
+            See all
+          </Link>
+        </div>
+        <p className="mt-1 text-xs text-muted-foreground">{blurb}</p>
+        {emptyTeaser}
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-2xl border border-border bg-surface p-4" aria-label={title}>
