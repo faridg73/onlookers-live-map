@@ -1385,9 +1385,10 @@ function PostScreen() {
                       live={capture === null}
                       rewardCredits={quote.baseCredits}
                       rewardMatchesGig={rewardMatchesGig}
+                      floorCredits={tier === "standard" ? gigFloor : undefined}
                       urgencyFactor={quote.urgencyFactor}
                       weatherFactor={quote.weatherFactor}
-                      totalCredits={quote.total}
+                      totalCredits={tier === "standard" ? escrowReward : quote.total}
                     />
                     <p className="mt-2 text-xs font-medium text-muted-foreground">
                       {captureDurationLabel(capture, action === "live")}
@@ -1669,8 +1670,9 @@ function PostScreen() {
                 <GigCostBreakdown
                   gig={gig}
                   live={capture === null}
-                  rewardCredits={quote.baseCredits}
+                  rewardCredits={escrowReward}
                   rewardMatchesGig={rewardMatchesGig}
+                  floorCredits={tier === "standard" ? gigFloor : undefined}
                   urgencyFactor={quote.urgencyFactor}
                   weatherFactor={quote.weatherFactor}
                   tipCredits={Number.isFinite(tip) ? tip : 0}
