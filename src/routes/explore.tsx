@@ -12,8 +12,8 @@ import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { readSessionState, writeSessionState } from "@/lib/session-state";
 import {
   countClipView,
+  fetchAllExploreClips,
   fetchClipComments,
-  fetchExploreClips,
   postClipComment,
   rateClip,
   type ExploreClip,
@@ -68,7 +68,7 @@ function ExplorePage() {
   }, [tab]);
 
   useEffect(() => {
-    void fetchExploreClips()
+    void fetchAllExploreClips()
       .then(setClips)
       .catch(() => setClips([]))
       .finally(() => setLoading(false));
