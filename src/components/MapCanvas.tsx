@@ -154,6 +154,10 @@ export function MapCanvas({
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
         });
+        // A manual drag means the viewer owns the camera from now on.
+        map.current.addListener("dragstart", () => {
+          userInteracted.current = true;
+        });
         // Once the map settles, note the area on screen so real place data can load.
         map.current.addListener("idle", () => {
           const current = map.current;
@@ -211,6 +215,8 @@ export function MapCanvas({
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
+  /** Once the viewer drags/zooms by hand, never auto-center under them again. */
+  const userInteracted = useRef(false);
 
   const centerOn = useCallback((at: google.maps.LatLngLiteral) => {
     if (!map.current) {
