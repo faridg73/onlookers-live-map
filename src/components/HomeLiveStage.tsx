@@ -479,11 +479,18 @@ export function HomeLiveStage({
         )}
       </div>
 
-      <div ref={tickerRef} className="relative mt-2 flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
+      {/* Section separator: clear hierarchy between the cards and the filter row. */}
+      <div className="mt-4 mb-2.5 flex items-center gap-3 px-1">
+        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-signal/35 to-signal/35" aria-hidden />
+        <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Explore feeds</span>
+        <span className="h-px flex-1 bg-gradient-to-l from-transparent via-signal/35 to-signal/35" aria-hidden />
+      </div>
+
+      <div ref={tickerRef} className="relative flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
         <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
         <div
           ref={trendScrollerRef}
-          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-2 pt-1 whitespace-nowrap"
+          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-3.5 pt-1.5 whitespace-nowrap"
           onScroll={updateTrendScroll}
           onWheel={(event) => {
             if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -502,7 +509,7 @@ export function HomeLiveStage({
                 aria-expanded={openFeed === trend.key}
                 aria-controls="home-live-feed-drawer"
                 aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[0.65rem] font-bold uppercase shadow-none transition-[transform] duration-150 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
+                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-home-line bg-home-glass px-3.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-foreground shadow-none transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal/70 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
               >
                 <Icon className="size-3.5" aria-hidden />
                 {trend.label}
@@ -511,7 +518,7 @@ export function HomeLiveStage({
             );
           })}
         </div>
-        <div className="pointer-events-none absolute inset-x-2 bottom-[3px] z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
+        <div className="pointer-events-none absolute inset-x-3 bottom-1 z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
           {trendScroll.thumbWidth < 100 && (
             <div
               className="h-full rounded-full bg-signal shadow-[0_0_10px_rgba(204,255,0,0.75)] transition-[width,margin-left] duration-150 ease-out motion-reduce:transition-none"
