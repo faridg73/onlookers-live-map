@@ -22,7 +22,9 @@ function agoLabel(iso: string) {
   if (mins < 1) return "now";
   if (mins < 60) return `${mins}m`;
   if (mins < 1440) return `${Math.floor(mins / 60)}h`;
-  return `${Math.floor(mins / 1440)}d`;
+  const days = Math.floor(mins / 1440);
+  if (days < 7) return `${days}d`;
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 /** Overview of every bounty conversation, opened from the nav chat button. */
