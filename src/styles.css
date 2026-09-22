@@ -303,8 +303,8 @@
   /* Home marketplace: a quieter, finance-grade glass layer over the live map. */
   --home-accent: var(--signal);
   --home-charcoal: oklch(0.1793 0 0); /* #121212 card step above page */
-  --home-glass: oklch(0.1793 0 0 / 0.92);
-  --home-glass-strong: oklch(0.1793 0 0 / 0.96);
+  --home-glass: oklch(0.1793 0 0);
+  --home-glass-strong: oklch(0.1793 0 0);
   /* Single neutral card hairline (#2A2A2A) — no category-colored borders. */
   --home-line: oklch(0.2603 0 0);
   --home-line-strong: oklch(0.31 0 0);
