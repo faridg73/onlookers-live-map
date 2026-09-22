@@ -50,10 +50,35 @@ export function RequestCard({
   const expired = request.status === "expired";
   const done = isClosed(request);
   const [cancelling, setCancelling] = useState(false);
-  const { remove } = useOnlooker();
+  const { remove, updateLocationType } = useOnlooker();
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
+
+  // The poster alone can re-tag the filming spot — e.g. a venue granted
+  // permission after posting, so "Public Space" becomes "Owner-Authorized".
+  const canEditLocationType = request.requester === "you" && Boolean(request.dbId) && !done;
+  const [editingLocationType, setEditingLocationType] = useState(false);
+  const [savingLocationType, setSavingLocationType] = useState(false);
+
+  async function saveLocationType(next: LocationTypeId) {
+    const dbId = request.dbId;
+    if (!dbId || next === request.locationType) {
+      setEditingLocationType(false);
+      return;
+    }
+    setSavingLocationType(true);
+    try {
+      await updateRequestLocationType({ data: { requestId: dbId, locationType: next } });
+      updateLocationType(request.id, next);
+      setEditingLocationType(false);
+      toast.success("Location tag updated.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update the location tag.");
+    } finally {
+      setSavingLocationType(false);
+    }
+  }
 
   if (compact) {
     return (
