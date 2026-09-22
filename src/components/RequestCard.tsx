@@ -174,7 +174,56 @@ export function RequestCard({
           <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground">
             <MapPin className="size-3.5" /> {request.place}
             <LocationTypeBadge locationType={request.locationType} />
+            {canEditLocationType && !editingLocationType && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingLocationType(true);
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Pencil className="size-3" aria-hidden /> Edit
+              </button>
+            )}
           </p>
+          {canEditLocationType && editingLocationType && (
+            <div
+              className="mt-2 flex flex-wrap items-center gap-1.5 rounded-xl border border-border bg-surface-raised p-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {LOCATION_TYPES.map((type) => {
+                const selected = type.id === request.locationType;
+                return (
+                  <button
+                    key={type.id}
+                    type="button"
+                    disabled={savingLocationType}
+                    onClick={() => void saveLocationType(type.id)}
+                    title={type.blurb}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] transition-colors disabled:opacity-50",
+                      selected
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-border bg-background/70 text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {selected && <Check className="size-3" aria-hidden />}
+                    <span aria-hidden>{type.emoji}</span>
+                    {type.label}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                disabled={savingLocationType}
+                onClick={() => setEditingLocationType(false)}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+              >
+                {savingLocationType ? "Saving…" : "Close"}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="shrink-0 rounded-xl border-2 border-signal/60 bg-signal/15 px-2.5 py-2 text-center">
