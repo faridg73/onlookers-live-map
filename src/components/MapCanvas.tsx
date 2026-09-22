@@ -43,7 +43,6 @@ export function MapCanvas({
   onGatheringClusterSelect,
   viewportStorageKey,
   mapTypeId,
-  styles,
   showNativeMapTypeControl = true,
   /** Vertical position of the app's zoom/locate column; screens with a tall
    *  top-right stack (logo card + menu) push it below that stack. */
@@ -76,8 +75,6 @@ export function MapCanvas({
   showNativeMapTypeControl?: boolean;
   /** Tailwind top-position class overriding the default zoom-column offset. */
   controlsTopClass?: string;
-  /** Optional Google style array to override the default base-map appearance. */
-  styles?: google.maps.MapTypeStyle[] | undefined;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -136,12 +133,10 @@ export function MapCanvas({
         restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
-          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
+          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "roadmap",
           mapTypeControl: showNativeMapTypeControl,
-          styles: styles ?? null,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
-          // Neighborhood-level default keeps aerial detail and hybrid labels
-          // legible while preserving the existing nearby marker density.
+          // Neighborhood-level default preserves nearby marker density.
           zoom: savedViewport?.zoom ?? 15,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.
@@ -213,13 +208,6 @@ export function MapCanvas({
     if (!ready || !map.current || !mapTypeId) return;
     map.current.setMapTypeId(mapTypeId);
   }, [mapTypeId, ready]);
-
-  // Keep the base-map style in sync so screens with a labels toggle can
-  // flip Google's label layers on and off after the map has booted.
-  useEffect(() => {
-    if (!ready || !map.current) return;
-    map.current.setOptions({ styles: styles ?? null });
-  }, [ready, styles]);
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);

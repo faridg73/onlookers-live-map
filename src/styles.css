@@ -296,6 +296,8 @@
   --home-glass: oklch(0.16 0.006 150 / 0.76);
   --home-glass-strong: oklch(0.13 0.004 150 / 0.9);
   --home-line: oklch(0.86 0.01 150 / 0.2);
+  --home-canvas-start: #09090b;
+  --home-canvas-end: #18181b;
 
   /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
   /* All map markers render in the neon lime signal color; tiers stay
@@ -373,6 +375,33 @@
 .home-marketplace,
 .home-marketplace * {
   font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.home-marketplace {
+  background:
+    linear-gradient(112deg, transparent 0 58%, color-mix(in oklab, var(--signal) 5%, transparent) 72%, transparent 88%),
+    linear-gradient(180deg, var(--home-canvas-start), var(--home-canvas-end));
+}
+
+.home-marketplace::before,
+.home-marketplace::after {
+  position: absolute;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.home-marketplace::before {
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--signal) 45%, transparent), transparent);
+}
+
+.home-marketplace::after {
+  inset: auto 8% 0;
+  height: 18rem;
+  background: linear-gradient(0deg, color-mix(in oklab, var(--signal) 7%, transparent), transparent);
+  filter: blur(48px);
 }
 
 .home-marketplace h1,
