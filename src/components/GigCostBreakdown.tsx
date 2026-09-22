@@ -55,7 +55,7 @@ export function GigCostBreakdown({
    * itemised from the gig price up to this number, so they are never
    * double-counted against the chosen reward.
    */
-  floorCredits?: number;
+  floorCredits?: number | undefined;
   urgencyFactor?: number;
   weatherFactor?: number;
   tipCredits?: number;
@@ -112,10 +112,10 @@ export function GigCostBreakdown({
             credits={rewardCredits}
           />
         )}
-        {rewardMatchesGig && urgencyFactor > 1 && (
+        {(rewardMatchesGig || floorCredits == null) && urgencyFactor > 1 && (
           <Row label="Schedule urgency" detail={`${pct(urgencyFactor)} for a tight window`} credits={afterUrgency - itemiseFrom} />
         )}
-        {rewardMatchesGig && weatherFactor > 1 && (
+        {(rewardMatchesGig || floorCredits == null) && weatherFactor > 1 && (
           <Row label="Filming conditions" detail={`${pct(weatherFactor)} for rough conditions`} credits={afterWeather - afterUrgency} />
         )}
         {tipCredits > 0 && <Row label="Tip" detail="added on top for the onlooker" credits={tipCredits} />}
