@@ -847,7 +847,22 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && source === "all" && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
+          {!loading && source === "all" && visible.length === 0 && popularFallback.length > 0 && (
+            <div className="mb-6">
+              <div className="rounded-2xl border border-border bg-surface px-5 py-4 text-center">
+                <p className="text-sm font-semibold text-foreground">
+                  Nothing nearby yet — here's what's popular.
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Widen your radius from the location pill to bring these into your local feed.
+                </p>
+              </div>
+              <div className="mt-6 grid grid-cols-1 items-start gap-6 md:grid-cols-3">
+                {popularFallback.map(renderCard)}
+              </div>
+            </div>
+          )}
+          {!loading && source === "all" && visible.length === 0 && popularFallback.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.
