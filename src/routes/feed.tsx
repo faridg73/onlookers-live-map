@@ -378,7 +378,7 @@ function FeedScreen() {
               <span className="text-signal">onlooker:~$</span> scan --radius {radiusLabel}
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              Nothing open within {radiusLabel} of you right now.
+              Quiet within {radiusLabel} right now — widen the net, or be the first to post something worth watching.
             </p>
             <button
               type="button"
