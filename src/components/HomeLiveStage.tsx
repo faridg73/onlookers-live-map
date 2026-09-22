@@ -226,7 +226,7 @@ export function HomeLiveStage({
       icon: Siren,
       request: emergencyRequest,
       onActivate: onOpenEmergency,
-      tone: "border-crisis/35 bg-home-glass text-foreground hover:border-crisis/70",
+      tone: "text-crisis",
       detail: (request: LiveRequest) => request.place,
     },
     {
@@ -235,7 +235,7 @@ export function HomeLiveStage({
       icon: CircleDollarSign,
       request: highestBounty,
       onActivate: onOpenHighBounty,
-      tone: "border-signal/45 bg-home-glass text-foreground hover:border-signal",
+      tone: "text-signal",
       detail: (request: LiveRequest) => `${poolOf(request)} cr`,
     },
     {
@@ -244,7 +244,7 @@ export function HomeLiveStage({
       icon: Radio,
       request: liveRequest,
       onActivate: onOpenLive,
-      tone: "border-live/35 bg-home-glass text-foreground hover:border-live/70",
+      tone: "text-live",
       detail: (request: LiveRequest) => `${request.watchers} watching`,
     },
     {
@@ -253,7 +253,7 @@ export function HomeLiveStage({
       icon: Clock,
       request: latestRequest,
       onActivate: onOpenDispatches,
-      tone: "border-signal/45 bg-home-glass text-foreground hover:border-signal",
+      tone: "text-signal",
       detail: (request: LiveRequest) =>
         request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`,
     },
@@ -263,7 +263,7 @@ export function HomeLiveStage({
       icon: Flame,
       request: hotSpot,
       onActivate: onOpenHotSpot,
-      tone: "border-signal/60 bg-signal/10 text-signal hover:border-signal",
+      tone: "text-signal",
       detail: (request: LiveRequest) => request.place,
     },
   ];
