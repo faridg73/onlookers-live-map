@@ -330,6 +330,50 @@ function CommunityHub() {
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
 
+  /**
+   * Radius fallback: when the chosen radius yields zero posts, keep the feed
+   * alive with the most popular posts from anywhere (same category/tag lane).
+   * "Anywhere" has no limit, so it never needs a fallback.
+   */
+  const popularFallback = useMemo(() => {
+    if (loading || visible.length > 0 || source !== "all") return [];
+    if (radiusMilesFor(radius) === null) return [];
+    const inLane = posts
+      .map((p) => ({ post: p, miles: distanceFor(p) }))
+      .filter(({ post }) => {
+        if (strangeSightings) {
+          return matchesStrangeSighting(
+            `${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`,
+          );
+        }
+        if (category === "all") return true;
+        if (post.category !== category) return false;
+        return !categoryId || post.tags.some((t) => t.toLowerCase() === categoryId);
+      });
+    const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
+    return [...exact]
+      .sort((a, b) => {
+        const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
+        if (pinDiff !== 0) return pinDiff;
+        const popDiff = b.post.validationCount - a.post.validationCount;
+        if (popDiff !== 0) return popDiff;
+        return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
+      })
+      .slice(0, 12);
+  }, [
+    loading,
+    visible.length,
+    source,
+    radius,
+    posts,
+    category,
+    categoryId,
+    strangeSightings,
+    tag,
+    distanceFor,
+    matchesTag,
+  ]);
+
   /** A hashtag behaves exactly like a vibe card: it opens the map filtered to it. */
   const openTagOnMap = useCallback((wanted: string) => {
     setTag(wanted);
@@ -803,7 +847,22 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && source === "all" && visible.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
+          {!loading && source === "all" && visible.length === 0 && popularFallback.length > 0 && (
+            <div className="mb-6">
+              <div className="rounded-2xl border border-border bg-surface px-5 py-4 text-center">
+                <p className="text-sm font-semibold text-foreground">
+                  Nothing nearby yet — here's what's popular.
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Widen your radius from the location pill to bring these into your local feed.
+                </p>
+              </div>
+              <div className="mt-6 grid grid-cols-1 items-start gap-6 md:grid-cols-3">
+                {popularFallback.map(renderCard)}
+              </div>
+            </div>
+          )}
+          {!loading && source === "all" && visible.length === 0 && popularFallback.length === 0 && category === "all" && radiusMilesFor(radius) !== null && (
             <div className="mb-6 rounded-2xl border border-dashed border-border bg-card p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Nothing posted this close yet.
@@ -825,7 +884,7 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && category !== "all" && visible.length === 0 && (
+          {!loading && category !== "all" && visible.length === 0 && popularFallback.length === 0 && (
             <CategoryExampleCards
               category={category}
               tag={tag}
