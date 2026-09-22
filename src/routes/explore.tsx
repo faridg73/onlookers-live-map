@@ -14,7 +14,6 @@ import {
   countClipView,
   fetchAllExploreClips,
   fetchClipComments,
-  fetchExploreClips,
   postClipComment,
   rateClip,
   type ExploreClip,
