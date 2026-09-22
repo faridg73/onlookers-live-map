@@ -154,6 +154,10 @@ export function MapCanvas({
           if (typeof nextZoom !== "number") return;
           setZoom(nextZoom);
         });
+        // A manual drag means the viewer owns the camera from now on.
+        map.current.addListener("dragstart", () => {
+          userInteracted.current = true;
+        });
         // Once the map settles, note the area on screen so real place data can load.
         map.current.addListener("idle", () => {
           const current = map.current;
@@ -211,6 +215,8 @@ export function MapCanvas({
 
   /** Position waiting for the map to finish loading. */
   const pendingCenter = useRef<google.maps.LatLngLiteral | null>(null);
+  /** Once the viewer drags/zooms by hand, never auto-center under them again. */
+  const userInteracted = useRef(false);
 
   const centerOn = useCallback((at: google.maps.LatLngLiteral) => {
     if (!map.current) {
@@ -223,7 +229,7 @@ export function MapCanvas({
   }, []);
 
   /** Ask the device for its precise position and center the map on it. */
-  const locateMe = useCallback(async () => {
+  const locateMe = useCallback(async (force = false) => {
     setGeoState("pending");
     setGeoMessage(null);
     try {
@@ -232,7 +238,8 @@ export function MapCanvas({
       setUserPos(at);
       onUserPositionChange?.(at);
       setGeoState("located");
-      centerOn(at);
+      // Auto-locate never yanks the camera once the viewer moved it by hand.
+      if (force || !userInteracted.current) centerOn(at);
     } catch (error) {
       const denied = error instanceof GeolocationFailure && error.code === "denied";
       setGeoState(denied ? "denied" : "unavailable");
@@ -272,20 +279,30 @@ export function MapCanvas({
     if (typeof z === "number") map.current?.setZoom(clamp(z + delta, 2, 20));
   };
 
-  // Searching for a place in pin mode flies the map there.
+  // Searching for a place in pin mode flies the map there. Depend on the
+  // coordinates themselves, not the object identity, so parent re-renders
+  // never re-center a map the viewer already moved.
+  const centerLat = centerTarget?.lat;
+  const centerLng = centerTarget?.lng;
+  const centerZoom = centerTarget?.zoom;
   useEffect(() => {
-    if (!ready || !centerTarget || !map.current) return;
-    map.current.setCenter({ lat: centerTarget.lat, lng: centerTarget.lng });
-    map.current.setZoom(centerTarget.zoom ?? 14);
-  }, [ready, centerTarget]);
+    if (!ready || centerLat == null || centerLng == null || !map.current) return;
+    map.current.setCenter({ lat: centerLat, lng: centerLng });
+    map.current.setZoom(centerZoom ?? 14);
+  }, [ready, centerLat, centerLng, centerZoom]);
 
   // A chosen place or category area: fly there and keep its own labelled pin.
+  // Same coordinate-value deps so the fly-over happens once per spot, never on
+  // every refresh of the request list.
+  const focusLat = focusPin?.lat;
+  const focusLng = focusPin?.lng;
+  const focusZoom = focusPin?.zoom;
   useEffect(() => {
-    if (!ready || !focusPin || !map.current) return;
-    map.current.panTo({ lat: focusPin.lat, lng: focusPin.lng });
+    if (!ready || focusLat == null || focusLng == null || !map.current) return;
+    map.current.panTo({ lat: focusLat, lng: focusLng });
     const current = map.current.getZoom() ?? 0;
-    if (current < (focusPin.zoom ?? 15)) map.current.setZoom(focusPin.zoom ?? 15);
-  }, [ready, focusPin]);
+    if (current < (focusZoom ?? 15)) map.current.setZoom(focusZoom ?? 15);
+  }, [ready, focusLat, focusLng, focusZoom]);
 
   /**
    * Real businesses for the settled view: names, ratings and addresses straight
