@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useBoosts } from "@/lib/boosts-store";
-import { isClosed, useOnlooker } from "@/lib/onlooker-store";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { refundExpiredBounties } from "@/lib/bounty-escrow";
 import {
   requestMapPosition,
