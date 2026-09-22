@@ -341,16 +341,23 @@ function FeedScreen() {
       </div>
 
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
-      <div className="mt-2 grid grid-cols-2 gap-1.5 min-[420px]:grid-cols-3 sm:grid-cols-5">
+      <div
+        className="mt-2 flex w-full items-stretch gap-1 overflow-hidden rounded-xl border border-white/10 bg-surface p-1"
+        role="tablist"
+        aria-label="Request status"
+      >
         {FILTERS.map((f) => (
           <button
             key={f.key}
+            type="button"
+            role="tab"
+            aria-selected={filter === f.key}
             onClick={() => setFilter(f.key)}
             className={
-              "min-w-0 rounded-lg border-2 px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
+              "min-h-9 min-w-0 flex-1 truncate rounded-lg px-1 py-1.5 text-[0.66rem] font-bold uppercase transition-colors " +
               (filter === f.key
-                ? "border-signal bg-signal text-signal-foreground shadow-signal/40"
-                : "border-signal bg-surface text-muted-foreground hover:text-foreground shadow-signal/20")
+                ? "bg-signal text-signal-foreground shadow-[0_0_16px_-4px_var(--signal)]"
+                : "border border-transparent text-muted-foreground hover:text-foreground")
             }
           >
             {f.label}
@@ -365,14 +372,18 @@ function FeedScreen() {
           </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-surface/60 p-6 backdrop-blur-sm">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-signal/40 to-transparent" aria-hidden />
+            <p className="font-mono text-[0.7rem] font-bold uppercase tracking-widest text-muted-foreground">
+              <span className="text-signal">onlooker:~$</span> scan --radius {radiusLabel}
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
               Nothing open within {radiusLabel} of you right now.
             </p>
             <button
               type="button"
               onClick={expandRadius}
-              className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
+              className="mt-4 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase text-signal-foreground transition-transform hover:scale-[1.02]"
             >
               {nextWiderRadius === "custom"
                 ? radiusChoice === "custom"
