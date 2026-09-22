@@ -381,7 +381,7 @@ export function HomeLiveStage({
 
       </div>
 
-      <div className="mt-2 overflow-hidden rounded-3xl border border-signal/25 bg-home-glass py-2.5 shadow-[0_24px_70px_color-mix(in_oklab,var(--color-background)_68%,transparent)] backdrop-blur-2xl">
+      <div className="mx-auto mt-2 w-full overflow-hidden rounded-3xl border border-signal/25 bg-home-glass py-2.5 shadow-[0_24px_70px_color-mix(in_oklab,var(--color-background)_68%,transparent)] backdrop-blur-2xl sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
         <div className="mb-2 flex items-center justify-between px-3.5">
           <div className="flex items-center gap-2">
             <span className="relative flex size-2" aria-hidden>
