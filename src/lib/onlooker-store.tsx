@@ -208,8 +208,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove }),
-    [requests, selectedId, addRequest, claim, remove],
+    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
+    [requests, selectedId, addRequest, claim, remove, updateLocationType],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
