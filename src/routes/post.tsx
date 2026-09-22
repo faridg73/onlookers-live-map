@@ -62,7 +62,12 @@ import {
 } from "@/components/ui/select";
 
 
-import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
+import {
+  PUBLIC_HAPPENINGS_DISCLAIMER,
+  VENUE_EXTERIOR_DISCLAIMER,
+  locationTypeAllowsPrivateProperty,
+  privacyAccessCopy,
+} from "@/lib/camera-only";
 import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
 import {
   BOUNTY_TIERS,
@@ -1474,8 +1479,8 @@ function PostScreen() {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-4">
                     <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-                      <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
-                       {needsPublicSpacesNotice(category) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
+                      <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{privacyAccessCopy(locationType)}</p>
+                       {needsPublicSpacesNotice(category) && !locationTypeAllowsPrivateProperty(locationType) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
                     </div>
                     {codeNeeded && (
                       <div className="flex gap-2">
