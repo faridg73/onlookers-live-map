@@ -5,6 +5,7 @@ import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone,
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
+import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json";
 import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
 import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
