@@ -82,11 +82,13 @@ import {
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
+  LOCATION_TYPES,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
   needsPublicSpacesNotice,
   type CategoryId,
+  type LocationTypeId,
 } from "@/lib/onlooker";
 import {
   BROADCAST_CATEGORIES,
@@ -248,6 +250,9 @@ function PostScreen() {
   const [title, setTitle] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
   const [place, setPlace] = useState("");
+  // Required: posters must declare what kind of spot this is, so cards can show
+  // the location was cleared for filming.
+  const [locationType, setLocationType] = useState<LocationTypeId | null>(null);
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
@@ -478,6 +483,10 @@ function PostScreen() {
       toast.error("Pick the exact place, search a venue, tap the map, or use your location.");
       return;
     }
+    if (!locationType) {
+      toast.error("Pick the location type so hunters know this spot is cleared for filming.");
+      return;
+    }
     setAction(parsed.action);
     setTitle((current) => current || parsed.title.slice(0, 120));
     setNote((current) => current || parsed.instructions);
@@ -690,6 +699,7 @@ function PostScreen() {
         prompt: title.trim(),
         details,
         locationName: place.trim(),
+        locationType,
         bounty: total,
         category,
         authorizationConfirmed: permissionNeeded && permissionOk,
@@ -713,6 +723,7 @@ function PostScreen() {
       addRequest({
         title: title.trim(),
         place: place.trim(),
+        locationType: locationType ?? undefined,
         note: details,
         bounty: total,
         category,
@@ -968,6 +979,42 @@ function PostScreen() {
                       setRecent(rememberRecentPlace(next));
                     }}
                   />
+                </div>
+
+                <div className="space-y-2 rounded-xl border border-border bg-background p-3">
+                  <p className="text-xs font-bold uppercase text-muted-foreground">
+                    Location type <span className="text-signal">· required</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Hunters and viewers see this next to the address. Private homes are only
+                    allowed with the owner&apos;s or agent&apos;s permission.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {LOCATION_TYPES.map((type) => {
+                      const on = locationType === type.id;
+                      return (
+                        <button
+                          key={type.id}
+                          type="button"
+                          onClick={() => setLocationType(type.id)}
+                          title={type.blurb}
+                          aria-pressed={on}
+                          className={
+                            on
+                              ? "rounded-full border border-signal bg-signal px-3 py-1.5 text-xs font-extrabold text-signal-foreground"
+                              : "rounded-full border border-border bg-surface-raised px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
+                          }
+                        >
+                          <span aria-hidden>{type.emoji}</span> {type.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {locationType && (
+                    <p className="text-xs text-muted-foreground">
+                      {LOCATION_TYPES.find((type) => type.id === locationType)?.blurb}
+                    </p>
+                  )}
                 </div>
 
                 {category === "realestate" && (

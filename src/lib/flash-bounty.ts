@@ -312,6 +312,7 @@ export function postFlashBounty(
     prompt: FLASH_TITLE,
     details,
     locationName: spot.formatted,
+    locationType: resolved.authorizationConfirmed ? "owner_authorized" : "public",
     bounty: quote.total,
     category: selectedCategory.requestCategory,
     authorizationConfirmed: resolved.authorizationConfirmed ?? false,

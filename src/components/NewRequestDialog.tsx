@@ -16,12 +16,14 @@ import { useOnlooker } from "@/lib/onlooker-store";
 import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
 import {
   CATEGORIES,
+  LOCATION_TYPES,
   categoryById,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
   needsPublicSpacesNotice,
   type CategoryId,
+  type LocationTypeId,
 } from "@/lib/onlooker";
 import { PUBLIC_HAPPENINGS_DISCLAIMER } from "@/lib/camera-only";
 
@@ -30,6 +32,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [place, setPlace] = useState("");
+  const [locationType, setLocationType] = useState<LocationTypeId | null>(null);
   const [note, setNote] = useState("");
   const [bounty, setBounty] = useState(20);
   const [category, setCategory] = useState<CategoryId>("food");
@@ -48,6 +51,10 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
+    if (!locationType) {
+      toast.error("Pick the location type so hunters know this spot is cleared for filming.");
+      return;
+    }
     if (bounty < MIN_BOUNTY) {
       toast.error(`Bounties start at ${MIN_BOUNTY} Credits.`);
       return;
@@ -74,6 +81,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         prompt: title.trim(),
         details: note.trim(),
         locationName: place.trim(),
+        locationType,
         bounty,
         category,
         authorizationConfirmed: permissionNeeded && permissionOk,
@@ -83,6 +91,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       addRequest({
         title: title.trim(),
         place: place.trim(),
+        locationType,
         note: note.trim(),
         bounty,
         category,
@@ -95,6 +104,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       });
       setTitle("");
       setPlace("");
+      setLocationType(null);
       setNote("");
       setBounty(20);
       setAccessCode("");
@@ -137,6 +147,31 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               className="field"
               required
             />
+          </Field>
+          <Field label="Location type (required)">
+            <div className="flex flex-wrap gap-2">
+              {LOCATION_TYPES.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  title={type.blurb}
+                  aria-pressed={locationType === type.id}
+                  onClick={() => setLocationType(type.id)}
+                  className={
+                    "rounded-full border px-3 py-1.5 text-xs transition-colors " +
+                    (locationType === type.id
+                      ? "border-signal bg-signal font-bold text-signal-foreground"
+                      : "border-border bg-surface-raised text-muted-foreground hover:text-foreground")
+                  }
+                >
+                  <span className="mr-1" aria-hidden>{type.emoji}</span>
+                  {type.label}
+                </button>
+              ))}
+            </div>
+            <span className="block text-xs text-muted-foreground">
+              Shown next to the address. Private homes need the owner&apos;s permission.
+            </span>
           </Field>
           <Field label="Category">
             <div className="flex flex-wrap gap-2">
@@ -223,7 +258,8 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               !human.ready ||
               bounty < MIN_BOUNTY ||
               (permissionNeeded && !permissionOk) ||
-              (codeNeeded && accessCode.trim().length < 4)
+              (codeNeeded && accessCode.trim().length < 4) ||
+              !locationType
             }
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >

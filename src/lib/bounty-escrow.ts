@@ -48,6 +48,8 @@ export async function lockBounty(input: {
   /** Camera instructions, checked by the content filter before publishing. */
   details?: string | null;
   locationName: string;
+  /** Declared spot type: public, commercial, event_venue or owner_authorized. */
+  locationType?: "public" | "commercial" | "event_venue" | "owner_authorized" | null;
   bounty: number;
   category?: string | null;
   /** Required attestation for filming requests involving private real estate. */
