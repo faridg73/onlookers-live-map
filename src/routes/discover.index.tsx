@@ -193,16 +193,39 @@ function DiscoverHome() {
               />
             </SectionBoundary>
 
-            {/* compact back pill, docked to the map's top-left corner */}
-            <button
-              type="button"
-              onClick={() => setView("grid")}
-              aria-label="Back to Browse places"
-              className="absolute left-2.5 top-2.5 z-10 inline-flex h-8 items-center gap-1.5 rounded-md border border-signal/60 bg-black/85 px-2.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <ArrowLeft className="size-3.5" aria-hidden />
-              Browse places
-            </button>
+            {/* top-left controls: history back arrow, Browse places pill, close X */}
+            <div className="absolute left-2.5 top-2.5 z-10 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.history.length > 1 && window.history.state?.idx > 0) {
+                    window.history.back();
+                  } else {
+                    setView("grid");
+                  }
+                }}
+                aria-label="Go back"
+                className="inline-flex size-8 items-center justify-center rounded-md border border-signal/60 bg-black/85 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <ArrowLeft className="size-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Back to Browse places"
+                className="inline-flex h-8 items-center gap-1.5 rounded-md border border-signal/60 bg-black/85 px-2.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Browse places
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                aria-label="Close the live map"
+                className="inline-flex size-8 items-center justify-center rounded-full border-2 border-signal bg-black/85 text-signal shadow-md shadow-signal/30 backdrop-blur-xl transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>
