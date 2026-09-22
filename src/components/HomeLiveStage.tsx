@@ -354,10 +354,23 @@ export function HomeLiveStage({
               return (
                 <li
                   key={step.step}
-                  className="flex min-w-0 items-start gap-3 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
+                  className="flex min-w-0 items-start gap-3.5 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-signal/35 bg-signal/10 text-signal">
-                    <Icon className="size-5" aria-hidden />
+                  <span className="relative shrink-0">
+                    <img
+                      src={step.thumb}
+                      alt={step.thumbAlt}
+                      loading="lazy"
+                      width={512}
+                      height={512}
+                      className="size-20 rounded-xl border border-home-line object-cover"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-1.5 -right-1.5 grid size-7 place-items-center rounded-full border border-signal/40 bg-background text-signal shadow-[0_2px_10px_rgba(0,0,0,0.7)]"
+                    >
+                      <Icon className="size-3.5" />
+                    </span>
                   </span>
                   <span className="min-w-0">
                     <span className="block font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step.step}</span>
