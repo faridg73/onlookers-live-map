@@ -143,69 +143,97 @@ export function HomeLiveStage({
     };
   }, [activeRequests, hotSpotRequests, isCrisis, poolOf]);
 
-  const trends: Array<{
+  const feedColumns: Array<{
     key: LiveFeedKey;
     label: string;
     icon: typeof Siren;
-    request: LiveRequest | null;
-    onActivate: (request: LiveRequest) => void;
     tone: string;
+    borderTone: string;
+    items: LiveRequest[];
+    onActivate: (request: LiveRequest) => void;
     detail: (request: LiveRequest) => string;
+    actionLabel: string;
+    emptyTitle: string;
+    emptyHint: string;
+    emptyAction: () => void;
+    emptyCta: string;
   }> = [
     {
       key: "emergency",
-      label: "Live Emergency",
+      label: "Live emergency",
       icon: Siren,
-      request: emergencyRequest,
-      onActivate: onOpenEmergency,
       tone: "text-crisis",
-      detail: (request: LiveRequest) => request.place,
-    },
-    {
-      key: "bounty",
-      label: "High Bounty",
-      icon: CircleDollarSign,
-      request: highestBounty,
-      onActivate: onOpenHighBounty,
-      tone: "text-signal",
-      detail: (request: LiveRequest) => `${poolOf(request)} cr`,
+      borderTone: "border-crisis/40",
+      items: feedItems.emergency,
+      onActivate: onOpenEmergency,
+      detail: (request) => request.place,
+      actionLabel: "View",
+      emptyTitle: "No active alerts nearby",
+      emptyHint: "Trusted alerts appear here first",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
     },
     {
       key: "stream",
-      label: "Trending Stream",
+      label: "Active streams",
       icon: Radio,
-      request: liveRequest,
-      onActivate: onOpenLive,
       tone: "text-live",
-      detail: (request: LiveRequest) => `${request.watchers} watching`,
+      borderTone: "border-live/40",
+      items: feedItems.stream,
+      onActivate: onOpenLive,
+      detail: (request) => `${request.watchers} watching`,
+      actionLabel: "Watch",
+      emptyTitle: "No live streams yet",
+      emptyHint: "Be the first pair of eyes",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
+    },
+    {
+      key: "bounty",
+      label: "High bounties",
+      icon: CircleDollarSign,
+      tone: "text-signal",
+      borderTone: "border-signal/40",
+      items: feedItems.bounty,
+      onActivate: onOpenHighBounty,
+      detail: (request) => `${poolOf(request)} cr`,
+      actionLabel: "Hunt",
+      emptyTitle: "No open bounties",
+      emptyHint: "Post one and hunters respond",
+      emptyAction: onPostBounty,
+      emptyCta: "Post bounty",
     },
     {
       key: "dispatches",
-      label: "Recent Dispatches",
+      label: "Recent dispatches",
       icon: Clock,
-      request: latestRequest,
-      onActivate: onOpenDispatches,
       tone: "text-signal",
-      detail: (request: LiveRequest) =>
-        request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`,
+      borderTone: "border-home-line",
+      items: feedItems.dispatches,
+      onActivate: onOpenDispatches,
+      detail: (request) => (request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`),
+      actionLabel: "View",
+      emptyTitle: "Nothing dispatched yet",
+      emptyHint: "Fresh requests land here",
+      emptyAction: onPostBounty,
+      emptyCta: "Post bounty",
     },
     {
       key: "hotspot",
-      label: "Hot Spot Near You",
+      label: "Hot spot near you",
       icon: Flame,
-      request: hotSpot,
-      onActivate: onOpenHotSpot,
       tone: "text-signal",
-      detail: (request: LiveRequest) => request.place,
+      borderTone: "border-home-line",
+      items: feedItems.hotspot,
+      onActivate: onOpenHotSpot,
+      detail: (request) => request.place,
+      actionLabel: "View",
+      emptyTitle: "No hot spot pinned yet",
+      emptyHint: "Activity near you shows here",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
     },
   ];
-  const activeTrend = trends.find((trend) => trend.key === openFeed) ?? null;
-  const activeItems = openFeed ? feedItems[openFeed] : [];
-
-  const openItem = (feed: LiveFeedKey, request: LiveRequest) => {
-    const trend = trends.find((candidate) => candidate.key === feed);
-    trend?.onActivate(request);
-  };
 
   if (mapExpanded) {
     return (
