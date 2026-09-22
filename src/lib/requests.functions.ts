@@ -28,6 +28,11 @@ const createSchema = z.object({
   /** Camera instructions and capture format, stored with the request. */
   details: safeMultiline(2000).nullable().optional(),
   locationName: safeText(160, 2),
+  /** How the poster classified the filming spot; private homes must be owner-authorized. */
+  locationType: z
+    .enum(["public", "commercial", "event_venue", "owner_authorized"])
+    .nullable()
+    .optional(),
   bounty: z.number().finite().min(MIN_BOUNTY).max(50000),
   category: z.string().trim().max(40).nullable().optional(),
   authorizationConfirmed: z.boolean().optional().default(false),
@@ -142,6 +147,7 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         requester_id: context.userId,
         prompt: data.prompt,
         location_name: data.locationName,
+        location_type: data.locationType ?? null,
         details: data.details ?? "",
         bounty_amount: data.bounty,
         latitude: data.latitude,
@@ -307,6 +313,8 @@ export type ActiveRequestRow = {
   prompt: string;
   details: string;
   locationName: string;
+  /** Declared spot type shown as a trust badge next to the address. */
+  locationType: string | null;
   bounty: number;
   category: string | null;
   latitude: number;
@@ -336,7 +344,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("requests")
       .select(
-        "id, requester_id, prompt, details, location_name, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier",
+        "id, requester_id, prompt, details, location_name, location_type, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier",
       )
       .eq("status", "open")
       .gt("expires_at", new Date().toISOString())
@@ -351,6 +359,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       prompt: row.prompt,
       details: row.details ?? "",
       locationName: row.location_name,
+      locationType: row.location_type ?? null,
       bounty: Number(row.bounty_amount),
       category: row.category ?? null,
       latitude: Number(row.latitude),

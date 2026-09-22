@@ -23,6 +23,7 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     dbId: row.id,
     title: row.prompt,
     place: row.locationName,
+    locationType: row.locationType ?? undefined,
     note: row.details,
     instructions: row.details,
     bounty: row.bounty,
@@ -59,6 +60,8 @@ export function isClosed(r: LiveRequest) {
 type NewRequest = {
   title: string;
   place: string;
+  /** Declared spot type, shown as a trust badge on the card. */
+  locationType?: string | undefined;
   note: string;
   bounty: number;
   category?: CategoryId;
@@ -163,6 +166,7 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
       id: `r${Math.random().toString(36).slice(2, 8)}`,
       title: input.title,
       place: input.place,
+      locationType: input.locationType,
       note: input.note,
       bounty: input.bounty,
       category: input.category,
