@@ -97,6 +97,7 @@ export function HomeLiveStage({
   mapExpanded = false,
   onExitMap,
 }: HomeLiveStageProps) {
+  const navigate = useNavigate();
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -274,21 +275,49 @@ export function HomeLiveStage({
               </span>
               The city is live
             </p>
-            <div className="hidden items-center gap-2 whitespace-nowrap text-[0.8rem] font-bold uppercase text-muted-foreground md:flex md:text-[0.9rem]">
-              <span className="whitespace-nowrap">{liveCount} live</span>
-              <span className="text-border">/</span>
-              <span className="whitespace-nowrap">{emergencyCount} alerts</span>
-              <span className="text-border">/</span>
-              <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
-            </div>
           </div>
-          <div className="mt-1 flex items-center justify-center gap-2 text-[0.78rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
-            <span className="whitespace-nowrap">{liveCount} live</span>
-            <span className="text-border">/</span>
-            <span className="whitespace-nowrap">{emergencyCount} alerts</span>
-            <span className="text-border">/</span>
-            <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
+          {/* Clickable financial-ticker readout, directly under "The city is live". */}
+          <div
+            className="mt-2 flex items-center justify-center gap-2.5 overflow-x-auto whitespace-nowrap rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 font-mono text-[0.8rem] font-bold uppercase tracking-[0.12em] tabular-nums text-foreground/70 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl sm:gap-4 sm:text-[0.9rem] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:py-1"
+            aria-label="Live city readout"
+          >
+            <button
+              type="button"
+              onClick={() => (liveRequest ? onOpenLive(liveRequest) : navigate({ to: "/discover" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${liveCount} live streams — open`}
+            >
+              LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (emergencyRequest ? onOpenEmergency(emergencyRequest) : navigate({ to: "/feed" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-crisis focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${emergencyCount} live alerts — open`}
+            >
+              ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (highestBounty ? onOpenHighBounty(highestBounty) : navigate({ to: "/feed" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${activeRequests.length} active bounties — open`}
+            >
+              BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (highestBounty ? onOpenHighBounty(highestBounty) : onPostBounty())}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={highestBounty ? `Top pool ${poolOf(highestBounty)} credits — open bounty` : "No pool yet — post a bounty"}
+            >
+              TOP POOL <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
+            </button>
           </div>
+
 
           <h2
             id="home-live-stage-title"
