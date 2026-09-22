@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
@@ -130,6 +130,74 @@ export function HomeLiveStage({
   const kindOf = (request: LiveRequest): ActivityTab =>
     isCrisis(request) ? "alert" : isLiveRequest(request) ? "live" : "bounty";
 
+  /**
+   * Ticker stats: only show counters with real activity. LIVE and ALERTS are
+   * dropped when zero; if nothing is active at all the whole bar is hidden.
+   */
+  const tickerItems = useMemo(() => {
+    const items: Array<{ key: string; node: React.ReactNode }> = [];
+    if (liveCount > 0) {
+      items.push({
+        key: "live",
+        node: (
+          <button
+            type="button"
+            onClick={() => (liveRequest ? onOpenLive(liveRequest) : navigate({ to: "/discover" }))}
+            className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            aria-label={`${liveCount} live streams — open`}
+          >
+            LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
+          </button>
+        ),
+      });
+    }
+    if (emergencyCount > 0) {
+      items.push({
+        key: "alerts",
+        node: (
+          <button
+            type="button"
+            onClick={() => (emergencyRequest ? onOpenEmergency(emergencyRequest) : navigate({ to: "/feed" }))}
+            className="rounded-full px-1 transition-colors duration-150 hover:text-crisis focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            aria-label={`${emergencyCount} live alerts — open`}
+          >
+            ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span>
+          </button>
+        ),
+      });
+    }
+    if (activeRequests.length > 0) {
+      items.push({
+        key: "bounties",
+        node: (
+          <button
+            type="button"
+            onClick={() => (highestBounty ? onOpenRequest(highestBounty) : navigate({ to: "/feed" }))}
+            className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            aria-label={`${activeRequests.length} active bounties — open`}
+          >
+            BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span>
+          </button>
+        ),
+      });
+      items.push({
+        key: "pool",
+        node: (
+          <button
+            type="button"
+            onClick={() => (highestBounty ? onOpenRequest(highestBounty) : onPostBounty())}
+            className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            aria-label={highestBounty ? `Top pool ${poolOf(highestBounty)} credits — open bounty` : "No pool yet — post a bounty"}
+          >
+            TOP POOL <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
+          </button>
+        ),
+      });
+    }
+    return items;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveCount, emergencyCount, activeRequests.length, liveRequest, emergencyRequest, highestBounty, poolOf]);
+
   /** One list, deduplicated: alerts first, then live streams, then richest bounties. */
   const activity = useMemo(() => {
     const rank: Record<ActivityTab, number> = { alert: 0, live: 1, bounty: 2, all: 3 };
@@ -185,47 +253,20 @@ export function HomeLiveStage({
             </p>
           </div>
 
-          {/* Clickable financial-ticker readout */}
-          <div
-            className="mt-2 flex items-center justify-center gap-2.5 overflow-x-auto whitespace-nowrap rounded-full border border-home-line bg-home-glass-strong px-3 py-1.5 font-mono text-[0.8rem] font-bold uppercase tracking-[0.12em] tabular-nums text-foreground/70 backdrop-blur-2xl sm:gap-4 sm:text-[0.9rem] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:py-1"
-            aria-label="Live city readout"
-          >
-            <button
-              type="button"
-              onClick={() => (liveRequest ? onOpenLive(liveRequest) : navigate({ to: "/discover" }))}
-              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-              aria-label={`${liveCount} live streams — open`}
+          {/* Clickable financial-ticker readout — hidden entirely when nothing is active */}
+          {tickerItems.length > 0 && (
+            <div
+              className="mt-2 flex items-center justify-center gap-2.5 overflow-x-auto whitespace-nowrap rounded-full border border-home-line bg-home-glass-strong px-3 py-1.5 font-mono text-[0.8rem] font-bold uppercase tracking-[0.12em] tabular-nums text-foreground/70 backdrop-blur-2xl sm:gap-4 sm:text-[0.9rem] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:py-1"
+              aria-label="Live city readout"
             >
-              LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
-            </button>
-            <span className="text-border" aria-hidden>|</span>
-            <button
-              type="button"
-              onClick={() => (emergencyRequest ? onOpenEmergency(emergencyRequest) : navigate({ to: "/feed" }))}
-              className="rounded-full px-1 transition-colors duration-150 hover:text-crisis focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-              aria-label={`${emergencyCount} live alerts — open`}
-            >
-              ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span>
-            </button>
-            <span className="text-border" aria-hidden>|</span>
-            <button
-              type="button"
-              onClick={() => (highestBounty ? onOpenRequest(highestBounty) : navigate({ to: "/feed" }))}
-              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-              aria-label={`${activeRequests.length} active bounties — open`}
-            >
-              BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span>
-            </button>
-            <span className="text-border" aria-hidden>|</span>
-            <button
-              type="button"
-              onClick={() => (highestBounty ? onOpenRequest(highestBounty) : onPostBounty())}
-              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-              aria-label={highestBounty ? `Top pool ${poolOf(highestBounty)} credits — open bounty` : "No pool yet — post a bounty"}
-            >
-              TOP POOL <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
-            </button>
-          </div>
+              {tickerItems.map((item, index) => (
+                <Fragment key={item.key}>
+                  {index > 0 && <span className="text-border" aria-hidden>|</span>}
+                  {item.node}
+                </Fragment>
+              ))}
+            </div>
+          )}
 
           <h2
             id="home-live-stage-title"
@@ -358,8 +399,8 @@ export function HomeLiveStage({
             </div>
           ) : (
             <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-home-line bg-home-glass-strong p-6 text-center">
-              <p className="text-[0.72rem] font-extrabold text-foreground">Nothing here right now</p>
-              <p className="text-[0.62rem] font-semibold text-muted-foreground">Switch to All, or start the first one nearby.</p>
+              <p className="text-[0.72rem] font-extrabold text-foreground">Your move — start the first one nearby</p>
+              <p className="text-[0.62rem] font-semibold text-muted-foreground">Nothing on this tab yet. Switch to All, or post a bounty and let Hunters pick it up.</p>
               <Button type="button" size="sm" onClick={onPostBounty} className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
                 Post bounty
               </Button>

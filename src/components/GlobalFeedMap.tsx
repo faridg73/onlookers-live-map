@@ -242,7 +242,7 @@ export function GlobalFeedMap({
       {emergencyOnly ? (
         pinnedReports.length === 0 && (
           <p className="mt-5 rounded-2xl border border-dashed border-crisis/40 p-8 text-center text-sm text-muted-foreground">
-            No active emergency alerts in this area. Verified Level 3 creators can file fire, police and medical reports.
+            All clear right now — trusted alerts will appear here the moment something happens. Verified Level 3 creators can file fire, police and medical reports.
           </p>
         )
       ) : (
