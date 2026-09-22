@@ -460,7 +460,7 @@ function CommunityHub() {
                       setStrangeSightings(false);
                     }}
                     aria-pressed={active}
-                    className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-surface-raised text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:animate-none animate-red-flash sm:h-44 md:h-48 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-signal/30 hover:border-signal/60"}`}
+                    className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-zinc-900/50 backdrop-blur-md text-left transition-transform hover:-translate-y-0.5 sm:h-44 md:h-48 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-white/10 hover:border-white/25"}`}
                   >
                     <span className="relative block min-h-0 w-full flex-1 overflow-hidden">
                       <LoopingPreview
@@ -510,7 +510,7 @@ function CommunityHub() {
                   setStrangeSightings(false);
                 }}
                 aria-pressed={active}
-                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:animate-none animate-red-flash md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : "border-border"}`}
+                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 text-left transition-transform hover:-translate-y-0.5 hover:border-white/25 md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : ""}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}
@@ -546,7 +546,7 @@ function CommunityHub() {
       </section>
 
       {strangeSightings && (
-        <section className="mx-5 mt-4 border-y border-signal/45 bg-surface px-4 py-4 shadow-[0_0_24px_var(--color-signal)] sm:mx-8">
+        <section className="mx-5 mt-4 rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3 backdrop-blur-md sm:mx-8">
           <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-signal">Mystery desk</p>
           <h2 className="mt-1 text-lg font-extrabold text-foreground">Report, investigate, or request proof</h2>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -558,8 +558,8 @@ function CommunityHub() {
       )}
 
       <ScrollableLane
-        className="mt-2 -mx-5 sm:-mx-8"
-        innerClassName="gap-1.5 px-5 pb-1 sm:px-8"
+        className="mt-1 -mx-5 sm:-mx-8"
+        innerClassName="gap-1.5 px-5 pb-0.5 sm:px-8"
         ariaLabel="Subcategory filters"
         arrows={false}
         fade={false}
@@ -579,8 +579,10 @@ function CommunityHub() {
               }
               openTagOnMap(t);
             }}
-            className={`h-9 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold text-signal ${
-              tag === t ? "border-signal bg-signal/10" : "border-signal/40"
+            className={`h-8 shrink-0 rounded-full px-3 text-[0.68rem] font-semibold ${
+              tag === t
+                ? "border-signal bg-signal/10 text-signal"
+                : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25"
             }`}
           >
             #{t}
@@ -589,7 +591,7 @@ function CommunityHub() {
       </ScrollableLane>
 
 
-      <div className="mt-4 px-5 sm:px-8">
+      <div className="mt-2 px-5 sm:px-8">
         <CommunityFeedFilters
           unit={unit}
           value={radius}
@@ -603,7 +605,7 @@ function CommunityHub() {
         />
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
         <div className="flex rounded-full border border-border p-0.5">
           <Button
             type="button"
@@ -734,7 +736,7 @@ function CommunityHub() {
           </SectionBoundary>
         </div>
       ) : (
-        <section className="mt-5 px-5 sm:px-8">
+        <section className="mt-3 px-5 sm:px-8">
           <SectionBoundary label="The community feed">
           {loading && <p className="text-sm text-muted-foreground">Loading Discover…</p>}
           {!loading && loadError && (
@@ -812,7 +814,7 @@ function CommunityHub() {
             />
           )}
           {featured.map(renderCard)}
-          <div className="columns-1 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
+          <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-3">
             {rest.map(renderCard)}
           </div>
           {/* Live activity is thin here, fall back to the evergreen clip archive. */}
