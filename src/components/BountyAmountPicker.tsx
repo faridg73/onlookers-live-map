@@ -14,14 +14,17 @@ export function BountyAmountPicker({
   value,
   onChange,
   balance,
+  min = MIN_BOUNTY,
 }: {
   value: number;
   onChange: (v: number) => void;
   balance?: number | null;
+  /** Payout floor — the reward can never settle below this. */
+  min?: number;
 }) {
   const safe = Number.isFinite(value) ? value : 0;
   const custom = !PRESETS.includes(safe);
-  const tooLow = safe < MIN_BOUNTY;
+  const tooLow = safe < min;
   const shortFall = balance != null && safe > balance;
 
   return (
