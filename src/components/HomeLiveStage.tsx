@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { useMemo } from "react";
+import { ChevronDown, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
@@ -96,74 +96,6 @@ export function HomeLiveStage({
   mapExpanded = false,
   onExitMap,
 }: HomeLiveStageProps) {
-  const [openFeed, setOpenFeed] = useState<LiveFeedKey | null>(null);
-  const trendScrollerRef = useRef<HTMLDivElement>(null);
-  const tickerRef = useRef<HTMLDivElement>(null);
-  // Anchor the dropdown to the viewport off the ticker rect so it can never be
-  // clipped by the stage, the map frame or the bottom tab dock on any device.
-  const [panel, setPanel] = useState<{
-    left: number;
-    width: number;
-    top?: number;
-    bottom?: number;
-    maxHeight: number;
-  }>({ left: 12, width: 320, top: 0, maxHeight: 384 });
-  useEffect(() => {
-    const update = () => {
-      const el = tickerRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const nav = document.querySelector("nav");
-      const navRect = nav?.getBoundingClientRect();
-      const navAllowance = navRect && navRect.height > 0 ? Math.max(0, window.innerHeight - navRect.top) + 8 : 96;
-      const gap = 8;
-      const spaceBelow = window.innerHeight - rect.bottom - gap - navAllowance;
-
-      const spaceAbove = rect.top - gap - 12;
-      const width = Math.min(rect.width, window.innerWidth - 16);
-      const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
-      if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-        setPanel({ left, width, top: rect.bottom + gap, maxHeight: Math.max(160, Math.min(spaceBelow, 416)) });
-      } else {
-        setPanel({
-          left,
-          width,
-          bottom: window.innerHeight - rect.top + gap,
-          maxHeight: Math.max(160, Math.min(spaceAbove, 416)),
-        });
-      }
-    };
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, true);
-    const timer = window.setTimeout(update, 350);
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update, true);
-      window.clearTimeout(timer);
-    };
-  }, [mapExpanded, openFeed]);
-
-  const [trendScroll, setTrendScroll] = useState({ thumbWidth: 100, thumbLeft: 0 });
-  const updateTrendScroll = useCallback(() => {
-    const el = trendScrollerRef.current;
-    if (!el) return;
-    const visible = el.clientWidth;
-    const total = el.scrollWidth;
-    if (total <= visible + 4) {
-      setTrendScroll({ thumbWidth: 100, thumbLeft: 0 });
-      return;
-    }
-    const thumbWidth = Math.max(14, (visible / total) * 100);
-    const maxScroll = total - visible;
-    const thumbLeft = maxScroll > 0 ? (el.scrollLeft / maxScroll) * (100 - thumbWidth) : 0;
-    setTrendScroll({ thumbWidth, thumbLeft });
-  }, []);
-  useEffect(() => {
-    updateTrendScroll();
-    window.addEventListener("resize", updateTrendScroll);
-    return () => window.removeEventListener("resize", updateTrendScroll);
-  }, [updateTrendScroll, mapExpanded]);
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -211,69 +143,97 @@ export function HomeLiveStage({
     };
   }, [activeRequests, hotSpotRequests, isCrisis, poolOf]);
 
-  const trends: Array<{
+  const feedColumns: Array<{
     key: LiveFeedKey;
     label: string;
     icon: typeof Siren;
-    request: LiveRequest | null;
-    onActivate: (request: LiveRequest) => void;
     tone: string;
+    borderTone: string;
+    items: LiveRequest[];
+    onActivate: (request: LiveRequest) => void;
     detail: (request: LiveRequest) => string;
+    actionLabel: string;
+    emptyTitle: string;
+    emptyHint: string;
+    emptyAction: () => void;
+    emptyCta: string;
   }> = [
     {
       key: "emergency",
-      label: "Live Emergency",
+      label: "Live emergency",
       icon: Siren,
-      request: emergencyRequest,
-      onActivate: onOpenEmergency,
       tone: "text-crisis",
-      detail: (request: LiveRequest) => request.place,
-    },
-    {
-      key: "bounty",
-      label: "High Bounty",
-      icon: CircleDollarSign,
-      request: highestBounty,
-      onActivate: onOpenHighBounty,
-      tone: "text-signal",
-      detail: (request: LiveRequest) => `${poolOf(request)} cr`,
+      borderTone: "border-crisis/40",
+      items: feedItems.emergency,
+      onActivate: onOpenEmergency,
+      detail: (request) => request.place,
+      actionLabel: "View",
+      emptyTitle: "No active alerts nearby",
+      emptyHint: "Trusted alerts appear here first",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
     },
     {
       key: "stream",
-      label: "Trending Stream",
+      label: "Active streams",
       icon: Radio,
-      request: liveRequest,
-      onActivate: onOpenLive,
       tone: "text-live",
-      detail: (request: LiveRequest) => `${request.watchers} watching`,
+      borderTone: "border-live/40",
+      items: feedItems.stream,
+      onActivate: onOpenLive,
+      detail: (request) => `${request.watchers} watching`,
+      actionLabel: "Watch",
+      emptyTitle: "No live streams yet",
+      emptyHint: "Be the first pair of eyes",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
+    },
+    {
+      key: "bounty",
+      label: "High bounties",
+      icon: CircleDollarSign,
+      tone: "text-signal",
+      borderTone: "border-signal/40",
+      items: feedItems.bounty,
+      onActivate: onOpenHighBounty,
+      detail: (request) => `${poolOf(request)} cr`,
+      actionLabel: "Hunt",
+      emptyTitle: "No open bounties",
+      emptyHint: "Post one and hunters respond",
+      emptyAction: onPostBounty,
+      emptyCta: "Post bounty",
     },
     {
       key: "dispatches",
-      label: "Recent Dispatches",
+      label: "Recent dispatches",
       icon: Clock,
-      request: latestRequest,
-      onActivate: onOpenDispatches,
       tone: "text-signal",
-      detail: (request: LiveRequest) =>
-        request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`,
+      borderTone: "border-home-line",
+      items: feedItems.dispatches,
+      onActivate: onOpenDispatches,
+      detail: (request) => (request.minutesAgo < 1 ? "just now" : `${request.minutesAgo}m ago`),
+      actionLabel: "View",
+      emptyTitle: "Nothing dispatched yet",
+      emptyHint: "Fresh requests land here",
+      emptyAction: onPostBounty,
+      emptyCta: "Post bounty",
     },
     {
       key: "hotspot",
-      label: "Hot Spot Near You",
+      label: "Hot spot near you",
       icon: Flame,
-      request: hotSpot,
-      onActivate: onOpenHotSpot,
       tone: "text-signal",
-      detail: (request: LiveRequest) => request.place,
+      borderTone: "border-home-line",
+      items: feedItems.hotspot,
+      onActivate: onOpenHotSpot,
+      detail: (request) => request.place,
+      actionLabel: "View",
+      emptyTitle: "No hot spot pinned yet",
+      emptyHint: "Activity near you shows here",
+      emptyAction: onGoLive,
+      emptyCta: "Go live",
     },
   ];
-  const activeTrend = trends.find((trend) => trend.key === openFeed) ?? null;
-  const activeItems = openFeed ? feedItems[openFeed] : [];
-
-  const openItem = (feed: LiveFeedKey, request: LiveRequest) => {
-    const trend = trends.find((candidate) => candidate.key === feed);
-    trend?.onActivate(request);
-  };
 
   if (mapExpanded) {
     return (
@@ -479,126 +439,70 @@ export function HomeLiveStage({
         )}
       </div>
 
-      {/* Section separator: clear hierarchy between the cards and the filter row. */}
+      {/* Section separator: clear hierarchy between the cards and the live dashboard. */}
       <div className="mt-4 mb-2.5 flex items-center gap-3 px-1">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-signal/35 to-signal/35" aria-hidden />
-        <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Explore feeds</span>
+        <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Live dashboard</span>
         <span className="h-px flex-1 bg-gradient-to-l from-transparent via-signal/35 to-signal/35" aria-hidden />
       </div>
 
-      <div ref={tickerRef} className="relative flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
-        <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
-        <div
-          ref={trendScrollerRef}
-          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-3.5 pt-1.5 whitespace-nowrap"
-          onScroll={updateTrendScroll}
-          onWheel={(event) => {
-            if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-            event.currentTarget.scrollBy({ left: event.deltaY, behavior: "smooth" });
-          }}
-          aria-label="Browse trending live feeds"
-        >
-          {trends.map((trend) => {
-            const Icon = trend.icon;
-            return (
-              <Button
-                key={trend.key}
-                type="button"
-                variant="outline"
-                onClick={() => setOpenFeed((current) => current === trend.key ? null : trend.key)}
-                aria-expanded={openFeed === trend.key}
-                aria-controls="home-live-feed-drawer"
-                aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-home-line bg-home-glass px-3.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-foreground shadow-none transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal/70 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
-              >
-                <Icon className="size-3.5" aria-hidden />
-                {trend.label}
-                {openFeed === trend.key ? <ChevronUp className="size-3" aria-hidden /> : <ChevronDown className="size-3" aria-hidden />}
-              </Button>
-            );
-          })}
-        </div>
-        <div className="pointer-events-none absolute inset-x-3 bottom-1 z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
-          {trendScroll.thumbWidth < 100 && (
-            <div
-              className="h-full rounded-full bg-signal shadow-[0_0_10px_rgba(204,255,0,0.75)] transition-[width,margin-left] duration-150 ease-out motion-reduce:transition-none"
-              style={{ width: `${trendScroll.thumbWidth}%`, marginLeft: `${trendScroll.thumbLeft}%` }}
-            />
-          )}
-        </div>
-      </div>
+      {/* Multi-column live dashboard: every feed visible at once, no dropdowns. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" aria-label="Live feeds dashboard">
+        {feedColumns.map((column) => {
+          const Icon = column.icon;
+          const visibleItems = column.items.slice(0, 4);
+          return (
+            <section
+              key={column.key}
+              aria-label={column.label}
+              className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border ${column.borderTone} bg-home-glass-strong shadow-[0_18px_50px_color-mix(in_oklab,var(--color-background)_65%,transparent)] backdrop-blur-2xl`}
+            >
+              <header className="flex items-center justify-between gap-2 border-b border-home-line px-3 py-2">
+                <span className={`flex min-w-0 items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] ${column.tone}`}>
+                  <Icon className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">{column.label}</span>
+                </span>
+                <span className="shrink-0 rounded-full border border-signal/50 bg-signal/10 px-1.5 py-px font-mono text-[0.55rem] font-bold tabular-nums text-signal">
+                  {column.items.length}
+                </span>
+              </header>
 
-      <div
-        id="home-live-feed-drawer"
-        style={{
-          left: panel.left,
-          width: panel.width,
-          ...(panel.top !== undefined ? { top: panel.top } : { bottom: panel.bottom }),
-        }}
-        className={`fixed z-[60] grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
-      >
-        <div className="min-h-0 overflow-hidden" style={{ maxHeight: panel.maxHeight }}>
-
-          {activeTrend && (
-            <div className="flex max-h-[inherit] flex-col px-3 pb-3 pt-2.5 sm:px-4">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                   <activeTrend.icon className="size-4 shrink-0 text-home-accent" aria-hidden />
-                   <h3 className="home-display truncate text-xs font-semibold uppercase text-home-accent">{activeTrend.label}</h3>
-                   <span className="rounded-full border border-signal/50 bg-signal/10 px-2 py-0.5 text-[0.62rem] font-bold text-signal">
-                    {activeItems.length}
-                  </span>
-                </div>
-                <Button type="button" variant="ghost" size="icon" onClick={() => setOpenFeed(null)} aria-label={`Close ${activeTrend.label}`} className="size-8 shrink-0 rounded-full text-foreground hover:text-signal">
-                  <ChevronUp className="size-4" aria-hidden />
-                </Button>
-              </div>
-
-              {activeItems.length > 0 ? (
-                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
-                  {activeItems.map((request) => (
-                     <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
-                       <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
-                         <span className="relative block size-10 shrink-0 overflow-hidden rounded-lg border border-signal/30">
-                           <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
-                         </span>
-                         <span className="min-w-0">
-                          <span className="block truncate text-sm font-extrabold text-foreground">{request.title}</span>
-                          <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[0.7rem] font-bold text-muted-foreground">
-                             <MapPin className="size-3 shrink-0 text-home-accent" aria-hidden />
-                            <span className="truncate">{request.place}</span>
-                            <span aria-hidden>·</span>
-                            <span className="shrink-0">{activeTrend.detail(request)}</span>
+              {visibleItems.length > 0 ? (
+                <ul className="flex min-h-0 flex-1 flex-col gap-1.5 p-2">
+                  {visibleItems.map((request) => (
+                    <li key={`${column.key}-${request.id}`}>
+                      <button
+                        type="button"
+                        onClick={() => column.onActivate(request)}
+                        className="group flex w-full min-w-0 items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2 text-left transition-[border-color,transform] duration-150 hover:-translate-y-0.5 hover:border-signal/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
+                      >
+                        <span className="relative block size-9 shrink-0 overflow-hidden rounded-lg border border-signal/30">
+                          <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[0.72rem] font-extrabold text-foreground group-hover:text-signal">{request.title}</span>
+                          <span className="mt-0.5 flex min-w-0 items-center gap-1 text-[0.6rem] font-bold text-muted-foreground">
+                            <MapPin className="size-2.5 shrink-0 text-home-accent" aria-hidden />
+                            <span className="truncate">{column.detail(request)}</span>
                           </span>
                         </span>
-                      </Button>
-                      <Button type="button" variant={openFeed === "bounty" ? "default" : "outline"} onClick={() => openFeed && openItem(openFeed, request)} className="h-8 shrink-0 rounded-full px-3 text-[0.65rem] font-extrabold uppercase">
-                        {openFeed === "bounty" && request.status === "open" ? "Hunt" : openFeed === "stream" ? "Watch" : "View"}
-                      </Button>
-                    </div>
+                        <span className={`shrink-0 text-[0.55rem] font-extrabold uppercase ${column.tone}`}>{column.actionLabel}</span>
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md border border-signal/45 bg-background/80 p-3 text-center">
-                  <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
-                  <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
-                    {SHOWCASE.map((item) => (
-                      <ShowcaseCard key={`drawer-${item.key}`} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
-                    ))}
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
-                      <Radio className="size-3.5" /> Go live
-                    </Button>
-                    <Button type="button" variant="outline" onClick={onPostBounty} className="h-9 animate-red-flash font-extrabold uppercase text-[#FF5A4E] hover:bg-signal hover:text-signal-foreground">
-                      <CircleDollarSign className="size-8 text-signal" /> Post bounty
-                    </Button>
-                  </div>
+                <div className="flex flex-1 flex-col items-center justify-center gap-1.5 p-3 text-center">
+                  <p className="text-[0.68rem] font-extrabold text-foreground">{column.emptyTitle}</p>
+                  <p className="text-[0.58rem] font-semibold text-foreground/55">{column.emptyHint}</p>
+                  <Button type="button" size="sm" onClick={column.emptyAction} className="mt-1 h-7 rounded-lg px-2.5 text-[0.58rem] font-extrabold uppercase">
+                    {column.emptyCta}
+                  </Button>
                 </div>
               )}
-            </div>
-          )}
-        </div>
+            </section>
+          );
+        })}
       </div>
     </section>
   );
