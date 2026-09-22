@@ -200,9 +200,14 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               ))}
             </div>
           </Field>
-          {needsPublicSpacesNotice(category) && (
+          {needsPublicSpacesNotice(category) && !locationTypeAllowsPrivateProperty(locationType) && (
             <p className="rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
-              {PUBLIC_HAPPENINGS_DISCLAIMER}
+              {privacyAccessCopy(locationType)}
+            </p>
+          )}
+          {locationTypeAllowsPrivateProperty(locationType) && (
+            <p className="rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
+              {privacyAccessCopy(locationType)}
             </p>
           )}
           {permissionNeeded && (
