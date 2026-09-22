@@ -17,7 +17,7 @@ import marketsImage from "@/assets/cat-shopping.jpg";
 import meetupsImage from "@/assets/cat-casual.jpg";
 import artsImage from "@/assets/cat-arts.jpg";
 import sportsImage from "@/assets/cat-sports.jpg";
-import generalImage from "@/assets/cat-casual.jpg";
+import generalImage from "@/assets/cat-general.jpg";
 import type { CommunityCategory } from "@/lib/community";
 
 export type CommunityVisual = {
