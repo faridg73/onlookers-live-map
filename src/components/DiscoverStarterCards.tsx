@@ -37,7 +37,7 @@ export function DiscoverStarterCards({
     <section aria-labelledby="starter-title" className="space-y-4">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-signal">
+          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
             <Sparkles className="size-4" /> Starter ideas
           </p>
           <h2 id="starter-title" className="mt-1 text-xl font-extrabold text-foreground">
@@ -63,7 +63,7 @@ export function DiscoverStarterCards({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/15 to-transparent" />
               <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-foreground/15 bg-background/80 px-2.5 py-1 text-[0.65rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-md">
-                <Icon className="size-3.5 text-signal" /> Starter preview
+                <Icon className="size-3.5 text-muted-foreground" /> Starter preview
               </span>
             </div>
             <div className="p-4">
@@ -73,7 +73,7 @@ export function DiscoverStarterCards({
                 type="button"
                 variant="ghost"
                 onClick={() => onStart(category)}
-                className="mt-3 h-auto p-0 font-bold text-signal hover:bg-transparent hover:text-signal"
+                className="mt-3 h-auto p-0 font-bold text-muted-foreground hover:bg-transparent hover:text-foreground"
               >
                 Use this idea <ArrowRight className="size-4" />
               </Button>

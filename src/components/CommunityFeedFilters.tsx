@@ -136,10 +136,10 @@ export function CommunityFeedFilters({
         <Button
           type="button"
           variant="outline"
-          className="h-10 max-w-full rounded-full border-white/15 bg-zinc-900/70 px-3.5 text-sm font-bold text-foreground hover:border-signal/60 hover:bg-zinc-900"
+          className="h-10 max-w-full rounded-full border-white/15 bg-zinc-900/70 px-3.5 text-sm font-bold text-foreground hover:border-white/25 hover:bg-zinc-900"
           aria-label={`Change location and radius. Current selection: ${areaLabel}, ${radiusLabel(value, unit)}`}
         >
-          <MapPin className="size-4 shrink-0 text-signal" />
+          <MapPin className="size-4 shrink-0 text-muted-foreground" />
           <span className="truncate">{areaLabel}</span>
           <span className="shrink-0 text-muted-foreground">· {radiusLabel(value, unit).replace(" ", "")}</span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
@@ -159,7 +159,7 @@ export function CommunityFeedFilters({
               variant="outline"
               disabled={locationBusy}
               onClick={() => void onUseMyLocation()}
-              className="w-full justify-center rounded-full border-white/15 bg-zinc-900/50 font-bold text-signal hover:border-signal/60"
+              className="w-full justify-center rounded-full border-white/15 bg-zinc-900/50 font-bold text-foreground hover:border-white/25"
             >
               {locationBusy ? <Loader2 className="size-4 animate-spin" /> : <LocateFixed className="size-4" />}
               {locationBusy ? "Locating…" : "Use my location"}
@@ -220,7 +220,7 @@ export function CommunityFeedFilters({
                         index === highlight ? "bg-surface-raised" : ""
                       }`}
                     >
-                      <MapPin className="size-3.5 shrink-0 text-signal" aria-hidden />
+                      <MapPin className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
                       <span className="truncate">{suggestion.text}</span>
                     </button>
                   </li>
