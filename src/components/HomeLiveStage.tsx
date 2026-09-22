@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, HandCoins, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
@@ -247,25 +247,28 @@ export function HomeLiveStage({
           </div>
         </div>
 
-        {/* 2. How Onlooker works */}
-        <section aria-labelledby="home-how-it-works" className="rounded-3xl border border-home-line bg-home-glass p-4 backdrop-blur-2xl sm:p-5">
+        {/* 2. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
+        <section
+          aria-labelledby="home-how-it-works"
+          className="rounded-3xl border border-home-line bg-home-charcoal p-4 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:p-6"
+        >
           <h3 id="home-how-it-works" className="home-display text-center text-[0.68rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
             How Onlooker works
           </h3>
-          <ol className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <ol className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {HOW_IT_WORKS.map((step) => {
               const Icon = step.icon;
               return (
                 <li
                   key={step.step}
-                  className="flex min-w-0 items-start gap-3 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl"
+                  className="flex min-w-0 items-start gap-3 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
                 >
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-background/70 text-muted-foreground">
-                    <Icon className="size-4" aria-hidden />
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-signal/35 bg-signal/10 text-signal">
+                    <Icon className="size-5" aria-hidden />
                   </span>
                   <span className="min-w-0">
                     <span className="block font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step.step}</span>
-                    <span className="mt-0.5 block text-sm font-extrabold text-foreground">{step.title}</span>
+                    <span className="mt-0.5 block text-sm font-extrabold text-white">{step.title}</span>
                     <span className="mt-1 block text-[0.72rem] leading-relaxed text-foreground/65">{step.body}</span>
                   </span>
                 </li>
