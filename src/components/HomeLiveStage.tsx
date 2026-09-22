@@ -275,21 +275,31 @@ export function HomeLiveStage({
             See what&apos;s happening. Right now.
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
-            Watch live streams, follow trusted alerts, or post local bounties.
+            Post a real-world task, or earn money completing them nearby — verified photos and video, on demand.
           </p>
 
           <div className="mt-3 flex flex-wrap justify-center gap-2.5 [@media(max-height:520px)]:mt-2">
-            <Button type="button" onClick={onGoLive} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
-              <Radio className="size-4" /> Go live
-            </Button>
             <Button type="button" onClick={onPostBounty} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
               <CircleDollarSign className="size-4" /> Post bounty
             </Button>
+            <Button type="button" onClick={onGoLive} variant="outline" className="h-11 rounded-xl border border-home-line bg-home-glass px-4 font-bold uppercase text-foreground/85 backdrop-blur-2xl transition-colors duration-150 hover:border-signal/60 hover:text-signal sm:px-6 [@media(max-height:520px)]:h-9">
+              <Radio className="size-4" /> Go live
+            </Button>
+          </div>
+          <div className="mt-3 flex justify-center [@media(max-height:520px)]:hidden">
+            <button
+              type="button"
+              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="rounded-full px-2 py-1 text-[0.7rem] font-medium text-muted-foreground underline-offset-4 transition-colors duration-150 hover:text-signal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            >
+              New here? See how it works ↓
+            </button>
           </div>
         </div>
 
         {/* 2. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
         <section
+          id="how-it-works"
           aria-labelledby="home-how-it-works"
           className="rounded-3xl border border-home-line bg-home-charcoal p-4 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:p-6"
         >
