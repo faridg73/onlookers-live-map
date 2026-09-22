@@ -408,7 +408,9 @@ function PostScreen() {
       if (prev != null && Math.round(current) === prev) return gigFloor;
       return current;
     });
-  }, [gigFloor, tier]);
+  // `bounty` is a dep so programmatic sets (prompt parse, capture change) that land
+  // below the floor get snapped up even when the floor itself didn't move.
+  }, [gigFloor, tier, bounty]);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
