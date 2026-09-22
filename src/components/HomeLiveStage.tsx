@@ -9,6 +9,9 @@ import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json
 import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
 import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
 import buildingPlaceholder from "@/assets/home/building-placeholder.jpg.asset.json";
+import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
+import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
+import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
