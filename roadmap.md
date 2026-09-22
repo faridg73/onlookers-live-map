@@ -11,5 +11,5 @@
 - [x] Navigation: remove the top-right logo globally and show the secondary menu only on Profile
 
 ## Ticker readout
-- [ ] Make LIVE/ALERTS/BOUNTIES/TOP POOL ticker items clickable
-- [ ] Move ticker readout under "The city is live" line
+- [x] Make LIVE/ALERTS/BOUNTIES/TOP POOL ticker items clickable
+- [x] Move ticker readout under "The city is live" line
