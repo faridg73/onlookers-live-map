@@ -439,126 +439,70 @@ export function HomeLiveStage({
         )}
       </div>
 
-      {/* Section separator: clear hierarchy between the cards and the filter row. */}
+      {/* Section separator: clear hierarchy between the cards and the live dashboard. */}
       <div className="mt-4 mb-2.5 flex items-center gap-3 px-1">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-signal/35 to-signal/35" aria-hidden />
-        <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Explore feeds</span>
+        <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Live dashboard</span>
         <span className="h-px flex-1 bg-gradient-to-l from-transparent via-signal/35 to-signal/35" aria-hidden />
       </div>
 
-      <div ref={tickerRef} className="relative flex h-14 items-stretch overflow-hidden rounded-xl border border-home-line bg-home-glass-strong shadow-xl backdrop-blur-2xl" aria-label="Trending live ticker">
-        <span className="home-display z-10 flex shrink-0 items-center border-r border-home-line bg-home-accent/10 px-3 text-[0.6rem] font-semibold uppercase text-home-accent sm:text-[0.68rem]">Trending live</span>
-        <div
-          ref={trendScrollerRef}
-          className="scrollbar-thin flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-2 pb-3.5 pt-1.5 whitespace-nowrap"
-          onScroll={updateTrendScroll}
-          onWheel={(event) => {
-            if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-            event.currentTarget.scrollBy({ left: event.deltaY, behavior: "smooth" });
-          }}
-          aria-label="Browse trending live feeds"
-        >
-          {trends.map((trend) => {
-            const Icon = trend.icon;
-            return (
-              <Button
-                key={trend.key}
-                type="button"
-                variant="outline"
-                onClick={() => setOpenFeed((current) => current === trend.key ? null : trend.key)}
-                aria-expanded={openFeed === trend.key}
-                aria-controls="home-live-feed-drawer"
-                aria-label={`${trend.label}: ${openFeed === trend.key ? "close" : "open"} feed`}
-                className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-home-line bg-home-glass px-3.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] text-foreground shadow-none transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal/70 focus-visible:ring-2 focus-visible:ring-signal aria-expanded:border-signal aria-expanded:bg-signal aria-expanded:text-signal-foreground motion-reduce:transform-none motion-reduce:animate-none animate-red-flash ${trend.tone}`}
-              >
-                <Icon className="size-3.5" aria-hidden />
-                {trend.label}
-                {openFeed === trend.key ? <ChevronUp className="size-3" aria-hidden /> : <ChevronDown className="size-3" aria-hidden />}
-              </Button>
-            );
-          })}
-        </div>
-        <div className="pointer-events-none absolute inset-x-3 bottom-1 z-20 h-[3px] rounded-full bg-signal/15" aria-hidden>
-          {trendScroll.thumbWidth < 100 && (
-            <div
-              className="h-full rounded-full bg-signal shadow-[0_0_10px_rgba(204,255,0,0.75)] transition-[width,margin-left] duration-150 ease-out motion-reduce:transition-none"
-              style={{ width: `${trendScroll.thumbWidth}%`, marginLeft: `${trendScroll.thumbLeft}%` }}
-            />
-          )}
-        </div>
-      </div>
+      {/* Multi-column live dashboard: every feed visible at once, no dropdowns. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" aria-label="Live feeds dashboard">
+        {feedColumns.map((column) => {
+          const Icon = column.icon;
+          const visibleItems = column.items.slice(0, 4);
+          return (
+            <section
+              key={column.key}
+              aria-label={column.label}
+              className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border ${column.borderTone} bg-home-glass-strong shadow-[0_18px_50px_color-mix(in_oklab,var(--color-background)_65%,transparent)] backdrop-blur-2xl`}
+            >
+              <header className="flex items-center justify-between gap-2 border-b border-home-line px-3 py-2">
+                <span className={`flex min-w-0 items-center gap-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] ${column.tone}`}>
+                  <Icon className="size-3.5 shrink-0" aria-hidden />
+                  <span className="truncate">{column.label}</span>
+                </span>
+                <span className="shrink-0 rounded-full border border-signal/50 bg-signal/10 px-1.5 py-px font-mono text-[0.55rem] font-bold tabular-nums text-signal">
+                  {column.items.length}
+                </span>
+              </header>
 
-      <div
-        id="home-live-feed-drawer"
-        style={{
-          left: panel.left,
-          width: panel.width,
-          ...(panel.top !== undefined ? { top: panel.top } : { bottom: panel.bottom }),
-        }}
-        className={`fixed z-[60] grid overflow-hidden rounded-xl border bg-home-glass-strong shadow-[0_28px_80px_color-mix(in_oklab,var(--color-background)_80%,transparent)] backdrop-blur-2xl transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:duration-0 ${openFeed ? "pointer-events-auto grid-rows-[1fr] border-signal/60 opacity-100 shadow-[0_0_28px_rgba(204,255,0,0.14)]" : "pointer-events-none grid-rows-[0fr] border-transparent opacity-0"}`}
-      >
-        <div className="min-h-0 overflow-hidden" style={{ maxHeight: panel.maxHeight }}>
-
-          {activeTrend && (
-            <div className="flex max-h-[inherit] flex-col px-3 pb-3 pt-2.5 sm:px-4">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                   <activeTrend.icon className="size-4 shrink-0 text-home-accent" aria-hidden />
-                   <h3 className="home-display truncate text-xs font-semibold uppercase text-home-accent">{activeTrend.label}</h3>
-                   <span className="rounded-full border border-signal/50 bg-signal/10 px-2 py-0.5 text-[0.62rem] font-bold text-signal">
-                    {activeItems.length}
-                  </span>
-                </div>
-                <Button type="button" variant="ghost" size="icon" onClick={() => setOpenFeed(null)} aria-label={`Close ${activeTrend.label}`} className="size-8 shrink-0 rounded-full text-foreground hover:text-signal">
-                  <ChevronUp className="size-4" aria-hidden />
-                </Button>
-              </div>
-
-              {activeItems.length > 0 ? (
-                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1" aria-label={`${activeTrend.label} active items`}>
-                  {activeItems.map((request) => (
-                     <div key={`${openFeed}-${request.id}`} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2.5 shadow-lg">
-                       <Button type="button" variant="ghost" onClick={() => openFeed && openItem(openFeed, request)} className="h-auto min-w-0 justify-start gap-2.5 p-0 text-left hover:bg-transparent">
-                         <span className="relative block size-10 shrink-0 overflow-hidden rounded-lg border border-signal/30">
-                           <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
-                         </span>
-                         <span className="min-w-0">
-                          <span className="block truncate text-sm font-extrabold text-foreground">{request.title}</span>
-                          <span className="mt-1 flex min-w-0 items-center gap-1.5 text-[0.7rem] font-bold text-muted-foreground">
-                             <MapPin className="size-3 shrink-0 text-home-accent" aria-hidden />
-                            <span className="truncate">{request.place}</span>
-                            <span aria-hidden>·</span>
-                            <span className="shrink-0">{activeTrend.detail(request)}</span>
+              {visibleItems.length > 0 ? (
+                <ul className="flex min-h-0 flex-1 flex-col gap-1.5 p-2">
+                  {visibleItems.map((request) => (
+                    <li key={`${column.key}-${request.id}`}>
+                      <button
+                        type="button"
+                        onClick={() => column.onActivate(request)}
+                        className="group flex w-full min-w-0 items-center gap-2 rounded-xl border border-home-line bg-home-glass p-2 text-left transition-[border-color,transform] duration-150 hover:-translate-y-0.5 hover:border-signal/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none"
+                      >
+                        <span className="relative block size-9 shrink-0 overflow-hidden rounded-lg border border-signal/30">
+                          <img src={requestCategoryArt(request.category)} alt="" aria-hidden className="absolute inset-0 size-full object-cover" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[0.72rem] font-extrabold text-foreground group-hover:text-signal">{request.title}</span>
+                          <span className="mt-0.5 flex min-w-0 items-center gap-1 text-[0.6rem] font-bold text-muted-foreground">
+                            <MapPin className="size-2.5 shrink-0 text-home-accent" aria-hidden />
+                            <span className="truncate">{column.detail(request)}</span>
                           </span>
                         </span>
-                      </Button>
-                      <Button type="button" variant={openFeed === "bounty" ? "default" : "outline"} onClick={() => openFeed && openItem(openFeed, request)} className="h-8 shrink-0 rounded-full px-3 text-[0.65rem] font-extrabold uppercase">
-                        {openFeed === "bounty" && request.status === "open" ? "Hunt" : openFeed === "stream" ? "Watch" : "View"}
-                      </Button>
-                    </div>
+                        <span className={`shrink-0 text-[0.55rem] font-extrabold uppercase ${column.tone}`}>{column.actionLabel}</span>
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md border border-signal/45 bg-background/80 p-3 text-center">
-                  <p className="text-xs font-bold text-foreground">Start the next one <span className="text-signal">and your city sees it instantly</span></p>
-                  <div className="scrollbar-thin mt-3 flex gap-2.5 overflow-x-auto pb-1 text-left lg:grid lg:grid-cols-4 lg:overflow-visible">
-                    {SHOWCASE.map((item) => (
-                      <ShowcaseCard key={`drawer-${item.key}`} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
-                    ))}
-                  </div>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <Button type="button" onClick={onGoLive} className="h-9 font-extrabold uppercase">
-                      <Radio className="size-3.5" /> Go live
-                    </Button>
-                    <Button type="button" variant="outline" onClick={onPostBounty} className="h-9 animate-red-flash font-extrabold uppercase text-[#FF5A4E] hover:bg-signal hover:text-signal-foreground">
-                      <CircleDollarSign className="size-8 text-signal" /> Post bounty
-                    </Button>
-                  </div>
+                <div className="flex flex-1 flex-col items-center justify-center gap-1.5 p-3 text-center">
+                  <p className="text-[0.68rem] font-extrabold text-foreground">{column.emptyTitle}</p>
+                  <p className="text-[0.58rem] font-semibold text-foreground/55">{column.emptyHint}</p>
+                  <Button type="button" size="sm" onClick={column.emptyAction} className="mt-1 h-7 rounded-lg px-2.5 text-[0.58rem] font-extrabold uppercase">
+                    {column.emptyCta}
+                  </Button>
                 </div>
               )}
-            </div>
-          )}
-        </div>
+            </section>
+          );
+        })}
       </div>
     </section>
   );
