@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileUp, Gavel, Loader2, ShieldAlert } from "lucide-react";
+import { CloudRain, FileUp, Gavel, Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -472,5 +472,185 @@ function DisputeCard({
         </div>
       )}
     </article>
+  );
+}
+
+/** Onlooker-side review when the real weather on site was worse than the poster declared. */
+function ConditionsDisputeForm({
+  userId,
+  jobs,
+  onSubmitted,
+}: {
+  userId: string;
+  jobs: EligibleConditionsBounty[];
+  onSubmitted: () => Promise<void>;
+}) {
+  const [requestId, setRequestId] = useState("");
+  const [actualId, setActualId] = useState("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const job = jobs.find((entry) => entry.requestId === requestId) ?? null;
+  const declared = job ? conditionByMultiplier(job.declaredMultiplier) : null;
+  const worseOptions = declared
+    ? WEATHER_CONDITIONS.filter((condition) => condition.multiplier > declared.multiplier)
+    : [];
+  const actual = worseOptions.find((condition) => condition.id === actualId) ?? null;
+  const valid = Boolean(requestId && actual && description.trim().length >= 10 && !busy);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!valid || !actual || !declared) return;
+    setBusy(true);
+    setError("");
+    let uploadedPath: string | null = null;
+    try {
+      if (file) {
+        const extension =
+          file.name.split(".").pop()?.replace(/[^A-Za-z0-9]/g, "").toLowerCase() || "bin";
+        uploadedPath = `${userId}/${requestId}/${crypto.randomUUID()}.${extension}`;
+        await uploadMedia({
+          bucket: "dispute-evidence",
+          path: uploadedPath,
+          file,
+          contentType: file.type,
+        });
+      }
+
+      await openDisputeWithEvidence({
+        data: {
+          requestId,
+          reasonCode: "conditions_mismatch",
+          description: `Declared: ${declared.label}. Actual on site: ${actual.label}. ${description.trim()}`,
+          file:
+            file && uploadedPath
+              ? {
+                  storagePath: uploadedPath,
+                  fileName: file.name,
+                  fileType: file.type as "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm" | "application/pdf",
+                  fileSize: file.size,
+                }
+              : null,
+        },
+      });
+      toast.success("Conditions review sent. An admin will look at both sides before payout.");
+      setRequestId("");
+      setActualId("");
+      setDescription("");
+      setFile(null);
+      await onSubmitted();
+    } catch (cause) {
+      if (uploadedPath) {
+        await supabase.storage.from("dispute-evidence").remove([uploadedPath]).catch(() => undefined);
+      }
+      const message = cause instanceof Error ? cause.message : "Could not send this review.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-2xl border border-border bg-surface p-5">
+      <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+        <CloudRain className="size-5 text-signal" /> Conditions review
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        The poster estimated the filming conditions when they posted. If the real weather on site
+        was worse, send it to admin review so you are not paid for easier conditions than you
+        actually worked in.
+      </p>
+      <form className="mt-4 space-y-4" onSubmit={submit}>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Bounty you are working</label>
+          <Select
+            value={requestId}
+            onValueChange={(value) => {
+              setRequestId(value);
+              setActualId("");
+            }}
+          >
+            <SelectTrigger className="h-12 bg-surface"><SelectValue placeholder="Select a bounty" /></SelectTrigger>
+            <SelectContent>
+              {jobs.map((entry) => (
+                <SelectItem key={entry.requestId} value={entry.requestId}>
+                  {entry.prompt} · {conditionByMultiplier(entry.declaredMultiplier).label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {declared && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Declared at posting time: <span className="text-signal">{declared.label}</span>
+            </p>
+          )}
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Actual conditions on site</label>
+          <Select value={actualId} onValueChange={setActualId} disabled={!declared}>
+            <SelectTrigger className="h-12 bg-surface"><SelectValue placeholder="What was it really like?" /></SelectTrigger>
+            <SelectContent>
+              {worseOptions.map((condition) => (
+                <SelectItem key={condition.id} value={condition.id}>
+                  {condition.label} · {condition.blurb}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {declared && worseOptions.length === 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">
+              This bounty already declares the toughest conditions, so there is nothing to review.
+            </p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="conditions-description" className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">What were the conditions?</label>
+          <Textarea
+            id="conditions-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value.slice(0, 3000))}
+            minLength={10}
+            maxLength={3000}
+            rows={4}
+            required
+            placeholder="Describe the weather, light, or hazards you filmed in, and the time you arrived."
+            className="min-h-28 bg-surface"
+          />
+        </div>
+        <div>
+          <label htmlFor="conditions-file" className="mb-1.5 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
+            <FileUp className="size-4" /> Photo or forecast screenshot (optional)
+          </label>
+          <Input
+            id="conditions-file"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm,application/pdf"
+            className="h-12 bg-surface py-2"
+            onChange={(event) => {
+              const next = event.target.files?.[0] ?? null;
+              if (next && next.size > 20 * 1024 * 1024) {
+                event.target.value = "";
+                setFile(null);
+                setError("Evidence files must be 20 MB or smaller.");
+                return;
+              }
+              setError("");
+              setFile(next);
+            }}
+          />
+        </div>
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" disabled={!valid} className="h-12 w-full uppercase">
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <CloudRain className="size-4" />}
+          Send conditions review
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          The bounty stays in escrow while an admin compares both sides.
+        </p>
+      </form>
+    </section>
   );
 }
