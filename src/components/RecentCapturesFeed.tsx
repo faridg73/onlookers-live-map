@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Clock, Eye, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export function RecentCapturesFeed({
   title?: string;
   blurb?: string;
   /** Shown in place of the wall while there are no captures yet (Home teaser). */
-  emptyTeaser?: React.ReactNode;
+  emptyTeaser?: ReactNode;
 }) {
   const [clips, setClips] = useState<ExploreClip[] | null>(null);
   /** Which card the person tapped — that one swaps the loop for the real player. */
