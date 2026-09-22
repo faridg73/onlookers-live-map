@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sheet";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
+import { LocationTypeBadge } from "@/components/LocationTypeBadge";
 import { BountyNoteDetails } from "@/components/BountyNoteDetails";
 import { ExpiryCountdown } from "@/components/ExpiryCountdown";
 import { VideoRecorder } from "@/components/VideoRecorder";
@@ -162,9 +163,10 @@ export function BountyBottomSheet({
             {!closed && <ExpiryCountdown minutesLeft={request.expiresInMin} />}
           </div>
           <SheetTitle className="font-display text-2xl leading-tight">{request.title}</SheetTitle>
-          <SheetDescription className="flex items-center gap-1.5 text-sm">
+          <SheetDescription className="flex flex-wrap items-center gap-1.5 text-sm">
             <MapPin className="size-4 shrink-0" />
             <span className="truncate">{request.place}</span>
+            <LocationTypeBadge locationType={request.locationType} />
             {distanceLabel && <span className="text-signal">· {distanceLabel} away</span>}
           </SheetDescription>
         </SheetHeader>

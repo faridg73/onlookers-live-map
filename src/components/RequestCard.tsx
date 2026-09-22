@@ -20,6 +20,7 @@ import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
+import { LocationTypeBadge } from "@/components/LocationTypeBadge";
 import { cn } from "@/lib/utils";
 
 
@@ -71,9 +72,10 @@ export function RequestCard({
             <h3 className="mt-2 truncate font-display text-base font-bold text-foreground">
               {request.title}
             </h3>
-            <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <p className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="size-3.5 shrink-0" />
               <span className="truncate">{request.place}</span>
+              <LocationTypeBadge locationType={request.locationType} />
             </p>
             {distanceLabel && (
               <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
@@ -137,8 +139,9 @@ export function RequestCard({
             <span>{formatAgo(request.minutesAgo)}</span>
           </div>
           <h3 className="mt-2 font-display text-lg font-bold leading-tight text-foreground">{request.title}</h3>
-          <p className="mt-1 flex items-center gap-1.5 text-sm font-medium text-foreground">
+          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground">
             <MapPin className="size-3.5" /> {request.place}
+            <LocationTypeBadge locationType={request.locationType} />
           </p>
         </div>
 
