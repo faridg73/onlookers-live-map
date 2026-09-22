@@ -136,12 +136,11 @@ export function MapCanvas({
         restoredViewport.current = Boolean(savedViewport);
         map.current = new maps.Map(holder.current, {
           ...SHARED_MAP_OPTIONS,
-          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "hybrid",
+          mapTypeId: mapTypeId ?? SHARED_MAP_OPTIONS.mapTypeId ?? "roadmap",
           mapTypeControl: showNativeMapTypeControl,
           styles: styles ?? null,
           center: savedViewport ? { lat: savedViewport.lat, lng: savedViewport.lng } : REGIONAL_CENTER,
-          // Neighborhood-level default keeps aerial detail and hybrid labels
-          // legible while preserving the existing nearby marker density.
+          // Neighborhood-level default preserves nearby marker density.
           zoom: savedViewport?.zoom ?? 15,
           // Zoom out far enough to reach any country, so a pin can be dropped
           // anywhere in the world.

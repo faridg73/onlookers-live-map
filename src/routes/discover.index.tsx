@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, Satellite, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ScrollableLane } from "@/components/ScrollableLane";
 
@@ -69,8 +69,6 @@ function DiscoverHome() {
   const { area } = useDiscoveryArea();
   const [view, setView] = useState<"grid" | "map">("grid");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  // App-owned base-map switcher (Satellite = hybrid aerial, Map = plain roads).
-  const [mapType, setMapType] = useState<"hybrid" | "roadmap">("hybrid");
   const restored = useRef(false);
 
   useSessionScroll("onlooker:scroll:discover");
@@ -79,17 +77,15 @@ function DiscoverHome() {
     const saved = readSessionState<{
       view?: "grid" | "map";
       selectedId?: string | null;
-      mapType?: "hybrid" | "roadmap";
     }>("onlooker:view:discover", {});
     if (saved.view === "grid" || saved.view === "map") setView(saved.view);
     setSelectedId(saved.selectedId ?? null);
-    if (saved.mapType === "hybrid" || saved.mapType === "roadmap") setMapType(saved.mapType);
     restored.current = true;
   }, []);
 
   useEffect(() => {
-    if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId, mapType });
-  }, [view, selectedId, mapType]);
+    if (restored.current) writeSessionState("onlooker:view:discover", { view, selectedId });
+  }, [view, selectedId]);
 
   // A deep-linked place wins; otherwise the map focuses the browsing area.
   const search = Route.useSearch();
@@ -191,7 +187,6 @@ function DiscoverHome() {
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 viewportStorageKey="onlooker:map:discover"
-                mapTypeId={mapType}
                 focusPin={focus ? { ...focus, zoom: 15 } : null}
                 centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
                 showNativeMapTypeControl={false}
@@ -208,32 +203,6 @@ function DiscoverHome() {
               <ArrowLeft className="size-3.5" aria-hidden />
               Browse places
             </button>
-
-            {/* terminal-grade base-map switcher, top-right corner */}
-            <div className="absolute right-2.5 top-2.5 z-10 flex overflow-hidden rounded-md border border-signal/50 bg-black/85 shadow-md shadow-signal/20 backdrop-blur-xl">
-              {(
-                [
-                  { id: "hybrid", label: "Satellite", icon: Satellite },
-                  { id: "roadmap", label: "Map", icon: MapIcon },
-                ] as const
-              ).map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => setMapType(option.id)}
-                  aria-pressed={mapType === option.id}
-                  className={cn(
-                    "flex h-8 items-center gap-1.5 px-2.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&:not(:first-child)]:border-l [&:not(:first-child)]:border-signal/40",
-                    mapType === option.id
-                      ? "bg-signal text-signal-foreground"
-                      : "text-signal hover:bg-signal/15",
-                  )}
-                >
-                  <option.icon className="size-3.5" aria-hidden />
-                  {option.label}
-                </button>
-              ))}
-            </div>
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>
