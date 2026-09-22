@@ -1519,12 +1519,25 @@ function PostScreen() {
                 {tier === "standard" && (
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
+                    <p className="mt-1 text-xs font-medium text-muted-foreground">
+                      Starts at the calculated price for your{" "}
+                      {captureDurationLabel(capture, action === "live")}. Changing it{" "}
+                      <span className="font-extrabold text-foreground">replaces</span> that
+                      price — it is never added on top.
+                    </p>
                     <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
-                    {!rewardMatchesGig && (
+                    {rewardMatchesGig ? (
+                      <p className="mt-2 text-xs font-medium text-muted-foreground">
+                        Matching the calculated price of{" "}
+                        <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                      </p>
+                    ) : (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                         <span>
-                          Gig price for {captureDurationLabel(capture, action === "live")} is{" "}
-                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                          You replaced the calculated price for{" "}
+                          {captureDurationLabel(capture, action === "live")} (
+                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>
+                          ).
                         </span>
                         <Button
                           type="button"
@@ -1533,7 +1546,7 @@ function PostScreen() {
                           onClick={() => setBounty(gig.totalCredits)}
                           className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
                         >
-                          Use gig price
+                          Reset to calculated price
                         </Button>
                       </div>
                     )}
@@ -1637,7 +1650,9 @@ function PostScreen() {
           <footer className="shrink-0 border-t border-border bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6">
             {step === 3 && (
               <div className="mb-3 flex items-center justify-between gap-3 text-sm">
-                <span className="font-bold text-muted-foreground">Total escrow</span>
+                <span className="font-bold text-muted-foreground">
+                  Held in escrow · paid to the onlooker
+                </span>
                 <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
               </div>
             )}
