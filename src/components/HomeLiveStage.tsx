@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, HandCoins, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, HandCoins, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
@@ -29,20 +29,20 @@ function isLiveRequest(request: LiveRequest) {
 const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typeof CircleDollarSign }> = [
   {
     step: "01",
-    title: "Post a bounty",
-    body: "Say what you want to see and lock credits behind the request.",
-    icon: CircleDollarSign,
+    title: "Post a Bounty",
+    body: "Need eyes on something real-world? Post a task with a reward — check a location, verify an event, capture a moment.",
+    icon: Megaphone,
   },
   {
     step: "02",
-    title: "A hunter claims it",
-    body: "Someone already nearby accepts and heads to the spot.",
-    icon: HandCoins,
+    title: "A Hunter Claims It",
+    body: "Nearby verified Hunters see your bounty and claim it to fulfill your request in person.",
+    icon: Radar,
   },
   {
     step: "03",
-    title: "Get verified footage back",
-    body: "Proof is reviewed, then your locked credits are released.",
+    title: "Get Verified Results",
+    body: "Receive photo or video proof, approve it, and payment is released. Hunters get paid for their time on the ground.",
     icon: BadgeCheck,
   },
 ];
