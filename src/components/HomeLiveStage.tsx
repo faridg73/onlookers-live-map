@@ -9,6 +9,9 @@ import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json
 import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
 import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
 import buildingPlaceholder from "@/assets/home/building-placeholder.jpg.asset.json";
+import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
+import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
+import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
@@ -30,24 +33,30 @@ function isLiveRequest(request: LiveRequest) {
   return request.bountyType === "live_stream" && request.status === "claimed";
 }
 
-const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typeof CircleDollarSign }> = [
+const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typeof CircleDollarSign; thumb: string; thumbAlt: string }> = [
   {
     step: "01",
     title: "Post a Bounty",
     body: "Need eyes on something real-world? Post a task with a reward — check a location, verify an event, capture a moment.",
     icon: Megaphone,
+    thumb: step1Thumb.url,
+    thumbAlt: "A phone screen showing a bounty request being posted",
   },
   {
     step: "02",
     title: "A Hunter Claims It",
     body: "Nearby verified Hunters see your bounty and claim it to fulfill your request in person.",
     icon: Radar,
+    thumb: step2Thumb.url,
+    thumbAlt: "A Hunter on location holding their phone",
   },
   {
     step: "03",
     title: "Get Verified Results",
     body: "Receive photo or video proof, approve it, and payment is released. Hunters get paid for their time on the ground.",
     icon: BadgeCheck,
+    thumb: step3Thumb.url,
+    thumbAlt: "A verified photo proof card with a checkmark",
   },
 ];
 
@@ -345,10 +354,23 @@ export function HomeLiveStage({
               return (
                 <li
                   key={step.step}
-                  className="flex min-w-0 items-start gap-3 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
+                  className="flex min-w-0 items-start gap-3.5 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
                 >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-signal/35 bg-signal/10 text-signal">
-                    <Icon className="size-5" aria-hidden />
+                  <span className="relative shrink-0">
+                    <img
+                      src={step.thumb}
+                      alt={step.thumbAlt}
+                      loading="lazy"
+                      width={512}
+                      height={512}
+                      className="size-20 rounded-xl border border-home-line object-cover"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-1.5 -right-1.5 grid size-7 place-items-center rounded-full border border-signal/40 bg-background text-signal shadow-[0_2px_10px_rgba(0,0,0,0.7)]"
+                    >
+                      <Icon className="size-3.5" />
+                    </span>
                   </span>
                   <span className="min-w-0">
                     <span className="block font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step.step}</span>
