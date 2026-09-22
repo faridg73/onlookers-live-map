@@ -148,6 +148,17 @@ function DisputesScreen() {
         />
       )}
 
+      {user && !loading && conditionsJobs.length > 0 && (
+        <ConditionsDisputeForm
+          userId={user.id}
+          jobs={conditionsJobs}
+          onSubmitted={async () => {
+            await refresh();
+            await loadConditionsJobs();
+          }}
+        />
+      )}
+
       <div className="mt-6 space-y-4">
         {cases.map((c) => (
           <DisputeCard
