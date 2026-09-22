@@ -393,7 +393,7 @@ export function HomeLiveStage({
           <span className="text-[0.58rem] font-bold uppercase text-signal">Live city feed</span>
         </div>
         {discoveryItems.length > 0 ? (
-          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Active live streams and high-value bounties">
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3.5 pb-1 lg:grid lg:grid-cols-4 lg:gap-3.5 lg:overflow-visible" aria-label="Active live streams and high-value bounties">
             {discoveryItems.map((request) => {
               const live = isLiveRequest(request);
               const initials = (request.requester || "?")
@@ -439,7 +439,7 @@ export function HomeLiveStage({
             })}
           </div>
         ) : (
-          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3 pb-1 lg:grid lg:grid-cols-4 lg:overflow-visible" aria-label="Ways to start the first stream or bounty nearby">
+          <div className="scrollbar-thin flex snap-x gap-2.5 overflow-x-auto overscroll-x-contain px-3.5 pb-1 lg:grid lg:grid-cols-4 lg:gap-3.5 lg:overflow-visible" aria-label="Ways to start the first stream or bounty nearby">
             {SHOWCASE.map((item) => (
               <ShowcaseCard key={item.key} item={item} onGoLive={onGoLive} onPostBounty={onPostBounty} />
             ))}
