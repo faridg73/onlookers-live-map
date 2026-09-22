@@ -46,7 +46,7 @@ export class SectionBoundary extends Component<
 export function RouteErrorPanel({ error, reset }: { error: Error; reset?: () => void }) {
   console.error(error);
   return (
-    <div className="app-shell pb-28 pt-10">
+    <div className="app-shell pb-32 pt-10">
       <div className="rounded-2xl border border-border bg-surface p-6 text-center">
         <h1 className="font-display text-2xl text-foreground">Nothing to show right now</h1>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
