@@ -166,7 +166,7 @@ export function RecentCapturesFeed({
                     </span>
                   )}
                   <span className="inline-flex items-center gap-1 tabular-nums">
-                    <Clock className="size-3" aria-hidden /> {ago(clip.createdAt)}
+                    <Clock className="size-3" aria-hidden /> {formatAgoISO(clip.createdAt)}
                   </span>
                   <span className="inline-flex items-center gap-1 tabular-nums">
                     <Eye className="size-3" aria-hidden /> {clip.views}
