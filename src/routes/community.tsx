@@ -524,7 +524,7 @@ function CommunityHub() {
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                 <span className="absolute inset-x-3 bottom-3 flex items-end gap-2 text-foreground">
                   <span className={`grid size-8 shrink-0 place-items-center rounded-lg ${active ? "bg-signal text-signal-foreground" : "bg-white/10 text-foreground"}`}><Icon className="size-4" /></span>
-                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] font-semibold text-signal">{c.blurb}</small></span>
+                  <span><strong className="block text-sm leading-tight">{c.label}</strong><small className="mt-0.5 line-clamp-1 block text-[0.65rem] font-semibold text-muted-foreground">{c.blurb}</small></span>
                 </span>
               </button>
             );
@@ -738,7 +738,7 @@ function CommunityHub() {
       {view === "alerts" ? (
         <div className="mt-5 px-5 sm:px-8">
           <SectionBoundary label="Emergency alert map">
-            <div className="mt-6 rounded-2xl border-2 border-signal/60 bg-crisis/10 px-4 py-3">
+            <div className="mt-6 rounded-2xl border-2 border-crisis/50 bg-crisis/10 px-4 py-3">
 
 
               <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-crisis">
