@@ -194,6 +194,46 @@ export function generateAccessCode() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
+/**
+ * How the filming spot is classified by the poster. Required on every bounty, so
+ * anyone reading a card can see the location was declared filmable — this is how
+ * the rule against targeting private homes without consent stays visible.
+ */
+export const LOCATION_TYPES = [
+  {
+    id: "public",
+    label: "Public Space",
+    emoji: "🌳",
+    blurb: "Street, park, sidewalk, plaza, beach — open to anyone.",
+  },
+  {
+    id: "commercial",
+    label: "Commercial",
+    emoji: "🏢",
+    blurb: "Store, mall, restaurant, office or other business address.",
+  },
+  {
+    id: "event_venue",
+    label: "Event Venue",
+    emoji: "🎪",
+    blurb: "Stadium, festival ground, theatre or ticketed venue.",
+  },
+  {
+    id: "owner_authorized",
+    label: "Owner-Authorized",
+    emoji: "🏠",
+    blurb: "Private property with explicit permission from the owner or agent.",
+  },
+] as const;
+
+export type LocationTypeId = (typeof LOCATION_TYPES)[number]["id"];
+
+export const LOCATION_TYPE_IDS = LOCATION_TYPES.map((t) => t.id) as LocationTypeId[];
+
+export function locationTypeById(id?: string | null) {
+  return LOCATION_TYPES.find((t) => t.id === id);
+}
+
 export type LiveRequest = {
   id: string;
   /** Database id of the escrowed request, when it was posted by this user */
@@ -231,6 +271,8 @@ export type LiveRequest = {
   scheduledStartAt?: string | undefined;
   /** Filming-conditions premium already priced in, 1 = clear */
   weatherMultiplier?: number | undefined;
+  /** Declared location type: public, commercial, event_venue or owner_authorized */
+  locationType?: string | undefined;
 };
 
 export type MapPosition = { lat: number; lng: number };
