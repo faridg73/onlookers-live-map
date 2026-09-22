@@ -54,11 +54,6 @@ const MOCK_ACTIVITY: CaptureActivity[] = [
   },
 ];
 
-function formatAgo(minutes: number) {
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
-}
 
 interface RecentActivityFeedProps {
   activity?: CaptureActivity[];

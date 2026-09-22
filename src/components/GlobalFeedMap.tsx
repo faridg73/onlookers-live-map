@@ -276,13 +276,7 @@ export function GlobalFeedMap({
 function formatAlertTime(iso: string) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
-  const minutes = Math.round((Date.now() - date.getTime()) / 60000);
-  const relative =
-    minutes < 1 ? "just now"
-      : minutes < 60 ? `${minutes} min ago`
-        : minutes < 1440 ? `${Math.round(minutes / 60)} hr ago`
-          : `${Math.round(minutes / 1440)} d ago`;
-  return { relative, absolute: date.toLocaleString() };
+  return { relative: formatAgoISO(iso), absolute: date.toLocaleString() };
 }
 
 const STATUS_LABEL: Record<string, string> = {
