@@ -24,7 +24,12 @@ const fileSchema = z
 
 const filingSchema = z.object({
   requestId: z.string().uuid(),
-  reasonCode: z.enum(["failure_to_deliver", "quality_issue", "verification_mismatch"]),
+  reasonCode: z.enum([
+    "failure_to_deliver",
+    "quality_issue",
+    "verification_mismatch",
+    "conditions_mismatch",
+  ]),
   description: z.string().trim().min(10).max(3000),
   file: fileSchema,
 });
@@ -58,6 +63,33 @@ export const listEligibleDisputeBounties = createServerFn({ method: "GET" })
         prompt: String(value["prompt"]),
         locationName: String(value["location_name"]),
         amount: Number(value["amount"]),
+        submittedAt: String(value["submitted_at"]),
+        reviewEndsAt: value["review_ends_at"] ? String(value["review_ends_at"]) : null,
+      };
+    });
+  });
+
+export type EligibleConditionsBounty = EligibleDisputeBounty & {
+  declaredMultiplier: number;
+};
+
+/** Bounties the signed-in onlooker is working, for raising a conditions review. */
+export const listEligibleConditionsDisputes = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<EligibleConditionsBounty[]> => {
+    const client = context.supabase as unknown as RpcClient;
+    const { data, error } = await client.rpc("list_eligible_conditions_disputes");
+    if (error) throw new Error(error.message);
+    if (!Array.isArray(data)) return [];
+
+    return data.map((row) => {
+      const value = row as Record<string, unknown>;
+      return {
+        requestId: String(value["request_id"]),
+        prompt: String(value["prompt"]),
+        locationName: String(value["location_name"]),
+        amount: Number(value["amount"]),
+        declaredMultiplier: Number(value["declared_multiplier"] ?? 1),
         submittedAt: String(value["submitted_at"]),
         reviewEndsAt: value["review_ends_at"] ? String(value["review_ends_at"]) : null,
       };

@@ -16,3 +16,15 @@ export type ModerationReasonCode = (typeof MODERATION_REASONS)[number]["code"];
 export function moderationReasonLabel(code: string) {
   return MODERATION_REASONS.find((reason) => reason.code === code)?.label ?? "Other policy violation";
 }
+
+/** Labels for escrow dispute reasons, including the onlooker-filed conditions review. */
+const DISPUTE_REASON_LABELS: Record<string, string> = {
+  failure_to_deliver: "Failure to deliver",
+  quality_issue: "Quality issue",
+  verification_mismatch: "Verification mismatch",
+  conditions_mismatch: "Conditions worse than declared",
+};
+
+export function disputeReasonLabel(code: string) {
+  return DISPUTE_REASON_LABELS[code] ?? moderationReasonLabel(code);
+}

@@ -1610,6 +1610,11 @@ function PostScreen() {
                   <p className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground">
                     <CloudRain className="size-3.5 text-signal" /> Filming conditions
                   </p>
+                  <p className="mt-1 text-xs font-medium text-muted-foreground">
+                    This is your best estimate at posting time. If the weather on site turns out
+                    worse than this, the onlooker can ask us to review the conditions before the
+                    payout settles.
+                  </p>
                   <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {WEATHER_CONDITIONS.map((condition) => (
                       <Button
