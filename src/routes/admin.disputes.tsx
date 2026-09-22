@@ -236,7 +236,7 @@ function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () =>
           </span>
         </div>
         <p className="mt-3 rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
-          <span className="font-semibold text-foreground">{moderationReasonLabel(item.reason_code ?? "")}</span>
+          <span className="font-semibold text-foreground">{disputeReasonLabel(item.reason_code ?? "")}</span>
           {item.dispute_reason ? ` · ${item.dispute_reason}` : ""}
         </p>
         <p className="mt-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
