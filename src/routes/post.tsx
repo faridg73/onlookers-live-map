@@ -1414,6 +1414,15 @@ function PostScreen() {
                   <textarea ref={noteRef} value={note} onChange={(event) => setNote(event.target.value)} rows={3} required minLength={10} className="field resize-none" />
                 </label>
 
+                <BountyBriefAssistant
+                  request={prompt || title}
+                  category={subcategory ? `${mainCategoryLabel} · ${subcategory}` : mainCategoryLabel}
+                  locationType={locationType ? LOCATION_TYPES.find((type) => type.id === locationType)?.label ?? null : null}
+                  place={place || null}
+                  onApplyTitle={(value) => setTitle(value.slice(0, 120))}
+                  onApplyInstructions={(value) => setNote(value)}
+                />
+
                 <Collapsible defaultOpen={permissionNeeded}>
                   <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-left text-sm font-bold text-foreground">
                     <Info className="size-4 text-signal" /><span className="flex-1">Privacy & access</span><ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
