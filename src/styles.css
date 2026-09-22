@@ -92,6 +92,7 @@
   --color-home-glass: var(--home-glass);
   --color-home-glass-strong: var(--home-glass-strong);
   --color-home-line: var(--home-line);
+  --color-home-line-strong: var(--home-line-strong);
   --color-home-obsidian: var(--home-obsidian);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
