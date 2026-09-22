@@ -10,7 +10,7 @@ import { SHARED_MAP_OPTIONS } from "@/lib/map-style";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
 import { formatCredits } from "@/lib/credits";
-import { REGIONAL_CENTER } from "@/lib/onlooker";
+import { formatAgoISO, REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
 import type { CommunityPost } from "@/lib/community";
 import { incidentById } from "@/lib/trust-tiers";
