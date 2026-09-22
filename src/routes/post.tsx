@@ -753,7 +753,7 @@ function PostScreen() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="post-wizard-title"
-        className="absolute inset-x-0 bottom-0 top-3 flex flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl sm:inset-x-[max(1rem,calc(50%-28rem))] sm:bottom-5 sm:top-5 sm:rounded-2xl"
+        className="absolute inset-x-0 bottom-0 top-3 flex flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl sm:inset-x-[max(1rem,calc(50%-36rem))] sm:bottom-5 sm:top-5 sm:rounded-2xl"
       >
         <header className="shrink-0 border-b border-border bg-surface px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
           <div className="flex items-center justify-between gap-3">
@@ -788,7 +788,7 @@ function PostScreen() {
 
         {mode === null && (
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
-            <div className="mx-auto max-w-2xl animate-rise space-y-3">
+            <div className="mx-auto max-w-4xl animate-rise space-y-3">
               <button
                 type="button"
                 onClick={() => setMode("broadcast")}
@@ -827,7 +827,7 @@ function PostScreen() {
         {mode === "broadcast" && (
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
             <BroadcastComposer onSwitchToBounty={() => setMode("bounty")} />
-            <div className="mx-auto mt-5 max-w-2xl">
+            <div className="mx-auto mt-5 max-w-4xl">
               <Button type="button" variant="outline" className="w-full gap-2" onClick={() => setMode(null)}>
                 <ArrowLeft className="size-4" /> Back to broadcast options
               </Button>
@@ -841,7 +841,7 @@ function PostScreen() {
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
           <div ref={formScrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">
             {step === 1 && (
-              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+              <div className="mx-auto max-w-4xl animate-rise space-y-5">
                 <div className="space-y-3 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Category</p>
                   <Select
@@ -1188,7 +1188,7 @@ function PostScreen() {
             )}
 
             {step === 2 && (
-              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+              <div className="mx-auto max-w-4xl animate-rise space-y-5">
                 {/* One compact dropdown instead of three tall cards. */}
                 <div className="rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">Request type</p>
@@ -1404,7 +1404,7 @@ function PostScreen() {
             )}
 
             {step === 3 && (
-              <div className="mx-auto max-w-2xl animate-rise space-y-5">
+              <div className="mx-auto max-w-4xl animate-rise space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold text-muted-foreground">
                     <CoinsIcon className="mr-1 inline size-3.5 text-signal" />
