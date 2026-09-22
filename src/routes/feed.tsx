@@ -341,16 +341,23 @@ function FeedScreen() {
       </div>
 
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
-      <div className="mt-2 grid grid-cols-2 gap-1.5 min-[420px]:grid-cols-3 sm:grid-cols-5">
+      <div
+        className="mt-2 flex w-full items-stretch gap-1 overflow-hidden rounded-xl border border-white/10 bg-surface p-1"
+        role="tablist"
+        aria-label="Request status"
+      >
         {FILTERS.map((f) => (
           <button
             key={f.key}
+            type="button"
+            role="tab"
+            aria-selected={filter === f.key}
             onClick={() => setFilter(f.key)}
             className={
-              "min-w-0 rounded-lg border-2 px-1 py-2 text-[0.66rem] font-bold uppercase transition-colors " +
+              "min-h-9 min-w-0 flex-1 truncate rounded-lg px-1 py-1.5 text-[0.66rem] font-bold uppercase transition-colors " +
               (filter === f.key
-                ? "border-signal bg-signal text-signal-foreground shadow-signal/40"
-                : "border-signal bg-surface text-muted-foreground hover:text-foreground shadow-signal/20")
+                ? "bg-signal text-signal-foreground shadow-[0_0_16px_-4px_var(--signal)]"
+                : "border border-transparent text-muted-foreground hover:text-foreground")
             }
           >
             {f.label}
