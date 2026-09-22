@@ -13,10 +13,13 @@ import {
   type DisputeCase,
   type DisputeEvidence,
 } from "@/lib/disputes";
-import { moderationReasonLabel } from "@/lib/moderation-reasons";
+import { disputeReasonLabel } from "@/lib/moderation-reasons";
+import { WEATHER_CONDITIONS, conditionByMultiplier } from "@/lib/bounty-pricing";
 import {
+  listEligibleConditionsDisputes,
   listEligibleDisputeBounties,
   openDisputeWithEvidence,
+  type EligibleConditionsBounty,
   type EligibleDisputeBounty,
 } from "@/lib/dispute-filing.functions";
 import { uploadMedia } from "@/lib/media-upload";
