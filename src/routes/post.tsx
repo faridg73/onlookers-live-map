@@ -389,6 +389,27 @@ function PostScreen() {
   /** Whether the bounty description is complete enough to lock escrow. */
   const detailsReady = note.trim().length >= 10;
 
+  /**
+   * Keeps the reward glued to the calculated total: it follows the floor up
+   * or down while the poster hasn't deliberately raised it, snaps up whenever
+   * urgency/conditions push the floor past it, and never lets a custom entry
+   * settle below the Step-2 calculated total.
+   */
+  const lastFloorRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (tier !== "standard") {
+      lastFloorRef.current = null;
+      return;
+    }
+    setBounty((current) => {
+      const prev = lastFloorRef.current;
+      lastFloorRef.current = gigFloor;
+      if (!Number.isFinite(current) || current < gigFloor) return gigFloor;
+      if (prev != null && Math.round(current) === prev) return gigFloor;
+      return current;
+    });
+  }, [gigFloor, tier]);
+
   useEffect(() => {
     void readWalletBalance().then(setBalance);
     setRecent(readRecentPlaces());
