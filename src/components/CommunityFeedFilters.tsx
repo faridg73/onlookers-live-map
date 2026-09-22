@@ -165,17 +165,17 @@ export function CommunityFeedFilters({
               {locationBusy ? "Locating…" : "Use my location"}
             </Button>
 
-        <form
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (highlight >= 0 && suggestions[highlight]) {
-              pickSuggestion(suggestions[highlight]);
-              return;
-            }
-            submitTyped();
-          }}
-        >
+            <form
+              className="flex gap-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (highlight >= 0 && suggestions[highlight]) {
+                  pickSuggestion(suggestions[highlight]);
+                  return;
+                }
+                submitTyped();
+              }}
+            >
           <div className="relative min-w-0 flex-1">
             <input
               value={query}
@@ -237,32 +237,31 @@ export function CommunityFeedFilters({
           >
             {locationBusy || suggesting ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
           </Button>
-        </form>
+            </form>
             {locationError && <p className="col-span-full text-xs text-destructive">{locationError}</p>}
-          </form>
 
-          <div>
-            <p className="mb-2 text-xs font-extrabold uppercase text-muted-foreground">Radius</p>
-            <div className="grid grid-cols-4 gap-2" aria-label="Distance from selected area">
-              {RADIUS_CHOICES.map((choice) => (
-                <Button
-                  key={choice.id}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onChange(choice.id)}
-                  aria-pressed={value === choice.id}
-                  className={`h-9 min-w-0 rounded-full border px-2 text-xs font-extrabold ${
-                    value === choice.id
-                      ? "border-signal bg-signal text-signal-foreground"
-                      : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25"
-                  }`}
-                >
-                  {radiusLabel(choice.id, unit).replace(" ", "")}
-                </Button>
-              ))}
+            <div>
+              <p className="mb-2 text-xs font-extrabold uppercase text-muted-foreground">Radius</p>
+              <div className="grid grid-cols-4 gap-2" aria-label="Distance from selected area">
+                {RADIUS_CHOICES.map((choice) => (
+                  <Button
+                    key={choice.id}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onChange(choice.id)}
+                    aria-pressed={value === choice.id}
+                    className={`h-9 min-w-0 rounded-full border px-2 text-xs font-extrabold ${
+                      value === choice.id
+                        ? "border-signal bg-signal text-signal-foreground"
+                        : "border-white/10 bg-zinc-900/50 text-muted-foreground hover:border-white/25"
+                    }`}
+                  >
+                    {radiusLabel(choice.id, unit).replace(" ", "")}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
           </div>
         </div>
       </SheetContent>
