@@ -5,6 +5,10 @@ import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone,
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
+import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json";
+import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
+import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
+import buildingPlaceholder from "@/assets/home/building-placeholder.jpg.asset.json";
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
@@ -52,6 +56,13 @@ const TABS: Array<{ key: ActivityTab; label: string }> = [
   { key: "bounty", label: "Bounties" },
   { key: "live", label: "Live" },
   { key: "alert", label: "Alerts" },
+];
+
+const HERO_PLACEHOLDERS = [
+  { src: streetPlaceholder.url, alt: "Crowds moving through a lively street event" },
+  { src: interiorPlaceholder.url, alt: "Modern interior ready for a real estate walkthrough" },
+  { src: capturePlaceholder.url, alt: "People capturing a live moment on their phones" },
+  { src: buildingPlaceholder.url, alt: "People arriving at a modern building" },
 ];
 
 /**
@@ -277,6 +288,28 @@ export function HomeLiveStage({
           <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
             Post a real-world task, or earn money completing them nearby — verified photos and video, on demand.
           </p>
+
+          <div
+            className="scrollbar-thin mx-auto mt-4 flex w-full max-w-4xl snap-x snap-mandatory gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 [@media(max-height:520px)]:mt-2"
+            aria-label="Examples of content people can request on Onlooker"
+          >
+            {HERO_PLACEHOLDERS.map((image, index) => (
+              <div
+                key={image.src}
+                className="relative aspect-[16/10] w-[72%] shrink-0 snap-center overflow-hidden rounded-xl border border-home-line bg-home-charcoal first:ml-[14%] last:mr-[14%] sm:w-auto sm:first:ml-0 sm:last:mr-0 [@media(max-height:520px)]:aspect-[16/7]"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  width={1200}
+                  height={750}
+                  className="size-full object-cover"
+                />
+                <span className="absolute inset-0 bg-background/60" aria-hidden />
+              </div>
+            ))}
+          </div>
 
           <div className="mt-3 flex flex-wrap justify-center gap-2.5 [@media(max-height:520px)]:mt-2">
             <Button type="button" onClick={onPostBounty} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
