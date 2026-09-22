@@ -262,28 +262,6 @@ export function HomeLiveStage({
 
   return (
     <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
-      {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
-      <div
-        className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
-        aria-label="Live city readout"
-      >
-        <span className="relative flex size-2 shrink-0" aria-hidden>
-          <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
-          <span className="relative size-2 rounded-full bg-signal" />
-        </span>
-        <div className="scrollbar-thin flex min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto whitespace-nowrap font-mono text-[0.8rem] font-bold uppercase tracking-[0.14em] tabular-nums text-foreground/70 sm:text-[0.95rem]">
-          <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>
-            TOP POOL{" "}
-            <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
-          </span>
-        </div>
-      </div>
       <div className="mx-auto w-full overflow-hidden rounded-3xl border border-home-line bg-home-obsidian shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent),0_0_0_1px_color-mix(in_oklab,var(--color-foreground)_6%,transparent),0_0_48px_color-mix(in_oklab,var(--color-signal)_9%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
         <div className="relative flex min-w-0 flex-col justify-center overflow-hidden px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
