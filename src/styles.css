@@ -511,6 +511,8 @@
   max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1rem;
+  /* Clear the floating 5-tab navigation dock at the bottom of every page. */
+  padding-bottom: 8rem;
 
   @media (min-width: 40rem) {
     padding-inline: 1.5rem;
