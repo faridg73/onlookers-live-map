@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { CalendarPlus, Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -19,6 +19,7 @@ import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
@@ -93,6 +94,7 @@ function CommunityHub() {
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
+  const filtersActive = view === "alerts" || source === "following";
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
   const [listingEvent, setListingEvent] = useState(false);
@@ -606,65 +608,96 @@ function CommunityHub() {
       </div>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3 px-5 sm:px-8">
-        <div className="flex rounded-full border border-border p-0.5">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setView("feed")}
-            className={`rounded-full text-xs font-bold ${
-              view === "feed" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
-            }`}
+        <div className="flex items-center gap-3">
+          {/* View switch — segmented tab control */}
+          <div
+            role="tablist"
+            aria-label="Content view"
+            className="flex rounded-lg border border-border bg-surface p-1 shadow-inner"
           >
-            <Rows3 className="size-3.5" /> Feed
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setView("map")}
-            className={`rounded-full text-xs font-bold ${
-              view === "map" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
-            }`}
-          >
-            <MapIcon className="size-3.5" /> Map
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setView("alerts")}
-            className={`rounded-full border-2 animate-red-flash motion-reduce:animate-none text-xs font-bold ${
-              view === "alerts" ? "border-signal bg-signal text-signal-foreground" : "border-signal bg-surface text-crisis"
-            }`}
-          >
-            <Siren className="size-3.5" /> Alerts
-          </Button>
-          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setSource("all")}
-            aria-pressed={source === "all"}
-            className={`rounded-full text-xs font-bold ${
-              source === "all" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Everyone
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setSource("following")}
-            aria-pressed={source === "following"}
-            className={`rounded-full text-xs font-bold ${
-              source === "following" ? "bg-signal text-signal-foreground" : "text-muted-foreground"
-            }`}
-          >
-            <UserCheck className="size-3.5" /> Following
-          </Button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={view !== "alerts"}
+              onClick={() => setView("feed")}
+              className={`rounded-md px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
+                view === "feed"
+                  ? "bg-signal text-signal-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className="flex items-center gap-1.5"><Rows3 className="size-3.5" /> Feed</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={view === "map"}
+              onClick={() => setView("map")}
+              className={`rounded-md px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
+                view === "map"
+                  ? "bg-signal text-signal-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span className="flex items-center gap-1.5"><MapIcon className="size-3.5" /> Map</span>
+            </button>
+          </div>
+
+          {/* Filters — funnel dropdown */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                aria-label="Filters"
+                className={`relative rounded-lg border-border bg-surface text-xs font-bold uppercase tracking-wide ${
+                  filtersActive ? "border-signal/60 text-signal" : "text-muted-foreground"
+                }`}
+              >
+                <Filter className="size-3.5" /> Filters
+                {filtersActive && (
+                  <span className="absolute -right-1 -top-1 size-2 rounded-full bg-signal" aria-hidden="true" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-60 rounded-xl border-border bg-surface p-2">
+              <p className="px-2 pb-1 pt-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
+                Filters
+              </p>
+              <button
+                type="button"
+                onClick={() => setView(view === "alerts" ? "feed" : "alerts")}
+                aria-pressed={view === "alerts"}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-semibold transition-colors ${
+                  view === "alerts" ? "bg-crisis/15 text-crisis" : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <Siren className={`size-4 shrink-0 ${view === "alerts" ? "animate-red-flash motion-reduce:animate-none" : ""}`} />
+                <span className="flex-1 text-left">Emergency alerts</span>
+                {view === "alerts" && <Check className="size-4" />}
+              </button>
+              <div className="my-1.5 h-px bg-border" aria-hidden="true" />
+              {([
+                { id: "all", label: "Everyone", icon: null },
+                { id: "following", label: "Following", icon: UserCheck },
+              ] as const).map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSource(id)}
+                  aria-pressed={source === id}
+                  className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-semibold transition-colors ${
+                    source === id ? "bg-signal/15 text-signal" : "text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {Icon ? <Icon className="size-4 shrink-0" /> : <span className="size-4 shrink-0" aria-hidden="true" />}
+                  <span className="flex-1 text-left">{label}</span>
+                  {source === id && <Check className="size-4" />}
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
