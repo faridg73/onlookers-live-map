@@ -64,7 +64,6 @@ import {
 
 import {
   PUBLIC_HAPPENINGS_DISCLAIMER,
-  VENUE_EXTERIOR_DISCLAIMER,
   locationTypeAllowsPrivateProperty,
   privacyAccessCopy,
 } from "@/lib/camera-only";
