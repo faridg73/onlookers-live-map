@@ -9,3 +9,7 @@
 - [x] Publish updated version
 - [x] Home: remove map canvas and use premium charcoal glass background; restore standard road maps globally
 - [x] Navigation: remove the top-right logo globally and show the secondary menu only on Profile
+
+## Ticker readout
+- [x] Make LIVE/ALERTS/BOUNTIES/TOP POOL ticker items clickable
+- [x] Move ticker readout under "The city is live" line

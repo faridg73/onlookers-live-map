@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { ChevronDown, CircleDollarSign, Clock, Eye, Flame, Map, MapPin, Radio, Siren, Sparkles } from "lucide-react";
 import type { LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
@@ -96,6 +97,7 @@ export function HomeLiveStage({
   mapExpanded = false,
   onExitMap,
 }: HomeLiveStageProps) {
+  const navigate = useNavigate();
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
   const emergencyCount = activeRequests.filter(isCrisis).length;
@@ -261,28 +263,6 @@ export function HomeLiveStage({
 
   return (
     <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
-      {/* Financial-ticker readout: crisp, tabular, edge-to-edge over the map. */}
-      <div
-        className="mb-2 flex items-center gap-3 overflow-hidden rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl"
-        aria-label="Live city readout"
-      >
-        <span className="relative flex size-2 shrink-0" aria-hidden>
-          <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
-          <span className="relative size-2 rounded-full bg-signal" />
-        </span>
-        <div className="scrollbar-thin flex min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto whitespace-nowrap font-mono text-[0.8rem] font-bold uppercase tracking-[0.14em] tabular-nums text-foreground/70 sm:text-[0.95rem]">
-          <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span></span>
-          <span className="text-border">|</span>
-          <span>
-            TOP POOL{" "}
-            <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
-          </span>
-        </div>
-      </div>
       <div className="mx-auto w-full overflow-hidden rounded-3xl border border-home-line bg-home-obsidian shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent),0_0_0_1px_color-mix(in_oklab,var(--color-foreground)_6%,transparent),0_0_48px_color-mix(in_oklab,var(--color-signal)_9%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
         <div className="relative flex min-w-0 flex-col justify-center overflow-hidden px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
@@ -295,21 +275,49 @@ export function HomeLiveStage({
               </span>
               The city is live
             </p>
-            <div className="hidden items-center gap-2 whitespace-nowrap text-[0.8rem] font-bold uppercase text-muted-foreground md:flex md:text-[0.9rem]">
-              <span className="whitespace-nowrap">{liveCount} live</span>
-              <span className="text-border">/</span>
-              <span className="whitespace-nowrap">{emergencyCount} alerts</span>
-              <span className="text-border">/</span>
-              <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
-            </div>
           </div>
-          <div className="mt-1 flex items-center justify-center gap-2 text-[0.78rem] font-bold uppercase text-muted-foreground md:hidden" aria-label="Current live activity">
-            <span className="whitespace-nowrap">{liveCount} live</span>
-            <span className="text-border">/</span>
-            <span className="whitespace-nowrap">{emergencyCount} alerts</span>
-            <span className="text-border">/</span>
-            <span className="whitespace-nowrap">{activeRequests.length} bounties</span>
+          {/* Clickable financial-ticker readout, directly under "The city is live". */}
+          <div
+            className="mt-2 flex items-center justify-center gap-2.5 overflow-x-auto whitespace-nowrap rounded-full border border-signal/30 bg-home-glass-strong px-3 py-1.5 font-mono text-[0.8rem] font-bold uppercase tracking-[0.12em] tabular-nums text-foreground/70 shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_12%,transparent)] backdrop-blur-2xl sm:gap-4 sm:text-[0.9rem] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:py-1"
+            aria-label="Live city readout"
+          >
+            <button
+              type="button"
+              onClick={() => (liveRequest ? onOpenLive(liveRequest) : navigate({ to: "/discover" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${liveCount} live streams — open`}
+            >
+              LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (emergencyRequest ? onOpenEmergency(emergencyRequest) : navigate({ to: "/feed" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-crisis focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${emergencyCount} live alerts — open`}
+            >
+              ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (highestBounty ? onOpenHighBounty(highestBounty) : navigate({ to: "/feed" }))}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={`${activeRequests.length} active bounties — open`}
+            >
+              BOUNTIES <span className="text-signal">{String(activeRequests.length).padStart(2, "0")}</span>
+            </button>
+            <span className="text-border" aria-hidden>|</span>
+            <button
+              type="button"
+              onClick={() => (highestBounty ? onOpenHighBounty(highestBounty) : onPostBounty())}
+              className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              aria-label={highestBounty ? `Top pool ${poolOf(highestBounty)} credits — open bounty` : "No pool yet — post a bounty"}
+            >
+              TOP POOL <span className="text-signal">{highestBounty ? `${poolOf(highestBounty)} CR` : "--"}</span>
+            </button>
           </div>
+
 
           <h2
             id="home-live-stage-title"
