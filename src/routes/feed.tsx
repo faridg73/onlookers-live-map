@@ -284,53 +284,25 @@ function FeedScreen() {
         </p>
       )}
 
-      <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">
-        What do you want to see?
-      </p>
-      <div className="mt-2">
-        <CategoryPicker
-          value={cat}
-          onChange={(id: CategoryPickerValue) => setCat(id)}
-          sub={sub}
-          onSubChange={setSub}
-          includeAll
-          counts={categoryCounts}
-        />
-      </div>
-
-      <div className="mt-3 flex items-center gap-2 rounded-xl border-2 border-signal bg-surface px-3 shadow-[0_0_12px_rgba(204,255,0,0.25)]">
-        <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search a venue, gate, section, or place..."
-          aria-label="Search bounties"
-          className="h-10 w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={() => setQuery("")}
-            aria-label="Clear search"
-            className="shrink-0 text-xs font-bold text-muted-foreground hover:text-foreground"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
-      {/* Jump the feed to any city, venue, landmark or address. */}
+      {/* One unified search bar: keyword filter + place jump in a single field. */}
       <div className="mt-3">
-        <PlaceSearchInput
-          placeholder="Filter by city, venue, landmark or address"
-          boxClassName="border-signal shadow-[0_0_12px_rgba(204,255,0,0.25)]"
-          onQueryChange={setPlaceQuery}
-          onPick={(place) => {
-            setPlaceQuery("");
-            setArea({ label: place.formatted, lat: place.latitude, lng: place.longitude });
-          }}
-        />
+        <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-surface px-3 py-2">
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          <PlaceSearchInput
+            variant="bare"
+            className="flex-1"
+            placeholder="Search a venue, gate, section, or city..."
+            onQueryChange={(value) => {
+              setPlaceQuery(value);
+              setQuery(value);
+            }}
+            onPick={(place) => {
+              setQuery("");
+              setPlaceQuery("");
+              setArea({ label: place.formatted, lat: place.latitude, lng: place.longitude });
+            }}
+          />
+        </div>
         {area && (
           <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-signal/50 bg-signal/10 px-3 py-2">
             <p className="truncate text-xs font-bold text-foreground">
@@ -345,12 +317,27 @@ function FeedScreen() {
             </button>
           </div>
         )}
-        {!area && query.trim().length === 0 && placeQuery.trim().length === 0 && (
-          <TrendingViewRequests
-            className="mt-3"
-            onOpen={(request) => navigate({ to: "/", search: { b: request.id } })}
-          />
-        )}
+      </div>
+
+      {!area && query.trim().length === 0 && placeQuery.trim().length === 0 && (
+        <TrendingViewRequests
+          className="mt-3"
+          onOpen={(request) => navigate({ to: "/", search: { b: request.id } })}
+        />
+      )}
+
+      <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">
+        What do you want to see?
+      </p>
+      <div className="mt-2">
+        <CategoryPicker
+          value={cat}
+          onChange={(id: CategoryPickerValue) => setCat(id)}
+          sub={sub}
+          onSubChange={setSub}
+          includeAll
+          counts={categoryCounts}
+        />
       </div>
 
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>

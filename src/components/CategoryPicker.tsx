@@ -47,10 +47,10 @@ export function CategoryPicker({
           onClick={() => select("all")}
           aria-pressed={value === "all"}
           className={cn(
-            "w-full rounded-xl border-2 py-2 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors",
+            "w-full rounded-xl border py-2 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors",
             value === "all"
               ? "border-signal bg-signal text-signal-foreground"
-              : "border-signal bg-surface text-muted-foreground shadow-[0_0_12px_rgba(204,255,0,0.25)]",
+              : "border-white/10 bg-surface text-muted-foreground",
           )}
         >
           {allLabel}
@@ -69,10 +69,10 @@ export function CategoryPicker({
               onClick={() => select(c.id)}
               aria-pressed={on}
               className={cn(
-                "relative flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border-2 p-2 text-center transition-all",
+                "relative flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-lg border p-2 text-center transition-all",
                 on
                   ? "shadow-[0_10px_28px_-16px_black]"
-                  : "border-signal bg-surface-raised shadow-[0_0_12px_rgba(204,255,0,0.25)]",
+                  : "border-white/10 bg-surface-raised",
               )}
               style={
                 on
@@ -120,7 +120,7 @@ export function CategoryPicker({
       </div>
 
       {subs.length > 0 && (
-        <div className="border-l-2 border-signal bg-surface-raised p-3">
+        <div className="border-l-2 border-white/10 bg-surface-raised p-3">
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             Narrow it down
           </p>
@@ -134,10 +134,10 @@ export function CategoryPicker({
                   onClick={() => onSubChange(on ? null : s.id)}
                   aria-pressed={on}
                   className={cn(
-                    "inline-flex items-center gap-1 rounded-full border-2 px-3 py-1.5 text-[0.72rem] font-bold transition-colors",
+                    "inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[0.72rem] font-bold transition-colors",
                     on
                       ? "border-signal bg-signal text-signal-foreground"
-                      : "border-signal bg-surface-raised text-foreground shadow-[0_0_12px_rgba(204,255,0,0.25)]",
+                      : "border-white/10 bg-surface-raised text-foreground",
                   )}
                 >
                   {on && <Check className="size-3" strokeWidth={3.2} aria-hidden />}
