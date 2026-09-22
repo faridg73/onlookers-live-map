@@ -94,6 +94,7 @@ function CommunityHub() {
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
+  const filtersActive = view === "alerts" || source === "following";
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [composing, setComposing] = useState(false);
   const [listingEvent, setListingEvent] = useState(false);
