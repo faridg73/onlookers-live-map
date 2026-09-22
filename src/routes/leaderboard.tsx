@@ -27,7 +27,7 @@ export const Route = createFileRoute("/leaderboard")({
 
 function LeaderboardPage() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
       <PageBackButton label="Profile" fallback="/profile" />
 
       <div className="mt-4 flex items-center gap-3">

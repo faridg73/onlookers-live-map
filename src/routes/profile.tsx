@@ -151,7 +151,7 @@ function ProfileScreen() {
 
 
   return (
-    <div className="app-shell pb-28 pt-[max(env(safe-area-inset-top),3rem)]">
+    <div className="app-shell pb-32 pt-[max(env(safe-area-inset-top),3rem)]">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
         <ProfileEditor
           profile={profile}

@@ -85,7 +85,7 @@ function DisputesScreen() {
   }, [user, refresh]);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
       <header className="flex items-start gap-3">
         <ShieldAlert className="mt-1 size-6 text-signal" />
         <div>
