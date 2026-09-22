@@ -601,6 +601,8 @@ function CommunityHub() {
 
 
       </section>
+        );
+      })()}
 
       {strangeSightings && (
         <section className="mx-5 mt-4 rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3 backdrop-blur-md sm:mx-8">
@@ -611,9 +613,7 @@ function CommunityHub() {
             <Button type="button" variant="outline" onClick={() => { setView("feed"); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }} className="h-auto min-h-10 whitespace-normal text-xs">View Community Logs</Button>
             <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal text-xs"><Link to="/post" search={{ mystery: "1" }}>Request a Mystery Bounty</Link></Button>
           </div>
-      </section>
-        );
-      })()}
+        </section>
       )}
 
       <ScrollableLane
