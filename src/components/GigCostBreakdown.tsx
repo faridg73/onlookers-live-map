@@ -37,6 +37,7 @@ export function GigCostBreakdown({
   live = false,
   rewardCredits,
   rewardMatchesGig,
+  floorCredits,
   urgencyFactor = 1,
   weatherFactor = 1,
   tipCredits = 0,
@@ -44,17 +45,26 @@ export function GigCostBreakdown({
 }: {
   gig: GigQuote;
   live?: boolean;
-  /** The reward the escrow quote actually uses as its base. */
+  /** The reward the escrow actually holds (already includes urgency/conditions on Standard). */
   rewardCredits: number;
-  /** True when the reward is exactly the gig price for this duration. */
+  /** True when the reward is exactly the calculated Step-2 total. */
   rewardMatchesGig: boolean;
+  /**
+   * Standard tier only: the calculated total (gig price × urgency ×
+   * conditions) that acts as the payout floor. Urgency/conditions rows are
+   * itemised from the gig price up to this number, so they are never
+   * double-counted against the chosen reward.
+   */
+  floorCredits?: number;
   urgencyFactor?: number;
   weatherFactor?: number;
   tipCredits?: number;
   totalCredits: number;
 }) {
   const pct = (m: number) => `+${Math.round((m - 1) * 100)}%`;
-  const afterUrgency = Math.round(rewardCredits * urgencyFactor);
+  // Standard tier itemises from the gig price; fixed tiers from the tier base.
+  const itemiseFrom = floorCredits != null ? gig.totalCredits : rewardCredits;
+  const afterUrgency = Math.round(itemiseFrom * urgencyFactor);
   const afterWeather = Math.round(afterUrgency * weatherFactor);
 
   return (
@@ -94,14 +104,18 @@ export function GigCostBreakdown({
         ) : (
           <Row
             label="Your chosen reward"
-            detail="replaces the calculated price, not added to it"
+            detail={
+              floorCredits != null
+                ? `above the ${formatCredits(floorCredits)} calculated minimum — the extra tips the onlooker`
+                : "replaces the calculated price, not added to it"
+            }
             credits={rewardCredits}
           />
         )}
-        {urgencyFactor > 1 && (
-          <Row label="Schedule urgency" detail={`${pct(urgencyFactor)} for a tight window`} credits={afterUrgency - rewardCredits} />
+        {rewardMatchesGig && urgencyFactor > 1 && (
+          <Row label="Schedule urgency" detail={`${pct(urgencyFactor)} for a tight window`} credits={afterUrgency - itemiseFrom} />
         )}
-        {weatherFactor > 1 && (
+        {rewardMatchesGig && weatherFactor > 1 && (
           <Row label="Filming conditions" detail={`${pct(weatherFactor)} for rough conditions`} credits={afterWeather - afterUrgency} />
         )}
         {tipCredits > 0 && <Row label="Tip" detail="added on top for the onlooker" credits={tipCredits} />}
