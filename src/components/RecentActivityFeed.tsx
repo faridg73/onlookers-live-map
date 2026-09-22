@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useMemo } from "react";
 import { Banknote, Clock, MapPin, Video } from "lucide-react";
+import { formatAgo } from "@/lib/onlooker";
 
 export interface CaptureActivity {
   id: string;
