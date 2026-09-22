@@ -1519,12 +1519,25 @@ function PostScreen() {
                 {tier === "standard" && (
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
+                    <p className="mt-1 text-xs font-medium text-muted-foreground">
+                      Starts at the calculated price for your{" "}
+                      {captureDurationLabel(capture, action === "live")}. Changing it{" "}
+                      <span className="font-extrabold text-foreground">replaces</span> that
+                      price — it is never added on top.
+                    </p>
                     <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
-                    {!rewardMatchesGig && (
+                    {rewardMatchesGig ? (
+                      <p className="mt-2 text-xs font-medium text-muted-foreground">
+                        Matching the calculated price of{" "}
+                        <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                      </p>
+                    ) : (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                         <span>
-                          Gig price for {captureDurationLabel(capture, action === "live")} is{" "}
-                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                          You replaced the calculated price for{" "}
+                          {captureDurationLabel(capture, action === "live")} (
+                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>
+                          ).
                         </span>
                         <Button
                           type="button"
