@@ -92,6 +92,7 @@
   --color-home-glass: var(--home-glass);
   --color-home-glass-strong: var(--home-glass-strong);
   --color-home-line: var(--home-line);
+  --color-home-obsidian: var(--home-obsidian);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
   --animate-confetti: confetti 2s linear forwards;
@@ -298,6 +299,7 @@
   --home-line: oklch(0.86 0.01 150 / 0.2);
   --home-canvas-start: #09090b;
   --home-canvas-end: #18181b;
+  --home-obsidian: oklch(0.115 0.005 150 / 0.96);
 
   /* Bounty pin tiers at the 4 Credits = $1 rate: medium (4-199), gold (200+) */
   /* All map markers render in the neon lime signal color; tiers stay

@@ -323,10 +323,10 @@ export function HomeLiveStage({
           </span>
         </div>
       </div>
-      <div className="overflow-hidden rounded-3xl border border-signal/25 bg-home-glass shadow-[0_24px_80px_color-mix(in_oklab,var(--color-background)_70%,transparent)] backdrop-blur-2xl">
+      <div className="mx-auto w-full overflow-hidden rounded-3xl border border-home-line bg-home-obsidian shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent),0_0_0_1px_color-mix(in_oklab,var(--color-foreground)_6%,transparent),0_0_48px_color-mix(in_oklab,var(--color-signal)_9%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
-        <div className="relative min-w-0 overflow-hidden px-5 pb-4 pt-4 sm:px-7 sm:pb-5 sm:pt-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
-          <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent" aria-hidden />
+        <div className="relative flex min-w-0 flex-col justify-center overflow-hidden px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+          <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 [@media(max-height:520px)]:left-5 [@media(max-height:520px)]:right-5" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
               <span className="relative flex size-2" aria-hidden>
@@ -371,7 +371,7 @@ export function HomeLiveStage({
           </div>
         </div>
 
-        <div className="hidden border-l border-home-line bg-home-glass p-4 lg:block">
+        <div className="hidden flex-col justify-center border-l border-home-line bg-home-glass p-5 sm:p-6 lg:block">
           <p className="home-display text-[0.62rem] font-semibold uppercase text-foreground/45">Live feed preview</p>
           {featured ? (
             <button type="button" onClick={() => onOpenRequest(featured)} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between rounded-xl border border-home-line bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/50 hover:bg-home-accent/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-home-accent">
