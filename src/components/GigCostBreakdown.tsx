@@ -92,7 +92,11 @@ export function GigCostBreakdown({
             )}
           </>
         ) : (
-          <Row label="Your chosen reward" detail="custom amount" credits={rewardCredits} />
+          <Row
+            label="Your chosen reward"
+            detail="replaces the calculated price, not added to it"
+            credits={rewardCredits}
+          />
         )}
         {urgencyFactor > 1 && (
           <Row label="Schedule urgency" detail={`${pct(urgencyFactor)} for a tight window`} credits={afterUrgency - rewardCredits} />
@@ -106,11 +110,17 @@ export function GigCostBreakdown({
         className="mt-2.5 flex items-baseline justify-between border-t pt-2.5"
         style={{ borderColor: "rgba(34,197,94,0.4)" }}
       >
-        <span className="text-sm font-extrabold text-foreground">Total payout</span>
+        <span className="text-sm font-extrabold text-foreground">
+          Held in escrow · paid to the onlooker
+        </span>
         <span className="font-display text-lg font-extrabold tabular-nums" style={{ color: LIME }}>
           {formatCredits(totalCredits)} · {formatCreditCash(totalCredits)}
         </span>
       </div>
+      <p className="mt-2 text-[0.7rem] font-medium leading-snug text-muted-foreground">
+        This single number is what leaves your wallet and what the onlooker earns. Changing your
+        reward replaces the calculated price — nothing is charged twice.
+      </p>
     </div>
   );
 }
