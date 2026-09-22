@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { CalendarPlus, Compass, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -19,6 +19,7 @@ import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useDistanceUnit } from "@/hooks/use-distance-unit";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
