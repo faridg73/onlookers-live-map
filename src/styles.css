@@ -296,18 +296,18 @@
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.62 0.21 25);
   --destructive-foreground: oklch(0.98 0.005 250);
-  --border: oklch(0.26862 0 0); /* #262626 */
+  --border: oklch(0.2603 0 0); /* #2A2A2A single neutral card border */
   --input: oklch(0.26862 0 0);
   --ring: oklch(0.93071 0.22858 123.09);
 
   /* Home marketplace: a quieter, finance-grade glass layer over the live map. */
   --home-accent: var(--signal);
-  --home-charcoal: oklch(0.175 0 0);
-  --home-glass: oklch(0.16 0.006 150 / 0.76);
-  --home-glass-strong: oklch(0.13 0.004 150 / 0.9);
-  /* Ultra-subtle frosted hairline (~white/5) — no gray template borders. */
-  --home-line: oklch(1 0 0 / 0.05);
-  --home-line-strong: oklch(1 0 0 / 0.1);
+  --home-charcoal: oklch(0.1793 0 0); /* #121212 card step above page */
+  --home-glass: oklch(0.1793 0 0);
+  --home-glass-strong: oklch(0.1793 0 0);
+  /* Single neutral card hairline (#2A2A2A) — no category-colored borders. */
+  --home-line: oklch(0.2603 0 0);
+  --home-line-strong: oklch(0.31 0 0);
   --home-canvas-start: #09090b;
   --home-canvas-end: #18181b;
   --home-obsidian: oklch(0.115 0.005 150 / 0.96);
