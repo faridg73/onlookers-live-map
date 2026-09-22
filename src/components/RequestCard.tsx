@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Eye, MapPin, Camera, MessageCircle, Video, X } from "lucide-react";
+import { Check, Eye, MapPin, Camera, MessageCircle, Pencil, Video, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { refundBounty } from "@/lib/bounty-escrow";
@@ -16,7 +16,14 @@ import { SitePinVerification } from "@/components/SitePinVerification";
 import { ChatDrawer } from "@/components/ChatDrawer";
 import { ExpiryCountdown, HIGH_BOUNTY } from "@/components/ExpiryCountdown";
 import { chatKey } from "@/lib/chat";
-import { formatAgo, statusLabel, type LiveRequest } from "@/lib/onlooker";
+import {
+  LOCATION_TYPES,
+  formatAgo,
+  statusLabel,
+  type LiveRequest,
+  type LocationTypeId,
+} from "@/lib/onlooker";
+import { updateRequestLocationType } from "@/lib/requests.functions";
 import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
