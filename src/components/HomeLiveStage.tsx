@@ -356,7 +356,7 @@ export function HomeLiveStage({
               </span>
               <span>
                 <span className="line-clamp-2 block text-sm font-extrabold text-foreground">{featured.title}</span>
-                <span className="mt-1 flex items-center gap-1 text-[0.68rem] text-muted-foreground"><MapPin className="size-3" /> {featured.place}</span>
+                <span className="mt-1 flex items-center gap-1 text-[0.68rem] text-foreground/60"><MapPin className="size-3" /> {featured.place}</span>
               </span>
               <span className="flex items-center gap-1 text-[0.68rem] font-bold uppercase text-foreground/75 group-hover:text-home-accent"><Eye className="size-3.5" /> Open on map</span>
             </button>
@@ -489,7 +489,7 @@ export function HomeLiveStage({
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[0.72rem] font-extrabold text-foreground group-hover:text-signal">{request.title}</span>
-                          <span className="mt-0.5 flex min-w-0 items-center gap-1 text-[0.6rem] font-bold text-muted-foreground">
+                          <span className="mt-0.5 flex min-w-0 items-center gap-1 text-[0.6rem] font-bold text-foreground/60">
                             <MapPin className="size-2.5 shrink-0 text-home-accent" aria-hidden />
                             <span className="truncate">{column.detail(request)}</span>
                           </span>

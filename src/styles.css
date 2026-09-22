@@ -92,6 +92,7 @@
   --color-home-glass: var(--home-glass);
   --color-home-glass-strong: var(--home-glass-strong);
   --color-home-line: var(--home-line);
+  --color-home-line-strong: var(--home-line-strong);
   --color-home-obsidian: var(--home-obsidian);
   --animate-ping-slow: ping-slow 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-rise: rise 0.24s ease-out;
@@ -296,7 +297,9 @@
   --home-accent: var(--signal);
   --home-glass: oklch(0.16 0.006 150 / 0.76);
   --home-glass-strong: oklch(0.13 0.004 150 / 0.9);
-  --home-line: oklch(0.86 0.01 150 / 0.2);
+  /* Ultra-subtle frosted hairline (~white/5) — no gray template borders. */
+  --home-line: oklch(1 0 0 / 0.05);
+  --home-line-strong: oklch(1 0 0 / 0.1);
   --home-canvas-start: #09090b;
   --home-canvas-end: #18181b;
   --home-obsidian: oklch(0.115 0.005 150 / 0.96);
