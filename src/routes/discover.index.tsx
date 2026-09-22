@@ -128,13 +128,44 @@ function DiscoverHome() {
     <div className="discover-inter app-shell pb-28 pt-safe">
       <RadarAlerts />
 
-      <h1 className="text-center font-display text-3xl tracking-tight text-signal">
-        Browse <span className="text-signal">places</span>
-      </h1>
-      <p className="mt-1 text-center text-sm text-foreground/90">
-        Pulled <span className="font-bold text-signal">live</span> from the area you&apos;re
-        browsing, pick a spot and ask for a view.
-      </p>
+      <div className="relative flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => {
+            if (window.history.length > 1 && window.history.state?.idx > 0) {
+              window.history.back();
+            } else {
+              window.location.href = "/";
+            }
+          }}
+          aria-label="Go back"
+          className="absolute left-0 top-0 inline-flex size-9 items-center justify-center rounded-full border border-signal/60 bg-surface text-signal shadow-md shadow-signal/20 transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (window.history.length > 1 && window.history.state?.idx > 0) {
+              window.history.back();
+            } else {
+              window.location.href = "/";
+            }
+          }}
+          aria-label="Close and go back"
+          className="absolute right-0 top-0 inline-flex size-9 items-center justify-center rounded-full border-2 border-signal bg-surface text-signal shadow-md shadow-signal/30 transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-4" aria-hidden />
+        </button>
+        <h1 className="text-center font-display text-3xl tracking-tight text-signal">
+          Browse <span className="text-signal">places</span>
+        </h1>
+        <p className="mt-1 max-w-xs text-center text-sm text-foreground/90 sm:max-w-none">
+          Pulled <span className="font-bold text-signal">live</span> from the area you&apos;re
+          browsing, pick a spot and ask for a view.
+        </p>
+      </div>
+
 
       <LocationSearchBar className="mt-4" />
 
@@ -193,22 +224,8 @@ function DiscoverHome() {
               />
             </SectionBoundary>
 
-            {/* top-left controls: history back arrow, Browse places pill, close X */}
+            {/* top-left control: Browse places pill */}
             <div className="absolute left-2.5 top-2.5 z-10 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.history.length > 1 && window.history.state?.idx > 0) {
-                    window.history.back();
-                  } else {
-                    setView("grid");
-                  }
-                }}
-                aria-label="Go back"
-                className="inline-flex size-8 items-center justify-center rounded-md border border-signal/60 bg-black/85 text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <ArrowLeft className="size-4" aria-hidden />
-              </button>
               <button
                 type="button"
                 onClick={() => setView("grid")}
@@ -217,15 +234,8 @@ function DiscoverHome() {
               >
                 Browse places
               </button>
-              <button
-                type="button"
-                onClick={() => setView("grid")}
-                aria-label="Close the live map"
-                className="inline-flex size-8 items-center justify-center rounded-full border-2 border-signal bg-black/85 text-signal shadow-md shadow-signal/30 backdrop-blur-xl transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
             </div>
+
           </div>
           {selected ? (
             <BountyDetailsDialog request={selected} onClaim={claim}>
