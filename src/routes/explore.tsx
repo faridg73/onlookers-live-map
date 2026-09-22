@@ -75,7 +75,7 @@ function ExplorePage() {
   }, []);
 
   return (
-    <main className="app-shell pb-28 pt-[max(env(safe-area-inset-top),2rem)]">
+    <main className="app-shell pb-32 pt-[max(env(safe-area-inset-top),2rem)]">
       <div className="relative">
         <button
           type="button"

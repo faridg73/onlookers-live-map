@@ -165,7 +165,7 @@ function PoolsScreen() {
     }`;
 
   return (
-    <div className="app-shell pb-28 pt-safe">
+    <div className="app-shell pb-32 pt-safe">
       <h1 className="font-display text-2xl tracking-tight text-foreground">Group <span className="text-signal">Pools</span></h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Everyone chips in Credits together to fund a bigger bounty or sponsor a local flash meetup.

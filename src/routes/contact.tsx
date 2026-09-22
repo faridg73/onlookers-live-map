@@ -89,7 +89,7 @@ function ContactScreen() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
       <header className="relative flex flex-col items-center text-center">
         <button
           type="button"

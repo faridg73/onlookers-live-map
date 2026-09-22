@@ -53,7 +53,7 @@ function BountyPreview() {
   const credits = Math.max(0, Math.round(amt ?? 0));
 
   return (
-    <div className="mx-auto flex min-h-[80vh] w-full max-w-3xl flex-col justify-center px-4 pb-28 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6">
+    <div className="mx-auto flex min-h-[80vh] w-full max-w-3xl flex-col justify-center px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6">
       {/* Back arrow, top left — always a way out of this page. */}
       <div className="mb-3 flex">
         {canGoBack ? (

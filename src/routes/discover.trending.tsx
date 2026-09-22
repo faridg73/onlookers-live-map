@@ -157,7 +157,7 @@ function TrendingScreen() {
     ).length;
 
   return (
-    <div className="discover-inter app-shell pb-28 pt-safe">
+    <div className="discover-inter app-shell pb-32 pt-safe">
       <PageBackButton label="Browse places" fallback="/discover" />
 
       <h1 className="mt-3 inline-flex items-center gap-2 font-display text-3xl tracking-tight text-foreground">

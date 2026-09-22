@@ -225,7 +225,7 @@ function AuthScreen() {
 
   if (verifying) {
     return (
-      <div className="mx-auto max-w-md px-4 pb-28 pt-10">
+      <div className="mx-auto max-w-md px-4 pb-32 pt-10">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           One last check
         </h1>
@@ -246,7 +246,7 @@ function AuthScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-28 pt-10">
+    <div className="mx-auto max-w-md px-4 pb-32 pt-10">
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         {mode === "signin" ? (
           <>Sign <span className="text-signal">in</span></>

@@ -125,7 +125,7 @@ function DiscoverHome() {
     ).length;
 
   return (
-    <div className="discover-inter app-shell pb-28 pt-safe">
+    <div className="discover-inter app-shell pb-32 pt-safe">
       <RadarAlerts />
 
       <div className="relative flex flex-col items-center">

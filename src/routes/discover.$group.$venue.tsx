@@ -96,7 +96,7 @@ function VenueScreen() {
 
   if (!venue) {
     return (
-      <div className="discover-inter app-shell pb-28 pt-safe">
+      <div className="discover-inter app-shell pb-32 pt-safe">
         <PageBackButton label="All places" fallback="/discover" />
         <div className="mt-6 h-28 animate-pulse rounded-2xl border border-border bg-surface" />
         <p className="mt-4 text-sm text-muted-foreground">
