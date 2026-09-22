@@ -1467,6 +1467,7 @@ export type Database = {
           id: string
           latitude: number
           location_name: string
+          location_type: string | null
           longitude: number
           prompt: string
           requester_id: string
@@ -1490,6 +1491,7 @@ export type Database = {
           id?: string
           latitude: number
           location_name?: string
+          location_type?: string | null
           longitude: number
           prompt: string
           requester_id: string
@@ -1513,6 +1515,7 @@ export type Database = {
           id?: string
           latitude?: number
           location_name?: string
+          location_type?: string | null
           longitude?: number
           prompt?: string
           requester_id?: string
