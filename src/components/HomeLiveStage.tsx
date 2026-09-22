@@ -455,7 +455,7 @@ export function HomeLiveStage({
       </div>
 
       {/* Multi-column live dashboard: every feed visible at once, no dropdowns. */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-3 xl:grid-cols-5 xl:gap-4" aria-label="Live feeds dashboard">
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5 md:grid-cols-5 md:gap-4" aria-label="Live feeds dashboard">
         {feedColumns.map((column) => {
           const Icon = column.icon;
           const visibleItems = column.items.slice(0, 4);
