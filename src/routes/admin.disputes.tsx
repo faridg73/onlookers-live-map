@@ -18,7 +18,7 @@ import {
   playbackUrl,
   type BountyVideo,
 } from "@/lib/bounty-videos";
-import { moderationReasonLabel } from "@/lib/moderation-reasons";
+import { disputeReasonLabel } from "@/lib/moderation-reasons";
 
 export const Route = createFileRoute("/admin/disputes")({
   head: () => ({
