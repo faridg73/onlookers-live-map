@@ -270,7 +270,7 @@ export function HomeLiveStage({
           <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
           <span className="relative size-2 rounded-full bg-signal" />
         </span>
-        <div className="scrollbar-thin flex min-w-0 flex-1 items-center justify-center gap-3 overflow-x-auto whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.18em] tabular-nums text-foreground/70 sm:text-[0.66rem]">
+        <div className="scrollbar-thin flex min-w-0 flex-1 items-center justify-center gap-4 overflow-x-auto whitespace-nowrap font-mono text-[0.8rem] font-bold uppercase tracking-[0.14em] tabular-nums text-foreground/70 sm:text-[0.95rem]">
           <span>LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span></span>
           <span className="text-border">|</span>
           <span>ALERTS <span className="text-crisis">{String(emergencyCount).padStart(2, "0")}</span></span>
