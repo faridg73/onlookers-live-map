@@ -151,8 +151,8 @@ function RootComponent() {
           <BoostProvider>
             {/* The footer follows the page naturally; the non-Home nav is also in document flow. */}
             <div className="flex min-h-screen flex-col bg-background text-foreground">
-              {/* Main route outlet: grows to fill available space */}
-              <main className="flex w-full flex-1 flex-col">
+              {/* Route content sets its natural height so empty feeds do not create a black void. */}
+              <main className="w-full">
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
                 <Outlet />
               </main>
