@@ -258,10 +258,10 @@ export function HomeLiveStage({
 
   return (
     <section className="scrollbar-thin pointer-events-auto absolute inset-x-0 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 w-full max-w-none overflow-y-auto overscroll-contain px-4 pb-1 lg:bottom-[7.5rem]" aria-labelledby="home-live-stage-title">
-      <div className="mx-auto flex w-full max-w-none flex-col gap-4 sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
+      <div className="mx-auto flex w-full max-w-none flex-col gap-2 sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
 
         {/* 1. Hero */}
-        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-6 pb-8 pt-7 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-10 sm:pt-9 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-6 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 lg:left-12 lg:right-12" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
@@ -343,7 +343,7 @@ export function HomeLiveStage({
         <section
           id="how-it-works"
           aria-labelledby="home-how-it-works"
-          className="rounded-3xl border border-home-line bg-home-charcoal p-4 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:p-6"
+          className="rounded-3xl border border-home-line bg-home-charcoal p-3.5 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:p-5"
         >
           <h3 id="home-how-it-works" className="home-display text-center text-[0.68rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
             How Onlooker works
