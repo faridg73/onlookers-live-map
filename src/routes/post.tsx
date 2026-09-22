@@ -360,14 +360,57 @@ function PostScreen() {
     () => gigQuoteForMinutes(capture ?? GIG_LIVE_BLOCK_MINUTES),
     [capture],
   );
-  /** True while the reward still tracks the gig price for the picked duration. */
+  /**
+   * The Step-2 calculated total — gig price plus schedule urgency and filming
+   * conditions. On the Standard tier this is the payout floor: the reward
+   * selector defaults to it and can never go below it, only above (a tip).
+   */
+  const gigFloor = Math.max(
+    MIN_BOUNTY,
+    Math.round(gig.totalCredits * quote.urgencyFactor * quote.weatherFactor),
+  );
+  /** True while the reward still equals the calculated Step-2 total. */
   const rewardMatchesGig =
-    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gig.totalCredits;
+    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gigFloor;
 
-  const total = quote.total + (Number.isFinite(tip) ? tip : 0);
+  /**
+   * What actually gets held in escrow and paid to the onlooker. On Standard
+   * the picked reward IS the final payout (multipliers are already baked into
+   * the floor, never applied twice); fixed tiers keep their quoted total.
+   */
+  const escrowReward =
+    tier === "standard"
+      ? Number.isFinite(bounty)
+        ? Math.max(Math.round(bounty), gigFloor)
+        : gigFloor
+      : quote.total;
+  const total = escrowReward + (Number.isFinite(tip) ? tip : 0);
 
   /** Whether the bounty description is complete enough to lock escrow. */
   const detailsReady = note.trim().length >= 10;
+
+  /**
+   * Keeps the reward glued to the calculated total: it follows the floor up
+   * or down while the poster hasn't deliberately raised it, snaps up whenever
+   * urgency/conditions push the floor past it, and never lets a custom entry
+   * settle below the Step-2 calculated total.
+   */
+  const lastFloorRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (tier !== "standard") {
+      lastFloorRef.current = null;
+      return;
+    }
+    setBounty((current) => {
+      const prev = lastFloorRef.current;
+      lastFloorRef.current = gigFloor;
+      if (!Number.isFinite(current) || current < gigFloor) return gigFloor;
+      if (prev != null && Math.round(current) === prev) return gigFloor;
+      return current;
+    });
+  // `bounty` is a dep so programmatic sets (prompt parse, capture change) that land
+  // below the floor get snapped up even when the floor itself didn't move.
+  }, [gigFloor, tier, bounty]);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -1344,9 +1387,10 @@ function PostScreen() {
                       live={capture === null}
                       rewardCredits={quote.baseCredits}
                       rewardMatchesGig={rewardMatchesGig}
+                      floorCredits={tier === "standard" ? gigFloor : undefined}
                       urgencyFactor={quote.urgencyFactor}
                       weatherFactor={quote.weatherFactor}
-                      totalCredits={quote.total}
+                      totalCredits={tier === "standard" ? escrowReward : quote.total}
                     />
                     <p className="mt-2 text-xs font-medium text-muted-foreground">
                       {captureDurationLabel(capture, action === "live")}
@@ -1520,33 +1564,42 @@ function PostScreen() {
                   <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
                     <p className="mt-1 text-xs font-medium text-muted-foreground">
-                      Starts at the calculated price for your{" "}
-                      {captureDurationLabel(capture, action === "live")}. Changing it{" "}
-                      <span className="font-extrabold text-foreground">replaces</span> that
-                      price — it is never added on top.
+                      Pre-set to the calculated total for your{" "}
+                      {captureDurationLabel(capture, action === "live")} — that's the{" "}
+                      <span className="font-extrabold text-foreground">minimum the onlooker earns</span>.
+                      You can raise it as a tip, but never go below it.
                     </p>
-                    <div className="mt-3"><BountyAmountPicker value={bounty} onChange={setBounty} balance={balance} /></div>
+                    <div className="mt-3">
+                      <BountyAmountPicker
+                        value={bounty}
+                        onChange={(next) => setBounty(Math.max(gigFloor, next))}
+                        balance={balance}
+                        min={gigFloor}
+                      />
+                    </div>
                     {rewardMatchesGig ? (
                       <p className="mt-2 text-xs font-medium text-muted-foreground">
-                        Matching the calculated price of{" "}
-                        <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>.
+                        Matching the calculated total of{" "}
+                        <span className="font-extrabold text-signal">{formatCredits(gigFloor)}</span> — held in
+                        escrow and paid to the onlooker.
                       </p>
                     ) : (
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                         <span>
-                          You replaced the calculated price for{" "}
-                          {captureDurationLabel(capture, action === "live")} (
-                          <span className="font-extrabold text-signal">{formatCredits(gig.totalCredits)}</span>
-                          ).
+                          You're tipping{" "}
+                          <span className="font-extrabold text-signal">
+                            {formatCredits(Math.max(0, Math.round(bounty) - gigFloor))}
+                          </span>{" "}
+                          above the {formatCredits(gigFloor)} calculated minimum.
                         </span>
                         <Button
                           type="button"
                           size="sm"
                           variant="outline"
-                          onClick={() => setBounty(gig.totalCredits)}
+                          onClick={() => setBounty(gigFloor)}
                           className="h-7 border-signal px-2 text-[0.7rem] font-extrabold text-signal"
                         >
-                          Reset to calculated price
+                          Back to calculated total
                         </Button>
                       </div>
                     )}
@@ -1628,8 +1681,9 @@ function PostScreen() {
                 <GigCostBreakdown
                   gig={gig}
                   live={capture === null}
-                  rewardCredits={quote.baseCredits}
+                  rewardCredits={escrowReward}
                   rewardMatchesGig={rewardMatchesGig}
+                  floorCredits={tier === "standard" ? gigFloor : undefined}
                   urgencyFactor={quote.urgencyFactor}
                   weatherFactor={quote.weatherFactor}
                   tipCredits={Number.isFinite(tip) ? tip : 0}

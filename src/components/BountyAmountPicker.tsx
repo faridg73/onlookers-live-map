@@ -14,14 +14,17 @@ export function BountyAmountPicker({
   value,
   onChange,
   balance,
+  min = MIN_BOUNTY,
 }: {
   value: number;
   onChange: (v: number) => void;
   balance?: number | null;
+  /** Payout floor — the reward can never settle below this. */
+  min?: number;
 }) {
   const safe = Number.isFinite(value) ? value : 0;
   const custom = !PRESETS.includes(safe);
-  const tooLow = safe < MIN_BOUNTY;
+  const tooLow = safe < min;
   const shortFall = balance != null && safe > balance;
 
   return (
@@ -29,17 +32,20 @@ export function BountyAmountPicker({
       <div className="grid grid-cols-4 gap-2">
         {PRESETS.map((amount) => {
           const on = safe === amount;
+          const belowFloor = amount < min;
           return (
             <button
               key={amount}
               type="button"
-              onClick={() => onChange(amount)}
+              onClick={() => onChange(Math.max(min, amount))}
               aria-pressed={on}
+              disabled={belowFloor}
               className={cn(
                 "rounded-xl border px-1 py-2.5 text-center transition-colors",
-                on
+              on
                   ? "border-signal bg-signal text-signal-foreground"
                   : "border-border bg-surface-raised text-foreground hover:border-signal/60",
+              belowFloor && "cursor-not-allowed opacity-35 hover:border-border",
               )}
             >
               <span className="block font-display text-lg font-extrabold leading-none tabular-nums">
@@ -65,7 +71,7 @@ export function BountyAmountPicker({
         <div className="mt-2 flex items-center gap-2">
           <button
             type="button"
-            onClick={() => onChange(Math.max(MIN_BOUNTY, safe - STEP))}
+            onClick={() => onChange(Math.max(min, safe - STEP))}
             aria-label="Lower the bounty"
             className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-foreground"
           >
@@ -76,15 +82,15 @@ export function BountyAmountPicker({
             <input
               type="number"
               inputMode="numeric"
-              min={MIN_BOUNTY}
+              min={min}
               step="1"
               value={Number.isFinite(value) ? value : ""}
               onChange={(e) => onChange(Number(e.target.value))}
               onBlur={() => {
-                // A custom amount can never settle below the 40-credit floor.
-                if (Number.isFinite(value) && value < MIN_BOUNTY) onChange(MIN_BOUNTY);
+                // A custom amount can never settle below the payout floor.
+                if (!Number.isFinite(value) || value < min) onChange(min);
               }}
-              placeholder={`Min ${MIN_BOUNTY}`}
+              placeholder={`Min ${min}`}
               className="w-full bg-transparent font-display text-lg font-bold tabular-nums text-foreground outline-none placeholder:font-medium placeholder:text-muted-foreground"
               aria-label="Custom bounty amount in credits"
             />
@@ -102,7 +108,9 @@ export function BountyAmountPicker({
 
       {tooLow && (
         <p className="text-xs font-bold text-destructive">
-          Bounties start at {formatCreditWords(MIN_BOUNTY)}.
+          {min > MIN_BOUNTY
+            ? `This request's calculated minimum is ${formatCreditWords(min)} — you can only go above it.`
+            : `Bounties start at ${formatCreditWords(MIN_BOUNTY)}.`}
         </p>
       )}
       {!tooLow && shortFall && (
