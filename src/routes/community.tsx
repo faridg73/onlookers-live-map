@@ -459,6 +459,17 @@ function CommunityHub() {
         </div>
       </header>
 
+      {/* The dropdown drives the cards: a selection narrows both views to that
+          lane, "All live content" restores the full set. */}
+      {(() => {
+        const selectedLane = categoryId ? broadcastCategoryById(categoryId) : null;
+        const gridLanes = selectedLane
+          ? BROADCAST_CATEGORIES.filter((lane) => lane.id === selectedLane.id)
+          : BROADCAST_CATEGORIES;
+        const carouselLanes = selectedLane
+          ? COMMUNITY_CATEGORIES.filter((c) => c.id === selectedLane.communityCategory)
+          : COMMUNITY_CATEGORIES;
+        return (
       <section aria-label="Discover categories" className="mt-6">
         <div className="mb-3 flex items-center justify-between gap-2 px-5 sm:px-8">
           <h2 className="text-sm font-extrabold uppercase tracking-[0.14em] text-foreground">Explore by vibe</h2>
@@ -490,7 +501,7 @@ function CommunityHub() {
             aria-label="All category cards"
             className="no-scrollbar grid max-h-[70dvh] grid-cols-4 gap-2 overflow-y-auto px-3 pb-4 sm:gap-2.5 md:grid-cols-4 md:gap-3"
           >
-            {BROADCAST_CATEGORIES.map((lane) => {
+            {gridLanes.map((lane) => {
               const visual = COMMUNITY_VISUALS[lane.communityCategory] ?? COMMUNITY_VISUALS.general;
               const Icon = visual.icon;
               const previewUrl = categoryPreviews[lane.communityCategory];
@@ -539,7 +550,7 @@ function CommunityHub() {
           aria-label="Category cards"
           className="no-scrollbar flex flex-row snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-3"
         >
-          {COMMUNITY_CATEGORIES.map((c) => {
+          {carouselLanes.map((c) => {
             const visual = COMMUNITY_VISUALS[c.id] ?? COMMUNITY_VISUALS.general;
             const Icon = visual.icon;
             const previewUrl = categoryPreviews[c.id];
@@ -600,7 +611,9 @@ function CommunityHub() {
             <Button type="button" variant="outline" onClick={() => { setView("feed"); window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }); }} className="h-auto min-h-10 whitespace-normal text-xs">View Community Logs</Button>
             <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal text-xs"><Link to="/post" search={{ mystery: "1" }}>Request a Mystery Bounty</Link></Button>
           </div>
-        </section>
+      </section>
+        );
+      })()}
       )}
 
       <ScrollableLane
