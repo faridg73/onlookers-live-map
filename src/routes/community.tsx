@@ -330,6 +330,50 @@ function CommunityHub() {
   const featured = visible.filter((r) => isPinned(r.post));
   const rest = visible.filter((r) => !isPinned(r.post));
 
+  /**
+   * Radius fallback: when the chosen radius yields zero posts, keep the feed
+   * alive with the most popular posts from anywhere (same category/tag lane).
+   * "Anywhere" has no limit, so it never needs a fallback.
+   */
+  const popularFallback = useMemo(() => {
+    if (loading || visible.length > 0 || source !== "all") return [];
+    if (radiusMilesFor(radius) === null) return [];
+    const inLane = posts
+      .map((p) => ({ post: p, miles: distanceFor(p) }))
+      .filter(({ post }) => {
+        if (strangeSightings) {
+          return matchesStrangeSighting(
+            `${post.title} ${post.body} ${post.place} ${post.tags.join(" ")}`,
+          );
+        }
+        if (category === "all") return true;
+        if (post.category !== category) return false;
+        return !categoryId || post.tags.some((t) => t.toLowerCase() === categoryId);
+      });
+    const exact = tag ? inLane.filter(({ post }) => matchesTag(post, tag)) : inLane;
+    return [...exact]
+      .sort((a, b) => {
+        const pinDiff = Number(isPinned(b.post)) - Number(isPinned(a.post));
+        if (pinDiff !== 0) return pinDiff;
+        const popDiff = b.post.validationCount - a.post.validationCount;
+        if (popDiff !== 0) return popDiff;
+        return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
+      })
+      .slice(0, 12);
+  }, [
+    loading,
+    visible.length,
+    source,
+    radius,
+    posts,
+    category,
+    categoryId,
+    strangeSightings,
+    tag,
+    distanceFor,
+    matchesTag,
+  ]);
+
   /** A hashtag behaves exactly like a vibe card: it opens the map filtered to it. */
   const openTagOnMap = useCallback((wanted: string) => {
     setTag(wanted);
