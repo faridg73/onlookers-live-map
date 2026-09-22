@@ -884,7 +884,7 @@ function CommunityHub() {
               </Button>
             </div>
           )}
-          {!loading && category !== "all" && visible.length === 0 && (
+          {!loading && category !== "all" && visible.length === 0 && popularFallback.length === 0 && (
             <CategoryExampleCards
               category={category}
               tag={tag}
