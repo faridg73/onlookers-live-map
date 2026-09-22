@@ -4,7 +4,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Clock, Eye, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { LoopingPreview } from "@/components/LoopingPreview";
-import { fetchExploreClips, type ExploreClip } from "@/lib/explore";
+import { fetchAllExploreClips, fetchExploreClips, type ExploreClip } from "@/lib/explore";
 import { deleteExploreClip } from "@/lib/explore.functions";
 import { formatCredits } from "@/lib/credits";
 import { formatAgoISO } from "@/lib/onlooker";
@@ -21,7 +21,8 @@ export function RecentCapturesFeed({
   blurb = "Streams that already wrapped, still watchable any time.",
   emptyTeaser,
 }: {
-  limit?: number;
+  /** How many to show; `null` loads the whole archive with no cap. */
+  limit?: number | null;
   title?: string;
   blurb?: string;
   /** Shown in place of the wall while there are no captures yet (Home teaser). */
@@ -93,13 +94,16 @@ export function RecentCapturesFeed({
 
   useEffect(() => {
     let alive = true;
-    void fetchExploreClips(limit)
-      .then((rows) => {
+    const load = async () => {
+      try {
+        const rows =
+          limit == null ? await fetchAllExploreClips() : await fetchExploreClips(limit);
         if (alive) setClips(rows);
-      })
-      .catch(() => {
+      } catch {
         if (alive) setClips([]);
-      });
+      }
+    };
+    void load();
     return () => {
       alive = false;
     };

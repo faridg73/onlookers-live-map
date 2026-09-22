@@ -476,7 +476,7 @@ export function HomeLiveStage({
 
         {/* 4. Recent results — completed bounties with verified proof, looping thumbnails */}
         <RecentCapturesFeed
-          limit={8}
+          limit={null}
           title="Recent results"
           blurb="Verified captures from bounties that already wrapped — tap any card to watch what a Hunter delivered."
           emptyTeaser={

@@ -10,8 +10,21 @@ import {
 
 export type { ExploreClip, ExploreComment };
 
+const PAGE_SIZE = 30; // server-side cap per request
+
 export function fetchExploreClips(limit = 12, offset = 0) {
   return listExploreClips({ data: { limit, offset } });
+}
+
+/** Every wrapped capture, newest first — pages of 30 until exhausted, no cap. */
+export async function fetchAllExploreClips(): Promise<ExploreClip[]> {
+  const all: ExploreClip[] = [];
+  for (let offset = 0; ; offset += PAGE_SIZE) {
+    const page = await fetchExploreClips(PAGE_SIZE, offset);
+    all.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return all;
 }
 
 export function fetchClipComments(videoId: string) {

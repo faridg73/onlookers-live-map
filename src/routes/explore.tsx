@@ -68,7 +68,7 @@ function ExplorePage() {
   }, [tab]);
 
   useEffect(() => {
-    void fetchExploreClips()
+    void fetchAllExploreClips()
       .then(setClips)
       .catch(() => setClips([]))
       .finally(() => setLoading(false));
