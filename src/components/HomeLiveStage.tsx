@@ -33,24 +33,30 @@ function isLiveRequest(request: LiveRequest) {
   return request.bountyType === "live_stream" && request.status === "claimed";
 }
 
-const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typeof CircleDollarSign }> = [
+const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typeof CircleDollarSign; thumb: string; thumbAlt: string }> = [
   {
     step: "01",
     title: "Post a Bounty",
     body: "Need eyes on something real-world? Post a task with a reward — check a location, verify an event, capture a moment.",
     icon: Megaphone,
+    thumb: step1Thumb.url,
+    thumbAlt: "A phone screen showing a bounty request being posted",
   },
   {
     step: "02",
     title: "A Hunter Claims It",
     body: "Nearby verified Hunters see your bounty and claim it to fulfill your request in person.",
     icon: Radar,
+    thumb: step2Thumb.url,
+    thumbAlt: "A Hunter on location holding their phone",
   },
   {
     step: "03",
     title: "Get Verified Results",
     body: "Receive photo or video proof, approve it, and payment is released. Hunters get paid for their time on the ground.",
     icon: BadgeCheck,
+    thumb: step3Thumb.url,
+    thumbAlt: "A verified photo proof card with a checkmark",
   },
 ];
 
