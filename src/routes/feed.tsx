@@ -284,7 +284,49 @@ function FeedScreen() {
         </p>
       )}
 
-      <p className="mt-5 text-[0.68rem] font-bold uppercase text-muted-foreground">
+      {/* One unified search bar: keyword filter + place jump in a single field. */}
+      <div className="mt-3">
+        <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-surface px-3 py-2">
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          <PlaceSearchInput
+            variant="bare"
+            className="flex-1"
+            placeholder="Search a venue, gate, section, or city..."
+            onQueryChange={(value) => {
+              setPlaceQuery(value);
+              setQuery(value);
+            }}
+            onPick={(place) => {
+              setQuery("");
+              setPlaceQuery("");
+              setArea({ label: place.formatted, lat: place.latitude, lng: place.longitude });
+            }}
+          />
+        </div>
+        {area && (
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-xl border border-signal/50 bg-signal/10 px-3 py-2">
+            <p className="truncate text-xs font-bold text-foreground">
+              Showing requests near {area.label}
+            </p>
+            <button
+              type="button"
+              onClick={() => setArea(null)}
+              className="shrink-0 text-[0.65rem] font-extrabold uppercase text-signal"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!area && query.trim().length === 0 && placeQuery.trim().length === 0 && (
+        <TrendingViewRequests
+          className="mt-3"
+          onOpen={(request) => navigate({ to: "/", search: { b: request.id } })}
+        />
+      )}
+
+      <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">
         What do you want to see?
       </p>
       <div className="mt-2">
