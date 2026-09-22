@@ -24,7 +24,12 @@ const fileSchema = z
 
 const filingSchema = z.object({
   requestId: z.string().uuid(),
-  reasonCode: z.enum(["failure_to_deliver", "quality_issue", "verification_mismatch"]),
+  reasonCode: z.enum([
+    "failure_to_deliver",
+    "quality_issue",
+    "verification_mismatch",
+    "conditions_mismatch",
+  ]),
   description: z.string().trim().min(10).max(3000),
   file: fileSchema,
 });
