@@ -325,7 +325,7 @@ export function HomeLiveStage({
           >
             See what&apos;s happening. Right now.
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-foreground/65 sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
+          <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
             Watch live streams, follow trusted alerts, or post local bounties.
           </p>
 
