@@ -460,7 +460,7 @@ function CommunityHub() {
                       setStrangeSightings(false);
                     }}
                     aria-pressed={active}
-                    className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-zinc-900/50 backdrop-blur-md text-left transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:animate-none animate-red-flash sm:h-44 md:h-48 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-white/10 hover:border-white/25"}`}
+                    className={`group flex h-40 w-full flex-col overflow-hidden rounded-xl border bg-zinc-900/50 backdrop-blur-md text-left transition-transform hover:-translate-y-0.5 sm:h-44 md:h-48 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-white/10 hover:border-white/25"}`}
                   >
                     <span className="relative block min-h-0 w-full flex-1 overflow-hidden">
                       <LoopingPreview
@@ -510,7 +510,7 @@ function CommunityHub() {
                   setStrangeSightings(false);
                 }}
                 aria-pressed={active}
-                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 text-left transition-transform hover:-translate-y-0.5 hover:border-white/25 motion-reduce:transition-none motion-reduce:animate-none animate-red-flash md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : ""}`}
+                className={`group relative h-32 w-[280px] flex-shrink-0 snap-start overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 text-left transition-transform hover:-translate-y-0.5 hover:border-white/25 md:h-40 md:w-full ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)] scale-[1.02]" : ""}`}
               >
                 <LoopingPreview
                   videoUrl={previewUrl}

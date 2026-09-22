@@ -103,7 +103,7 @@ export function CommunityPostCard({
   }
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 shadow-lg shadow-background/40 backdrop-blur-md animate-red-flash motion-reduce:animate-none">
+    <article className="group overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 shadow-lg shadow-background/40 backdrop-blur-md">
       <div className={`relative w-full overflow-hidden ${post.aspect === "4:3" ? "aspect-[4/3]" : "aspect-video"}`}>
         <LoopingPreview
           {...(looksLikeVideo(mediaUrl) ? { videoUrl: mediaUrl } : { imageUrl: mediaUrl })}
