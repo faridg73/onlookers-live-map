@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
+import { BountyBriefAssistant } from "@/components/BountyBriefAssistant";
 import { BountyConditionIcon } from "@/components/BountyConditionIcon";
 import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
 import { GigCostBreakdown } from "@/components/GigCostBreakdown";
@@ -1413,6 +1414,15 @@ function PostScreen() {
                   <span className="text-xs font-bold uppercase text-muted-foreground">Camera instructions</span>
                   <textarea ref={noteRef} value={note} onChange={(event) => setNote(event.target.value)} rows={3} required minLength={10} className="field resize-none" />
                 </label>
+
+                <BountyBriefAssistant
+                  request={prompt || title}
+                  category={subcategory ? `${mainCategoryLabel} · ${subcategory}` : mainCategoryLabel}
+                  locationType={locationType ? LOCATION_TYPES.find((type) => type.id === locationType)?.label ?? null : null}
+                  place={place || null}
+                  onApplyTitle={(value) => setTitle(value.slice(0, 120))}
+                  onApplyInstructions={(value) => setNote(value)}
+                />
 
                 <Collapsible defaultOpen={permissionNeeded}>
                   <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded-lg border border-border bg-background px-3 py-3 text-left text-sm font-bold text-foreground">
