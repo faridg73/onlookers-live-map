@@ -224,17 +224,6 @@ function DiscoverHome() {
               />
             </SectionBoundary>
 
-            {/* top-left control: Browse places pill */}
-            <div className="absolute left-2.5 top-2.5 z-10 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setView("grid")}
-                aria-label="Back to Browse places"
-                className="inline-flex h-8 items-center gap-1.5 rounded-md border border-signal/60 bg-black/85 px-2.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal shadow-md shadow-signal/20 backdrop-blur-xl transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Browse places
-              </button>
-            </div>
 
           </div>
           {selected ? (
