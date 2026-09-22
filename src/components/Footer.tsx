@@ -147,15 +147,16 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
           </nav>
         )}
 
-        <SocialLinks className="mt-1 flex items-center justify-center gap-2.5" />
-
-        <div className="mt-3 flex flex-col items-center justify-between gap-1.5 border-t border-border/60 pt-3 sm:flex-row">
-          <p className="text-xs font-semibold text-muted-foreground">
-            © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
-          </p>
-          <p className="text-xs font-semibold tracking-wide text-muted-foreground">
-            #OnlookerLive
-          </p>
+        <div className="my-8 flex flex-col items-center gap-6">
+          <SocialLinks className="flex items-center justify-center gap-2.5" />
+          <div className="flex w-full flex-col items-center justify-between gap-1.5 sm:flex-row">
+            <p className="text-xs font-semibold text-muted-foreground">
+              © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
+            </p>
+            <p className="text-xs font-semibold tracking-wide text-muted-foreground">
+              #OnlookerLive
+            </p>
+          </div>
         </div>
       </div>
 

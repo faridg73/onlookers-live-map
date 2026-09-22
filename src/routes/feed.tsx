@@ -342,7 +342,7 @@ function FeedScreen() {
 
       <p className="mt-4 text-[0.68rem] font-bold uppercase text-muted-foreground">Status</p>
       <div
-        className="mt-2 flex w-full items-stretch gap-1 overflow-hidden rounded-xl border border-white/10 bg-surface p-1"
+        className="mt-2 flex w-full items-center rounded-xl bg-zinc-900 p-1"
         role="tablist"
         aria-label="Request status"
       >
@@ -356,8 +356,8 @@ function FeedScreen() {
             className={
               "min-h-9 min-w-0 flex-1 truncate rounded-lg px-1 py-1.5 text-[0.66rem] font-bold uppercase transition-colors " +
               (filter === f.key
-                ? "bg-signal text-signal-foreground shadow-[0_0_16px_-4px_var(--signal)]"
-                : "border border-transparent text-muted-foreground hover:text-foreground")
+                ? "bg-[#22c55e] text-zinc-950 font-semibold"
+                : "text-zinc-400 hover:text-white")
             }
           >
             {f.label}
