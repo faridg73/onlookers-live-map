@@ -371,7 +371,7 @@ export function HomeLiveStage({
           </div>
         </div>
 
-        <div className="hidden border-l border-home-line bg-home-glass p-4 lg:block">
+        <div className="flex flex-col justify-center border-l border-home-line bg-home-glass p-5 sm:p-6">
           <p className="home-display text-[0.62rem] font-semibold uppercase text-foreground/45">Live feed preview</p>
           {featured ? (
             <button type="button" onClick={() => onOpenRequest(featured)} className="group mt-2 flex h-[calc(100%-1.4rem)] w-full flex-col justify-between rounded-xl border border-home-line bg-home-glass p-3 text-left shadow-lg transition-[transform,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-home-accent/50 hover:bg-home-accent/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-home-accent">
