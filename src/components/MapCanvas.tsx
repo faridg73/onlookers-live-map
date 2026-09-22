@@ -802,7 +802,7 @@ export function MapCanvas({
         </div>
         <button
           type="button"
-          onClick={locateMe}
+          onClick={() => void locateMe(true)}
           aria-label="Recenter to my location"
           title={geoMessage ?? "Recenter to my location"}
           className="flex size-10 items-center justify-center rounded-xl border border-home-line bg-home-glass-strong text-foreground shadow-xl backdrop-blur-2xl transition-colors hover:border-home-accent/50 hover:bg-home-accent/12 hover:text-home-accent"
