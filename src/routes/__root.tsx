@@ -144,17 +144,31 @@ function RootComponent() {
   const embedded = pathname.startsWith("/embed");
   useSessionScroll(`onlooker:scroll:route:${location.href}`);
 
+  // Home and embeds are full-bleed fixed layouts — they opt out of the global bottom pad.
+  const fullBleed = embedded || pathname === "/";
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <OnlookerProvider>
           <BoostProvider>
-            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-            <Outlet />
-            {/* Home is a full-screen fixed map that would cover the footer, so mount it only on scrollable pages. */}
-            {!embedded && pathname !== "/" && (
-              <Footer showLinks={pathname.startsWith("/profile")} />
-            )}
+            {/* Outer application container: obsidian backdrop, viewport-height flex column */}
+            <div
+              className={`flex min-h-screen flex-col justify-between bg-[#09090b] text-white ${
+                fullBleed ? "" : "pb-32"
+              }`}
+            >
+              {/* Main route outlet: grows to fill available space */}
+              <main className="flex w-full flex-1 flex-col">
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </main>
+              {/* Home is a full-screen fixed map that would cover the footer, so mount it only on scrollable pages. */}
+              {!embedded && pathname !== "/" && (
+                <Footer showLinks={pathname.startsWith("/profile")} />
+              )}
+            </div>
+            {/* Floating navigation dock and overlays stay layered above the pb-32 clearance */}
             {!embedded && (
               <>
                 {pathname.startsWith("/profile") && <AppMenu />}
