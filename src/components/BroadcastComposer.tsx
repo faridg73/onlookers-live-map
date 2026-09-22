@@ -201,7 +201,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
 
   if (gate && !gate.allowed) {
     return (
-      <div className="mx-auto max-w-xl animate-rise space-y-4">
+      <div className="mx-auto max-w-3xl animate-rise space-y-4">
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
             <ShieldCheck className="size-4 text-signal" /> Free broadcasting isn&apos;t open yet
@@ -231,7 +231,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   }
 
   return (
-    <div className="mx-auto max-w-2xl animate-rise space-y-5">
+    <div className="mx-auto max-w-4xl animate-rise space-y-5">
       <div className="flex items-start gap-3 rounded-xl border border-signal/40 bg-signal/5 p-3">
         <Radio className="mt-0.5 size-5 shrink-0 text-signal" />
         <p className="text-xs font-medium text-foreground/90">
