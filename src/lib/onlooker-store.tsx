@@ -82,6 +82,7 @@ type Store = {
   addRequest: (input: NewRequest) => LiveRequest;
   claim: (id: string) => void;
   remove: (id: string) => void;
+  updateLocationType: (id: string, locationType: string) => void;
 };
 
 // Keep one context identity across Vite hot updates. Without this, the root
