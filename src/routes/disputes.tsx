@@ -57,6 +57,16 @@ function DisputesScreen() {
   const [selected, setSelected] = useState<string | null>(null);
   const [staff, setStaff] = useState(false);
   const [eligible, setEligible] = useState<EligibleDisputeBounty[]>([]);
+  const [conditionsJobs, setConditionsJobs] = useState<EligibleConditionsBounty[]>([]);
+
+  const loadConditionsJobs = useCallback(async () => {
+    try {
+      setConditionsJobs(await listEligibleConditionsDisputes());
+    } catch (error) {
+      console.error("[disputes] failed to load conditions jobs", error);
+      setConditionsJobs([]);
+    }
+  }, []);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -80,12 +90,14 @@ function DisputesScreen() {
           console.error("[disputes] failed to load eligible bounties", error);
           setEligible([]);
         });
+      void loadConditionsJobs();
     } else {
       setStaff(false);
       setEligible([]);
+      setConditionsJobs([]);
       setLoading(false);
     }
-  }, [user, refresh]);
+  }, [user, refresh, loadConditionsJobs]);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
