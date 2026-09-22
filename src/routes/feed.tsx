@@ -372,14 +372,18 @@ function FeedScreen() {
           </BountyDetailsDialog>
         ))}
         {list.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-surface/60 p-6 backdrop-blur-sm">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-signal/40 to-transparent" aria-hidden />
+            <p className="font-mono text-[0.7rem] font-bold uppercase tracking-widest text-muted-foreground">
+              <span className="text-signal">onlooker:~$</span> scan --radius {radiusLabel}
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
               Nothing open within {radiusLabel} of you right now.
             </p>
             <button
               type="button"
               onClick={expandRadius}
-              className="mt-3 rounded-full border border-signal bg-surface px-4 py-2 text-xs font-extrabold uppercase text-signal"
+              className="mt-4 rounded-full bg-signal px-4 py-2 text-xs font-extrabold uppercase text-signal-foreground transition-transform hover:scale-[1.02]"
             >
               {nextWiderRadius === "custom"
                 ? radiusChoice === "custom"
