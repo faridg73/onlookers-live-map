@@ -262,11 +262,11 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(78rem,calc(100vw-5rem))]" aria-labelledby="home-live-stage-title">
+    <section className="scrollbar-thin pointer-events-auto absolute inset-x-3 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 mx-auto overflow-y-auto overscroll-contain pb-1 sm:w-[min(68rem,calc(100vw-8rem))] lg:bottom-[7.5rem] lg:w-[min(88rem,calc(100vw-6rem))] 2xl:w-[min(116rem,calc(100vw-8rem))]" aria-labelledby="home-live-stage-title">
       <div className="mx-auto w-full overflow-hidden rounded-3xl border border-home-line bg-home-obsidian shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent),0_0_0_1px_color-mix(in_oklab,var(--color-foreground)_6%,transparent),0_0_48px_color-mix(in_oklab,var(--color-signal)_9%,transparent)] backdrop-blur-2xl">
       <div className="grid min-h-[10rem] grid-cols-1 [@media(max-height:520px)]:min-h-0 lg:grid-cols-[minmax(0,1.25fr)_minmax(15rem,0.75fr)]">
-        <div className="relative flex min-w-0 flex-col justify-center overflow-hidden px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
-          <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 [@media(max-height:520px)]:left-5 [@media(max-height:520px)]:right-5" aria-hidden />
+        <div className="relative flex min-w-0 flex-col justify-center overflow-hidden px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+          <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 lg:left-12 lg:right-12 [@media(max-height:520px)]:left-5 [@media(max-height:520px)]:right-5" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
               <span className="relative flex size-2" aria-hidden>
@@ -382,7 +382,7 @@ export function HomeLiveStage({
       </div>
 
       <div className="mt-2 overflow-hidden rounded-3xl border border-signal/25 bg-home-glass py-2.5 shadow-[0_24px_70px_color-mix(in_oklab,var(--color-background)_68%,transparent)] backdrop-blur-2xl">
-        <div className="mb-2 flex items-center justify-between px-3">
+        <div className="mb-2 flex items-center justify-between px-3.5">
           <div className="flex items-center gap-2">
             <span className="relative flex size-2" aria-hidden>
               <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
@@ -448,14 +448,14 @@ export function HomeLiveStage({
       </div>
 
       {/* Section separator: clear hierarchy between the cards and the live dashboard. */}
-      <div className="mt-4 mb-2.5 flex items-center gap-3 px-1">
+      <div className="mt-4 mb-2.5 flex items-center gap-3 px-2">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent via-signal/35 to-signal/35" aria-hidden />
         <span className="home-display text-[0.56rem] font-bold uppercase tracking-[0.24em] text-foreground/50">Live dashboard</span>
         <span className="h-px flex-1 bg-gradient-to-l from-transparent via-signal/35 to-signal/35" aria-hidden />
       </div>
 
       {/* Multi-column live dashboard: every feed visible at once, no dropdowns. */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" aria-label="Live feeds dashboard">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-3 xl:grid-cols-5 xl:gap-4" aria-label="Live feeds dashboard">
         {feedColumns.map((column) => {
           const Icon = column.icon;
           const visibleItems = column.items.slice(0, 4);
