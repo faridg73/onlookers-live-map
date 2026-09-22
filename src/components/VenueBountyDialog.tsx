@@ -199,6 +199,9 @@ export function VenueBountyDialog({
         prompt: title.trim(),
         details: note.trim(),
         locationName: `${venue.name}, ${venue.area}`,
+        // Listed venues are businesses or event grounds; private property only
+        // rides along when the requester attested to owner permission.
+        locationType: permissionNeeded && permissionOk ? "owner_authorized" : "commercial",
         bounty: total,
         category: venue.category,
         authorizationConfirmed: permissionNeeded && permissionOk,
@@ -218,6 +221,7 @@ export function VenueBountyDialog({
       addRequest({
         title: title.trim(),
         place: `${venue.name}, ${venue.area}`,
+        locationType: permissionNeeded && permissionOk ? "owner_authorized" : "commercial",
         note: details,
         bounty: total,
         category: venue.category,

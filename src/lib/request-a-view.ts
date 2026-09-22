@@ -116,6 +116,8 @@ export function postRequestedView(
     prompt: REQUEST_VIEW_TITLE,
     details,
     locationName: options.placeName.trim(),
+    // Request-a-View pins are always public vantage points.
+    locationType: "public",
     bounty: quote.total,
     category: "events",
     latitude: pin.latitude,
