@@ -2305,6 +2305,18 @@ export type Database = {
           status: string
         }[]
       }
+      list_eligible_conditions_disputes: {
+        Args: never
+        Returns: {
+          amount: number
+          declared_multiplier: number
+          location_name: string
+          prompt: string
+          request_id: string
+          review_ends_at: string
+          submitted_at: string
+        }[]
+      }
       list_eligible_dispute_bounties: {
         Args: never
         Returns: {
