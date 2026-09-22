@@ -81,6 +81,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         prompt: title.trim(),
         details: note.trim(),
         locationName: place.trim(),
+        locationType,
         bounty,
         category,
         authorizationConfirmed: permissionNeeded && permissionOk,
@@ -90,6 +91,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       addRequest({
         title: title.trim(),
         place: place.trim(),
+        locationType,
         note: note.trim(),
         bounty,
         category,
@@ -102,6 +104,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
       });
       setTitle("");
       setPlace("");
+      setLocationType(null);
       setNote("");
       setBounty(20);
       setAccessCode("");
@@ -144,6 +147,31 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               className="field"
               required
             />
+          </Field>
+          <Field label="Location type (required)">
+            <div className="flex flex-wrap gap-2">
+              {LOCATION_TYPES.map((type) => (
+                <button
+                  key={type.id}
+                  type="button"
+                  title={type.blurb}
+                  aria-pressed={locationType === type.id}
+                  onClick={() => setLocationType(type.id)}
+                  className={
+                    "rounded-full border px-3 py-1.5 text-xs transition-colors " +
+                    (locationType === type.id
+                      ? "border-signal bg-signal font-bold text-signal-foreground"
+                      : "border-border bg-surface-raised text-muted-foreground hover:text-foreground")
+                  }
+                >
+                  <span className="mr-1" aria-hidden>{type.emoji}</span>
+                  {type.label}
+                </button>
+              ))}
+            </div>
+            <span className="block text-xs text-muted-foreground">
+              Shown next to the address. Private homes need the owner&apos;s permission.
+            </span>
           </Field>
           <Field label="Category">
             <div className="flex flex-wrap gap-2">
@@ -230,7 +258,8 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               !human.ready ||
               bounty < MIN_BOUNTY ||
               (permissionNeeded && !permissionOk) ||
-              (codeNeeded && accessCode.trim().length < 4)
+              (codeNeeded && accessCode.trim().length < 4) ||
+              !locationType
             }
             className="w-full rounded-xl bg-signal py-3 text-sm font-semibold uppercase tracking-[0.16em] text-signal-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
           >
