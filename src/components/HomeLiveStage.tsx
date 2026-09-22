@@ -53,7 +53,7 @@ const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typ
   {
     step: "03",
     title: "Get Verified Results",
-    body: "Receive photo or video proof, approve it, and payment is released. Hunters get paid for their time on the ground.",
+    body: "Receive photo or video proof, approve it, and payment is released instantly. Hunters earn real cash for completing tasks nearby — think of it like Uber or DoorDash, but for real-world verification.",
     icon: BadgeCheck,
     thumb: step3Thumb.url,
     thumbAlt: "A verified photo proof card with a checkmark",
@@ -295,7 +295,7 @@ export function HomeLiveStage({
             See what&apos;s happening. Right now.
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
-            Post a real-world task, or earn money completing them nearby — verified photos and video, on demand.
+            Post a real-world task, or earn real cash completing them nearby — verified photos and video, on demand.
           </p>
 
           <div
@@ -375,7 +375,7 @@ export function HomeLiveStage({
                   <span className="min-w-0">
                     <span className="block font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step.step}</span>
                     <span className="mt-0.5 block text-sm font-extrabold text-white">{step.title}</span>
-                    <span className="mt-1 block text-[0.72rem] leading-relaxed text-foreground/65">{step.body}</span>
+                    <span className="mt-1 block text-sm leading-relaxed text-foreground/90 sm:text-base">{step.body}</span>
                   </span>
                 </li>
               );
