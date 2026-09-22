@@ -25,7 +25,11 @@ import {
   type CategoryId,
   type LocationTypeId,
 } from "@/lib/onlooker";
-import { PUBLIC_HAPPENINGS_DISCLAIMER } from "@/lib/camera-only";
+import {
+  PUBLIC_HAPPENINGS_DISCLAIMER,
+  locationTypeAllowsPrivateProperty,
+  privacyAccessCopy,
+} from "@/lib/camera-only";
 
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
