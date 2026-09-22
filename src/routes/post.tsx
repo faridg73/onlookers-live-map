@@ -360,11 +360,31 @@ function PostScreen() {
     () => gigQuoteForMinutes(capture ?? GIG_LIVE_BLOCK_MINUTES),
     [capture],
   );
-  /** True while the reward still tracks the gig price for the picked duration. */
+  /**
+   * The Step-2 calculated total — gig price plus schedule urgency and filming
+   * conditions. On the Standard tier this is the payout floor: the reward
+   * selector defaults to it and can never go below it, only above (a tip).
+   */
+  const gigFloor = Math.max(
+    MIN_BOUNTY,
+    Math.round(gig.totalCredits * quote.urgencyFactor * quote.weatherFactor),
+  );
+  /** True while the reward still equals the calculated Step-2 total. */
   const rewardMatchesGig =
-    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gig.totalCredits;
+    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gigFloor;
 
-  const total = quote.total + (Number.isFinite(tip) ? tip : 0);
+  /**
+   * What actually gets held in escrow and paid to the onlooker. On Standard
+   * the picked reward IS the final payout (multipliers are already baked into
+   * the floor, never applied twice); fixed tiers keep their quoted total.
+   */
+  const escrowReward =
+    tier === "standard"
+      ? Number.isFinite(bounty)
+        ? Math.max(Math.round(bounty), gigFloor)
+        : gigFloor
+      : quote.total;
+  const total = escrowReward + (Number.isFinite(tip) ? tip : 0);
 
   /** Whether the bounty description is complete enough to lock escrow. */
   const detailsReady = note.trim().length >= 10;
