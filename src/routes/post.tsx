@@ -82,11 +82,13 @@ import {
   type CaptureDuration,
 } from "@/lib/capture-format";
 import {
+  LOCATION_TYPES,
   generateAccessCode,
   needsAccessCode,
   needsPermissionConfirmation,
   needsPublicSpacesNotice,
   type CategoryId,
+  type LocationTypeId,
 } from "@/lib/onlooker";
 import {
   BROADCAST_CATEGORIES,
@@ -248,6 +250,9 @@ function PostScreen() {
   const [title, setTitle] = useState("");
   const titleRef = useRef<HTMLInputElement>(null);
   const [place, setPlace] = useState("");
+  // Required: posters must declare what kind of spot this is, so cards can show
+  // the location was cleared for filming.
+  const [locationType, setLocationType] = useState<LocationTypeId | null>(null);
   const [venueQuery, setVenueQuery] = useState("");
   const [venueResults, setVenueResults] = useState<DiscoveredPlace[]>([]);
   const [venueBusy, setVenueBusy] = useState(false);
