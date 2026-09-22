@@ -386,9 +386,9 @@ function CommunityHub() {
         </p>
         <Link
           to="/discover"
-          className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.14em] text-signal"
+          className="venue-hint-flash mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-yellow-300"
         >
-          Browse venues & events →
+          Browse venues &amp; events →
         </Link>
         <div className="mt-4">
           <BroadcastCategoryPicker

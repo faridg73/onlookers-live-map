@@ -145,6 +145,12 @@
   }
 }
 
+/* Flashing yellow border hinting there is more to see (Browse venues & events link) */
+.venue-hint-flash {
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  animation: all-vibes-flash 1.4s ease-in-out infinite;
+}
+
 /* Bright yellow highlight for the location search box under "Use my location" */
 .location-search-highlight {
   border: 2px solid rgba(250, 204, 21, 0.9);
