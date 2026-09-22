@@ -479,6 +479,17 @@ export function HomeLiveStage({
           limit={8}
           title="Recent results"
           blurb="Verified captures from bounties that already wrapped — tap any card to watch what a Hunter delivered."
+          emptyTeaser={
+            <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-home-line bg-home-glass p-6 text-center">
+              <p className="text-[0.72rem] font-extrabold text-foreground">Nothing here yet — be the first to wrap one</p>
+              <p className="text-[0.62rem] font-semibold text-muted-foreground">
+                Approve your first bounty's proof and this wall fills with what Hunters captured.
+              </p>
+              <Button type="button" size="sm" onClick={onPostBounty} className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
+                Post bounty
+              </Button>
+            </div>
+          }
         />
       </div>
     </section>
