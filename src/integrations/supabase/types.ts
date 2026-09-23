@@ -2394,6 +2394,13 @@ export type Database = {
           view_count: number
         }[]
       }
+      get_member_tiers: {
+        Args: { _user_ids: string[] }
+        Returns: {
+          tier: string
+          user_id: string
+        }[]
+      }
       global_feed_clips: {
         Args: { _limit?: number }
         Returns: {

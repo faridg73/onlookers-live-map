@@ -37,6 +37,8 @@ import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { FollowingCreators } from "@/components/FollowingCreators";
 import { EarningsWallet } from "@/components/EarningsWallet";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
+import { MembershipBadge } from "@/components/MembershipBadge";
+import { fetchUserWallet } from "@/lib/wallet-ledger";
 import { AlertSettingsCard } from "@/components/AlertSettingsCard";
 import { StreakCard } from "@/components/StreakCard";
 import { toast } from "sonner";
@@ -92,6 +94,17 @@ function ProfileScreen() {
   const [profile, setProfile] = useState<MyProfile | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [stats, setStats] = useState<ProfileStats | null>(null);
+  const [memberTier, setMemberTier] = useState<string | null>(null);
+
+  // Paid membership badge — refreshes when a checkout completes.
+  useEffect(() => {
+    if (!user) { setMemberTier(null); return; }
+    let live = true;
+    const load = () => fetchUserWallet().then((w) => live && setMemberTier(w?.subscriptionTier ?? null)).catch(() => {});
+    void load();
+    window.addEventListener("onlooker:credits-refresh", load);
+    return () => { live = false; window.removeEventListener("onlooker:credits-refresh", load); };
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user) { setStats(null); return; }
@@ -177,6 +190,7 @@ function ProfileScreen() {
             {profile?.display_name ?? user?.email?.split("@")[0] ?? "Onlooker"}
             </span>
             {verified && <VerifiedBadge className="size-5" />}
+            <MembershipBadge tier={memberTier} />
           </h1>
           <p className="text-sm text-muted-foreground">
             {profile?.location?.trim() || "Location not added"}
