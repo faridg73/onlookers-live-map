@@ -7,6 +7,7 @@ import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { supabase } from "@/integrations/supabase/client";
+import { distanceMiles, requestMapPosition } from "@/lib/onlooker";
 import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
