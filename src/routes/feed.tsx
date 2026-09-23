@@ -372,7 +372,12 @@ function FeedScreen() {
       <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {list.map((r) => (
           <BountyDetailsDialog key={r.id} request={r} onClaim={claim}>
-            <RequestCard request={r} compact distanceLabel={distanceLabel(r)} />
+            <RequestCard
+              request={r}
+              compact
+              distanceLabel={distanceLabel(r)}
+              distanceMiles={milesTo(r)}
+            />
           </BountyDetailsDialog>
         ))}
         {list.length === 0 && (

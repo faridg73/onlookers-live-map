@@ -217,11 +217,12 @@ function HuntScreen() {
                   )}
                 </span>
               </div>
-              <BountyDetailsDialog request={request} onClaim={claim}>
+              <BountyDetailsDialog request={request} onClaim={claim} userPosition={position}>
                 <RequestCard
                   request={request}
                   compact
                   distanceLabel={miles !== null ? formatDistance(miles) : undefined}
+                  distanceMiles={miles}
                 />
               </BountyDetailsDialog>
             </div>
