@@ -54,7 +54,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                 type="button"
                 aria-pressed={cycle === option}
                 onClick={() => setCycle(option)}
-                className={`min-h-9 rounded-full px-4 py-1.5 text-xs font-semibold capitalize transition ${
+                className={`min-h-9 cursor-pointer rounded-full px-4 py-1.5 text-xs font-semibold capitalize transition ${
                   cycle === option
                     ? "bg-signal text-signal-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -76,7 +76,24 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
           return (
             <div
               key={plan.id}
-              className={`flex flex-col rounded-2xl border bg-surface p-4 ${
+              role="button"
+              tabIndex={active ? -1 : 0}
+              aria-label={active ? `${plan.name} — current plan` : `Get ${plan.name}`}
+              aria-disabled={active}
+              onClick={() => {
+                if (!active) setCheckout(plan);
+              }}
+              onKeyDown={(e) => {
+                if (!active && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  setCheckout(plan);
+                }
+              }}
+              className={`flex flex-col rounded-2xl border bg-surface p-4 outline-none transition duration-200 focus-visible:ring-2 focus-visible:ring-ring ${
+                active
+                  ? "cursor-default opacity-90"
+                  : "cursor-pointer hover:-translate-y-0.5 hover:border-signal/70 hover:shadow-[0_8px_24px_-8px_rgba(204,255,0,0.35)]"
+              } ${
                 plan.highlight ? `${plan.accent.border} shadow-[0_0_0_1px] shadow-signal/20` : "border-border"
               }`}
             >
@@ -120,8 +137,11 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
               <button
                 type="button"
                 disabled={active}
-                onClick={() => setCheckout(plan)}
-                className={`mt-4 rounded-full px-4 py-2 text-sm font-semibold transition disabled:opacity-50 ${plan.accent.chip}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCheckout(plan);
+                }}
+                className={`mt-4 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-default disabled:opacity-50 ${plan.accent.chip}`}
               >
                 {active ? "Current plan" : `Get ${plan.name}`}
               </button>
