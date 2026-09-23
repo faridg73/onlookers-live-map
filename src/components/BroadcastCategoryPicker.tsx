@@ -99,7 +99,7 @@ export function BroadcastCategoryPicker({
                 categoryId === null ? "bg-signal/10 text-signal" : "text-foreground hover:bg-accent",
               )}
             >
-              <span className="w-6 shrink-0 text-center text-base" aria-hidden>🌐</span>
+              <Globe2 className="size-5 w-6 shrink-0 text-signal" aria-hidden />
               <span className="min-w-0 flex-1 text-xs font-bold leading-snug">{allLabel}</span>
               {categoryId === null && <Check className="size-4 shrink-0" strokeWidth={3} />}
             </Button>
