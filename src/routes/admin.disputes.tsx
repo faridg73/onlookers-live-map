@@ -269,6 +269,25 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
           <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+            Original bounty
+          </p>
+          <div className="rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
+            <p className="text-sm text-foreground">{item.prompt}</p>
+            {item.details && <p className="mt-1 whitespace-pre-wrap">{item.details}</p>}
+            <p className="mt-2">
+              {item.category ? `${item.category} · ` : ""}
+              {spot ? `${spot.emoji} ${spot.label}` : "No location type declared"}
+            </p>
+            {item.checklist.length > 0 && (
+              <ul className="mt-2 list-disc space-y-0.5 pl-4">
+                {item.checklist.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
             Submitted clips
           </p>
           {clips.length === 0 && (
