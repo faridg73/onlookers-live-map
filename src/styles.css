@@ -146,13 +146,13 @@
   }
 }
 
-/* Flashing yellow border hinting there is more to see (Browse venues & events link) */
+/* Flashing lime border hinting there is more to see (Browse venues & events link) */
 .venue-hint-flash {
   border: 1px solid color-mix(in oklab, var(--signal) calc(0.5 * 100%), transparent);
   animation: all-vibes-flash 1.4s ease-in-out infinite;
 }
 
-/* Bright yellow highlight for the location search box under "Use my location" */
+/* Bright lime highlight for the location search box under "Use my location" */
 .location-search-highlight {
   border: 2px solid color-mix(in oklab, var(--signal) calc(0.9 * 100%), transparent);
   box-shadow: 0 0 12px 1px color-mix(in oklab, var(--signal) calc(0.4 * 100%), transparent);
@@ -272,8 +272,8 @@
   --map: oklch(1 0 0); /* neutral fallback behind standard Google map tiles */
   --signal: oklch(0.93071 0.22858 123.09); /* #CCFF00 neon lime */
   --signal-foreground: oklch(0.14 0.03 124);
-  --cyan: oklch(0.75 0.18 195); /* electric cyan for high-visibility CTAs */
-  --cyan-glow: oklch(0.75 0.18 195 / 0.35);
+  --cyan: var(--signal); /* unified: no secondary CTA hue */
+  --cyan-glow: color-mix(in oklab, var(--signal) 35%, transparent);
   --live: var(--signal); /* unified to the single brand green */
   --crisis: oklch(0.64 0.24 27);
   --warning-note: oklch(0.85 0.1 230); /* light blue #7DD3FC */
@@ -321,20 +321,20 @@
   --pin-gold: var(--signal);
 
   /* Category hues used by the colour-coded request badges */
-  --cat-food: oklch(0.78 0.17 55);
-  --cat-vehicles: oklch(0.75 0.16 250);
+  --cat-food: var(--signal);
+  --cat-vehicles: var(--signal);
   --cat-outdoors: var(--signal);
-  --cat-nightlife: oklch(0.75 0.19 330);
-  --cat-transit: oklch(0.78 0.15 200);
-  --cat-events: oklch(0.76 0.18 20);
-  --cat-parking: oklch(0.75 0.14 285);
-  --cat-weather: oklch(0.85 0.16 100);
-  --cat-realestate: oklch(0.8 0.14 85);
-  --cat-art: oklch(0.74 0.17 305);
-  --cat-sports: oklch(0.79 0.18 135);
-  --cat-street: oklch(0.78 0.18 25);
-  --cat-community: oklch(0.78 0.17 170);
-  --cat-markets: oklch(0.82 0.16 75);
+  --cat-nightlife: var(--signal);
+  --cat-transit: var(--signal);
+  --cat-events: var(--signal);
+  --cat-parking: var(--signal);
+  --cat-weather: var(--signal);
+  --cat-realestate: var(--signal);
+  --cat-art: var(--signal);
+  --cat-sports: var(--signal);
+  --cat-street: var(--signal);
+  --cat-community: var(--signal);
+  --cat-markets: var(--signal);
   --urgent: oklch(0.7 0.2 30);
   --discover-friends: linear-gradient(145deg, oklch(0.78 0.19 130), oklch(0.2 0.06 150) 52%, oklch(0.08 0 0));
   --discover-meetups: linear-gradient(145deg, oklch(0.75 0.17 165), oklch(0.22 0.08 210) 50%, oklch(0.08 0 0));
