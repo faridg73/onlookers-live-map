@@ -189,24 +189,41 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     // property, which is what unlocks footage submission and the payout.
     if (data.category === "realestate") {
       const pin = generateSitePin();
+      const contact = data.agentContact;
+      const phone = contact?.phone ?? "";
+      const email = contact?.email ?? "";
+      // Opaque token so the agent can decline the visit without an account.
+      const declineToken = crypto.randomUUID().replace(/-/g, "");
+      // The PIN dies two hours after the bounty's own deadline, so a stale code
+      // can never be used on a later visit.
+      const rowExpiresAt = (row as { expires_at?: string | null }).expires_at ?? "";
+      const deadlineMs = Date.parse(rowExpiresAt);
+      const pinExpiresAt = new Date(
+        (Number.isFinite(deadlineMs) ? deadlineMs : Date.now()) + 2 * 60 * 60 * 1000,
+      ).toISOString();
+
       await supabaseAdmin.from("request_site_pins").insert({
         request_id: row.id,
         requester_id: context.userId,
         pin,
+        expires_at: pinExpiresAt,
+        agent_name: contact?.name ?? null,
+        agent_phone: phone || null,
+        agent_email: email || null,
+        decline_token: declineToken,
+        last_sent_at: new Date().toISOString(),
+        send_count: 1,
       });
 
       // Deliver the PIN straight to the listing agent the poster named, so the
       // PIN never has to be copied by hand. A delivery problem must never stop
       // a paid request from going live.
-      const contact = data.agentContact;
-      const phone = contact?.phone ?? "";
-      const email = contact?.email ?? "";
       if (phone.length >= 5 || email.includes("@")) {
         try {
           const { sendAgentPin } = await import("@/lib/agent-pin.server");
           const delivery = await sendAgentPin(
             { name: contact?.name ?? "", phone, email },
-            { pin, requestId: row.id, locationName: data.locationName },
+            { pin, requestId: row.id, locationName: data.locationName, declineToken },
           );
           if (phone && !delivery.sms && delivery.smsError) {
             console.error(`[agent-pin] SMS to agent failed: ${delivery.smsError}`);

@@ -1,9 +1,11 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
-import { BadgeCheck, Copy, KeyRound, Loader2, ShieldCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { BadgeCheck, Copy, KeyRound, Loader2, Send, ShieldAlert, ShieldCheck, ShieldX } from "lucide-react";
 import { toast } from "sonner";
 
-import { readSitePinState, verifySitePin, type SitePinState } from "@/lib/site-pin";
+import { resendSitePin } from "@/lib/site-pin.functions";
+import { readSitePinState, reportAgentUnreachable, verifySitePin, type SitePinState } from "@/lib/site-pin";
 
 /**
  * Three-step on-site handshake for real estate bounties:
@@ -11,6 +13,10 @@ import { readSitePinState, verifySitePin, type SitePinState } from "@/lib/site-p
  * reads it out, and the onlooker types it here. A match stamps the bounty
  * "Verified on site" and unlocks footage submission and payout, so nobody can
  * file from their couch.
+ *
+ * The PIN is single use and expires two hours after the bounty's deadline. When
+ * it never reaches the agent, either side can resend it; when the agent never
+ * shows, the onlooker can report it and still be paid for the trip.
  */
 export function SitePinVerification({
   requestId,
@@ -25,6 +31,11 @@ export function SitePinVerification({
   const [digits, setDigits] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  const [resending, setResending] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportNote, setReportNote] = useState("");
+  const [reporting, setReporting] = useState(false);
+  const resend = useServerFn(resendSitePin);
 
   const load = useCallback(async () => {
     if (!requestId) return;
@@ -64,6 +75,70 @@ export function SitePinVerification({
     }
   }
 
+  async function triggerResend() {
+    if (!requestId) return;
+    setResending(true);
+    try {
+      const result = await resend({ data: { requestId } });
+      const channels = [result.sms ? "text" : null, result.email ? "email" : null].filter(Boolean);
+      toast.success(`PIN sent again to the property contact by ${channels.join(" and ")}.`);
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't resend the PIN.");
+    } finally {
+      setResending(false);
+    }
+  }
+
+  async function submitUnreachable() {
+    if (!requestId || reportNote.trim().length < 10) return;
+    setReporting(true);
+    try {
+      await reportAgentUnreachable(requestId, reportNote);
+      toast.success("Reported. The bounty money is held and our team will settle your trip fee.");
+      setReportOpen(false);
+      setReportNote("");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't file that report.");
+    } finally {
+      setReporting(false);
+    }
+  }
+
+  const expiryLine = state.expiresAt
+    ? `PIN expires ${new Date(state.expiresAt).toLocaleString()} and works only once.`
+    : "The PIN works only once.";
+
+  const resendButton = state.canResend && (state.agentPhoneSet || state.agentEmailSet) ? (
+    <button
+      type="button"
+      disabled={resending}
+      onClick={() => void triggerResend()}
+      className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background/70 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground disabled:opacity-50"
+    >
+      {resending ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+      {resending ? "Sending…" : "Resend PIN to the contact"}
+    </button>
+  ) : null;
+
+  // The property contact said the visit was never authorized.
+  if (state.declined) {
+    return (
+      <div className="mt-3 rounded-xl border border-border bg-surface p-3">
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <ShieldX className="size-4" /> Not authorized by the property contact
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          {state.declinedAt ? `Reported ${new Date(state.declinedAt).toLocaleString()}. ` : ""}
+          This bounty is cancelled and the PIN no longer works. The poster&apos;s money was returned,
+          and the onlooker who had already travelled is paid a trip fee.
+          {state.declineNote ? ` They added: “${state.declineNote}”` : ""}
+        </p>
+      </div>
+    );
+  }
+
   if (state.verified) {
     return (
       <div className="mt-3 rounded-xl border border-signal/50 bg-signal/10 p-3">
@@ -73,7 +148,7 @@ export function SitePinVerification({
         <p className="mt-1 text-xs text-muted-foreground">
           {state.verifiedAt ? `Confirmed ${new Date(state.verifiedAt).toLocaleString()}. ` : ""}
           {state.mine
-            ? "An onlooker matched your PIN with the agent at the property."
+            ? "An onlooker matched your PIN with the agent at the property. The PIN is now used up."
             : "Your footage and payout for this bounty are unlocked."}
         </p>
       </div>
@@ -108,7 +183,14 @@ export function SitePinVerification({
         <p className="mt-2 text-xs text-muted-foreground">
           Give this PIN only to the seller, listing agent or property manager who will be on site.
           The onlooker has to enter it at the property before any footage or payout goes through.
+          No account is needed on their side — it arrives by text or email.
         </p>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          {expiryLine}
+          {state.sendCount > 1 ? ` Sent ${state.sendCount} times.` : ""}
+          {state.expired ? " It has expired — resend a fresh delivery if the visit is still on." : ""}
+        </p>
+        {resendButton}
       </div>
     );
   }
@@ -120,8 +202,8 @@ export function SitePinVerification({
         <ShieldCheck className="size-3.5" /> Verify on site
       </div>
       <p className="mt-1.5 text-xs text-muted-foreground">
-        Ask the agent at the property for the 6-digit Onlooker Live PIN, then enter it to unlock
-        filming and payout for this bounty.
+        Ask the contact at the property for the 6-digit Onlooker Live PIN, then enter it to unlock
+        filming and payout for this bounty. {expiryLine}
       </p>
       <input
         value={digits}
@@ -154,6 +236,63 @@ export function SitePinVerification({
           "Verify bounty submission"
         )}
       </button>
+
+      {resendButton}
+
+      {state.isSpotter && (
+        <div className="mt-3 border-t border-border pt-3">
+          {reportOpen ? (
+            <>
+              <p className="text-xs font-semibold text-foreground">No PIN after waiting on site?</p>
+              <textarea
+                value={reportNote}
+                onChange={(event) => setReportNote(event.target.value.slice(0, 1000))}
+                rows={3}
+                placeholder="What happened? e.g. waited 25 minutes at the gate, called twice, no answer."
+                className="mt-2 w-full rounded-xl border border-border bg-surface-raised px-3 py-2 text-xs text-foreground outline-none focus:border-signal"
+              />
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  disabled={reportNote.trim().length < 10 || reporting}
+                  onClick={() => void submitUnreachable()}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-background/70 px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-foreground disabled:opacity-50"
+                >
+                  {reporting ? <Loader2 className="size-3.5 animate-spin" /> : <ShieldAlert className="size-3.5" />}
+                  Send for review
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReportOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                The bounty money stays held while our team reviews it, and you&apos;re paid a partial
+                trip fee for the journey you already made.
+              </p>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={!state.unreachableEligible}
+                onClick={() => setReportOpen(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background/70 px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground disabled:opacity-50"
+              >
+                <ShieldAlert className="size-3.5" /> Contact unreachable — get a trip fee
+              </button>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                {state.unreachableEligible
+                  ? "Use this if you're on site and the PIN never came through. Your trip won't go unpaid."
+                  : "Available 15 minutes after you claim this bounty, if the PIN still hasn't reached you."}
+              </p>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

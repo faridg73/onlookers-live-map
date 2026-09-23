@@ -1462,34 +1462,61 @@ export type Database = {
       }
       request_site_pins: {
         Row: {
+          agent_email: string | null
+          agent_name: string | null
+          agent_phone: string | null
           attempts: number
           created_at: string
+          decline_note: string | null
+          decline_token: string | null
+          declined_at: string | null
+          expires_at: string | null
           last_attempt_at: string | null
+          last_sent_at: string | null
           pin: string
           request_id: string
           requester_id: string
+          send_count: number
           updated_at: string
           verified_at: string | null
           verified_by: string | null
         }
         Insert: {
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
           attempts?: number
           created_at?: string
+          decline_note?: string | null
+          decline_token?: string | null
+          declined_at?: string | null
+          expires_at?: string | null
           last_attempt_at?: string | null
+          last_sent_at?: string | null
           pin: string
           request_id: string
           requester_id: string
+          send_count?: number
           updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
           attempts?: number
           created_at?: string
+          decline_note?: string | null
+          decline_token?: string | null
+          declined_at?: string | null
+          expires_at?: string | null
           last_attempt_at?: string | null
+          last_sent_at?: string | null
           pin?: string
           request_id?: string
           requester_id?: string
+          send_count?: number
           updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
@@ -2154,6 +2181,10 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: number
       }
+      authorize_site_pin_resend: {
+        Args: { _request_id: string }
+        Returns: Json
+      }
       award_reputation: {
         Args: { _action: string; _subject?: string }
         Returns: number
@@ -2250,6 +2281,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      decline_site_pin_authorization: {
+        Args: { _note?: string; _token: string }
+        Returns: Json
       }
       dispute_bounty:
         | { Args: { _reason: string; _request_id: string }; Returns: boolean }
@@ -2575,6 +2610,10 @@ export type Database = {
       }
       reject_proof: {
         Args: { _reason: string; _request_id: string }
+        Returns: boolean
+      }
+      report_agent_unreachable: {
+        Args: { _description: string; _request_id: string }
         Returns: boolean
       }
       reputation_total: { Args: { _user_id: string }; Returns: number }

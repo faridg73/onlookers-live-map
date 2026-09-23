@@ -23,6 +23,8 @@ const DISPUTE_REASON_LABELS: Record<string, string> = {
   quality_issue: "Quality issue",
   verification_mismatch: "Verification mismatch",
   conditions_mismatch: "Conditions worse than declared",
+  agent_unreachable: "Property contact unreachable on site",
+  authorization_declined: "Property contact never authorized the visit",
 };
 
 export function disputeReasonLabel(code: string) {
