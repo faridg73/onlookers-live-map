@@ -129,7 +129,7 @@ export async function listDisputeHistory(
 ): Promise<PastDisputeRuling[]> {
   const { data, error } = await supabase.rpc("dispute_history_for", {
     _requester_id: requesterId,
-    _spotter_id: spotterId,
+    _spotter_id: spotterId as string,
   });
   if (error) throw error;
   return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
