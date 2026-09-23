@@ -205,7 +205,7 @@ export function ProfileSetup() {
           Finish your profile
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Requesters and onlookers see this when you post or fulfil a bounty.
+          Posters and onlookers see this when you post or fulfil a bounty.
         </p>
 
         <div className="mt-5 space-y-3">

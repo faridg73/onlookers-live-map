@@ -122,7 +122,7 @@ export function BountyBottomSheet({
         note: "Filmed live from the map after accepting the bounty.",
         onStatus: setStatus,
       });
-      toast.success("Sent to the requester for review.");
+      toast.success("Sent to the poster for review.");
       setLastFile(null);
       setCapturing(false);
       onClose();
@@ -200,7 +200,7 @@ export function BountyBottomSheet({
           </span>
         </div>
         <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
-          {pool} credit bounty · {payout} Credits paid to you once the requester approves your
+          {pool} credit bounty · {payout} Credits paid to you once the poster approves your
           clip.
         </p>
 
@@ -242,7 +242,7 @@ export function BountyBottomSheet({
               type="button"
               disabled={!claimable || accepting}
               onClick={accept}
-              className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-live font-display text-base font-extrabold uppercase tracking-[0.1em] text-black disabled:opacity-50"
+              className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-signal font-display text-base font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
             >
               {wantsLive ? <Radio className="size-5" /> : <Camera className="size-5" />}
               {!claimable

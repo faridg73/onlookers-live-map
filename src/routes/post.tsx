@@ -219,7 +219,7 @@ type PlaceCategoryId = (typeof PLACE_CATEGORIES)[number]["id"];
 
 
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
-  { id: "live", label: "Go Live Now", copy: "Alert nearby hunters immediately", icon: Radio },
+  { id: "live", label: "Go Live Now", copy: "Alert nearby onlookers immediately", icon: Radio },
   { id: "clip", label: "Request Video Clip", copy: "Receive a short live-captured video", icon: Video },
   { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
@@ -532,7 +532,7 @@ function PostScreen() {
       return;
     }
     if (!locationType) {
-      toast.error("Pick the location type so hunters know this spot is cleared for filming.");
+      toast.error("Pick the location type so onlookers know this spot is cleared for filming.");
       return;
     }
     setAction(parsed.action);
@@ -555,7 +555,7 @@ function PostScreen() {
       return;
     }
     if (note.trim().length < 10) {
-      toast.error("Tell the hunter exactly what to film.");
+      toast.error("Tell the onlooker exactly what to film.");
       return;
     }
     if (action === "clip" && scheduledStart && scheduledStart.getTime() <= Date.now()) {
@@ -676,7 +676,7 @@ function PostScreen() {
       return;
     }
     if (note.trim().length < 10) {
-      toast.error("Tell the hunter exactly what to film before going live.");
+      toast.error("Tell the onlooker exactly what to film before going live.");
       return;
     }
     if (customDeadline && customDeadline.getTime() <= Date.now()) {
@@ -743,7 +743,7 @@ function PostScreen() {
         taggedKeywords.length ? `Keywords: ${taggedKeywords.join(", ")}` : "",
 
         note.trim(),
-        tip > 0 ? `Includes a ${tip} Credits tip from the requester's credit wallet.` : "",
+        tip > 0 ? `Includes a ${tip} Credits tip from the poster's credit wallet.` : "",
       ].filter(Boolean);
       const details = detailLines.join("\n");
       const locked = await lockBounty({
@@ -862,7 +862,7 @@ function PostScreen() {
                     Free social broadcast
                   </span>
                   <span className="mt-1 block text-sm text-signal">
-                    Verified creators stream to followers and people nearby. No credits, no escrow.
+                    Verified onlookers stream to followers and people nearby. No credits, no escrow.
                   </span>
                 </span>
               </button>
@@ -1037,7 +1037,7 @@ function PostScreen() {
                     Location type <span className="text-signal">· required</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Hunters and viewers see this next to the address. Private homes are only
+                    Onlookers and viewers see this next to the address. Private homes are only
                     allowed with the owner&apos;s or agent&apos;s permission.
                   </p>
                   <div className="flex flex-wrap gap-2">

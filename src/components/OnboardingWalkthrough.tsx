@@ -28,7 +28,7 @@ const SLIDES = [
   {
     step: "Verified result",
     title: "Proof first, then credits are released",
-    body: "The requester reviews the live proof before the bounty is completed. Once it is verified, the onlooker earns and everyone can see how the result was reached.",
+    body: "The poster reviews the live proof before the bounty is completed. Once it is verified, the onlooker earns and everyone can see how the result was reached.",
     art: captureArt,
     icon: BadgeCheck,
     alt: "Illustration of a verified real-world capture",

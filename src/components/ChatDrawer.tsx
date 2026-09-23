@@ -101,7 +101,7 @@ export function ChatDrawer({
     setWorking(true);
     try {
       const paid = await approveAndPay(review.videoId, requestKey);
-      toast.success(`Approved, $${paid.toFixed(2)} released to the hunter.`);
+      toast.success(`Approved, $${paid.toFixed(2)} released to the onlooker.`);
       setConfirming(false);
       refresh();
     } catch (err) {
@@ -117,7 +117,7 @@ export function ChatDrawer({
     try {
       await requestRevision(
         requestKey,
-        "The requester asked for a revision. Please send another take of this bounty.",
+        "The poster asked for a revision. Please send another take of this bounty.",
       );
       toast.success("Revision requested in the chat.");
     } catch (err) {
@@ -222,7 +222,7 @@ export function ChatDrawer({
                 </AlertDialogTitle>
                 <AlertDialogDescription className="text-muted-foreground">
                   Are you sure you want to approve this video? This will instantly release{" "}
-                  {formatCreditWords(reward)} to the Bounty Hunter.
+                  {formatCreditWords(reward)} to the Onlooker.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

@@ -5,7 +5,7 @@ import { sendMessage } from "@/lib/chat";
 
 /** Exact wording posted into the thread once a bounty is approved and paid. */
 export const APPROVED_MESSAGE =
-  "✅ Bounty approved! The payment has been released to the Hunter. This chat is now closed.";
+  "✅ Bounty approved! The payment has been released to the Onlooker. This chat is now closed.";
 export const REVISION_PREFIX = "🔁 Revision requested:";
 
 /** System notices are ordinary messages that carry one of these markers. */

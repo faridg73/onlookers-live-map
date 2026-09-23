@@ -176,7 +176,7 @@ export function CreditPayoutDashboard() {
             type="button"
             onClick={() => void cashOutCredits()}
             disabled={busy}
-            className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-live font-display text-base font-extrabold uppercase tracking-[0.1em] text-black disabled:opacity-60"
+            className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-signal font-display text-base font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-60"
           >
             {busy ? <Loader2 className="size-5 animate-spin" /> : <Landmark className="size-5" />}
             Cash out via Stripe Connect
@@ -219,7 +219,7 @@ export function CreditPayoutDashboard() {
                 type="button"
                 onClick={() => void connectBank()}
                 disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-live px-4 py-3 text-sm font-bold text-black disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-sm font-bold text-signal-foreground disabled:opacity-60"
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <Landmark className="size-4" />}
                 {bank?.connected ? "Finish Stripe Connect setup" : "Onboard with Stripe Connect"}
