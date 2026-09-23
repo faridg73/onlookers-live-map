@@ -97,7 +97,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Transit",
     tagline: "Boards, platforms and security lines",
     emoji: "\u{1F686}",
-    art: "from-emerald-500/30 to-cyan-500/20",
+    art: "from-signal/30 to-cyan-500/20",
     venues: [
       {
         slug: "lax-terminal-b",
@@ -183,7 +183,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Landmarks",
     tagline: "Views, crowds and photo spots",
     emoji: "\u{1F5FD}",
-    art: "from-lime-400/30 to-emerald-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "griffith-observatory",
@@ -431,7 +431,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Events",
     tagline: "Markets, street fairs and tailgates by the day",
     emoji: "\u{1F389}",
-    art: "from-orange-500/30 to-lime-400/20",
+    art: "from-orange-500/30 to-signal/20",
     venues: [
       {
         slug: "hollywood-farmers-market",

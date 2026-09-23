@@ -274,19 +274,19 @@
   --signal-foreground: oklch(0.14 0.03 124);
   --cyan: oklch(0.75 0.18 195); /* electric cyan for high-visibility CTAs */
   --cyan-glow: oklch(0.75 0.18 195 / 0.35);
-  --live: oklch(0.79 0.16 165);
+  --live: var(--signal); /* unified to the single brand green */
   --crisis: oklch(0.64 0.24 27);
   --warning-note: oklch(0.85 0.1 230); /* light blue #7DD3FC */
 
   --traffic-slow: oklch(0.86 0.18 93);
   --traffic-heavy: oklch(0.72 0.19 55);
   --gathering-low: oklch(0.82 0.16 180);
-  --gathering-high: oklch(0.88 0.2 125);
+  --gathering-high: var(--signal);
   --card: oklch(0.19125 0 0);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.19125 0 0);
   --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.93071 0.22858 123.09);
+  --primary: var(--signal);
   --primary-foreground: oklch(0.14 0.03 124);
   --secondary: oklch(0.19125 0 0);
   --secondary-foreground: oklch(1 0 0);
@@ -298,7 +298,7 @@
   --destructive-foreground: oklch(0.98 0.005 250);
   --border: oklch(0.2603 0 0); /* #2A2A2A single neutral card border */
   --input: oklch(0.26862 0 0);
-  --ring: oklch(0.93071 0.22858 123.09);
+  --ring: var(--signal);
 
   /* Home marketplace: a quieter, finance-grade glass layer over the live map. */
   --home-accent: var(--signal);
@@ -323,7 +323,7 @@
   /* Category hues used by the colour-coded request badges */
   --cat-food: oklch(0.78 0.17 55);
   --cat-vehicles: oklch(0.75 0.16 250);
-  --cat-outdoors: oklch(0.78 0.17 150);
+  --cat-outdoors: var(--signal);
   --cat-nightlife: oklch(0.75 0.19 330);
   --cat-transit: oklch(0.78 0.15 200);
   --cat-events: oklch(0.76 0.18 20);

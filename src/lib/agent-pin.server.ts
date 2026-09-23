@@ -45,16 +45,16 @@ function emailBody(opts: PinOpts & { name: string }) {
   const greeting = opts.name ? `Hi ${opts.name},` : "Hello,";
   return `<!doctype html><html><body style="margin:0;background:#0f0f0f;padding:32px;font-family:Arial,Helvetica,sans-serif;color:#e5e5e5;">
   <div style="max-width:520px;margin:0 auto;background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:28px;">
-    <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#ccff00;font-weight:bold;">ONLOOKER · ON-SITE VERIFICATION</p>
+    <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#CCFF00;font-weight:bold;">ONLOOKER · ON-SITE VERIFICATION</p>
     <h1 style="margin:0 0 16px;font-size:22px;color:#ffffff;">Your 6-digit PIN</h1>
     <p style="margin:0 0 16px;font-size:14px;line-height:1.6;">${greeting} a paid Onlooker bounty was posted for
     <strong style="color:#ffffff;">${opts.locationName}</strong>. Hand this PIN only to the onlooker filming
     your property — they type it in on site to unlock footage submission and payout.</p>
-    <p style="margin:0 0 20px;"><span style="display:inline-block;background:#000;border:1px solid #ccff00;color:#ccff00;font-size:30px;font-weight:bold;letter-spacing:10px;padding:14px 22px;border-radius:12px;">${opts.pin}</span></p>
+    <p style="margin:0 0 20px;"><span style="display:inline-block;background:#000;border:1px solid #CCFF00;color:#CCFF00;font-size:30px;font-weight:bold;letter-spacing:10px;padding:14px 22px;border-radius:12px;">${opts.pin}</span></p>
     <p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#a3a3a3;">This PIN can be used once and stops working when the request closes.</p>
     <p style="margin:0 0 8px;font-size:13px;color:#a3a3a3;">Bounty link:</p>
-    <p style="margin:0 0 16px;"><a href="${SITE_URL}/?b=${opts.requestId}" style="color:#ccff00;font-size:13px;word-break:break-all;">${SITE_URL}/?b=${opts.requestId}</a></p>
-    ${declineUrl(opts.declineToken) ? `<p style="margin:0;font-size:13px;line-height:1.6;color:#a3a3a3;">Did you not authorize this? <a href="${declineUrl(opts.declineToken)}" style="color:#ccff00;">Cancel this request</a> — no account needed.</p>` : ""}
+    <p style="margin:0 0 16px;"><a href="${SITE_URL}/?b=${opts.requestId}" style="color:#CCFF00;font-size:13px;word-break:break-all;">${SITE_URL}/?b=${opts.requestId}</a></p>
+    ${declineUrl(opts.declineToken) ? `<p style="margin:0;font-size:13px;line-height:1.6;color:#a3a3a3;">Did you not authorize this? <a href="${declineUrl(opts.declineToken)}" style="color:#CCFF00;">Cancel this request</a> — no account needed.</p>` : ""}
   </div>
 </body></html>`;
 }
