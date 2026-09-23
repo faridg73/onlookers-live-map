@@ -29,7 +29,7 @@ export function TermsBody() {
         <p>
           Onlooker LLC operates exclusively as a peer-to-peer software platform and technological
           intermediary that connects individuals posting media requests (&ldquo;Posters&rdquo;) with
-          individuals fulfilling requests ((&ldquo;Fulfillers&rdquo;)ldquo;Onlookers(&ldquo;Fulfillers&rdquo;)rdquo;). Onlooker LLC is not a publisher,
+          individuals fulfilling requests (&ldquo;Onlookers&rdquo;). Onlooker LLC is not a publisher,
           employer, agent, or security supervisor of its users, exercises no control over physical
           field activities, and disclaims all liability arising from real-world interactions.
         </p>
