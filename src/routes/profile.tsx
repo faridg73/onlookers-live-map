@@ -29,6 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { RequestCard } from "@/components/RequestCard";
+import { PosterBountyDashboard } from "@/components/PosterBountyDashboard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -257,6 +258,8 @@ function ProfileScreen() {
       <WeeklyTopOnlookers />
 
       <Leaderboard limit={5} moreLink />
+
+      <PosterBountyDashboard />
 
       <h2 className="mt-8 font-display text-lg text-foreground">Your requests</h2>
       <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">

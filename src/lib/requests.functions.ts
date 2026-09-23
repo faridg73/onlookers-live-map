@@ -402,3 +402,128 @@ export const updateRequestLocationType = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export type PostedBountyStage =
+  | "open"
+  | "claimed"
+  | "submitted"
+  | "disputed"
+  | "completed"
+  | "expired";
+
+export type PostedBountyRow = {
+  id: string;
+  prompt: string;
+  details: string;
+  locationName: string;
+  locationType: string | null;
+  category: string | null;
+  bounty: number;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
+  /** Derived state the dashboard groups by. */
+  stage: PostedBountyStage;
+  /** Escrow snapshot for this bounty, when one exists. */
+  escrowStatus: string | null;
+  escrowAmount: number;
+  disputedAt: string | null;
+  /** Claim snapshot from the onlooker working it. */
+  claimStatus: string | null;
+  claimedAt: string | null;
+  /** Footage submitted against this bounty. */
+  submissionCount: number;
+  acceptedAt: string | null;
+  payoutAmount: number;
+};
+
+/**
+ * Everything the signed-in poster has posted, in every state, with the escrow,
+ * claim and footage facts attached — so they can track their own bounties and
+ * payouts without any admin access.
+ */
+export const listMyPostedBounties = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PostedBountyRow[]> => {
+    const { data: requests, error } = await context.supabase
+      .from("requests")
+      .select(
+        "id, prompt, details, location_name, location_type, category, bounty_amount, status, created_at, expires_at",
+      )
+      .eq("requester_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) throw new Error(error.message);
+
+    const rows = requests ?? [];
+    if (rows.length === 0) return [];
+    const ids = rows.map((r) => r.id);
+
+    const [escrows, claims, videos] = await Promise.all([
+      context.supabase
+        .from("escrows")
+        .select("request_id, status, amount, disputed_at")
+        .in("request_id", ids),
+      context.supabase
+        .from("claims")
+        .select("request_id, status, claimed_at")
+        .in("request_id", ids),
+      context.supabase
+        .from("bounty_videos")
+        .select("request_id, accepted_at, payout_amount")
+        .in("request_id", ids),
+    ]);
+
+    const escrowBy = new Map(
+      (escrows.data ?? []).map((e) => [e.request_id as string, e]),
+    );
+    const claimBy = new Map((claims.data ?? []).map((c) => [c.request_id as string, c]));
+    const videosBy = new Map<string, { count: number; acceptedAt: string | null; payout: number }>();
+    for (const v of videos.data ?? []) {
+      const key = v.request_id as string;
+      const current = videosBy.get(key) ?? { count: 0, acceptedAt: null, payout: 0 };
+      current.count += 1;
+      if (v.accepted_at) {
+        current.acceptedAt = current.acceptedAt ?? (v.accepted_at as string);
+        current.payout += Number(v.payout_amount ?? 0);
+      }
+      videosBy.set(key, current);
+    }
+
+    const now = Date.now();
+    return rows.map((row) => {
+      const escrow = escrowBy.get(row.id);
+      const claim = claimBy.get(row.id);
+      const media = videosBy.get(row.id);
+      const expired = new Date(row.expires_at).getTime() <= now;
+
+      let stage: PostedBountyStage = "open";
+      if (row.status === "completed") stage = "completed";
+      else if (escrow?.disputed_at || escrow?.status === "disputed") stage = "disputed";
+      else if ((media?.count ?? 0) > 0 || claim?.status === "submitted") stage = "submitted";
+      else if (row.status === "claimed" || claim) stage = "claimed";
+      else if (row.status === "expired" || expired) stage = "expired";
+
+      return {
+        id: row.id,
+        prompt: row.prompt,
+        details: row.details ?? "",
+        locationName: row.location_name,
+        locationType: row.location_type ?? null,
+        category: row.category ?? null,
+        bounty: Number(row.bounty_amount),
+        status: row.status,
+        createdAt: row.created_at,
+        expiresAt: row.expires_at,
+        stage,
+        escrowStatus: escrow?.status ?? null,
+        escrowAmount: Number(escrow?.amount ?? 0),
+        disputedAt: (escrow?.disputed_at as string | null) ?? null,
+        claimStatus: claim?.status ?? null,
+        claimedAt: (claim?.claimed_at as string | null) ?? null,
+        submissionCount: media?.count ?? 0,
+        acceptedAt: media?.acceptedAt ?? null,
+        payoutAmount: media?.payout ?? 0,
+      };
+    });
+  });
