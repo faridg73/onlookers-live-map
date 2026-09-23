@@ -48,6 +48,13 @@ function minutesLeft(expiresAt?: number, expiresInMin?: number) {
   return expiresInMin ?? 0;
 }
 
+/**
+ * Suggested hunting distances. `null` means no distance filter at all — hunters
+ * in low-density areas can always see every open bounty. Shortcuts only: the
+ * custom field below takes any number, there is no platform maximum.
+ */
+const RADIUS_PRESETS_MI = [5, 25, 50, 100, 250, 500] as const;
+
 function HuntScreen() {
   const { requests, claim } = useOnlooker();
   const { boostOf } = useBoosts();
