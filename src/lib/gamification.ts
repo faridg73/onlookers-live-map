@@ -12,10 +12,10 @@ export type HunterTier = {
 };
 
 export const HUNTER_TIERS: HunterTier[] = [
-  { name: "Bronze", minLevel: 1, badge: "bg-[#B0763A] text-white", dot: "#B0763A" },
-  { name: "Silver", minLevel: 3, badge: "bg-[#B8BCC4] text-black", dot: "#B8BCC4" },
-  { name: "Gold", minLevel: 6, badge: "bg-[#E8B531] text-black", dot: "#E8B531" },
-  { name: "Elite", minLevel: 10, badge: "bg-signal text-signal-foreground", dot: "#CCFF00" },
+  { name: "Bronze", minLevel: 1, badge: "bg-tier-bronze text-foreground", dot: "var(--tier-bronze)" },
+  { name: "Silver", minLevel: 3, badge: "bg-tier-silver text-background", dot: "var(--tier-silver)" },
+  { name: "Gold", minLevel: 6, badge: "bg-tier-gold text-background", dot: "var(--tier-gold)" },
+  { name: "Elite", minLevel: 10, badge: "bg-signal text-signal-foreground", dot: "var(--signal)" },
 ];
 
 export const XP_PER_BOUNTY = 10;

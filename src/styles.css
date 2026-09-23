@@ -83,6 +83,9 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
   --color-cyan: var(--cyan);
+  --color-tier-bronze: var(--tier-bronze);
+  --color-tier-silver: var(--tier-silver);
+  --color-tier-gold: var(--tier-gold);
   --color-cyan-glow: var(--cyan-glow);
   --color-pin-standard: var(--pin-standard);
   --color-pin-medium: var(--pin-medium);
@@ -335,6 +338,11 @@
   --cat-street: var(--signal);
   --cat-community: var(--signal);
   --cat-markets: var(--signal);
+
+  /* Tier badge palette — the ONLY secondary colors. Use only on XP/level tier badges. */
+  --tier-bronze: #B0763A;
+  --tier-silver: #B8BCC4;
+  --tier-gold: #E8B531;
   --urgent: oklch(0.7 0.2 30);
   --discover-friends: linear-gradient(145deg, oklch(0.78 0.19 130), oklch(0.2 0.06 150) 52%, oklch(0.08 0 0));
   --discover-meetups: linear-gradient(145deg, oklch(0.75 0.17 165), oklch(0.22 0.08 210) 50%, oklch(0.08 0 0));

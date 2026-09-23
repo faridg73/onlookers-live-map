@@ -39,7 +39,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Events",
     tagline: "Stadium nights, fight cards, concerts and big gatherings",
     emoji: "\u{1F3DF}\u{FE0F}",
-    art: "from-signal/40 to-orange-500/20",
+    art: "from-signal/40 to-signal/20",
     category: "events",
     includedTypes: ["stadium", "sports_complex", "concert_hall", "performing_arts_theater"],
     subs: [
@@ -56,7 +56,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Malls",
     tagline: "Food courts, queues and stock checks",
     emoji: "\u{1F6CD}\u{FE0F}",
-    art: "from-fuchsia-500/30 to-sky-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "food",
     includedTypes: ["shopping_mall", "department_store"],
     subs: [
@@ -73,7 +73,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Food",
     tagline: "Wait times, patios and what the line looks like",
     emoji: "\u{1F374}",
-    art: "from-amber-500/30 to-rose-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "food",
     includedTypes: ["restaurant", "cafe", "bakery"],
     subs: [
@@ -90,7 +90,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Nightlife",
     tagline: "Door lines, crowd size and the vibe right now",
     emoji: "\u{1F303}",
-    art: "from-violet-500/30 to-indigo-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "nightlife",
     includedTypes: ["night_club", "bar"],
     subs: [
@@ -107,7 +107,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Transit",
     tagline: "Security lines, platforms and pickup lanes",
     emoji: "\u{2708}\u{FE0F}",
-    art: "from-sky-500/30 to-signal/20",
+    art: "from-signal/30 to-signal/20",
     category: "transit",
     includedTypes: ["airport", "train_station", "subway_station", "bus_station"],
     subs: [
@@ -124,7 +124,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Landmarks",
     tagline: "Views, entry queues and photo spots",
     emoji: "\u{1F5FC}",
-    art: "from-cyan-500/30 to-blue-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "events",
     includedTypes: ["tourist_attraction", "museum", "art_gallery"],
     subs: [
@@ -141,7 +141,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Outdoors",
     tagline: "Surf, trails, sunsets and how packed it is",
     emoji: "\u{1F30A}",
-    art: "from-signal/30 to-teal-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "outdoors",
     includedTypes: ["park", "beach", "hiking_area"],
     subs: [
@@ -158,7 +158,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Performances",
     tagline: "Buskers, local musicians, park shows and pop-up art",
     emoji: "\u{1F3B8}",
-    art: "from-orange-500/30 to-rose-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "street",
     includedTypes: ["tourist_attraction", "park", "performing_arts_theater"],
     subs: [
@@ -175,7 +175,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Markets",
     tagline: "Farmers markets, food trucks and block parties",
     emoji: "\u{1F3EA}",
-    art: "from-signal/30 to-amber-500/20",
+    art: "from-signal/30 to-signal/20",
     category: "markets",
     includedTypes: ["market", "meal_takeaway"],
     subs: [
