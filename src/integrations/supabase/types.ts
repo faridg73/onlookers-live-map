@@ -534,6 +534,56 @@ export type Database = {
           },
         ]
       }
+      dispute_resolutions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          note: string
+          outcome: string
+          request_id: string
+          requester_id: string
+          resolver_id: string
+          spotter_id: string | null
+          spotter_pct: number
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          note: string
+          outcome: string
+          request_id: string
+          requester_id: string
+          resolver_id: string
+          spotter_id?: string | null
+          spotter_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          note?: string
+          outcome?: string
+          request_id?: string
+          requester_id?: string
+          resolver_id?: string
+          spotter_id?: string | null
+          spotter_pct?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_resolutions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dmca_notices: {
         Row: {
           content_url: string
@@ -2203,6 +2253,20 @@ export type Database = {
             Args: { _reason: string; _reason_code: string; _request_id: string }
             Returns: boolean
           }
+      dispute_history_for: {
+        Args: { _requester_id: string; _spotter_id: string }
+        Returns: {
+          amount: number
+          created_at: string
+          id: string
+          note: string
+          outcome: string
+          prompt: string
+          request_id: string
+          side: string
+          spotter_pct: number
+        }[]
+      }
       end_stream_session: { Args: { _session_id: string }; Returns: boolean }
       ensure_coin_wallet: { Args: { _user_id?: string }; Returns: string }
       ensure_credit_wallet: { Args: { _user_id: string }; Returns: string }
@@ -2520,14 +2584,28 @@ export type Database = {
       }
       request_is_live: { Args: { _request_id: string }; Returns: boolean }
       request_site_pin_state: { Args: { _request_id: string }; Returns: Json }
-      resolve_dispute: {
-        Args: { _award_spotter: boolean; _request_id: string }
-        Returns: boolean
-      }
-      resolve_dispute_split: {
-        Args: { _request_id: string; _spotter_pct: number }
-        Returns: boolean
-      }
+      resolve_dispute:
+        | {
+            Args: { _award_spotter: boolean; _request_id: string }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              _award_spotter: boolean
+              _note?: string
+              _request_id: string
+            }
+            Returns: boolean
+          }
+      resolve_dispute_split:
+        | {
+            Args: { _request_id: string; _spotter_pct: number }
+            Returns: boolean
+          }
+        | {
+            Args: { _note?: string; _request_id: string; _spotter_pct: number }
+            Returns: boolean
+          }
       resolve_payout: {
         Args: { _approve: boolean; _note: string; _payout_id: string }
         Returns: boolean
