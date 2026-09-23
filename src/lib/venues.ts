@@ -43,7 +43,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Malls",
     tagline: "Food courts, queues and stock checks",
     emoji: "\u{1F6CD}\u{FE0F}",
-    art: "from-fuchsia-500/30 to-sky-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "the-grove",
@@ -97,7 +97,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Transit",
     tagline: "Boards, platforms and security lines",
     emoji: "\u{1F686}",
-    art: "from-signal/30 to-cyan-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "lax-terminal-b",
@@ -140,7 +140,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Shows",
     tagline: "Venues, gigs, games and nightlife",
     emoji: "\u{1F3AB}",
-    art: "from-amber-500/30 to-rose-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "crypto-arena",
@@ -226,7 +226,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Areas",
     tagline: "Streets, listings and local conditions",
     emoji: "\u{1F3D8}\u{FE0F}",
-    art: "from-indigo-500/30 to-violet-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "silver-lake",
@@ -269,7 +269,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Traffic",
     tagline: "Bottlenecks, bridge tolls and platform waits",
     emoji: "\u{1F6A6}",
-    art: "from-red-500/30 to-amber-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "the-101-downtown-slot",
@@ -323,7 +323,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Nightlife",
     tagline: "Strips, restaurant rows and outdoor stages",
     emoji: "\u{1F303}",
-    art: "from-purple-500/30 to-pink-500/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "downtown-broadway",
@@ -377,7 +377,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Lookouts",
     tagline: "Surf, mountain passes and trailheads",
     emoji: "\u{1F30A}",
-    art: "from-sky-500/30 to-teal-400/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "malibu-surfrider",
@@ -431,7 +431,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
     short: "Events",
     tagline: "Markets, street fairs and tailgates by the day",
     emoji: "\u{1F389}",
-    art: "from-orange-500/30 to-signal/20",
+    art: "from-signal/30 to-signal/20",
     venues: [
       {
         slug: "hollywood-farmers-market",
