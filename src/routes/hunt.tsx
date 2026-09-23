@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, useCanGoBack, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
+import { Bell, Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
@@ -118,6 +118,21 @@ function HuntScreen() {
 
   const potential = list.reduce((sum, row) => sum + row.payout, 0);
   const nearby = list.length;
+
+  /**
+   * How many open bounties sit within widening rings around the hunter, so an
+   * empty or thin list still shows a clear path forward instead of a dead end.
+   */
+  const rings = useMemo(() => {
+    if (!position) return null;
+    const withMiles = open
+      .map((r) => distanceMiles(position, requestMapPosition(r)))
+      .filter((m) => Number.isFinite(m));
+    return [5, 25, 100, 500].map((miles) => ({
+      miles,
+      count: withMiles.filter((m) => m <= miles).length,
+    }));
+  }, [open, position]);
 
   /** Open bounties that have real coordinates, shown on the compact live map. */
   const pins = useMemo<LiveBountyPin[]>(
@@ -337,9 +352,41 @@ function HuntScreen() {
           ))}
           {list.length === 0 && (
             <div className="space-y-4 md:col-span-2 xl:col-span-3">
-              <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No open bounties right now. Keep an eye on the live map.
-              </p>
+              <div className="rounded-2xl border border-dashed border-border p-6 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {radiusMiles === null
+                    ? "No open bounties anywhere right now."
+                    : `Nothing to claim within ${radiusText.toLowerCase()} right now.`}
+                </p>
+                {rings && (
+                  <p className="mt-2 text-sm font-semibold text-foreground">
+                    {rings.map((ring, i) => (
+                      <span key={ring.miles}>
+                        {i > 0 && <span className="text-muted-foreground"> · </span>}
+                        <span className="tabular-nums">
+                          {ring.count} within {Math.round(toDisplay(ring.miles))} {unit}
+                        </span>
+                      </span>
+                    ))}
+                  </p>
+                )}
+                {rings && rings.some((ring) => ring.count > 0) && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Widen your travel distance above to see them.
+                  </p>
+                )}
+                <Link
+                  to="/profile"
+                  className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-full border border-signal bg-surface px-4 text-xs font-bold uppercase tracking-[0.12em] text-signal transition-colors hover:bg-signal/10"
+                >
+                  <Bell className="size-4" aria-hidden />
+                  Notify me when bounties post nearby
+                </Link>
+                <p className="mt-2 text-[0.7rem] text-muted-foreground">
+                  Bounty alerts live in your Profile — set your area and we'll ping you the moment
+                  something new posts.
+                </p>
+              </div>
               <LiveBountyMapBox pins={pins} center={position} />
             </div>
           )}
