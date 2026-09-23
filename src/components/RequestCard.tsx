@@ -57,6 +57,18 @@ export function RequestCard({
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
+  // Trip value only makes sense while the bounty is still up for grabs.
+  const showTripValue =
+    typeof distanceMiles === "number" && Number.isFinite(distanceMiles) && !done && !expired;
+  const tripRow = showTripValue ? (
+    <TripValueRow
+      miles={distanceMiles as number}
+      distanceLabel={distanceLabel ?? `${(distanceMiles as number).toFixed(1)} mi`}
+      credits={pool}
+      onSiteMinutes={request.captureMinutes}
+      compact={compact}
+    />
+  ) : null;
 
   // The poster alone can re-tag the filming spot — e.g. a venue granted
   // permission after posting, so "Public Space" becomes "Owner-Authorized".
