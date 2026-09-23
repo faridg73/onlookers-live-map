@@ -16,7 +16,7 @@
 
 ## In progress
 - [x] Percentage-based visibility boost pricing in Step 3 (Fast Catch = 50% of reward, min 10 Cr; Priority Hunt = 100%, min 20 Cr; total escrow = reward + boost) — math unit-verified, type-check clean
-- [ ] Verify boost pricing + dynamic Privacy & access copy in the preview UI (Playwright blocked by step-1/2 validation in the headless flow; needs a signed-in or manual pass)
+- [x] Verify boost pricing + dynamic Privacy & access copy (signed-in wizard pass confirmed by user)
 - [x] Poster bounty dashboard inside Profile (tabs: Open / In progress / Settled, escrow + payout totals, cancel + footage review)
 - [x] Verify boost pricing + dynamic Privacy & access copy (signed-in wizard pass confirmed)
 - [x] Visible auto-close/settle countdowns on poster bounty dashboard cards
