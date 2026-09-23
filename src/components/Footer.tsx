@@ -125,24 +125,24 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
     <footer className="mt-8 border-t border-border bg-surface px-4 py-6">
       <div className="mx-auto w-full max-w-7xl">
         {showLinks && (
-          <nav className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+          <nav className="mx-auto mb-8 flex w-full max-w-md flex-col divide-y divide-border/60 border-y border-border/60">
             {LINKS.map(({ to, label, icon: Icon }) => (
               <Link
                 key={to}
                 to={to}
-                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+                className="flex items-center gap-3 px-3 py-3.5 text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
               >
-                <Icon className="size-4 text-signal" />
-                {label}
+                <Icon className="size-4 shrink-0 text-signal" />
+                <span className="flex-1">{label}</span>
               </Link>
             ))}
             <button
               type="button"
               onClick={() => setDmcaOpen(true)}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
+              className="flex items-center gap-3 px-3 py-3.5 text-left text-sm text-muted-foreground transition-colors hover:bg-surface-raised hover:text-foreground"
             >
-              <ShieldAlert className="size-4 text-signal" />
-              DMCA / Report Infringement
+              <ShieldAlert className="size-4 shrink-0 text-signal" />
+              <span className="flex-1">DMCA / Report Infringement</span>
             </button>
           </nav>
         )}
