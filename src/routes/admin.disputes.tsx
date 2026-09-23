@@ -182,12 +182,14 @@ function ModeratorAdmin() {
   );
 }
 
-function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () => void }) {
+function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolved: () => void }) {
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<DisputeEvidence[]>([]);
   const [clips, setClips] = useState<BountyVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [ruling, setRuling] = useState(false);
+  const [killFee, setKillFee] = useState(25);
+  const spot = locationTypeById(item.location_type);
 
   const load = useCallback(async () => {
     const [ev, vids] = await Promise.all([
