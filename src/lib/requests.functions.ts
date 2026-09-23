@@ -196,9 +196,10 @@ export const createBountyRequest = createServerFn({ method: "POST" })
       const declineToken = crypto.randomUUID().replace(/-/g, "");
       // The PIN dies two hours after the bounty's own deadline, so a stale code
       // can never be used on a later visit.
+      const rowExpiresAt = (row as { expires_at?: string | null }).expires_at ?? "";
+      const deadlineMs = Date.parse(rowExpiresAt);
       const pinExpiresAt = new Date(
-        Date.parse(String((row as { expires_at?: string }).expires_at ?? "") || Date.now()) +
-          2 * 60 * 60 * 1000,
+        (Number.isFinite(deadlineMs) ? deadlineMs : Date.now()) + 2 * 60 * 60 * 1000,
       ).toISOString();
 
       await supabaseAdmin.from("request_site_pins").insert({
