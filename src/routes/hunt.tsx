@@ -103,16 +103,21 @@ function HuntScreen() {
       left: minutesLeft(r.expiresAt, r.expiresInMin),
       miles: position ? distanceMiles(position, requestMapPosition(r)) : null,
     }));
-    return withMeta.sort((a, b) => {
+    // The chosen distance is the only filter, and it is always optional.
+    const inRange =
+      radiusMiles === null
+        ? withMeta
+        : withMeta.filter((row) => row.miles === null || row.miles <= radiusMiles);
+    return inRange.sort((a, b) => {
       if (sort === "payout") return b.payout - a.payout;
       if (sort === "urgency") return a.left - b.left;
       if (a.miles === null || b.miles === null) return b.payout - a.payout;
       return a.miles - b.miles;
     });
-  }, [open, position, sort, boostOf]);
+  }, [open, position, sort, boostOf, radiusMiles]);
 
   const potential = list.reduce((sum, row) => sum + row.payout, 0);
-  const nearby = list.filter((row) => row.miles !== null && row.miles <= radius).length;
+  const nearby = list.length;
 
   /** Open bounties that have real coordinates, shown on the compact live map. */
   const pins = useMemo<LiveBountyPin[]>(
