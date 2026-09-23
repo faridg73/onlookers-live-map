@@ -807,7 +807,7 @@ function PostScreen() {
   }
 
   const pill = (on: boolean) =>
-    `h-11 rounded-full text-xs font-extrabold ${on ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "bg-surface-raised"}`;
+    `h-auto min-h-11 rounded-full border px-3 py-2 text-center text-xs font-extrabold leading-tight ${on ? "border-signal bg-signal text-signal-foreground hover:bg-signal hover:text-signal-foreground" : "border-border bg-surface-raised text-foreground hover:bg-surface-raised/80"}`;
 
   return (
     <main className="fixed inset-0 z-50 bg-background/90 backdrop-blur-sm">
