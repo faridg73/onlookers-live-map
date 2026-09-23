@@ -88,7 +88,7 @@ export const Route = createFileRoute("/api/public/webhooks/signalhouse")({
           recipient,
           error_code: errorCode,
           error_message: errorMessage,
-          payload: body,
+          payload: JSON.parse(JSON.stringify(body)) as never,
         });
         if (error) {
           console.error("[signalhouse webhook] insert failed", error);

@@ -43,6 +43,7 @@ import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group
 import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicSitePinDeclineRouteImport } from './routes/api/public/site-pin/decline'
+import { Route as ApiPublicWebhooksSignalhouseRouteImport } from './routes/api/public/webhooks/signalhouse'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -218,6 +219,12 @@ const ApiPublicSitePinDeclineRoute = ApiPublicSitePinDeclineRouteImport.update({
   path: '/api/public/site-pin/decline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWebhooksSignalhouseRoute =
+  ApiPublicWebhooksSignalhouseRouteImport.update({
+    id: '/api/public/webhooks/signalhouse',
+    path: '/api/public/webhooks/signalhouse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -270,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
+  '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -309,6 +317,7 @@ export interface FileRoutesByTo {
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
+  '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -349,6 +358,7 @@ export interface FileRoutesById {
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
+  '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -390,6 +400,7 @@ export interface FileRouteTypes {
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/api/public/site-pin/decline'
+    | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/api/public/site-pin/decline'
+    | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -468,6 +480,7 @@ export interface FileRouteTypes {
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
     | '/api/public/site-pin/decline'
+    | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -508,6 +521,7 @@ export interface RootRouteChildren {
   ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicSitePinDeclineRoute: typeof ApiPublicSitePinDeclineRoute
+  ApiPublicWebhooksSignalhouseRoute: typeof ApiPublicWebhooksSignalhouseRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -753,6 +767,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSitePinDeclineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/signalhouse': {
+      id: '/api/public/webhooks/signalhouse'
+      path: '/api/public/webhooks/signalhouse'
+      fullPath: '/api/public/webhooks/signalhouse'
+      preLoaderRoute: typeof ApiPublicWebhooksSignalhouseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -812,6 +833,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicSitePinDeclineRoute: ApiPublicSitePinDeclineRoute,
+  ApiPublicWebhooksSignalhouseRoute: ApiPublicWebhooksSignalhouseRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
