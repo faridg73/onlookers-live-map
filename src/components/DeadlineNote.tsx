@@ -53,7 +53,7 @@ export function DeadlineNote({
     <p
       className={cn(
         "flex items-center gap-1.5 text-xs tabular-nums",
-        urgent ? "text-urgent" : "text-muted-foreground",
+        urgent ? "font-semibold text-foreground" : "text-muted-foreground",
         className,
       )}
     >
