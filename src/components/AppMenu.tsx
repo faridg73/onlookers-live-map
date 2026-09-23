@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { AccountDeletion } from "@/components/ProfileEditor";
+import { useAuth } from "@/hooks/useAuth";
 import {
   ChevronRight,
   CircleDollarSign,
@@ -43,6 +46,9 @@ export function AppMenu() {
   const { unread } = useChatAlerts();
   const [open, setOpen] = useState(false);
   const [inboxOpen, setInboxOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   // Points at the "You're here" link so the drawer can scroll to it on open.
   const activeLinkRef = useRef<HTMLAnchorElement | null>(null);
   // Current path so the drawer highlights the page you're on when reopened.
@@ -183,6 +189,17 @@ export function AppMenu() {
               );
             })}
           </nav>
+          {user && (
+            <div className="border-t border-border px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
+              <AccountDeletion
+                onDeleted={() => {
+                  setOpen(false);
+                  queryClient.clear();
+                  void navigate({ to: "/auth", replace: true });
+                }}
+              />
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 

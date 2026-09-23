@@ -77,8 +77,8 @@ export function ProfileEditor({ profile, fallbackName, onSaved }: ProfileEditorP
         ) : (
           <div className="grid size-16 place-items-center rounded-2xl bg-signal font-display text-2xl text-signal-foreground">{initials}</div>
         )}
-        <button type="button" onClick={() => setEditing(true)} aria-label="Edit profile photo" className="absolute -bottom-2 -right-2 grid size-11 place-items-center rounded-full border border-border bg-secondary text-foreground shadow-lg">
-          <Camera className="size-5" />
+        <button type="button" onClick={() => setEditing(true)} aria-label="Edit profile photo" className="absolute -bottom-3 -right-3 grid size-8 place-items-center rounded-full border-2 border-background bg-secondary text-foreground shadow-lg after:absolute after:-inset-1.5 after:content-['']">
+          <Camera className="size-4" />
         </button>
       </div>
 
@@ -129,10 +129,8 @@ export function AccountDeletion({ onDeleted }: { onDeleted: () => void }) {
   }
 
   return (
-    <section className="mt-8 border-t border-destructive/30 pt-6">
-      <h2 className="font-display text-lg text-foreground">Delete account</h2>
-      <p className="mt-1 text-sm text-muted-foreground">Permanently remove your profile, activity, uploads, wallet history, and account access.</p>
-      <Button type="button" variant="destructive" onClick={() => setOpen(true)} className="mt-3 w-full sm:w-auto"><Trash2 />Delete Account</Button>
+    <section>
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-9 items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-destructive"><Trash2 className="size-3.5" />Delete account</button>
       <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setConfirmation(""); }}>
         <DialogContent className="max-w-md border-destructive/50">
           <DialogHeader><DialogTitle className="text-destructive">Permanently delete account?</DialogTitle><DialogDescription>This cannot be undone. Your profile, posts, bounties, uploads, wallet history, and account access will be permanently removed.</DialogDescription></DialogHeader>
