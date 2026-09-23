@@ -61,7 +61,14 @@ function HuntScreen() {
   const [position, setPosition] = useState<MapPosition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("distance");
-  const { formatDistance, radius, unit } = useDistanceUnit(position);
+  /** null = no distance filter (every open bounty, anywhere). */
+  const [radiusMiles, setRadiusMiles] = useState<number | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
+  const { formatDistance, unit } = useDistanceUnit(position);
+  const toDisplay = (miles: number) => (unit === "mi" ? miles : miles * 1.609344);
+  const fromDisplay = (value: number) => (unit === "mi" ? value : value / 1.609344);
+  const radiusText =
+    radiusMiles === null ? "Anywhere" : `${Math.round(toDisplay(radiusMiles))} ${unit}`;
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
