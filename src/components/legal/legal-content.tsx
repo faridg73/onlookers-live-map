@@ -29,7 +29,7 @@ export function TermsBody() {
         <p>
           Onlooker LLC operates exclusively as a peer-to-peer software platform and technological
           intermediary that connects individuals posting media requests (&ldquo;Posters&rdquo;) with
-          individuals fulfilling requests (&ldquo;Fulfillers&rdquo;). Onlooker LLC is not a publisher,
+          individuals fulfilling requests (&ldquo;Onlookers&rdquo;). Onlooker LLC is not a publisher,
           employer, agent, or security supervisor of its users, exercises no control over physical
           field activities, and disclaims all liability arising from real-world interactions.
         </p>
@@ -262,7 +262,7 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
           <strong className="text-foreground">What we collect.</strong> With your permission, the app
           reads your device&rsquo;s precise location (GPS) to show the map centred on you, to list
           nearby bounty requests by distance, to place the pin for a request you post, and to verify
-          that a fulfiller is physically at the requested location when they submit media
+          that an Onlooker is physically at the requested location when they submit media
           (geofence check).
         </p>
         <p>
@@ -306,7 +306,7 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
       <Section title="4. How we use your data">
         <p>
           We use the data above to operate accounts and sign-in, match requests with nearby
-          fulfillers, verify that captures were taken at the right place, process bounties, boosts
+          Onlookers, verify that captures were taken at the right place, process bounties, boosts
           and payouts, calculate ratings and the Top Reporters ranking, provide customer support,
           detect abuse and fraud, and meet our legal obligations. We do not sell your personal data,
           and we do not use your location or media for advertising or third-party profiling.
