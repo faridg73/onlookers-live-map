@@ -107,7 +107,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Transit",
     tagline: "Security lines, platforms and pickup lanes",
     emoji: "\u{2708}\u{FE0F}",
-    art: "from-sky-500/30 to-emerald-500/20",
+    art: "from-sky-500/30 to-signal/20",
     category: "transit",
     includedTypes: ["airport", "train_station", "subway_station", "bus_station"],
     subs: [
@@ -141,7 +141,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Outdoors",
     tagline: "Surf, trails, sunsets and how packed it is",
     emoji: "\u{1F30A}",
-    art: "from-emerald-500/30 to-teal-500/20",
+    art: "from-signal/30 to-teal-500/20",
     category: "outdoors",
     includedTypes: ["park", "beach", "hiking_area"],
     subs: [
@@ -175,7 +175,7 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
     short: "Markets",
     tagline: "Farmers markets, food trucks and block parties",
     emoji: "\u{1F3EA}",
-    art: "from-lime-500/30 to-amber-500/20",
+    art: "from-signal/30 to-amber-500/20",
     category: "markets",
     includedTypes: ["market", "meal_takeaway"],
     subs: [
