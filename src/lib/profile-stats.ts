@@ -2,9 +2,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { fetchCreditWallet } from "@/lib/credits";
 
-export type ProfileStats = { credits: number | null; shots: number | null; rating: number | null };
+export type ProfileStats = { credits: number | null; totalEarned: number | null; shots: number | null; rating: number | null };
 
-/** Real per-user numbers for the Profile header: wallet balance, clips sent, average review score. */
+/** Real per-user numbers for the Profile header: total credits earned, clips sent, average review score. */
 export async function fetchProfileStats(userId: string): Promise<ProfileStats> {
   const [wallet, shots, videos] = await Promise.all([
     fetchCreditWallet().catch(() => null),
@@ -20,8 +20,22 @@ export async function fetchProfileStats(userId: string): Promise<ProfileStats> {
     if (scores.length) rating = scores.reduce((a, b) => a + b, 0) / scores.length;
   }
 
+  // Lifetime earned = net payouts + tips received (purchases/top-ups excluded).
+  let totalEarned: number | null = null;
+  if (wallet) {
+    const { data: earnings, error } = await supabase
+      .from("credit_transactions")
+      .select("amount_net")
+      .eq("receiver_wallet_id", wallet.id)
+      .in("transaction_type", ["bounty_payout", "direct_tip"]);
+    if (!error) {
+      totalEarned = (earnings ?? []).reduce((sum, row) => sum + (row.amount_net ?? 0), 0);
+    }
+  }
+
   return {
     credits: wallet?.creditBalance ?? null,
+    totalEarned,
     shots: shots.error ? null : (shots.count ?? 0),
     rating,
   };
