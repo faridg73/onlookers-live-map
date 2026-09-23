@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Loader2, X } from "lucide-react";
 
+import { supabase } from "@/integrations/supabase/client";
 import { getStripe } from "@/lib/stripe";
 import { startSubscriptionCheckout } from "@/lib/subscriptions.functions";
 import {
@@ -33,6 +34,11 @@ export function SubscriptionCheckoutSheet({
 
     void (async () => {
       try {
+        const { data: auth } = await supabase.auth.getSession();
+        if (!auth.session?.access_token) {
+          if (live) setError("Please sign in to join Onlooker+.");
+          return;
+        }
         const result = await startSubscriptionCheckout({
           data: { planId: plan.id, cycle },
         });
