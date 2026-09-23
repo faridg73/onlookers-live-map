@@ -28,6 +28,7 @@ import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { LocationTypeBadge } from "@/components/LocationTypeBadge";
+import { TripValueRow } from "@/components/TripValueRow";
 import { cn } from "@/lib/utils";
 
 
