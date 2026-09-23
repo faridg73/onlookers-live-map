@@ -258,11 +258,11 @@ export function HomeLiveStage({
   }
 
   return (
-    <section className="scrollbar-thin pointer-events-auto absolute inset-x-0 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 w-full max-w-none overflow-y-auto overscroll-contain px-4 pb-1 lg:bottom-[7.5rem]" aria-labelledby="home-live-stage-title">
-      <div className="mx-auto flex w-full max-w-none flex-col gap-2 sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
+    <section className="scrollbar-thin pointer-events-auto absolute inset-x-0 bottom-[6.75rem] top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 w-full max-w-none overflow-y-auto overscroll-contain px-3 pb-4 sm:px-4 lg:bottom-[7.5rem]" aria-labelledby="home-live-stage-title">
+      <div className="mx-auto flex w-full max-w-none flex-col gap-4 sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
 
         {/* 1. Hero */}
-        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-6 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-4 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 lg:left-12 lg:right-12" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
@@ -344,18 +344,18 @@ export function HomeLiveStage({
         <section
           id="how-it-works"
           aria-labelledby="home-how-it-works"
-          className="rounded-3xl border border-home-line bg-home-charcoal p-3.5 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] sm:p-5"
+          className="px-1 py-2 sm:rounded-3xl sm:border sm:border-home-line sm:bg-home-charcoal sm:p-5"
         >
           <h3 id="home-how-it-works" className="home-display text-center text-[0.68rem] font-bold uppercase tracking-[0.22em] text-muted-foreground">
             How Onlooker works
           </h3>
-          <ol className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <ol className="mt-4 flex flex-col gap-5 sm:grid sm:grid-cols-3 sm:gap-3">
             {HOW_IT_WORKS.map((step) => {
               const Icon = step.icon;
               return (
                 <li
                   key={step.step}
-                  className="flex min-w-0 items-start gap-3.5 rounded-2xl border border-home-line bg-home-glass-strong p-3.5 backdrop-blur-2xl sm:p-4"
+                  className="flex min-w-0 items-start gap-3.5 sm:rounded-2xl sm:border sm:border-home-line sm:bg-home-glass-strong sm:p-4"
                 >
                   <span className="relative shrink-0">
                     <img
@@ -364,7 +364,7 @@ export function HomeLiveStage({
                       loading="lazy"
                       width={512}
                       height={512}
-                      className="size-20 rounded-xl border border-home-line object-cover"
+                      className="size-16 rounded-xl border border-home-line object-cover sm:size-20"
                     />
                     <span
                       aria-hidden
@@ -373,10 +373,10 @@ export function HomeLiveStage({
                       <Icon className="size-3.5" />
                     </span>
                   </span>
-                  <span className="min-w-0">
+                  <span className="min-w-0 flex-1">
                     <span className="block font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">Step {step.step}</span>
-                    <span className="mt-0.5 block text-sm font-extrabold text-white">{step.title}</span>
-                    <span className="mt-1 block text-base leading-relaxed text-[#E5E5E5] sm:text-[1.05rem]">{step.body}</span>
+                    <span className="mt-0.5 block text-sm font-extrabold text-foreground">{step.title}</span>
+                    <span className="mt-1 block text-sm leading-snug text-muted-foreground sm:text-base">{step.body}</span>
                   </span>
                 </li>
               );
