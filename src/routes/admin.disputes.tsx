@@ -104,8 +104,9 @@ function ModeratorDashboard() {
         <div>
           <h1 className="font-display text-2xl text-foreground">Dispute review</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Inspect the submitted clip and the evidence from both sides, then release the payout to
-            the reporter or refund the poster. The escrow stays locked until you decide.
+            Newest first. Read the original bounty, watch the submission, then release the full
+            payout, refund the poster, or settle a kill-fee split. The escrow stays locked until you
+            decide.
           </p>
         </div>
       </header>
