@@ -4,7 +4,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 
-import { Footer } from "@/components/Footer";
 import { submitDmcaNotice } from "@/lib/dmca.functions";
 import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
 
@@ -187,7 +186,6 @@ function DmcaPage() {
           </form>
         )}
       </main>
-      <Footer />
     </div>
   );
 }

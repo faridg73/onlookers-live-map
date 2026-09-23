@@ -24,7 +24,6 @@ import { readSessionState, writeSessionState } from "@/lib/session-state";
 import { discoveryImage } from "@/lib/discovery-visuals";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { TwoToneName } from "@/components/TwoTone";
-import { SocialLinks } from "@/components/Footer";
 
 export const Route = createFileRoute("/discover/")({
   head: () => ({
@@ -398,17 +397,6 @@ function DiscoverHome() {
       </div>
       </div>
 
-      <footer className="mt-auto border-t border-border bg-surface px-4 pt-6 pb-32">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-4">
-          <SocialLinks className="flex items-center justify-center gap-2.5" />
-          <div className="flex w-full flex-col items-center justify-between gap-1.5 sm:flex-row">
-            <p className="text-xs font-semibold text-muted-foreground">
-              © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
-            </p>
-            <p className="text-xs font-semibold tracking-wide text-muted-foreground">#OnlookerLive</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
