@@ -17,8 +17,19 @@ function requestHost(): string | null {
 }
 
 function appOrigin(): string {
-  const url = getRequest()?.url;
-  if (url) return new URL(url).origin;
+  const req = getRequest();
+  const candidates = [req?.headers.get("origin"), req?.headers.get("referer"), req?.url];
+  for (const c of candidates) {
+    if (!c) continue;
+    try {
+      const u = new URL(c);
+      if (u.hostname === "localhost" || u.hostname === "127.0.0.1") continue;
+      if (u.protocol !== "https:") continue;
+      return u.origin;
+    } catch {
+      /* ignore */
+    }
+  }
   return "https://onlookerlive.com";
 }
 
