@@ -133,7 +133,12 @@ export function BountyDetailsDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <RequestCard request={request} />
+          <RequestCard
+            request={request}
+            distanceMiles={
+              userPosition ? distanceMiles(userPosition, requestMapPosition(request)) : null
+            }
+          />
 
           {!done && (
             <div className="mt-2 rounded-2xl border border-border bg-surface-raised p-3">
