@@ -227,6 +227,19 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     }
   }
 
+  async function splitDecision() {
+    setRuling(true);
+    try {
+      await resolveDisputeSplit(item.request_id, killFee);
+      toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
+      onResolved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
+    } finally {
+      setRuling(false);
+    }
+  }
+
   return (
     <article className="rounded-2xl border border-border bg-surface p-4">
       <button type="button" onClick={() => setOpen(!open)} className="w-full text-left">
