@@ -291,7 +291,7 @@ export function AlertSettingsCard() {
         Alert radius
       </p>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {RADIUS_CHOICES.map((miles) => (
+        {RADIUS_CHOICES.map((miles: number) => (
           <button
             key={miles}
             type="button"
@@ -311,12 +311,14 @@ export function AlertSettingsCard() {
         className="mt-2"
         type="number"
         min={1}
-        max={100}
         step={1}
-        placeholder="Custom radius in miles"
+        placeholder="Any distance in miles"
         value={prefs.radius_miles}
-        onChange={(e) => set("radius_miles", Math.max(1, Math.min(100, Number(e.target.value) || 1)))}
+        onChange={(e) => set("radius_miles", Math.max(1, Number(e.target.value) || 1))}
       />
+      <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
+        Set any distance you like — city-wide, statewide or further. There is no maximum.
+      </p>
       <div className="mt-2 flex items-center gap-2">
         <MapPin className="size-4 shrink-0 text-signal" />
         <Input

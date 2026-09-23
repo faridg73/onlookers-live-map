@@ -48,13 +48,27 @@ function minutesLeft(expiresAt?: number, expiresInMin?: number) {
   return expiresInMin ?? 0;
 }
 
+/**
+ * Suggested hunting distances. `null` means no distance filter at all — hunters
+ * in low-density areas can always see every open bounty. Shortcuts only: the
+ * custom field below takes any number, there is no platform maximum.
+ */
+const RADIUS_PRESETS_MI = [5, 25, 50, 100, 250, 500] as const;
+
 function HuntScreen() {
   const { requests, claim } = useOnlooker();
   const { boostOf } = useBoosts();
   const [position, setPosition] = useState<MapPosition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("distance");
-  const { formatDistance, radius, unit } = useDistanceUnit(position);
+  /** null = no distance filter (every open bounty, anywhere). */
+  const [radiusMiles, setRadiusMiles] = useState<number | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
+  const { formatDistance, unit } = useDistanceUnit(position);
+  const toDisplay = (miles: number) => (unit === "mi" ? miles : miles * 1.609344);
+  const fromDisplay = (value: number) => (unit === "mi" ? value : value / 1.609344);
+  const radiusText =
+    radiusMiles === null ? "Anywhere" : `${Math.round(toDisplay(radiusMiles))} ${unit}`;
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
@@ -89,16 +103,21 @@ function HuntScreen() {
       left: minutesLeft(r.expiresAt, r.expiresInMin),
       miles: position ? distanceMiles(position, requestMapPosition(r)) : null,
     }));
-    return withMeta.sort((a, b) => {
+    // The chosen distance is the only filter, and it is always optional.
+    const inRange =
+      radiusMiles === null
+        ? withMeta
+        : withMeta.filter((row) => row.miles === null || row.miles <= radiusMiles);
+    return inRange.sort((a, b) => {
       if (sort === "payout") return b.payout - a.payout;
       if (sort === "urgency") return a.left - b.left;
       if (a.miles === null || b.miles === null) return b.payout - a.payout;
       return a.miles - b.miles;
     });
-  }, [open, position, sort, boostOf]);
+  }, [open, position, sort, boostOf, radiusMiles]);
 
   const potential = list.reduce((sum, row) => sum + row.payout, 0);
-  const nearby = list.filter((row) => row.miles !== null && row.miles <= radius).length;
+  const nearby = list.length;
 
   /** Open bounties that have real coordinates, shown on the compact live map. */
   const pins = useMemo<LiveBountyPin[]>(
@@ -156,10 +175,99 @@ function HuntScreen() {
           <Navigation className="size-4 text-signal" aria-hidden />
           <p className="mt-1 font-display text-xl text-foreground">{position ? nearby : "-"}</p>
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
-            Within {radius} {unit}
+            {radiusMiles === null ? "Anywhere" : `Within ${radiusText}`}
           </p>
         </div>
       </div>
+
+      <div className="mt-4">
+        <p className="text-[0.66rem] font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
+          How far will you travel? Currently {radiusText.toLowerCase()}
+        </p>
+        <div
+          className="mt-2 flex flex-wrap items-center gap-1.5"
+          role="group"
+          aria-label="Hunting distance"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setRadiusMiles(null);
+              setCustomOpen(false);
+            }}
+            aria-pressed={radiusMiles === null}
+            className={
+              "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (radiusMiles === null
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            Anywhere
+          </button>
+          {RADIUS_PRESETS_MI.map((miles) => {
+            const active = !customOpen && radiusMiles === miles;
+            return (
+              <button
+                key={miles}
+                type="button"
+                onClick={() => {
+                  setRadiusMiles(miles);
+                  setCustomOpen(false);
+                }}
+                aria-pressed={active}
+                className={
+                  "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+                  (active
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface text-muted-foreground hover:text-foreground")
+                }
+              >
+                {Math.round(toDisplay(miles))} {unit}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => {
+              setCustomOpen(true);
+              setRadiusMiles((current) => current ?? 100);
+            }}
+            aria-pressed={customOpen}
+            className={
+              "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (customOpen
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            Custom
+          </button>
+          {customOpen && (
+            <label className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-1">
+              <input
+                type="number"
+                min={1}
+                value={radiusMiles === null ? "" : Math.round(toDisplay(radiusMiles))}
+                onChange={(e) => {
+                  const next = Number(e.target.value.replace(/\D/g, ""));
+                  setRadiusMiles(next > 0 ? fromDisplay(next) : null);
+                }}
+                aria-label={`Hunting distance in ${unit}`}
+                className="w-16 bg-transparent text-center text-[0.72rem] font-bold text-foreground outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <span className="pr-1 text-[0.65rem] font-bold uppercase text-muted-foreground">
+                {unit}
+              </span>
+            </label>
+          )}
+        </div>
+        <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
+          Set any distance you want — city-wide, statewide, or leave it on Anywhere. There is no
+          maximum.
+        </p>
+      </div>
+
 
       {!position && (
         <button
