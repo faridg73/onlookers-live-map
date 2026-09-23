@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, Share2, Trash2, Video, X } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, RotateCcw, Share2, Trash2, Video, X } from "lucide-react";
+import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
+import { describeUploadError } from "@/lib/upload-errors";
 import { formatCredits } from "@/lib/credits";
 import { VideoRecorder } from "@/components/VideoRecorder";
 import { blockFileDrop, blockFilePaste, PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
@@ -243,6 +245,35 @@ export function BountyVideoDialog({
                   </>
                 )}
               </button>
+
+              {uploadStatus && (
+                <p className="flex items-center justify-center gap-2 text-xs font-semibold text-foreground">
+                  <Loader2 className="size-3.5 animate-spin" /> {uploadStatus}
+                </p>
+              )}
+
+              {uploadError && (
+                <div className="rounded-2xl border border-border bg-surface px-3.5 py-3">
+                  <p className="text-xs font-semibold leading-relaxed text-foreground">
+                    {uploadError}
+                  </p>
+                  {lastFile && (
+                    <button
+                      type="button"
+                      disabled={uploading}
+                      onClick={() => void onCaptured(lastFile)}
+                      className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground disabled:opacity-50"
+                    >
+                      <RotateCcw className="size-3.5" /> Retry this clip
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="flex justify-center">
+                <SubmissionSupportLink />
+              </div>
+
 
               <p className="text-center text-[0.68rem] text-muted-foreground">
                 Live camera captures only, gallery videos and screenshots can't be submitted.
