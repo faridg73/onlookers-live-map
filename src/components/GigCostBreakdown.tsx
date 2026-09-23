@@ -62,7 +62,7 @@ export function GigCostBreakdown({
   tipCredits?: number;
   /** Visibility boost charge (Fast Catch / Priority Hunt), on top of the reward. */
   boostCredits?: number;
-  boostLabel?: string;
+  boostLabel?: string | undefined;
   totalCredits: number;
 }) {
   const pct = (m: number) => `+${Math.round((m - 1) * 100)}%`;
