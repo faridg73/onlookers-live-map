@@ -46,13 +46,13 @@ export const Route = createFileRoute("/admin/disputes")({
 function ModeratorDashboard() {
   const { user } = useAuth();
   const [staff, setStaff] = useState<boolean | null>(null);
-  const [cases, setCases] = useState<DisputeCase[]>([]);
+  const [cases, setCases] = useState<DetailedDisputeCase[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      setCases(await listDisputes());
+      setCases(await listDisputesDetailed());
     } catch {
       setCases([]);
     } finally {
