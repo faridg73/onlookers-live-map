@@ -2,6 +2,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { scrollFieldToStart } from "@/lib/field-scroll";
 import { format } from "date-fns";
 import {
   ArrowLeft,
