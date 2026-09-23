@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { DeadlineNote } from "@/components/DeadlineNote";
 import { useAuth } from "@/hooks/use-auth";
 import { formatCredits, formatCreditCash } from "@/lib/credits";
 import { formatAgoISO, locationTypeById, type LiveRequest } from "@/lib/onlooker";
