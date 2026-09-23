@@ -125,8 +125,12 @@ export function RequestCard({
               <span className="truncate">{request.place}</span>
               <LocationTypeBadge locationType={request.locationType} />
             </p>
-            {distanceLabel && (
-              <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
+            {tripRow ? (
+              <div className="mt-1.5">{tripRow}</div>
+            ) : (
+              distanceLabel && (
+                <p className="mt-0.5 text-xs font-bold text-foreground">{distanceLabel} away</p>
+              )
             )}
             <BountyBriefBadges request={request} compact />
           </div>
