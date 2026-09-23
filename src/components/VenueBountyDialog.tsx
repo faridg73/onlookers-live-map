@@ -81,6 +81,8 @@ export function VenueBountyDialog({
   const [weather, setWeather] = useState(1);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
+  const titleRef = useRef<HTMLInputElement>(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
   const [bounty, setBounty] = useState(20);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
@@ -92,6 +94,10 @@ export function VenueBountyDialog({
     void readWalletBalance().then(setBalance);
     if (defaultTitle) setTitle(defaultTitle);
     if (defaultNote) setNote(defaultNote);
+    if (defaultTitle || defaultNote) {
+      scrollFieldToStart(titleRef.current);
+      scrollFieldToStart(noteRef.current);
+    }
   }, [open, defaultTitle, defaultNote]);
 
   function pickMode(next: Mode) {
@@ -295,6 +301,7 @@ export function VenueBountyDialog({
               Title
             </span>
             <input
+              ref={titleRef}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={120}
@@ -309,6 +316,7 @@ export function VenueBountyDialog({
               Camera instructions
             </span>
             <textarea
+              ref={noteRef}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
