@@ -50,6 +50,9 @@ export function BountyBottomSheet({
   const [capturing, setCapturing] = useState(false);
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
   const human = useHumanCheck("accept-bounty");
   const router = useRouter();
   const navigate = useNavigate();
@@ -107,19 +110,30 @@ export function BountyBottomSheet({
 
   async function submit(file: File) {
     setSending(true);
+    setSendError(null);
+    setLastFile(file);
+    setStatus("Starting your submission…");
     try {
       await uploadBountyVideo({
         file,
         request: request!,
         note: "Filmed live from the map after accepting the bounty.",
+        onStatus: setStatus,
       });
       toast.success("Sent to the requester for review.");
+      setLastFile(null);
       setCapturing(false);
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "That clip could not be sent.");
+      const reason = describeUploadError(error, {
+        bucket: "bounty-videos",
+        sizeBytes: file.size,
+      });
+      setSendError(reason);
+      toast.error(reason);
     } finally {
       setSending(false);
+      setStatus(null);
     }
   }
 
