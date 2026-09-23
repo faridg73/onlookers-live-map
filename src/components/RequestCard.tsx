@@ -256,6 +256,9 @@ export function RequestCard({
         </div>
       </div>
 
+      {tripRow && <div className="mt-3">{tripRow}</div>}
+
+
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {request.status === "open" && !done ? (
           <LivePulseBadge />
