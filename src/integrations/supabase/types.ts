@@ -670,6 +670,7 @@ export type Database = {
           reserved_until: string | null
           spotter_id: string | null
           status: string
+          submission_started_at: string | null
           updated_at: string
         }
         Insert: {
@@ -685,6 +686,7 @@ export type Database = {
           reserved_until?: string | null
           spotter_id?: string | null
           status?: string
+          submission_started_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -700,6 +702,7 @@ export type Database = {
           reserved_until?: string | null
           spotter_id?: string | null
           status?: string
+          submission_started_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2156,6 +2159,7 @@ export type Database = {
         Returns: number
       }
       award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
+      begin_bounty_submission: { Args: { _request_id: string }; Returns: Json }
       bill_stream_minute: {
         Args: { _session_id: string }
         Returns: {
