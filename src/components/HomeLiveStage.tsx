@@ -262,7 +262,7 @@ export function HomeLiveStage({
       <div className="mx-auto flex w-full max-w-none flex-col gap-4 sm:max-w-[min(68rem,calc(100vw-8rem))] lg:max-w-[min(88rem,calc(100vw-6rem))] 2xl:max-w-[min(116rem,calc(100vw-8rem))]">
 
         {/* 1. Hero */}
-        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-6 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
+        <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-4 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 lg:left-12 lg:right-12" aria-hidden />
           <div className="flex items-center justify-center gap-3">
             <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
