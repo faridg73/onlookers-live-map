@@ -162,7 +162,7 @@ function mapTicketmaster(raw: TmEvent): LiveEvent[] {
       city: venue?.city?.name ?? null,
       latitude: Number.isFinite(lat) ? lat : null,
       longitude: Number.isFinite(lng) ? lng : null,
-      category: classification?.genre?.name ?? classification?.segment?.name ?? null,
+      category: [classification?.genre?.name, classification?.segment?.name].find((n) => n && n.toLowerCase() !== "undefined") ?? null,
       imageUrl: tmImage(raw.images),
       ticketUrl: raw.url,
       priceFrom: typeof price?.min === "number" ? price.min : null,

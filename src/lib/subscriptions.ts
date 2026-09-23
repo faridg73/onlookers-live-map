@@ -37,10 +37,10 @@ export const PLUS_PLANS: PlusPlan[] = [
       "Saved areas and alerts",
     ],
     accent: {
-      text: "text-sky-300",
-      border: "border-sky-400/50",
-      bg: "bg-sky-400/10",
-      chip: "bg-sky-400 text-black",
+      text: "text-foreground",
+      border: "border-border",
+      bg: "bg-surface-raised",
+      chip: "bg-foreground text-background",
     },
   },
   {
@@ -78,10 +78,10 @@ export const PLUS_PLANS: PlusPlan[] = [
       "Raw archive stream and extended retention",
     ],
     accent: {
-      text: "text-fuchsia-300",
-      border: "border-fuchsia-400/50",
-      bg: "bg-fuchsia-400/10",
-      chip: "bg-fuchsia-400 text-black",
+      text: "text-signal",
+      border: "border-signal",
+      bg: "bg-signal/15",
+      chip: "bg-signal text-signal-foreground",
     },
   },
 ];

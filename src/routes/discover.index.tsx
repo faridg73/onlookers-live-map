@@ -242,9 +242,9 @@ function DiscoverHome() {
             <section className="mt-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
-                    <Flame className="size-4 text-signal" aria-hidden /> Trending events &amp;{" "}
-                    <span className="text-signal">live sports</span>
+                  <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+                    <Flame className="size-4 shrink-0 text-signal" aria-hidden /><span>Trending events &amp;{" "}
+                    <span className="text-signal">live sports</span></span>
                   </h2>
                   <p className="text-xs text-foreground/90">
                     <span className="font-bold text-signal">{isWeekend ? "On this weekend" : "Coming up"}</span>{" "}
