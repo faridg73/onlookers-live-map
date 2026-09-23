@@ -24,6 +24,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
+import { Route as PinDeclineRouteImport } from './routes/pin-decline'
 import { Route as PoolsRouteImport } from './routes/pools'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -41,6 +42,7 @@ import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicSitePinDeclineRouteImport } from './routes/api/public/site-pin/decline'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -118,6 +120,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
 const PayoutHistoryRoute = PayoutHistoryRouteImport.update({
   id: '/payout-history',
   path: '/payout-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PinDeclineRoute = PinDeclineRouteImport.update({
+  id: '/pin-decline',
+  path: '/pin-decline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PoolsRoute = PoolsRouteImport.update({
@@ -206,6 +213,11 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSitePinDeclineRoute = ApiPublicSitePinDeclineRouteImport.update({
+  id: '/api/public/site-pin/decline',
+  path: '/api/public/site-pin/decline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
@@ -239,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
@@ -256,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -276,6 +290,7 @@ export interface FileRoutesByTo {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
@@ -293,6 +308,7 @@ export interface FileRoutesByTo {
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -314,6 +330,7 @@ export interface FileRoutesById {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
@@ -331,6 +348,7 @@ export interface FileRoutesById {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -353,6 +371,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pin-decline'
     | '/pools'
     | '/post'
     | '/privacy'
@@ -370,6 +389,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/decline'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -390,6 +410,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pin-decline'
     | '/pools'
     | '/post'
     | '/privacy'
@@ -407,6 +428,7 @@ export interface FileRouteTypes {
     | '/discover/$group'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/decline'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -427,6 +449,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/pin-decline'
     | '/pools'
     | '/post'
     | '/privacy'
@@ -444,6 +467,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/decline'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/transactional/preview'
@@ -465,6 +489,7 @@ export interface RootRouteChildren {
   HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
+  PinDeclineRoute: typeof PinDeclineRoute
   PoolsRoute: typeof PoolsRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -482,6 +507,7 @@ export interface RootRouteChildren {
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicSitePinDeclineRoute: typeof ApiPublicSitePinDeclineRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -592,6 +618,13 @@ declare module '@tanstack/react-router' {
       path: '/payout-history'
       fullPath: '/payout-history'
       preLoaderRoute: typeof PayoutHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pin-decline': {
+      id: '/pin-decline'
+      path: '/pin-decline'
+      fullPath: '/pin-decline'
+      preLoaderRoute: typeof PinDeclineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pools': {
@@ -713,6 +746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/site-pin/decline': {
+      id: '/api/public/site-pin/decline'
+      path: '/api/public/site-pin/decline'
+      fullPath: '/api/public/site-pin/decline'
+      preLoaderRoute: typeof ApiPublicSitePinDeclineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/auth/preview': {
       id: '/lovable/email/auth/preview'
       path: '/lovable/email/auth/preview'
@@ -753,6 +793,7 @@ const rootRouteChildren: RootRouteChildren = {
   HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
+  PinDeclineRoute: PinDeclineRoute,
   PoolsRoute: PoolsRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
@@ -770,6 +811,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicSitePinDeclineRoute: ApiPublicSitePinDeclineRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,

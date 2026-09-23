@@ -18,14 +18,30 @@ export type AgentPinDelivery = {
   emailError?: string;
 };
 
-function smsBody(opts: { pin: string; requestId: string; locationName: string }) {
+type PinOpts = {
+  pin: string;
+  requestId: string;
+  locationName: string;
+  /** One-time token letting the agent decline the visit without an account. */
+  declineToken?: string | null;
+};
+
+/** Account-free link the agent taps when they never authorized the visit. */
+function declineUrl(token?: string | null) {
+  return token ? `${SITE_URL}/pin-decline?t=${encodeURIComponent(token)}` : null;
+}
+
+function smsBody(opts: PinOpts) {
+  const decline = declineUrl(opts.declineToken);
   return (
-    `Onlooker: the 6-digit on-site PIN for "${opts.locationName}" is ${opts.pin}. ` +
-    `Give it only to the onlooker filming your property. Bounty: ${SITE_URL}/?b=${opts.requestId}`
+    `Onlooker: the single-use 6-digit on-site PIN for "${opts.locationName}" is ${opts.pin}. ` +
+    `Give it only to the onlooker filming your property; it works once and expires when the request closes. ` +
+    `Bounty: ${SITE_URL}/?b=${opts.requestId}` +
+    (decline ? ` Not authorized? Cancel it: ${decline}` : "")
   );
 }
 
-function emailBody(opts: { pin: string; requestId: string; locationName: string; name: string }) {
+function emailBody(opts: PinOpts & { name: string }) {
   const greeting = opts.name ? `Hi ${opts.name},` : "Hello,";
   return `<!doctype html><html><body style="margin:0;background:#0f0f0f;padding:32px;font-family:Arial,Helvetica,sans-serif;color:#e5e5e5;">
   <div style="max-width:520px;margin:0 auto;background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:28px;">
@@ -35,19 +51,23 @@ function emailBody(opts: { pin: string; requestId: string; locationName: string;
     <strong style="color:#ffffff;">${opts.locationName}</strong>. Hand this PIN only to the onlooker filming
     your property — they type it in on site to unlock footage submission and payout.</p>
     <p style="margin:0 0 20px;"><span style="display:inline-block;background:#000;border:1px solid #ccff00;color:#ccff00;font-size:30px;font-weight:bold;letter-spacing:10px;padding:14px 22px;border-radius:12px;">${opts.pin}</span></p>
+    <p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#a3a3a3;">This PIN can be used once and stops working when the request closes.</p>
     <p style="margin:0 0 8px;font-size:13px;color:#a3a3a3;">Bounty link:</p>
-    <p style="margin:0;"><a href="${SITE_URL}/?b=${opts.requestId}" style="color:#ccff00;font-size:13px;word-break:break-all;">${SITE_URL}/?b=${opts.requestId}</a></p>
+    <p style="margin:0 0 16px;"><a href="${SITE_URL}/?b=${opts.requestId}" style="color:#ccff00;font-size:13px;word-break:break-all;">${SITE_URL}/?b=${opts.requestId}</a></p>
+    ${declineUrl(opts.declineToken) ? `<p style="margin:0;font-size:13px;line-height:1.6;color:#a3a3a3;">Did you not authorize this? <a href="${declineUrl(opts.declineToken)}" style="color:#ccff00;">Cancel this request</a> — no account needed.</p>` : ""}
   </div>
 </body></html>`;
 }
 
-function emailText(opts: { pin: string; requestId: string; locationName: string; name: string }) {
+function emailText(opts: PinOpts & { name: string }) {
   const greeting = opts.name ? `Hi ${opts.name},` : "Hello,";
   return (
     `${greeting} a paid Onlooker bounty was posted for "${opts.locationName}".\n\n` +
     `Your 6-digit on-site PIN: ${opts.pin}\n\n` +
     `Give it only to the onlooker filming your property — they type it in on site to unlock ` +
-    `footage submission and payout.\n\nBounty: ${SITE_URL}/?b=${opts.requestId}`
+    `footage submission and payout. It can be used once and stops working when the request closes.` +
+    `\n\nBounty: ${SITE_URL}/?b=${opts.requestId}` +
+    (declineUrl(opts.declineToken) ? `\n\nDid you not authorize this? Cancel it here: ${declineUrl(opts.declineToken)}` : "")
   );
 }
 
@@ -58,7 +78,7 @@ function emailText(opts: { pin: string; requestId: string; locationName: string;
  */
 export async function sendAgentPin(
   contact: AgentContact,
-  opts: { pin: string; requestId: string; locationName: string },
+  opts: PinOpts,
 ): Promise<AgentPinDelivery> {
   const result: AgentPinDelivery = { sms: false, email: false };
   const phone = (contact.phone ?? "").trim();
