@@ -1,9 +1,6 @@
 name: Deploy iOS App to App Store Connect
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
