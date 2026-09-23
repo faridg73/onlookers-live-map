@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Layers3 } from "lucide-react";
+import { Check, ChevronDown, Globe2, Layers3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -61,7 +61,7 @@ export function BroadcastCategoryPicker({
         className="h-auto min-h-14 w-full justify-start gap-3 border-border bg-surface-raised px-3 py-2.5 text-left hover:border-white/25 hover:bg-surface-raised"
       >
         <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-surface-raised text-lg">
-          {selected?.icon ?? "🌐"}
+          {selected?.icon ?? <Globe2 className="size-5 text-signal" aria-hidden />}
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[0.6rem] font-extrabold uppercase text-muted-foreground">
