@@ -187,8 +187,12 @@ function FeedScreen() {
     );
   }, [inScope, cat, sub, center]);
 
-  const distanceLabel = (r: (typeof requests)[number]) =>
-    center ? formatDistance(distanceMiles(center, requestMapPosition(r))) : undefined;
+  const milesTo = (r: (typeof requests)[number]) =>
+    center ? distanceMiles(center, requestMapPosition(r)) : null;
+  const distanceLabel = (r: (typeof requests)[number]) => {
+    const miles = milesTo(r);
+    return miles === null ? undefined : formatDistance(miles);
+  };
   const pot = inScope.filter((r) => r.status === "open").reduce((s, r) => s + r.bounty, 0);
 
   const displayCustom = Math.round(unit === "mi" ? customMiles : customMiles * 1.609344);
