@@ -996,6 +996,33 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_otp_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          expires_at: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       phone_verifications: {
         Row: {
           created_at: string
