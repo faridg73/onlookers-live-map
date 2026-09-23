@@ -30,7 +30,7 @@ export function HunterEarningBanner() {
             <Zap className="size-4 fill-signal text-signal" aria-hidden /> How hunting works
           </p>
           <p className="mt-1 max-w-[16rem] text-xs leading-relaxed text-foreground/90">
-            Turn your phone into a paycheck. Hunters keep{" "}
+            Turn your phone into a paycheck. Onlookers keep{" "}
             <span className="font-bold text-signal">100% of the bounty</span> and receive{" "}
             <span className="font-bold text-signal">fast Stripe payouts</span> straight to
             their bank.
