@@ -291,7 +291,7 @@ export function AlertSettingsCard() {
         Alert radius
       </p>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {RADIUS_CHOICES.map((miles) => (
+        {RADIUS_CHOICES.map((miles: number) => (
           <button
             key={miles}
             type="button"
