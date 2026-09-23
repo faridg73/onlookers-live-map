@@ -1614,7 +1614,6 @@ function PostScreen() {
                       </div>
                     )}
                   </div>
-                )}
 
                 <div>
                   <p className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground">
@@ -1698,10 +1697,12 @@ function PostScreen() {
                   live={capture === null}
                   rewardCredits={escrowReward}
                   rewardMatchesGig={rewardMatchesGig}
-                  floorCredits={tier === "standard" ? gigFloor : undefined}
+                  floorCredits={gigFloor}
                   urgencyFactor={quote.urgencyFactor}
                   weatherFactor={quote.weatherFactor}
                   tipCredits={Number.isFinite(tip) ? tip : 0}
+                  boostCredits={boostCost}
+                  boostLabel={tier !== "standard" ? tierById(tier).label : undefined}
                   totalCredits={total}
                 />
                 {tip > 0 && (
@@ -1720,7 +1721,9 @@ function PostScreen() {
             {step === 3 && (
               <div className="mb-3 flex items-center justify-between gap-3 text-sm">
                 <span className="font-bold text-muted-foreground">
-                  Held in escrow · paid to the onlooker
+                  {boostCost > 0
+                    ? "Total escrow · reward + boost"
+                    : "Held in escrow · paid to the onlooker"}
                 </span>
                 <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
               </div>
