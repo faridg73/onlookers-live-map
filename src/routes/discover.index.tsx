@@ -157,10 +157,10 @@ function DiscoverHome() {
         >
           <X className="size-4" aria-hidden />
         </button>
-        <h1 className="text-center font-display text-3xl tracking-tight text-signal">
+        <h1 className="max-w-full px-12 text-center font-display text-2xl tracking-tight text-signal sm:text-3xl">
           Browse <span className="text-signal">places</span>
         </h1>
-        <p className="mt-1 max-w-xs text-center text-sm text-foreground/90 sm:max-w-none">
+        <p className="mt-1 max-w-xs px-12 text-center text-sm text-foreground/90 sm:max-w-none sm:px-0">
           Pulled <span className="font-bold text-signal">live</span> from the area you&apos;re
           browsing, pick a spot and ask for a view.
         </p>
