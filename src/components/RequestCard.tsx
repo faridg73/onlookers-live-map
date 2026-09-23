@@ -293,7 +293,7 @@ export function RequestCard({
       {expired && (
         <p className="mt-3 rounded-xl border border-border bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
           This bounty ran out of time. Submissions and chip-ins are closed and the deposit went
-          back to the requester.
+          back to the poster.
         </p>
       )}
 

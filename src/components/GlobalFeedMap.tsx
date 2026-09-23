@@ -263,7 +263,7 @@ export function GlobalFeedMap({
               <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
                 {categoryLabel
                   ? `No unlocked ${subcategory ? `${subcategory} ` : ""}${categoryLabel} clips are on the map yet.`
-                  : "No unlocked clips yet. Once requesters approve footage it shows up here."}
+                  : "No unlocked clips yet. Once posters approve footage it shows up here."}
               </p>
             )}
           </div>
@@ -418,7 +418,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
             className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-signal px-3 py-2 text-xs font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50 sm:w-auto"
           >
             {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <CoinsIcon className="size-3.5" />}
-            Micro-Tip Hunter {MICRO_TIP} Credits
+            Micro-Tip Onlooker {MICRO_TIP} Credits
           </button>
         </div>
       </div>

@@ -27,7 +27,7 @@ const GUIDE_STEPS = [
   {
     icon: Coins,
     label: "Fund it securely",
-    copy: "Your reward is held by Onlooker while a nearby creator completes the bounty.",
+    copy: "Your reward is held by Onlooker while a nearby onlooker completes the bounty.",
   },
   {
     icon: ShieldCheck,
@@ -55,7 +55,7 @@ export function FirstPostGuide({
               Turn a question into a real-world view
             </DialogTitle>
             <DialogDescription className="leading-relaxed text-muted-foreground">
-              A nearby creator captures what is happening now. You stay in control of the brief,
+              A nearby onlooker captures what is happening now. You stay in control of the brief,
               location, timing, and reward.
             </DialogDescription>
           </DialogHeader>
@@ -122,7 +122,7 @@ export function RealEstateSecurityDialog({ open, onOpenChange }: RealEstateSecur
           {[
             ["Escrow lock", "Onlooker securely holds the bounty reward when the request goes live."],
             ["Private 6-digit PIN", "A unique code and claim link are sent to your authorized property contact."],
-            ["On-site verification", "The creator must receive and enter the PIN at the property before capture and payout unlock."],
+            ["On-site verification", "The onlooker must receive and enter the PIN at the property before capture and payout unlock."],
           ].map(([label, copy], index) => (
             <div key={label} className="flex gap-3 rounded-lg border border-border bg-background/70 p-3.5">
               <span className="grid size-8 shrink-0 place-items-center rounded-full bg-signal font-display text-sm font-extrabold text-signal-foreground">

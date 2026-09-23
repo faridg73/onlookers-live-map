@@ -25,12 +25,12 @@ export const Route = createFileRoute("/admin/")({
       {
         name: "description",
         content:
-          "Admin control panel for Onlooker: review open disputes and approve or deny hunter payout requests.",
+          "Admin control panel for Onlooker: review open disputes and approve or deny onlooker payout requests.",
       },
       { property: "og:title", content: "Onlooker admin dashboard" },
       {
         property: "og:description",
-        content: "Review open disputes and settle hunter payout requests.",
+        content: "Review open disputes and settle onlooker payout requests.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

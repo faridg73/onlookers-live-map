@@ -221,7 +221,7 @@ export function BountyVideoDialog({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={2}
-                placeholder="Add a note for the requester (optional)"
+                placeholder="Add a note for the poster (optional)"
                 className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
               />
               <button

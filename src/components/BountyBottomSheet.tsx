@@ -122,7 +122,7 @@ export function BountyBottomSheet({
         note: "Filmed live from the map after accepting the bounty.",
         onStatus: setStatus,
       });
-      toast.success("Sent to the requester for review.");
+      toast.success("Sent to the poster for review.");
       setLastFile(null);
       setCapturing(false);
       onClose();
@@ -200,7 +200,7 @@ export function BountyBottomSheet({
           </span>
         </div>
         <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
-          {pool} credit bounty · {payout} Credits paid to you once the requester approves your
+          {pool} credit bounty · {payout} Credits paid to you once the poster approves your
           clip.
         </p>
 

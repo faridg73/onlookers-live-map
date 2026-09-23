@@ -17,13 +17,13 @@ import { distanceMiles, requestMapPosition, type MapPosition } from "@/lib/onloo
 export const Route = createFileRoute("/hunt")({
   head: () => ({
     meta: [
-      { title: "Hunter Dashboard, Earn on Onlooker" },
+      { title: "Hunt Dashboard, Earn on Onlooker" },
       {
         name: "description",
         content:
           "See every open bounty near you with the payout, the time left and how far you have to walk.",
       },
-      { property: "og:title", content: "Hunter Dashboard, Earn on Onlooker" },
+      { property: "og:title", content: "Hunt Dashboard, Earn on Onlooker" },
       {
         property: "og:description",
         content: "Open bounties near you with payout, time left and distance.",
@@ -155,11 +155,11 @@ function HuntScreen() {
   return (
     <div className="app-shell pb-32 pt-safe">
       <div className="flex items-start justify-between gap-3">
-        <h1 className="font-display text-3xl tracking-tight text-foreground"><span className="text-signal">Hunter</span> dashboard</h1>
+        <h1 className="font-display text-3xl tracking-tight text-foreground"><span className="text-signal">Hunt</span> dashboard</h1>
         <button
           type="button"
           onClick={close}
-          aria-label="Close Hunter dashboard"
+          aria-label="Close hunt dashboard"
           className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X className="size-5" aria-hidden />

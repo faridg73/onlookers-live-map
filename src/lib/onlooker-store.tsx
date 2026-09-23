@@ -34,7 +34,7 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     responses: 0,
     expiresInMin: Math.max(0, Math.round((expiresAt - createdAt) / 60_000)),
     expiresAt,
-    requester: row.mine ? "you" : "an onlooker nearby",
+    requester: row.mine ? "you" : "a poster nearby",
     lat: row.latitude,
     lng: row.longitude,
     x: 500,

@@ -143,7 +143,7 @@ export function VenueBountyDialog({
       return;
     }
     if (note.trim().length < 10) {
-      toast.error("Say exactly what the hunter should capture.");
+      toast.error("Say exactly what the onlooker should capture.");
       return;
     }
     if (total < MIN_BOUNTY) {

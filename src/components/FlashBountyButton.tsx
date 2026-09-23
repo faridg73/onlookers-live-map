@@ -630,7 +630,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
                 htmlFor="flash-instructions"
                 className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground"
               >
-                Optional instructions for hunter
+                Optional instructions for onlooker
               </label>
               <Textarea
                 id="flash-instructions"

@@ -46,7 +46,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
           </div>
 
           <p className="text-xs font-medium leading-relaxed text-white/90">
-            Your {formatCredits(credits)} are locked and safe — no one can spend them while hunters work on your bounty.
+            Your {formatCredits(credits)} are locked and safe — no one can spend them while onlookers work on your bounty.
           </p>
 
           <div>

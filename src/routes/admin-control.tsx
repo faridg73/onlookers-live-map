@@ -37,7 +37,7 @@ export const Route = createFileRoute("/admin-control")({
       {
         name: "description",
         content:
-          "Admin control center for Onlooker: review flagged content, approve hunter cash-outs and track platform volume.",
+          "Admin control center for Onlooker: review flagged content, approve onlooker cash-outs and track platform volume.",
       },
       { property: "og:title", content: "Onlooker control center" },
       {
@@ -157,7 +157,7 @@ function ControlCenter() {
       <header className="mb-6">
         <h1 className="text-2xl font-black tracking-tight text-foreground">Control center</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Flagged content, hunter cash-outs and live platform volume.
+          Flagged content, onlooker cash-outs and live platform volume.
         </p>
       </header>
 

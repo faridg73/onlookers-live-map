@@ -56,7 +56,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
     e.preventDefault();
     if (!title.trim() || !place.trim()) return;
     if (!locationType) {
-      toast.error("Pick the location type so hunters know this spot is cleared for filming.");
+      toast.error("Pick the location type so onlookers know this spot is cleared for filming.");
       return;
     }
     if (bounty < MIN_BOUNTY) {

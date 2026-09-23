@@ -45,11 +45,11 @@ const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typ
   },
   {
     step: "02",
-    title: "A Hunter Claims It",
-    body: "Nearby verified Hunters see your bounty and claim it to fulfill your request in person.",
+    title: "An Onlooker Claims It",
+    body: "Nearby verified Onlookers see your bounty and claim it to fulfill your request in person.",
     icon: Radar,
     thumb: step2Thumb.url,
-    thumbAlt: "A Hunter on location holding their phone",
+    thumbAlt: "An Onlooker on location holding their phone",
   },
   {
     step: "03",
@@ -466,7 +466,7 @@ export function HomeLiveStage({
           ) : (
             <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-home-line bg-home-glass-strong p-6 text-center">
               <p className="text-[0.72rem] font-extrabold text-foreground">Your move — start the first one nearby</p>
-              <p className="text-[0.62rem] font-semibold text-muted-foreground">Nothing on this tab yet. Switch to All, or post a bounty and let Hunters pick it up.</p>
+              <p className="text-[0.62rem] font-semibold text-muted-foreground">Nothing on this tab yet. Switch to All, or post a bounty and let Onlookers pick it up.</p>
               <Button type="button" size="sm" onClick={onPostBounty} className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
                 Post bounty
               </Button>
@@ -478,12 +478,12 @@ export function HomeLiveStage({
         <RecentCapturesFeed
           limit={null}
           title="Recent results"
-          blurb="Verified captures from bounties that already wrapped — tap any card to watch what a Hunter delivered."
+          blurb="Verified captures from bounties that already wrapped — tap any card to watch what an Onlooker delivered."
           emptyTeaser={
             <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-home-line bg-home-glass p-6 text-center">
               <p className="text-[0.72rem] font-extrabold text-foreground">Nothing here yet — be the first to wrap one</p>
               <p className="text-[0.62rem] font-semibold text-muted-foreground">
-                Approve your first bounty's proof and this wall fills with what Hunters captured.
+                Approve your first bounty's proof and this wall fills with what Onlookers captured.
               </p>
               <Button type="button" size="sm" onClick={onPostBounty} className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
                 Post bounty

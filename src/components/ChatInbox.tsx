@@ -182,7 +182,7 @@ export function ChatInbox({
                 </p>
                 <p className="mt-1 max-w-64 text-xs leading-relaxed text-muted-foreground">
                   {tab === "streamers"
-                    ? "Live coordination appears here when a hunter claims your bounty."
+                    ? "Live coordination appears here when an onlooker claims your bounty."
                     : "Your first conversation opens when a bounty is claimed."}
                 </p>
               </div>
@@ -301,7 +301,7 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
             Stay close to the action.
           </h3>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            Message hunters, share arrival updates, and follow every live request from claim to payout.
+            Message onlookers, share arrival updates, and follow every live request from claim to payout.
           </p>
         </div>
 
