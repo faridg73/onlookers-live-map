@@ -20,7 +20,11 @@ export const DEFAULT_ALERT_PREFERENCES: AlertPreferences = {
   area_label: "",
 };
 
-export const RADIUS_CHOICES = [2, 5, 10, 25] as const;
+/**
+ * Suggested alert distances. These are shortcuts only — the custom field
+ * accepts any distance, there is no platform maximum.
+ */
+export const RADIUS_CHOICES = [2, 5, 10, 25, 50, 100, 250, 500] as const;
 
 const COLUMNS = "push_enabled, sms_enabled, email_enabled, phone, radius_miles, area_label";
 
