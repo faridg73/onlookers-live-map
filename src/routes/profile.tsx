@@ -51,7 +51,8 @@ import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { SocialLinks } from "@/components/Footer";
 import { AccountCenter } from "@/components/AccountCenter";
-import { AccountDeletion, ProfileEditor } from "@/components/ProfileEditor";
+import { ProfileEditor } from "@/components/ProfileEditor";
+import { fetchProfileStats, type ProfileStats } from "@/lib/profile-stats";
 
 
 export const Route = createFileRoute("/profile")({
@@ -73,11 +74,6 @@ export const Route = createFileRoute("/profile")({
   component: ProfileScreen,
 });
 
-const STATS = [
-  { icon: Wallet, label: "Earned", value: "2,480 Credits" },
-  { icon: Camera, label: "Shots sent", value: "37" },
-  { icon: Star, label: "Rating", value: "4.9" },
-];
 
 const ACTIVITY = [
   { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 Credits bounty · 12 min ago" },
@@ -95,6 +91,22 @@ function ProfileScreen() {
   const [verified, setVerified] = useState(false);
   const [profile, setProfile] = useState<MyProfile | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [stats, setStats] = useState<ProfileStats | null>(null);
+
+  useEffect(() => {
+    if (!user) { setStats(null); return; }
+    let live = true;
+    const load = () => fetchProfileStats(user.id).then((next) => live && setStats(next)).catch(() => {});
+    void load();
+    window.addEventListener("onlooker:credits-refresh", load);
+    return () => { live = false; window.removeEventListener("onlooker:credits-refresh", load); };
+  }, [user?.id]);
+
+  const STATS = [
+    { icon: Wallet, label: "Credits", value: stats?.credits != null ? stats.credits.toLocaleString() : "—" },
+    { icon: Camera, label: "Shots sent", value: stats?.shots != null ? String(stats.shots) : "—" },
+    { icon: Star, label: "Rating", value: stats?.rating != null ? stats.rating.toFixed(1) : "New" },
+  ];
 
   useEffect(() => {
     let active = true;
@@ -359,12 +371,6 @@ function ProfileScreen() {
         </button>
       </div>
 
-      <AccountDeletion
-        onDeleted={() => {
-          queryClient.clear();
-          navigate({ to: "/auth", replace: true });
-        }}
-      />
 
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent className="max-w-md">
