@@ -13,6 +13,8 @@ import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 import { PhoneVerification } from "@/components/PhoneVerification";
 import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
+import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
+import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -46,6 +48,7 @@ function AuthScreen() {
   const [verifying, setVerifying] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  const [offerTwoFactor, setOfferTwoFactor] = useState(false);
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
@@ -179,7 +182,8 @@ function AuthScreen() {
         await supabase.rpc("claim_verified_phone");
         await queryClient.cancelQueries();
         queryClient.clear();
-        await navigate({ to: "/profile", replace: true });
+        // Offer (never force) two-factor right after the account exists.
+        setOfferTwoFactor(true);
       } else {
         setMode("signin");
         setNeedsEmailConfirm(true);
@@ -221,6 +225,17 @@ function AuthScreen() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
     }
+  }
+
+  if (offerTwoFactor) {
+    return (
+      <TwoFactorSetup
+        onDone={() => {
+          setOfferTwoFactor(false);
+          void navigate({ to: "/profile", replace: true });
+        }}
+      />
+    );
   }
 
   if (verifying) {
@@ -304,10 +319,14 @@ function AuthScreen() {
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
         {mode === "signup" ? (
-          <p className="px-1 text-xs text-muted-foreground">
-            At least 10 characters with a capital letter, a number and a symbol. Passwords found in
-            known data breaches are rejected.
-          </p>
+          <>
+            <PasswordStrengthMeter password={password} email={email} />
+            {!password ? (
+              <p className="px-1 text-xs text-muted-foreground">
+                At least 10 characters with a capital letter, a number and a symbol.
+              </p>
+            ) : null}
+          </>
         ) : null}
         {human.widget}
         {formError ? (
