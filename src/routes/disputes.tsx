@@ -347,6 +347,8 @@ function DisputeCard({
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [ruling, setRuling] = useState(false);
+  const [ruleNote, setRuleNote] = useState("");
+  const ruleNoteReady = ruleNote.trim().length >= 10;
 
   const role = item.is_moderator && item.requester_id !== userId ? "moderator" : item.requester_id === userId ? "poster" : "reporter";
 
@@ -381,7 +383,7 @@ function DisputeCard({
   async function decide(awardSpotter: boolean) {
     setRuling(true);
     try {
-      await resolveDispute(item.request_id, awardSpotter);
+      await resolveDispute(item.request_id, awardSpotter, ruleNote);
       toast.success(awardSpotter ? "Payout released to the reporter." : "Bounty refunded to the poster.");
       onResolved();
     } catch (err) {
@@ -449,10 +451,22 @@ function DisputeCard({
               <p className="flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
                 <Gavel className="size-3.5" /> Moderator decision
               </p>
+              <textarea
+                value={ruleNote}
+                onChange={(e) => setRuleNote(e.target.value)}
+                rows={3}
+                placeholder="Your reasoning (required, kept on the record)"
+                className="mt-3 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-signal"
+              />
+              {!ruleNoteReady && (
+                <p className="mt-1 text-[0.68rem] text-muted-foreground">
+                  Write at least 10 characters before settling.
+                </p>
+              )}
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  disabled={ruling}
+                  disabled={ruling || !ruleNoteReady}
                   onClick={() => void decide(true)}
                   className="rounded-xl bg-signal px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
                 >
@@ -460,7 +474,7 @@ function DisputeCard({
                 </button>
                 <button
                   type="button"
-                  disabled={ruling}
+                  disabled={ruling || !ruleNoteReady}
                   onClick={() => void decide(false)}
                   className="rounded-xl border border-border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
                 >

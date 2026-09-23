@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { DeadlineNote } from "@/components/DeadlineNote";
 import { useAuth } from "@/hooks/use-auth";
 import { formatCredits, formatCreditCash } from "@/lib/credits";
 import { formatAgoISO, locationTypeById, type LiveRequest } from "@/lib/onlooker";
@@ -219,6 +220,29 @@ export function PosterBountyDashboard() {
                   )}
                   {stage.label} · {formatAgoISO(row.createdAt)}
                 </p>
+
+                {row.stage === "submitted" && row.autoReleaseAt ? (
+                  <DeadlineNote
+                    className="mt-1.5"
+                    deadline={row.autoReleaseAt}
+                    prefix="Approves automatically in"
+                    passed="Approving automatically — the payout is settling now."
+                  />
+                ) : row.stage === "claimed" ? (
+                  <DeadlineNote
+                    className="mt-1.5"
+                    deadline={row.reservedUntil ?? row.expiresAt}
+                    prefix="Onlooker's hold lapses in"
+                    passed="Hold lapsed — reopening to other onlookers."
+                  />
+                ) : row.stage === "open" ? (
+                  <DeadlineNote
+                    className="mt-1.5"
+                    deadline={row.expiresAt}
+                    prefix="Closes in"
+                    passed="Closing now — your credits are on the way back."
+                  />
+                ) : null}
 
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                   <div className="text-xs text-muted-foreground">

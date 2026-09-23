@@ -86,21 +86,57 @@ export async function listDisputesDetailed(): Promise<DetailedDisputeCase[]> {
 export async function resolveDisputeSplit(
   requestId: string,
   spotterPercent: number,
+  note: string,
 ): Promise<void> {
   const { error } = await supabase.rpc("resolve_dispute_split", {
     _request_id: requestId,
     _spotter_pct: spotterPercent,
+    _note: sanitizeText(note, { multiline: true, maxLength: 2000 }),
   });
   if (error) throw error;
 }
 
 /** Moderator decision: pay the reporter or refund the poster. */
-export async function resolveDispute(requestId: string, awardSpotter: boolean): Promise<void> {
+export async function resolveDispute(
+  requestId: string,
+  awardSpotter: boolean,
+  note: string,
+): Promise<void> {
   const { error } = await supabase.rpc("resolve_dispute", {
     _request_id: requestId,
     _award_spotter: awardSpotter,
+    _note: sanitizeText(note, { multiline: true, maxLength: 2000 }),
   });
   if (error) throw error;
+}
+
+export type PastDisputeRuling = {
+  id: string;
+  request_id: string;
+  prompt: string;
+  outcome: string;
+  spotter_pct: number;
+  amount: number;
+  note: string;
+  side: string;
+  created_at: string;
+};
+
+/** Moderator view: earlier rulings involving the same poster or onlooker. */
+export async function listDisputeHistory(
+  requesterId: string,
+  spotterId: string | null,
+): Promise<PastDisputeRuling[]> {
+  const { data, error } = await supabase.rpc("dispute_history_for", {
+    _requester_id: requesterId,
+    _spotter_id: spotterId as string,
+  });
+  if (error) throw error;
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    ...(row as unknown as PastDisputeRuling),
+    amount: Number(row["amount"] ?? 0),
+    spotter_pct: Number(row["spotter_pct"] ?? 0),
+  }));
 }
 
 /** True when the signed-in account is an admin or moderator. */

@@ -7,12 +7,14 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   isReviewStaff,
   listDisputesDetailed,
+  listDisputeHistory,
   listEvidence,
   resolveDispute,
   resolveDisputeSplit,
   setModerator,
   type DetailedDisputeCase,
   type DisputeEvidence,
+  type PastDisputeRuling,
 } from "@/lib/disputes";
 import { locationTypeById } from "@/lib/onlooker";
 import {
@@ -190,16 +192,23 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [ruling, setRuling] = useState(false);
   const [killFee, setKillFee] = useState(25);
+  const [note, setNote] = useState("");
+  const [history, setHistory] = useState<PastDisputeRuling[]>([]);
+  const noteReady = note.trim().length >= 10;
   const spot = locationTypeById(item.location_type);
 
   const load = useCallback(async () => {
-    const [ev, vids] = await Promise.all([
+    const [ev, vids, past] = await Promise.all([
       listEvidence(item.request_id).catch(() => []),
       listVideosForRequest(item.request_id).catch(() => [] as BountyVideo[]),
+      listDisputeHistory(item.requester_id, item.spotter_id).catch(
+        () => [] as PastDisputeRuling[],
+      ),
     ]);
     setEntries(ev);
     setClips(vids as BountyVideo[]);
-  }, [item.request_id]);
+    setHistory(past);
+  }, [item.request_id, item.requester_id, item.spotter_id]);
 
   useEffect(() => {
     if (open) void load();
@@ -216,7 +225,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
   async function decide(awardSpotter: boolean) {
     setRuling(true);
     try {
-      await resolveDispute(item.request_id, awardSpotter);
+      await resolveDispute(item.request_id, awardSpotter, note);
       toast.success(
         awardSpotter ? "Payout released to the reporter." : "Bounty refunded to the poster.",
       );
@@ -231,7 +240,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
   async function splitDecision() {
     setRuling(true);
     try {
-      await resolveDisputeSplit(item.request_id, killFee);
+      await resolveDisputeSplit(item.request_id, killFee, note);
       toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
       onResolved();
     } catch (err) {
@@ -341,10 +350,57 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
             </div>
           ))}
 
+          {history.length > 0 && (
+            <div className="rounded-xl border border-border bg-surface-raised px-3 py-2.5">
+              <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+                Earlier rulings involving these accounts
+              </p>
+              <ul className="mt-2 space-y-2">
+                {history.map((h) => (
+                  <li key={h.id} className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      {h.outcome === "payout"
+                        ? "Paid the onlooker"
+                        : h.outcome === "refund"
+                          ? "Refunded the poster"
+                          : `Split ${h.spotter_pct}% to the onlooker`}
+                    </span>{" "}
+                    · {h.side === "poster" ? "same poster" : h.side === "onlooker" ? "same onlooker" : "both parties"}{" "}
+                    · {new Date(h.created_at).toLocaleDateString()}
+                    <span className="block truncate text-[0.68rem]">{h.prompt}</span>
+                    <span className="block whitespace-pre-wrap text-[0.7rem] italic">{h.note}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="pt-2">
+            <label
+              htmlFor={`note-${item.request_id}`}
+              className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground"
+            >
+              Your reasoning (required, kept on the record)
+            </label>
+            <textarea
+              id={`note-${item.request_id}`}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+              placeholder="Why you settled it this way — both sides can be shown this later."
+              className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none focus:border-signal"
+            />
+            {!noteReady && (
+              <p className="mt-1 text-[0.68rem] text-muted-foreground">
+                Write at least 10 characters before settling.
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 gap-2 pt-2">
             <button
               type="button"
-              disabled={ruling}
+              disabled={ruling || !noteReady}
               onClick={() => void decide(true)}
               className="flex items-center justify-center gap-2 rounded-xl bg-signal px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-50"
             >
@@ -352,7 +408,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
             </button>
             <button
               type="button"
-              disabled={ruling}
+              disabled={ruling || !noteReady}
               onClick={() => void decide(false)}
               className="rounded-xl border border-border px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
             >
@@ -377,7 +433,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
             </span>
             <button
               type="button"
-              disabled={ruling}
+              disabled={ruling || !noteReady}
               onClick={() => void splitDecision()}
               className="ml-auto rounded-xl border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
             >

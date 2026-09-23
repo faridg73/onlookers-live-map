@@ -428,6 +428,10 @@ export type PostedBountyRow = {
   escrowStatus: string | null;
   escrowAmount: number;
   disputedAt: string | null;
+  /** When the onlooker's hold lapses and the bounty reopens to everyone. */
+  reservedUntil: string | null;
+  /** When submitted footage is approved and paid out automatically. */
+  autoReleaseAt: string | null;
   /** Claim snapshot from the onlooker working it. */
   claimStatus: string | null;
   claimedAt: string | null;
@@ -462,7 +466,7 @@ export const listMyPostedBounties = createServerFn({ method: "GET" })
     const [escrows, claims, videos] = await Promise.all([
       context.supabase
         .from("escrows")
-        .select("request_id, status, amount, disputed_at")
+        .select("request_id, status, amount, disputed_at, reserved_until, auto_release_at")
         .in("request_id", ids),
       context.supabase
         .from("claims")
@@ -519,6 +523,8 @@ export const listMyPostedBounties = createServerFn({ method: "GET" })
         escrowStatus: escrow?.status ?? null,
         escrowAmount: Number(escrow?.amount ?? 0),
         disputedAt: (escrow?.disputed_at as string | null) ?? null,
+        reservedUntil: (escrow?.reserved_until as string | null) ?? null,
+        autoReleaseAt: (escrow?.auto_release_at as string | null) ?? null,
         claimStatus: claim?.status ?? null,
         claimedAt: (claim?.claimed_at as string | null) ?? null,
         submissionCount: media?.count ?? 0,
