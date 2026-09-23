@@ -13,3 +13,7 @@
 ## Ticker readout
 - [x] Make LIVE/ALERTS/BOUNTIES/TOP POOL ticker items clickable
 - [x] Move ticker readout under "The city is live" line
+
+## In progress
+- [ ] Percentage-based visibility boost pricing in Step 3 (Fast Catch = 50% of reward, min 10 Cr; Priority Hunt = 100%, min 20 Cr; total escrow = reward + boost)
+- [ ] Verify dynamic Privacy & access copy per location type in the preview (Playwright)
