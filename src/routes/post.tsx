@@ -2,6 +2,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { scrollFieldToStart } from "@/lib/field-scroll";
 import { format } from "date-fns";
 import {
   ArrowLeft,
@@ -440,6 +441,8 @@ function PostScreen() {
     setPrompt("Request a live video of a strange sighting, unexplained light, or unusual aircraft");
     setTitle("Investigate a strange sighting");
     setNote("Capture a clear, steady view of the sighting and its surroundings without approaching anything unsafe.");
+    scrollFieldToStart(titleRef.current);
+    scrollFieldToStart(noteRef.current);
   }, [mystery]);
 
   useEffect(() => {
@@ -538,6 +541,8 @@ function PostScreen() {
     setAction(parsed.action);
     setTitle((current) => current || parsed.title.slice(0, 120));
     setNote((current) => current || parsed.instructions);
+    scrollFieldToStart(titleRef.current);
+    scrollFieldToStart(noteRef.current);
     if (parsed.action === "live") setMinutes(15);
     setCustomCapture(false);
     applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
@@ -1471,8 +1476,8 @@ function PostScreen() {
                   category={subcategory ? `${mainCategoryLabel} · ${subcategory}` : mainCategoryLabel}
                   locationType={locationType ? LOCATION_TYPES.find((type) => type.id === locationType)?.label ?? null : null}
                   place={place || null}
-                  onApplyTitle={(value) => setTitle(value.slice(0, 120))}
-                  onApplyInstructions={(value) => setNote(value)}
+                  onApplyTitle={(value) => { setTitle(value.slice(0, 120)); scrollFieldToStart(titleRef.current); }}
+                  onApplyInstructions={(value) => { setNote(value); scrollFieldToStart(noteRef.current); }}
                 />
 
                 <Collapsible defaultOpen={permissionNeeded}>
@@ -1840,8 +1845,9 @@ function PostScreen() {
           setModerationOpen(false);
           window.setTimeout(() => {
             setStep(2);
-            if (!isRequestAllowed("", note, "") && isRequestAllowed(title, "", "")) noteRef.current?.focus();
-            else titleRef.current?.focus();
+            const target = !isRequestAllowed("", note, "") && isRequestAllowed(title, "", "") ? noteRef.current : titleRef.current;
+            target?.focus();
+            scrollFieldToStart(target);
           }, 50);
         }}
       />

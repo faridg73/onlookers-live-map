@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { scrollFieldToStart } from "@/lib/field-scroll";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { CalendarIcon, CloudRain, Radio, ShieldCheck, Timer, Video, Zap } from "lucide-react";
@@ -80,6 +81,8 @@ export function VenueBountyDialog({
   const [weather, setWeather] = useState(1);
   const [title, setTitle] = useState(defaultTitle ?? "");
   const [note, setNote] = useState(defaultNote ?? "");
+  const titleRef = useRef<HTMLInputElement>(null);
+  const noteRef = useRef<HTMLTextAreaElement>(null);
   const [bounty, setBounty] = useState(20);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
@@ -91,6 +94,10 @@ export function VenueBountyDialog({
     void readWalletBalance().then(setBalance);
     if (defaultTitle) setTitle(defaultTitle);
     if (defaultNote) setNote(defaultNote);
+    if (defaultTitle || defaultNote) {
+      scrollFieldToStart(titleRef.current);
+      scrollFieldToStart(noteRef.current);
+    }
   }, [open, defaultTitle, defaultNote]);
 
   function pickMode(next: Mode) {
@@ -294,6 +301,7 @@ export function VenueBountyDialog({
               Title
             </span>
             <input
+              ref={titleRef}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={120}
@@ -308,6 +316,7 @@ export function VenueBountyDialog({
               Camera instructions
             </span>
             <textarea
+              ref={noteRef}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
