@@ -1,7 +1,9 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, RotateCcw, ShieldCheck } from "lucide-react";
+import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
+import { describeUploadError } from "@/lib/upload-errors";
 import { toast } from "sonner";
 
 import { useHumanCheck } from "@/components/HumanCheck";
@@ -50,6 +52,9 @@ export function BountyBottomSheet({
   const [capturing, setCapturing] = useState(false);
   const [sending, setSending] = useState(false);
   const [accepting, setAccepting] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
   const human = useHumanCheck("accept-bounty");
   const router = useRouter();
   const navigate = useNavigate();
@@ -107,19 +112,30 @@ export function BountyBottomSheet({
 
   async function submit(file: File) {
     setSending(true);
+    setSendError(null);
+    setLastFile(file);
+    setStatus("Starting your submission…");
     try {
       await uploadBountyVideo({
         file,
         request: request!,
         note: "Filmed live from the map after accepting the bounty.",
+        onStatus: setStatus,
       });
       toast.success("Sent to the requester for review.");
+      setLastFile(null);
       setCapturing(false);
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "That clip could not be sent.");
+      const reason = describeUploadError(error, {
+        bucket: "bounty-videos",
+        sizeBytes: file.size,
+      });
+      setSendError(reason);
+      toast.error(reason);
     } finally {
       setSending(false);
+      setStatus(null);
     }
   }
 
@@ -189,10 +205,10 @@ export function BountyBottomSheet({
         </p>
 
         {capturing ? (
-          <div className="mt-4">
+          <div className="mt-4 space-y-3">
             {sending ? (
-              <p className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
-                <Loader2 className="size-4 animate-spin" /> Sending your clip…
+              <p className="flex items-center justify-center gap-2 py-6 text-sm font-semibold text-foreground">
+                <Loader2 className="size-4 animate-spin" /> {status ?? "Sending your clip…"}
               </p>
             ) : (
               <VideoRecorder
@@ -200,6 +216,24 @@ export function BountyBottomSheet({
                 onRecorded={(file) => void submit(file)}
               />
             )}
+            {sendError && (
+              <div className="rounded-2xl border border-border bg-surface-raised px-3.5 py-3">
+                <p className="text-xs font-semibold leading-relaxed text-foreground">{sendError}</p>
+                {lastFile && (
+                  <button
+                    type="button"
+                    disabled={sending}
+                    onClick={() => void submit(lastFile)}
+                    className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground disabled:opacity-50"
+                  >
+                    <RotateCcw className="size-3.5" /> Retry this clip
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="flex justify-center">
+              <SubmissionSupportLink />
+            </div>
           </div>
         ) : (
           <>

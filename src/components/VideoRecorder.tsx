@@ -7,6 +7,7 @@ import { MAX_CLIP_SECONDS } from "@/lib/video-compress";
 import { PUBLIC_SPACES_DISCLAIMER } from "@/lib/camera-only";
 import { isMobileCaptureDevice, requestNativeCapture } from "@/lib/native-capture";
 import { DesktopWebcamRecorder } from "@/components/DesktopWebcamRecorder";
+import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
 
 /**
  * Launches the phone's own camera app for clips and photos. There is no in-app
@@ -103,6 +104,10 @@ export function VideoRecorder({
       <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
         {PUBLIC_SPACES_DISCLAIMER}
       </p>
+
+      <div className="flex justify-center px-4 pb-1 pt-2">
+        <SubmissionSupportLink tone="light" />
+      </div>
 
       <div className="flex flex-col gap-3 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
