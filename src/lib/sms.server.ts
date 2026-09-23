@@ -1,137 +1,92 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 /**
- * Server-only text messaging through the Twilio connector gateway. The app
- * never sees Twilio credentials — the gateway signs each request.
+ * Server-only text messaging through Signal House. Never import from client code.
  */
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+const DEFAULT_BASE_URL = "https://v2.signalhouse.io";
+const STATUS_CALLBACK_PATH = "/api/public/webhooks/signalhouse";
+const SITE_URL = "https://onlookerlive.com";
 
 /** Turns what someone typed into an E.164 number, assuming US when no country is given. */
 export function normalizePhone(raw: string): string | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
   const digits = trimmed.replace(/[^\d]/g, "");
-  // A leading "+" is often typed without a country code (e.g. "+310 400 9981"),
-  // so fall through to the US rules whenever the digits look like a US number.
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   if (trimmed.startsWith("+")) return digits.length >= 8 ? `+${digits}` : null;
   return digits.length >= 11 ? `+${digits}` : null;
 }
 
-/** Plain-language explanations for the Twilio failures we can actually hit. */
-function statusProblem(status: string, errorCode: number | null): string | null {
-  if (status !== "failed" && status !== "undelivered") return null;
-  switch (errorCode) {
-    case 30034:
-      return "Your Twilio number isn't registered for US A2P 10DLC messaging yet, so carriers are blocking these texts. Register the number in Twilio, then try again.";
-    case 21211:
-    case 21614:
-      return "That mobile number isn't a valid text-capable number.";
-    case 21610:
-      return "That number has replied STOP, so we can't text it.";
-    case 21408:
-    case 21612:
-      return "Your Twilio number can't send texts to that destination.";
-    default:
-      return `The carrier rejected the text${errorCode ? ` (error ${errorCode})` : ""}.`;
-  }
-}
-
 export type SmsResult = { ok: true; sid: string } | { ok: false; error: string };
 
-
-/**
- * Polls a just-sent message for a few seconds. Returns a readable problem when
- * the carrier rejected it, or null when it looks fine (still queued is fine).
- */
-async function confirmDelivery(
-  sid: string,
-  lovableKey: string,
-  connectionKey: string,
-): Promise<string | null> {
-  if (!sid) return null;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    try {
-      const response = await fetch(`${GATEWAY_URL}/Messages/${sid}.json`, {
-        headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": connectionKey,
-        },
-      });
-      if (!response.ok) return null;
-      const message = (await response.json()) as { status?: string; error_code?: number | null };
-      const problem = statusProblem(message.status ?? "", message.error_code ?? null);
-      if (problem) {
-        console.error(`[sms] ${sid} ${message.status} error ${message.error_code}`);
-        return problem;
-      }
-      if (message.status === "sent" || message.status === "delivered") return null;
-    } catch (error) {
-      console.error("[sms] status check threw", error);
-      return null;
-    }
+function readableError(status: number, text: string): string {
+  let message = "";
+  try {
+    const parsed = JSON.parse(text) as { error?: unknown; message?: unknown };
+    const raw = parsed.error ?? parsed.message;
+    if (typeof raw === "string") message = raw;
+    else if (raw && typeof raw === "object" && "message" in raw) message = String((raw as { message: unknown }).message);
+  } catch {
+    /* not JSON */
   }
-  return null;
+  if (status === 401 || status === 403) {
+    return "The texting service rejected our credentials. The Signal House API key needs to be checked.";
+  }
+  return message || `Text delivery failed (${status}).`;
 }
 
 /** Sends one text message. Never throws — callers get a readable failure instead. */
 export async function sendSms(to: string, body: string): Promise<SmsResult> {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const connectionKey = process.env["TWILIO_API_KEY"];
-  const from = process.env["TWILIO_FROM_NUMBER"];
+  const apiKey = process.env["SIGNALHOUSE_API_KEY"];
+  const from = process.env["SIGNALHOUSE_FROM_NUMBER"];
+  const baseUrl = (process.env["SIGNALHOUSE_BASE_URL"] || DEFAULT_BASE_URL).replace(/\/$/, "");
+  const webhookToken = process.env["SIGNALHOUSE_WEBHOOK_TOKEN"];
 
-  if (!lovableKey || !connectionKey) {
-    return { ok: false, error: "The texting service is not connected yet." };
-  }
-  if (!from) {
-    return { ok: false, error: "No sending phone number is configured for texts yet." };
-  }
+  if (!apiKey) return { ok: false, error: "The texting service is not connected yet." };
+  if (!from) return { ok: false, error: "No sending phone number is configured for texts yet." };
 
   const number = normalizePhone(to);
-  if (!number) {
-    return { ok: false, error: "That mobile number does not look right." };
+  if (!number) return { ok: false, error: "That mobile number does not look right." };
+
+  const payload: Record<string, unknown> = {
+    senderPhoneNumber: from.replace(/[^\d]/g, ""),
+    recipientPhoneNumber: number.replace(/[^\d]/g, ""),
+    messageBody: body,
+    enableShortlink: false,
+  };
+  if (webhookToken) {
+    payload["statusCallbackUrl"] = `${SITE_URL}${STATUS_CALLBACK_PATH}?token=${encodeURIComponent(webhookToken)}`;
   }
 
   try {
-    const response = await fetch(`${GATEWAY_URL}/Messages.json`, {
+    const response = await fetch(`${baseUrl}/message/sms`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": connectionKey,
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
-      body: new URLSearchParams({ To: number, From: from, Body: body }),
+      body: JSON.stringify(payload),
     });
-
     const text = await response.text();
     if (!response.ok) {
-      console.error(`[sms] send failed [${response.status}]: ${text}`);
-      let message = `Text delivery failed (${response.status}).`;
-      try {
-        const parsed = JSON.parse(text) as { message?: string };
-        if (parsed.message) message = parsed.message;
-      } catch {
-        /* keep the generic message */
+      console.error(`[sms] Signal House send failed [${response.status}]: ${text}`);
+      return { ok: false, error: readableError(response.status, text) };
+    }
+    let sid = "";
+    try {
+      const parsed = JSON.parse(text) as Record<string, unknown>;
+      if (parsed["success"] === false) {
+        console.error(`[sms] Signal House reported failure: ${text}`);
+        return { ok: false, error: readableError(400, text) };
       }
-      return { ok: false, error: message };
+      const data = (parsed["data"] ?? parsed) as Record<string, unknown> | Record<string, unknown>[];
+      const first = Array.isArray(data) ? data[0] : data;
+      const id = first?.["messageId"] ?? first?.["id"] ?? first?.["sid"];
+      if (id != null) sid = String(id);
+    } catch {
+      /* accepted without a JSON body */
     }
-
-    const parsed = JSON.parse(text) as { sid?: string; status?: string; error_code?: number | null };
-    const sid = parsed.sid ?? "";
-
-    // Twilio accepts the request first and only reports carrier rejections a
-    // moment later, so confirm the message really left before claiming success.
-    const immediate = statusProblem(parsed.status ?? "", parsed.error_code ?? null);
-    if (immediate) {
-      console.error(`[sms] rejected on create ${sid}: ${parsed.status} ${parsed.error_code}`);
-      return { ok: false, error: immediate };
-    }
-
-    const settled = await confirmDelivery(sid, lovableKey, connectionKey);
-    if (settled) return { ok: false, error: settled };
     return { ok: true, sid };
-
   } catch (error) {
     console.error("[sms] send threw", error);
     return { ok: false, error: "Could not reach the texting service." };
