@@ -175,10 +175,99 @@ function HuntScreen() {
           <Navigation className="size-4 text-signal" aria-hidden />
           <p className="mt-1 font-display text-xl text-foreground">{position ? nearby : "-"}</p>
           <p className="text-[0.62rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
-            Within {radius} {unit}
+            {radiusMiles === null ? "Anywhere" : `Within ${radiusText}`}
           </p>
         </div>
       </div>
+
+      <div className="mt-4">
+        <p className="text-[0.66rem] font-extrabold uppercase tracking-[0.12em] text-muted-foreground">
+          How far will you travel? Currently {radiusText.toLowerCase()}
+        </p>
+        <div
+          className="mt-2 flex flex-wrap items-center gap-1.5"
+          role="group"
+          aria-label="Hunting distance"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setRadiusMiles(null);
+              setCustomOpen(false);
+            }}
+            aria-pressed={radiusMiles === null}
+            className={
+              "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (radiusMiles === null
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            Anywhere
+          </button>
+          {RADIUS_PRESETS_MI.map((miles) => {
+            const active = !customOpen && radiusMiles === miles;
+            return (
+              <button
+                key={miles}
+                type="button"
+                onClick={() => {
+                  setRadiusMiles(miles);
+                  setCustomOpen(false);
+                }}
+                aria-pressed={active}
+                className={
+                  "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+                  (active
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface text-muted-foreground hover:text-foreground")
+                }
+              >
+                {Math.round(toDisplay(miles))} {unit}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => {
+              setCustomOpen(true);
+              setRadiusMiles((current) => current ?? 100);
+            }}
+            aria-pressed={customOpen}
+            className={
+              "min-h-9 rounded-full border px-3 py-1.5 text-[0.66rem] font-extrabold uppercase transition-colors " +
+              (customOpen
+                ? "border-signal bg-signal text-signal-foreground"
+                : "border-border bg-surface text-muted-foreground hover:text-foreground")
+            }
+          >
+            Custom
+          </button>
+          {customOpen && (
+            <label className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-1">
+              <input
+                type="number"
+                min={1}
+                value={radiusMiles === null ? "" : Math.round(toDisplay(radiusMiles))}
+                onChange={(e) => {
+                  const next = Number(e.target.value.replace(/\D/g, ""));
+                  setRadiusMiles(next > 0 ? fromDisplay(next) : null);
+                }}
+                aria-label={`Hunting distance in ${unit}`}
+                className="w-16 bg-transparent text-center text-[0.72rem] font-bold text-foreground outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <span className="pr-1 text-[0.65rem] font-bold uppercase text-muted-foreground">
+                {unit}
+              </span>
+            </label>
+          )}
+        </div>
+        <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
+          Set any distance you want — city-wide, statewide, or leave it on Anywhere. There is no
+          maximum.
+        </p>
+      </div>
+
 
       {!position && (
         <button
