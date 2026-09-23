@@ -140,7 +140,7 @@ export function AppMenu() {
               // Stays highlighted while you're on that page (or a page under
               // it), so context never resets between secondary tools.
               const active = pathname === to || pathname.startsWith(`${to}/`);
-              // Venues & Events gets a bright yellow flashing border and a
+              // Venues & Events gets a lime flashing border and a
               // flashing forward arrow to signal more places to discover.
               const featured = to === "/discover";
               return (
@@ -155,7 +155,7 @@ export function AppMenu() {
                     (active
                       ? "border-signal bg-signal/10 shadow-[0_0_10px_rgba(204,255,0,0.25)]"
                       : featured
-                        ? "border-yellow-400 bg-surface-raised hover:border-yellow-300 animate-all-vibes-flash motion-reduce:animate-none"
+                        ? "border-signal bg-surface-raised hover:border-signal animate-all-vibes-flash motion-reduce:animate-none"
                         : "border-border bg-surface-raised hover:border-signal/60")
                   }
                 >
@@ -175,7 +175,7 @@ export function AppMenu() {
                   </span>
                   {featured && !active && (
                     <ChevronRight
-                      className="ml-auto size-5 shrink-0 text-yellow-400 animate-arrow-flash motion-reduce:animate-none"
+                      className="ml-auto size-5 shrink-0 text-signal animate-arrow-flash motion-reduce:animate-none"
                       strokeWidth={3}
                       aria-hidden
                     />

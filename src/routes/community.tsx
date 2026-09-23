@@ -432,7 +432,7 @@ function CommunityHub() {
         </p>
         <Link
           to="/discover"
-          className="venue-hint-flash mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-yellow-300"
+          className="venue-hint-flash mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-signal"
         >
           Browse venues &amp; events →
         </Link>
