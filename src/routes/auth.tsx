@@ -13,6 +13,8 @@ import { checkAuthAttempt } from "@/lib/auth-guard.functions";
 import { PhoneVerification } from "@/components/PhoneVerification";
 import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
+import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
+import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -46,6 +48,7 @@ function AuthScreen() {
   const [verifying, setVerifying] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
+  const [offerTwoFactor, setOfferTwoFactor] = useState(false);
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
