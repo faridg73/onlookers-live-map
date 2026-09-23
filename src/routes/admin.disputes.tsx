@@ -358,6 +358,31 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
               Refund poster
             </button>
           </div>
+
+          <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-raised px-3 py-2.5">
+            <span className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+              Kill fee split
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={killFee}
+              onChange={(e) => setKillFee(Math.min(99, Math.max(1, Number(e.target.value) || 1)))}
+              className="w-16 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none focus:border-signal"
+            />
+            <span className="text-xs text-muted-foreground">
+              % to the reporter (${((item.amount * killFee) / 100).toFixed(2)}), rest refunded
+            </span>
+            <button
+              type="button"
+              disabled={ruling}
+              onClick={() => void splitDecision()}
+              className="ml-auto rounded-xl border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
+            >
+              Settle split
+            </button>
+          </div>
         </div>
       )}
     </article>
