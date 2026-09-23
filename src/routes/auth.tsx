@@ -182,7 +182,8 @@ function AuthScreen() {
         await supabase.rpc("claim_verified_phone");
         await queryClient.cancelQueries();
         queryClient.clear();
-        await navigate({ to: "/profile", replace: true });
+        // Offer (never force) two-factor right after the account exists.
+        setOfferTwoFactor(true);
       } else {
         setMode("signin");
         setNeedsEmailConfirm(true);
@@ -224,6 +225,17 @@ function AuthScreen() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
     }
+  }
+
+  if (offerTwoFactor) {
+    return (
+      <TwoFactorSetup
+        onDone={() => {
+          setOfferTwoFactor(false);
+          void navigate({ to: "/profile", replace: true });
+        }}
+      />
+    );
   }
 
   if (verifying) {
@@ -307,10 +319,14 @@ function AuthScreen() {
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
         {mode === "signup" ? (
-          <p className="px-1 text-xs text-muted-foreground">
-            At least 10 characters with a capital letter, a number and a symbol. Passwords found in
-            known data breaches are rejected.
-          </p>
+          <>
+            <PasswordStrengthMeter password={password} email={email} />
+            {!password ? (
+              <p className="px-1 text-xs text-muted-foreground">
+                At least 10 characters with a capital letter, a number and a symbol.
+              </p>
+            ) : null}
+          </>
         ) : null}
         {human.widget}
         {formError ? (
