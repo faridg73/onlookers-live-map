@@ -6,13 +6,15 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
   isReviewStaff,
-  listDisputes,
+  listDisputesDetailed,
   listEvidence,
   resolveDispute,
+  resolveDisputeSplit,
   setModerator,
-  type DisputeCase,
+  type DetailedDisputeCase,
   type DisputeEvidence,
 } from "@/lib/disputes";
+import { locationTypeById } from "@/lib/onlooker";
 import {
   listVideosForRequest,
   playbackUrl,
@@ -44,13 +46,13 @@ export const Route = createFileRoute("/admin/disputes")({
 function ModeratorDashboard() {
   const { user } = useAuth();
   const [staff, setStaff] = useState<boolean | null>(null);
-  const [cases, setCases] = useState<DisputeCase[]>([]);
+  const [cases, setCases] = useState<DetailedDisputeCase[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      setCases(await listDisputes());
+      setCases(await listDisputesDetailed());
     } catch {
       setCases([]);
     } finally {
@@ -180,12 +182,14 @@ function ModeratorAdmin() {
   );
 }
 
-function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () => void }) {
+function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolved: () => void }) {
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<DisputeEvidence[]>([]);
   const [clips, setClips] = useState<BountyVideo[]>([]);
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [ruling, setRuling] = useState(false);
+  const [killFee, setKillFee] = useState(25);
+  const spot = locationTypeById(item.location_type);
 
   const load = useCallback(async () => {
     const [ev, vids] = await Promise.all([
@@ -223,13 +227,29 @@ function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () =>
     }
   }
 
+  async function splitDecision() {
+    setRuling(true);
+    try {
+      await resolveDisputeSplit(item.request_id, killFee);
+      toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
+      onResolved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
+    } finally {
+      setRuling(false);
+    }
+  }
+
   return (
     <article className="rounded-2xl border border-border bg-surface p-4">
       <button type="button" onClick={() => setOpen(!open)} className="w-full text-left">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="truncate font-display text-base text-foreground">{item.prompt}</h2>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.location_name}</p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+              {item.location_name}
+              {spot ? ` · ${spot.emoji} ${spot.label}` : ""}
+            </p>
           </div>
           <span className="shrink-0 rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold text-signal">
             ${item.amount.toFixed(2)} held
@@ -248,6 +268,25 @@ function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () =>
 
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
+          <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+            Original bounty
+          </p>
+          <div className="rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
+            <p className="text-sm text-foreground">{item.prompt}</p>
+            {item.details && <p className="mt-1 whitespace-pre-wrap">{item.details}</p>}
+            <p className="mt-2">
+              {item.category ? `${item.category} · ` : ""}
+              {spot ? `${spot.emoji} ${spot.label}` : "No location type declared"}
+            </p>
+            {item.checklist.length > 0 && (
+              <ul className="mt-2 list-disc space-y-0.5 pl-4">
+                {item.checklist.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
             Submitted clips
           </p>
@@ -317,6 +356,31 @@ function ReviewCase({ item, onResolved }: { item: DisputeCase; onResolved: () =>
               className="rounded-xl border border-border px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
             >
               Refund poster
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-raised px-3 py-2.5">
+            <span className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+              Kill fee split
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={killFee}
+              onChange={(e) => setKillFee(Math.min(99, Math.max(1, Number(e.target.value) || 1)))}
+              className="w-16 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-foreground outline-none focus:border-signal"
+            />
+            <span className="text-xs text-muted-foreground">
+              % to the reporter (${((item.amount * killFee) / 100).toFixed(2)}), rest refunded
+            </span>
+            <button
+              type="button"
+              disabled={ruling}
+              onClick={() => void splitDecision()}
+              className="ml-auto rounded-xl border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground disabled:opacity-50"
+            >
+              Settle split
             </button>
           </div>
         </div>

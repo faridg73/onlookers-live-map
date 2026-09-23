@@ -2288,6 +2288,27 @@ export type Database = {
           status: string
         }[]
       }
+      list_disputes_detailed: {
+        Args: never
+        Returns: {
+          amount: number
+          category: string
+          checklist: string[]
+          details: string
+          dispute_reason: string
+          disputed_at: string
+          evidence_count: number
+          is_moderator: boolean
+          location_name: string
+          location_type: string
+          prompt: string
+          reason_code: string
+          request_id: string
+          requester_id: string
+          spotter_id: string
+          status: string
+        }[]
+      }
       list_disputes_with_reasons: {
         Args: never
         Returns: {
@@ -2501,6 +2522,10 @@ export type Database = {
       request_site_pin_state: { Args: { _request_id: string }; Returns: Json }
       resolve_dispute: {
         Args: { _award_spotter: boolean; _request_id: string }
+        Returns: boolean
+      }
+      resolve_dispute_split: {
+        Args: { _request_id: string; _spotter_pct: number }
         Returns: boolean
       }
       resolve_payout: {

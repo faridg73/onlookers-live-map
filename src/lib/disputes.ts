@@ -62,6 +62,38 @@ export async function addEvidence(requestId: string, body: string, role: string)
   if (error) throw error;
 }
 
+export type DetailedDisputeCase = DisputeCase & {
+  details: string;
+  checklist: string[];
+  category: string | null;
+  location_type: string | null;
+};
+
+/** Same list, plus the original bounty brief — used by the admin review panel. */
+export async function listDisputesDetailed(): Promise<DetailedDisputeCase[]> {
+  const { data, error } = await supabase.rpc("list_disputes_detailed");
+  if (error) throw error;
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    ...(row as unknown as DetailedDisputeCase),
+    amount: Number(row["amount"]),
+    evidence_count: Number(row["evidence_count"] ?? 0),
+    details: String(row["details"] ?? ""),
+    checklist: Array.isArray(row["checklist"]) ? (row["checklist"] as string[]) : [],
+  }));
+}
+
+/** Moderator decision: split the escrow — kill fee to the reporter, rest refunded. */
+export async function resolveDisputeSplit(
+  requestId: string,
+  spotterPercent: number,
+): Promise<void> {
+  const { error } = await supabase.rpc("resolve_dispute_split", {
+    _request_id: requestId,
+    _spotter_pct: spotterPercent,
+  });
+  if (error) throw error;
+}
+
 /** Moderator decision: pay the reporter or refund the poster. */
 export async function resolveDispute(requestId: string, awardSpotter: boolean): Promise<void> {
   const { error } = await supabase.rpc("resolve_dispute", {
