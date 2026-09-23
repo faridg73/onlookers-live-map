@@ -2,6 +2,7 @@
 import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
+import { describeUploadError } from "@/lib/upload-errors";
 import type { LiveRequest } from "@/lib/onlooker";
 import type { ModerationReasonCode } from "@/lib/moderation-reasons";
 
@@ -122,30 +123,86 @@ function playableContentType(mime: string) {
   return mime;
 }
 
+export type SubmissionWindow = {
+  status: string;
+  reservedUntil: string | null;
+  submissionStartedAt: string | null;
+  /** Latest moment this upload still counts as on-time. */
+  graceUntil: string | null;
+};
+
+/**
+ * Stamps the escrow the moment an upload starts, so the automatic sweep gives
+ * this submission a grace buffer instead of cutting it off at the deadline and
+ * forfeiting the payout.
+ */
+export async function beginBountySubmission(requestId: string): Promise<SubmissionWindow | null> {
+  const { data, error } = await supabase.rpc("begin_bounty_submission", {
+    _request_id: requestId,
+  });
+  if (error) throw error;
+  const row = (data ?? null) as Record<string, string | null> | null;
+  if (!row) return null;
+  return {
+    status: String(row["status"] ?? ""),
+    reservedUntil: row["reserved_until"] ?? null,
+    submissionStartedAt: row["submission_started_at"] ?? null,
+    graceUntil: row["grace_until"] ?? null,
+  };
+}
+
 /** Upload a fulfilment video to storage and save the record against the bounty. */
 export async function uploadBountyVideo({
   file,
   request,
   note,
   durationSeconds,
+  onStatus,
 }: {
   file: File;
   request: LiveRequest;
   note?: string;
   durationSeconds?: number | null;
+  /** Live progress line for the upload screen. */
+  onStatus?: (message: string) => void;
 }): Promise<BountyVideo> {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
   if (!user) throw new Error("Sign in to upload a bounty video.");
 
   const path = `${user.id}/${request.id}/${Date.now()}.${extensionFor(file)}`;
+  let window: SubmissionWindow | null = null;
 
-  await uploadMedia({
-    bucket: BOUNTY_VIDEO_BUCKET,
-    path,
-    file,
-    contentType: playableContentType(file.type),
-  });
+  // Claim the grace buffer before a single byte moves. Free broadcasts and
+  // instant clips have no escrow, so a failure here is never fatal.
+  if (request.dbId) {
+    try {
+      window = await beginBountySubmission(request.dbId);
+    } catch (cause) {
+      console.warn("[bounty] could not start the submission window", cause);
+    }
+  }
+
+  const describe = (cause: unknown) =>
+    new Error(
+      describeUploadError(cause, {
+        bucket: BOUNTY_VIDEO_BUCKET,
+        sizeBytes: file.size,
+        windowEndsAt: window?.graceUntil ?? window?.reservedUntil ?? null,
+      }),
+    );
+
+  try {
+    await uploadMedia({
+      bucket: BOUNTY_VIDEO_BUCKET,
+      path,
+      file,
+      contentType: playableContentType(file.type),
+      onStatus: (status) => onStatus?.(status.message),
+    });
+  } catch (cause) {
+    throw describe(cause);
+  }
 
   let thumbPath: string | null = null;
   const thumb = await captureThumbnail(file);
@@ -164,6 +221,8 @@ export async function uploadBountyVideo({
       thumbPath = null;
     }
   }
+
+  onStatus?.("Saving your submission…");
 
   const { data, error } = await supabase
     .from("bounty_videos")
@@ -188,7 +247,7 @@ export async function uploadBountyVideo({
     await supabase.storage
       .from(BOUNTY_VIDEO_BUCKET)
       .remove(thumbPath ? [path, thumbPath] : [path]);
-    throw error;
+    throw describe(error);
   }
 
   return data as BountyVideo;
