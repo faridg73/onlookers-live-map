@@ -50,7 +50,7 @@ export async function sendSms(to: string, body: string): Promise<SmsResult> {
 
   const payload: Record<string, unknown> = {
     senderPhoneNumber: from.replace(/[^\d]/g, ""),
-    recipientPhoneNumber: number.replace(/[^\d]/g, ""),
+    recipientPhoneNumber: [number.replace(/[^\d]/g, "")],
     messageBody: body,
     enableShortlink: false,
   };
