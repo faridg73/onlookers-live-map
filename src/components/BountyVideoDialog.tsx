@@ -50,6 +50,9 @@ export function BountyVideoDialog({
   const [videos, setVideos] = useState<BountyVideo[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
   const [note, setNote] = useState("");
   const [playing, setPlaying] = useState<{ id: string; url: string } | null>(null);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
@@ -109,9 +112,13 @@ export function BountyVideoDialog({
   /** Only clips filmed inside the app get here — there is no gallery path. */
   async function onCaptured(file: File) {
     setUploading(true);
+    setUploadError(null);
+    setLastFile(file);
+    setUploadStatus("Starting your submission…");
     try {
-      await uploadBountyVideo({ file, request, note });
+      await uploadBountyVideo({ file, request, note, onStatus: setUploadStatus });
       setNote("");
+      setLastFile(null);
       const rows = await listVideosForRequest(request.id, request.dbId ?? null);
       setVideos(rows);
       setThumbs(await thumbnailUrls(rows));
@@ -119,9 +126,12 @@ export function BountyVideoDialog({
       if (mine) setJustSent(mine);
       toast.success("Live capture sent to this bounty.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Sending that capture failed.");
+      const reason = describeUploadError(err, { bucket: "bounty-videos", sizeBytes: file.size });
+      setUploadError(reason);
+      toast.error(reason);
     } finally {
       setUploading(false);
+      setUploadStatus(null);
     }
   }
 
