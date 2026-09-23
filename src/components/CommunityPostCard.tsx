@@ -8,6 +8,7 @@ import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { HunterBadge } from "@/components/HunterBadge";
+import { MembershipBadge } from "@/components/MembershipBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { FollowButton } from "@/components/FollowButton";
 import { Button } from "@/components/ui/button";
@@ -150,6 +151,7 @@ export function CommunityPostCard({
             <span className="flex items-center gap-1 text-xs font-extrabold text-foreground">
               <span className="truncate">{post.authorName}</span>
               {post.authorVerified && <VerifiedBadge className="size-3.5" />}
+              <MembershipBadge userId={post.userId} />
             </span>
             <span className="block truncate text-[0.65rem] text-muted-foreground">{handle}</span>
           </span>
