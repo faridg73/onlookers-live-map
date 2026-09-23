@@ -25,7 +25,11 @@ import {
   type CategoryId,
   type LocationTypeId,
 } from "@/lib/onlooker";
-import { PUBLIC_HAPPENINGS_DISCLAIMER } from "@/lib/camera-only";
+import {
+  PUBLIC_HAPPENINGS_DISCLAIMER,
+  locationTypeAllowsPrivateProperty,
+  privacyAccessCopy,
+} from "@/lib/camera-only";
 
 export function NewRequestDialog({ children }: { children: ReactNode }) {
   const { addRequest } = useOnlooker();
@@ -196,7 +200,11 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
               ))}
             </div>
           </Field>
-          {needsPublicSpacesNotice(category) && (
+          {locationTypeAllowsPrivateProperty(locationType) ? (
+            <p className="rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
+              {privacyAccessCopy(locationType)}
+            </p>
+          ) : needsPublicSpacesNotice(category) && (
             <p className="rounded-xl border border-signal/50 bg-surface-raised px-3 py-2.5 text-xs font-bold text-foreground">
               {PUBLIC_HAPPENINGS_DISCLAIMER}
             </p>

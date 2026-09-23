@@ -62,12 +62,19 @@ import {
 } from "@/components/ui/select";
 
 
-import { PUBLIC_HAPPENINGS_DISCLAIMER, VENUE_EXTERIOR_DISCLAIMER } from "@/lib/camera-only";
+import {
+  PUBLIC_HAPPENINGS_DISCLAIMER,
+  locationTypeAllowsPrivateProperty,
+  privacyAccessCopy,
+} from "@/lib/camera-only";
 import { lockBounty, MIN_BOUNTY, readWalletBalance } from "@/lib/bounty-escrow";
 import {
   BOUNTY_TIERS,
+  VISIBILITY_BOOSTS,
   WEATHER_CONDITIONS,
   quoteBounty,
+  tierById,
+  visibilityBoostCost,
   type BountyTierId,
 } from "@/lib/bounty-pricing";
 import { formatCreditCash, formatCredits } from "@/lib/credits";
@@ -341,10 +348,13 @@ function PostScreen() {
     return Math.round((target - Date.now()) / 60_000);
   }, [action, customDeadline, minutes, scheduledStart]);
 
+  /** Multipliers for the picked deadline and conditions. The reward base is
+   *  always the poster's own amount — visibility boosts are charged
+   *  separately on top, never baked into the reward. */
   const quote = useMemo(
     () =>
       quoteBounty({
-        tier,
+        tier: "standard",
         customBase: Number.isFinite(bounty) ? bounty : 0,
         durationMinutes: capture,
         minutesUntilDue,
@@ -352,7 +362,7 @@ function PostScreen() {
         // The gig algorithm already priced the minutes into the base reward.
         durationPricedInBase: true,
       }),
-    [bounty, capture, minutesUntilDue, tier, weather],
+    [bounty, capture, minutesUntilDue, weather],
   );
 
   /** Gig pricing for the selected capture length, shown in the breakdown card. */
@@ -371,20 +381,20 @@ function PostScreen() {
   );
   /** True while the reward still equals the calculated Step-2 total. */
   const rewardMatchesGig =
-    tier === "standard" && Number.isFinite(bounty) && Math.round(bounty) === gigFloor;
+    Number.isFinite(bounty) && Math.round(bounty) === gigFloor;
 
   /**
-   * What actually gets held in escrow and paid to the onlooker. On Standard
-   * the picked reward IS the final payout (multipliers are already baked into
-   * the floor, never applied twice); fixed tiers keep their quoted total.
+   * What the onlooker earns. The picked reward IS the payout on every tier
+   * (multipliers are already baked into the floor, never applied twice); a
+   * visibility boost is a separate charge on top of the reward.
    */
   const escrowReward =
-    tier === "standard"
-      ? Number.isFinite(bounty)
-        ? Math.max(Math.round(bounty), gigFloor)
-        : gigFloor
-      : quote.total;
-  const total = escrowReward + (Number.isFinite(tip) ? tip : 0);
+    Number.isFinite(bounty) && Math.round(bounty) > 0
+      ? Math.max(Math.round(bounty), gigFloor)
+      : gigFloor;
+  /** Fast Catch = +50% of the reward (min 10), Priority Hunt = +100% (min 20). */
+  const boostCost = visibilityBoostCost(tier, escrowReward);
+  const total = escrowReward + boostCost + (Number.isFinite(tip) ? tip : 0);
 
   /** Whether the bounty description is complete enough to lock escrow. */
   const detailsReady = note.trim().length >= 10;
@@ -397,10 +407,6 @@ function PostScreen() {
    */
   const lastFloorRef = useRef<number | null>(null);
   useEffect(() => {
-    if (tier !== "standard") {
-      lastFloorRef.current = null;
-      return;
-    }
     setBounty((current) => {
       const prev = lastFloorRef.current;
       lastFloorRef.current = gigFloor;
@@ -410,7 +416,7 @@ function PostScreen() {
     });
   // `bounty` is a dep so programmatic sets (prompt parse, capture change) that land
   // below the floor get snapped up even when the floor itself didn't move.
-  }, [gigFloor, tier, bounty]);
+  }, [gigFloor, bounty]);
 
   useEffect(() => {
     void readWalletBalance().then(setBalance);
@@ -500,9 +506,7 @@ function PostScreen() {
    */
   const applyCapture = (next: CaptureDuration, nextAction: RequestAction = action, keepAction = false) => {
     setCapture(next);
-    if (tier === "standard") {
-      setBounty(gigQuoteForMinutes(next ?? GIG_LIVE_BLOCK_MINUTES).totalCredits);
-    }
+    setBounty(gigQuoteForMinutes(next ?? GIG_LIVE_BLOCK_MINUTES).totalCredits);
     if (next === null && nextAction !== "meetup") setAction("live");
     if (next !== null && nextAction === "live" && !keepAction) setAction("clip");
   };
@@ -731,6 +735,9 @@ function PostScreen() {
         `Requested capture: ${captureDurationLabel(capture, action === "live")}`,
         `Camera: ${angleLabel} · ${orientationLabel}`,
         scheduledStart ? `Start recording: ${format(scheduledStart, "EEE, MMM d 'at' h:mm a")}` : "",
+        boostCost > 0
+          ? `Visibility boost: ${tierById(tier).label} (+${boostCost} Credits for priority placement)`
+          : "",
         `Category: ${mainCategoryLabel}`,
         subcategory ? `Subcategory: ${subcategory}` : "",
         taggedKeywords.length ? `Keywords: ${taggedKeywords.join(", ")}` : "",
@@ -870,8 +877,8 @@ function PostScreen() {
                     Paid flash bounty
                   </span>
                   <span className="mt-1 block text-sm text-signal">
-                    Ask someone standing there for a live look. Fast Catch (500), Priority Hunt (1000)
-                    or your own amount, held in escrow until you approve.
+                    Ask someone standing there for a live look. Fast Catch (+50%), Priority
+                    Hunt (+100%) or your own amount, held in escrow until you approve.
                   </span>
                 </span>
               </button>
@@ -1387,10 +1394,10 @@ function PostScreen() {
                       live={capture === null}
                       rewardCredits={quote.baseCredits}
                       rewardMatchesGig={rewardMatchesGig}
-                      floorCredits={tier === "standard" ? gigFloor : undefined}
+                      floorCredits={gigFloor}
                       urgencyFactor={quote.urgencyFactor}
                       weatherFactor={quote.weatherFactor}
-                      totalCredits={tier === "standard" ? escrowReward : quote.total}
+                      totalCredits={escrowReward}
                     />
                     <p className="mt-2 text-xs font-medium text-muted-foreground">
                       {captureDurationLabel(capture, action === "live")}
@@ -1474,8 +1481,8 @@ function PostScreen() {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="mt-3 space-y-4">
                     <div className="rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-                      <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{VENUE_EXTERIOR_DISCLAIMER}</p>
-                       {needsPublicSpacesNotice(category) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
+                      <p className="flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{privacyAccessCopy(locationType)}</p>
+                       {needsPublicSpacesNotice(category) && !locationTypeAllowsPrivateProperty(locationType) && <p className="mt-2 flex gap-2"><ShieldCheck className="size-4 shrink-0 text-signal" />{PUBLIC_HAPPENINGS_DISCLAIMER}</p>}
                     </div>
                     {codeNeeded && (
                       <div className="flex gap-2">
@@ -1530,12 +1537,7 @@ function PostScreen() {
                         type="button"
                         variant="outline"
                         aria-pressed={tier === option.id}
-                        onClick={() => {
-                          setTier(option.id);
-                          // Coming back to Standard restores the gig price for the
-                          // clip length picked on Step 2 instead of a stale amount.
-                          if (option.id === "standard") setBounty(gig.totalCredits);
-                        }}
+                        onClick={() => setTier(option.id)}
                         className={`relative h-auto items-start justify-start gap-3 whitespace-normal p-3 pr-7 text-left ${tier === option.id ? "border-signal bg-signal/10" : ""}`}
                       >
                         {option.id === "fast_catch" && (
@@ -1552,22 +1554,30 @@ function PostScreen() {
                         <span>
                           <span className="block font-extrabold text-foreground">{option.label}</span>
                           <span className="mt-1 block text-xs font-medium text-muted-foreground">
-                            {option.baseCredits ? `${option.baseCredits} Credits · ${option.blurb}` : option.blurb}
+                            {option.id === "standard"
+                              ? option.blurb
+                              : `+${VISIBILITY_BOOSTS[option.id].pct * 100}% of your reward (min ${VISIBILITY_BOOSTS[option.id].min} Credits) · ${option.blurb}`}
                           </span>
+                          {option.id !== "standard" && (
+                            <span className="mt-1 block text-xs font-extrabold text-signal">
+                              +{formatCredits(visibilityBoostCost(option.id, escrowReward))} on your{" "}
+                              {formatCredits(escrowReward)} reward
+                            </span>
+                          )}
                         </span>
                       </Button>
                     ))}
                   </div>
                 </div>
 
-                {tier === "standard" && (
-                  <div>
+                <div>
                     <p className="text-xs font-bold uppercase text-muted-foreground">Your reward</p>
                     <p className="mt-1 text-xs font-medium text-muted-foreground">
                       Pre-set to the calculated total for your{" "}
                       {captureDurationLabel(capture, action === "live")} — that's the{" "}
                       <span className="font-extrabold text-foreground">minimum the onlooker earns</span>.
-                      You can raise it as a tip, but never go below it.
+                      You can raise it as a tip, but never go below it. Fast Catch and Priority Hunt
+                      charge a percentage of this reward as their boost cost.
                     </p>
                     <div className="mt-3">
                       <BountyAmountPicker
@@ -1604,7 +1614,6 @@ function PostScreen() {
                       </div>
                     )}
                   </div>
-                )}
 
                 <div>
                   <p className="flex items-center gap-2 text-xs font-bold uppercase text-muted-foreground">
@@ -1688,10 +1697,12 @@ function PostScreen() {
                   live={capture === null}
                   rewardCredits={escrowReward}
                   rewardMatchesGig={rewardMatchesGig}
-                  floorCredits={tier === "standard" ? gigFloor : undefined}
+                  floorCredits={gigFloor}
                   urgencyFactor={quote.urgencyFactor}
                   weatherFactor={quote.weatherFactor}
                   tipCredits={Number.isFinite(tip) ? tip : 0}
+                  boostCredits={boostCost}
+                  boostLabel={tier !== "standard" ? tierById(tier).label : undefined}
                   totalCredits={total}
                 />
                 {tip > 0 && (
@@ -1710,7 +1721,9 @@ function PostScreen() {
             {step === 3 && (
               <div className="mb-3 flex items-center justify-between gap-3 text-sm">
                 <span className="font-bold text-muted-foreground">
-                  Held in escrow · paid to the onlooker
+                  {boostCost > 0
+                    ? "Total escrow · reward + boost"
+                    : "Held in escrow · paid to the onlooker"}
                 </span>
                 <span className="font-display text-lg font-extrabold text-signal">{formatCredits(total)} · {formatCreditCash(total)}</span>
               </div>

@@ -41,6 +41,8 @@ export function GigCostBreakdown({
   urgencyFactor = 1,
   weatherFactor = 1,
   tipCredits = 0,
+  boostCredits = 0,
+  boostLabel = "Visibility",
   totalCredits,
 }: {
   gig: GigQuote;
@@ -50,15 +52,17 @@ export function GigCostBreakdown({
   /** True when the reward is exactly the calculated Step-2 total. */
   rewardMatchesGig: boolean;
   /**
-   * Standard tier only: the calculated total (gig price × urgency ×
-   * conditions) that acts as the payout floor. Urgency/conditions rows are
-   * itemised from the gig price up to this number, so they are never
-   * double-counted against the chosen reward.
+   * The calculated total (gig price × urgency × conditions) that acts as the
+   * payout floor. Urgency/conditions rows are itemised from the gig price up
+   * to this number, so they are never double-counted against the chosen reward.
    */
   floorCredits?: number | undefined;
   urgencyFactor?: number;
   weatherFactor?: number;
   tipCredits?: number;
+  /** Visibility boost charge (Fast Catch / Priority Hunt), on top of the reward. */
+  boostCredits?: number;
+  boostLabel?: string | undefined;
   totalCredits: number;
 }) {
   const pct = (m: number) => `+${Math.round((m - 1) * 100)}%`;
@@ -119,21 +123,29 @@ export function GigCostBreakdown({
           <Row label="Filming conditions" detail={`${pct(weatherFactor)} for rough conditions`} credits={afterWeather - afterUrgency} />
         )}
         {tipCredits > 0 && <Row label="Tip" detail="added on top for the onlooker" credits={tipCredits} />}
+        {boostCredits > 0 && (
+          <Row
+            label={`${boostLabel} boost`}
+            detail="priority placement — charged on top of the reward"
+            credits={boostCredits}
+          />
+        )}
       </ul>
       <div
         className="mt-2.5 flex items-baseline justify-between border-t pt-2.5"
         style={{ borderColor: "rgba(34,197,94,0.4)" }}
       >
         <span className="text-sm font-extrabold text-foreground">
-          Held in escrow · paid to the onlooker
+          {boostCredits > 0 ? "Total escrow" : "Held in escrow · paid to the onlooker"}
         </span>
         <span className="font-display text-lg font-extrabold tabular-nums" style={{ color: LIME }}>
           {formatCredits(totalCredits)} · {formatCreditCash(totalCredits)}
         </span>
       </div>
       <p className="mt-2 text-[0.7rem] font-medium leading-snug text-muted-foreground">
-        This single number is what leaves your wallet and what the onlooker earns. Changing your
-        reward replaces the calculated price — nothing is charged twice.
+        {boostCredits > 0
+          ? `This is what leaves your wallet and is held in escrow — the onlooker earns ${formatCredits(rewardCredits)}; the ${formatCredits(boostCredits)} ${boostLabel.toLowerCase()} boost pays for priority placement.`
+          : "This single number is what leaves your wallet and what the onlooker earns. Changing your reward replaces the calculated price — nothing is charged twice."}
       </p>
     </div>
   );

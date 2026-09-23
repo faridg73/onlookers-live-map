@@ -43,6 +43,34 @@ export function tierById(id: BountyTierId): BountyTier {
   return BOUNTY_TIERS.find((t) => t.id === id) ?? BOUNTY_TIERS[0]!;
 }
 
+/**
+ * Visibility boosts, priced as a share of the poster's own reward so the
+ * charge stays proportionate at any bounty size. The boost is a separate
+ * charge on top of the reward — it never changes what the onlooker is paid.
+ */
+export type VisibilityBoostId = Exclude<BountyTierId, "standard">;
+
+export const VISIBILITY_BOOSTS: Record<
+  VisibilityBoostId,
+  { pct: number; min: number }
+> = {
+  fast_catch: { pct: 0.5, min: 10 },
+  priority_hunt: { pct: 1, min: 20 },
+};
+
+/** Boost charge for a tier at the given reward: pct of reward, floored at min. */
+export function visibilityBoostCost(
+  tier: BountyTierId,
+  rewardCredits: number,
+): number {
+  if (tier === "standard") return 0;
+  const boost = VISIBILITY_BOOSTS[tier];
+  const reward = Number.isFinite(rewardCredits)
+    ? Math.max(0, Math.round(rewardCredits))
+    : 0;
+  return Math.max(boost.min, Math.round(reward * boost.pct));
+}
+
 export type WeatherCondition = {
   id: string;
   label: string;
