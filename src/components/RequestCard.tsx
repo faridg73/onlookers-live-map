@@ -38,6 +38,7 @@ export function RequestCard({
   onSelect,
   compact = false,
   distanceLabel,
+  distanceMiles,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
@@ -46,6 +47,8 @@ export function RequestCard({
   compact?: boolean;
   /** Pre-computed "4.2 mi" style label shown under the location. */
   distanceLabel?: string | undefined;
+  /** Straight-line miles to the spot, used for the trip-value estimate. */
+  distanceMiles?: number | null | undefined;
 }) {
   const expired = request.status === "expired";
   const done = isClosed(request);
