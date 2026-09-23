@@ -307,7 +307,7 @@ function HuntScreen() {
             onClick={() => setSort(s.key)}
             aria-pressed={sort === s.key}
             className={
-              "rounded-lg border px-2 py-2 text-[0.66rem] font-bold uppercase tracking-[0.1em] transition-colors " +
+              "min-h-9 rounded-lg border px-2 py-2 text-[0.66rem] font-bold uppercase tracking-[0.1em] transition-colors " +
               (sort === s.key
                 ? "border-signal bg-signal text-signal-foreground"
                 : "border-border bg-surface text-muted-foreground hover:text-foreground")

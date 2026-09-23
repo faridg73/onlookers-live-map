@@ -242,7 +242,7 @@ export function BountyBottomSheet({
               type="button"
               disabled={!claimable || accepting}
               onClick={accept}
-              className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-live font-display text-base font-extrabold uppercase tracking-[0.1em] text-black disabled:opacity-50"
+              className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-signal font-display text-base font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
             >
               {wantsLive ? <Radio className="size-5" /> : <Camera className="size-5" />}
               {!claimable
