@@ -119,6 +119,21 @@ function HuntScreen() {
   const potential = list.reduce((sum, row) => sum + row.payout, 0);
   const nearby = list.length;
 
+  /**
+   * How many open bounties sit within widening rings around the hunter, so an
+   * empty or thin list still shows a clear path forward instead of a dead end.
+   */
+  const rings = useMemo(() => {
+    if (!position) return null;
+    const withMiles = open
+      .map((r) => distanceMiles(position, requestMapPosition(r)))
+      .filter((m) => Number.isFinite(m));
+    return [5, 25, 100, 500].map((miles) => ({
+      miles,
+      count: withMiles.filter((m) => m <= miles).length,
+    }));
+  }, [open, position]);
+
   /** Open bounties that have real coordinates, shown on the compact live map. */
   const pins = useMemo<LiveBountyPin[]>(
     () =>
