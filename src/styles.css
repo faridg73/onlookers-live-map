@@ -614,7 +614,9 @@
 }
 
 @utility pb-safe {
-  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  /* Always keep visible space between the nav and the Android/iOS gesture bar:
+     the system inset plus extra room, never less than 1rem. */
+  padding-bottom: max(calc(env(safe-area-inset-bottom) + 0.75rem), 1rem);
 }
 
 /* ============= Global pill accent =============
