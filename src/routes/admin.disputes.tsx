@@ -6,13 +6,15 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
   isReviewStaff,
-  listDisputes,
+  listDisputesDetailed,
   listEvidence,
   resolveDispute,
+  resolveDisputeSplit,
   setModerator,
-  type DisputeCase,
+  type DetailedDisputeCase,
   type DisputeEvidence,
 } from "@/lib/disputes";
+import { locationTypeById } from "@/lib/onlooker";
 import {
   listVideosForRequest,
   playbackUrl,
