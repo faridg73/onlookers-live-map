@@ -55,7 +55,7 @@ export async function sendSms(to: string, body: string): Promise<SmsResult> {
     enableShortlink: false,
   };
   if (webhookToken) {
-    payload.statusCallbackUrl = `${SITE_URL}${STATUS_CALLBACK_PATH}?token=${encodeURIComponent(webhookToken)}`;
+    payload["statusCallbackUrl"] = `${SITE_URL}${STATUS_CALLBACK_PATH}?token=${encodeURIComponent(webhookToken)}`;
   }
 
   try {
@@ -75,13 +75,13 @@ export async function sendSms(to: string, body: string): Promise<SmsResult> {
     let sid = "";
     try {
       const parsed = JSON.parse(text) as Record<string, unknown>;
-      if (parsed.success === false) {
+      if (parsed["success"] === false) {
         console.error(`[sms] Signal House reported failure: ${text}`);
         return { ok: false, error: readableError(400, text) };
       }
-      const data = (parsed.data ?? parsed) as Record<string, unknown> | Record<string, unknown>[];
+      const data = (parsed["data"] ?? parsed) as Record<string, unknown> | Record<string, unknown>[];
       const first = Array.isArray(data) ? data[0] : data;
-      const id = first?.messageId ?? first?.id ?? first?.sid;
+      const id = first?.["messageId"] ?? first?.["id"] ?? first?.["sid"];
       if (id != null) sid = String(id);
     } catch {
       /* accepted without a JSON body */

@@ -18,7 +18,7 @@ async function hashCode(phone: string, code: string): Promise<string> {
 }
 
 function newCode(): string {
-  const n = crypto.getRandomValues(new Uint32Array(1))[0] % 1_000_000;
+  const n = crypto.getRandomValues(new Uint32Array(1))[0]! % 1_000_000;
   return n.toString().padStart(6, "0");
 }
 
