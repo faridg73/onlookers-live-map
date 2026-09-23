@@ -114,7 +114,7 @@ export function PosterBountyDashboard() {
     { icon: Camera, label: "In progress", value: String(totals.working), show: totals.working > 0 },
     { icon: Lock, label: "In escrow", value: formatCredits(totals.held), show: totals.held > 0 },
     { icon: BadgeDollarSign, label: "Paid out", value: formatCredits(totals.paid), show: totals.paid > 0 },
-    { icon: Clock, label: "Refunded", value: formatCredits(totals.refunded), show: totals.refunded > 0 },
+    { icon: Clock, label: "Returned to balance", value: formatCredits(totals.refunded), show: totals.refunded > 0 },
   ].filter((s) => s.show);
 
   const active = TABS.find((t) => t.id === tab) ?? TABS[0]!;
