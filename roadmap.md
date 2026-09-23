@@ -23,3 +23,4 @@
 - [x] Specific upload/submission error messages, automatic retries, 10-minute submission grace buffer (escrows.submission_started_at + begin_bounty_submission), and a persistent "Submission failed? Contact support" link on every capture screen
 - [x] Trip-value row on bounty cards (distance, travel time, payout, est. hourly)
 - [x] Hunter search distance fully adjustable (Anywhere default, presets, uncapped custom); alert radius cap removed; confirmed no backend distance limit
+- [x] PIN handshake: expiry + single use, resend to agent, onlooker unreachable report (trip fee via dispute), account-free agent decline link with refund + kill fee
