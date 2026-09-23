@@ -103,7 +103,7 @@ function ProfileScreen() {
   }, [user?.id]);
 
   const STATS = [
-    { icon: Wallet, label: "Credits", value: stats?.credits != null ? stats.credits.toLocaleString() : "—" },
+    { icon: Wallet, label: "Total earned", value: stats?.totalEarned != null ? stats.totalEarned.toLocaleString() : "—" },
     { icon: Camera, label: "Shots sent", value: stats?.shots != null ? String(stats.shots) : "—" },
     { icon: Star, label: "Rating", value: stats?.rating != null ? stats.rating.toFixed(1) : "New" },
   ];
