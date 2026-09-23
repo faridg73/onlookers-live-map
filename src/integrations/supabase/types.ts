@@ -1627,6 +1627,42 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_delivery_events: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          message_id: string | null
+          payload: Json
+          provider: string
+          recipient: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          payload?: Json
+          provider?: string
+          recipient?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          message_id?: string | null
+          payload?: Json
+          provider?: string
+          recipient?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       stream_sessions: {
         Row: {
           created_at: string
