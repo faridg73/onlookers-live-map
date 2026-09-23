@@ -19,5 +19,5 @@
 - [ ] Verify boost pricing + dynamic Privacy & access copy in the preview UI (Playwright blocked by step-1/2 validation in the headless flow; needs a signed-in or manual pass)
 - [x] Poster bounty dashboard inside Profile (tabs: Open / In progress / Settled, escrow + payout totals, cancel + footage review)
 - [x] Verify boost pricing + dynamic Privacy & access copy (signed-in wizard pass confirmed)
-- [ ] Visible auto-close/settle countdowns on poster bounty dashboard cards
-- [ ] Required resolution note on dispute decisions, stored with the case and shown for repeat disputes
+- [x] Visible auto-close/settle countdowns on poster bounty dashboard cards
+- [x] Required resolution note on dispute decisions, stored with the case and shown for repeat disputes
