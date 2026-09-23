@@ -53,14 +53,15 @@ export function checkPasswordStrength(password: string, email: string): Password
     warnings.push("Avoid runs like 1234 or abcd, they're the first guesses.");
   }
 
-  let score = 0;
-  if (password.length >= 10) score += 1;
-  if (password.length >= 14) score += 1;
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
-  if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) score += 1;
+  let raw = 0;
+  if (password.length >= 10) raw += 1;
+  if (password.length >= 14) raw += 1;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) raw += 1;
+  if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) raw += 1;
 
-  if (common) score = Math.min(score, 1);
-  if (password.length < 10) score = Math.min(score, 1);
+  if (common) raw = Math.min(raw, 1);
+  if (password.length < 10) raw = Math.min(raw, 1);
+  const score = Math.max(0, Math.min(4, raw)) as PasswordStrength["score"];
 
   if (password.length < 10) suggestions.push("Use at least 10 characters, 14+ is stronger.");
   if (!/[^A-Za-z0-9]/.test(password)) suggestions.push("Add a symbol like ! or ?.");
