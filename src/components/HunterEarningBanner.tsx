@@ -41,20 +41,22 @@ export function HunterEarningBanner() {
         </span>
       </div>
 
-      <div className="relative mt-4 grid grid-cols-3 gap-2">
+      <ol className="relative mt-4 space-y-3 sm:grid sm:grid-cols-3 sm:gap-2 sm:space-y-0">
         {STEPS.map((step) => (
-          <div
+          <li
             key={step.label}
-            className="rounded-xl border border-border bg-background/60 p-2.5"
+            className="flex items-start gap-3 sm:block sm:rounded-xl sm:border sm:border-border sm:bg-background/60 sm:p-2.5"
           >
-            <step.icon className="size-4 text-signal" aria-hidden />
-            <p className="mt-2 text-xs font-bold text-foreground">{step.label}</p>
-            <p className="mt-0.5 text-[0.62rem] leading-snug text-muted-foreground">
-              {step.text}
-            </p>
-          </div>
+            <step.icon className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden />
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-foreground sm:mt-2 sm:text-xs">{step.label}</p>
+              <p className="mt-0.5 text-xs leading-snug text-muted-foreground sm:text-[0.62rem]">
+                {step.text}
+              </p>
+            </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </div>
   );
 }

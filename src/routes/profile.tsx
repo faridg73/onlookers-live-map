@@ -177,9 +177,9 @@ function ProfileScreen() {
 
       <div className="mt-6 grid grid-cols-1 gap-3 min-[360px]:grid-cols-3">
         {STATS.map(({ icon: Icon, label, value }) => (
-          <div key={label} className="rounded-2xl border border-border bg-surface p-4 text-center">
+          <div key={label} className="min-w-0 rounded-2xl border border-border bg-surface px-2 py-3 text-center sm:p-4">
             <Icon className="mx-auto size-4 text-signal" />
-            <div className="mt-2 font-display text-xl text-foreground">{value}</div>
+            <div className="mt-2 truncate font-display text-lg text-foreground sm:text-xl">{value}</div>
             <div className="text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground">
               {label}
             </div>

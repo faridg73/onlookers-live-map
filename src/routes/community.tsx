@@ -424,7 +424,7 @@ function CommunityHub() {
             <X className="size-5" />
           </button>
         </div>
-        <h1 className="mt-2 whitespace-nowrap text-center text-xl font-extrabold text-foreground sm:text-2xl">
+        <h1 className="mt-2 text-balance text-center text-xl font-extrabold leading-tight text-foreground sm:whitespace-nowrap sm:text-2xl">
           See what your city is doing now
         </h1>
         <p className="mt-1 text-center text-sm font-semibold text-muted-foreground">
