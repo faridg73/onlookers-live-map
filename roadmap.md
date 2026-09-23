@@ -22,3 +22,4 @@
 - [x] Visible auto-close/settle countdowns on poster bounty dashboard cards
 - [x] Required resolution note on dispute decisions, stored with the case and shown for repeat disputes
 - [x] Specific upload/submission error messages, automatic retries, 10-minute submission grace buffer (escrows.submission_started_at + begin_bounty_submission), and a persistent "Submission failed? Contact support" link on every capture screen
+- [x] Trip-value row on bounty cards (distance, travel time, payout, est. hourly)

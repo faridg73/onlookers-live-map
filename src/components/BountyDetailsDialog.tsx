@@ -7,6 +7,7 @@ import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
 import { supabase } from "@/integrations/supabase/client";
+import { distanceMiles, requestMapPosition } from "@/lib/onlooker";
 import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import {
@@ -133,7 +134,12 @@ export function BountyDetailsDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <RequestCard request={request} />
+          <RequestCard
+            request={request}
+            distanceMiles={
+              userPosition ? distanceMiles(userPosition, requestMapPosition(request)) : null
+            }
+          />
 
           {!done && (
             <div className="mt-2 rounded-2xl border border-border bg-surface-raised p-3">

@@ -28,6 +28,7 @@ import { LivePulseBadge } from "@/components/LivePulseBadge";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
 import { LocationTypeBadge } from "@/components/LocationTypeBadge";
+import { TripValueRow } from "@/components/TripValueRow";
 import { cn } from "@/lib/utils";
 
 
@@ -38,6 +39,7 @@ export function RequestCard({
   onSelect,
   compact = false,
   distanceLabel,
+  distanceMiles,
 }: {
   request: LiveRequest;
   onClaim?: (id: string) => void;
@@ -46,6 +48,8 @@ export function RequestCard({
   compact?: boolean;
   /** Pre-computed "4.2 mi" style label shown under the location. */
   distanceLabel?: string | undefined;
+  /** Straight-line miles to the spot, used for the trip-value estimate. */
+  distanceMiles?: number | null | undefined;
 }) {
   const expired = request.status === "expired";
   const done = isClosed(request);
@@ -54,6 +58,18 @@ export function RequestCard({
   const { boostOf } = useBoosts();
   const boosted = boostOf(request.id);
   const pool = request.bounty + boosted;
+  // Trip value only makes sense while the bounty is still up for grabs.
+  const showTripValue =
+    typeof distanceMiles === "number" && Number.isFinite(distanceMiles) && !done && !expired;
+  const tripRow = showTripValue ? (
+    <TripValueRow
+      miles={distanceMiles as number}
+      distanceLabel={distanceLabel ?? `${(distanceMiles as number).toFixed(1)} mi`}
+      credits={pool}
+      onSiteMinutes={request.captureMinutes}
+      compact={compact}
+    />
+  ) : null;
 
   // The poster alone can re-tag the filming spot — e.g. a venue granted
   // permission after posting, so "Public Space" becomes "Owner-Authorized".
@@ -109,8 +125,12 @@ export function RequestCard({
               <span className="truncate">{request.place}</span>
               <LocationTypeBadge locationType={request.locationType} />
             </p>
-            {distanceLabel && (
-              <p className="mt-0.5 text-xs font-bold text-signal">{distanceLabel} away</p>
+            {tripRow ? (
+              <div className="mt-1.5">{tripRow}</div>
+            ) : (
+              distanceLabel && (
+                <p className="mt-0.5 text-xs font-bold text-foreground">{distanceLabel} away</p>
+              )
             )}
             <BountyBriefBadges request={request} compact />
           </div>
@@ -235,6 +255,9 @@ export function RequestCard({
           </div>
         </div>
       </div>
+
+      {tripRow && <div className="mt-3">{tripRow}</div>}
+
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {request.status === "open" && !done ? (
