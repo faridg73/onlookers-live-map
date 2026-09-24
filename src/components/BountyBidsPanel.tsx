@@ -38,6 +38,9 @@ function friendly(msg: string) {
 }
 
 export function BountyBidsPanel({ requestId }: { requestId: string }) {
+  // The bounty map page uses display ids like "db-<uuid>"; the backend wants
+  // the bare uuid, so strip the prefix before every query.
+  const bountyId = requestId.startsWith("db-") ? requestId.slice(3) : requestId;
   const [userId, setUserId] = useState<string | null>(null);
   const [req, setReq] = useState<Req | null>(null);
   const [summary, setSummary] = useState({ count: 0, top: 0 });
@@ -54,21 +57,21 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setUserId(uid);
 
     const [{ data: r }, { data: s }] = await Promise.all([
-      db.from("requests").select("requester_id, status, expires_at").eq("id", requestId).maybeSingle(),
-      db.rpc("bounty_bid_summary", { _request_id: requestId }),
+      db.from("requests").select("requester_id, status, expires_at").eq("id", bountyId).maybeSingle(),
+      db.rpc("bounty_bid_summary", { _request_id: bountyId }),
     ]);
     setReq(r ?? null);
     const row = Array.isArray(s) ? s[0] : s;
     setSummary({ count: Number(row?.bid_count ?? 0), top: Number(row?.top_bid ?? 0) });
 
     if (uid && r?.requester_id === uid) {
-      const { data } = await db.rpc("bounty_bids_for_poster", { _request_id: requestId });
+      const { data } = await db.rpc("bounty_bids_for_poster", { _request_id: bountyId });
       setPosterBids((data ?? []) as Bid[]);
     } else if (uid) {
       const { data } = await db
         .from("bounty_bids")
         .select("id, bidder_id, amount, note, status, created_at")
-        .eq("request_id", requestId)
+        .eq("request_id", bountyId)
         .eq("bidder_id", uid)
         .order("created_at", { ascending: false })
         .limit(1);
@@ -80,7 +83,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
       }
     }
     setLoaded(true);
-  }, [requestId]);
+  }, [bountyId]);
 
   useEffect(() => {
     void load();
@@ -95,7 +98,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
       return;
     }
     setBusy("place");
-    const { error } = await db.rpc("place_bounty_bid", { _request_id: requestId, _amount: n, _note: note });
+    const { error } = await db.rpc("place_bounty_bid", { _request_id: bountyId, _amount: n, _note: note });
     setBusy(null);
     if (error) { toast.error(friendly(error.message)); return; }
     toast.success(myBid?.status === "active" ? "Bid updated." : `Bid placed — ${n} credits held from your wallet.`);
