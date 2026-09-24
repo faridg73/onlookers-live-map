@@ -281,6 +281,20 @@ export const getBountyAccessCode = createServerFn({ method: "GET" })
     return row?.code ?? null;
   });
 
+/** Atomically assigns an open bounty to the signed-in Hunter. */
+export const claimBountyRequest = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }): Promise<{ claimId: string }> => {
+    await enforceRateLimit(RATE_LIMITS.acceptBounty, context.userId);
+    const { data: claimId, error } = await context.supabase.rpc("claim_bounty", {
+      _request_id: data.id,
+    });
+    if (error) throw new Error(error.message);
+    if (!claimId) throw new Error("This bounty could not be claimed. Refresh and try again.");
+    return { claimId: claimId as unknown as string };
+  });
+
 /**
  * Cancels an unfulfilled request the caller owns. Deleting it triggers the full
  * escrow refund back into their wallet.
@@ -339,6 +353,7 @@ export type ActiveRequestRow = {
   expiresAt: string;
   createdAt: string;
   mine: boolean;
+  status: "open" | "claimed";
   /** Reward tier the requester picked: standard, fast_catch or priority_hunt. */
   bountyTier: string | null;
   /** 'live_stream' or 'pre_recorded_clip'. */
@@ -363,7 +378,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       .select(
         "id, requester_id, prompt, details, location_name, location_type, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier",
       )
-      .eq("status", "open")
+      .in("status", ["open", "claimed"])
       .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false })
       .limit(200);
@@ -384,6 +399,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       expiresAt: row.expires_at,
       createdAt: row.created_at,
       mine: row.requester_id === context.userId,
+      status: row.status === "claimed" ? "claimed" : "open",
       bountyTier: row.bounty_tier ?? "standard",
       bountyType: row.bounty_type ?? "live_stream",
       captureMinutes: Number(row.custom_duration_minutes ?? row.duration_minutes ?? 5),

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { ShareToSocialButton } from "@/components/ShareToSocialButton";
 import { acceptBountyAndGoLive } from "@/lib/bounty-live.functions";
+import { claimBountyRequest } from "@/lib/requests.functions";
 
 
 import {
@@ -100,13 +101,26 @@ export function BountyBottomSheet({
     }
   }
 
-  function accept() {
+  async function accept() {
     if (wantsLive) {
       void goLive();
       return;
     }
-    onClaim?.(request!.id);
-    setCapturing(true);
+    const target = request.dbId;
+    if (!target) {
+      toast.error("This bounty is still loading. Refresh and try again.");
+      return;
+    }
+    setAccepting(true);
+    try {
+      await claimBountyRequest({ data: { id: target } });
+      onClaim?.(request.id);
+      setCapturing(true);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not claim this bounty.");
+    } finally {
+      setAccepting(false);
+    }
   }
 
 

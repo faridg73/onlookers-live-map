@@ -28,7 +28,7 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     instructions: row.details,
     bounty: row.bounty,
     category: row.category && CATEGORY_IDS.has(row.category) ? (row.category as CategoryId) : undefined,
-    status: "open",
+    status: row.status,
     minutesAgo: Math.max(0, Math.round((Date.now() - createdAt) / 60_000)),
     watchers: 1,
     responses: 0,

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState, type ReactNode } from "react";
-import { CircleOff, HandCoins, Radar, ShieldCheck } from "lucide-react";
+import { CircleOff, HandCoins, Loader2, Radar, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import { RequestCard } from "@/components/RequestCard";
 import { BoostBounty } from "@/components/BoostBounty";
 import { InstantSnippetButton } from "@/components/InstantSnippetButton";
@@ -10,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { distanceMiles, requestMapPosition } from "@/lib/onlooker";
 import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
+import { claimBountyRequest } from "@/lib/requests.functions";
 import {
   Dialog,
   DialogContent,
@@ -55,6 +57,7 @@ export function BountyDetailsDialog({
   const [availabilityPrompt, setAvailabilityPrompt] = useState(false);
   const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [claiming, setClaiming] = useState(false);
   const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
@@ -241,13 +244,35 @@ export function BountyDetailsDialog({
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                onClaim?.(request.id);
-                setConfirming(false);
-                setOpen(false);
+              disabled={claiming}
+              onClick={async (event) => {
+                event.preventDefault();
+                if (claiming) return;
+                const requestId = request.dbId;
+                if (!requestId) {
+                  toast.error("This bounty is still loading. Refresh and try again.");
+                  return;
+                }
+                setClaiming(true);
+                try {
+                  await claimBountyRequest({ data: { id: requestId } });
+                  onClaim?.(request.id);
+                  setConfirming(false);
+                  setOpen(true);
+                  toast.success("Bounty claimed. When you arrive, request approval below.");
+                } catch (error) {
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "The bounty could not be claimed. Refresh and try again.",
+                  );
+                } finally {
+                  setClaiming(false);
+                }
               }}
             >
-              Yes, lock my claim
+              {claiming ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+              {claiming ? "Locking your claim…" : "Yes, lock my claim"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
