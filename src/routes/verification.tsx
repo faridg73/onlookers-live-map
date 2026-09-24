@@ -50,13 +50,13 @@ const STEPS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   },
   {
     icon: MessageSquareText,
-    title: "The contact gets a one-time PIN",
-    body: "We text and/or email a single-use 6-digit PIN directly to the agent, manager, or site contact, along with a simple link to decline if this wasn't authorized. Only share this code with the assigned Onlooker — it acts as your authorization for who may film the property.",
+    title: "The contact is ready to approve",
+    body: "We text and/or email the agent, manager, or site contact a single-use 6-digit backup PIN, plus a link to cancel the bounty if this visit wasn't authorized. No account is needed on their side.",
   },
   {
     icon: KeyRound,
-    title: "The Hunter verifies on site",
-    body: "Once the Hunter has claimed the bounty and arrives on site, the contact hands over the PIN — in person or by phone — and the Hunter enters it into the app. Only the Hunter who claimed the bounty can complete this step. A correct match unlocks the camera. If the contact never authorized the visit, they can tap the decline link at any time to cancel the bounty.",
+    title: "One tap approves the Hunter",
+    body: "Once the Hunter has claimed the bounty and arrives, they tap “I'm on site.” The contact instantly gets a link showing the Hunter's name and photo, and taps Approve — or “This isn't the right person,” which blocks that Hunter and sends the visit to review. The Hunter's screen updates live. Can't open the link? The contact can give the backup PIN in person or by phone instead. Only the Hunter who claimed the bounty can be approved.",
   },
   {
     icon: BadgeCheck,
@@ -79,7 +79,7 @@ const PROTECTIONS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   {
     icon: Undo2,
     title: "Unreachable? You're covered",
-    body: "If the Onlooker arrives and no PIN ever arrives, they can report the contact unreachable after a fair wait. You get the bounty back minus a small kill fee for the wasted trip.",
+    body: "If the Onlooker arrives and the contact never approves or shares the PIN, they can report the contact unreachable after a fair wait. You get the bounty back minus a small kill fee for the wasted trip.",
   },
   {
     icon: Smartphone,

@@ -272,6 +272,21 @@ export function SitePinVerification({
     );
   }
 
+  // Not claimed yet: guide them to claim before anything else.
+  if (!state.isSpotter) {
+    return (
+      <div className="mt-3 rounded-xl border border-signal/40 bg-surface p-3">
+        <div className="flex items-center gap-1.5 text-[0.6rem] uppercase tracking-[0.16em] text-signal">
+          <ShieldCheck className="size-3.5" /> On-site approval
+        </div>
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          Claim this bounty first. Once it&apos;s yours and you arrive, tap &ldquo;I&apos;m on site&rdquo; so the
+          property contact can approve you, then you can film.
+        </p>
+      </div>
+    );
+  }
+
   // Steps 2 and 3: the onlooker asks the agent and enters the PIN here.
   return (
     <div className="mt-3 rounded-xl border border-signal/40 bg-surface p-3">
@@ -313,7 +328,9 @@ export function SitePinVerification({
         {showPin ? "Hide PIN entry" : "Contact can't open the link? Enter their 6-digit PIN instead"}
       </button>
       {showPin && (<>
-      <p className="mt-2 text-xs text-muted-foreground">{expiryLine}</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Ask the contact for their 6-digit Onlooker PIN (in person or by phone) and enter it here. {expiryLine}
+      </p>
       <input
         value={digits}
         onChange={(event) => {
