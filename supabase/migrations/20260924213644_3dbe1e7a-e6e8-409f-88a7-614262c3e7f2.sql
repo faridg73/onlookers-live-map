@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS private.claim_bounty_entry(uuid);
