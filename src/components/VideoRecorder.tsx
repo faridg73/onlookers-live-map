@@ -133,6 +133,7 @@ export function VideoRecorder({
           </button>
         )}
       </div>
+      </div>
     </div>
   );
 }
