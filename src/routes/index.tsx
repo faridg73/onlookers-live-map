@@ -54,11 +54,12 @@ function MapScreen() {
   const navigate = useNavigate();
   const { b, at } = Route.useSearch();
 
+  // Bounties open their own dedicated map page, not the general browse map.
   const openOnMap = useCallback((request: LiveRequest) => {
-    const position = requestMapPosition(request);
     void navigate({
-      to: "/discover",
-      search: { view: "map", lat: position.lat, lng: position.lng, label: request.title, b: request.id },
+      to: "/b/$id",
+      params: { id: request.id },
+      search: { amt: request.bounty, title: request.title, place: request.place },
     });
   }, [navigate]);
 
