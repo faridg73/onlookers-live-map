@@ -26,6 +26,7 @@ import type { SitePinState } from "@/lib/site-pin";
 import { BountyChat } from "@/components/BountyChat";
 import { chatKey } from "@/lib/chat";
 import { useAuth } from "@/hooks/use-auth";
+import { notifyPayoutReleased } from "@/lib/payout-emails.functions";
 import {
   acceptBountyVideo,
   deleteBountyVideo,
