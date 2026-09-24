@@ -28,7 +28,7 @@ export type ProVisitBooking = {
   contactPhone: string;
   contactEmail: string;
   requestId: string | null;
-  bookingStatus: "draft" | "published";
+  bookingStatus: "draft" | "published" | "cancelled";
   requestStatus: string | null;
   requestExpiresAt: string | null;
   createdAt: string;
@@ -107,7 +107,11 @@ export const listMyProVisitBookings = createServerFn({ method: "GET" })
         contactPhone: booking.contact_phone,
         contactEmail: booking.contact_email,
         requestId: booking.request_id,
-        bookingStatus: booking.booking_status === "published" ? "published" : "draft",
+        bookingStatus: booking.booking_status === "published"
+          ? "published"
+          : booking.booking_status === "cancelled"
+            ? "cancelled"
+            : "draft",
         requestStatus: request?.status ?? null,
         requestExpiresAt: request?.expires_at ?? null,
         createdAt: booking.created_at,
@@ -135,7 +139,11 @@ export const getMyProVisitBooking = createServerFn({ method: "POST" })
       contactPhone: booking.contact_phone,
       contactEmail: booking.contact_email,
       requestId: booking.request_id,
-      bookingStatus: booking.booking_status === "published" ? "published" : "draft",
+      bookingStatus: booking.booking_status === "published"
+        ? "published"
+        : booking.booking_status === "cancelled"
+          ? "cancelled"
+          : "draft",
       requestStatus: null,
       requestExpiresAt: null,
       createdAt: booking.created_at,

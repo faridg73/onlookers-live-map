@@ -13,6 +13,7 @@ import { listMyProVisitBookings, type ProVisitBooking } from "@/lib/pro-visits.f
 
 function statusFor(booking: ProVisitBooking) {
   if (booking.bookingStatus === "draft") return { label: "Needs confirmation", tone: "text-signal" };
+  if (booking.bookingStatus === "cancelled") return { label: "Cancelled", tone: "text-muted-foreground" };
   if (!booking.requestId) return { label: "Cancelled", tone: "text-muted-foreground" };
   if (booking.requestStatus === "completed") return { label: "Completed", tone: "text-foreground" };
   if (booking.requestStatus === "claimed") return { label: "In progress", tone: "text-signal" };
