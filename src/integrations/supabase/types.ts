@@ -2716,6 +2716,10 @@ export type Database = {
           verified_phone: string
         }[]
       }
+      mark_payout_email_sent: {
+        Args: { _video_id: string }
+        Returns: undefined
+      }
       onlookers_within_radius: {
         Args: {
           _exclude_user_id?: string
