@@ -1203,6 +1203,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_accounts: {
+        Row: {
+          company: string
+          created_at: string
+          plan: string
+          plan_updated_at: string | null
+          pro_role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          plan?: string
+          plan_updated_at?: string | null
+          pro_role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          plan?: string
+          plan_updated_at?: string | null
+          pro_role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_security_answers: {
         Row: {
           answer_key: string

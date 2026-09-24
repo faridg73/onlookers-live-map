@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { PageBackButton } from "@/components/PageBackButton";
+import { VerifiedVisitsPro } from "@/components/pro/VerifiedVisitsPro";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/verification")({
@@ -194,6 +195,8 @@ function VerificationScreen() {
             ))}
           </div>
         </section>
+
+        <VerifiedVisitsPro />
 
         {/* CTA */}
         <section className="mt-12 rounded-2xl border border-signal/40 bg-signal/5 p-6 text-center">

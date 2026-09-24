@@ -216,8 +216,26 @@ async function endSubscription(subscription: Record<string, any>) {
 }
 
 /** Routes a settled checkout: membership, credit pack or money top-up. */
+/** Sets or clears a Verified Visits pro plan. */
+async function setProPlan(userId: string | undefined, plan: string) {
+  if (!userId) return;
+  const { error } = await getSupabase()
+    .from("pro_accounts")
+    .update({ plan, plan_updated_at: new Date().toISOString() })
+    .eq("user_id", userId);
+  if (error) {
+    console.error("[webhook] pro plan update failed", { userId, plan, message: error.message });
+    throw new Error(error.message);
+  }
+  console.log("[webhook] pro plan set", { userId, plan });
+}
+
 async function fulfil(session: Record<string, any>, env: StripeEnv) {
   const kind = session["metadata"]?.kind;
+  if (kind === "pro_subscription") {
+    await setProPlan(session["metadata"]?.userId ?? session["client_reference_id"], String(session["metadata"]?.tier ?? "none"));
+    return;
+  }
   if (kind === "subscription") await activateSubscription(session, env);
   else if (kind === "credit_purchase") await creditCreditPurchase(session, env);
   else await creditTopUp(session, env);
@@ -242,11 +260,22 @@ async function handleWebhook(request: Request, env: StripeEnv) {
         session: (event.data.object as Record<string, any>)["id"],
       });
       break;
-    case "invoice.paid":
+    case "invoice.paid": {
+      const inv = event.data.object as Record<string, any>;
+      const m = inv["subscription_details"]?.metadata ?? inv["lines"]?.data?.[0]?.metadata ?? {};
+      if (m.kind === "pro_subscription") {
+        await setProPlan(m.userId, String(m.tier ?? "none"));
+        break;
+      }
       await renewSubscription(event.data.object as Record<string, any>, env);
       break;
-    case "customer.subscription.deleted":
-      await endSubscription(event.data.object as Record<string, any>);
+    }
+    case "customer.subscription.deleted": {
+      const sub = event.data.object as Record<string, any>;
+      if (sub["metadata"]?.kind === "pro_subscription") await setProPlan(sub["metadata"]?.userId, "none");
+      else await endSubscription(sub);
+      break;
+    }
       break;
     default:
       console.log("[webhook] unhandled event", event.type);
