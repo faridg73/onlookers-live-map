@@ -50,6 +50,47 @@ export type Database = {
         }
         Relationships: []
       }
+      bounty_bids: {
+        Row: {
+          amount: number
+          bidder_id: string
+          created_at: string
+          id: string
+          note: string
+          request_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          bidder_id: string
+          created_at?: string
+          id?: string
+          note?: string
+          request_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          bidder_id?: string
+          created_at?: string
+          id?: string
+          note?: string
+          request_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounty_bids_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bounty_boosts: {
         Row: {
           amount: number
@@ -2248,6 +2289,7 @@ export type Database = {
         Args: { _request_id: string }
         Returns: Json
       }
+      award_bounty_bid: { Args: { _bid_id: string }; Returns: undefined }
       award_reputation: {
         Args: { _action: string; _subject?: string }
         Returns: number
@@ -2260,6 +2302,25 @@ export type Database = {
           credits_spent: number
           host_earned: number
           minutes_billed: number
+        }[]
+      }
+      bounty_bid_summary: {
+        Args: { _request_id: string }
+        Returns: {
+          bid_count: number
+          top_bid: number
+        }[]
+      }
+      bounty_bids_for_poster: {
+        Args: { _request_id: string }
+        Returns: {
+          amount: number
+          bidder_id: string
+          bidder_name: string
+          created_at: string
+          id: string
+          note: string
+          status: string
         }[]
       }
       build_alias: { Args: { _user_id: string }; Returns: string }
@@ -2573,6 +2634,10 @@ export type Database = {
         Args: { _credits: number; _hours?: number; _post_id: string }
         Returns: string
       }
+      place_bounty_bid: {
+        Args: { _amount: number; _note?: string; _request_id: string }
+        Returns: string
+      }
       platform_metrics: {
         Args: never
         Returns: {
@@ -2812,6 +2877,7 @@ export type Database = {
           validation_count: number
         }[]
       }
+      withdraw_bounty_bid: { Args: { _bid_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"

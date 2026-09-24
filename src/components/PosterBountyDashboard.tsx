@@ -201,7 +201,15 @@ export function PosterBountyDashboard() {
                 key={row.id}
                 className="rounded-2xl border border-border bg-surface p-4"
               >
-                <p className="line-clamp-2 text-sm font-semibold text-foreground">{row.prompt}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="line-clamp-2 text-sm font-semibold text-foreground">{row.prompt}</p>
+                  <a
+                    href={`/b/${row.id}`}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.1em] text-foreground hover:border-signal/60"
+                  >
+                    <Gavel className="size-3" /> Bids
+                  </a>
+                </div>
                 <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                   <MapPin className="size-3.5" />
                   <span className="truncate">{row.locationName}</span>
