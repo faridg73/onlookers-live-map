@@ -1242,6 +1242,7 @@ export type Database = {
       pro_visit_bookings: {
         Row: {
           address: string
+          booking_status: string
           contact_email: string
           contact_name: string
           contact_phone: string
@@ -1255,6 +1256,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          booking_status?: string
           contact_email?: string
           contact_name: string
           contact_phone?: string
@@ -1268,6 +1270,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          booking_status?: string
           contact_email?: string
           contact_name?: string
           contact_phone?: string
