@@ -135,8 +135,9 @@ function VerificationScreen() {
 
         {/* How it works */}
         <section className="mt-12" aria-labelledby="handshake-steps">
-          <h2 id="handshake-steps" className="text-center text-lg font-bold text-foreground">
-            How the handshake works
+          <h2 id="handshake-steps" className="text-center text-lg font-extrabold italic uppercase tracking-tight text-foreground">
+            <span className="mr-2 font-mono text-xs not-italic tracking-[0.25em] text-signal/60" aria-hidden>// 01</span>
+            How the <span className="text-signal">handshake</span> works
           </h2>
           <ol className="mt-6 space-y-4">
             {STEPS.map((step, i) => (
@@ -148,8 +149,8 @@ function VerificationScreen() {
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-signal/40 bg-signal/10">
                     <step.icon className="size-5 text-signal" aria-hidden />
                   </span>
-                  <span className="text-[0.65rem] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-                    Step {i + 1}
+                  <span className="whitespace-nowrap font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-signal/60">
+                    Step_{String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
                 <div className="min-w-0">
@@ -163,8 +164,9 @@ function VerificationScreen() {
 
         {/* Protections */}
         <section className="mt-12" aria-labelledby="handshake-protections">
-          <h2 id="handshake-protections" className="text-center text-lg font-bold text-foreground">
-            Trust built into every step
+          <h2 id="handshake-protections" className="text-center text-lg font-extrabold italic uppercase tracking-tight text-foreground">
+            <span className="mr-2 font-mono text-xs not-italic tracking-[0.25em] text-signal/60" aria-hidden>// 02</span>
+            Trust built into <span className="text-signal">every step</span>
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {PROTECTIONS.map((item) => (
@@ -181,8 +183,9 @@ function VerificationScreen() {
 
         {/* Audiences */}
         <section className="mt-12" aria-labelledby="handshake-audiences">
-          <h2 id="handshake-audiences" className="text-center text-lg font-bold text-foreground">
-            Built for property professionals
+          <h2 id="handshake-audiences" className="text-center text-lg font-extrabold italic uppercase tracking-tight text-foreground">
+            <span className="mr-2 font-mono text-xs not-italic tracking-[0.25em] text-signal/60" aria-hidden>// 03</span>
+            Built for <span className="text-signal">property professionals</span>
           </h2>
           <div className="mt-6 space-y-4">
             {AUDIENCES.map((aud) => (
@@ -213,7 +216,7 @@ function VerificationScreen() {
             your payment stays in escrow until the handshake proves the visit happened.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild className="h-11 rounded-xl bg-signal px-6 font-bold uppercase text-signal-foreground hover:brightness-110">
+            <Button asChild className="h-11 border border-signal bg-signal px-6 font-extrabold uppercase italic tracking-tight text-signal-foreground shadow-[0_0_28px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] [clip-path:polygon(0_0,100%_0,97%_100%,3%_100%)] hover:brightness-110">
               <Link to="/post">
                 <CircleDollarSign className="size-4" /> Post a verified bounty
               </Link>
