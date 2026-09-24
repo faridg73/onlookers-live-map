@@ -251,7 +251,7 @@ function DiscoverHome() {
             <section className="mt-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+                  <h2 className="flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
                     <Flame className="size-4 shrink-0 text-signal" aria-hidden /><span>Trending events &amp;{" "}
                     <span className="text-signal">live sports</span></span>
                   </h2>
@@ -353,7 +353,7 @@ function DiscoverHome() {
       )}
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
-        <p className="inline-flex items-center gap-2 font-display text-base text-foreground">
+        <p className="inline-flex items-center gap-2 text-base font-extrabold italic uppercase tracking-tight text-foreground">
           <Radar className="size-4 text-signal" aria-hidden /> Bounty <span className="text-signal">Radar</span>
         </p>
         {spots.length === 0 ? (

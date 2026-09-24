@@ -113,14 +113,20 @@ function VerificationScreen() {
         <PageBackButton label="Home" fallback="/" />
 
         {/* Hero */}
-        <header className="mt-8 text-center">
-          <p className="text-[0.7rem] font-bold uppercase tracking-[0.3em] text-signal">
+        <header className="relative mt-6 overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-5 pb-7 pt-6 text-center sm:px-10">
+          <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10" aria-hidden />
+          <div className="pointer-events-none absolute left-1/2 top-[-4rem] h-44 w-[70%] -translate-x-1/2 rounded-full bg-signal/10 blur-3xl" aria-hidden />
+          <p className="relative inline-flex items-center gap-2 border border-signal/30 bg-signal/5 px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-[0.25em] text-signal sm:text-xs">
+            <span className="relative flex size-1.5" aria-hidden>
+              <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+              <span className="relative size-1.5 rounded-full bg-signal" />
+            </span>
             The Onlooker Handshake
           </p>
-          <h1 className="mt-3 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">
+          <h1 className="relative mt-4 text-3xl font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)] sm:text-4xl">
             Verified on-site visits, end to end.
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+          <p className="relative mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Anyone can promise to visit a property. Onlooker proves it. A one-time PIN,
             an on-site handshake, and escrow that only releases on verification — a new,
             trusted way to get things done without being there yourself.
