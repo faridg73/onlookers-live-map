@@ -119,6 +119,7 @@ import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sig
 
 import { useOnlooker } from "@/lib/onlooker-store";
 import { PRO_VISIT_DRAFT_KEY, type ProVisitDraft } from "@/lib/pro-plans";
+import { linkProVisitBooking } from "@/lib/pro-visits.functions";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { useVoiceInput } from "@/lib/use-voice-input";
@@ -313,6 +314,7 @@ function PostScreen() {
   const [agentName, setAgentName] = useState("");
   const [agentPhone, setAgentPhone] = useState("");
   const [agentEmail, setAgentEmail] = useState("");
+  const [proVisitBookingId, setProVisitBookingId] = useState<string | null>(null);
   const [recent, setRecent] = useState<RecentPlace[]>([]);
   const [gpsBusy, setGpsBusy] = useState(false);
   /** Refill panel, so a short wallet never ends the journey. */
@@ -448,6 +450,9 @@ function PostScreen() {
     try {
       const d = JSON.parse(raw) as ProVisitDraft;
       setMode("bounty");
+      setCategoryId("real-estate");
+      setMainCategoryId("real-estate");
+      setPlaceCategoryId(null);
       setLocationType("owner_authorized");
       setPermissionOk(true);
       setTitle(`Verified visit: ${d.address}`.slice(0, 120));
@@ -458,6 +463,7 @@ function PostScreen() {
       setAgentName(d.agentName);
       setAgentPhone(d.agentPhone);
       setAgentEmail(d.agentEmail);
+      setProVisitBookingId(d.bookingId || null);
       if (d.startAt) {
         const when = new Date(d.startAt);
         if (!Number.isNaN(when.getTime()) && when.getTime() > Date.now()) setScheduledStart(when);
@@ -807,6 +813,14 @@ function PostScreen() {
         weatherMultiplier: weather,
         bountyTier: tier,
       });
+      if (proVisitBookingId) {
+        try {
+          await linkProVisitBooking({ data: { bookingId: proVisitBookingId, requestId: locked.id } });
+          setProVisitBookingId(null);
+        } catch {
+          toast.error("The bounty is live, but its dashboard link is still updating.");
+        }
+      }
       setBalance(locked.balance);
       addRequest({
         title: title.trim(),

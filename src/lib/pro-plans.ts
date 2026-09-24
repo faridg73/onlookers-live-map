@@ -52,6 +52,7 @@ export const formatUsd = (cents: number) => `$${(cents / 100).toFixed(cents % 10
 /** Draft handed from the Verified Visits request form to the bounty form. */
 export const PRO_VISIT_DRAFT_KEY = "onlooker:pro-visit-draft";
 export interface ProVisitDraft {
+  bookingId: string;
   address: string;
   purpose: string;
   startAt: string | null;
