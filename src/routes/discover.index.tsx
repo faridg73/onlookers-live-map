@@ -16,6 +16,7 @@ import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { requestMapPosition } from "@/lib/onlooker";
 import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
