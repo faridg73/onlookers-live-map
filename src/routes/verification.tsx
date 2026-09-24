@@ -46,22 +46,22 @@ const STEPS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   {
     icon: CircleDollarSign,
     title: "Post a verified bounty",
-    body: "Describe the property or site you need eyes on, add the on-site contact's name, phone or email, and fund the bounty. Payment sits in escrow — nothing is released yet.",
+    body: "Describe the property or site you need eyes on, add the on-site contact's name, phone, and/or email, and fund the bounty. Payment sits in escrow — nothing is released yet.",
   },
   {
     icon: MessageSquareText,
     title: "The contact gets a one-time PIN",
-    body: "We text and email a single-use 6-digit PIN straight to the agent, manager, or site contact. They never need an Onlooker account.",
+    body: "We text and/or email a single-use 6-digit PIN directly to the agent, manager, or site contact, along with a simple link to decline if this wasn't authorized. Only share this code with the assigned Onlooker — it acts as your authorization for who may film the property.",
   },
   {
     icon: KeyRound,
-    title: "The handshake happens on site",
-    body: "The Onlooker arrives, films, and the contact reads out the PIN. The Onlooker types it into the app — only a match marks the visit verified on site.",
+    title: "The Hunter verifies on site",
+    body: "Once the Hunter has claimed the bounty and arrives on site, the contact hands over the PIN — in person or by phone — and the Hunter enters it into the app. Only the Hunter who claimed the bounty can complete this step. A correct match unlocks the camera. If the contact never authorized the visit, they can tap the decline link at any time to cancel the bounty.",
   },
   {
     icon: BadgeCheck,
-    title: "Verification unlocks the payout",
-    body: "A verified visit unlocks footage submission and releases the escrowed payout. No handshake, no payout — you never pay for a visit that didn't happen.",
+    title: "Verification unlocks submission",
+    body: "A verified visit unlocks footage submission for Poster review. Once approved (or auto-approved after the review window), the escrowed payout releases. If the contact never shows or responds, the Hunter can report it and receive a partial trip fee — you never pay for a visit that didn't happen, and Hunters never lose out for a no-show contact.",
   },
 ];
 
