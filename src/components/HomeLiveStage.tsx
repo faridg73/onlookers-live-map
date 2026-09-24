@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, ChevronRight, CircleDollarSign, Eye, KeyRound, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, KeyRound, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
@@ -264,11 +264,12 @@ export function HomeLiveStage({
         {/* 1. Hero */}
         <div className="relative overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-4 pb-5 pt-5 shadow-[0_32px_90px_-18px_color-mix(in_oklab,var(--color-background)_95%,transparent)] backdrop-blur-2xl sm:px-10 sm:pb-6 sm:pt-6 lg:px-12 [@media(max-height:520px)]:px-5 [@media(max-height:520px)]:pb-3 [@media(max-height:520px)]:pt-3">
           <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent sm:left-10 sm:right-10 lg:left-12 lg:right-12" aria-hidden />
-          <div className="flex items-center justify-center gap-3">
-            <p className="home-display flex items-center gap-2 text-[0.62rem] font-semibold uppercase text-home-accent sm:text-xs">
-              <span className="relative flex size-2" aria-hidden>
-                <span className="absolute inset-0 animate-ping-slow rounded-full bg-live motion-reduce:animate-none" />
-                <span className="relative size-2 rounded-full bg-live" />
+          <div className="pointer-events-none absolute left-1/2 top-[-4rem] h-48 w-[70%] -translate-x-1/2 rounded-full bg-signal/10 blur-3xl" aria-hidden />
+          <div className="relative flex items-center justify-center gap-3">
+            <p className="home-display inline-flex items-center gap-2 border border-signal/30 bg-signal/5 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.25em] text-signal sm:text-xs">
+              <span className="relative flex size-1.5" aria-hidden>
+                <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+                <span className="relative size-1.5 rounded-full bg-signal" />
               </span>
               The city is live
             </p>
@@ -291,11 +292,11 @@ export function HomeLiveStage({
 
           <h2
             id="home-live-stage-title"
-            className="mt-2 text-center text-[clamp(1.2rem,4.2vw,2.1rem)] font-semibold leading-[1.05] text-signal drop-shadow-[0_0_16px_color-mix(in_oklab,var(--color-signal)_24%,transparent)] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
+            className="relative mt-3 text-center text-[clamp(1.2rem,4.2vw,2.4rem)] font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)] [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[1.05rem]"
           >
             See what&apos;s happening. Right now.
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-white sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
+          <p className="relative mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-muted-foreground sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
             Post a real-world task, or earn real cash completing them nearby — verified photos and video, on demand.
           </p>
 
