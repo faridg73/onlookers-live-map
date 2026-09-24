@@ -18,6 +18,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DmcaRouteImport } from './routes/dmca'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -91,6 +92,11 @@ const DisputesRoute = DisputesRouteImport.update({
 const DmcaRoute = DmcaRouteImport.update({
   id: '/dmca',
   path: '/dmca',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -333,6 +341,7 @@ export interface FileRoutesById {
   '/copyright': typeof CopyrightRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
+  '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
@@ -375,6 +384,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/disputes'
     | '/dmca'
+    | '/events'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -415,6 +425,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/disputes'
     | '/dmca'
+    | '/events'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -455,6 +466,7 @@ export interface FileRouteTypes {
     | '/copyright'
     | '/disputes'
     | '/dmca'
+    | '/events'
     | '/explore'
     | '/faq'
     | '/feed'
@@ -496,6 +508,7 @@ export interface RootRouteChildren {
   CopyrightRoute: typeof CopyrightRoute
   DisputesRoute: typeof DisputesRoute
   DmcaRoute: typeof DmcaRoute
+  EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
@@ -590,6 +603,13 @@ declare module '@tanstack/react-router' {
       path: '/dmca'
       fullPath: '/dmca'
       preLoaderRoute: typeof DmcaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -808,6 +828,7 @@ const rootRouteChildren: RootRouteChildren = {
   CopyrightRoute: CopyrightRoute,
   DisputesRoute: DisputesRoute,
   DmcaRoute: DmcaRoute,
+  EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,

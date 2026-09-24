@@ -198,7 +198,7 @@ function DiscoverHome() {
       </div>
 
       <Link
-        to="/discover/trending"
+        to="/events"
         className="group mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-signal/60"
       >
         <span className="inline-flex min-w-0 items-center gap-2.5 text-sm font-bold text-foreground">
@@ -259,7 +259,7 @@ function DiscoverHome() {
                   </p>
                 </div>
                 <Link
-                  to="/discover/trending"
+                  to="/events"
                   className="shrink-0 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-signal"
                 >
                   See all

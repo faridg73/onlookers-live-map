@@ -431,7 +431,7 @@ function CommunityHub() {
           A live local stream, tap a lane, tighten the radius, or open the map.
         </p>
         <Link
-          to="/discover"
+          to="/events"
           className="venue-hint-flash mt-3 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-signal"
         >
           Browse venues &amp; events →
