@@ -93,8 +93,8 @@ export function AreaPicker({ compact = false }: { compact?: boolean }) {
       >
         <MapPin className="size-4 shrink-0 text-signal" aria-hidden />
         {compact ? (
-          <p className="min-w-0 flex-1 truncate text-sm font-bold text-foreground">
-            <span className="mr-1.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="min-w-0 flex-1 truncate text-[0.8rem] font-bold text-foreground">
+            <span className="mr-1.5 text-[0.55rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
               Near
             </span>
             {area.label}
