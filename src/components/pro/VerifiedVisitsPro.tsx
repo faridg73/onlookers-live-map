@@ -313,8 +313,10 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-  const allowanceUsed = account?.plan !== "none"
-    && account?.plan !== "team"
+  const hasPlan = account !== null && account.plan !== "none";
+  const allowanceUsed = account !== null
+    && account.plan !== "none"
+    && account.plan !== "team"
     && account.visits_used >= (account.plan === "starter" ? 5 : 20);
 
   const submit = (e: React.FormEvent) => {
@@ -361,7 +363,7 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
           <Field label="Contact email"><input type="email" value={form.agentEmail} onChange={set("agentEmail")} maxLength={255} placeholder="dana@realty.com" className="field" /></Field>
         </div>
         <p className="text-xs text-muted-foreground">The contact receives a one-time PIN by text or email — no account needed.</p>
-        {account?.plan !== "none" && (
+        {hasPlan && account && (
           <p className={`text-xs font-semibold ${allowanceUsed ? "text-destructive" : "text-signal"}`}>
             {account.plan === "team"
               ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
