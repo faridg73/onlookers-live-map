@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { scrollFieldToStart } from "@/lib/field-scroll";
@@ -877,7 +877,7 @@ function PostScreen() {
               </p>
               <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
                 {mode === null
-                  ? <>Broadcast or <span className="text-signal">bounty?</span></>
+                  ? <>Broadcast, bounty or <span className="text-signal">visit?</span></>
                   : mode === "broadcast"
                     ? <>Stream to your <span className="text-signal">followers</span></>
                     : step === 1
@@ -934,6 +934,32 @@ function PostScreen() {
                   </span>
                 </span>
               </button>
+              <button
+                type="button"
+                onClick={startVerifiedVisit}
+                className="flex w-full items-start gap-3 rounded-xl border border-signal/50 bg-signal/10 p-4 text-left transition-colors hover:border-signal"
+              >
+                <ShieldCheck className="mt-0.5 size-6 shrink-0 text-signal" />
+                <span>
+                  <span className="block font-display text-lg font-extrabold text-foreground">
+                    Verified Visit
+                  </span>
+                  <span className="mt-1 block text-sm text-signal">
+                    For agents, property managers &amp; builders. Your on-site contact approves
+                    the onlooker with a one-tap link before filming — payment held in escrow
+                    until the visit is verified.
+                  </span>
+                  <span className="mt-2 block text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    Built for real estate · <span className="text-signal">See how the handshake works →</span>
+                  </span>
+                </span>
+              </button>
+              <Link
+                to="/verification"
+                className="block rounded-xl border border-border bg-background px-4 py-3 text-center text-sm font-extrabold text-foreground transition-colors hover:border-signal hover:text-signal"
+              >
+                How the Onlooker Handshake works
+              </Link>
             </div>
           </div>
         )}
