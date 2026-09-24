@@ -2492,6 +2492,15 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_my_pro_visit_usage: {
+        Args: never
+        Returns: {
+          period_start: string
+          plan: string
+          visit_limit: number
+          visits_used: number
+        }[]
+      }
       global_feed_clips: {
         Args: { _limit?: number }
         Returns: {
