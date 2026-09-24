@@ -1212,6 +1212,8 @@ export type Database = {
           pro_role: string
           updated_at: string
           user_id: string
+          visit_period_start: string | null
+          visits_used: number
         }
         Insert: {
           company: string
@@ -1221,6 +1223,8 @@ export type Database = {
           pro_role: string
           updated_at?: string
           user_id: string
+          visit_period_start?: string | null
+          visits_used?: number
         }
         Update: {
           company?: string
@@ -1230,6 +1234,8 @@ export type Database = {
           pro_role?: string
           updated_at?: string
           user_id?: string
+          visit_period_start?: string | null
+          visits_used?: number
         }
         Relationships: []
       }
@@ -2490,15 +2496,6 @@ export type Database = {
         Returns: {
           tier: string
           user_id: string
-        }[]
-      }
-      get_my_pro_visit_usage: {
-        Args: never
-        Returns: {
-          period_start: string
-          plan: string
-          visit_limit: number
-          visits_used: number
         }[]
       }
       global_feed_clips: {
