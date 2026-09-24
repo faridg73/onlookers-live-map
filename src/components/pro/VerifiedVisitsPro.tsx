@@ -27,24 +27,35 @@ interface ProAccount {
   plan: "none" | "starter" | "pro" | "team";
 }
 
+interface ProVisitUsage {
+  visits_used: number;
+  visit_limit: number | null;
+  period_start: string;
+}
+
 // pro_accounts is newer than the generated types; keep the client loosely typed here.
 const db = supabase as unknown as { from: (t: string) => any };
 
 function useProAccount() {
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [account, setAccount] = useState<ProAccount | null>(null);
+  const [usage, setUsage] = useState<ProVisitUsage | null>(null);
 
   const load = async () => {
     const { data } = await supabase.auth.getSession();
     const uid = data.session?.user.id ?? null;
     setUserId(uid);
-    if (!uid) return setAccount(null);
-    const { data: row } = await db
-      .from("pro_accounts")
-      .select("pro_role, company, plan")
-      .eq("user_id", uid)
-      .maybeSingle();
+    if (!uid) {
+      setAccount(null);
+      setUsage(null);
+      return;
+    }
+    const [{ data: row }, { data: usageRows }] = await Promise.all([
+      db.from("pro_accounts").select("pro_role, company, plan").eq("user_id", uid).maybeSingle(),
+      (supabase as any).rpc("get_my_pro_visit_usage"),
+    ]);
     setAccount((row as ProAccount | null) ?? null);
+    setUsage(((usageRows as ProVisitUsage[] | null)?.[0]) ?? null);
   };
 
   useEffect(() => {
@@ -53,7 +64,7 @@ function useProAccount() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  return { userId, account, reload: load };
+  return { userId, account, usage, reload: load };
 }
 
 const signupSchema = z.object({
@@ -74,7 +85,7 @@ const requestSchema = z.object({
 });
 
 export function VerifiedVisitsPro() {
-  const { userId, account, reload } = useProAccount();
+  const { userId, account, usage, reload } = useProAccount();
   const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
   const signupRef = useRef<HTMLElement>(null);
 
@@ -101,10 +112,10 @@ export function VerifiedVisitsPro() {
     <>
       <PricingSection current={account?.plan ?? "none"} onChoose={choosePlan} />
       <section ref={signupRef} id="pro-signup" className="mt-12 scroll-mt-6" aria-labelledby="pro-signup-title">
-        <ProSignup userId={userId} account={account} onSaved={reload} />
+        <ProSignup userId={userId} account={account} usage={usage} onSaved={reload} />
       </section>
       <section id="request-visit" className="mt-12 scroll-mt-6" aria-labelledby="request-visit-title">
-        <RequestVisitForm />
+        <RequestVisitForm account={account} usage={usage} />
       </section>
       {checkoutPlan && (
         <ProCheckoutSheet plan={checkoutPlan} onClose={() => { setCheckoutPlan(null); void reload(); }} />
@@ -171,10 +182,12 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
 function ProSignup({
   userId,
   account,
+  usage,
   onSaved,
 }: {
   userId: string | null | undefined;
   account: ProAccount | null;
+  usage: ProVisitUsage | null;
   onSaved: () => Promise<void>;
 }) {
   const [role, setRole] = useState<ProRole>("agent");
@@ -249,6 +262,13 @@ function ProSignup({
         <p className="mt-2 text-center text-sm text-muted-foreground">
           Plan: <span className="font-semibold text-foreground">{plan ? `${plan.name} — ${plan.visits}` : "No plan yet"}</span>
         </p>
+        {account.plan !== "none" && usage && (
+          <p className="mt-1 text-center text-sm font-semibold text-signal">
+            {usage.visit_limit === null
+              ? `${usage.visits_used} verified visits this billing month · Unlimited`
+              : `${usage.visits_used} of ${usage.visit_limit} verified visits used this billing month`}
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <Button asChild className="h-11 rounded-xl bg-signal px-5 font-bold text-signal-foreground hover:brightness-110">
             <Link to="/profile">Manage my verified bounties</Link>
@@ -295,15 +315,23 @@ function ProSignup({
   );
 }
 
-function RequestVisitForm() {
+function RequestVisitForm({ account, usage }: { account: ProAccount | null; usage: ProVisitUsage | null }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
+  const allowanceUsed = account?.plan !== "none"
+    && usage?.visit_limit !== null
+    && usage?.visit_limit !== undefined
+    && usage.visits_used >= usage.visit_limit;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (allowanceUsed) {
+      setError(`Your ${proPlanById(account?.plan ?? "")?.name ?? "current"} plan's monthly visit allowance has been used. Choose a higher plan or wait for the next billing month.`);
+      return;
+    }
     const parsed = requestSchema.safeParse(form);
     if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? "Check the form");
     if (form.startAt && new Date(form.startAt).getTime() < Date.now()) return setError("Pick a visit time in the future");
@@ -342,8 +370,15 @@ function RequestVisitForm() {
           <Field label="Contact email"><input type="email" value={form.agentEmail} onChange={set("agentEmail")} maxLength={255} placeholder="dana@realty.com" className="field" /></Field>
         </div>
         <p className="text-xs text-muted-foreground">The contact receives a one-time PIN by text or email — no account needed.</p>
+        {account?.plan !== "none" && usage && (
+          <p className={`text-xs font-semibold ${allowanceUsed ? "text-destructive" : "text-signal"}`}>
+            {usage.visit_limit === null
+              ? `Plan usage: ${usage.visits_used} visits this billing month · Unlimited`
+              : `Plan usage: ${usage.visits_used} of ${usage.visit_limit} visits`}
+          </p>
+        )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
-        <Button type="submit" className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
+        <Button type="submit" disabled={allowanceUsed} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
           <Send className="size-4" /> Continue to verified bounty
         </Button>
       </div>
