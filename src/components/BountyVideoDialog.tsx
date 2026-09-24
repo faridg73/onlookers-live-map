@@ -26,6 +26,7 @@ import type { SitePinState } from "@/lib/site-pin";
 import { BountyChat } from "@/components/BountyChat";
 import { chatKey } from "@/lib/chat";
 import { useAuth } from "@/hooks/use-auth";
+import { notifyPayoutReleased } from "@/lib/payout-emails.functions";
 import {
   acceptBountyVideo,
   deleteBountyVideo,
@@ -151,6 +152,8 @@ export function BountyVideoDialog({
     try {
       const paid = await acceptBountyVideo(video.id);
       toast.success(`Accepted. ${Math.round(paid)} Credits sent to the Onlooker's wallet.`);
+      // Let the Onlooker know by email; never block the accept on this.
+      void notifyPayoutReleased({ data: { videoId: video.id } }).catch(() => undefined);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
