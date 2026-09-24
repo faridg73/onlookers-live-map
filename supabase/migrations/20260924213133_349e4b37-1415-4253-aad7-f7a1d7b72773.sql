@@ -1,0 +1,1 @@
+ALTER FUNCTION public.claim_bounty(uuid) SECURITY INVOKER;

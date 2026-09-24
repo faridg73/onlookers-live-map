@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION private.claim_bounty_atomic(uuid, uuid) FROM authenticated;
