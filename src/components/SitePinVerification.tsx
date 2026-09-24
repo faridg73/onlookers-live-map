@@ -1,10 +1,20 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, Copy, KeyRound, Loader2, Send, ShieldAlert, ShieldCheck, ShieldX } from "lucide-react";
+import { BadgeCheck, Copy, KeyRound, Loader2, MapPin, Send, ShieldAlert, ShieldCheck, ShieldX } from "lucide-react";
 import { toast } from "sonner";
 
-import { resendSitePin } from "@/lib/site-pin.functions";
+import { checkInOnSite, resendSitePin } from "@/lib/site-pin.functions";
+import { supabase } from "@/integrations/supabase/client";
+
+type Approval = {
+  checked_in_at?: string | null;
+  checked_in_by_me?: boolean;
+  link_active?: boolean;
+  denied?: boolean;
+  denied_for_me?: boolean;
+  approved_via?: string | null;
+};
 import { readSitePinState, reportAgentUnreachable, verifySitePin, type SitePinState } from "@/lib/site-pin";
 
 /**
@@ -36,10 +46,20 @@ export function SitePinVerification({
   const [reportNote, setReportNote] = useState("");
   const [reporting, setReporting] = useState(false);
   const resend = useServerFn(resendSitePin);
+  const checkIn = useServerFn(checkInOnSite);
+  const [approval, setApproval] = useState<Approval>({});
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [showPin, setShowPin] = useState(false);
+  const prevVerified = useRef(false);
+  const waitingSeen = useRef(false);
 
   const load = useCallback(async () => {
     if (!requestId) return;
-    const next = await readSitePinState(requestId);
+    const [next, appr] = await Promise.all([
+      readSitePinState(requestId),
+      supabase.rpc("site_approval_state", { _request_id: requestId }),
+    ]);
+    setApproval((appr.data ?? {}) as Approval);
     setState(next);
     onState?.(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,6 +68,22 @@ export function SitePinVerification({
   useEffect(() => {
     void load();
   }, [load]);
+
+  // Live status: while a check-in is waiting on the contact, refresh every 4s.
+  const waiting = Boolean(state?.required && !state.verified && !state.declined && approval.link_active);
+  useEffect(() => {
+    if (!waiting) return;
+    const id = window.setInterval(() => void load(), 4000);
+    return () => window.clearInterval(id);
+  }, [waiting, load]);
+
+  useEffect(() => {
+    if (state?.verified && !prevVerified.current && waitingSeen.current && approval.approved_via === "link") {
+      toast.success("The property contact approved you. Filming and payout are unlocked.");
+    }
+    if (waiting) waitingSeen.current = true;
+    prevVerified.current = Boolean(state?.verified);
+  }, [state?.verified, approval.approved_via, waiting]);
 
   if (!requestId || !state?.required) return null;
 
@@ -72,6 +108,21 @@ export function SitePinVerification({
       setError(err instanceof Error ? err.message : "Couldn't check that PIN.");
     } finally {
       setChecking(false);
+    }
+  }
+
+  async function triggerCheckIn() {
+    if (!requestId) return;
+    setCheckingIn(true);
+    try {
+      const r = await checkIn({ data: { requestId } });
+      const channels = [r.sms ? "text" : null, r.email ? "email" : null].filter(Boolean);
+      toast.success(`Approval link sent to the property contact by ${channels.join(" and ")}.`);
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't send the approval link.");
+    } finally {
+      setCheckingIn(false);
     }
   }
 
@@ -148,7 +199,9 @@ export function SitePinVerification({
         <p className="mt-1 text-xs text-muted-foreground">
           {state.verifiedAt ? `Confirmed ${new Date(state.verifiedAt).toLocaleString()}. ` : ""}
           {state.mine
-            ? "An onlooker matched your PIN with the agent at the property. The PIN is now used up."
+            ? approval.approved_via === "link"
+              ? "The property contact approved the onlooker on site."
+              : "An onlooker matched your PIN with the agent at the property. The PIN is now used up."
             : "Your footage and payout for this bounty are unlocked."}
         </p>
       </div>
@@ -190,7 +243,31 @@ export function SitePinVerification({
           {state.sendCount > 1 ? ` Sent ${state.sendCount} times.` : ""}
           {state.expired ? " It has expired — resend a fresh delivery if the visit is still on." : ""}
         </p>
+        {approval.link_active && (
+          <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-signal">
+            <Loader2 className="size-3.5 animate-spin" /> Onlooker checked in — waiting for the contact to approve.
+          </p>
+        )}
+        {approval.denied && (
+          <p className="mt-2 text-xs font-medium text-foreground">
+            The contact said the checked-in onlooker wasn&apos;t the right person. It&apos;s with our review team.
+          </p>
+        )}
         {resendButton}
+      </div>
+    );
+  }
+
+  if (approval.denied_for_me) {
+    return (
+      <div className="mt-3 rounded-xl border border-border bg-surface p-3">
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <ShieldX className="size-4" /> Not approved by the property contact
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+          The contact said you weren&apos;t the right person. You can&apos;t verify this visit, and our review
+          team will look into it. The bounty money stays on hold meanwhile.
+        </p>
       </div>
     );
   }
@@ -201,10 +278,42 @@ export function SitePinVerification({
       <div className="flex items-center gap-1.5 text-[0.6rem] uppercase tracking-[0.16em] text-signal">
         <ShieldCheck className="size-3.5" /> Verify on site
       </div>
-      <p className="mt-1.5 text-xs text-muted-foreground">
-        Ask the contact at the property for the 6-digit Onlooker Live PIN, then enter it to unlock
-        filming and payout for this bounty. {expiryLine}
-      </p>
+      {approval.link_active && approval.checked_in_by_me ? (
+        <div className="mt-2 rounded-lg border border-signal/40 bg-signal/5 p-3" aria-live="polite">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-signal">
+            <Loader2 className="size-4 animate-spin" /> Waiting for the contact to approve…
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            We sent them a link with your name and photo. This screen updates by itself the moment they tap
+            Approve.
+          </p>
+        </div>
+      ) : (
+        <>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            When you arrive, tap below. The property contact gets a link with your name and photo and
+            approves you with one tap — that unlocks filming and payout.
+          </p>
+          <button
+            type="button"
+            disabled={checkingIn}
+            onClick={() => void triggerCheckIn()}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+          >
+            {checkingIn ? <Loader2 className="size-3.5 animate-spin" /> : <MapPin className="size-3.5" />}
+            {checkingIn ? "Sending…" : "I'm on site — request approval"}
+          </button>
+        </>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowPin((v) => !v)}
+        className="mt-3 w-full text-center text-xs font-semibold text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      >
+        {showPin ? "Hide PIN entry" : "Contact can't open the link? Enter their 6-digit PIN instead"}
+      </button>
+      {showPin && (<>
+      <p className="mt-2 text-xs text-muted-foreground">{expiryLine}</p>
       <input
         value={digits}
         onChange={(event) => {
@@ -233,9 +342,10 @@ export function SitePinVerification({
             <Loader2 className="size-3.5 animate-spin" /> Checking…
           </>
         ) : (
-          "Verify bounty submission"
+          "Verify with PIN"
         )}
       </button>
+      </>)}
 
       {resendButton}
 
