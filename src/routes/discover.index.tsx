@@ -128,6 +128,9 @@ function DiscoverHome() {
     setIsWeekend(WEEKEND.includes(new Date().getDay()));
   }, []);
   const selected = requests.find((r) => r.id === selectedId) ?? null;
+  // A linked bounty owns the camera: center and zoom on its true coordinates so
+  // the map never opens on the viewer's own location instead of the bounty.
+  const selectedPos = selected ? requestMapPosition(selected) : null;
 
   const liveNear = (name: string) =>
     requests.filter(
