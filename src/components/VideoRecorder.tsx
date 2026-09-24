@@ -60,7 +60,8 @@ export function VideoRecorder({
   // The person taps "Open camera to film" instead.
 
   return (
-    <div className="fixed inset-0 z-[70] flex flex-col bg-black">
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-black">
+      <div className="flex min-h-full flex-col">
       <div className="flex items-center justify-between px-4 pb-2 pt-[max(1rem,env(safe-area-inset-top))]">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white">
           Camera · max {MAX_CLIP_SECONDS}s
@@ -75,10 +76,10 @@ export function VideoRecorder({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-6 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-4 text-center">
         {isMobile ? (
           <>
-            <Video className="size-10 text-white" />
+            <Video className="size-10 shrink-0 text-white" />
             <p className="text-sm font-semibold text-white">
               Tap open camera and your phone's camera app takes over, so the clip keeps its full
               quality.
@@ -101,13 +102,16 @@ export function VideoRecorder({
         )}
       </div>
 
-      <p className="px-4 pb-1 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
-        {PUBLIC_SPACES_DISCLAIMER}
-      </p>
+      <div className="px-4 pt-2">
+        <p className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-center text-[0.7rem] font-medium leading-snug text-amber-300">
+          {PUBLIC_SPACES_DISCLAIMER}
+        </p>
+      </div>
 
       <div className="flex justify-center px-4 pb-1 pt-2">
         <SubmissionSupportLink tone="light" />
       </div>
+
 
       <div className="flex flex-col gap-3 px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4">
         <button
@@ -128,6 +132,7 @@ export function VideoRecorder({
             <Camera className="size-5" /> Take a photo instead
           </button>
         )}
+      </div>
       </div>
     </div>
   );
