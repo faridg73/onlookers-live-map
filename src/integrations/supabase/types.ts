@@ -176,6 +176,7 @@ export type Database = {
           is_public: boolean
           note: string
           payout_amount: number
+          payout_email_sent_at: string | null
           purged_at: string | null
           request_id: string
           request_place: string
@@ -198,6 +199,7 @@ export type Database = {
           is_public?: boolean
           note?: string
           payout_amount?: number
+          payout_email_sent_at?: string | null
           purged_at?: string | null
           request_id: string
           request_place?: string
@@ -220,6 +222,7 @@ export type Database = {
           is_public?: boolean
           note?: string
           payout_amount?: number
+          payout_email_sent_at?: string | null
           purged_at?: string | null
           request_id?: string
           request_place?: string
