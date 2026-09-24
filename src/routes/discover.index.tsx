@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/discover/")({
   // Deep link from a place or category: /discover?view=map&lat=..&lng=..&label=..
   validateSearch: (
     search: Record<string, unknown>,
-  ): { view?: "map"; lat?: number; lng?: number; label?: string } => {
+  ): { view?: "map"; lat?: number; lng?: number; label?: string; b?: string } => {
     const lat = Number(search["lat"]);
     const lng = Number(search["lng"]);
     const label = typeof search["label"] === "string" ? search["label"] : undefined;
@@ -55,6 +55,7 @@ export const Route = createFileRoute("/discover/")({
       ...(search["view"] === "map" ? { view: "map" as const } : {}),
       ...(Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : {}),
       ...(label ? { label } : {}),
+      ...(typeof search["b"] === "string" ? { b: search["b"] } : {}),
     };
   },
   component: DiscoverHome,
@@ -100,6 +101,15 @@ function DiscoverHome() {
   useEffect(() => {
     if (search.view === "map") setView("map");
   }, [search.view]);
+  // A linked bounty is pre-selected so its pin is always drawn and highlighted.
+  useEffect(() => {
+    if (search.b) setSelectedId(search.b);
+  }, [search.b]);
+  const navigate = useNavigate();
+  const openBounty = (id: string | null) => {
+    setSelectedId(id);
+    if (id) void navigate({ to: "/b/$id", params: { id } });
+  };
   useEffect(() => {
     if (view !== "map") return;
     setFocus({ ...target, label: target.label });
@@ -225,9 +235,9 @@ function DiscoverHome() {
               <MapCanvas
                 requests={requests}
                 selectedId={selectedId}
-                onSelect={setSelectedId}
+                onSelect={openBounty}
                 viewportStorageKey="onlooker:map:discover"
-                focusPin={focus ? { ...focus, zoom: 15 } : null}
+                focusPin={focus && !search.b ? { ...focus, zoom: 15 } : null}
                 centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
                 showNativeMapTypeControl={false}
               />
