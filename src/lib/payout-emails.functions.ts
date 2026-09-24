@@ -26,28 +26,6 @@ export const notifyPayoutReleased = createServerFn({ method: "POST" })
       return { sent: false as const, reason: "not_accepted_by_caller" };
     }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: hunterUser, error: hunterErr } = await supabaseAdmin.auth.admin.getUserById(video.uploader_id);
-    const hunterEmail = hunterUser?.user?.email?.trim();
-    if (hunterErr || !hunterEmail) return { sent: false as const, reason: "no_hunter_email" };
-
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("display_name, username")
-      .eq("id", video.uploader_id)
-      .maybeSingle();
-
-    const requestId = video.request_id.replace(/^db-/, "");
-    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-    const result = await sendTemplateEmail("payout-released", hunterEmail, {
-      templateData: {
-        hunterName: profile?.display_name || profile?.username || "",
-        bountyTitle: video.request_title,
-        place: video.request_place,
-        credits: Math.round(Number(video.payout_amount)),
-        bountyUrl: `https://onlookerlive.com/b/${requestId}`,
-      },
-      idempotencyKey: `payout-released-${video.id}`,
-    });
-    return result;
+    const { sendPayoutEmailForVideo } = await import("@/lib/payout-email.server");
+    return sendPayoutEmailForVideo(video);
   });
