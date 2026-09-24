@@ -118,6 +118,7 @@ import {
 import { STRANGE_SIGHTINGS_ID, STRANGE_SIGHTINGS_LABEL } from "@/lib/strange-sightings";
 
 import { useOnlooker } from "@/lib/onlooker-store";
+import { PRO_VISIT_DRAFT_KEY, type ProVisitDraft } from "@/lib/pro-plans";
 import { usePhoneGate } from "@/components/PhoneGate";
 import { readRecentPlaces, rememberRecentPlace, type RecentPlace } from "@/lib/recent-places";
 import { useVoiceInput } from "@/lib/use-voice-input";
@@ -434,6 +435,37 @@ function PostScreen() {
       setFirstPostGuideOpen(true);
     }
   }, [mode]);
+
+  useEffect(() => {
+    let raw: string | null = null;
+    try {
+      raw = window.sessionStorage.getItem(PRO_VISIT_DRAFT_KEY);
+      window.sessionStorage.removeItem(PRO_VISIT_DRAFT_KEY);
+    } catch {
+      return;
+    }
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw) as ProVisitDraft;
+      setMode("bounty");
+      setLocationType("owner_authorized");
+      setPermissionOk(true);
+      setTitle(`Verified visit: ${d.address}`.slice(0, 120));
+      setPrompt(d.purpose);
+      setPlace(d.address);
+      setVenueQuery(d.address);
+      setNote(d.purpose);
+      setAgentName(d.agentName);
+      setAgentPhone(d.agentPhone);
+      setAgentEmail(d.agentEmail);
+      if (d.startAt) {
+        const when = new Date(d.startAt);
+        if (!Number.isNaN(when.getTime()) && when.getTime() > Date.now()) setScheduledStart(when);
+      }
+    } catch {
+      /* ignore bad draft */
+    }
+  }, []);
 
   useEffect(() => {
     if (mystery !== "1") return;

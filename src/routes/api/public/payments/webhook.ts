@@ -269,6 +269,7 @@ async function handleWebhook(request: Request, env: StripeEnv) {
       }
       await renewSubscription(event.data.object as Record<string, any>, env);
       break;
+    }
     case "customer.subscription.deleted": {
       const sub = event.data.object as Record<string, any>;
       if (sub["metadata"]?.kind === "pro_subscription") await setProPlan(sub["metadata"]?.userId, "none");
