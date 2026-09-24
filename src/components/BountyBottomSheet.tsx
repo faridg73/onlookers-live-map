@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Camera, CoinsIcon, Loader2, MapPin, Radio, RotateCcw, ShieldCheck } from "lucide-react";
 import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
 import { describeUploadError } from "@/lib/upload-errors";
@@ -59,6 +60,7 @@ export function BountyBottomSheet({
   const human = useHumanCheck("accept-bounty");
   const router = useRouter();
   const navigate = useNavigate();
+  const saveClaim = useServerFn(claimBountyRequest);
 
   /** Return to the exact previous page/view, with the map as a safe fallback. */
   function goBack() {
@@ -106,15 +108,16 @@ export function BountyBottomSheet({
       void goLive();
       return;
     }
-    const target = request.dbId;
-    if (!target) {
+    const target = request?.dbId;
+    const localId = request?.id;
+    if (!target || !localId) {
       toast.error("This bounty is still loading. Refresh and try again.");
       return;
     }
     setAccepting(true);
     try {
-      await claimBountyRequest({ data: { id: target } });
-      onClaim?.(request.id);
+      await saveClaim({ data: { id: target } });
+      onClaim?.(localId);
       setCapturing(true);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not claim this bounty.");

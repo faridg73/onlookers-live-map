@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState, type ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { CircleOff, HandCoins, Loader2, Radar, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { RequestCard } from "@/components/RequestCard";
@@ -58,6 +59,7 @@ export function BountyDetailsDialog({
   const [unavailableReason, setUnavailableReason] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
   const [claiming, setClaiming] = useState(false);
+  const saveClaim = useServerFn(claimBountyRequest);
   const { boostOf } = useBoosts();
   const done = isClosed(request);
   const claimable = !done && request.status === "open" && !!onClaim;
@@ -255,7 +257,7 @@ export function BountyDetailsDialog({
                 }
                 setClaiming(true);
                 try {
-                  await claimBountyRequest({ data: { id: requestId } });
+                  await saveClaim({ data: { id: requestId } });
                   onClaim?.(request.id);
                   setConfirming(false);
                   setOpen(true);
