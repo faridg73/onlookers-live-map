@@ -65,7 +65,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setSummary({ count: Number(row?.bid_count ?? 0), top: Number(row?.top_bid ?? 0) });
 
     if (uid && r?.requester_id === uid) {
-      const { data } = await db.rpc("bounty_bids_for_poster", { _request_id: requestId });
+      const { data } = await db.rpc("bounty_bids_for_poster", { _request_id: bountyId });
       setPosterBids((data ?? []) as Bid[]);
     } else if (uid) {
       const { data } = await db
