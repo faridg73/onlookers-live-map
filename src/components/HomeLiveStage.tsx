@@ -301,13 +301,16 @@ export function HomeLiveStage({
           </p>
 
           <div
-            className="scrollbar-thin mx-auto mt-4 flex w-full max-w-4xl snap-x snap-mandatory gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 [@media(max-height:520px)]:mt-2"
+            className="relative mx-auto mt-5 grid w-full max-w-4xl grid-cols-4 gap-1.5 sm:gap-2 [@media(max-height:520px)]:mt-2"
             aria-label="Examples of content people can request on Onlooker"
           >
+            <span className="pointer-events-none absolute -top-3 left-0 font-mono text-[0.55rem] font-bold uppercase tracking-[0.3em] text-signal/40" aria-hidden>
+              Active feeds // 04
+            </span>
             {HERO_PLACEHOLDERS.map((image, index) => (
               <div
                 key={image.src}
-                className="relative aspect-[16/10] w-[72%] shrink-0 snap-center overflow-hidden rounded-xl border border-home-line bg-home-charcoal first:ml-[14%] last:mr-[14%] sm:w-auto sm:first:ml-0 sm:last:mr-0 [@media(max-height:520px)]:aspect-[16/7]"
+                className={`group relative aspect-[2/3] overflow-hidden rounded-sm border border-home-line bg-home-charcoal sm:aspect-[3/4] ${index % 2 === 1 ? "sm:-translate-y-2" : "sm:translate-y-1"}`}
               >
                 <img
                   src={image.src}
@@ -315,52 +318,62 @@ export function HomeLiveStage({
                   loading={index === 0 ? "eager" : "lazy"}
                   width={1200}
                   height={750}
-                  className="size-full object-cover brightness-110 contrast-110 saturate-105"
+                  className="size-full object-cover grayscale-[35%] contrast-110 transition-[filter,transform] duration-200 group-hover:scale-105 group-hover:grayscale-0 motion-reduce:transform-none"
                 />
                 <span
-                  className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-foreground/5"
+                  className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-foreground/5"
                   aria-hidden
                 />
+                <span className="absolute left-1 top-1 font-mono text-[0.5rem] font-bold tracking-[0.2em] text-signal/80" aria-hidden>
+                  CAM_{String(index + 1).padStart(2, "0")}
+                </span>
               </div>
             ))}
           </div>
 
-          <div className="mt-3 flex flex-wrap justify-center gap-2.5 [@media(max-height:520px)]:mt-2">
-            <Button type="button" onClick={onPostBounty} className="h-11 rounded-xl border border-signal bg-signal px-4 font-bold uppercase text-signal-foreground shadow-[0_0_24px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] transition-[transform,filter] duration-150 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 sm:px-6 [@media(max-height:520px)]:h-9">
-              <CircleDollarSign className="size-4" /> Post bounty
+          <div className="relative mx-auto mt-4 flex w-full max-w-md flex-col gap-2.5 [@media(max-height:520px)]:mt-2">
+            <Button type="button" onClick={onPostBounty} className="h-11 justify-between border border-signal bg-signal px-5 text-sm font-extrabold uppercase italic tracking-tight text-signal-foreground shadow-[0_0_28px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] [clip-path:polygon(0_0,100%_0,97%_100%,3%_100%)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99] sm:h-12 [@media(max-height:520px)]:h-9">
+              <span className="inline-flex items-center gap-2"><CircleDollarSign className="size-4" /> Post bounty</span>
+              <span className="font-mono text-[0.6rem] font-bold not-italic tracking-[0.2em] text-signal-foreground">01</span>
             </Button>
-            <Button type="button" onClick={onGoLive} variant="outline" className="h-11 rounded-xl border border-home-line bg-home-glass px-4 font-bold uppercase text-foreground/85 backdrop-blur-2xl transition-colors duration-150 hover:border-signal/60 hover:text-signal sm:px-6 [@media(max-height:520px)]:h-9">
-              <Radio className="size-4" /> Go live
+            <Button type="button" onClick={onGoLive} variant="outline" className="h-11 justify-between border border-home-line bg-transparent px-5 text-sm font-bold uppercase italic tracking-tight text-foreground/85 transition-colors duration-150 hover:border-signal/60 hover:text-signal sm:h-12 [@media(max-height:520px)]:h-9">
+              <span className="inline-flex items-center gap-2"><Radio className="size-4" /> Go live</span>
+              <span className="relative flex size-1.5" aria-hidden>
+                <span className="absolute inset-0 animate-ping-slow rounded-full bg-live motion-reduce:animate-none" />
+                <span className="relative size-1.5 rounded-full bg-live" />
+              </span>
             </Button>
           </div>
-          <Link
-            to="/events"
-            className="group mx-auto mt-2 flex w-full max-w-md items-center justify-between gap-2 rounded-xl border border-home-line bg-home-glass-strong px-3.5 py-2 backdrop-blur-2xl transition-colors duration-150 hover:border-signal/60 [@media(max-height:520px)]:hidden"
-          >
-            <span className="inline-flex min-w-0 items-center gap-2 text-[0.72rem] font-bold text-foreground">
-              <Ticket className="size-3.5 shrink-0 text-signal" aria-hidden />
-              <span className="truncate">Venues &amp; events near you</span>
-            </span>
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-colors duration-150 group-hover:text-signal" aria-hidden />
-          </Link>
-          <Link
-            to="/verification"
-            className="group mx-auto mt-2 flex w-full max-w-md items-center justify-between gap-2 rounded-xl border border-home-line bg-home-glass-strong px-3.5 py-2 backdrop-blur-2xl transition-colors duration-150 hover:border-signal/60 [@media(max-height:520px)]:hidden"
-          >
-            <span className="inline-flex min-w-0 items-center gap-2 text-[0.72rem] font-bold text-foreground">
-              <KeyRound className="size-3.5 shrink-0 text-signal" aria-hidden />
-              <span className="truncate">Verified on-site visits — the PIN handshake</span>
-            </span>
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-colors duration-150 group-hover:text-signal" aria-hidden />
-          </Link>
-          <div className="mt-3 flex justify-center [@media(max-height:520px)]:hidden">
-            <button
-              type="button"
-              onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="rounded-full px-2 py-1 text-[0.7rem] font-medium text-muted-foreground underline-offset-4 transition-colors duration-150 hover:text-signal hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+          <div className="relative mx-auto mt-4 w-full max-w-md border-t border-home-line pt-1">
+            <Link
+              to="/events"
+              className="group flex items-center justify-between gap-2 border-b border-home-line py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal [@media(max-height:520px)]:hidden"
             >
-              New here? See how it works ↓
-            </button>
+              <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors duration-150 group-hover:text-signal">
+                <Ticket className="size-3.5 shrink-0 text-signal" aria-hidden />
+                <span className="truncate">Venues &amp; events near you</span>
+              </span>
+              <span className="font-mono text-xs text-signal/70 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
+            </Link>
+            <Link
+              to="/verification"
+              className="group flex items-center justify-between gap-2 border-b border-home-line py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal [@media(max-height:520px)]:hidden"
+            >
+              <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors duration-150 group-hover:text-signal">
+                <KeyRound className="size-3.5 shrink-0 text-signal" aria-hidden />
+                <span className="truncate">Verified on-site visits — the PIN handshake</span>
+              </span>
+              <span className="font-mono text-xs text-signal/70 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
+            </Link>
+            <div className="flex justify-center pt-2 [@media(max-height:520px)]:hidden">
+              <button
+                type="button"
+                onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="border-b border-home-line px-1 pb-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-muted-foreground transition-colors duration-150 hover:border-signal/60 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+              >
+                New here? See how it works ↓
+              </button>
+            </div>
           </div>
         </div>
 
