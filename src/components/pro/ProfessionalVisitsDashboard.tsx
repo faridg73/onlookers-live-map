@@ -79,7 +79,12 @@ export function ProfessionalVisitsDashboard() {
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">Scheduled property visits and their live progress.</p>
         </div>
-        {loading && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-label="Loading visits" />}
+        <div className="flex items-center gap-2">
+          {loading && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-label="Loading visits" />}
+          <Button asChild variant="outline" className="h-9 rounded-lg px-3">
+            <Link to="/pro-dashboard">Open dashboard <ChevronRight className="size-4" /></Link>
+          </Button>
+        </div>
       </div>
 
       {!loading && rows.length === 0 ? (
