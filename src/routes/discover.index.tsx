@@ -160,30 +160,62 @@ function DiscoverHome() {
         <h1 className="max-w-full px-12 text-center font-display text-2xl tracking-tight text-signal sm:text-3xl">
           Browse <span className="text-signal">places</span>
         </h1>
-        <p className="mt-1 max-w-xs px-12 text-center text-sm text-foreground/90 sm:max-w-none sm:px-0">
-          Pulled <span className="font-bold text-signal">live</span> from the area you&apos;re
-          browsing, pick a spot and ask for a view.
+        <p className="mt-1 px-12 text-center text-sm text-foreground/90">
+          Pick a spot and ask for a <span className="font-bold text-signal">live</span> view.
         </p>
       </div>
 
       <div className="flex-1">
-      <LocationSearchBar className="mt-4" />
+      <LocationSearchBar className="mt-4" hideBrowsingLine />
 
-      <div className="mt-4">
-        <AreaPicker />
+      <div className="mt-3 flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <AreaPicker compact />
+        </div>
+        <div className="flex shrink-0 rounded-xl border border-border bg-surface p-1">
+          {(
+            [
+              { id: "grid", label: "Grid", icon: LayoutGrid },
+              { id: "map", label: "Map", icon: MapIcon },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setView(tab.id)}
+              aria-pressed={view === tab.id}
+              aria-label={tab.id === "grid" ? "Show categories" : "Show live map"}
+              className={cn(
+                "flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] transition-colors",
+                view === tab.id ? "bg-signal text-signal-foreground" : "text-muted-foreground",
+              )}
+            >
+              <tab.icon className="size-3.5" aria-hidden />
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
-
 
       <Link
         to="/discover/trending"
-        className="mt-3 flex items-center justify-between gap-3 rounded-2xl border-2 border-signal/50 bg-signal/10 px-4 py-3"
+        className="group mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-signal/60"
       >
-        <span className="inline-flex items-center gap-2 text-sm font-extrabold text-foreground">
-          <Flame className="size-4 text-signal" aria-hidden /> Trending feeds &amp;{" "}
-          <span className="text-signal">live events</span>
+        <span className="inline-flex min-w-0 items-center gap-2.5 text-sm font-bold text-foreground">
+          <span className="relative flex size-2 shrink-0" aria-hidden>
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal opacity-60" />
+            <span className="relative inline-flex size-2 rounded-full bg-signal" />
+          </span>
+          <span className="truncate">
+            Trending feeds &amp; <span className="text-signal">live events</span>
+          </span>
         </span>
-        <ChevronRight className="size-4 text-signal" aria-hidden />
+        <ChevronRight
+          className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-signal"
+          aria-hidden
+        />
       </Link>
+
 
 
       <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-1">
@@ -311,35 +343,31 @@ function DiscoverHome() {
             </section>
           )}
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-3">
             {DISCOVERY_GROUPS.map((group) => (
               <Link
                 key={group.slug}
                 to="/discover/$group"
                 params={{ group: group.slug }}
-                className="block overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-signal/60"
+                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-0.5 hover:border-signal/70 hover:shadow-[0_8px_24px_-8px_rgba(204,255,0,0.35)]"
               >
-                <div className="relative h-28 overflow-hidden">
-                  <PlacePhoto
-                    src={discoveryImage(group.slug)}
-                    identity={group.name}
-                    identityNote={group.short}
-                    alt={`${group.name} near ${area.label}`}
-                  />
-                  <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
-                  <span className="absolute right-3 top-3 rounded-full bg-background/80 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground backdrop-blur-sm">
-                    Near {area.label.split(",")[0]}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-lg">
-                      <TwoToneName name={group.name} />
-                    </p>
-                    <p className="truncate text-xs font-semibold text-signal">{group.tagline}</p>
-
-                  </div>
-                  <ChevronRight className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                <PlacePhoto
+                  src={discoveryImage(group.slug)}
+                  identity={group.name}
+                  identityNote={group.short}
+                  alt={`${group.name} near ${area.label}`}
+                  className="absolute inset-0 size-full opacity-80 transition-opacity group-hover:opacity-100"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <ChevronRight
+                  className="absolute right-3 top-3 size-4 text-foreground/60 transition-colors group-hover:text-signal"
+                  aria-hidden
+                />
+                <div className="absolute inset-x-0 bottom-0 p-3">
+                  <p className="truncate font-display text-base">
+                    <TwoToneName name={group.name} />
+                  </p>
+                  <p className="truncate text-[0.68rem] font-semibold text-signal">{group.tagline}</p>
                 </div>
               </Link>
             ))}
