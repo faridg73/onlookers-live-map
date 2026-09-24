@@ -98,7 +98,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
       return;
     }
     setBusy("place");
-    const { error } = await db.rpc("place_bounty_bid", { _request_id: requestId, _amount: n, _note: note });
+    const { error } = await db.rpc("place_bounty_bid", { _request_id: bountyId, _amount: n, _note: note });
     setBusy(null);
     if (error) { toast.error(friendly(error.message)); return; }
     toast.success(myBid?.status === "active" ? "Bid updated." : `Bid placed — ${n} credits held from your wallet.`);
