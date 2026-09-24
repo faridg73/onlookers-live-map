@@ -325,6 +325,11 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!account) {
+      setError("Create your free professional account first (the \"Join as a professional\" form on this page), then tap Continue again.");
+      document.querySelector("form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     if (allowanceUsed) {
       setError(`Your ${proPlanById(account?.plan ?? "")?.name ?? "current"} plan's monthly visit allowance has been used. Choose a higher plan or wait for the next billing month.`);
       return;
@@ -388,7 +393,7 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
           </p>
         )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
-        <Button type="submit" disabled={allowanceUsed || saving || !account} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
+        <Button type="submit" disabled={allowanceUsed || saving} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
           {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : "Continue to verified bounty"}
         </Button>
       </div>
