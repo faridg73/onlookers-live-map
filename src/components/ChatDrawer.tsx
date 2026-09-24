@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { BadgeCheck, Loader2, MessageSquare, RotateCcw } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Loader2, MessageSquare, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { BountyChat } from "@/components/BountyChat";
 import { formatCreditWords } from "@/lib/credits";
