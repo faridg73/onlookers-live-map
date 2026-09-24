@@ -160,21 +160,36 @@ function EventsScreen() {
     <div className="discover-inter app-shell pb-32 pt-safe">
       <PageBackButton label="Home" fallback="/" />
 
-      <h1 className="mt-3 inline-flex items-center gap-2 font-display text-3xl tracking-tight text-foreground">
-        <Flame className="size-6 text-signal" aria-hidden /> Venues &amp; events
-      </h1>
-      <p className="mt-1 text-sm font-semibold text-signal">
-        {activeVibe
-          ? `${activeVibe.label} streams and places around ${area.label}.`
-          : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label} — tap any card to launch a live view from that exact spot.`}
-      </p>
+      <div className="relative mt-4 overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-5 pb-5 pt-5">
+        <div className="absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-home-accent/65 to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute left-1/2 top-[-3rem] h-32 w-[70%] -translate-x-1/2 rounded-full bg-signal/10 blur-3xl" aria-hidden />
+        <p className="relative inline-flex items-center gap-2 border border-signal/30 bg-signal/5 px-3 py-1 font-mono text-[0.62rem] font-bold uppercase tracking-[0.25em] text-signal">
+          <span className="relative flex size-1.5" aria-hidden>
+            <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+            <span className="relative size-1.5 rounded-full bg-signal" />
+          </span>
+          Crowd radar // live
+        </p>
+        <h1 className="relative mt-3 inline-flex items-center gap-2 text-3xl font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)]">
+          <Flame className="size-6 shrink-0" aria-hidden /> Venues &amp; events
+        </h1>
+        <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
+          {activeVibe
+            ? `${activeVibe.label} streams and places around ${area.label}.`
+            : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label} — tap any card to launch a live view from that exact spot.`}
+        </p>
 
-      <Link
-        to="/discover"
-        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-signal"
-      >
-        <Grid2x2 className="size-3.5" aria-hidden /> Browse categories
-      </Link>
+        <Link
+          to="/discover"
+          className="group relative mt-3 flex items-center justify-between gap-2 border-y border-home-line py-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+        >
+          <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors group-hover:text-signal">
+            <Grid2x2 className="size-3.5 shrink-0 text-signal" aria-hidden />
+            <span className="truncate">Browse categories</span>
+          </span>
+          <span className="font-mono text-xs text-signal/70 transition-transform group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
+        </Link>
+      </div>
 
       <div className="mt-4">
         <CreatorVibePills
