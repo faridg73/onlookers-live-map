@@ -29,6 +29,7 @@ import { Route as PinDeclineRouteImport } from './routes/pin-decline'
 import { Route as PoolsRouteImport } from './routes/pools'
 import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProDashboardRouteImport } from './routes/pro-dashboard'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
@@ -148,6 +149,11 @@ const PostRoute = PostRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProDashboardRoute = ProDashboardRouteImport.update({
+  id: '/pro-dashboard',
+  path: '/pro-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -275,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -360,6 +368,7 @@ export interface FileRoutesById {
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
   '/privacy': typeof PrivacyRoute
+  '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/pools'
     | '/post'
     | '/privacy'
+    | '/pro-dashboard'
     | '/profile'
     | '/terms'
     | '/verification'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/pools'
     | '/post'
     | '/privacy'
+    | '/pro-dashboard'
     | '/profile'
     | '/terms'
     | '/verification'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '/pools'
     | '/post'
     | '/privacy'
+    | '/pro-dashboard'
     | '/profile'
     | '/terms'
     | '/verification'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   PoolsRoute: typeof PoolsRoute
   PostRoute: typeof PostRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProDashboardRoute: typeof ProDashboardRoute
   ProfileRoute: typeof ProfileRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
@@ -693,6 +706,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pro-dashboard': {
+      id: '/pro-dashboard'
+      path: '/pro-dashboard'
+      fullPath: '/pro-dashboard'
+      preLoaderRoute: typeof ProDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -859,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
   PoolsRoute: PoolsRoute,
   PostRoute: PostRoute,
   PrivacyRoute: PrivacyRoute,
+  ProDashboardRoute: ProDashboardRoute,
   ProfileRoute: ProfileRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,

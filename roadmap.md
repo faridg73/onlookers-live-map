@@ -15,6 +15,7 @@
 - [x] Move ticker readout under "The city is live" line
 
 ## In progress
+- [x] Pro Dashboard: subscription tier, monthly usage, saved visits, bounty controls, live escrow tracking
 - [x] Percentage-based visibility boost pricing in Step 3 (Fast Catch = 50% of reward, min 10 Cr; Priority Hunt = 100%, min 20 Cr; total escrow = reward + boost) — math unit-verified, type-check clean
 - [x] Verify boost pricing + dynamic Privacy & access copy (signed-in wizard pass confirmed by user)
 - [x] Poster bounty dashboard inside Profile (tabs: Open / In progress / Settled, escrow + payout totals, cancel + footage review)

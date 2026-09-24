@@ -265,7 +265,7 @@ function ProSignup({
         )}
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <Button asChild className="h-11 rounded-xl bg-signal px-5 font-bold text-signal-foreground hover:brightness-110">
-            <Link to="/profile">Manage my verified bounties</Link>
+            <Link to="/pro-dashboard">Open Pro Dashboard</Link>
           </Button>
           <Button type="button" variant="outline" className="h-11 rounded-xl" onClick={() => setEditing(true)}>
             Edit details

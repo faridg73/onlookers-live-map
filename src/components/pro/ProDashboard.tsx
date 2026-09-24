@@ -11,12 +11,12 @@ import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { DeadlineNote } from "@/components/DeadlineNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { refundBounty } from "@/lib/bounty-escrow";
 import { formatCredits } from "@/lib/credits";
 import { escrowLabel, planLimit, proVisitView, remainingVisits, type ProVisitView } from "@/lib/pro-dashboard";
 import { PRO_ROLES, PRO_VISIT_DRAFT_KEY, proPlanById, type ProVisitDraft } from "@/lib/pro-plans";
 import { getMyProDashboard, type ProVisitBooking } from "@/lib/pro-visits.functions";
 import type { LiveRequest } from "@/lib/onlooker";
+import { cancelBountyRequest } from "@/lib/requests.functions";
 
 const QUERY_KEY = ["pro-dashboard"] as const;
 const VIEWS: Array<{ id: ProVisitView; label: string }> = [
@@ -34,6 +34,7 @@ function asLiveRequest(row: ProVisitBooking): LiveRequest {
 
 export function ProDashboard() {
   const fetchDashboard = useServerFn(getMyProDashboard);
+  const cancelBounty = useServerFn(cancelBountyRequest);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [view, setView] = useState<ProVisitView>("scheduled");
@@ -53,7 +54,7 @@ export function ProDashboard() {
   }, [queryClient]);
 
   const cancelMutation = useMutation({
-    mutationFn: (id: string) => refundBounty(id),
+    mutationFn: (id: string) => cancelBounty({ data: { id } }),
     onSuccess: async () => { toast.success("Bounty cancelled and escrow returned."); await queryClient.invalidateQueries({ queryKey: QUERY_KEY }); },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Could not cancel that bounty."),
   });
