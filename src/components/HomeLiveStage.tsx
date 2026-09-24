@@ -335,7 +335,7 @@ export function HomeLiveStage({
           >
             <span className="inline-flex min-w-0 items-center gap-2 text-[0.72rem] font-bold text-foreground">
               <Ticket className="size-3.5 shrink-0 text-signal" aria-hidden />
-              <span className="truncate">Venues &amp; events near you — crowds, sports, concerts</span>
+              <span className="truncate">Venues &amp; events near you</span>
             </span>
             <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-colors duration-150 group-hover:text-signal" aria-hidden />
           </Link>
