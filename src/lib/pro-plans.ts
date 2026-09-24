@@ -34,9 +34,9 @@ export const PRO_PLANS: ProPlan[] = [
     id: "team",
     name: "Team",
     priceCents: 39900,
-    visits: "Unlimited verified visits",
+    visits: "Unlimited seats & verified visits",
     tagline: "For brokerages, management firms and builders.",
-    features: ["Everything in Pro", "Multi-site scheduling", "Priority dispute review"],
+    features: ["Everything in Pro", "Unlimited team seats", "Multi-site scheduling", "Priority dispute review"],
   },
 ];
 
