@@ -284,7 +284,11 @@ export const getBountyAccessCode = createServerFn({ method: "GET" })
 /** Atomically assigns an open bounty to the signed-in Hunter. */
 export const claimBountyRequest = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .inputValidator((data: unknown) => {
+    const parsed = z.object({ id: z.string().min(1) }).parse(data);
+    const id = parsed.id.replace(/^db-/, "");
+    return { id: z.string().uuid().parse(id) };
+  })
   .handler(async ({ data, context }): Promise<{ claimId: string }> => {
     await enforceRateLimit(RATE_LIMITS.acceptBounty, context.userId);
     const { data: claimId, error } = await context.supabase.rpc("claim_bounty", {
