@@ -38,6 +38,9 @@ function friendly(msg: string) {
 }
 
 export function BountyBidsPanel({ requestId }: { requestId: string }) {
+  // The bounty map page uses display ids like "db-<uuid>"; the backend wants
+  // the bare uuid, so strip the prefix before every query.
+  const bountyId = requestId.startsWith("db-") ? requestId.slice(3) : requestId;
   const [userId, setUserId] = useState<string | null>(null);
   const [req, setReq] = useState<Req | null>(null);
   const [summary, setSummary] = useState({ count: 0, top: 0 });
