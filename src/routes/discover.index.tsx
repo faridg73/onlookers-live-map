@@ -172,11 +172,11 @@ function DiscoverHome() {
         <div className="min-w-0 flex-1">
           <AreaPicker compact />
         </div>
-        <div className="flex shrink-0 rounded-xl border border-border bg-surface p-1">
+        <div className="flex shrink-0 items-center gap-1 rounded-xl border border-border bg-surface p-1">
           {(
             [
-              { id: "grid", label: "Grid", icon: LayoutGrid },
-              { id: "map", label: "Map", icon: MapIcon },
+              { id: "grid", label: "Show categories", icon: LayoutGrid },
+              { id: "map", label: "Show live map", icon: MapIcon },
             ] as const
           ).map((tab) => (
             <button
@@ -184,14 +184,14 @@ function DiscoverHome() {
               type="button"
               onClick={() => setView(tab.id)}
               aria-pressed={view === tab.id}
-              aria-label={tab.id === "grid" ? "Show categories" : "Show live map"}
+              aria-label={tab.label}
+              title={tab.label}
               className={cn(
-                "flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] transition-colors",
+                "grid size-8 place-items-center rounded-lg transition-colors",
                 view === tab.id ? "bg-signal text-signal-foreground" : "text-muted-foreground",
               )}
             >
-              <tab.icon className="size-3.5" aria-hidden />
-              {tab.label}
+              <tab.icon className="size-4" aria-hidden />
             </button>
           ))}
         </div>
@@ -215,31 +215,6 @@ function DiscoverHome() {
           aria-hidden
         />
       </Link>
-
-
-
-      <div className="mt-3 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-1">
-        {(
-          [
-            { id: "grid", label: "Categories", icon: LayoutGrid },
-            { id: "map", label: "Live map", icon: MapIcon },
-          ] as const
-        ).map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setView(tab.id)}
-            aria-pressed={view === tab.id}
-            className={cn(
-              "flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-extrabold uppercase tracking-[0.14em] transition-colors",
-              view === tab.id ? "bg-signal text-signal-foreground" : "text-muted-foreground",
-            )}
-          >
-            <tab.icon className="size-4" aria-hidden />
-            {tab.label}
-          </button>
-        ))}
-      </div>
 
       {view === "map" ? (
         <div className="mt-4 space-y-3">

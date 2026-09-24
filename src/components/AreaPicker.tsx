@@ -84,7 +84,7 @@ export function AreaPicker({ compact = false }: { compact?: boolean }) {
   );
 
   return (
-    <div className={cn(!compact && "rounded-2xl border border-border bg-surface p-3")}>
+    <div className={cn("relative", !compact && "rounded-2xl border border-border bg-surface p-3")}>
       <div
         className={cn(
           "flex items-center gap-2",
