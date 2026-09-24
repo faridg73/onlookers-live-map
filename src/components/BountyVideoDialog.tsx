@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { isClosed } from "@/lib/onlooker-store";
+import { bountyViewState } from "@/lib/bounty-view-state";
 import { AccessPasscode } from "@/components/AccessPasscode";
 import { SitePinVerification } from "@/components/SitePinVerification";
 import type { SitePinState } from "@/lib/site-pin";
@@ -68,9 +68,10 @@ export function BountyVideoDialog({
   const [shareLabel, setShareLabel] = useState("");
   const [justSent, setJustSent] = useState<BountyVideo | null>(null);
   const [pinState, setPinState] = useState<SitePinState | null>(null);
-  const closed = isClosed(request);
   /** Real estate bounties stay locked until the on-site PIN handshake passes. */
   const pinLocked = Boolean(pinState?.required) && !pinState?.verifiedByMe && !pinState?.mine;
+  const view = bountyViewState(request.status, { pinLocked });
+  const closed = view.closed;
 
 
   async function shareClip(video: BountyVideo) {
@@ -219,7 +220,7 @@ export function BountyVideoDialog({
             {closed ? (
               <div className="rounded-2xl border border-border bg-surface p-4 text-center">
                 <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-foreground">
-                  <Lock className="size-4 text-muted-foreground" /> This bounty is closed
+                  <Lock className="size-4 text-muted-foreground" /> {view.closedNotice}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   It&rsquo;s no longer taking new clips. Any submitted videos are listed below.
@@ -247,11 +248,7 @@ export function BountyVideoDialog({
                 ) : (
                   <>
                     <Camera className="size-4" />{" "}
-                    {closed
-                      ? "Submissions closed"
-                      : pinLocked
-                        ? "Enter the on-site PIN first"
-                        : "Film live video"}
+                    {view.captureLabel}
                   </>
                 )}
               </button>
