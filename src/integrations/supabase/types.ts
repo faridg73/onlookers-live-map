@@ -176,6 +176,7 @@ export type Database = {
           is_public: boolean
           note: string
           payout_amount: number
+          payout_email_sent_at: string | null
           purged_at: string | null
           request_id: string
           request_place: string
@@ -198,6 +199,7 @@ export type Database = {
           is_public?: boolean
           note?: string
           payout_amount?: number
+          payout_email_sent_at?: string | null
           purged_at?: string | null
           request_id: string
           request_place?: string
@@ -220,6 +222,7 @@ export type Database = {
           is_public?: boolean
           note?: string
           payout_amount?: number
+          payout_email_sent_at?: string | null
           purged_at?: string | null
           request_id?: string
           request_place?: string
@@ -2712,6 +2715,10 @@ export type Database = {
           verified_at: string
           verified_phone: string
         }[]
+      }
+      mark_payout_email_sent: {
+        Args: { _video_id: string }
+        Returns: undefined
       }
       onlookers_within_radius: {
         Args: {

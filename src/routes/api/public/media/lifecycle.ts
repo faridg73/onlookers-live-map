@@ -86,7 +86,17 @@ export const Route = createFileRoute("/api/public/media/lifecycle")({
             .is("purged_at", null);
         }
 
-        return Response.json({ swept, purged, queued: rows.length });
+        // 4. Settle auto-released payouts and email those Hunters.
+        await supabaseAdmin.rpc("settle_escrows");
+        let payoutEmails = 0;
+        try {
+          const { sendPendingPayoutEmails } = await import("@/lib/payout-email.server");
+          payoutEmails = await sendPendingPayoutEmails();
+        } catch (e) {
+          console.error("payout emails failed", e);
+        }
+
+        return Response.json({ swept, purged, queued: rows.length, payoutEmails });
       },
     },
   },
