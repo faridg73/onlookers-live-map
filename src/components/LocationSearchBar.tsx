@@ -15,7 +15,13 @@ import {
  * address brings back live suggestions; picking one switches the area everything
  * on the screen is pulled from, so trending spots and events refresh right away.
  */
-export function LocationSearchBar({ className = "" }: { className?: string }) {
+export function LocationSearchBar({
+  className = "",
+  hideBrowsingLine = false,
+}: {
+  className?: string;
+  hideBrowsingLine?: boolean;
+}) {
   const { area, busy, error, useMyLocation, setCity, applyPlace } = useDiscoveryArea();
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
@@ -218,9 +224,11 @@ export function LocationSearchBar({ className = "" }: { className?: string }) {
         </button>
       </form>
 
-      <p className="mt-1.5 truncate text-[0.68rem] text-foreground/90">
-        Browsing <span className="font-bold text-signal">{area.label}</span>
-      </p>
+      {!hideBrowsingLine && (
+        <p className="mt-1.5 truncate text-[0.68rem] text-foreground/90">
+          Browsing <span className="font-bold text-signal">{area.label}</span>
+        </p>
+      )}
       {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
