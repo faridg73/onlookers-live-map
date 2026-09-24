@@ -66,6 +66,14 @@ export const createProVisitBooking = createServerFn({ method: "POST" })
 export const listMyProVisitBookings = createServerFn({ method: "GET" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<ProVisitBooking[]> => {
+    const { data: account, error: accountError } = await context.supabase
+      .from("pro_accounts")
+      .select("user_id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (accountError) throw new Error(accountError.message);
+    if (!account) throw new Error("Professional account required.");
+
     const { data: bookings, error } = await context.supabase
       .from("pro_visit_bookings")
       .select("id, address, purpose, scheduled_start_at, contact_name, contact_phone, contact_email, request_id, booking_status, created_at")

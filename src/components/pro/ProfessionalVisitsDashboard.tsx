@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { CalendarClock, ChevronRight, Loader2, MapPin, UserRound } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ function statusFor(booking: ProVisitBooking) {
 export function ProfessionalVisitsDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const listBookings = useServerFn(listMyProVisitBookings);
   const [rows, setRows] = useState<ProVisitBooking[]>([]);
   const [loading, setLoading] = useState(false);
   const [available, setAvailable] = useState(false);
@@ -33,7 +35,7 @@ export function ProfessionalVisitsDashboard() {
     if (!user) return;
     setLoading(true);
     try {
-      const bookings = await listMyProVisitBookings();
+      const bookings = await listBookings();
       setRows(bookings);
       setAvailable(true);
     } catch {
@@ -42,7 +44,7 @@ export function ProfessionalVisitsDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, listBookings]);
 
   useEffect(() => { void load(); }, [load]);
 

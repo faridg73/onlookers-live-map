@@ -243,6 +243,7 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
+  const linkSavedVisit = useServerFn(linkProVisitBooking);
   const { mystery, mode: initialMode } = Route.useSearch();
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
@@ -815,7 +816,7 @@ function PostScreen() {
       });
       if (proVisitBookingId) {
         try {
-          await linkProVisitBooking({ data: { bookingId: proVisitBookingId, requestId: locked.id } });
+          await linkSavedVisit({ data: { bookingId: proVisitBookingId, requestId: locked.id } });
           setProVisitBookingId(null);
         } catch {
           toast.error("The bounty is live, but its dashboard link is still updating.");

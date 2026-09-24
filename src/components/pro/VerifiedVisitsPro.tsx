@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
+import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, CalendarClock, Check, Loader2, Send, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -310,6 +311,7 @@ function ProSignup({
 
 function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const navigate = useNavigate();
+  const saveBooking = useServerFn(createProVisitBooking);
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -334,7 +336,7 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
     setSaving(true);
     try {
       const scheduledStartAt = form.startAt ? new Date(form.startAt).toISOString() : null;
-      const booking = await createProVisitBooking({ data: {
+      const booking = await saveBooking({ data: {
         address: parsed.data.address,
         purpose: parsed.data.purpose,
         scheduledStartAt,
