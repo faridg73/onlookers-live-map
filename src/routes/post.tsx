@@ -1323,6 +1323,7 @@ function PostScreen() {
                 )}
 
 
+                {mainCategoryId !== "real-estate" && categoryId !== "real-estate" && (
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {VENUE_QUICK_SEARCHES.map((venue) => (
                     <Button key={venue.label} type="button" variant="secondary" size="sm" onClick={() => setVenueQuery(venue.query)} className="shrink-0">
@@ -1330,6 +1331,7 @@ function PostScreen() {
                     </Button>
                   ))}
                 </div>
+                )}
                 <div>
                   <p className="text-xs font-bold uppercase text-muted-foreground">Recent spots</p>
                   <div className="mt-2 flex gap-2 overflow-x-auto pb-1">

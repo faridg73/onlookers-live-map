@@ -58,7 +58,7 @@ function MapScreen() {
     const position = requestMapPosition(request);
     void navigate({
       to: "/discover",
-      search: { view: "map", lat: position.lat, lng: position.lng, label: request.title },
+      search: { view: "map", lat: position.lat, lng: position.lng, label: request.title, b: request.id },
     });
   }, [navigate]);
 
