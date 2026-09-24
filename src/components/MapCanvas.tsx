@@ -250,10 +250,13 @@ export function MapCanvas({
     }
   }, [onUserPositionChange, centerOn]);
 
+  // A linked bounty, chosen spot, or pre-selected pin owns the camera — never
+  // let the auto "locate me" yank the map back to the viewer's own position.
+  const autoLocateSuppressed = Boolean(centerTarget ?? focusPin ?? selectedId);
   useEffect(() => {
-    if (restoredViewport.current) return;
+    if (restoredViewport.current || autoLocateSuppressed) return;
     locateMe();
-  }, [locateMe]);
+  }, [locateMe, autoLocateSuppressed]);
 
   // If the fix arrived before the map booted, apply it as soon as it's ready.
   useEffect(() => {

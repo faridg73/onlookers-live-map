@@ -241,7 +241,13 @@ function DiscoverHome() {
                 onSelect={openBounty}
                 viewportStorageKey="onlooker:map:discover"
                 focusPin={focus && !search.b ? { ...focus, zoom: 15 } : null}
-                centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
+                centerTarget={
+                  search.b && selectedPos
+                    ? { lat: selectedPos.lat, lng: selectedPos.lng, zoom: 16 }
+                    : focus
+                      ? { lat: focus.lat, lng: focus.lng, zoom: 15 }
+                      : null
+                }
                 showNativeMapTypeControl={false}
               />
             </SectionBoundary>
