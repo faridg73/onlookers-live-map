@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ChevronRight, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
+import { ArrowLeft, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ScrollableLane } from "@/components/ScrollableLane";
 
@@ -157,10 +157,17 @@ function DiscoverHome() {
         >
           <X className="size-4" aria-hidden />
         </button>
-        <h1 className="max-w-full px-12 text-center font-display text-2xl tracking-tight text-signal sm:text-3xl">
-          Browse <span className="text-signal">places</span>
+        <p className="inline-flex items-center gap-2 border border-signal/30 bg-signal/5 px-3 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-signal">
+          <span className="relative flex size-1.5" aria-hidden>
+            <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+            <span className="relative size-1.5 rounded-full bg-signal" />
+          </span>
+          Discover // your city
+        </p>
+        <h1 className="mt-3 max-w-full px-12 text-center text-2xl font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)] sm:text-3xl">
+          Browse places
         </h1>
-        <p className="mt-1 px-12 text-center text-sm text-foreground/90">
+        <p className="mt-2 px-12 text-center text-sm text-muted-foreground">
           Pick a spot and ask for a <span className="font-bold text-signal">live</span> view.
         </p>
       </div>
@@ -199,21 +206,16 @@ function DiscoverHome() {
 
       <Link
         to="/events"
-        className="group mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-signal/60"
+        className="group mt-3 flex items-center justify-between gap-3 border-y border-home-line py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
       >
-        <span className="inline-flex min-w-0 items-center gap-2.5 text-sm font-bold text-foreground">
-          <span className="relative flex size-2 shrink-0" aria-hidden>
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal opacity-60" />
-            <span className="relative inline-flex size-2 rounded-full bg-signal" />
+        <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors group-hover:text-signal">
+          <span className="relative flex size-1.5 shrink-0" aria-hidden>
+            <span className="absolute inline-flex size-full animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+            <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
           </span>
-          <span className="truncate">
-            Trending feeds &amp; <span className="text-signal">live events</span>
-          </span>
+          <span className="truncate">Trending feeds &amp; live events</span>
         </span>
-        <ChevronRight
-          className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-signal"
-          aria-hidden
-        />
+        <span className="font-mono text-xs text-signal/70 transition-transform group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
       </Link>
 
       {view === "map" ? (
@@ -249,7 +251,7 @@ function DiscoverHome() {
             <section className="mt-5">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
+                  <h2 className="flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
                     <Flame className="size-4 shrink-0 text-signal" aria-hidden /><span>Trending events &amp;{" "}
                     <span className="text-signal">live sports</span></span>
                   </h2>
@@ -334,10 +336,12 @@ function DiscoverHome() {
                   className="absolute inset-0 size-full opacity-80 transition-opacity group-hover:opacity-100"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                <ChevronRight
-                  className="absolute right-3 top-3 size-4 text-foreground/60 transition-colors group-hover:text-signal"
+                <span
+                  className="absolute right-3 top-3 font-mono text-xs text-foreground/60 transition-all group-hover:translate-x-0.5 group-hover:text-signal"
                   aria-hidden
-                />
+                >
+                  &gt;&gt;
+                </span>
                 <div className="absolute inset-x-0 bottom-0 p-3">
                   <p className="line-clamp-2 font-display text-sm leading-tight">
                     <TwoToneName name={group.name} />
@@ -351,7 +355,7 @@ function DiscoverHome() {
       )}
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
-        <p className="inline-flex items-center gap-2 font-display text-base text-foreground">
+        <p className="inline-flex items-center gap-2 text-base font-extrabold italic uppercase tracking-tight text-foreground">
           <Radar className="size-4 text-signal" aria-hidden /> Bounty <span className="text-signal">Radar</span>
         </p>
         {spots.length === 0 ? (
