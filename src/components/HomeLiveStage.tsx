@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { BadgeCheck, ChevronDown, ChevronRight, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
@@ -329,6 +329,16 @@ export function HomeLiveStage({
               <Radio className="size-4" /> Go live
             </Button>
           </div>
+          <Link
+            to="/events"
+            className="group mx-auto mt-2 flex w-full max-w-md items-center justify-between gap-2 rounded-xl border border-home-line bg-home-glass-strong px-3.5 py-2 backdrop-blur-2xl transition-colors duration-150 hover:border-signal/60 [@media(max-height:520px)]:hidden"
+          >
+            <span className="inline-flex min-w-0 items-center gap-2 text-[0.72rem] font-bold text-foreground">
+              <Ticket className="size-3.5 shrink-0 text-signal" aria-hidden />
+              <span className="truncate">Venues &amp; events near you</span>
+            </span>
+            <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-colors duration-150 group-hover:text-signal" aria-hidden />
+          </Link>
           <div className="mt-3 flex justify-center [@media(max-height:520px)]:hidden">
             <button
               type="button"
