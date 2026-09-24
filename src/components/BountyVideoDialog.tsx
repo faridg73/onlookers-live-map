@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Play, RotateCcw, Share2, Trash2, Video, X } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Lock, Play, RotateCcw, Share2, Trash2, Video, X } from "lucide-react";
 import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
 import { describeUploadError } from "@/lib/upload-errors";
 import { formatCredits } from "@/lib/credits";
@@ -149,7 +149,7 @@ export function BountyVideoDialog({
     setPayingId(video.id);
     try {
       const paid = await acceptBountyVideo(video.id);
-      toast.success(`Accepted. ${Math.round(paid)} Credits sent to the reporter's wallet.`);
+      toast.success(`Accepted. ${Math.round(paid)} Credits sent to the Onlooker's wallet.`);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
@@ -197,10 +197,10 @@ export function BountyVideoDialog({
             {request.title} · {request.place}
           </DialogDescription>
         </DialogHeader>
-        <AccessPasscode request={request} />
+        {!closed && <AccessPasscode request={request} />}
         <SitePinVerification requestId={request.dbId ?? null} onState={setPinState} />
 
-        <BountyChat requestKey={chatKey(request)} />
+        <BountyChat requestKey={chatKey(request)} hideWhenLocked={closed} />
 
         {!user ? (
           <div className="rounded-2xl border border-border bg-surface p-5 text-center">
@@ -216,6 +216,16 @@ export function BountyVideoDialog({
           </div>
         ) : (
           <>
+            {closed ? (
+              <div className="rounded-2xl border border-border bg-surface p-4 text-center">
+                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-foreground">
+                  <Lock className="size-4 text-muted-foreground" /> This bounty is closed
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  It&rsquo;s no longer taking new clips. Any submitted videos are listed below.
+                </p>
+              </div>
+            ) : (
             <div className="space-y-3" onDrop={blockFileDrop} onDragOver={blockFileDrop} onPaste={blockFilePaste}>
               <textarea
                 value={note}
@@ -289,6 +299,7 @@ export function BountyVideoDialog({
                 />
               )}
             </div>
+            )}
 
             {justSent && (
               <div className="mt-2 rounded-2xl border border-signal/40 bg-surface p-4 text-center">
@@ -389,7 +400,7 @@ export function BountyVideoDialog({
                   {v.accepted_at ? (
                     <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-xs font-semibold text-signal">
                       <CoinsIcon className="size-3.5" /> Accepted ·{" "}
-                      {formatCredits(Number(v.payout_amount))} paid to the reporter
+                      {formatCredits(Number(v.payout_amount))} paid to the Onlooker
                     </p>
                   ) : (
                     v.uploader_id !== user.id && (

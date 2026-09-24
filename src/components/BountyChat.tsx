@@ -27,11 +27,14 @@ export function BountyChat({
   requestKey,
   bare = false,
   readOnly = false,
+  hideWhenLocked = false,
 }: {
   requestKey: string;
   bare?: boolean;
   /** Approved bounties become a historical log: no typing, no attachments. */
   readOnly?: boolean;
+  /** Closed bounties skip the "chat opens once claimed" hint. */
+  hideWhenLocked?: boolean;
 }) {
   const { user } = useAuth();
   const key = requestKey;
@@ -69,9 +72,10 @@ export function BountyChat({
   if (!user || loading) return null;
 
   if (locked) {
+    if (hideWhenLocked) return null;
     return (
       <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-surface-raised px-3 py-2.5 text-xs text-muted-foreground">
-        <Lock className="size-3.5" /> Chat opens once a reporter claims this bounty.
+        <Lock className="size-3.5" /> Chat opens once an Onlooker claims this bounty.
       </div>
     );
   }
