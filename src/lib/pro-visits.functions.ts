@@ -166,7 +166,7 @@ export const listMyProVisitBookings = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .maybeSingle();
     if (accountError) throw new Error(accountError.message);
-    if (!account) throw new Error("Professional account required.");
+    if (!account) return [];
 
     const { data: bookings, error } = await context.supabase
       .from("pro_visit_bookings")
