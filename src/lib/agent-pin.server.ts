@@ -36,7 +36,7 @@ function smsBody(opts: PinOpts) {
   return (
     `Onlooker: the single-use 6-digit on-site PIN for "${opts.locationName}" is ${opts.pin}. ` +
     `When they arrive we'll text you a one-tap approval link. If you can't open it, give this code ONLY to the assigned Onlooker who claimed this visit; it works once and expires when the request closes. ` +
-    `Bounty: ${SITE_URL}/?b=${opts.requestId}` +
+    `Bounty: ${SITE_URL}/b/db-${opts.requestId}` +
     (decline ? ` Didn't authorize this? Tap to cancel the bounty: ${decline}` : "")
   );
 }
@@ -54,7 +54,7 @@ function emailBody(opts: PinOpts & { name: string }) {
     <p style="margin:0 0 20px;"><span style="display:inline-block;background:#000;border:1px solid #CCFF00;color:#CCFF00;font-size:30px;font-weight:bold;letter-spacing:10px;padding:14px 22px;border-radius:12px;">${opts.pin}</span></p>
     <p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#a3a3a3;">This PIN can be used once and stops working when the request closes.</p>
     <p style="margin:0 0 8px;font-size:13px;color:#a3a3a3;">Bounty link:</p>
-    <p style="margin:0 0 16px;"><a href="${SITE_URL}/?b=${opts.requestId}" style="color:#CCFF00;font-size:13px;word-break:break-all;">${SITE_URL}/?b=${opts.requestId}</a></p>
+    <p style="margin:0 0 16px;"><a href="${SITE_URL}/b/db-${opts.requestId}" style="color:#CCFF00;font-size:13px;word-break:break-all;">${SITE_URL}/b/db-${opts.requestId}</a></p>
     ${declineUrl(opts.declineToken) ? `<p style="margin:0;font-size:13px;line-height:1.6;color:#a3a3a3;">Didn't authorize this visit? <a href="${declineUrl(opts.declineToken)}" style="color:#CCFF00;">Tap here to cancel the bounty</a> — no account needed.</p>` : ""}
   </div>
 </body></html>`;
@@ -67,7 +67,7 @@ function emailText(opts: PinOpts & { name: string }) {
     `Your 6-digit on-site PIN: ${opts.pin}\n\n` +
     `When the onlooker arrives we'll send you a one-tap approval link. If you can't open it, give this ` +
     `backup PIN ONLY to the assigned Onlooker who claimed this visit. It works once and stops working when the request closes.` +
-    `\n\nBounty: ${SITE_URL}/?b=${opts.requestId}` +
+    `\n\nBounty: ${SITE_URL}/b/db-${opts.requestId}` +
     (declineUrl(opts.declineToken) ? `\n\nDidn't authorize this visit? Tap to cancel the bounty: ${declineUrl(opts.declineToken)}` : "")
   );
 }
