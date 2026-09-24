@@ -14,7 +14,7 @@ import {
 } from "@/lib/geocode.functions";
 
 type Props = {
-  initialText?: string;
+  initialText?: string | undefined;
   onPick: (location: PickedLocation) => void;
   placeholder?: string;
 };
