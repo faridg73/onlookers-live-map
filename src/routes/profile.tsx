@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { RequestCard } from "@/components/RequestCard";
 import { PosterBountyDashboard } from "@/components/PosterBountyDashboard";
+import { ProfessionalVisitsDashboard } from "@/components/pro/ProfessionalVisitsDashboard";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -292,6 +293,8 @@ function ProfileScreen() {
       <WeeklyTopOnlookers />
 
       <Leaderboard limit={5} moreLink />
+
+      <ProfessionalVisitsDashboard />
 
       <PosterBountyDashboard />
 

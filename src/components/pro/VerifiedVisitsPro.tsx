@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
+import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, CalendarClock, Check, Loader2, Send, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -9,6 +10,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { getStripe } from "@/lib/stripe";
 import { startProCheckout } from "@/lib/pro.functions";
+import { createProVisitBooking } from "@/lib/pro-visits.functions";
 import {
   PRO_PLANS,
   PRO_ROLES,
@@ -309,8 +311,10 @@ function ProSignup({
 
 function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const navigate = useNavigate();
+  const saveBooking = useServerFn(createProVisitBooking);
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
   const hasPlan = account !== null && account.plan !== "none";
@@ -319,7 +323,7 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
     && account.plan !== "team"
     && account.visits_used >= (account.plan === "starter" ? 5 : 20);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (allowanceUsed) {
       setError(`Your ${proPlanById(account?.plan ?? "")?.name ?? "current"} plan's monthly visit allowance has been used. Choose a higher plan or wait for the next billing month.`);
@@ -329,20 +333,33 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
     if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? "Check the form");
     if (form.startAt && new Date(form.startAt).getTime() < Date.now()) return setError("Pick a visit time in the future");
     setError(null);
-    const draft: ProVisitDraft = {
-      address: parsed.data.address,
-      purpose: parsed.data.purpose,
-      startAt: form.startAt ? new Date(form.startAt).toISOString() : null,
-      agentName: parsed.data.agentName,
-      agentPhone: parsed.data.agentPhone,
-      agentEmail: parsed.data.agentEmail,
-    };
+    setSaving(true);
     try {
+      const scheduledStartAt = form.startAt ? new Date(form.startAt).toISOString() : null;
+      const booking = await saveBooking({ data: {
+        address: parsed.data.address,
+        purpose: parsed.data.purpose,
+        scheduledStartAt,
+        contactName: parsed.data.agentName,
+        contactPhone: parsed.data.agentPhone,
+        contactEmail: parsed.data.agentEmail,
+      } });
+      const draft: ProVisitDraft = {
+        bookingId: booking.id,
+        address: parsed.data.address,
+        purpose: parsed.data.purpose,
+        startAt: scheduledStartAt,
+        agentName: parsed.data.agentName,
+        agentPhone: parsed.data.agentPhone,
+        agentEmail: parsed.data.agentEmail,
+      };
       window.sessionStorage.setItem(PRO_VISIT_DRAFT_KEY, JSON.stringify(draft));
-    } catch {
-      /* storage blocked — user can still fill the bounty manually */
+      void navigate({ to: "/post", search: { mode: "bounty" } });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not save this visit. Please try again.");
+    } finally {
+      setSaving(false);
     }
-    void navigate({ to: "/post", search: { mode: "bounty" } });
   };
 
   return (
@@ -371,8 +388,8 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
           </p>
         )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
-        <Button type="submit" disabled={allowanceUsed} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
-          <Send className="size-4" /> Continue to verified bounty
+        <Button type="submit" disabled={allowanceUsed || saving || !account} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
+          {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : "Continue to verified bounty"}
         </Button>
       </div>
     </form>
