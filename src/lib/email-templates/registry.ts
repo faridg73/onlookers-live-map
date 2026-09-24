@@ -21,9 +21,11 @@ export interface TemplateEntry {
 import { template as dmcaReport } from './dmca-report'
 import { template as supportTicket } from './support-ticket'
 import { template as supportReceived } from './support-received'
+import { template as payoutReleased } from './payout-released'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'dmca-report': dmcaReport,
   'support-ticket': supportTicket,
   'support-received': supportReceived,
+  'payout-released': payoutReleased,
 }

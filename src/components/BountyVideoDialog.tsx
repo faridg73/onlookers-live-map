@@ -151,6 +151,8 @@ export function BountyVideoDialog({
     try {
       const paid = await acceptBountyVideo(video.id);
       toast.success(`Accepted. ${Math.round(paid)} Credits sent to the Onlooker's wallet.`);
+      // Let the Onlooker know by email; never block the accept on this.
+      void notifyPayoutReleased({ data: { videoId: video.id } }).catch(() => undefined);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't accept that clip.");
