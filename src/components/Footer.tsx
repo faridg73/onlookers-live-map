@@ -5,6 +5,7 @@ import {
   MessageSquare,
   Gavel,
   HelpCircle,
+  KeyRound,
   FileText,
   Shield,
   ShieldAlert,
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { DmcaReportModal } from "@/components/DmcaReportModal";
 
 const LINKS = [
+  { to: "/verification", label: "Verified Visits", icon: KeyRound },
   { to: "/faq", label: "FAQ", icon: HelpCircle },
   { to: "/contact", label: "Contact", icon: MessageSquare },
   { to: "/disputes", label: "Disputes", icon: Gavel },
