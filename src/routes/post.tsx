@@ -618,6 +618,19 @@ function PostScreen() {
   };
 
   /** Picking a category sets the Flash lane, the nearby search, and any extra fields it needs. */
+  /** Third choice on the picker: a pre-loaded real-estate verified visit with the
+   *  approval-link handshake, so agents and property managers can post directly. */
+  const startVerifiedVisit = () => {
+    setMode("bounty");
+    setPlaceCategoryId(null);
+    setCategoryId("real-estate");
+    setMainCategoryId("real-estate");
+    setSubcategory(null);
+    setLocationType("owner_authorized");
+    setPermissionOk(true);
+    setVenueQuery("homes for sale open houses apartment tours near me");
+  };
+
   const choosePlaceCategory = (next: PlaceCategoryId) => {
     const picked = PLACE_CATEGORIES.find((entry) => entry.id === next);
     if (!picked) return;
