@@ -1051,6 +1051,7 @@ function PostScreen() {
                     Address, landmark, or coordinates
                   </p>
                   <AddressSearchField
+                    initialText={spot ? undefined : place}
                     onPick={(next) => {
                       setSpot(next);
                       setPlace(next.formatted);

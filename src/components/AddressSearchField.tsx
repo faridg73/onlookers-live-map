@@ -14,6 +14,7 @@ import {
 } from "@/lib/geocode.functions";
 
 type Props = {
+  initialText?: string;
   onPick: (location: PickedLocation) => void;
   placeholder?: string;
 };
@@ -21,8 +22,11 @@ type Props = {
 const COORDS = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/;
 
 /** Address, landmark and coordinate search that drops the pin on the map. */
-export function AddressSearchField({ onPick, placeholder }: Props) {
+export function AddressSearchField({ onPick, placeholder, initialText }: Props) {
   const [text, setText] = useState("");
+  useEffect(() => {
+    if (initialText) setText((t) => t || initialText);
+  }, [initialText]);
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [busy, setBusy] = useState(false);
   const session = useRef<string>(crypto.randomUUID());
