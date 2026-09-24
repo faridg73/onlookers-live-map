@@ -45,6 +45,7 @@ import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicSitePinApprovalRouteImport } from './routes/api/public/site-pin/approval'
 import { Route as ApiPublicSitePinDeclineRouteImport } from './routes/api/public/site-pin/decline'
 import { Route as ApiPublicWebhooksSignalhouseRouteImport } from './routes/api/public/webhooks/signalhouse'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -232,6 +233,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSitePinApprovalRoute =
+  ApiPublicSitePinApprovalRouteImport.update({
+    id: '/api/public/site-pin/approval',
+    path: '/api/public/site-pin/approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSitePinDeclineRoute = ApiPublicSitePinDeclineRouteImport.update({
   id: '/api/public/site-pin/decline',
   path: '/api/public/site-pin/decline',
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -340,6 +348,7 @@ export interface FileRoutesByTo {
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -384,6 +393,7 @@ export interface FileRoutesById {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -472,6 +483,7 @@ export interface FileRouteTypes {
     | '/discover/$group'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -515,6 +527,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -559,6 +572,7 @@ export interface RootRouteChildren {
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicSitePinApprovalRoute: typeof ApiPublicSitePinApprovalRoute
   ApiPublicSitePinDeclineRoute: typeof ApiPublicSitePinDeclineRoute
   ApiPublicWebhooksSignalhouseRoute: typeof ApiPublicWebhooksSignalhouseRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -820,6 +834,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/site-pin/approval': {
+      id: '/api/public/site-pin/approval'
+      path: '/api/public/site-pin/approval'
+      fullPath: '/api/public/site-pin/approval'
+      preLoaderRoute: typeof ApiPublicSitePinApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/site-pin/decline': {
       id: '/api/public/site-pin/decline'
       path: '/api/public/site-pin/decline'
@@ -895,6 +916,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicSitePinApprovalRoute: ApiPublicSitePinApprovalRoute,
   ApiPublicSitePinDeclineRoute: ApiPublicSitePinDeclineRoute,
   ApiPublicWebhooksSignalhouseRoute: ApiPublicWebhooksSignalhouseRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
