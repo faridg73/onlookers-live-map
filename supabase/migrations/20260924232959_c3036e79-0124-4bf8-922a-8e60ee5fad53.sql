@@ -1,0 +1,12 @@
+REVOKE EXECUTE ON FUNCTION public.chat_participants(text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.list_disputes() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.pending_verification_requests() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.public_profile_card(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.reject_proof(uuid, text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.request_creator_verification() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.request_is_live(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.begin_bounty_submission(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.bounty_bid_summary(uuid) FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.list_disputes_detailed() FROM PUBLIC, anon;
+REVOKE EXECUTE ON FUNCTION public.resolve_dispute_split(uuid, numeric) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.begin_bounty_submission(uuid), public.bounty_bid_summary(uuid), public.list_disputes_detailed(), public.resolve_dispute_split(uuid, numeric) TO authenticated, service_role;
