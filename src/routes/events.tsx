@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Flame, Ticket } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Flame, Grid2x2, Ticket } from "lucide-react";
 import { AreaPicker } from "@/components/AreaPicker";
 import { CreatorVibePills } from "@/components/CreatorVibePills";
 import { TrendingCard } from "@/components/TrendingCard";
@@ -168,6 +168,13 @@ function EventsScreen() {
           ? `${activeVibe.label} streams and places around ${area.label}.`
           : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label} — tap any card to launch a live view from that exact spot.`}
       </p>
+
+      <Link
+        to="/discover"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-signal"
+      >
+        <Grid2x2 className="size-3.5" aria-hidden /> Browse categories
+      </Link>
 
       <div className="mt-4">
         <CreatorVibePills
