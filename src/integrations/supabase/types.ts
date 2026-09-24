@@ -1629,7 +1629,14 @@ export type Database = {
           agent_email: string | null
           agent_name: string | null
           agent_phone: string | null
+          approval_denied_at: string | null
+          approval_denied_for: string | null
+          approval_deny_note: string | null
+          approve_token: string | null
+          approved_via: string | null
           attempts: number
+          checked_in_at: string | null
+          checked_in_by: string | null
           created_at: string
           decline_note: string | null
           decline_token: string | null
@@ -1649,7 +1656,14 @@ export type Database = {
           agent_email?: string | null
           agent_name?: string | null
           agent_phone?: string | null
+          approval_denied_at?: string | null
+          approval_denied_for?: string | null
+          approval_deny_note?: string | null
+          approve_token?: string | null
+          approved_via?: string | null
           attempts?: number
+          checked_in_at?: string | null
+          checked_in_by?: string | null
           created_at?: string
           decline_note?: string | null
           decline_token?: string | null
@@ -1669,7 +1683,14 @@ export type Database = {
           agent_email?: string | null
           agent_name?: string | null
           agent_phone?: string | null
+          approval_denied_at?: string | null
+          approval_denied_for?: string | null
+          approval_deny_note?: string | null
+          approve_token?: string | null
+          approved_via?: string | null
           attempts?: number
+          checked_in_at?: string | null
+          checked_in_by?: string | null
           created_at?: string
           decline_note?: string | null
           decline_token?: string | null
@@ -2898,6 +2919,13 @@ export type Database = {
         Returns: boolean
       }
       settle_escrows: { Args: never; Returns: Json }
+      site_approval_decide: {
+        Args: { _approve: boolean; _note?: string; _token: string }
+        Returns: Json
+      }
+      site_approval_lookup: { Args: { _token: string }; Returns: Json }
+      site_approval_state: { Args: { _request_id: string }; Returns: Json }
+      site_checkin: { Args: { _request_id: string }; Returns: Json }
       start_stream_session: {
         Args: {
           _credits_per_minute?: number
