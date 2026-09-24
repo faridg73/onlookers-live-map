@@ -123,3 +123,51 @@ export async function sendAgentPin(
 
   return result;
 }
+
+/** Sends the one-hour "approve this onlooker" link after the Hunter checks in. */
+export async function sendAgentApprovalLink(
+  contact: AgentContact,
+  opts: { token: string; locationName: string; hunterName: string },
+): Promise<AgentPinDelivery> {
+  const result: AgentPinDelivery = { sms: false, email: false };
+  const url = `${SITE_URL}/visit-approve?t=${encodeURIComponent(opts.token)}`;
+  const phone = (contact.phone ?? "").trim();
+  const email = (contact.email ?? "").trim();
+  const text =
+    `Onlooker: ${opts.hunterName} says they're on site at "${opts.locationName}". ` +
+    `Tap to approve or deny them (link works 60 min): ${url}`;
+  if (phone) {
+    const normalized = normalizePhone(phone);
+    if (!normalized) result.smsError = "That phone number could not be recognized.";
+    else {
+      const sms = await sendSms(normalized, text);
+      if (sms.ok) result.sms = true;
+      else result.smsError = sms.error;
+    }
+  }
+  if (email) {
+    try {
+      const apiKey = process.env["LOVABLE_API_KEY"];
+      if (!apiKey) throw new Error("Email sending is not configured.");
+      const response = await sendLovableEmail(
+        {
+          to: email,
+          from: "Onlooker <noreply@onlookerlive.com>",
+          sender_domain: "notify.onlookerlive.com",
+          label: "agent-site-approval",
+          idempotency_key: crypto.randomUUID(),
+          subject: `Approve the onlooker at ${opts.locationName}`,
+          html: `<!doctype html><html><body style="margin:0;background:#0f0f0f;padding:32px;font-family:Arial,sans-serif;color:#e5e5e5;"><div style="max-width:520px;margin:0 auto;background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:28px;"><p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#CCFF00;font-weight:bold;">ONLOOKER · ON-SITE APPROVAL</p><h1 style="margin:0 0 16px;font-size:22px;color:#fff;">Is this the right person?</h1><p style="font-size:14px;line-height:1.6;"><strong style="color:#fff;">${opts.hunterName}</strong> says they're at <strong style="color:#fff;">${opts.locationName}</strong>. Open the link to see their photo and approve or deny them. It works for 60 minutes.</p><p><a href="${url}" style="display:inline-block;background:#CCFF00;color:#000;font-weight:bold;padding:12px 20px;border-radius:10px;text-decoration:none;">Review onlooker</a></p></div></body></html>`,
+          text,
+          purpose: "transactional",
+        },
+        { apiKey },
+      );
+      result.email = response.success;
+      if (!response.success) result.emailError = response.status ?? "Email provider rejected the send.";
+    } catch (err) {
+      result.emailError = err instanceof Error ? err.message : "Email failed.";
+    }
+  }
+  return result;
+}

@@ -33,6 +33,7 @@ import { Route as ProDashboardRouteImport } from './routes/pro-dashboard'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
+import { Route as VisitApproveRouteImport } from './routes/visit-approve'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
@@ -45,6 +46,7 @@ import { Route as DiscoverGroupIndexRouteImport } from './routes/discover.$group
 import { Route as DiscoverGroupVenueRouteImport } from './routes/discover.$group.$venue'
 import { Route as ApiPublicMediaLifecycleRouteImport } from './routes/api/public/media/lifecycle'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicSitePinApprovalRouteImport } from './routes/api/public/site-pin/approval'
 import { Route as ApiPublicSitePinDeclineRouteImport } from './routes/api/public/site-pin/decline'
 import { Route as ApiPublicWebhooksSignalhouseRouteImport } from './routes/api/public/webhooks/signalhouse'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -171,6 +173,11 @@ const VerificationRoute = VerificationRouteImport.update({
   path: '/verification',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VisitApproveRoute = VisitApproveRouteImport.update({
+  id: '/visit-approve',
+  path: '/visit-approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -232,6 +239,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSitePinApprovalRoute =
+  ApiPublicSitePinApprovalRouteImport.update({
+    id: '/api/public/site-pin/approval',
+    path: '/api/public/site-pin/approval',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSitePinDeclineRoute = ApiPublicSitePinDeclineRouteImport.update({
   id: '/api/public/site-pin/decline',
   path: '/api/public/site-pin/decline',
@@ -285,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/visit-approve': typeof VisitApproveRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -297,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -328,6 +343,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/visit-approve': typeof VisitApproveRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -340,6 +356,7 @@ export interface FileRoutesByTo {
   '/discover/$group': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -372,6 +389,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/visit-approve': typeof VisitApproveRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -384,6 +402,7 @@ export interface FileRoutesById {
   '/discover/$group/': typeof DiscoverGroupIndexRoute
   '/api/public/media/lifecycle': typeof ApiPublicMediaLifecycleRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/site-pin/approval': typeof ApiPublicSitePinApprovalRoute
   '/api/public/site-pin/decline': typeof ApiPublicSitePinDeclineRoute
   '/api/public/webhooks/signalhouse': typeof ApiPublicWebhooksSignalhouseRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -417,6 +436,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/terms'
     | '/verification'
+    | '/visit-approve'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -429,6 +449,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -460,6 +481,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/terms'
     | '/verification'
+    | '/visit-approve'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -472,6 +494,7 @@ export interface FileRouteTypes {
     | '/discover/$group'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -503,6 +526,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/terms'
     | '/verification'
+    | '/visit-approve'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -515,6 +539,7 @@ export interface FileRouteTypes {
     | '/discover/$group/'
     | '/api/public/media/lifecycle'
     | '/api/public/payments/webhook'
+    | '/api/public/site-pin/approval'
     | '/api/public/site-pin/decline'
     | '/api/public/webhooks/signalhouse'
     | '/lovable/email/auth/preview'
@@ -547,6 +572,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
+  VisitApproveRoute: typeof VisitApproveRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
   DiscoverTrendingRoute: typeof DiscoverTrendingRoute
@@ -559,6 +585,7 @@ export interface RootRouteChildren {
   DiscoverGroupIndexRoute: typeof DiscoverGroupIndexRoute
   ApiPublicMediaLifecycleRoute: typeof ApiPublicMediaLifecycleRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicSitePinApprovalRoute: typeof ApiPublicSitePinApprovalRoute
   ApiPublicSitePinDeclineRoute: typeof ApiPublicSitePinDeclineRoute
   ApiPublicWebhooksSignalhouseRoute: typeof ApiPublicWebhooksSignalhouseRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -736,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/visit-approve': {
+      id: '/visit-approve'
+      path: '/visit-approve'
+      fullPath: '/visit-approve'
+      preLoaderRoute: typeof VisitApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -820,6 +854,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/site-pin/approval': {
+      id: '/api/public/site-pin/approval'
+      path: '/api/public/site-pin/approval'
+      fullPath: '/api/public/site-pin/approval'
+      preLoaderRoute: typeof ApiPublicSitePinApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/site-pin/decline': {
       id: '/api/public/site-pin/decline'
       path: '/api/public/site-pin/decline'
@@ -883,6 +924,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
+  VisitApproveRoute: VisitApproveRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
   DiscoverTrendingRoute: DiscoverTrendingRoute,
@@ -895,6 +937,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscoverGroupIndexRoute: DiscoverGroupIndexRoute,
   ApiPublicMediaLifecycleRoute: ApiPublicMediaLifecycleRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicSitePinApprovalRoute: ApiPublicSitePinApprovalRoute,
   ApiPublicSitePinDeclineRoute: ApiPublicSitePinDeclineRoute,
   ApiPublicWebhooksSignalhouseRoute: ApiPublicWebhooksSignalhouseRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
