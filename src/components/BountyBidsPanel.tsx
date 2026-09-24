@@ -97,7 +97,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setBusy("place");
     const { error } = await db.rpc("place_bounty_bid", { _request_id: requestId, _amount: n, _note: note });
     setBusy(null);
-    if (error) return toast.error(friendly(error.message));
+    if (error) { toast.error(friendly(error.message)); return; }
     toast.success(myBid?.status === "active" ? "Bid updated." : `Bid placed — ${n} credits held from your wallet.`);
     refreshWallet();
     void load();
@@ -107,7 +107,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setBusy(id);
     const { error } = await db.rpc("withdraw_bounty_bid", { _bid_id: id });
     setBusy(null);
-    if (error) return toast.error(friendly(error.message));
+    if (error) { toast.error(friendly(error.message)); return; }
     toast.success("Bid withdrawn — credits returned to your wallet.");
     setAmount("");
     setNote("");
@@ -120,7 +120,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setBusy(bid.id);
     const { error } = await db.rpc("award_bounty_bid", { _bid_id: bid.id });
     setBusy(null);
-    if (error) return toast.error(friendly(error.message));
+    if (error) { toast.error(friendly(error.message)); return; }
     toast.success("Winner confirmed. They can start filming now.");
     refreshWallet();
     void load();
