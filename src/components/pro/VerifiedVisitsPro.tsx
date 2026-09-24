@@ -25,12 +25,8 @@ interface ProAccount {
   pro_role: ProRole;
   company: string;
   plan: "none" | "starter" | "pro" | "team";
-}
-
-interface ProVisitUsage {
   visits_used: number;
-  visit_limit: number | null;
-  period_start: string;
+  visit_period_start: string | null;
 }
 
 // pro_accounts is newer than the generated types; keep the client loosely typed here.
@@ -39,7 +35,6 @@ const db = supabase as unknown as { from: (t: string) => any };
 function useProAccount() {
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [account, setAccount] = useState<ProAccount | null>(null);
-  const [usage, setUsage] = useState<ProVisitUsage | null>(null);
 
   const load = async () => {
     const { data } = await supabase.auth.getSession();
@@ -47,15 +42,14 @@ function useProAccount() {
     setUserId(uid);
     if (!uid) {
       setAccount(null);
-      setUsage(null);
       return;
     }
-    const [{ data: row }, { data: usageRows }] = await Promise.all([
-      db.from("pro_accounts").select("pro_role, company, plan").eq("user_id", uid).maybeSingle(),
-      (supabase as any).rpc("get_my_pro_visit_usage"),
-    ]);
+    const { data: row } = await db
+      .from("pro_accounts")
+      .select("pro_role, company, plan, visits_used, visit_period_start")
+      .eq("user_id", uid)
+      .maybeSingle();
     setAccount((row as ProAccount | null) ?? null);
-    setUsage(((usageRows as ProVisitUsage[] | null)?.[0]) ?? null);
   };
 
   useEffect(() => {
@@ -64,7 +58,7 @@ function useProAccount() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  return { userId, account, usage, reload: load };
+  return { userId, account, reload: load };
 }
 
 const signupSchema = z.object({
@@ -85,7 +79,7 @@ const requestSchema = z.object({
 });
 
 export function VerifiedVisitsPro() {
-  const { userId, account, usage, reload } = useProAccount();
+  const { userId, account, reload } = useProAccount();
   const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
   const signupRef = useRef<HTMLElement>(null);
 
@@ -112,10 +106,10 @@ export function VerifiedVisitsPro() {
     <>
       <PricingSection current={account?.plan ?? "none"} onChoose={choosePlan} />
       <section ref={signupRef} id="pro-signup" className="mt-12 scroll-mt-6" aria-labelledby="pro-signup-title">
-        <ProSignup userId={userId} account={account} usage={usage} onSaved={reload} />
+        <ProSignup userId={userId} account={account} onSaved={reload} />
       </section>
       <section id="request-visit" className="mt-12 scroll-mt-6" aria-labelledby="request-visit-title">
-        <RequestVisitForm account={account} usage={usage} />
+        <RequestVisitForm account={account} />
       </section>
       {checkoutPlan && (
         <ProCheckoutSheet plan={checkoutPlan} onClose={() => { setCheckoutPlan(null); void reload(); }} />
@@ -182,12 +176,10 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
 function ProSignup({
   userId,
   account,
-  usage,
   onSaved,
 }: {
   userId: string | null | undefined;
   account: ProAccount | null;
-  usage: ProVisitUsage | null;
   onSaved: () => Promise<void>;
 }) {
   const [role, setRole] = useState<ProRole>("agent");
@@ -262,11 +254,11 @@ function ProSignup({
         <p className="mt-2 text-center text-sm text-muted-foreground">
           Plan: <span className="font-semibold text-foreground">{plan ? `${plan.name} — ${plan.visits}` : "No plan yet"}</span>
         </p>
-        {account.plan !== "none" && usage && (
+        {account.plan !== "none" && (
           <p className="mt-1 text-center text-sm font-semibold text-signal">
-            {usage.visit_limit === null
-              ? `${usage.visits_used} verified visits this billing month · Unlimited`
-              : `${usage.visits_used} of ${usage.visit_limit} verified visits used this billing month`}
+            {account.plan === "team"
+              ? `${account.visits_used} verified visits this billing month · Unlimited`
+              : `${account.visits_used} of ${account.plan === "starter" ? 5 : 20} verified visits used this billing month`}
           </p>
         )}
         <div className="mt-5 flex flex-wrap justify-center gap-3">
@@ -315,16 +307,15 @@ function ProSignup({
   );
 }
 
-function RequestVisitForm({ account, usage }: { account: ProAccount | null; usage: ProVisitUsage | null }) {
+function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
   const allowanceUsed = account?.plan !== "none"
-    && usage?.visit_limit !== null
-    && usage?.visit_limit !== undefined
-    && usage.visits_used >= usage.visit_limit;
+    && account?.plan !== "team"
+    && account.visits_used >= (account.plan === "starter" ? 5 : 20);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -370,11 +361,11 @@ function RequestVisitForm({ account, usage }: { account: ProAccount | null; usag
           <Field label="Contact email"><input type="email" value={form.agentEmail} onChange={set("agentEmail")} maxLength={255} placeholder="dana@realty.com" className="field" /></Field>
         </div>
         <p className="text-xs text-muted-foreground">The contact receives a one-time PIN by text or email — no account needed.</p>
-        {account?.plan !== "none" && usage && (
+        {account?.plan !== "none" && (
           <p className={`text-xs font-semibold ${allowanceUsed ? "text-destructive" : "text-signal"}`}>
-            {usage.visit_limit === null
-              ? `Plan usage: ${usage.visits_used} visits this billing month · Unlimited`
-              : `Plan usage: ${usage.visits_used} of ${usage.visit_limit} visits`}
+            {account.plan === "team"
+              ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
+              : `Plan usage: ${account.visits_used} of ${account.plan === "starter" ? 5 : 20} visits`}
           </p>
         )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
