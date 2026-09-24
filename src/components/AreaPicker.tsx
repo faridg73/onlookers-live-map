@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Crosshair, Loader2, MapPin, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { autocompletePlaces, resolvePlaceSuggestion, type PlaceSuggestion } from "@/lib/geocode.functions";
 
@@ -9,7 +10,7 @@ import { autocompletePlaces, resolvePlaceSuggestion, type PlaceSuggestion } from
  * person switch to their own GPS position or any other city — with live
  * suggestions as they type.
  */
-export function AreaPicker() {
+export function AreaPicker({ compact = false }: { compact?: boolean }) {
   const { area, busy, error, useMyLocation, setCity, applyPlace } = useDiscoveryArea();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -75,28 +76,55 @@ export function AreaPicker() {
       });
   };
 
+  const changeButton = cn(
+    "shrink-0 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground transition-colors hover:text-signal",
+    compact
+      ? "ml-1 border-l border-border py-0.5 pl-2.5 text-signal"
+      : "rounded-full border border-border px-3 py-1.5",
+  );
+
   return (
-    <div className="rounded-2xl border border-border bg-surface p-3">
-      <div className="flex items-center gap-2">
+    <div className={cn("relative", !compact && "rounded-2xl border border-border bg-surface p-3")}>
+      <div
+        className={cn(
+          "flex items-center gap-2",
+          compact && "rounded-full border border-border bg-surface px-3.5 py-2",
+        )}
+      >
         <MapPin className="size-4 shrink-0 text-signal" aria-hidden />
-        <div className="min-w-0 flex-1">
-          <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
-            Showing spots near
+        {compact ? (
+          <p className="min-w-0 flex-1 truncate text-[0.8rem] font-bold text-foreground">
+            <span className="mr-1.5 text-[0.55rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
+              Near
+            </span>
+            {area.label}
           </p>
-          <p className="truncate text-sm font-bold text-foreground">{area.label}</p>
-        </div>
+        ) : (
+          <div className="min-w-0 flex-1">
+            <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-signal">
+              Showing spots near
+            </p>
+            <p className="truncate text-sm font-bold text-foreground">{area.label}</p>
+          </div>
+        )}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="rounded-full border border-border px-3 py-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.12em] text-foreground"
+          className={changeButton}
         >
           Change
         </button>
       </div>
 
       {open && (
-        <div className="mt-3 space-y-2">
+        <div
+          className={cn(
+            "space-y-2",
+            compact &&
+              "absolute inset-x-0 top-full z-40 mt-2 rounded-2xl border border-border bg-surface p-3 shadow-xl",
+          )}
+        >
           <button
             type="button"
             disabled={busy}
