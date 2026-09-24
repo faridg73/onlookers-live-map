@@ -2,6 +2,7 @@
 import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, MapPin, Zap } from "lucide-react";
 
+import { BountyBidsPanel } from "@/components/BountyBidsPanel";
 import { formatCreditCash } from "@/lib/credits";
 
 type Search = {
@@ -109,6 +110,7 @@ function BountyPreview() {
           </Link>
         </div>
       </div>
+      <BountyBidsPanel requestId={id} />
     </div>
   );
 }
