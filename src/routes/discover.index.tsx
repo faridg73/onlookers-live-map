@@ -16,6 +16,7 @@ import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useOnlooker } from "@/lib/onlooker-store";
+import { requestMapPosition } from "@/lib/onlooker";
 import { useRadar } from "@/hooks/use-radar";
 import { cn } from "@/lib/utils";
 import { PlacePhoto } from "@/components/PlacePhoto";
@@ -128,6 +129,9 @@ function DiscoverHome() {
     setIsWeekend(WEEKEND.includes(new Date().getDay()));
   }, []);
   const selected = requests.find((r) => r.id === selectedId) ?? null;
+  // A linked bounty owns the camera: center and zoom on its true coordinates so
+  // the map never opens on the viewer's own location instead of the bounty.
+  const selectedPos = selected ? requestMapPosition(selected) : null;
 
   const liveNear = (name: string) =>
     requests.filter(
@@ -238,7 +242,13 @@ function DiscoverHome() {
                 onSelect={openBounty}
                 viewportStorageKey="onlooker:map:discover"
                 focusPin={focus && !search.b ? { ...focus, zoom: 15 } : null}
-                centerTarget={focus ? { lat: focus.lat, lng: focus.lng, zoom: 15 } : null}
+                centerTarget={
+                  search.b && selectedPos
+                    ? { lat: selectedPos.lat, lng: selectedPos.lng, zoom: 16 }
+                    : focus
+                      ? { lat: focus.lat, lng: focus.lng, zoom: 15 }
+                      : null
+                }
                 showNativeMapTypeControl={false}
               />
             </SectionBoundary>
