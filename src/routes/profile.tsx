@@ -10,6 +10,7 @@ import {
   FileText,
   Gavel,
   Headphones,
+  Home,
   HelpCircle,
   Info,
   LogOut,
@@ -178,6 +179,13 @@ function ProfileScreen() {
 
   return (
     <div className="app-shell pb-32 pt-[max(env(safe-area-inset-top),3rem)]">
+      <Link
+        to="/"
+        aria-label="Back to home"
+        className="mb-3 inline-flex size-9 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:border-signal/60 hover:text-signal"
+      >
+        <Home className="size-4" />
+      </Link>
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
         <ProfileEditor
           profile={profile}
