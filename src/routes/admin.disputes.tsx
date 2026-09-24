@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gavel, Loader2, Play, ShieldCheck, UserCog, Video } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { DisputeMessagesInbox } from "@/components/admin/DisputeMessagesInbox";
 import {
   isReviewStaff,
   listDisputesDetailed,
@@ -114,6 +115,7 @@ function ModeratorDashboard() {
       </header>
 
       <ModeratorAdmin />
+      <DisputeMessagesInbox />
 
       {loading && <p className="mt-8 text-center text-sm text-muted-foreground">Loading cases…</p>}
       {!loading && cases.length === 0 && (
