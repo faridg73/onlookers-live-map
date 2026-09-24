@@ -83,7 +83,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
       }
     }
     setLoaded(true);
-  }, [requestId]);
+  }, [bountyId]);
 
   useEffect(() => {
     void load();
