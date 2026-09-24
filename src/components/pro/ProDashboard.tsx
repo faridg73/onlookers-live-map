@@ -12,7 +12,7 @@ import { DeadlineNote } from "@/components/DeadlineNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCredits } from "@/lib/credits";
-import { escrowLabel, planLimit, proVisitView, remainingVisits, type ProVisitView } from "@/lib/pro-dashboard";
+import { escrowLabel, planLimit, proVisitControls, proVisitView, remainingVisits, type ProVisitView } from "@/lib/pro-dashboard";
 import { PRO_ROLES, PRO_VISIT_DRAFT_KEY, proPlanById, type ProVisitDraft } from "@/lib/pro-plans";
 import { getMyProDashboard, type ProVisitBooking } from "@/lib/pro-visits.functions";
 import type { LiveRequest } from "@/lib/onlooker";
@@ -62,10 +62,12 @@ export function ProDashboard() {
   const rows = data?.bookings ?? [];
   const visible = rows.filter((row) => proVisitView(row) === view);
   const totals = useMemo(() => ({
-    active: rows.filter((r) => ["scheduled", "progress"].includes(proVisitView(r))).length,
+    scheduled: rows.filter((r) => proVisitView(r) === "scheduled").length,
+    active: rows.filter((r) => Boolean(r.requestId) && !["completed", "expired"].includes(r.requestStatus ?? "")).length,
     review: rows.filter((r) => (r.submissionCount ?? 0) > 0 && r.requestStatus !== "completed").length,
     held: rows.reduce((sum, r) => ["held", "reserved", "submitted", "disputed"].includes(r.escrowStatus ?? "") ? sum + (r.escrowAmount ?? 0) : sum, 0),
     paid: rows.reduce((sum, r) => sum + (r.payoutAmount ?? 0), 0),
+    returned: rows.reduce((sum, r) => r.escrowStatus === "refunded" ? sum + (r.escrowAmount ?? 0) : sum, 0),
   }), [rows]);
 
   const resume = (row: ProVisitBooking) => {
@@ -89,8 +91,9 @@ export function ProDashboard() {
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs uppercase text-muted-foreground">Monthly usage</p><div className="mt-2 flex items-end justify-between"><p className="text-2xl font-bold text-foreground">{remaining === null ? "Unlimited" : `${remaining} left`}</p><p className="text-xs text-muted-foreground">{data.account.visitsUsed}{limit === null ? " used" : ` / ${limit}`}</p></div>{limit !== null && limit > 0 && <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-signal" style={{ width: `${Math.min(100, (data.account.visitsUsed / limit) * 100)}%` }} /></div>}</div>
       </div>
     </section>
-    <section className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">{[
-      [CalendarClock, "Active visits", totals.active], [Camera, "Needs review", totals.review], [Lock, "In escrow", formatCredits(totals.held)], [CircleDollarSign, "Paid out", formatCredits(totals.paid)],
+    <section className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{[
+      [CalendarClock, "Scheduled", totals.scheduled], [Building2, "Active bounties", totals.active], [Camera, "Needs review", totals.review],
+      [Lock, "In escrow", formatCredits(totals.held)], [CircleDollarSign, "Paid out", formatCredits(totals.paid)], [RefreshCw, "Returned", formatCredits(totals.returned)],
     ].map(([Icon, label, value]) => { const I = Icon as typeof CalendarClock; return <div key={String(label)} className="rounded-lg border border-border bg-surface p-3"><I className="size-4 text-signal"/><p className="mt-2 font-display text-xl text-foreground">{String(value)}</p><p className="text-xs text-muted-foreground">{String(label)}</p></div>; })}</section>
     <section className="mt-8"><div className="flex items-end justify-between gap-3"><div><h2 className="font-display text-xl text-foreground">Visit pipeline</h2><p className="text-sm text-muted-foreground">Track every scheduled property visit from setup to settlement.</p></div><Button variant="ghost" size="icon" aria-label="Refresh dashboard" onClick={() => void query.refetch()}><RefreshCw className={`size-4 ${query.isFetching ? "animate-spin" : ""}`} /></Button></div>
       <div role="tablist" aria-label="Visit states" className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-secondary p-1 sm:grid-cols-4">{VIEWS.map((item) => { const count=rows.filter((r)=>proVisitView(r)===item.id).length; return <Button key={item.id} variant={view===item.id?"default":"ghost"} className={view===item.id?"bg-signal text-signal-foreground":"text-muted-foreground"} onClick={()=>setView(item.id)}>{item.label} {count > 0 && <span>{count}</span>}</Button>; })}</div>
@@ -100,10 +103,10 @@ export function ProDashboard() {
 }
 
 function VisitRow({ row, onResume, onCancel, cancelling }: { row: ProVisitBooking; onResume: () => void; onCancel: () => void; cancelling: boolean }) {
-  const stage=proVisitView(row); const deadline=row.autoReleaseAt ?? row.reservedUntil ?? row.requestExpiresAt;
+  const stage=proVisitView(row); const deadline=row.autoReleaseAt ?? row.reservedUntil ?? row.requestExpiresAt; const controls=proVisitControls(row);
   return <article className="rounded-lg border border-border bg-card p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="line-clamp-2 font-semibold text-foreground">{row.purpose}</h3><p className="mt-1 flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="mt-0.5 size-4 shrink-0 text-signal"/>{row.address}</p></div><span className="shrink-0 text-xs font-bold uppercase text-signal">{VIEWS.find((v)=>v.id===stage)?.label}</span></div>
-    <div className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3"><p className="flex items-center gap-2"><CalendarClock className="size-4"/>{row.scheduledStartAt?format(new Date(row.scheduledStartAt),"MMM d, h:mm a"):"Time not set"}</p><p className="flex items-center gap-2"><UserRound className="size-4"/>{row.contactName}</p><p className="flex items-center gap-2"><Lock className="size-4"/>{escrowLabel(row.escrowStatus ?? null,row.escrowAmount ?? 0,row.payoutAmount ?? 0)}</p></div>
+    <div className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-4"><p className="flex items-center gap-2"><CalendarClock className="size-4"/>{row.scheduledStartAt?format(new Date(row.scheduledStartAt),"MMM d, h:mm a"):"Time not set"}</p><p className="flex items-center gap-2"><UserRound className="size-4"/>{row.contactName}</p><p className="flex items-center gap-2"><Building2 className="size-4"/>{row.requestStatus ?? "Not published"}</p><p className="flex items-center gap-2"><Lock className="size-4"/>{escrowLabel(row.escrowStatus ?? null,row.escrowAmount ?? 0,row.payoutAmount ?? 0)}</p></div>
     {deadline && ["scheduled","progress"].includes(stage) && <DeadlineNote className="mt-3" deadline={deadline} prefix={row.submissionCount?"Approves in":"Updates in"} passed="Updating now"/>}
-    <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">{stage==="draft" && <Button onClick={onResume} className="bg-signal text-signal-foreground">Continue setup <ChevronRight className="size-4"/></Button>}{row.requestId && <Button asChild variant="outline"><Link to="/b/$id" params={{id:row.requestId}}>View bounty</Link></Button>}{row.requestId && row.submissionCount !== undefined && <BountyVideoDialog request={asLiveRequest(row)}><Button variant={row.submissionCount>0?"default":"outline"} className={row.submissionCount>0?"bg-signal text-signal-foreground":""}><Camera className="size-4"/>{row.submissionCount>0?`Review footage (${row.submissionCount})`:"Footage"}</Button></BountyVideoDialog>}{row.requestId && row.requestStatus==="open" && <Button variant="outline" disabled={cancelling} onClick={onCancel}>{cancelling?<Loader2 className="size-4 animate-spin"/>:<Clock className="size-4"/>} Cancel</Button>}</div>
+    <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">{controls.canContinue && <Button onClick={onResume} className="bg-signal text-signal-foreground">Continue setup <ChevronRight className="size-4"/></Button>}{row.requestId && <Button asChild variant="outline"><Link to="/b/$id" params={{id:row.requestId}}>View bounty</Link></Button>}{controls.canReview && <BountyVideoDialog request={asLiveRequest(row)}><Button className="bg-signal text-signal-foreground"><Camera className="size-4"/>Review footage ({row.submissionCount})</Button></BountyVideoDialog>}{controls.canCancel && <Button variant="outline" disabled={cancelling} onClick={onCancel}>{cancelling?<Loader2 className="size-4 animate-spin"/>:<Clock className="size-4"/>} Cancel</Button>}</div>
   </article>;
 }

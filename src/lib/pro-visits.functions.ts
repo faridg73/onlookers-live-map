@@ -39,6 +39,7 @@ export type ProVisitBooking = {
   autoReleaseAt?: string | null;
   submissionCount?: number;
   payoutAmount?: number;
+  claimStatus?: string | null;
 };
 
 export type ProDashboardData = {
@@ -75,15 +76,18 @@ export const getMyProDashboard = createServerFn({ method: "GET" })
     const requestById = new Map<string, { status: string; expires_at: string; bounty_amount: number }>();
     const escrowById = new Map<string, { status: string; amount: number; reserved_until: string | null; auto_release_at: string | null }>();
     const videoById = new Map<string, { count: number; payout: number }>();
+    const claimById = new Map<string, { status: string }>();
     if (requestIds.length > 0) {
-      const [requests, escrows, videos] = await Promise.all([
+      const [requests, escrows, videos, claims] = await Promise.all([
         context.supabase.from("requests").select("id, status, expires_at, bounty_amount").eq("requester_id", context.userId).in("id", requestIds),
         context.supabase.from("escrows").select("request_id, status, amount, reserved_until, auto_release_at").in("request_id", requestIds),
         context.supabase.from("bounty_videos").select("request_id, accepted_at, payout_amount").in("request_id", requestIds),
+        context.supabase.from("claims").select("request_id, status").in("request_id", requestIds),
       ]);
       if (requests.error) throw new Error(requests.error.message);
       if (escrows.error) throw new Error(escrows.error.message);
       if (videos.error) throw new Error(videos.error.message);
+      if (claims.error) throw new Error(claims.error.message);
       for (const row of requests.data ?? []) requestById.set(row.id, row);
       for (const row of escrows.data ?? []) escrowById.set(row.request_id, row);
       for (const row of videos.data ?? []) {
@@ -92,6 +96,7 @@ export const getMyProDashboard = createServerFn({ method: "GET" })
         if (row.accepted_at) current.payout += Number(row.payout_amount ?? 0);
         videoById.set(row.request_id, current);
       }
+      for (const row of claims.data ?? []) claimById.set(row.request_id, row);
     }
 
     return {
@@ -117,6 +122,7 @@ export const getMyProDashboard = createServerFn({ method: "GET" })
           escrowStatus: escrow?.status ?? null, escrowAmount: Number(escrow?.amount ?? 0),
           reservedUntil: escrow?.reserved_until ?? null, autoReleaseAt: escrow?.auto_release_at ?? null,
           submissionCount: media?.count ?? 0, payoutAmount: media?.payout ?? 0,
+          claimStatus: booking.request_id ? claimById.get(booking.request_id)?.status ?? null : null,
         };
       }),
     };

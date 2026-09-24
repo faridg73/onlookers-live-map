@@ -28,3 +28,11 @@ export function escrowLabel(status: string | null, amount: number, payout: numbe
   if (["held", "reserved", "submitted", "disputed"].includes(status ?? "")) return `${Math.round(amount)} Cr held`;
   return "No escrow";
 }
+
+export function proVisitControls(row: ProVisitBooking) {
+  return {
+    canContinue: row.bookingStatus === "draft",
+    canCancel: Boolean(row.requestId) && row.requestStatus === "open",
+    canReview: Boolean(row.requestId) && (row.submissionCount ?? 0) > 0,
+  };
+}
