@@ -97,7 +97,7 @@ export const getMyProDashboard = createServerFn({ method: "GET" })
     return {
       account: {
         company: account.company,
-        role: account.pro_role as ProDashboardData["account"] extends infer T ? NonNullable<T>["role"] : never,
+        role: account.pro_role as NonNullable<ProDashboardData["account"]>["role"],
         plan: account.plan as NonNullable<ProDashboardData["account"]>["plan"],
         visitsUsed: account.visits_used,
         periodStart: account.visit_period_start,
