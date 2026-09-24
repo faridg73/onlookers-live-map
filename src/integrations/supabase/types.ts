@@ -1239,6 +1239,63 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_visit_bookings: {
+        Row: {
+          address: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          id: string
+          owner_id: string
+          purpose: string
+          request_id: string | null
+          scheduled_start_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          contact_email?: string
+          contact_name: string
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          purpose: string
+          request_id?: string | null
+          scheduled_start_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          purpose?: string
+          request_id?: string | null
+          scheduled_start_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_visit_bookings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "pro_accounts"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "pro_visit_bookings_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_security_answers: {
         Row: {
           answer_key: string
