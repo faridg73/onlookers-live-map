@@ -331,7 +331,10 @@ export function RequestCard({
       )}
 
       <AccessPasscode request={request} />
-      <SitePinVerification requestId={request.dbId ?? null} />
+      <SitePinVerification
+        key={`${request.dbId ?? "local"}-${request.status}`}
+        requestId={request.dbId ?? null}
+      />
 
 
       <ChatDrawer

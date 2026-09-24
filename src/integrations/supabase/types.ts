@@ -2459,6 +2459,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      claim_bounty: { Args: { _request_id: string }; Returns: string }
       claim_verified_phone: {
         Args: never
         Returns: {
