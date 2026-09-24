@@ -157,10 +157,17 @@ function DiscoverHome() {
         >
           <X className="size-4" aria-hidden />
         </button>
-        <h1 className="max-w-full px-12 text-center font-display text-2xl tracking-tight text-signal sm:text-3xl">
-          Browse <span className="text-signal">places</span>
+        <p className="inline-flex items-center gap-2 border border-signal/30 bg-signal/5 px-3 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-signal">
+          <span className="relative flex size-1.5" aria-hidden>
+            <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+            <span className="relative size-1.5 rounded-full bg-signal" />
+          </span>
+          Discover // your city
+        </p>
+        <h1 className="mt-3 max-w-full px-12 text-center text-2xl font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)] sm:text-3xl">
+          Browse places
         </h1>
-        <p className="mt-1 px-12 text-center text-sm text-foreground/90">
+        <p className="mt-2 px-12 text-center text-sm text-muted-foreground">
           Pick a spot and ask for a <span className="font-bold text-signal">live</span> view.
         </p>
       </div>

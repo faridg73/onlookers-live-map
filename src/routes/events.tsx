@@ -241,7 +241,7 @@ function EventsScreen() {
 
       {(eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
-          <h2 className="inline-flex items-center gap-2 font-display text-lg text-foreground">
+          <h2 className="inline-flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
             <Ticket className="size-4 text-signal" aria-hidden />{" "}
             {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
           </h2>
