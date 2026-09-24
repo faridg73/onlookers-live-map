@@ -71,7 +71,7 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
       const { data } = await db
         .from("bounty_bids")
         .select("id, bidder_id, amount, note, status, created_at")
-        .eq("request_id", requestId)
+        .eq("request_id", bountyId)
         .eq("bidder_id", uid)
         .order("created_at", { ascending: false })
         .limit(1);
