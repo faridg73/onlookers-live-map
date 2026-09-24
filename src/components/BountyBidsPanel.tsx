@@ -57,8 +57,8 @@ export function BountyBidsPanel({ requestId }: { requestId: string }) {
     setUserId(uid);
 
     const [{ data: r }, { data: s }] = await Promise.all([
-      db.from("requests").select("requester_id, status, expires_at").eq("id", requestId).maybeSingle(),
-      db.rpc("bounty_bid_summary", { _request_id: requestId }),
+      db.from("requests").select("requester_id, status, expires_at").eq("id", bountyId).maybeSingle(),
+      db.rpc("bounty_bid_summary", { _request_id: bountyId }),
     ]);
     setReq(r ?? null);
     const row = Array.isArray(s) ? s[0] : s;
