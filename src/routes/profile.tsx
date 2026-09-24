@@ -10,6 +10,7 @@ import {
   FileText,
   Gavel,
   Headphones,
+  Home,
   HelpCircle,
   Info,
   LogOut,
