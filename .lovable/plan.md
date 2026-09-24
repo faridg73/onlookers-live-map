@@ -1,30 +1,39 @@
-# Poster bounty dashboard
+# Verified Visits booking persistence
 
-A single page where someone who posts bounties can see everything they've posted and what happened to it — no admin access needed.
+## Goal
+Save every valid scheduled-visit form submission immediately, then let the professional finish payout and publish the bounty without losing the booking. Show both unfinished and published visits on their Profile dashboard.
 
-## New page: "My bounties"
+## Booking flow
+1. A signed-in professional completes the Verified Visits form.
+2. Submission creates a private booking record with the property, visit instructions, preferred time, and on-site contact.
+3. The app opens the existing bounty form with those details prefilled and Real Estate selected automatically.
+4. After payout confirmation creates the bounty, the booking is linked to it and changes from **Needs confirmation** to the bounty’s live status.
+5. If the professional leaves before confirming, the saved booking remains on their dashboard with a **Continue setup** action.
 
-Reached from the Profile page and from the "Everything else" menu, at `/my-bounties`.
+## Professional dashboard
+Add a **Verified Visits** section to Profile for professional accounts only. It will show:
+- Property and scheduled date/time
+- On-site contact
+- Status: Needs confirmation, Open, In progress, Completed, Cancelled, or Expired
+- **Continue setup** for drafts
+- **View bounty** for published visits
+- Clear empty, loading, and error states
 
-**Summary row at the top** (each tile hidden when zero, matching the rest of the app):
-- Open — bounties still waiting for an onlooker
-- In progress — claimed or footage submitted, waiting on you
-- Credits held in escrow — money locked right now
-- Paid out — total released to onlookers
-- Refunded — credits that came back to you (expired or cancelled)
+## Database and security
+- Add a `pro_visit_bookings` table for booking drafts and their optional linked bounty.
+- Grant access explicitly, enable row-level security, and restrict reads/writes to the signed-in owner.
+- Validate booking creation and linking in authenticated server functions rather than trusting browser-supplied user IDs.
+- Keep existing bounty escrow, PIN delivery, visit allowances, and payment confirmation unchanged.
 
-**Three lists, newest first:**
+## Code changes
+- Add booking server functions for create, list, resume, and link-to-bounty operations.
+- Extend the handoff draft with its booking ID.
+- Update the Verified Visits form to save before navigating.
+- Fix the handoff so the bounty form always selects Real Estate and preserves the address.
+- Link the saved booking after the bounty is successfully created.
+- Add the professional dashboard section to Profile.
 
-1. **Open** — title, spot with its location-type badge, reward, time left, and how many onlookers are watching. Actions: open the bounty, cancel it (refunds the escrow through the existing path), edit the location tag.
-2. **Needs your review / in progress** — claimed bounties and ones with submitted footage. Shows the submitted clip thumbnail and links straight into the existing review dialog where you approve or dispute. Flags anything in dispute.
-3. **Settled** — completed, expired, refunded and disputed bounties, each showing the outcome and the credits: paid to the onlooker, refunded to you, or under review.
-
-Empty states use the app's encouraging tone, e.g. "Nothing open right now — post a bounty and watch it land here."
-
-## Technical notes
-
-- New server function `listMyPostedBounties` in `src/lib/requests.functions.ts` (`requireSupabaseAuth`, poster-scoped): reads the caller's `requests` rows in every status, left-joined to `escrows` (status, amount, `auto_release_at`, `disputed_at`), `claims` (status, spotter, claimed_at) and `bounty_videos` (id, storage/thumb path, accepted_at, payout_amount) for those request ids. Returns one flat row per bounty with a derived `stage`: `open` | `claimed` | `submitted` | `disputed` | `completed` | `refunded` | `expired`.
-- New `src/routes/my-bounties.tsx` route with its own `head()` (title/description/og). Data via `useQuery` in the component (not a loader — the function is auth-gated). Reuses `RequestCard`-style presentation but a compact dashboard row component local to the route; reuses `BountyVideoDialog` for review and `locationTypeById` for the badge.
-- Reuses existing money paths: `cancelBountyRequest`, `acceptBountyVideo`, `disputeBountyVideo`. No new SQL, no schema change, no new RLS — existing poster-scoped policies already permit these reads.
-- Links added in `src/components/AppMenu.tsx` and on the Profile page above "Your requests".
-- Styling follows the standing rules: neutral `#2A2A2A`-style borders, cards a step lighter than the page, neon lime only on active tabs and credit amounts, red only for a real open dispute.
+## Verification
+- Test saving a booking, leaving before confirmation, resuming it, and publishing it.
+- Confirm only the owner can read or update a booking.
+- Confirm the dashboard reflects draft and live bounty statuses on phone and desktop.
