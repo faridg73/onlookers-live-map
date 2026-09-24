@@ -206,21 +206,16 @@ function DiscoverHome() {
 
       <Link
         to="/events"
-        className="group mt-3 flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/60 px-4 py-3 transition-colors hover:border-signal/60"
+        className="group mt-3 flex items-center justify-between gap-3 border-y border-home-line py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
       >
-        <span className="inline-flex min-w-0 items-center gap-2.5 text-sm font-bold text-foreground">
-          <span className="relative flex size-2 shrink-0" aria-hidden>
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal opacity-60" />
-            <span className="relative inline-flex size-2 rounded-full bg-signal" />
+        <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors group-hover:text-signal">
+          <span className="relative flex size-1.5 shrink-0" aria-hidden>
+            <span className="absolute inline-flex size-full animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
+            <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
           </span>
-          <span className="truncate">
-            Trending feeds &amp; <span className="text-signal">live events</span>
-          </span>
+          <span className="truncate">Trending feeds &amp; live events</span>
         </span>
-        <ChevronRight
-          className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-signal"
-          aria-hidden
-        />
+        <span className="font-mono text-xs text-signal/70 transition-transform group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
       </Link>
 
       {view === "map" ? (
