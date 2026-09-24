@@ -169,6 +169,13 @@ function EventsScreen() {
           : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label} — tap any card to launch a live view from that exact spot.`}
       </p>
 
+      <Link
+        to="/discover"
+        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-signal"
+      >
+        <Grid2x2 className="size-3.5" aria-hidden /> Browse categories
+      </Link>
+
       <div className="mt-4">
         <CreatorVibePills
           activeId={vibeId}
