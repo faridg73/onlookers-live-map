@@ -84,6 +84,7 @@ export function VerifiedVisitsPro() {
       const t = setTimeout(() => void reload(), 2500);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, []);
 
   const choosePlan = (plan: ProPlan) => {
@@ -191,7 +192,10 @@ function ProSignup({
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = signupSchema.safeParse({ role, company });
-    if (!parsed.success) return toast.error(parsed.error.issues[0]?.message ?? "Check the form");
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Check the form");
+      return;
+    }
     if (!userId) return;
     setSaving(true);
     const payload = { pro_role: parsed.data.role, company: parsed.data.company };
@@ -199,7 +203,10 @@ function ProSignup({
       ? await db.from("pro_accounts").update(payload).eq("user_id", userId)
       : await db.from("pro_accounts").insert({ user_id: userId, ...payload });
     setSaving(false);
-    if (error) return toast.error("Couldn't save your account. Please try again.");
+    if (error) {
+      toast.error("Couldn't save your account. Please try again.");
+      return;
+    }
     toast.success(account ? "Account updated." : "Welcome aboard — your professional account is ready.");
     setEditing(false);
     await onSaved();
