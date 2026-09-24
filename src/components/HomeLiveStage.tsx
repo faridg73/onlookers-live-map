@@ -314,9 +314,12 @@ export function HomeLiveStage({
                   loading={index === 0 ? "eager" : "lazy"}
                   width={1200}
                   height={750}
-                  className="size-full object-cover"
+                  className="size-full object-cover brightness-110 contrast-110 saturate-105"
                 />
-                <span className="absolute inset-0 bg-background/60" aria-hidden />
+                <span
+                  className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-foreground/5"
+                  aria-hidden
+                />
               </div>
             ))}
           </div>
