@@ -2622,6 +2622,10 @@ export type Database = {
         }[]
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      is_assigned_hunter: {
+        Args: { _request_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       is_username_available: { Args: { _username: string }; Returns: boolean }
       list_disputes: {
