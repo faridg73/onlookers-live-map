@@ -219,9 +219,10 @@ async function endSubscription(subscription: Record<string, any>) {
 /** Sets or clears a Verified Visits pro plan. */
 async function setProPlan(userId: string | undefined, plan: string) {
   if (!userId) return;
+  const now = new Date().toISOString();
   const { error } = await getSupabase()
     .from("pro_accounts")
-    .update({ plan, plan_updated_at: new Date().toISOString() })
+    .update({ plan, plan_updated_at: now, visit_period_start: now, visits_used: 0 })
     .eq("user_id", userId);
   if (error) {
     console.error("[webhook] pro plan update failed", { userId, plan, message: error.message });

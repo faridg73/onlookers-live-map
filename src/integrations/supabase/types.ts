@@ -1212,6 +1212,8 @@ export type Database = {
           pro_role: string
           updated_at: string
           user_id: string
+          visit_period_start: string | null
+          visits_used: number
         }
         Insert: {
           company: string
@@ -1221,6 +1223,8 @@ export type Database = {
           pro_role: string
           updated_at?: string
           user_id: string
+          visit_period_start?: string | null
+          visits_used?: number
         }
         Update: {
           company?: string
@@ -1230,6 +1234,8 @@ export type Database = {
           pro_role?: string
           updated_at?: string
           user_id?: string
+          visit_period_start?: string | null
+          visits_used?: number
         }
         Relationships: []
       }
