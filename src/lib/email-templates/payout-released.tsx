@@ -50,7 +50,7 @@ const Email = ({ hunterName, bountyTitle, place, credits, bountyUrl }: Props) =>
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `Payout released${data?.credits ? `: ${data.credits} credits` : ''} — Onlooker`,
+    `Payout released${data?.['credits'] ? `: ${data['credits']} credits` : ''} — Onlooker`,
   displayName: 'Payout released',
   previewData: {
     hunterName: 'Alex',
