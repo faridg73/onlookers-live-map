@@ -141,7 +141,7 @@ function VerificationScreen() {
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-signal/40 bg-signal/10">
                     <step.icon className="size-5 text-signal" aria-hidden />
                   </span>
-                  <span className="text-[0.65rem] font-bold uppercase tracking-widest text-muted-foreground">
+                  <span className="text-[0.65rem] font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap">
                     Step {i + 1}
                   </span>
                 </div>
