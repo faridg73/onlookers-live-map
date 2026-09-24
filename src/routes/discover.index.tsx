@@ -336,10 +336,12 @@ function DiscoverHome() {
                   className="absolute inset-0 size-full opacity-80 transition-opacity group-hover:opacity-100"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-                <ChevronRight
-                  className="absolute right-3 top-3 size-4 text-foreground/60 transition-colors group-hover:text-signal"
+                <span
+                  className="absolute right-3 top-3 font-mono text-xs text-foreground/60 transition-all group-hover:translate-x-0.5 group-hover:text-signal"
                   aria-hidden
-                />
+                >
+                  &gt;&gt;
+                </span>
                 <div className="absolute inset-x-0 bottom-0 p-3">
                   <p className="line-clamp-2 font-display text-sm leading-tight">
                     <TwoToneName name={group.name} />
