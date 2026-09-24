@@ -119,9 +119,21 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     };
     void load();
     const t = setInterval(() => void load(), 30_000);
+    // Reload immediately when someone signs in or out, instead of waiting 30s.
+    let unsub: (() => void) | undefined;
+    void import("@/integrations/supabase/client").then(({ supabase }) => {
+      void supabase.auth.getSession().then(({ data }) => active && setSignedIn(!!data.session));
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT") return;
+        setSignedIn(!!session);
+        void load();
+      });
+      unsub = () => data.subscription.unsubscribe();
+    });
     return () => {
       active = false;
       clearInterval(t);
+      unsub?.();
     };
   }, []);
 
