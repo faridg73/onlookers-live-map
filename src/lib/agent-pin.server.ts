@@ -149,10 +149,13 @@ export async function sendAgentApprovalLink(
     try {
       const apiKey = process.env["LOVABLE_API_KEY"];
       if (!apiKey) throw new Error("Email sending is not configured.");
-      await sendLovableEmail(
+      const response = await sendLovableEmail(
         {
           to: email,
           from: "Onlooker <noreply@onlookerlive.com>",
+          sender_domain: "notify.onlookerlive.com",
+          label: "agent-site-approval",
+          idempotency_key: crypto.randomUUID(),
           subject: `Approve the onlooker at ${opts.locationName}`,
           html: `<!doctype html><html><body style="margin:0;background:#0f0f0f;padding:32px;font-family:Arial,sans-serif;color:#e5e5e5;"><div style="max-width:520px;margin:0 auto;background:#161616;border:1px solid #2a2a2a;border-radius:16px;padding:28px;"><p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;color:#CCFF00;font-weight:bold;">ONLOOKER · ON-SITE APPROVAL</p><h1 style="margin:0 0 16px;font-size:22px;color:#fff;">Is this the right person?</h1><p style="font-size:14px;line-height:1.6;"><strong style="color:#fff;">${opts.hunterName}</strong> says they're at <strong style="color:#fff;">${opts.locationName}</strong>. Open the link to see their photo and approve or deny them. It works for 60 minutes.</p><p><a href="${url}" style="display:inline-block;background:#CCFF00;color:#000;font-weight:bold;padding:12px 20px;border-radius:10px;text-decoration:none;">Review onlooker</a></p></div></body></html>`,
           text,
@@ -160,7 +163,8 @@ export async function sendAgentApprovalLink(
         },
         { apiKey },
       );
-      result.email = true;
+      result.email = response.success;
+      if (!response.success) result.emailError = response.status ?? "Email provider rejected the send.";
     } catch (err) {
       result.emailError = err instanceof Error ? err.message : "Email failed.";
     }

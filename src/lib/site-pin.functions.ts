@@ -68,3 +68,49 @@ export const resendSitePin = createServerFn({ method: "POST" })
       sendCount: pinRow.send_count ?? 1,
     };
   });
+
+/**
+ * Hunter taps "I'm on site". The database confirms they hold the claim and
+ * mints a one-hour approval token; the link goes straight to the property
+ * contact and never reaches the Hunter's browser.
+ */
+export const checkInOnSite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { requestId: string }) =>
+    z.object({ requestId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { error: gateError } = await context.supabase.rpc("site_checkin", {
+      _request_id: data.requestId,
+    });
+    if (gateError) throw new Error(gateError.message);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("request_site_pins")
+      .select("approve_token, agent_name, agent_phone, agent_email")
+      .eq("request_id", data.requestId)
+      .maybeSingle();
+    if (!row?.approve_token) throw new Error("Couldn't create the approval link.");
+    const [{ data: request }, { data: profile }] = await Promise.all([
+      supabaseAdmin.from("requests").select("location_name").eq("id", data.requestId).maybeSingle(),
+      supabaseAdmin.from("profiles").select("display_name, username").eq("id", context.userId).maybeSingle(),
+    ]);
+
+    const { sendAgentApprovalLink } = await import("@/lib/agent-pin.server");
+    const delivery = await sendAgentApprovalLink(
+      { name: row.agent_name ?? "", phone: row.agent_phone ?? "", email: row.agent_email ?? "" },
+      {
+        token: row.approve_token,
+        locationName: request?.location_name ?? "the property",
+        hunterName: profile?.display_name || profile?.username || "Your onlooker",
+      },
+    );
+    if (!delivery.sms && !delivery.email) {
+      throw new Error(
+        delivery.smsError ?? delivery.emailError ??
+          "We couldn't reach the property contact. Ask them for the PIN instead.",
+      );
+    }
+    return { sms: delivery.sms, email: delivery.email };
+  });
