@@ -145,12 +145,12 @@ const CATEGORIES: FAQCategory[] = [
         answer: `The poster must have explicit authorization from the seller, listing agent, property manager, or another authorized party. The posting form requires this confirmation. Neither posters nor onlookers may enter private property, record restricted interiors, or capture occupants where they reasonably expect privacy without valid permission. False authorization claims can lead to suspension.`,
       },
       {
-        question: "How does the six-digit agent PIN handshake work?",
-        answer: `When a qualifying real-estate bounty is posted, Onlooker generates a unique six-digit on-site PIN for that bounty. The PIN is stored securely and sent to the supplied listing-agent phone number or email. The agent gives it directly to the onlooker at the property. The onlooker enters it in the check-in screen to prove an on-site handshake.`,
+        question: "How does on-site approval for property visits work?",
+        answer: `When a real-estate bounty is posted, the listing agent receives a single-use six-digit backup PIN and a cancel link by text or email. After an onlooker claims the bounty and arrives, they tap “I'm on site.” The agent then gets a link showing the onlooker's name and photo and taps Approve, or “This isn't the right person.” If the agent can't open the link, they can give the backup PIN (in person or by phone) to the onlooker who claimed the bounty, who enters it in the app. Only that onlooker can be verified.`,
       },
       {
         question: "When is a real-estate payout unlocked?",
-        answer: `A real-estate submission cannot enter the payout flow until its secure on-site PIN has been validated. A successful match records the verification time and marks the bounty Verified On-Site. The normal fulfillment review still applies afterward. Repeated invalid attempts are rate-limited to protect the agent, property, and escrow.`,
+        answer: `A real-estate submission cannot enter the payout flow until the visit has been approved on site (by link or backup PIN). A successful match records the verification time and marks the bounty Verified On-Site. The normal fulfillment review still applies afterward. Repeated invalid attempts are rate-limited to protect the agent, property, and escrow.`,
       },
       {
         question: "Why does the form request agent contact information?",

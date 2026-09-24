@@ -1126,8 +1126,8 @@ function PostScreen() {
                     <p className="flex gap-2 text-xs font-medium text-foreground">
                       <KeyRound className="mt-0.5 size-4 shrink-0 text-signal" />
                       <span>
-                        <strong className="block">6-digit PIN handshake required</strong>
-                        The agent receives the private PIN and claim link when this bounty goes live.
+                        <strong className="block">On-site approval required</strong>
+                        When the Onlooker arrives, the agent gets a one-tap approval link. They also get a backup 6-digit PIN and a cancel link when this bounty goes live.
                       </span>
                     </p>
                     <div className="space-y-2 rounded-lg border border-border bg-background p-3">
