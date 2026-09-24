@@ -339,10 +339,10 @@ function DiscoverHome() {
                   aria-hidden
                 />
                 <div className="absolute inset-x-0 bottom-0 p-3">
-                  <p className="truncate font-display text-base">
+                  <p className="line-clamp-2 font-display text-sm leading-tight">
                     <TwoToneName name={group.name} />
                   </p>
-                  <p className="truncate text-[0.68rem] font-semibold text-signal">{group.tagline}</p>
+                  <p className="mt-0.5 truncate text-[0.66rem] font-semibold text-signal">{group.tagline}</p>
                 </div>
               </Link>
             ))}
