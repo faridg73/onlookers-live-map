@@ -31,6 +31,7 @@ import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminDisputesRouteImport } from './routes/admin.disputes'
 import { Route as BIdRouteImport } from './routes/b.$id'
@@ -159,6 +160,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerificationRoute = VerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -271,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -354,6 +362,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
   '/admin/disputes': typeof AdminDisputesRoute
   '/b/$id': typeof BIdRoute
   '/discover/trending': typeof DiscoverTrendingRoute
@@ -397,6 +406,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
+    | '/verification'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
+    | '/verification'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -479,6 +490,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/terms'
+    | '/verification'
     | '/admin/disputes'
     | '/b/$id'
     | '/discover/trending'
@@ -521,6 +533,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   TermsRoute: typeof TermsRoute
+  VerificationRoute: typeof VerificationRoute
   AdminDisputesRoute: typeof AdminDisputesRoute
   BIdRoute: typeof BIdRoute
   DiscoverTrendingRoute: typeof DiscoverTrendingRoute
@@ -696,6 +709,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
@@ -841,6 +861,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   TermsRoute: TermsRoute,
+  VerificationRoute: VerificationRoute,
   AdminDisputesRoute: AdminDisputesRoute,
   BIdRoute: BIdRoute,
   DiscoverTrendingRoute: DiscoverTrendingRoute,

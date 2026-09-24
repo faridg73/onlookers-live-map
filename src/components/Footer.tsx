@@ -5,6 +5,7 @@ import {
   MessageSquare,
   Gavel,
   HelpCircle,
+  KeyRound,
   FileText,
   Shield,
   ShieldAlert,
