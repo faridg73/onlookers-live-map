@@ -77,6 +77,8 @@ type NewRequest = {
 
 type Store = {
   requests: LiveRequest[];
+  /** null while checking; false = visitor not signed in (bounties hidden). */
+  signedIn: boolean | null;
   selectedId: string | null;
   select: (id: string | null) => void;
   addRequest: (input: NewRequest) => LiveRequest;
@@ -102,6 +104,7 @@ if (!existingStoreContext) {
 export function OnlookerProvider({ children }: { children: ReactNode }) {
   const [requests, setRequests] = useState<LiveRequest[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
   // Every live request anyone posted, refreshed so nearby onlookers see new
   // bounties without reloading. Saved rows replace their local placeholder.
@@ -221,8 +224,8 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ requests, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
-    [requests, selectedId, addRequest, claim, remove, updateLocationType],
+    () => ({ requests, signedIn, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
+    [requests, signedIn, selectedId, addRequest, claim, remove, updateLocationType],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

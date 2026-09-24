@@ -3,6 +3,7 @@ import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, KeyRound, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
+import { useOnlooker } from "@/lib/onlooker-store";
 import { requestCategoryArt } from "@/lib/category-art";
 import { Button } from "@/components/ui/button";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
@@ -137,6 +138,7 @@ export function HomeLiveStage({
 }: HomeLiveStageProps) {
   const navigate = useNavigate();
   const [tab, setTab] = useState<ActivityTab>("all");
+  const { signedIn } = useOnlooker();
 
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
@@ -454,7 +456,15 @@ export function HomeLiveStage({
             </div>
           </div>
 
-          {activity.length > 0 ? (
+          {signedIn === false ? (
+            <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-signal/40 bg-home-glass-strong p-6 text-center">
+              <p className="text-[0.72rem] font-extrabold text-foreground">Sign in to see live bounties near you</p>
+              <p className="text-[0.62rem] font-semibold text-muted-foreground">Bounties, live streams and alerts are only shown to members. Joining is free.</p>
+              <Button asChild size="sm" className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
+                <Link to="/auth">Sign in or join free</Link>
+              </Button>
+            </div>
+          ) : activity.length > 0 ? (
             <ul className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {activity.map((request) => {
                 const kind = kindOf(request);
