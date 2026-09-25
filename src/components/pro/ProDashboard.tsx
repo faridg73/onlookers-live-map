@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { ProPaywallDialog } from "@/components/pro/ProPaywallDialog";
+import { TeamBillingPanel } from "@/components/pro/TeamBillingPanel";
 import { DeadlineNote } from "@/components/DeadlineNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,6 +94,7 @@ export function ProDashboard() {
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs uppercase text-muted-foreground">{plan ? "Monthly usage" : "Free trial usage"}</p><div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2"><p className="truncate text-2xl font-bold text-foreground">{remaining === null ? "Unlimited" : `${remaining} left`}</p><p className="shrink-0 text-xs text-muted-foreground">{data.account.visitsUsed}{limit === null ? " used" : ` / ${limit}`}</p></div>{limit !== null && limit > 0 && <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-signal" style={{ width: `${Math.min(100, (data.account.visitsUsed / limit) * 100)}%` }} /></div>}{!plan && <p className="mt-2 text-xs text-muted-foreground">{remaining === 0 ? "Trial used — choose a plan to keep scheduling." : `${remaining} of ${limit} free trial visits left.`}</p>}</div>
       </div>
     </section>
+    <TeamBillingPanel plan={data.account.plan} onUpgrade={() => setPaywallOpen(true)} />
     <section className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{[
       [CalendarClock, "Scheduled", totals.scheduled], [Building2, "Active bounties", totals.active], [Camera, "Needs review", totals.review],
       [Lock, "In escrow", formatCredits(totals.held)], [CircleDollarSign, "Paid out", formatCredits(totals.paid)], [RefreshCw, "Returned", formatCredits(totals.returned)],
