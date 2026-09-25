@@ -16,8 +16,6 @@ type NavigateFn = (path: string) => void;
 // Converts an absolute onlooker URL (deep link / universal link) into an
 // in-app path and navigates there. Ignores anything not on our origins.
 const APP_ORIGINS = [
-  "https://onlooker.io",
-  "https://www.onlooker.io",
   "https://onlookerlive.com",
   "https://www.onlookerlive.com",
   "https://onlooker.lovable.app",

@@ -12,7 +12,7 @@ type Search = {
   lng?: number | undefined;
 };
 
-const SITE = "https://onlooker.io";
+const SITE = "https://onlookerlive.com";
 const OG_IMAGE = `${SITE}/og-onlooker.jpg`;
 
 export const Route = createFileRoute("/live/$id")({

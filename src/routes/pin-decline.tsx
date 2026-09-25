@@ -127,7 +127,7 @@ function PinDeclinePage() {
               )}
             </button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Questions? Email <span className="text-foreground">legal@onlooker.io</span>
+              Questions? Email <span className="text-foreground">legal@onlookerlive.com</span>
             </p>
           </>
         )}

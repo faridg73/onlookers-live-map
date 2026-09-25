@@ -40,7 +40,7 @@ export const template = {
   component: Email,
   subject: 'New support message | Onlooker',
   displayName: 'Support ticket alert',
-  to: 'support@onlooker.io',
+  to: 'support@onlookerlive.com',
   previewData: {
     name: 'Jane Onlooker',
     email: 'jane@example.com',

@@ -25,7 +25,7 @@ function appOrigin(): string {
       /* ignore */
     }
   }
-  return "https://onlooker.io";
+  return "https://onlookerlive.com";
 }
 
 /** Embedded checkout for a Verified Visits Pro plan. Requires a pro account. */
