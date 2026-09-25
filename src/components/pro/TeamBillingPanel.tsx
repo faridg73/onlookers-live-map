@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Loader2, Mail, Trash2, Users, Wallet } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { inviteTeamMember } from "@/lib/team.functions";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +35,7 @@ const STATUS: Record<string, string> = {
 /** Team plan: one shared agency wallet paying every staff bounty, plus a preferred Onlooker roster. */
 export function TeamBillingPanel({ plan, onUpgrade }: { plan: string; onUpgrade: () => void }) {
   const qc = useQueryClient();
+  const sendInvite = useServerFn(inviteTeamMember);
   const q = useQuery({ queryKey: KEY, queryFn: loadTeam, staleTime: 15_000 });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -48,9 +51,15 @@ export function TeamBillingPanel({ plan, onUpgrade }: { plan: string; onUpgrade:
     onSuccess: async () => { toast.success("Team saved."); await refresh(); }, onError: onErr,
   });
   const invite = useMutation({
-    mutationFn: async () => { const { error } = await supabase.rpc("team_invite", { _email: email, _member_type: type }); if (error) throw error; },
-    onSuccess: async () => {
-      toast.success(`Added ${email}`, { description: "They join automatically when they sign in to Onlooker with this email." });
+    mutationFn: async () => {
+      const r = await sendInvite({ data: { email, memberType: type } });
+      if ("error" in r) throw new Error(r.error);
+      return r;
+    },
+    onSuccess: async (r) => {
+      toast.success(r.emailed ? `Invite emailed to ${email}` : `Added ${email}`, {
+        description: r.emailed ? "They join automatically once they sign in with this email." : "We couldn't send the email — let them know to sign in with this address.",
+      });
       setEmail(""); await refresh();
     }, onError: onErr,
   });
