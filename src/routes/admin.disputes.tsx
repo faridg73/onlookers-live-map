@@ -221,6 +221,19 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     if (open) void load();
   }, [open, load]);
 
+  const refreshRate = useCallback(async () => {
+    const rate = await getPosterDisputeStats(item.requester_id).catch(() => null);
+    if (rate) setPosterRate(rate);
+  }, [item.requester_id]);
+
+  // Keep the poster's report rate live while this case is on screen.
+  useEffect(() => {
+    void refreshRate();
+    const t = window.setInterval(() => void refreshRate(), 10000);
+    return () => window.clearInterval(t);
+  }, [refreshRate]);
+
+
 
   async function watch(clip: BountyVideo) {
     try {
