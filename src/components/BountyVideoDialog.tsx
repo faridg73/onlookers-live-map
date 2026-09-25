@@ -105,18 +105,36 @@ export function BountyVideoDialog({
       const rows = await listVideosForRequest(request.id, request.dbId ?? null);
       setVideos(rows);
       setThumbs(await thumbnailUrls(rows));
+      setReviewWindow(await getReviewWindow(request.dbId ?? request.id));
     } catch {
       // A signed-out visitor simply sees nothing.
       setVideos([]);
       setThumbs({});
+      setReviewWindow(null);
     } finally {
       setLoading(false);
     }
-  }, [request.id]);
+  }, [request.id, request.dbId]);
 
   useEffect(() => {
     if (open && user) void refresh();
   }, [open, user, refresh]);
+
+  /** Keep the auto-approve countdown honest while the dialog stays open. */
+  useEffect(() => {
+    if (!open) return;
+    const timer = setInterval(() => setNowTick(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, [open]);
+
+  /** The poster's own report history, shown as a deterrent before filing. */
+  useEffect(() => {
+    if (!disputeVideo) return;
+    void getPosterDisputeStats().then(setDisputeStats);
+  }, [disputeVideo]);
+
+  const autoApproveIn = countdownLabel(reviewWindow?.autoReleaseAt ?? null, nowTick);
+
 
   /** Only clips filmed inside the app get here — there is no gallery path. */
   async function onCaptured(file: File) {
