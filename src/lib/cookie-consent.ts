@@ -3,6 +3,7 @@ export type CookieConsentChoice = "accepted" | "declined";
 
 const CONSENT_STORAGE_KEY = "onlooker.cookie-consent.v1";
 export const COOKIE_CONSENT_EVENT = "onlooker:cookie-consent-changed";
+export const OPEN_COOKIE_PREFERENCES_EVENT = "onlooker:open-cookie-preferences";
 
 export function readCookieConsent(): CookieConsentChoice | null {
   if (typeof window === "undefined") return null;
@@ -26,4 +27,9 @@ export function saveCookieConsent(choice: CookieConsentChoice) {
     // The choice lasts for this page when browser storage is unavailable.
   }
   window.dispatchEvent(new CustomEvent<CookieConsentChoice>(COOKIE_CONSENT_EVENT, { detail: choice }));
+}
+
+export function openCookiePreferences() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(OPEN_COOKIE_PREFERENCES_EVENT));
 }

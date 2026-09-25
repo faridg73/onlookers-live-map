@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DmcaReportModal } from "@/components/DmcaReportModal";
+import { Button } from "@/components/ui/button";
+import { openCookiePreferences } from "@/lib/cookie-consent";
 
 const LINKS = [
   { to: "/verification", label: "Verified Visits", icon: KeyRound },
@@ -155,6 +157,15 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
             <p className="text-xs font-semibold text-muted-foreground">
               © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
             </p>
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              onClick={openCookiePreferences}
+              className="h-auto px-1 py-0 text-xs text-muted-foreground"
+            >
+              Cookie preferences
+            </Button>
             <p className="text-xs font-semibold tracking-wide text-muted-foreground">
               #OnlookerLive
             </p>
