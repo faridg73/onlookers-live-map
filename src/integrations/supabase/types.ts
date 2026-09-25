@@ -2443,6 +2443,14 @@ export type Database = {
           status: string
         }[]
       }
+      bounty_review_window: {
+        Args: { _request_id: string }
+        Returns: {
+          auto_release_at: string
+          can_dispute: boolean
+          status: string
+        }[]
+      }
       build_alias: { Args: { _user_id: string }; Returns: string }
       calculate_community_report_state: {
         Args: { _post_id: string }
@@ -2778,6 +2786,14 @@ export type Database = {
         Returns: {
           backer_count: number
           pool_id: string
+        }[]
+      }
+      poster_dispute_stats: {
+        Args: { _user_id?: string }
+        Returns: {
+          dispute_rate: number
+          disputed_count: number
+          reviewed_count: number
         }[]
       }
       public_community_feed: {

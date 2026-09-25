@@ -24,6 +24,8 @@ import {
   type BountyVideo,
 } from "@/lib/bounty-videos";
 import { disputeReasonLabel } from "@/lib/moderation-reasons";
+import { getPosterDisputeStats, type DisputeStats } from "@/lib/bounty-review";
+
 
 export const Route = createFileRoute("/admin/disputes")({
   head: () => ({
@@ -196,25 +198,29 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
   const [killFee, setKillFee] = useState(25);
   const [note, setNote] = useState("");
   const [history, setHistory] = useState<PastDisputeRuling[]>([]);
+  const [posterRate, setPosterRate] = useState<DisputeStats | null>(null);
   const noteReady = note.trim().length >= 10;
   const spot = locationTypeById(item.location_type);
 
   const load = useCallback(async () => {
-    const [ev, vids, past] = await Promise.all([
+    const [ev, vids, past, rate] = await Promise.all([
       listEvidence(item.request_id).catch(() => []),
       listVideosForRequest(item.request_id).catch(() => [] as BountyVideo[]),
       listDisputeHistory(item.requester_id, item.spotter_id).catch(
         () => [] as PastDisputeRuling[],
       ),
+      getPosterDisputeStats(item.requester_id).catch(() => null),
     ]);
     setEntries(ev);
     setClips(vids as BountyVideo[]);
     setHistory(past);
+    setPosterRate(rate);
   }, [item.request_id, item.requester_id, item.spotter_id]);
 
   useEffect(() => {
     if (open) void load();
   }, [open, load]);
+
 
   async function watch(clip: BountyVideo) {
     try {
@@ -280,9 +286,22 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
 
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
+          {posterRate && posterRate.reviewed > 0 && (
+            <p
+              className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                posterRate.rate >= 40
+                  ? "bg-destructive/15 text-destructive"
+                  : "bg-surface-raised text-muted-foreground"
+              }`}
+            >
+              Poster report rate: {posterRate.rate}% ({posterRate.disputed} of{" "}
+              {posterRate.reviewed} bounties reported)
+            </p>
+          )}
           <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
             Original bounty
           </p>
+
           <div className="rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
             <p className="text-sm text-foreground">{item.prompt}</p>
             {item.details && <p className="mt-1 whitespace-pre-wrap">{item.details}</p>}

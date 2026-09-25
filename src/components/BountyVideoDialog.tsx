@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Lock, Play, RotateCcw, Share2, Trash2, Video, X } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Lock, Play, RotateCcw, Share2, ShieldAlert, Timer, Trash2, Video, X } from "lucide-react";
 import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
 import { describeUploadError } from "@/lib/upload-errors";
 import { formatCredits } from "@/lib/credits";
@@ -30,7 +30,6 @@ import { notifyPayoutReleased } from "@/lib/payout-emails.functions";
 import {
   acceptBountyVideo,
   deleteBountyVideo,
-  disputeBountyVideo,
   listVideosForRequest,
   playbackUrl,
   thumbnailUrls,
@@ -38,7 +37,9 @@ import {
   type BountyVideo,
 } from "@/lib/bounty-videos";
 import type { LiveRequest } from "@/lib/onlooker";
-import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
+import { REPORT_DETAIL_MIN, REPORT_REASONS, reportCapture, type ReportReasonCode } from "@/lib/bounty-report";
+import { countdownLabel, getPosterDisputeStats, getReviewWindow, type DisputeStats, type ReviewWindow } from "@/lib/bounty-review";
+
 
 export function BountyVideoDialog({
   request,
@@ -62,8 +63,12 @@ export function BountyVideoDialog({
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [disputeVideo, setDisputeVideo] = useState<BountyVideo | null>(null);
-  const [disputeReasonCode, setDisputeReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
+  const [disputeReasonCode, setDisputeReasonCode] = useState<ReportReasonCode>("verification_mismatch");
   const [disputeDetails, setDisputeDetails] = useState("");
+  const [reviewWindow, setReviewWindow] = useState<ReviewWindow | null>(null);
+  const [disputeStats, setDisputeStats] = useState<DisputeStats | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+
   const [capturing, setCapturing] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [shareLabel, setShareLabel] = useState("");
@@ -100,18 +105,36 @@ export function BountyVideoDialog({
       const rows = await listVideosForRequest(request.id, request.dbId ?? null);
       setVideos(rows);
       setThumbs(await thumbnailUrls(rows));
+      setReviewWindow(await getReviewWindow(request.dbId ?? request.id));
     } catch {
       // A signed-out visitor simply sees nothing.
       setVideos([]);
       setThumbs({});
+      setReviewWindow(null);
     } finally {
       setLoading(false);
     }
-  }, [request.id]);
+  }, [request.id, request.dbId]);
 
   useEffect(() => {
     if (open && user) void refresh();
   }, [open, user, refresh]);
+
+  /** Keep the auto-approve countdown honest while the dialog stays open. */
+  useEffect(() => {
+    if (!open) return;
+    const timer = setInterval(() => setNowTick(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, [open]);
+
+  /** The poster's own report history, shown as a deterrent before filing. */
+  useEffect(() => {
+    if (!disputeVideo) return;
+    void getPosterDisputeStats().then(setDisputeStats);
+  }, [disputeVideo]);
+
+  const autoApproveIn = countdownLabel(reviewWindow?.autoReleaseAt ?? null, nowTick);
+
 
   /** Only clips filmed inside the app get here — there is no gallery path. */
   async function onCaptured(file: File) {
@@ -162,23 +185,24 @@ export function BountyVideoDialog({
     }
   }
 
-  /** Requester flags a clip; the bounty stays locked until a moderator decides. */
-  async function dispute(video: BountyVideo, reasonCode: ModerationReasonCode, reason: string) {
+  /** Poster reports a capture; the money stays held until a moderator decides. */
+  async function dispute(video: BountyVideo, reasonCode: ReportReasonCode, reason: string) {
     setDisputingId(video.id);
     try {
-      await disputeBountyVideo(video.request_id, reason, reasonCode);
+      await reportCapture(video.request_id, reasonCode, reason);
       setDisputeVideo(null);
       setDisputeDetails("");
-      toast.success("Clip disputed. Add evidence in the dispute center.", {
+      toast.success("Report filed. Add any extra evidence in the dispute center.", {
         action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
       });
       await refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't dispute that clip.");
+      toast.error(err instanceof Error ? err.message : "Couldn't file that report.");
     } finally {
       setDisputingId(null);
     }
   }
+
 
   async function remove(video: BountyVideo) {
     try {
@@ -404,43 +428,44 @@ export function BountyVideoDialog({
                     </p>
                   ) : (
                     v.uploader_id !== user.id && (
-                      <button
-                        type="button"
-                        disabled={payingId === v.id}
-                        onClick={() => void accept(v)}
-                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
-                      >
-                        {payingId === v.id ? (
-                          <>
-                            <Loader2 className="size-3.5 animate-spin" /> Paying…
-                          </>
-                        ) : (
-                          <>
-                            <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
-                            {formatCredits(Number(v.bounty_amount))}
-                          </>
+                      <>
+                        {autoApproveIn && (
+                          <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-[0.7rem] font-semibold text-foreground">
+                            <Timer className="size-3.5 text-signal" /> Review window · auto-approves in{" "}
+                            {autoApproveIn}
+                          </p>
                         )}
-                      </button>
+                        <button
+                          type="button"
+                          disabled={payingId === v.id}
+                          onClick={() => void accept(v)}
+                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                        >
+                          {payingId === v.id ? (
+                            <>
+                              <Loader2 className="size-3.5 animate-spin" /> Paying…
+                            </>
+                          ) : (
+                            <>
+                              <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
+                              {formatCredits(Number(v.bounty_amount))}
+                            </>
+                          )}
+                        </button>
+                      </>
                     )
                   )}
-                  {!v.accepted_at && v.uploader_id !== user.id && (
+
+                  {!v.accepted_at && v.uploader_id !== user.id && reviewWindow?.canDispute && (
                     <button
                       type="button"
-                      disabled={disputingId === v.id}
-                       onClick={() => setDisputeVideo(v)}
-                      className="mt-2 w-full rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
+                      onClick={() => setDisputeVideo(v)}
+                      className="mt-2 block w-full text-center text-[0.68rem] text-muted-foreground underline-offset-4 hover:underline"
                     >
-                      {disputingId === v.id ? "Sending…" : "Dispute this clip"}
+                      Something wrong with this capture? Report an issue
                     </button>
                   )}
-                  {!v.accepted_at && (
-                    <Link
-                      to="/disputes"
-                      className="mt-2 block text-center text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
-                    >
-                      Dispute center
-                    </Link>
-                  )}
+
                   {playing?.id === v.id && (
                     <div className="relative mx-auto mt-3 w-full max-w-xs">
                       <video
@@ -468,41 +493,88 @@ export function BountyVideoDialog({
       </DialogContent>
     </Dialog>
     <Dialog open={Boolean(disputeVideo)} onOpenChange={(next) => { if (!next) setDisputeVideo(null); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Report this capture</DialogTitle>
-          <DialogDescription>Choose the main issue and add details for the review team.</DialogDescription>
+          <DialogDescription>
+            Reports go to a person for review. Pick the issue and explain it clearly.
+          </DialogDescription>
         </DialogHeader>
+
+        <div className="space-y-2">
+          {REPORT_REASONS.map((reason) => (
+            <button
+              key={reason.code}
+              type="button"
+              onClick={() => setDisputeReasonCode(reason.code)}
+              className={`w-full rounded-xl border px-3.5 py-3 text-left transition-colors ${
+                disputeReasonCode === reason.code
+                  ? "border-signal bg-signal/10"
+                  : "border-border bg-surface hover:border-signal/50"
+              }`}
+            >
+              <span className="block text-sm font-semibold text-foreground">{reason.label}</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">{reason.hint}</span>
+            </button>
+          ))}
+        </div>
+
         <label className="space-y-2 text-sm text-foreground">
-          <span className="font-semibold">Reason</span>
-          <select
-            value={disputeReasonCode}
-            onChange={(event) => setDisputeReasonCode(event.target.value as ModerationReasonCode)}
-            className="w-full rounded-xl border border-border bg-surface px-3 py-3 text-sm text-foreground outline-none focus:border-signal"
-          >
-            {MODERATION_REASONS.map((reason) => (
-              <option key={reason.code} value={reason.code}>{reason.label}</option>
-            ))}
-          </select>
+          <span className="font-semibold">What went wrong?</span>
+          <textarea
+            value={disputeDetails}
+            onChange={(event) => setDisputeDetails(event.target.value)}
+            rows={4}
+            maxLength={2000}
+            placeholder="Be specific: what you asked for, what you got, and the moment in the video where the problem shows."
+            className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-3 text-sm text-foreground outline-none focus:border-signal"
+          />
         </label>
-        <textarea
-          value={disputeDetails}
-          onChange={(event) => setDisputeDetails(event.target.value)}
-          rows={4}
-          maxLength={2000}
-          placeholder="Describe what happened and include a timestamp when helpful."
-          className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-3 text-sm text-foreground outline-none focus:border-signal"
-        />
+        <p className="text-[0.7rem] text-muted-foreground">
+          {disputeDetails.trim().length < REPORT_DETAIL_MIN
+            ? `${REPORT_DETAIL_MIN - disputeDetails.trim().length} more characters needed.`
+            : "Thanks, that is enough detail for the review team."}
+        </p>
+
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-3.5 py-3">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
+            <ShieldAlert className="size-3.5" /> Before you file this
+          </p>
+          <p className="mt-1.5 text-[0.72rem] leading-relaxed text-amber-200/90">
+            Filing a report freezes the Onlooker&rsquo;s payout and sends the bounty to a human
+            reviewer. Reports we can&rsquo;t substantiate count against your account standing and can
+            limit your posting.
+          </p>
+          {disputeStats && disputeStats.reviewed > 0 && (
+            <p className="mt-2 text-[0.72rem] font-semibold text-amber-200/90">
+              Your report rate so far: {disputeStats.rate}% ({disputeStats.disputed} of{" "}
+              {disputeStats.reviewed} bounties).
+            </p>
+          )}
+        </div>
+
         <button
           type="button"
-          disabled={!disputeVideo || !disputeDetails.trim() || Boolean(disputingId)}
+          disabled={
+            !disputeVideo ||
+            disputeDetails.trim().length < REPORT_DETAIL_MIN ||
+            Boolean(disputingId)
+          }
           onClick={() => disputeVideo && void dispute(disputeVideo, disputeReasonCode, disputeDetails.trim())}
           className="rounded-xl bg-signal px-4 py-3 text-sm font-semibold text-signal-foreground disabled:opacity-50"
         >
-          Submit for review
+          {disputingId ? "Filing…" : "File this report for review"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setDisputeVideo(null)}
+          className="text-center text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
+        >
+          Cancel
         </button>
       </DialogContent>
     </Dialog>
+
     </>
   );
 }
