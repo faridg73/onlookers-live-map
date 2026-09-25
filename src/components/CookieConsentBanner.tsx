@@ -20,6 +20,10 @@ export function CookieConsentBanner() {
 
   const choose = (choice: CookieConsentChoice) => {
     saveCookieConsent(choice);
+    const url = new URL(window.location.href);
+    if (url.searchParams.delete("cookie-preferences")) {
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    }
     setVisible(false);
   };
 
