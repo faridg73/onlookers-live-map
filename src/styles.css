@@ -639,3 +639,9 @@
 
 
 
+
+
+/* Ensure Sonner toasts render below iOS/Android status bars using safe-area insets on mobile */
+[data-sonner-toaster][data-position^="top"] {
+  --offset: max(1rem, env(safe-area-inset-top)) !important;
+}
