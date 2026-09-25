@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.onlooker.app',
   appName: 'Onlooker',
   webDir: 'mobile-shell',
-  server: { url: 'https://onlookerlive.com' },
+  server: { url: 'https://onlooker.io' },
   ios: {
     contentInset: 'always',
   },

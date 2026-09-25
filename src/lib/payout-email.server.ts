@@ -30,7 +30,7 @@ export async function sendPayoutEmailForVideo(video: VideoRow) {
       bountyTitle: video.request_title,
       place: video.request_place,
       credits: Math.round(Number(video.payout_amount)),
-      bountyUrl: `https://onlookerlive.com/b/${requestId}`,
+      bountyUrl: `https://onlooker.io/b/${requestId}`,
     },
     idempotencyKey: `payout-released-${video.id}`,
   });

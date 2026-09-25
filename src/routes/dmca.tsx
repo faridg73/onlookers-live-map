@@ -149,7 +149,7 @@ function DmcaPage() {
                 maxLength={500}
                 value={contentUrl}
                 onChange={(e) => setContentUrl(e.target.value)}
-                placeholder="https://onlookerlive.com/b/…"
+                placeholder="https://onlooker.io/b/…"
                 className={field}
               />
             </label>

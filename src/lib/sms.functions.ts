@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { RATE_LIMITED_MESSAGE, RATE_LIMITS, withinRateLimit } from "@/lib/rate-limit.server";
 
-const SITE_URL = "https://onlookerlive.com";
+const SITE_URL = "https://onlooker.io";
 
 /** Straight-line distance in miles between two points. */
 function milesBetween(

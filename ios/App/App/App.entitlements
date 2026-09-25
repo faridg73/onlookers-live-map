@@ -4,6 +4,8 @@
 <dict>
     <key>com.apple.developer.associated-domains</key>
     <array>
+        <string>applinks:onlooker.io</string>
+        <string>applinks:www.onlooker.io</string>
         <string>applinks:onlookerlive.com</string>
         <string>applinks:www.onlookerlive.com</string>
     </array>

@@ -37,7 +37,7 @@ function appOrigin(): string {
       /* ignore */
     }
   }
-  return "https://onlookerlive.com";
+  return "https://onlooker.io";
 }
 
 /** Embedded checkout for an Onlooker+ membership. */

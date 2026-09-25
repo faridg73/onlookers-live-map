@@ -52,7 +52,7 @@ export const submitDmcaNotice = createServerFn({ method: "POST" })
 
     try {
       const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-      await sendTemplateEmail("dmca-report", "support@onlookerlive.com", {
+      await sendTemplateEmail("dmca-report", "support@onlooker.io", {
         templateData: {
           name: data.name,
           email: data.email,
