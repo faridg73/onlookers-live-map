@@ -445,16 +445,18 @@ function RequestVisitForm({ account, onNeedsUpgrade }: { account: ProAccount | n
           <Field label="Contact email"><input type="email" value={form.agentEmail} onChange={set("agentEmail")} maxLength={255} placeholder="dana@realty.com" className="field" /></Field>
         </div>
         <p className="text-xs text-muted-foreground">The contact receives a one-time PIN by text or email — no account needed.</p>
-        {hasPlan && account && (
+        {account && (
           <p className={`text-xs font-semibold ${allowanceUsed ? "text-destructive" : "text-signal"}`}>
-            {account.plan === "team"
-              ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
-              : `Plan usage: ${account.visits_used} of ${account.plan === "starter" ? 5 : 20} visits`}
+            {trial
+              ? `Trial: ${Math.min(account.visits_used, TRIAL_VISITS)} of ${TRIAL_VISITS} free verified visits used`
+              : limit === null
+                ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
+                : `Plan usage: ${account.visits_used} of ${limit} visits`}
           </p>
         )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
-        <Button type="submit" disabled={allowanceUsed || saving} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
-          {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : "Continue to verified bounty"}
+        <Button type="submit" disabled={saving} className="h-12 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
+          {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : allowanceUsed ? "Choose a plan to continue" : "Continue to verified bounty"}
         </Button>
       </div>
     </form>
