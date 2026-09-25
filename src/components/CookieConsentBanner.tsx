@@ -4,7 +4,6 @@ import { Cookie } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  OPEN_COOKIE_PREFERENCES_EVENT,
   readCookieConsent,
   saveCookieConsent,
   type CookieConsentChoice,
@@ -15,10 +14,8 @@ export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setVisible(readCookieConsent() === null);
-    const openPreferences = () => setVisible(true);
-    window.addEventListener(OPEN_COOKIE_PREFERENCES_EVENT, openPreferences);
-    return () => window.removeEventListener(OPEN_COOKIE_PREFERENCES_EVENT, openPreferences);
+    const params = new URLSearchParams(window.location.search);
+    setVisible(readCookieConsent() === null || params.get("cookie-preferences") === "1");
   }, []);
 
   const choose = (choice: CookieConsentChoice) => {

@@ -14,7 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import { DmcaReportModal } from "@/components/DmcaReportModal";
 import { Button } from "@/components/ui/button";
-import { openCookiePreferences } from "@/lib/cookie-consent";
 
 const LINKS = [
   { to: "/verification", label: "Verified Visits", icon: KeyRound },
@@ -158,13 +157,12 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
               © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
             </p>
             <Button
-              type="button"
+              asChild
               variant="link"
               size="sm"
-              onClick={openCookiePreferences}
               className="h-auto px-1 py-0 text-xs text-muted-foreground"
             >
-              Cookie preferences
+              <a href="/?cookie-preferences=1">Cookie preferences</a>
             </Button>
             <p className="text-xs font-semibold tracking-wide text-muted-foreground">
               #OnlookerLive
