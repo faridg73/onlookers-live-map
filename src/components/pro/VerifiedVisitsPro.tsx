@@ -106,22 +106,76 @@ export function VerifiedVisitsPro() {
       return;
     }
     if (account.plan === plan.id) return;
-    setCheckoutPlan(plan);
+    setPaywall({ reason: "upgrade", plan: plan.id });
   };
 
   return (
     <>
+      <TrialBanner account={account} onUpgrade={() => setPaywall({ reason: account && !isTrialPlan(account.plan) ? "allowance-used" : "trial-exhausted" })} />
       <PricingSection current={account?.plan ?? "none"} onChoose={choosePlan} />
       <section ref={signupRef} id="pro-signup" className="mt-12 scroll-mt-6" aria-labelledby="pro-signup-title">
         <ProSignup userId={userId} account={account} onSaved={reload} />
       </section>
       <section id="request-visit" className="mt-12 scroll-mt-6" aria-labelledby="request-visit-title">
-        <RequestVisitForm account={account} />
+        <RequestVisitForm
+          account={account}
+          onNeedsUpgrade={() =>
+            setPaywall({ reason: account && !isTrialPlan(account.plan) ? "allowance-used" : "trial-exhausted" })
+          }
+        />
       </section>
-      {checkoutPlan && (
-        <ProCheckoutSheet plan={checkoutPlan} onClose={() => { setCheckoutPlan(null); void reload(); }} />
+      {paywall && (
+        <ProPaywallDialog
+          currentPlan={account?.plan ?? "none"}
+          trialVisitsUsed={account?.visits_used ?? 0}
+          reason={paywall.reason}
+          initialPlan={paywall.plan ?? "pro"}
+          onClose={() => { setPaywall(null); void reload(); }}
+        />
       )}
     </>
+  );
+}
+
+/** Free-trial / allowance strip above the plans. */
+function TrialBanner({ account, onUpgrade }: { account: ProAccount | null; onUpgrade: () => void }) {
+  if (!account) return null;
+  const trial = isTrialPlan(account.plan);
+  const limit = planVisitLimit(account.plan);
+  const used = account.visits_used;
+  const exhausted = needsUpgrade(account.plan, used);
+  const remaining = limit === null ? null : Math.max(0, limit - used);
+
+  return (
+    <div
+      className={`mt-8 grid gap-3 rounded-2xl border p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-5 ${exhausted ? "border-destructive/50 bg-destructive/10" : "border-signal/40 bg-signal/10"}`}
+    >
+      <div className="min-w-0">
+        <p className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-signal">
+          <Sparkles className="size-3.5 shrink-0" aria-hidden />
+          {trial ? "Free trial" : `${proPlanById(account.plan)?.name} plan`}
+        </p>
+        <p className="mt-1 text-sm font-bold text-foreground sm:text-base">
+          {trial
+            ? `Trial: ${Math.min(used, TRIAL_VISITS)} of ${TRIAL_VISITS} free verified visits used`
+            : remaining === null
+              ? `${used} verified visits this billing month · Unlimited`
+              : `${remaining} of ${limit} verified visits left this month`}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {exhausted
+            ? "Choose a plan to keep scheduling verified visits. You still fund each Onlooker's bounty separately."
+            : "No card needed for trial visits — you only fund the Onlooker's bounty."}
+        </p>
+      </div>
+      <Button
+        type="button"
+        onClick={onUpgrade}
+        className="h-12 w-full rounded-xl bg-signal px-5 font-bold text-signal-foreground hover:brightness-110 sm:w-auto"
+      >
+        {exhausted ? "Choose a plan" : "See plans"}
+      </Button>
+    </div>
   );
 }
 
