@@ -23,6 +23,7 @@ import { ProfileSetup } from "../components/ProfileSetup";
 import { OnboardingWalkthrough } from "../components/OnboardingWalkthrough";
 import { AuthProvider } from "@/hooks/use-auth";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 function NotFoundComponent() {
   return (
@@ -171,6 +172,7 @@ function RootComponent() {
               </>
             )}
             <Toaster position="top-center" />
+            <CookieConsentBanner />
           </BoostProvider>
         </OnlookerProvider>
       </AuthProvider>

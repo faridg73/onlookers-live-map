@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DmcaReportModal } from "@/components/DmcaReportModal";
+import { Button } from "@/components/ui/button";
 
 const LINKS = [
   { to: "/verification", label: "Verified Visits", icon: KeyRound },
@@ -155,6 +156,14 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
             <p className="text-xs font-semibold text-muted-foreground">
               © {new Date().getFullYear()} Onlooker LLC. All rights reserved.
             </p>
+            <Button
+              asChild
+              variant="link"
+              size="sm"
+              className="h-auto px-1 py-0 text-xs text-muted-foreground"
+            >
+              <a href="/?cookie-preferences=1">Cookie preferences</a>
+            </Button>
             <p className="text-xs font-semibold tracking-wide text-muted-foreground">
               #OnlookerLive
             </p>

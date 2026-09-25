@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
+import { hasOptionalCookieConsent } from "@/lib/cookie-consent";
 type LovableErrorOptions = {
   mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
   handled?: boolean;
@@ -26,6 +27,7 @@ declare global {
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
+  if (!hasOptionalCookieConsent()) return;
   window.__lovableEvents?.captureException?.(
     error,
     {
