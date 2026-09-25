@@ -423,24 +423,16 @@ export function BountyVideoDialog({
                       </button>
                     )
                   )}
-                  {!v.accepted_at && v.uploader_id !== user.id && (
+                  {!v.accepted_at && v.uploader_id !== user.id && reviewWindow?.canDispute && (
                     <button
                       type="button"
-                      disabled={disputingId === v.id}
-                       onClick={() => setDisputeVideo(v)}
-                      className="mt-2 w-full rounded-xl border border-border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-destructive disabled:opacity-50"
+                      onClick={() => setDisputeVideo(v)}
+                      className="mt-2 block w-full text-center text-[0.68rem] text-muted-foreground underline-offset-4 hover:underline"
                     >
-                      {disputingId === v.id ? "Sending…" : "Dispute this clip"}
+                      Something wrong with this capture? Report an issue
                     </button>
                   )}
-                  {!v.accepted_at && (
-                    <Link
-                      to="/disputes"
-                      className="mt-2 block text-center text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground underline-offset-4 hover:underline"
-                    >
-                      Dispute center
-                    </Link>
-                  )}
+
                   {playing?.id === v.id && (
                     <div className="relative mx-auto mt-3 w-full max-w-xs">
                       <video
