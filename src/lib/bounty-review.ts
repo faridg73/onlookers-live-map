@@ -36,9 +36,11 @@ export type DisputeStats = {
 
 /** How often this poster reports the work they receive. */
 export async function getPosterDisputeStats(userId?: string): Promise<DisputeStats | null> {
-  const { data, error } = await supabase.rpc("poster_dispute_stats", {
-    _user_id: userId ?? undefined,
-  });
+  const { data, error } = await supabase.rpc(
+    "poster_dispute_stats",
+    userId ? { _user_id: userId } : {},
+  );
+
   if (error) return null;
   const row = (data ?? [])[0];
   if (!row) return null;

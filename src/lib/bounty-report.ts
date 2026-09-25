@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { addEvidence } from "@/lib/disputes";
+import { openDisputeWithEvidence } from "@/lib/dispute-filing.functions";
+
 
 /** Minimum written detail a poster must give before a report can be filed. */
 export const REPORT_DETAIL_MIN = 40;
@@ -61,10 +63,8 @@ export async function reportCapture(
     return;
   }
 
-  const { error } = await supabase.rpc("open_dispute_with_evidence", {
-    _request_id: id,
-    _reason_code: reasonCode,
-    _description: body,
+  await openDisputeWithEvidence({
+    data: { requestId: id, reasonCode, description: body, file: null },
   });
-  if (error) throw error;
 }
+
