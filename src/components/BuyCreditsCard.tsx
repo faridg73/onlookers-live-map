@@ -144,7 +144,7 @@ export function BuyCreditsCard({ onPurchaseComplete }: { onPurchaseComplete?: ()
         <CreditCheckoutSheet
           pack={pack}
           onClose={() => setPack(null)}
-          onComplete={onPurchaseComplete}
+          {...(onPurchaseComplete ? { onComplete: onPurchaseComplete } : {})}
         />
       )}
     </div>
