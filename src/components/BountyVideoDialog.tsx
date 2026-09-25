@@ -185,23 +185,24 @@ export function BountyVideoDialog({
     }
   }
 
-  /** Requester flags a clip; the bounty stays locked until a moderator decides. */
-  async function dispute(video: BountyVideo, reasonCode: ModerationReasonCode, reason: string) {
+  /** Poster reports a capture; the money stays held until a moderator decides. */
+  async function dispute(video: BountyVideo, reasonCode: ReportReasonCode, reason: string) {
     setDisputingId(video.id);
     try {
-      await disputeBountyVideo(video.request_id, reason, reasonCode);
+      await reportCapture(video.request_id, reasonCode, reason);
       setDisputeVideo(null);
       setDisputeDetails("");
-      toast.success("Clip disputed. Add evidence in the dispute center.", {
+      toast.success("Report filed. Add any extra evidence in the dispute center.", {
         action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
       });
       await refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Couldn't dispute that clip.");
+      toast.error(err instanceof Error ? err.message : "Couldn't file that report.");
     } finally {
       setDisputingId(null);
     }
   }
+
 
   async function remove(video: BountyVideo) {
     try {
