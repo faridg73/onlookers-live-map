@@ -258,20 +258,28 @@ export async function markOnboardingCompleted() {
   if (error) throw error;
 }
 
+const ONBOARDING_SEEN_KEY = "onlooker.onboarding-seen.v1";
+
+export function hasSeenOnboarding() {
+  try {
+    return window.localStorage.getItem(ONBOARDING_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function rememberOnboardingSeen() {
+  try {
+    window.localStorage.setItem(ONBOARDING_SEEN_KEY, "1");
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 /** Custom event dispatched to re-open the walkthrough on demand. */
 export const REPLAY_ONBOARDING_EVENT = "onlooker:replay-onboarding";
 
-/** Reset the onboarding flag and ask the mounted walkthrough to re-open. */
+/** Re-open the walkthrough without changing its saved completion state. */
 export async function replayOnboarding() {
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
-  if (user) {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ onboarding_completed: false })
-      .eq("id", user.id);
-    if (error) throw error;
-  }
-
   window.dispatchEvent(new CustomEvent(REPLAY_ONBOARDING_EVENT));
 }
