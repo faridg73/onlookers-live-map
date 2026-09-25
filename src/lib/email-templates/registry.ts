@@ -22,10 +22,12 @@ import { template as dmcaReport } from './dmca-report'
 import { template as supportTicket } from './support-ticket'
 import { template as supportReceived } from './support-received'
 import { template as payoutReleased } from './payout-released'
+import { template as teamInvite } from './team-invite'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'dmca-report': dmcaReport,
   'support-ticket': supportTicket,
   'support-received': supportReceived,
   'payout-released': payoutReleased,
+  'team-invite': teamInvite,
 }
