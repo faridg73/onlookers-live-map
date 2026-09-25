@@ -164,7 +164,16 @@ export function ChatDrawer({
             {isMobile && (
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" aria-hidden />
             )}
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 pr-6">
+            <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 pr-6">
+              <button
+                type="button"
+                aria-label="Back"
+                onClick={() => setOpen(false)}
+                className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:bg-secondary"
+              >
+                <ArrowLeft className="size-4" />
+                <span className="sr-only">Back</span>
+              </button>
               <div className="min-w-0">
                 <SheetTitle className="truncate font-display text-base font-extrabold tracking-tight text-foreground">
                   {title}
