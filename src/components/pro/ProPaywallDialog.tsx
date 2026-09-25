@@ -15,6 +15,8 @@ interface ProPaywallDialogProps {
   trialVisitsUsed?: number;
   /** Shown when the trial allowance is spent rather than a plain upgrade. */
   reason?: "trial-exhausted" | "allowance-used" | "upgrade";
+  /** Plan highlighted when the sheet opens. */
+  initialPlan?: ProPlanId;
   onClose: () => void;
 }
 
