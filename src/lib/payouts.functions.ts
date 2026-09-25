@@ -153,7 +153,7 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
       if (!accountId) {
         const email =
           (context.claims as { email?: string } | undefined)?.email ??
-          `hunter+${context.userId}@onlookerlive.com`;
+          `hunter+${context.userId}@onlooker.io`;
 
         const account = await stripeV2Request<V2Account>(env, "POST", "/v2/core/accounts", {
           dashboard: "express",
