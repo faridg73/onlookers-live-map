@@ -341,6 +341,18 @@ function AuthScreen() {
           placeholder={mode === "signup" ? "Password (10+ characters)" : "Password"}
           className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
         />
+        {mode === "signin" ? (
+          <div className="px-1 text-right">
+            <button
+              type="button"
+              onClick={() => void sendPasswordReset()}
+              disabled={busy}
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline disabled:opacity-50"
+            >
+              Forgot your password?
+            </button>
+          </div>
+        ) : null}
         {mode === "signup" ? (
           <>
             <PasswordStrengthMeter password={password} email={email} />

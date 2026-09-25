@@ -31,6 +31,7 @@ import { Route as PostRouteImport } from './routes/post'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProDashboardRouteImport } from './routes/pro-dashboard'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as VisitApproveRouteImport } from './routes/visit-approve'
@@ -161,6 +162,11 @@ const ProDashboardRoute = ProDashboardRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/visit-approve': typeof VisitApproveRoute
@@ -341,6 +348,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/visit-approve': typeof VisitApproveRoute
@@ -387,6 +395,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/pro-dashboard': typeof ProDashboardRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
   '/visit-approve': typeof VisitApproveRoute
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pro-dashboard'
     | '/profile'
+    | '/reset-password'
     | '/terms'
     | '/verification'
     | '/visit-approve'
@@ -479,6 +489,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pro-dashboard'
     | '/profile'
+    | '/reset-password'
     | '/terms'
     | '/verification'
     | '/visit-approve'
@@ -524,6 +535,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/pro-dashboard'
     | '/profile'
+    | '/reset-password'
     | '/terms'
     | '/verification'
     | '/visit-approve'
@@ -570,6 +582,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProDashboardRoute: typeof ProDashboardRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
   VisitApproveRoute: typeof VisitApproveRoute
@@ -749,6 +762,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -922,6 +942,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProDashboardRoute: ProDashboardRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
   VisitApproveRoute: VisitApproveRoute,
