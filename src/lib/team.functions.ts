@@ -32,7 +32,7 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
           inviterName: profile?.full_name || profile?.display_name || "",
           memberType: data.memberType,
           email: data.email,
-          joinUrl: "https://onlookerlive.com/pro-dashboard",
+          joinUrl: "https://onlooker.io/pro-dashboard",
         },
         idempotencyKey: `team-invite-${memberId}`,
       });

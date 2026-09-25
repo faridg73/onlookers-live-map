@@ -46,7 +46,7 @@ export const template = {
   component: Email,
   subject: (data: Record<string, any>) => `${data?.['teamName'] || 'An agency'} added you to their Onlooker team`,
   displayName: 'Team invite',
-  previewData: { teamName: 'Sunset Realty', inviterName: 'Maria', memberType: 'staff', email: 'alex@sunsetrealty.com', joinUrl: 'https://onlookerlive.com/pro-dashboard' },
+  previewData: { teamName: 'Sunset Realty', inviterName: 'Maria', memberType: 'staff', email: 'alex@sunsetrealty.com', joinUrl: 'https://onlooker.io/pro-dashboard' },
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }

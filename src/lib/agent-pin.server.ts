@@ -3,7 +3,7 @@ import { sendLovableEmail } from "@lovable.dev/email-js";
 
 import { normalizePhone, sendSms } from "@/lib/sms.server";
 
-const SITE_URL = "https://onlookerlive.com";
+const SITE_URL = "https://onlooker.io";
 
 /**
  * Server-only delivery of a real-estate bounty's 6-digit on-site PIN to the

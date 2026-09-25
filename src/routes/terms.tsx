@@ -55,7 +55,7 @@ function TermsPage() {
 
       <p className="mt-8 text-sm text-muted-foreground">
         Questions about these terms:{" "}
-        <span className="font-semibold text-foreground">support@onlookerlive.com</span>
+        <span className="font-semibold text-foreground">support@onlooker.io</span>
       </p>
 
 

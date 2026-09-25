@@ -2,7 +2,7 @@
 /** Server-only geofenced alert dispatch for brand new credit bounties. */
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/firebase_messaging";
-const SITE_URL = "https://onlookerlive.com";
+const SITE_URL = "https://onlooker.io";
 
 /** How far around the venue pin we wake up onlookers (1.5 miles ≈ 2.4 km). */
 export const GEOFENCE_RADIUS_MILES = 1.5;
