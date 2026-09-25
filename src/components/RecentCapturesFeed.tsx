@@ -251,7 +251,7 @@ export function RecentCapturesFeed({
                         >
                           <MapPin className="size-3.5 text-signal" aria-hidden /> View on map
                         </button>
-                        {myId && myId === clip.uploaderId && (
+                        {(isStaff || (myId && myId === clip.uploaderId)) && (
                           <button
                             type="button"
                             role="menuitem"
