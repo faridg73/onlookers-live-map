@@ -313,6 +313,20 @@ export function PrivacyBody({ linkToTerms = true }: { linkToTerms?: boolean }) {
         </p>
       </Section>
 
+      <Section title="4A. Cookies and browser storage">
+        <p>
+          We use essential cookies and similar browser storage to keep sign-in secure, remember legal
+          acceptance and onboarding progress, and retain preferences you choose in the app. These are
+          necessary for requested functionality and remain available if you decline optional cookies.
+        </p>
+        <p>
+          Optional diagnostic reporting is disabled unless you accept it through our consent banner.
+          It helps us identify and fix technical problems. We do not currently use advertising cookies
+          or third-party behavioral tracking. Your consent choice is saved on your device so we do not
+          ask on every visit; you may clear site data in your browser to reset that choice.
+        </p>
+      </Section>
+
       <Section title="5. Who we share data with">
         <p>
           We share only what is necessary with service providers that run the platform on our
