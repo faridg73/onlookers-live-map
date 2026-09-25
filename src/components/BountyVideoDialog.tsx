@@ -459,7 +459,7 @@ export function BountyVideoDialog({
                           )}
                         </button>
                       </>
-                    )
+                    ))
                   )}
 
                   {!v.accepted_at && v.uploader_id !== user.id && reviewWindow?.canDispute && (
