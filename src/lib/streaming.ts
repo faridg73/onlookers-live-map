@@ -37,6 +37,9 @@ export async function billStreamMinute(sessionId: string): Promise<StreamMeter> 
   const { data, error } = await supabase.rpc("bill_stream_minute", { _session_id: sessionId });
   if (error) {
     if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");
+    if (/minutes_billed.*ambiguous/i.test(error.message)) {
+      throw new Error("The live meter could not update. End this session and try again.");
+    }
     throw new Error(error.message);
   }
   const row = (Array.isArray(data) ? data[0] : data) as

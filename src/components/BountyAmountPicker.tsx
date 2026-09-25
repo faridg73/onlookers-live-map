@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { CoinsIcon, Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { MIN_BOUNTY } from "@/lib/bounty-escrow";
 import { formatCreditCash, formatCreditWords, formatCredits } from "@/lib/credits";
 import { cn } from "@/lib/utils";
@@ -15,12 +16,15 @@ export function BountyAmountPicker({
   onChange,
   balance,
   min = MIN_BOUNTY,
+  onBuyCredits,
 }: {
   value: number;
   onChange: (v: number) => void;
   balance?: number | null;
   /** Payout floor — the reward can never settle below this. */
   min?: number;
+  /** Opens an in-place wallet refill without leaving the current task. */
+  onBuyCredits?: () => void;
 }) {
   const safe = Number.isFinite(value) ? value : 0;
   const custom = !PRESETS.includes(safe);
@@ -114,10 +118,23 @@ export function BountyAmountPicker({
         </p>
       )}
       {!tooLow && shortFall && (
-        <p className="text-xs font-bold tabular-nums text-destructive">
-          Your wallet has {formatCredits(balance ?? 0)}, buy credits before locking{" "}
-          {formatCredits(safe)}.
-        </p>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <p className="min-w-0 text-xs font-bold tabular-nums text-destructive">
+            Your wallet has {formatCredits(balance ?? 0)}. Add credits before locking{" "}
+            {formatCredits(safe)}.
+          </p>
+          {onBuyCredits ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onBuyCredits}
+              className="min-h-12 shrink-0 rounded-full border-signal px-3 font-extrabold text-signal"
+            >
+              <Plus className="size-4" /> Add credits
+            </Button>
+          ) : null}
+        </div>
       )}
       {!tooLow && !shortFall && (
         <p className="text-xs font-medium tabular-nums text-foreground">
