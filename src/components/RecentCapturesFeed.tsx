@@ -33,6 +33,8 @@ export function RecentCapturesFeed({
   const [playingId, setPlayingId] = useState<string | null>(null);
   /** Signed-in user, so owners see the Delete option on their own captures. */
   const [myId, setMyId] = useState<string | null>(null);
+  /** Review staff (admins/moderators) see Delete on every capture. */
+  const [isStaff, setIsStaff] = useState(false);
   /** Which card's options menu is open (by clip id). */
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -40,7 +42,15 @@ export function RecentCapturesFeed({
   const navigate = useNavigate();
 
   useEffect(() => {
-    void supabase.auth.getUser().then(({ data }) => setMyId(data.user?.id ?? null));
+    void supabase.auth.getUser().then(async ({ data }) => {
+      setMyId(data.user?.id ?? null);
+      if (data.user?.id) {
+        const { data: staff } = await supabase.rpc("is_review_staff", {
+          _user_id: data.user.id,
+        });
+        setIsStaff(Boolean(staff));
+      }
+    });
   }, []);
 
   // Tap anywhere outside the open menu closes it.
