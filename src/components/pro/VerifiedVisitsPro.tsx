@@ -1,26 +1,29 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, CalendarClock, Check, Loader2, Send, UserPlus, X } from "lucide-react";
+import { BadgeCheck, CalendarClock, Check, Loader2, Send, Sparkles, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
-import { getStripe } from "@/lib/stripe";
-import { startProCheckout } from "@/lib/pro.functions";
 import { createProVisitBooking } from "@/lib/pro-visits.functions";
 import {
   PRO_PLANS,
   PRO_ROLES,
   PRO_VISIT_DRAFT_KEY,
+  TRIAL_VISITS,
   formatUsd,
+  isTrialPlan,
+  needsUpgrade,
+  planVisitLimit,
   proPlanById,
   type ProPlan,
+  type ProPlanId,
   type ProRole,
   type ProVisitDraft,
 } from "@/lib/pro-plans";
+import { ProPaywallDialog } from "@/components/pro/ProPaywallDialog";
 import { Button } from "@/components/ui/button";
 
 interface ProAccount {
