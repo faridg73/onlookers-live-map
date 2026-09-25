@@ -18,8 +18,6 @@ type NavigateFn = (path: string) => void;
 const APP_ORIGINS = [
   "https://onlookerlive.com",
   "https://www.onlookerlive.com",
-  "https://onlookerlive.com",
-  "https://www.onlookerlive.com",
   "https://onlooker.lovable.app",
 ];
 

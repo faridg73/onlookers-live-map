@@ -31,8 +31,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="onlookerlive.com" />
                 <data android:scheme="https" android:host="www.onlookerlive.com" />
-                <data android:scheme="https" android:host="onlookerlive.com" />
-                <data android:scheme="https" android:host="www.onlookerlive.com" />
             </intent-filter>
 
         </activity>
