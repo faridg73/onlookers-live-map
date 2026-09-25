@@ -24,6 +24,7 @@ import { OnboardingWalkthrough } from "../components/OnboardingWalkthrough";
 import { AuthProvider } from "@/hooks/use-auth";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { initNativeShell } from "@/lib/native";
 
 function NotFoundComponent() {
   return (
@@ -144,6 +145,17 @@ function RootComponent() {
   const pathname = location.pathname;
   const embedded = pathname.startsWith("/embed");
   useSessionScroll(`onlooker:scroll:route:${location.href}`);
+
+  // Native shell (Capacitor iOS/Android): deep links open in-app,
+  // Android back button walks router history. No-ops in the browser.
+  const router = useRouter();
+  useEffect(() => {
+    void initNativeShell(
+      (path) => void router.navigate({ to: path }),
+      () => router.history.canGoBack(),
+      () => router.history.back(),
+    );
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>

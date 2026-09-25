@@ -27,3 +27,12 @@
 - [x] Trip-value row on bounty cards (distance, travel time, payout, est. hourly)
 - [x] Hunter search distance fully adjustable (Anywhere default, presets, uncapped custom); alert radius cap removed; confirmed no backend distance limit
 - [x] PIN handshake: expiry + single use, resend to agent, onlooker unreachable report (trip fee via dispute), account-free agent decline link with refund + kill fee
+
+## Native app launch (Capacitor iOS/Android)
+- [x] Phase 1 (in-repo): native bridge (deep links appUrlOpen → in-app nav, Android back button → router history), Android https App Links intent filter, iOS App.entitlements (associated domains), /.well-known/apple-app-site-association + assetlinks.json templates, cap sync green, build OK
+- [ ] Fill placeholders: apple-app-site-association TEAMID (Apple Developer Team ID), assetlinks.json SHA-256 (release keystore fingerprint)
+- [ ] In Xcode: enable Associated Domains capability (links App.entitlements), set signing team
+- [ ] Phase 1 remaining: native camera/geolocation/push plugins, generate Android release keystore, build binaries on a Mac
+- [ ] Phase 2 payments: Stripe in-app for bounties/escrow; web-first subscriptions with account restore
+- [ ] Phase 0 re-verify: Apple external-link/commission policy the week of submission (Dec 2025 ruling — rules keep changing)
+- [ ] User action: register Apple Developer ($99/yr) + Google Play Console ($25) accounts

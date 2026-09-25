@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.onlooker.app"],
+        "components": [{ "/": "/*" }]
+      }
+    ]
+  }
+}
