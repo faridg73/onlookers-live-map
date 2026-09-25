@@ -83,9 +83,11 @@ const requestSchema = z.object({
   path: ["agentPhone"],
 });
 
+type PaywallState = { reason: "trial-exhausted" | "allowance-used" | "upgrade"; plan?: ProPlanId };
+
 export function VerifiedVisitsPro() {
   const { userId, account, reload } = useProAccount();
-  const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
+  const [paywall, setPaywall] = useState<PaywallState | null>(null);
   const signupRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
