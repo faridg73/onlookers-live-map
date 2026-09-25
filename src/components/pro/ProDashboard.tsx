@@ -38,6 +38,7 @@ export function ProDashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [view, setView] = useState<ProVisitView>("scheduled");
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const query = useQuery({ queryKey: QUERY_KEY, queryFn: () => fetchDashboard(), staleTime: 15_000 });
   const data = query.data;
 
