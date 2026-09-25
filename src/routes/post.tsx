@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { scrollFieldToStart } from "@/lib/field-scroll";
 import { format } from "date-fns";
 import {
@@ -320,6 +320,14 @@ function PostScreen() {
   const [gpsBusy, setGpsBusy] = useState(false);
   /** Refill panel, so a short wallet never ends the journey. */
   const [topUpOpen, setTopUpOpen] = useState(false);
+  const finishTopUp = useCallback(() => {
+    setTopUpOpen(false);
+    const refreshDelays = [0, 1200, 3000];
+    refreshDelays.forEach((delay) => {
+      window.setTimeout(() => void readWalletBalance().then(setBalance), delay);
+    });
+    toast.success("Credits added. Your bounty is still ready here.");
+  }, []);
   const [firstPostGuideOpen, setFirstPostGuideOpen] = useState(false);
   const [hideFirstPostGuide, setHideFirstPostGuide] = useState(false);
   const [realEstateGuideOpen, setRealEstateGuideOpen] = useState(false);
@@ -1679,6 +1687,7 @@ function PostScreen() {
                         onChange={(next) => setBounty(Math.max(gigFloor, next))}
                         balance={balance}
                         min={gigFloor}
+                        onBuyCredits={() => setTopUpOpen(true)}
                       />
                     </div>
                     {rewardMatchesGig ? (
@@ -1944,6 +1953,7 @@ function PostScreen() {
         open={topUpOpen}
         balance={balance}
         needed={total}
+        onPurchaseComplete={finishTopUp}
         onClose={() => {
           setTopUpOpen(false);
           void readWalletBalance().then(setBalance);

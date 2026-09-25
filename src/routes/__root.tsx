@@ -183,7 +183,15 @@ function RootComponent() {
                 <OnboardingWalkthrough />
               </>
             )}
-            <Toaster position="top-center" />
+            <Toaster
+              position="top-center"
+              offset={{ top: "1rem", left: "1rem", right: "1rem" }}
+              mobileOffset={{
+                top: "max(calc(env(safe-area-inset-top) + 0.75rem), 4.75rem)",
+                left: "0.75rem",
+                right: "0.75rem",
+              }}
+            />
             <CookieConsentBanner />
           </BoostProvider>
         </OnlookerProvider>

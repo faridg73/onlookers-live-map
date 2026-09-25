@@ -14,7 +14,7 @@ import {
 import { CreditCheckoutSheet } from "@/components/CreditCheckoutSheet";
 
 /** Buy Credits — preset tiers plus a custom amount at the fixed 4:$1 rate. */
-export function BuyCreditsCard() {
+export function BuyCreditsCard({ onPurchaseComplete }: { onPurchaseComplete?: () => void } = {}) {
   const [pack, setPack] = useState<CreditPackage | null>(null);
   const [customCredits, setCustomCredits] = useState<string>("");
 
@@ -140,7 +140,13 @@ export function BuyCreditsCard() {
         Apple Pay, Google Pay, Link and cards accepted.
       </p>
 
-      {pack && <CreditCheckoutSheet pack={pack} onClose={() => setPack(null)} />}
+      {pack && (
+        <CreditCheckoutSheet
+          pack={pack}
+          onClose={() => setPack(null)}
+          {...(onPurchaseComplete ? { onComplete: onPurchaseComplete } : {})}
+        />
+      )}
     </div>
   );
 }

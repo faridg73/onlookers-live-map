@@ -15,6 +15,8 @@
 - [x] Move ticker readout under "The city is live" line
 
 ## In progress
+- [x] Posting flow: add an inline credit top-up action, resume the exact bounty step after payment, and keep phone alerts below status bars
+- [x] Live viewing: fix the ambiguous minutes-billed error shown to viewers
 - [x] First-visit cookie consent: accept/decline persistence, optional diagnostics gate, privacy disclosure, mobile/desktop verification
 - [x] First-open mobile onboarding: signed-out completion, account sync, browsable CTAs, replay-safe persistence, and four-case preview verification
 - [x] Pro Dashboard: subscription tier, monthly usage, saved visits, bounty controls, live escrow tracking

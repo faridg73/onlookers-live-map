@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Loader2, X } from "lucide-react";
 
@@ -14,12 +14,22 @@ import { getStripe } from "@/lib/stripe";
 export function CreditCheckoutSheet({
   pack,
   onClose,
+  onComplete,
 }: {
   pack: CreditPackage;
   onClose: () => void;
+  onComplete?: () => void;
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const finishCheckout = useCallback(() => {
+    onComplete?.();
+    onClose();
+  }, [onClose, onComplete]);
+  const checkoutOptions = useMemo(
+    () => (clientSecret ? { clientSecret, onComplete: finishCheckout } : null),
+    [clientSecret, finishCheckout],
+  );
 
   useEffect(() => {
     let live = true;
@@ -89,8 +99,8 @@ export function CreditCheckoutSheet({
                 Close
               </button>
             </div>
-          ) : clientSecret ? (
-            <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
+          ) : checkoutOptions ? (
+            <EmbeddedCheckoutProvider stripe={getStripe()} options={checkoutOptions}>
               <EmbeddedCheckout />
             </EmbeddedCheckoutProvider>
           ) : (
