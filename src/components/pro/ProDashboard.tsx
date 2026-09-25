@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { ProPaywallDialog } from "@/components/pro/ProPaywallDialog";
 import { DeadlineNote } from "@/components/DeadlineNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
