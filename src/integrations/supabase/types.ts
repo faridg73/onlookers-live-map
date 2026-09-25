@@ -708,6 +708,7 @@ export type Database = {
           dispute_reason: string | null
           disputed_at: string | null
           id: string
+          payer_id: string | null
           reason_code: string | null
           request_id: string
           requester_id: string
@@ -724,6 +725,7 @@ export type Database = {
           dispute_reason?: string | null
           disputed_at?: string | null
           id?: string
+          payer_id?: string | null
           reason_code?: string | null
           request_id: string
           requester_id: string
@@ -740,6 +742,7 @@ export type Database = {
           dispute_reason?: string | null
           disputed_at?: string | null
           id?: string
+          payer_id?: string | null
           reason_code?: string | null
           request_id?: string
           requester_id?: string
@@ -1241,6 +1244,82 @@ export type Database = {
           visits_used?: number
         }
         Relationships: []
+      }
+      pro_team_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          joined_at: string | null
+          member_type: string
+          status: string
+          team_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          joined_at?: string | null
+          member_type?: string
+          status?: string
+          team_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          joined_at?: string | null
+          member_type?: string
+          status?: string
+          team_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "pro_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_teams: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_teams_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "pro_accounts"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       pro_visit_bookings: {
         Row: {
@@ -2634,6 +2713,8 @@ export type Database = {
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_team_member: { Args: { _team_id: string }; Returns: boolean }
+      is_team_owner: { Args: { _team_id: string }; Returns: boolean }
       is_username_available: { Args: { _username: string }; Returns: boolean }
       list_disputes: {
         Args: never
@@ -2959,6 +3040,47 @@ export type Database = {
         Returns: string
       }
       submit_instant_snippet: { Args: { _video_id: string }; Returns: number }
+      team_accept_invites: { Args: never; Returns: number }
+      team_invite: {
+        Args: { _email: string; _member_type: string }
+        Returns: string
+      }
+      team_my_invites: {
+        Args: never
+        Returns: {
+          member_id: string
+          member_type: string
+          team_name: string
+        }[]
+      }
+      team_payer_for: { Args: { _user_id: string }; Returns: string }
+      team_remove_member: { Args: { _member_id: string }; Returns: undefined }
+      team_save: { Args: { _name: string }; Returns: string }
+      team_statement: {
+        Args: { _since?: string }
+        Returns: {
+          amount: number
+          created_at: string
+          hunter: string
+          hunter_on_roster: boolean
+          place: string
+          posted_by: string
+          request_id: string
+          status: string
+          title: string
+        }[]
+      }
+      team_wallet_summary: {
+        Args: never
+        Returns: {
+          balance: number
+          is_owner: boolean
+          plan_active: boolean
+          spent_this_month: number
+          team_id: string
+          team_name: string
+        }[]
+      }
       tip_coins: {
         Args: {
           _amount: number
