@@ -11,10 +11,7 @@ export function proVisitView(row: ProVisitBooking): ProVisitView {
 }
 
 export function planLimit(plan: string): number | null {
-  if (plan === "starter") return 5;
-  if (plan === "pro") return 20;
-  if (plan === "team") return null;
-  return 0;
+  return planVisitLimit(plan);
 }
 
 export function remainingVisits(plan: string, used: number): number | null {
