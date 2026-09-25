@@ -53,6 +53,12 @@ function TermsPage() {
         <TermsBody />
       </div>
 
+      <p className="mt-8 text-sm text-muted-foreground">
+        Questions about these terms:{" "}
+        <span className="font-semibold text-foreground">support@onlooker.io</span>
+      </p>
+
+
       <Link
         to="/auth"
         className="mt-10 inline-flex min-h-11 items-center rounded-full border border-border bg-secondary/80 px-4 py-3 text-sm font-semibold text-foreground"
