@@ -68,5 +68,15 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Onlooker uses your camera to film live streams and clips for bounties you claim.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Onlooker uses your microphone to record sound with the live streams and clips you capture.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Onlooker uses your location to show nearby bounties and confirm you are on site when you capture footage.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Onlooker lets you choose photos and videos from your library to submit for a bounty.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Onlooker can save footage you capture to your photo library.</string>
 </dict>
 </plist>
