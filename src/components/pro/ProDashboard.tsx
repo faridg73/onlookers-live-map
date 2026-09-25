@@ -100,6 +100,7 @@ export function ProDashboard() {
       <div role="tablist" aria-label="Visit states" className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-secondary p-1 sm:grid-cols-4">{VIEWS.map((item) => { const count=rows.filter((r)=>proVisitView(r)===item.id).length; return <Button key={item.id} variant={view===item.id?"default":"ghost"} className={view===item.id?"bg-signal text-signal-foreground":"text-muted-foreground"} onClick={()=>setView(item.id)}>{item.label} {count > 0 && <span>{count}</span>}</Button>; })}</div>
       <div className="mt-4 space-y-3">{visible.length===0 ? <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No visits in this stage.</div> : visible.map((row)=><VisitRow key={row.id} row={row} onResume={()=>resume(row)} onCancel={()=>row.requestId && cancelMutation.mutate(row.requestId)} cancelling={cancelMutation.isPending}/>)}</div>
     </section>
+    {paywallOpen && <ProPaywallDialog currentPlan={data.account.plan} trialVisitsUsed={data.account.visitsUsed} reason={remaining === 0 ? (plan ? "allowance-used" : "trial-exhausted") : "upgrade"} onClose={() => { setPaywallOpen(false); void query.refetch(); }} />}
   </>;
 }
 
