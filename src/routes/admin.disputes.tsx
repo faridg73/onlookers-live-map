@@ -221,6 +221,19 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     if (open) void load();
   }, [open, load]);
 
+  const refreshRate = useCallback(async () => {
+    const rate = await getPosterDisputeStats(item.requester_id).catch(() => null);
+    if (rate) setPosterRate(rate);
+  }, [item.requester_id]);
+
+  // Keep the poster's report rate live while this case is on screen.
+  useEffect(() => {
+    void refreshRate();
+    const t = window.setInterval(() => void refreshRate(), 10000);
+    return () => window.clearInterval(t);
+  }, [refreshRate]);
+
+
 
   async function watch(clip: BountyVideo) {
     try {
@@ -237,6 +250,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
       toast.success(
         awardSpotter ? "Payout released to the reporter." : "Bounty refunded to the poster.",
       );
+      await refreshRate();
       onResolved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
@@ -250,6 +264,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     try {
       await resolveDisputeSplit(item.request_id, killFee, note);
       toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
+      await refreshRate();
       onResolved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
@@ -283,6 +298,12 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
           {open ? "Hide" : "Review"}
         </p>
       </button>
+      {posterRate && posterRate.reviewed > 0 && (
+        <p className={`mt-2 text-[0.68rem] font-semibold ${posterRate.rate >= 40 ? "text-destructive" : "text-muted-foreground"}`}>
+          <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-signal align-middle" />
+          Live poster report rate: {posterRate.rate}%
+        </p>
+      )}
 
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
