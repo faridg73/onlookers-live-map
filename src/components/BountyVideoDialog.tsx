@@ -254,6 +254,10 @@ export function BountyVideoDialog({
                   It&rsquo;s no longer taking new clips. Any submitted videos are listed below.
                 </p>
               </div>
+            ) : request.requester === "you" ? (
+              <p className="rounded-2xl border border-border bg-surface p-4 text-center text-xs text-muted-foreground">
+                This is your bounty. Clips from the onlooker who claims it will appear below for your review.
+              </p>
             ) : (
             <div className="space-y-3" onDrop={blockFileDrop} onDragOver={blockFileDrop} onPaste={blockFilePaste}>
               <textarea

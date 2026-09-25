@@ -76,7 +76,8 @@ export function BountyBottomSheet({
   const tier = bountyTier(pool);
   const payout = pool - Math.floor(pool * PLATFORM_FEE_RATE);
   const closed = isClosed(request);
-  const claimable = !closed && request.status === "open";
+  const isPoster = request.requester === "you";
+  const claimable = !closed && !isPoster && request.status === "open";
   /** Funded pins ask for a live stream; everything else takes a recorded clip. */
   const wantsLive = request.bountyType === "live_stream";
 
@@ -265,7 +266,9 @@ export function BountyBottomSheet({
               {!claimable
                 ? closed
                   ? "Closed"
-                  : "Already claimed"
+                  : isPoster
+                    ? "This is your bounty"
+                    : "Already claimed"
                 : accepting
                   ? "Starting your live session…"
                   : wantsLive
