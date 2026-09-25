@@ -104,12 +104,13 @@ function DiscoverHome() {
   }, [search.view]);
   // A linked bounty is pre-selected so its pin is always drawn and highlighted.
   useEffect(() => {
-    if (search.b) setSelectedId(search.b);
+    if (search.b) setSelectedId(search.b.startsWith("db-") ? search.b : `db-${search.b}`);
   }, [search.b]);
   const navigate = useNavigate();
   const openBounty = (id: string | null) => {
     setSelectedId(id);
-    if (id) void navigate({ to: "/b/$id", params: { id } });
+    // Arrived from a bounty page to claim: keep the claim card here instead of bouncing back.
+    if (id && !search.b) void navigate({ to: "/b/$id", params: { id } });
   };
   useEffect(() => {
     if (view !== "map") return;
@@ -128,7 +129,7 @@ function DiscoverHome() {
   useEffect(() => {
     setIsWeekend(WEEKEND.includes(new Date().getDay()));
   }, []);
-  const selected = requests.find((r) => r.id === selectedId) ?? null;
+  const selected = requests.find((r) => r.id === selectedId || r.id === `db-${selectedId}`) ?? null;
   // A linked bounty owns the camera: center and zoom on its true coordinates so
   // the map never opens on the viewer's own location instead of the bounty.
   const selectedPos = selected ? requestMapPosition(selected) : null;
