@@ -24,6 +24,8 @@ import {
   type BountyVideo,
 } from "@/lib/bounty-videos";
 import { disputeReasonLabel } from "@/lib/moderation-reasons";
+import { getPosterDisputeStats, type DisputeStats } from "@/lib/bounty-review";
+
 
 export const Route = createFileRoute("/admin/disputes")({
   head: () => ({
@@ -196,25 +198,29 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
   const [killFee, setKillFee] = useState(25);
   const [note, setNote] = useState("");
   const [history, setHistory] = useState<PastDisputeRuling[]>([]);
+  const [posterRate, setPosterRate] = useState<DisputeStats | null>(null);
   const noteReady = note.trim().length >= 10;
   const spot = locationTypeById(item.location_type);
 
   const load = useCallback(async () => {
-    const [ev, vids, past] = await Promise.all([
+    const [ev, vids, past, rate] = await Promise.all([
       listEvidence(item.request_id).catch(() => []),
       listVideosForRequest(item.request_id).catch(() => [] as BountyVideo[]),
       listDisputeHistory(item.requester_id, item.spotter_id).catch(
         () => [] as PastDisputeRuling[],
       ),
+      getPosterDisputeStats(item.requester_id).catch(() => null),
     ]);
     setEntries(ev);
     setClips(vids as BountyVideo[]);
     setHistory(past);
+    setPosterRate(rate);
   }, [item.request_id, item.requester_id, item.spotter_id]);
 
   useEffect(() => {
     if (open) void load();
   }, [open, load]);
+
 
   async function watch(clip: BountyVideo) {
     try {
