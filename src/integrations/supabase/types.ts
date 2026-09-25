@@ -2493,7 +2493,12 @@ export type Database = {
         Args: { _action: string; _subject?: string }
         Returns: number
       }
-      award_xp: { Args: { _amount: number; _user_id: string }; Returns: number }
+      award_xp:
+        | { Args: { _amount: number; _user_id: string }; Returns: number }
+        | {
+            Args: { _amount: number; _reason: string; _user_id: string }
+            Returns: undefined
+          }
       begin_bounty_submission: { Args: { _request_id: string }; Returns: Json }
       bill_stream_minute: {
         Args: { _session_id: string }
