@@ -286,9 +286,22 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
 
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
+          {posterRate && posterRate.reviewed > 0 && (
+            <p
+              className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                posterRate.rate >= 40
+                  ? "bg-destructive/15 text-destructive"
+                  : "bg-surface-raised text-muted-foreground"
+              }`}
+            >
+              Poster report rate: {posterRate.rate}% ({posterRate.disputed} of{" "}
+              {posterRate.reviewed} bounties reported)
+            </p>
+          )}
           <p className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
             Original bounty
           </p>
+
           <div className="rounded-xl bg-surface-raised px-3 py-2 text-xs text-muted-foreground">
             <p className="text-sm text-foreground">{item.prompt}</p>
             {item.details && <p className="mt-1 whitespace-pre-wrap">{item.details}</p>}
