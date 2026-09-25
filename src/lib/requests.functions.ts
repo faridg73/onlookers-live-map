@@ -71,6 +71,10 @@ const createSchema = z.object({
 export const getWalletBalance = createServerFn({ method: "GET" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<number> => {
+    // Team staff post from their agency's shared wallet.
+    const { data: team } = await context.supabase.rpc("team_wallet_summary");
+    const t = Array.isArray(team) ? team[0] : null;
+    if (t && !t.is_owner && t.plan_active) return Number(t.balance ?? 0);
     // The credit wallet is the same balance shown on /balance — never the
     // legacy profile column, which can drift behind it.
     const { data } = await context.supabase
@@ -118,16 +122,21 @@ export const createBountyRequest = createServerFn({ method: "POST" })
     }
 
     // The escrow trigger debits the wallet in the same transaction, so check the
-    // balance up front and fail with a message people can act on.
+    // balance up front and fail with a message people can act on. Team staff
+    // are funded by their agency's shared wallet.
+    const { data: teamPayer } = await supabaseAdmin.rpc("team_payer_for", { _user_id: context.userId });
+    const payerId = (teamPayer as string | null) || context.userId;
     const { data: current } = await supabaseAdmin
       .from("user_credit_wallets")
       .select("credit_balance")
-      .eq("user_id", context.userId)
+      .eq("user_id", payerId)
       .maybeSingle();
     const available = Number(current?.credit_balance ?? 0);
     if (available < data.bounty) {
       throw new Error(
-        `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} Credits available, buy credits first.`,
+        payerId !== context.userId
+          ? `Your agency's shared wallet has ${Math.round(available)} Credits — ask your team owner to add credits.`
+          : `Not enough wallet balance to lock this bounty. You have ${Math.round(available)} Credits available, buy credits first.`,
       );
     }
 
