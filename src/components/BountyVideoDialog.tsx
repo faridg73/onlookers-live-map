@@ -191,6 +191,7 @@ export function BountyVideoDialog({
     try {
       await reportCapture(video.request_id, reasonCode, reason);
       setDisputeVideo(null);
+      setReviewWindow((w) => (w ? { ...w, status: "disputed", canDispute: false, autoReleaseAt: null } : w));
       setDisputeDetails("");
       toast.success("Report filed. Add any extra evidence in the dispute center.", {
         action: { label: "Open", onClick: () => void navigate({ to: "/disputes" }) },
@@ -427,7 +428,12 @@ export function BountyVideoDialog({
                       {formatCredits(Number(v.payout_amount))} paid to the Onlooker
                     </p>
                   ) : (
-                    v.uploader_id !== user.id && (
+                    v.uploader_id !== user.id &&
+                    (reviewWindow?.status === "disputed" ? (
+                      <p className="mt-3 rounded-xl bg-surface-raised px-3 py-2 text-center text-[0.7rem] font-semibold text-muted-foreground">
+                        Reported · a moderator is reviewing this capture. Payment is on hold.
+                      </p>
+                    ) : (
                       <>
                         {autoApproveIn && (
                           <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-[0.7rem] font-semibold text-foreground">
@@ -453,7 +459,7 @@ export function BountyVideoDialog({
                           )}
                         </button>
                       </>
-                    )
+                    ))
                   )}
 
                   {!v.accepted_at && v.uploader_id !== user.id && reviewWindow?.canDispute && (
