@@ -25,6 +25,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
+import { Route as PaywallCheckRouteImport } from './routes/paywall-check'
 import { Route as PinDeclineRouteImport } from './routes/pin-decline'
 import { Route as PoolsRouteImport } from './routes/pools'
 import { Route as PostRouteImport } from './routes/post'
@@ -131,6 +132,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
 const PayoutHistoryRoute = PayoutHistoryRouteImport.update({
   id: '/payout-history',
   path: '/payout-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaywallCheckRoute = PaywallCheckRouteImport.update({
+  id: '/paywall-check',
+  path: '/paywall-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PinDeclineRoute = PinDeclineRouteImport.update({
@@ -290,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/paywall-check': typeof PaywallCheckRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
@@ -335,6 +342,7 @@ export interface FileRoutesByTo {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/paywall-check': typeof PaywallCheckRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
@@ -381,6 +389,7 @@ export interface FileRoutesById {
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/payout-history': typeof PayoutHistoryRoute
+  '/paywall-check': typeof PaywallCheckRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
   '/post': typeof PostRoute
@@ -428,6 +437,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/paywall-check'
     | '/pin-decline'
     | '/pools'
     | '/post'
@@ -473,6 +483,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/paywall-check'
     | '/pin-decline'
     | '/pools'
     | '/post'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/hunt'
     | '/leaderboard'
     | '/payout-history'
+    | '/paywall-check'
     | '/pin-decline'
     | '/pools'
     | '/post'
@@ -564,6 +576,7 @@ export interface RootRouteChildren {
   HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
+  PaywallCheckRoute: typeof PaywallCheckRoute
   PinDeclineRoute: typeof PinDeclineRoute
   PoolsRoute: typeof PoolsRoute
   PostRoute: typeof PostRoute
@@ -705,6 +718,13 @@ declare module '@tanstack/react-router' {
       path: '/payout-history'
       fullPath: '/payout-history'
       preLoaderRoute: typeof PayoutHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paywall-check': {
+      id: '/paywall-check'
+      path: '/paywall-check'
+      fullPath: '/paywall-check'
+      preLoaderRoute: typeof PaywallCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pin-decline': {
@@ -916,6 +936,7 @@ const rootRouteChildren: RootRouteChildren = {
   HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
+  PaywallCheckRoute: PaywallCheckRoute,
   PinDeclineRoute: PinDeclineRoute,
   PoolsRoute: PoolsRoute,
   PostRoute: PostRoute,
