@@ -250,6 +250,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
       toast.success(
         awardSpotter ? "Payout released to the reporter." : "Bounty refunded to the poster.",
       );
+      await refreshRate();
       onResolved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
@@ -263,6 +264,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     try {
       await resolveDisputeSplit(item.request_id, killFee, note);
       toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
+      await refreshRate();
       onResolved();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't settle this dispute.");
@@ -296,6 +298,12 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
           {open ? "Hide" : "Review"}
         </p>
       </button>
+      {posterRate && posterRate.reviewed > 0 && (
+        <p className={`mt-2 text-[0.68rem] font-semibold ${posterRate.rate >= 40 ? "text-destructive" : "text-muted-foreground"}`}>
+          <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-signal align-middle" />
+          Live poster report rate: {posterRate.rate}%
+        </p>
+      )}
 
       {open && (
         <div className="mt-4 space-y-3 border-t border-border pt-4">
