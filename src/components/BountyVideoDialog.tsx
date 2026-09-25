@@ -428,25 +428,34 @@ export function BountyVideoDialog({
                     </p>
                   ) : (
                     v.uploader_id !== user.id && (
-                      <button
-                        type="button"
-                        disabled={payingId === v.id}
-                        onClick={() => void accept(v)}
-                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
-                      >
-                        {payingId === v.id ? (
-                          <>
-                            <Loader2 className="size-3.5 animate-spin" /> Paying…
-                          </>
-                        ) : (
-                          <>
-                            <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
-                            {formatCredits(Number(v.bounty_amount))}
-                          </>
+                      <>
+                        {autoApproveIn && (
+                          <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-raised px-3 py-2 text-[0.7rem] font-semibold text-foreground">
+                            <Timer className="size-3.5 text-signal" /> Review window · auto-approves in{" "}
+                            {autoApproveIn}
+                          </p>
                         )}
-                      </button>
+                        <button
+                          type="button"
+                          disabled={payingId === v.id}
+                          onClick={() => void accept(v)}
+                          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                        >
+                          {payingId === v.id ? (
+                            <>
+                              <Loader2 className="size-3.5 animate-spin" /> Paying…
+                            </>
+                          ) : (
+                            <>
+                              <CoinsIcon className="size-3.5" /> Accept &amp; pay{" "}
+                              {formatCredits(Number(v.bounty_amount))}
+                            </>
+                          )}
+                        </button>
+                      </>
                     )
                   )}
+
                   {!v.accepted_at && v.uploader_id !== user.id && reviewWindow?.canDispute && (
                     <button
                       type="button"
