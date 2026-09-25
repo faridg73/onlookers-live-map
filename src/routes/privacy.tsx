@@ -53,6 +53,12 @@ function PrivacyPage() {
         <PrivacyBody />
       </div>
 
+      <p className="mt-8 text-sm text-muted-foreground">
+        Privacy questions or data deletion requests:{" "}
+        <span className="font-semibold text-foreground">support@onlooker.io</span>
+      </p>
+
+
       <p className="mt-10 text-sm text-muted-foreground">
         See also our{" "}
         <Link to="/terms" className="font-semibold text-foreground underline underline-offset-4">

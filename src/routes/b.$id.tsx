@@ -30,8 +30,8 @@ export const Route = createFileRoute("/b/$id")({
     const desc = title
       ? `${title}${place ? ` at ${place}` : ""}. Capture a live photo or clip and claim the bounty.`
       : "Open this bounty on the Onlooker map and claim it with a live photo or clip.";
-    const url = `https://onlookerlive.com/b/${match.params.id}`;
-    const image = "https://onlookerlive.com/og-onlooker.jpg";
+    const url = `https://onlooker.io/b/${match.params.id}`;
+    const image = "https://onlooker.io/og-onlooker.jpg";
     return {
       meta: [
         { title: heading },

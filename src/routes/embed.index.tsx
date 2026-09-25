@@ -4,7 +4,7 @@ import { MapPin, Zap } from "lucide-react";
 
 import { listEmbedMarkers } from "@/lib/embed.functions";
 
-const SITE = "https://onlookerlive.com";
+const SITE = "https://onlooker.io";
 
 /** Iframe-friendly board of every active Onlooker feed, for external sites. */
 export const Route = createFileRoute("/embed/")({

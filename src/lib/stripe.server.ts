@@ -175,6 +175,8 @@ export async function stripeV2Request<T>(
 export function resolveStripeEnvForHost(host: string | null | undefined): StripeEnv {
   const value = (host ?? '').toLowerCase();
   const isProductionHost =
+    value === 'onlooker.io' ||
+    value === 'www.onlooker.io' ||
     value === 'onlookerlive.com' ||
     value === 'www.onlookerlive.com' ||
     value === 'onlookers-live-map.lovable.app';

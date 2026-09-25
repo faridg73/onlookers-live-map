@@ -55,7 +55,7 @@ export const submitSupportTicket = createServerFn({ method: "POST" })
     // failure must never lose the message — it is logged, not thrown.
     try {
       const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-      await sendTemplateEmail("support-ticket", "support@onlookerlive.com", {
+      await sendTemplateEmail("support-ticket", "support@onlooker.io", {
         templateData: {
           name: data.name,
           email: data.email,
@@ -81,7 +81,7 @@ export const submitSupportTicket = createServerFn({ method: "POST" })
           message: data.message,
           ticketId: row.id,
         },
-        replyTo: "support@onlookerlive.com",
+        replyTo: "support@onlooker.io",
         idempotencyKey: `support-received-${row.id}`,
       });
     } catch (err) {
