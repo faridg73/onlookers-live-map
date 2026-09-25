@@ -405,7 +405,7 @@ export function RequestCard({
               <Video className="size-3.5" /> Videos
             </button>
           </BountyVideoDialog>
-        {onClaim && (
+        {onClaim && request.requester !== "you" && (
           <button
             type="button"
             disabled={done}
