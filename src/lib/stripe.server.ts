@@ -177,8 +177,6 @@ export function resolveStripeEnvForHost(host: string | null | undefined): Stripe
   const isProductionHost =
     value === 'onlookerlive.com' ||
     value === 'www.onlookerlive.com' ||
-    value === 'onlookerlive.com' ||
-    value === 'www.onlookerlive.com' ||
     value === 'onlookers-live-map.lovable.app';
   if (!isProductionHost) return 'sandbox';
   return process.env['STRIPE_LIVE_API_KEY'] ? 'live' : 'sandbox';
