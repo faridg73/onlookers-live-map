@@ -15,6 +15,8 @@ interface ProPaywallDialogProps {
   trialVisitsUsed?: number;
   /** Shown when the trial allowance is spent rather than a plain upgrade. */
   reason?: "trial-exhausted" | "allowance-used" | "upgrade";
+  /** Plan highlighted when the sheet opens. */
+  initialPlan?: ProPlanId;
   onClose: () => void;
 }
 
@@ -37,9 +39,10 @@ export function ProPaywallDialog({
   currentPlan = "none",
   trialVisitsUsed = TRIAL_VISITS,
   reason = "upgrade",
+  initialPlan = "pro",
   onClose,
 }: ProPaywallDialogProps) {
-  const [selected, setSelected] = useState<ProPlanId>("pro");
+  const [selected, setSelected] = useState<ProPlanId>(initialPlan);
   const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
   const copy = HEADLINES[reason];
   const plan = PRO_PLANS.find((p) => p.id === selected) ?? PRO_PLANS[1]!;

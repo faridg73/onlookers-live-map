@@ -1,26 +1,29 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, CalendarClock, Check, Loader2, Send, UserPlus, X } from "lucide-react";
+import { BadgeCheck, CalendarClock, Check, Loader2, Send, Sparkles, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
-import { getStripe } from "@/lib/stripe";
-import { startProCheckout } from "@/lib/pro.functions";
 import { createProVisitBooking } from "@/lib/pro-visits.functions";
 import {
   PRO_PLANS,
   PRO_ROLES,
   PRO_VISIT_DRAFT_KEY,
+  TRIAL_VISITS,
   formatUsd,
+  isTrialPlan,
+  needsUpgrade,
+  planVisitLimit,
   proPlanById,
   type ProPlan,
+  type ProPlanId,
   type ProRole,
   type ProVisitDraft,
 } from "@/lib/pro-plans";
+import { ProPaywallDialog } from "@/components/pro/ProPaywallDialog";
 import { Button } from "@/components/ui/button";
 
 interface ProAccount {
@@ -80,9 +83,11 @@ const requestSchema = z.object({
   path: ["agentPhone"],
 });
 
+type PaywallState = { reason: "trial-exhausted" | "allowance-used" | "upgrade"; plan?: ProPlanId };
+
 export function VerifiedVisitsPro() {
   const { userId, account, reload } = useProAccount();
-  const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
+  const [paywall, setPaywall] = useState<PaywallState | null>(null);
   const signupRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -101,22 +106,76 @@ export function VerifiedVisitsPro() {
       return;
     }
     if (account.plan === plan.id) return;
-    setCheckoutPlan(plan);
+    setPaywall({ reason: "upgrade", plan: plan.id });
   };
 
   return (
     <>
+      <TrialBanner account={account} onUpgrade={() => setPaywall({ reason: account && !isTrialPlan(account.plan) ? "allowance-used" : "trial-exhausted" })} />
       <PricingSection current={account?.plan ?? "none"} onChoose={choosePlan} />
       <section ref={signupRef} id="pro-signup" className="mt-12 scroll-mt-6" aria-labelledby="pro-signup-title">
         <ProSignup userId={userId} account={account} onSaved={reload} />
       </section>
       <section id="request-visit" className="mt-12 scroll-mt-6" aria-labelledby="request-visit-title">
-        <RequestVisitForm account={account} />
+        <RequestVisitForm
+          account={account}
+          onNeedsUpgrade={() =>
+            setPaywall({ reason: account && !isTrialPlan(account.plan) ? "allowance-used" : "trial-exhausted" })
+          }
+        />
       </section>
-      {checkoutPlan && (
-        <ProCheckoutSheet plan={checkoutPlan} onClose={() => { setCheckoutPlan(null); void reload(); }} />
+      {paywall && (
+        <ProPaywallDialog
+          currentPlan={account?.plan ?? "none"}
+          trialVisitsUsed={account?.visits_used ?? 0}
+          reason={paywall.reason}
+          initialPlan={paywall.plan ?? "pro"}
+          onClose={() => { setPaywall(null); void reload(); }}
+        />
       )}
     </>
+  );
+}
+
+/** Free-trial / allowance strip above the plans. */
+function TrialBanner({ account, onUpgrade }: { account: ProAccount | null; onUpgrade: () => void }) {
+  if (!account) return null;
+  const trial = isTrialPlan(account.plan);
+  const limit = planVisitLimit(account.plan);
+  const used = account.visits_used;
+  const exhausted = needsUpgrade(account.plan, used);
+  const remaining = limit === null ? null : Math.max(0, limit - used);
+
+  return (
+    <div
+      className={`mt-8 grid gap-3 rounded-2xl border p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-5 ${exhausted ? "border-destructive/50 bg-destructive/10" : "border-signal/40 bg-signal/10"}`}
+    >
+      <div className="min-w-0">
+        <p className="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-signal">
+          <Sparkles className="size-3.5 shrink-0" aria-hidden />
+          {trial ? "Free trial" : `${proPlanById(account.plan)?.name} plan`}
+        </p>
+        <p className="mt-1 text-sm font-bold text-foreground sm:text-base">
+          {trial
+            ? `Trial: ${Math.min(used, TRIAL_VISITS)} of ${TRIAL_VISITS} free verified visits used`
+            : remaining === null
+              ? `${used} verified visits this billing month · Unlimited`
+              : `${remaining} of ${limit} verified visits left this month`}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {exhausted
+            ? "Choose a plan to keep scheduling verified visits. You still fund each Onlooker's bounty separately."
+            : "No card needed for trial visits — you only fund the Onlooker's bounty."}
+        </p>
+      </div>
+      <Button
+        type="button"
+        onClick={onUpgrade}
+        className="h-12 w-full rounded-xl bg-signal px-5 font-bold text-signal-foreground hover:brightness-110 sm:w-auto"
+      >
+        {exhausted ? "Choose a plan" : "See plans"}
+      </Button>
+    </div>
   );
 }
 
@@ -129,7 +188,7 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
       <p className="mx-auto mt-2 max-w-md text-center text-sm text-muted-foreground">
         Monthly plans, cancel anytime. Bounty payouts to Onlookers are held in escrow separately.
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PRO_PLANS.map((plan) => {
           const active = current === plan.id;
           return (
@@ -137,10 +196,10 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
               key={plan.id}
               className={`flex flex-col rounded-2xl border bg-card p-5 ${plan.featured ? "border-signal" : "border-border"}`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-bold text-foreground">{plan.name}</h3>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <h3 className="truncate font-bold text-foreground">{plan.name}</h3>
                 {plan.featured && (
-                  <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-signal-foreground">
+                  <span className="shrink-0 rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-signal-foreground">
                     Popular
                   </span>
                 )}
@@ -154,7 +213,8 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
               <ul className="mt-4 flex-1 space-y-2">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2 text-sm text-foreground">
-                    <Check className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden /> {f}
+                    <Check className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden />
+                    <span className="min-w-0">{f}</span>
                   </li>
                 ))}
               </ul>
@@ -163,7 +223,7 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
                 disabled={active}
                 onClick={() => onChoose(plan)}
                 variant={plan.featured ? "default" : "outline"}
-                className={`mt-5 h-11 rounded-xl font-bold ${plan.featured ? "bg-signal text-signal-foreground hover:brightness-110" : ""}`}
+                className={`mt-5 h-12 rounded-xl font-bold ${plan.featured ? "bg-signal text-signal-foreground hover:brightness-110" : ""}`}
               >
                 {active ? "Current plan" : `Choose ${plan.name}`}
               </Button>
@@ -309,7 +369,7 @@ function ProSignup({
   );
 }
 
-function RequestVisitForm({ account }: { account: ProAccount | null }) {
+function RequestVisitForm({ account, onNeedsUpgrade }: { account: ProAccount | null; onNeedsUpgrade: () => void }) {
   const navigate = useNavigate();
   const saveBooking = useServerFn(createProVisitBooking);
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
@@ -317,11 +377,9 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const [saving, setSaving] = useState(false);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-  const hasPlan = account !== null && account.plan !== "none";
-  const allowanceUsed = account !== null
-    && account.plan !== "none"
-    && account.plan !== "team"
-    && account.visits_used >= (account.plan === "starter" ? 5 : 20);
+  const trial = account !== null && isTrialPlan(account.plan);
+  const limit = account ? planVisitLimit(account.plan) : null;
+  const allowanceUsed = account !== null && needsUpgrade(account.plan, account.visits_used);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -331,7 +389,9 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
       return;
     }
     if (allowanceUsed) {
-      setError(`Your ${proPlanById(account?.plan ?? "")?.name ?? "current"} plan's monthly visit allowance has been used. Choose a higher plan or wait for the next billing month.`);
+      // Third visit onward: open the paywall instead of a dead-end message.
+      setError(null);
+      onNeedsUpgrade();
       return;
     }
     const parsed = requestSchema.safeParse(form);
@@ -385,16 +445,18 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
           <Field label="Contact email"><input type="email" value={form.agentEmail} onChange={set("agentEmail")} maxLength={255} placeholder="dana@realty.com" className="field" /></Field>
         </div>
         <p className="text-xs text-muted-foreground">The contact receives a one-time PIN by text or email — no account needed.</p>
-        {hasPlan && account && (
+        {account && (
           <p className={`text-xs font-semibold ${allowanceUsed ? "text-destructive" : "text-signal"}`}>
-            {account.plan === "team"
-              ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
-              : `Plan usage: ${account.visits_used} of ${account.plan === "starter" ? 5 : 20} visits`}
+            {trial
+              ? `Trial: ${Math.min(account.visits_used, TRIAL_VISITS)} of ${TRIAL_VISITS} free verified visits used`
+              : limit === null
+                ? `Plan usage: ${account.visits_used} visits this billing month · Unlimited`
+                : `Plan usage: ${account.visits_used} of ${limit} visits`}
           </p>
         )}
         {error && <p role="alert" className="text-sm font-semibold text-destructive">{error}</p>}
-        <Button type="submit" disabled={allowanceUsed || saving} className="h-11 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
-          {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : "Continue to verified bounty"}
+        <Button type="submit" disabled={saving} className="h-12 w-full rounded-xl bg-signal font-bold uppercase text-signal-foreground hover:brightness-110">
+          {saving ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />} {saving ? "Saving visit" : allowanceUsed ? "Choose a plan to continue" : "Continue to verified bounty"}
         </Button>
       </div>
     </form>
@@ -407,59 +469,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
       <div className="mt-2">{children}</div>
     </label>
-  );
-}
-
-function ProCheckoutSheet({ plan, onClose }: { plan: ProPlan; onClose: () => void }) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    void (async () => {
-      try {
-        const result = await startProCheckout({ data: { planId: plan.id } });
-        if (result.error) throw new Error(result.error);
-        if (!result.clientSecret) throw new Error("The payment form could not be opened.");
-        setClientSecret(result.clientSecret);
-      } catch (cause) {
-        const msg = cause instanceof Error ? cause.message : "Could not open checkout";
-        setError(msg.toLowerCase().includes("unauthorized") ? "Please sign in to choose a plan." : msg);
-      }
-    })();
-  }, [plan.id]);
-
-  return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-background/80 backdrop-blur-sm sm:items-center">
-      <div className="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-border bg-surface-raised sm:rounded-3xl" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">Verified Visits {plan.name}, {formatUsd(plan.priceCents)}/mo</p>
-            <p className="text-xs text-muted-foreground">{plan.visits}</p>
-          </div>
-          <button type="button" onClick={onClose} aria-label="Close checkout" className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground hover:bg-secondary">
-            <X className="size-4" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-3">
-          {error ? (
-            <div className="px-3 py-8 text-center">
-              <p className="text-sm text-foreground">{error}</p>
-              <Button type="button" onClick={onClose} className="mt-4 rounded-full bg-signal text-signal-foreground">Close</Button>
-            </div>
-          ) : clientSecret ? (
-            <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
-              <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
-          ) : (
-            <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" /> Opening secure checkout…
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
   );
 }

@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
+import { ProPaywallDialog } from "@/components/pro/ProPaywallDialog";
 import { DeadlineNote } from "@/components/DeadlineNote";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,7 @@ export function ProDashboard() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [view, setView] = useState<ProVisitView>("scheduled");
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const query = useQuery({ queryKey: QUERY_KEY, queryFn: () => fetchDashboard(), staleTime: 15_000 });
   const data = query.data;
 
@@ -87,8 +89,8 @@ export function ProDashboard() {
     <section className="border-b border-border pb-6">
       <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase text-signal">{role}</p><h1 className="mt-1 font-display text-3xl text-foreground">{data.account.company}</h1><p className="mt-1 text-sm text-muted-foreground">Verified visits, bounties, and escrow in one place.</p></div><Button asChild className="bg-signal font-bold text-signal-foreground"><Link to="/verification" hash="request-visit">Schedule visit</Link></Button></div>
       <div className="mt-5 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-lg border border-signal/40 bg-card p-4"><div className="flex items-center justify-between"><div><p className="text-xs uppercase text-muted-foreground">Active subscription</p><p className="mt-1 text-xl font-bold text-foreground">{plan?.name ?? "No plan"}</p></div><span className="rounded-full bg-signal px-3 py-1 text-xs font-bold text-signal-foreground">{plan ? `$${plan.priceCents / 100}/mo` : "Inactive"}</span></div><Button asChild variant="outline" className="mt-4 h-9"><Link to="/verification" hash="pro-pricing">Manage plan</Link></Button></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs uppercase text-muted-foreground">Monthly usage</p><div className="mt-2 flex items-end justify-between"><p className="text-2xl font-bold text-foreground">{remaining === null ? "Unlimited" : `${remaining} left`}</p><p className="text-xs text-muted-foreground">{data.account.visitsUsed}{limit === null ? " used" : ` / ${limit}`}</p></div>{limit !== null && limit > 0 && <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-signal" style={{ width: `${Math.min(100, (data.account.visitsUsed / limit) * 100)}%` }} /></div>}</div>
+        <div className="rounded-lg border border-signal/40 bg-card p-4"><div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2"><div className="min-w-0"><p className="text-xs uppercase text-muted-foreground">Active subscription</p><p className="mt-1 truncate text-xl font-bold text-foreground">{plan?.name ?? "2-visit free trial"}</p></div><span className="shrink-0 rounded-full bg-signal px-3 py-1 text-xs font-bold text-signal-foreground">{plan ? `$${plan.priceCents / 100}/mo` : "Free"}</span></div><Button type="button" variant={plan ? "outline" : "default"} onClick={() => setPaywallOpen(true)} className={`mt-4 h-12 w-full rounded-xl font-bold ${plan ? "" : "bg-signal text-signal-foreground hover:brightness-110"}`}>{plan ? "Manage plan" : "Upgrade plan"}</Button></div>
+        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs uppercase text-muted-foreground">{plan ? "Monthly usage" : "Free trial usage"}</p><div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2"><p className="truncate text-2xl font-bold text-foreground">{remaining === null ? "Unlimited" : `${remaining} left`}</p><p className="shrink-0 text-xs text-muted-foreground">{data.account.visitsUsed}{limit === null ? " used" : ` / ${limit}`}</p></div>{limit !== null && limit > 0 && <div className="mt-3 h-2 overflow-hidden rounded-full bg-secondary"><div className="h-full bg-signal" style={{ width: `${Math.min(100, (data.account.visitsUsed / limit) * 100)}%` }} /></div>}{!plan && <p className="mt-2 text-xs text-muted-foreground">{remaining === 0 ? "Trial used — choose a plan to keep scheduling." : `${remaining} of ${limit} free trial visits left.`}</p>}</div>
       </div>
     </section>
     <section className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{[
@@ -99,6 +101,7 @@ export function ProDashboard() {
       <div role="tablist" aria-label="Visit states" className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-secondary p-1 sm:grid-cols-4">{VIEWS.map((item) => { const count=rows.filter((r)=>proVisitView(r)===item.id).length; return <Button key={item.id} variant={view===item.id?"default":"ghost"} className={view===item.id?"bg-signal text-signal-foreground":"text-muted-foreground"} onClick={()=>setView(item.id)}>{item.label} {count > 0 && <span>{count}</span>}</Button>; })}</div>
       <div className="mt-4 space-y-3">{visible.length===0 ? <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No visits in this stage.</div> : visible.map((row)=><VisitRow key={row.id} row={row} onResume={()=>resume(row)} onCancel={()=>row.requestId && cancelMutation.mutate(row.requestId)} cancelling={cancelMutation.isPending}/>)}</div>
     </section>
+    {paywallOpen && <ProPaywallDialog currentPlan={data.account.plan} trialVisitsUsed={data.account.visitsUsed} reason={remaining === 0 ? (plan ? "allowance-used" : "trial-exhausted") : "upgrade"} onClose={() => { setPaywallOpen(false); void query.refetch(); }} />}
   </>;
 }
 
