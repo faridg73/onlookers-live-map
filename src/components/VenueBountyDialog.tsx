@@ -274,7 +274,7 @@ export function VenueBountyDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[92dvh] overflow-y-auto overscroll-contain sm:max-w-md">
+      <DialogContent className="top-[calc(env(safe-area-inset-top)+0.75rem)] max-h-[calc(100dvh-env(safe-area-inset-top)-1.5rem)] translate-y-0 overflow-y-auto overscroll-contain sm:top-1/2 sm:max-h-[90dvh] sm:max-w-md sm:-translate-y-1/2">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Post a bounty</DialogTitle>
           <DialogDescription>
