@@ -11,7 +11,7 @@ import { toast } from "sonner";
  * open the app's camera instead.
  */
 
-export const SITE_URL = "https://onlookerlive.com";
+export const SITE_URL = "https://onlooker.io";
 export const BRAND_HASHTAGS = ["Onlooker", "OnlookerLive"] as const;
 
 export type ShareSubject = {

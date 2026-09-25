@@ -10,7 +10,7 @@ type Search = {
   lng?: number | undefined;
 };
 
-const SITE = "https://onlookerlive.com";
+const SITE = "https://onlooker.io";
 
 /** Iframe-friendly card an external news site or blog embeds. */
 export const Route = createFileRoute("/embed/$id")({
