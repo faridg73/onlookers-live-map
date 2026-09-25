@@ -63,6 +63,29 @@ function AuthScreen() {
 
 
 
+  /** Emails a password reset link for the address typed in the form. */
+  async function sendPasswordReset() {
+    if (!email) {
+      setFormError("Type your email address above first.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent, check your inbox.");
+      setFormError(null);
+    } catch (err) {
+      const described = describeAuthError(err);
+      setFormError(described.message);
+      toast.error(described.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   /** Sends a fresh confirmation link when someone never received the first one. */
   async function resendConfirmation() {
     setBusy(true);
