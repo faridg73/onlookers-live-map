@@ -33,12 +33,31 @@ export const PRO_PLANS: ProPlan[] = [
   {
     id: "team",
     name: "Team",
-    priceCents: 39900,
+    priceCents: 34900,
     visits: "Unlimited seats & verified visits",
     tagline: "For brokerages, management firms and builders.",
     features: ["Everything in Pro", "Unlimited team seats", "Multi-site scheduling", "Priority dispute review"],
   },
 ];
+
+/** Free trial: every new professional account gets this many verified visits. */
+export const TRIAL_VISITS = 2;
+
+/** Monthly verified-visit allowance. `null` means unlimited. */
+export function planVisitLimit(plan: string): number | null {
+  if (plan === "starter") return 5;
+  if (plan === "pro") return 20;
+  if (plan === "team") return null;
+  return TRIAL_VISITS;
+}
+
+export const isTrialPlan = (plan: string) => plan !== "starter" && plan !== "pro" && plan !== "team";
+
+/** True when the account has no verified visits left and must upgrade. */
+export function needsUpgrade(plan: string, visitsUsed: number): boolean {
+  const limit = planVisitLimit(plan);
+  return limit !== null && visitsUsed >= limit;
+}
 
 export const PRO_ROLES: Array<{ id: ProRole; label: string }> = [
   { id: "agent", label: "Real estate agent" },
