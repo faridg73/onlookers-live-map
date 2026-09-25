@@ -39,7 +39,7 @@ function appOrigin(): string {
       /* ignore */
     }
   }
-  return "https://onlooker.io";
+  return "https://onlookerlive.com";
 }
 
 /** Finds or creates the buyer's payment customer, tagged with their user id. */

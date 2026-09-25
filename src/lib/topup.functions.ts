@@ -30,7 +30,7 @@ function appOrigin(): string {
       /* ignore */
     }
   }
-  return "https://onlooker.io";
+  return "https://onlookerlive.com";
 }
 
 /**

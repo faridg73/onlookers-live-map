@@ -4,7 +4,7 @@
  */
 const DEFAULT_BASE_URL = "https://v2.signalhouse.io";
 const STATUS_CALLBACK_PATH = "/api/public/webhooks/signalhouse";
-const SITE_URL = "https://onlooker.io";
+const SITE_URL = "https://onlookerlive.com";
 
 /** Turns what someone typed into an E.164 number, assuming US when no country is given. */
 export function normalizePhone(raw: string): string | null {

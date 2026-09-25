@@ -57,7 +57,7 @@ export const template = {
     bountyTitle: 'Room-by-room walkthrough',
     place: '255 S Olive St, Los Angeles',
     credits: 235,
-    bountyUrl: 'https://onlooker.io',
+    bountyUrl: 'https://onlookerlive.com',
   },
 } satisfies TemplateEntry
 

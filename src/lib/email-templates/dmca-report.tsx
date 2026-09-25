@@ -42,11 +42,11 @@ export const template = {
   component: Email,
   subject: 'New DMCA / infringement report | Onlooker LLC',
   displayName: 'DMCA report alert',
-  to: 'support@onlooker.io',
+  to: 'support@onlookerlive.com',
   previewData: {
     name: 'Jane Rights',
     email: 'jane@example.com',
-    contentUrl: 'https://onlooker.io/b/abc123',
+    contentUrl: 'https://onlookerlive.com/b/abc123',
     reasonCode: 'duplicate_content',
     description: 'This clip reproduces my copyrighted broadcast footage without permission.',
     noticeId: '00000000-0000-0000-0000-000000000000',

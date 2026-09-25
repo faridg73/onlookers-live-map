@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-const SITE_URL = "https://onlooker.io";
+const SITE_URL = "https://onlookerlive.com";
 const BRAND = "#CCFF00";
 
 /** Anything worth bragging about: a finished bounty, a discovery, a flash meetup. */
