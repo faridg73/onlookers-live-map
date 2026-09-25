@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
-import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Lock, Play, RotateCcw, Share2, Trash2, Video, X } from "lucide-react";
+import { BadgeDollarSign, Camera, CheckCircle2, CoinsIcon, Loader2, Lock, Play, RotateCcw, Share2, ShieldAlert, Timer, Trash2, Video, X } from "lucide-react";
 import { SubmissionSupportLink } from "@/components/SubmissionSupportLink";
 import { describeUploadError } from "@/lib/upload-errors";
 import { formatCredits } from "@/lib/credits";
@@ -30,7 +30,6 @@ import { notifyPayoutReleased } from "@/lib/payout-emails.functions";
 import {
   acceptBountyVideo,
   deleteBountyVideo,
-  disputeBountyVideo,
   listVideosForRequest,
   playbackUrl,
   thumbnailUrls,
@@ -38,7 +37,9 @@ import {
   type BountyVideo,
 } from "@/lib/bounty-videos";
 import type { LiveRequest } from "@/lib/onlooker";
-import { MODERATION_REASONS, type ModerationReasonCode } from "@/lib/moderation-reasons";
+import { REPORT_DETAIL_MIN, REPORT_REASONS, reportCapture, type ReportReasonCode } from "@/lib/bounty-report";
+import { countdownLabel, getPosterDisputeStats, getReviewWindow, type DisputeStats, type ReviewWindow } from "@/lib/bounty-review";
+
 
 export function BountyVideoDialog({
   request,
@@ -62,8 +63,12 @@ export function BountyVideoDialog({
   const [payingId, setPayingId] = useState<string | null>(null);
   const [disputingId, setDisputingId] = useState<string | null>(null);
   const [disputeVideo, setDisputeVideo] = useState<BountyVideo | null>(null);
-  const [disputeReasonCode, setDisputeReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
+  const [disputeReasonCode, setDisputeReasonCode] = useState<ReportReasonCode>("verification_mismatch");
   const [disputeDetails, setDisputeDetails] = useState("");
+  const [reviewWindow, setReviewWindow] = useState<ReviewWindow | null>(null);
+  const [disputeStats, setDisputeStats] = useState<DisputeStats | null>(null);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+
   const [capturing, setCapturing] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [shareLabel, setShareLabel] = useState("");
