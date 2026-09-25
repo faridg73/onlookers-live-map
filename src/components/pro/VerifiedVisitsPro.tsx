@@ -188,7 +188,7 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
       <p className="mx-auto mt-2 max-w-md text-center text-sm text-muted-foreground">
         Monthly plans, cancel anytime. Bounty payouts to Onlookers are held in escrow separately.
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PRO_PLANS.map((plan) => {
           const active = current === plan.id;
           return (
@@ -196,10 +196,10 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
               key={plan.id}
               className={`flex flex-col rounded-2xl border bg-card p-5 ${plan.featured ? "border-signal" : "border-border"}`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-bold text-foreground">{plan.name}</h3>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <h3 className="truncate font-bold text-foreground">{plan.name}</h3>
                 {plan.featured && (
-                  <span className="rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-signal-foreground">
+                  <span className="shrink-0 rounded-full bg-signal px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-signal-foreground">
                     Popular
                   </span>
                 )}
@@ -213,7 +213,8 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
               <ul className="mt-4 flex-1 space-y-2">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2 text-sm text-foreground">
-                    <Check className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden /> {f}
+                    <Check className="mt-0.5 size-4 shrink-0 text-signal" aria-hidden />
+                    <span className="min-w-0">{f}</span>
                   </li>
                 ))}
               </ul>
@@ -222,7 +223,7 @@ function PricingSection({ current, onChoose }: { current: string; onChoose: (p: 
                 disabled={active}
                 onClick={() => onChoose(plan)}
                 variant={plan.featured ? "default" : "outline"}
-                className={`mt-5 h-11 rounded-xl font-bold ${plan.featured ? "bg-signal text-signal-foreground hover:brightness-110" : ""}`}
+                className={`mt-5 h-12 rounded-xl font-bold ${plan.featured ? "bg-signal text-signal-foreground hover:brightness-110" : ""}`}
               >
                 {active ? "Current plan" : `Choose ${plan.name}`}
               </Button>
