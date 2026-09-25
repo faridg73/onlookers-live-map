@@ -369,7 +369,7 @@ function ProSignup({
   );
 }
 
-function RequestVisitForm({ account }: { account: ProAccount | null }) {
+function RequestVisitForm({ account, onNeedsUpgrade }: { account: ProAccount | null; onNeedsUpgrade: () => void }) {
   const navigate = useNavigate();
   const saveBooking = useServerFn(createProVisitBooking);
   const [form, setForm] = useState({ address: "", purpose: "", startAt: "", agentName: "", agentPhone: "", agentEmail: "" });
@@ -377,11 +377,9 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
   const [saving, setSaving] = useState(false);
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
-  const hasPlan = account !== null && account.plan !== "none";
-  const allowanceUsed = account !== null
-    && account.plan !== "none"
-    && account.plan !== "team"
-    && account.visits_used >= (account.plan === "starter" ? 5 : 20);
+  const trial = account !== null && isTrialPlan(account.plan);
+  const limit = account ? planVisitLimit(account.plan) : null;
+  const allowanceUsed = account !== null && needsUpgrade(account.plan, account.visits_used);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -391,7 +389,9 @@ function RequestVisitForm({ account }: { account: ProAccount | null }) {
       return;
     }
     if (allowanceUsed) {
-      setError(`Your ${proPlanById(account?.plan ?? "")?.name ?? "current"} plan's monthly visit allowance has been used. Choose a higher plan or wait for the next billing month.`);
+      // Third visit onward: open the paywall instead of a dead-end message.
+      setError(null);
+      onNeedsUpgrade();
       return;
     }
     const parsed = requestSchema.safeParse(form);
