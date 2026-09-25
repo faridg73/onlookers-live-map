@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
+import { planVisitLimit } from "@/lib/pro-plans";
 import type { ProVisitBooking } from "@/lib/pro-visits.functions";
 
 export type ProVisitView = "draft" | "scheduled" | "progress" | "completed";
