@@ -54,7 +54,15 @@ function useProAccount() {
       .select("pro_role, company, plan, visits_used, visit_period_start")
       .eq("user_id", uid)
       .maybeSingle();
-    setAccount((row as ProAccount | null) ?? null);
+    let acct = (row as ProAccount | null) ?? null;
+    // Active staff on an agency Team plan get the agency's unlimited visits.
+    if (acct) {
+      await supabase.rpc("team_accept_invites");
+      const { data: team } = await supabase.rpc("team_wallet_summary");
+      const t = Array.isArray(team) ? team[0] : null;
+      if (t && !t.is_owner && t.plan_active) acct = { ...acct, plan: "team" };
+    }
+    setAccount(acct);
   };
 
   useEffect(() => {
