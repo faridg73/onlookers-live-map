@@ -104,8 +104,8 @@ export async function sendAgentPin(
       const response = await sendLovableEmail(
         {
           to: email,
-          from: "Onlooker <noreply@onlookerlive.com>",
-          sender_domain: "notify.onlookerlive.com",
+          from: "Onlooker <noreply@onlooker.io>",
+          sender_domain: "notify.onlooker.io",
           subject: `Onlooker on-site PIN: ${opts.pin}`,
           html: emailBody({ ...opts, name }),
           text: emailText({ ...opts, name }),
@@ -153,8 +153,8 @@ export async function sendAgentApprovalLink(
       const response = await sendLovableEmail(
         {
           to: email,
-          from: "Onlooker <noreply@onlookerlive.com>",
-          sender_domain: "notify.onlookerlive.com",
+          from: "Onlooker <noreply@onlooker.io>",
+          sender_domain: "notify.onlooker.io",
           label: "agent-site-approval",
           idempotency_key: crypto.randomUUID(),
           subject: `Approve the onlooker at ${opts.locationName}`,
