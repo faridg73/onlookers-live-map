@@ -36,3 +36,4 @@
 - [ ] Phase 2 payments: Stripe in-app for bounties/escrow; web-first subscriptions with account restore
 - [ ] Phase 0 re-verify: Apple external-link/commission policy the week of submission (Dec 2025 ruling — rules keep changing)
 - [ ] User action: register Apple Developer ($99/yr) + Google Play Console ($25) accounts
+- [x] Wallets: Apple Pay + Google Pay enabled on all payment configs (sandbox+live), Apple Pay domains registered (both modes), association file in public/.well-known — needs publish so Apple can verify onlookerlive.com; verified live checkout mounts Stripe Express Checkout wallet strip
