@@ -157,6 +157,10 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
         const session = await stripe.checkout.sessions.create({
           mode: "payment",
           ui_mode: "embedded_page",
+          // Cards and wallets finish inside the sheet, preserving the bounty
+          // wizard exactly as entered. Redirect only if a payment method truly
+          // requires leaving the page for authentication.
+          redirect_on_completion: "if_required",
           client_reference_id: userId,
           metadata,
           ...(customerId ? { customer: customerId } : {}),
