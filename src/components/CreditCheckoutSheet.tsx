@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { Loader2, X } from "lucide-react";
+import { toast } from "sonner";
 
 import { formatPackPrice, type CreditPackage } from "@/lib/credit-packages";
 import { startCreditPurchase } from "@/lib/credits.functions";
@@ -23,9 +24,17 @@ export function CreditCheckoutSheet({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const finishCheckout = useCallback(() => {
+    toast.success(`Payment successful! ${pack.credits} credits are being added to your wallet.`, {
+      description: "A receipt with a printable PDF copy is on its way to your email.",
+    });
+    // The payment confirmation can land a few seconds after the form closes,
+    // so refresh the balance a few times.
+    for (const delay of [0, 2500, 6000, 12000]) {
+      window.setTimeout(() => window.dispatchEvent(new Event("onlooker:credits-refresh")), delay);
+    }
     onComplete?.();
     onClose();
-  }, [onClose, onComplete]);
+  }, [onClose, onComplete, pack.credits]);
   const checkoutOptions = useMemo(
     () => (clientSecret ? { clientSecret, onComplete: finishCheckout } : null),
     [clientSecret, finishCheckout],

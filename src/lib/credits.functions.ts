@@ -168,6 +168,16 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
             description: `${pack.name}, ${pack.credits} Credits`,
             metadata,
           },
+          // Creates a paid invoice so the receipt email includes a
+          // downloadable/printable PDF invoice and receipt.
+          invoice_creation: {
+            enabled: true,
+            invoice_data: {
+              description: `${pack.name}, ${pack.credits} Credits`,
+              metadata,
+              footer: "Onlooker LLC · onlooker.io · support@onlooker.io",
+            },
+          },
           line_items: [
             price
               ? { quantity: 1, price: price.id }
