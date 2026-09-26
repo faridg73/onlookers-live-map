@@ -17,6 +17,11 @@ import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 
 export const Route = createFileRoute("/auth")({
+  // Carries where the person was headed before sign-in, e.g. the live stream sheet.
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } =>
+    typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
+      ? { redirect: search["redirect"] }
+      : {},
   head: () => ({
     meta: [
       { title: "Sign in to Onlooker, post and fulfil live bounties" },
