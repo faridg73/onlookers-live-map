@@ -55,11 +55,16 @@ import {
 } from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs"; cat?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mystery?: "report" | "logs"; cat?: string; action?: "live" | "post" | "event" } => ({
     ...(search["mystery"] === "report" || search["mystery"] === "logs"
       ? { mystery: search["mystery"] }
       : {}),
     ...(typeof search["cat"] === "string" ? { cat: search["cat"] } : {}),
+    ...(search["action"] === "live" || search["action"] === "post" || search["action"] === "event"
+      ? { action: search["action"] as "live" | "post" | "event" }
+      : {}),
   }),
   head: () => ({
     meta: [
