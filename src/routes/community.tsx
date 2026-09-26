@@ -55,11 +55,16 @@ import {
 } from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs"; cat?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { mystery?: "report" | "logs"; cat?: string; action?: "live" | "post" | "event" } => ({
     ...(search["mystery"] === "report" || search["mystery"] === "logs"
       ? { mystery: search["mystery"] }
       : {}),
     ...(typeof search["cat"] === "string" ? { cat: search["cat"] } : {}),
+    ...(search["action"] === "live" || search["action"] === "post" || search["action"] === "event"
+      ? { action: search["action"] as "live" | "post" | "event" }
+      : {}),
   }),
   head: () => ({
     meta: [
@@ -87,7 +92,7 @@ function CommunityHub() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
-  const { mystery, cat } = Route.useSearch();
+  const { mystery, cat, action } = Route.useSearch();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -117,6 +122,47 @@ function CommunityHub() {
   const [listingEvent, setListingEvent] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
+
+  // Returning from sign-in with ?action=live|post|event reopens the exact sheet
+  // the person tapped before they were sent to the sign-in page.
+  const actionHandled = useRef(false);
+  useEffect(() => {
+    if (!action || actionHandled.current) return;
+    actionHandled.current = true;
+    if (action === "event") {
+      setListingEvent(true);
+    } else {
+      setLiveFirst(action === "live");
+      setComposing(true);
+    }
+    void navigate({
+      to: "/community",
+      search: {
+        ...(cat ? { cat } : {}),
+        ...(mystery ? { mystery } : {}),
+      },
+      replace: true,
+    });
+  }, [action, cat, mystery, navigate]);
+
+  /**
+   * Opens a composer sheet. Signed-out people go to sign-in first, carrying the
+   * lane and the action so they land straight back on this sheet afterwards.
+   */
+  const startAction = (kind: "live" | "post" | "event") => {
+    if (!user) {
+      const lane = categoryId ?? cat;
+      const target = `/community?${lane ? `cat=${encodeURIComponent(lane)}&` : ""}action=${kind}`;
+      void navigate({ to: "/auth", search: { redirect: target } });
+      return;
+    }
+    if (kind === "event") {
+      setListingEvent(true);
+      return;
+    }
+    setLiveFirst(kind === "live");
+    setComposing(true);
+  };
   const [loading, setLoading] = useState(true);
   /** Shown inline with a retry, so a failed load never leaves a blank page. */
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -823,10 +869,7 @@ function CommunityHub() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => {
-              setLiveFirst(true);
-              setComposing(true);
-            }}
+            onClick={() => startAction("live")}
             className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <Radio className="size-4" /> Start live stream
@@ -835,7 +878,7 @@ function CommunityHub() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setListingEvent(true)}
+            onClick={() => startAction("event")}
             className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <CalendarPlus className="size-4" /> List an event
@@ -843,10 +886,7 @@ function CommunityHub() {
           <Button
             type="button"
             size="sm"
-            onClick={() => {
-              setLiveFirst(false);
-              setComposing(true);
-            }}
+            onClick={() => startAction("post")}
             className="rounded-full px-4 text-xs font-extrabold uppercase tracking-[0.1em]"
           >
             <Plus className="size-4" /> Post

@@ -17,6 +17,11 @@ import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 
 export const Route = createFileRoute("/auth")({
+  // Carries where the person was headed before sign-in, e.g. the live stream sheet.
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } =>
+    typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
+      ? { redirect: search["redirect"] }
+      : {},
   head: () => ({
     meta: [
       { title: "Sign in to Onlooker, post and fulfil live bounties" },
@@ -40,6 +45,16 @@ export const Route = createFileRoute("/auth")({
 function AuthScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { redirect } = Route.useSearch();
+
+  /** Sends the person where they were headed, or to their profile by default. */
+  const goAfterAuth = async () => {
+    if (redirect) {
+      await navigate({ href: redirect, replace: true });
+      return;
+    }
+    await navigate({ to: "/profile", replace: true });
+  };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -170,7 +185,7 @@ function AuthScreen() {
         await queryClient.cancelQueries();
         queryClient.clear();
         toast.success("Welcome back.");
-        await navigate({ to: "/profile", replace: true });
+        await goAfterAuth();
       }
     } catch (err) {
       human.reset();
@@ -237,13 +252,16 @@ function AuthScreen() {
       await beginAccountSwitch();
       rememberTermsAcceptance();
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        // Public same-origin landing spot, so social sign-in returns to the
+        // sheet the person tapped instead of the home page.
+        redirect_uri: redirect ? `${window.location.origin}${redirect}` : window.location.origin,
       });
       if (result.error) throw result.error;
       if (!result.redirected) {
         const { data } = await supabase.auth.getSession();
         if (!data.session) throw new Error("Social sign-in did not return a fresh session.");
         await requireExactAuthenticatedUser(data.session);
+        await goAfterAuth();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
@@ -255,7 +273,7 @@ function AuthScreen() {
       <TwoFactorSetup
         onDone={() => {
           setOfferTwoFactor(false);
-          void navigate({ to: "/profile", replace: true });
+          void goAfterAuth();
         }}
       />
     );
