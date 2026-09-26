@@ -203,12 +203,23 @@ function CommunityHub() {
       vibeGridOpen?: boolean;
       focus?: { lat: number; lng: number; label: string } | null;
     }>("onlooker:view:community", {});
+    // A ?cat= deep link (Home vibe grid) wins over the saved filter state.
+    const deepLinkCat = new URLSearchParams(window.location.search).get("cat");
+    const deepLinkLane = deepLinkCat ? BROADCAST_CATEGORIES.find((entry) => entry.id === deepLinkCat) : null;
     const savedCategory = saved.category;
-    if (savedCategory === "all") setCategory("all");
-    else if (savedCategory && COMMUNITY_CATEGORIES.some((item) => item.id === savedCategory)) setCategory(savedCategory);
-    setTag(saved.tag ?? null);
-    if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
-    setStrangeSightings(Boolean(saved.strangeSightings));
+    if (deepLinkLane) {
+      setCategoryId(deepLinkLane.id);
+      setCategory(deepLinkLane.communityCategory);
+      setTag(null);
+      setStrangeSightings(false);
+      setVibeGridOpen(true);
+    } else {
+      if (savedCategory === "all") setCategory("all");
+      else if (savedCategory && COMMUNITY_CATEGORIES.some((item) => item.id === savedCategory)) setCategory(savedCategory);
+      setTag(saved.tag ?? null);
+      if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
+      setStrangeSightings(Boolean(saved.strangeSightings));
+    }
     if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
