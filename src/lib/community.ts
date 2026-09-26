@@ -499,7 +499,7 @@ export async function listMyCommunityPosts(): Promise<CommunityPost[]> {
         : r.report_incident_type
           ? "unverified"
           : null,
-    hiddenAt: r.hidden_at ?? null,
+    hiddenAt: (r as { hidden_at?: string | null }).hidden_at ?? null,
   }));
 }
 
