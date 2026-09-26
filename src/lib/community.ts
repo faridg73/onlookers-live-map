@@ -447,6 +447,60 @@ export async function deleteCommunityPost(postId: string) {
   if (error) throw new Error(error.message);
 }
 
+/** Everything the signed-in member has posted, newest first, including expired Flash posts. */
+export async function listMyCommunityPosts(): Promise<CommunityPost[]> {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return [];
+  const { data, error } = await supabase
+    .from("community_posts")
+    .select(COLUMNS + ", hidden_at")
+    .eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw new Error(error.message);
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    category: r.category as CommunityCategory,
+    tags: r.tags ?? [],
+    title: r.title,
+    body: r.body ?? "",
+    place: r.place ?? "",
+    latitude: r.latitude,
+    longitude: r.longitude,
+    mediaPath: r.media_path,
+    aspect: r.aspect === "4:3" ? "4:3" : "16:9",
+    isFlash: r.is_flash,
+    expiresAt: r.expires_at,
+    pinnedUntil: r.pinned_until,
+    pinnedCredits: r.pinned_credits ?? 0,
+    createdAt: r.created_at,
+    eventStartsAt: r.event_starts_at ?? null,
+    authorName: "You",
+    authorAvatar: null,
+    hunterLevel: 1,
+    authorVerified: false,
+    reportIncidentType: r.report_incident_type ?? null,
+    reportRadiusM: r.report_radius_m ?? null,
+    mediaAnalysisStatus:
+      r.media_analysis_status === "analyzing" || r.media_analysis_status === "complete"
+        ? r.media_analysis_status
+        : "not_required",
+    reporterTrustLevel: r.reporter_trust_level ?? null,
+    validationCount: r.validation_count ?? 0,
+    flagCount: r.flag_count ?? 0,
+    trustScore: r.trust_score ?? 0,
+    reportStatus:
+      r.report_status === "confirmed" || r.report_status === "disputed" || r.report_status === "expired"
+        ? r.report_status
+        : r.report_incident_type
+          ? "unverified"
+          : null,
+    hiddenAt: r.hidden_at ?? null,
+  }));
+}
+
 /** True while a post is still current (not an expired Flash post). */
 export function isPostLive(post: { expiresAt: string | null }) {
   return !post.expiresAt || new Date(post.expiresAt).getTime() > Date.now();
