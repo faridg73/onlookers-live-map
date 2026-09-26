@@ -850,10 +850,7 @@ function CommunityHub() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => {
-              setLiveFirst(true);
-              setComposing(true);
-            }}
+            onClick={() => startAction("live")}
             className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <Radio className="size-4" /> Start live stream
@@ -862,7 +859,7 @@ function CommunityHub() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => setListingEvent(true)}
+            onClick={() => startAction("event")}
             className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
             <CalendarPlus className="size-4" /> List an event
@@ -870,10 +867,7 @@ function CommunityHub() {
           <Button
             type="button"
             size="sm"
-            onClick={() => {
-              setLiveFirst(false);
-              setComposing(true);
-            }}
+            onClick={() => startAction("post")}
             className="rounded-full px-4 text-xs font-extrabold uppercase tracking-[0.1em]"
           >
             <Plus className="size-4" /> Post
