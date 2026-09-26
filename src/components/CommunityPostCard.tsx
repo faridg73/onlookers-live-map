@@ -28,6 +28,7 @@ import {
   type CommunityPost,
   voteOnCommunityReport,
 } from "@/lib/community";
+import { PostSafetyMenu } from "@/components/PostSafetyMenu";
 
 /** One media-rich Discover card: photo or gradient, author identity, quick actions. */
 export function CommunityPostCard({
@@ -251,6 +252,7 @@ export function CommunityPostCard({
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
+          {!isMine && <PostSafetyMenu postId={post.id} authorId={post.userId} authorName={post.authorName} onChanged={onChanged} />}
           {!isMine && isReport && reportStatus !== "expired" && (
             <>
               <Button
