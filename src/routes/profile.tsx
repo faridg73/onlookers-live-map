@@ -58,6 +58,7 @@ import { AccountCenter } from "@/components/AccountCenter";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { fetchProfileStats, type ProfileStats } from "@/lib/profile-stats";
 import { BlockedAccounts } from "@/components/BlockedAccounts";
+import { MyCommunityPosts } from "@/components/MyCommunityPosts";
 
 
 export const Route = createFileRoute("/profile")({
@@ -228,6 +229,8 @@ function ProfileScreen() {
       <AccountCenter />
 
       <MyBountyVideos />
+
+      <MyCommunityPosts />
 
       <Link
         to="/balance"
