@@ -53,10 +53,12 @@ import {
 } from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs" } =>
-    search["mystery"] === "report" || search["mystery"] === "logs"
+  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs"; cat?: string } => ({
+    ...(search["mystery"] === "report" || search["mystery"] === "logs"
       ? { mystery: search["mystery"] }
-      : {},
+      : {}),
+    ...(typeof search["cat"] === "string" ? { cat: search["cat"] } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Community feed and local activity | Onlooker" },
@@ -83,7 +85,7 @@ function CommunityHub() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
-  const { mystery } = Route.useSearch();
+  const { mystery, cat } = Route.useSearch();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
@@ -91,6 +93,19 @@ function CommunityHub() {
   const [category, setCategory] = useState<CommunityCategory | "all">("all");
   const [tag, setTag] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
+
+  // Deep link from the Home "Explore by vibe" grid: /community?cat=<lane id>
+  // preselects that lane so the feed opens already filtered to it.
+  useEffect(() => {
+    if (!cat) return;
+    const lane = BROADCAST_CATEGORIES.find((entry) => entry.id === cat);
+    if (!lane) return;
+    setCategoryId(lane.id);
+    setCategory(lane.communityCategory);
+    setTag(null);
+    setStrangeSightings(false);
+    setVibeGridOpen(true);
+  }, [cat]);
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
@@ -188,16 +203,27 @@ function CommunityHub() {
       vibeGridOpen?: boolean;
       focus?: { lat: number; lng: number; label: string } | null;
     }>("onlooker:view:community", {});
+    // A ?cat= deep link (Home vibe grid) wins over the saved filter state.
+    const deepLinkCat = new URLSearchParams(window.location.search).get("cat");
+    const deepLinkLane = deepLinkCat ? BROADCAST_CATEGORIES.find((entry) => entry.id === deepLinkCat) : null;
     const savedCategory = saved.category;
-    if (savedCategory === "all") setCategory("all");
-    else if (savedCategory && COMMUNITY_CATEGORIES.some((item) => item.id === savedCategory)) setCategory(savedCategory);
-    setTag(saved.tag ?? null);
-    if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
-    setStrangeSightings(Boolean(saved.strangeSightings));
+    if (deepLinkLane) {
+      setCategoryId(deepLinkLane.id);
+      setCategory(deepLinkLane.communityCategory);
+      setTag(null);
+      setStrangeSightings(false);
+      setVibeGridOpen(true);
+    } else {
+      if (savedCategory === "all") setCategory("all");
+      else if (savedCategory && COMMUNITY_CATEGORIES.some((item) => item.id === savedCategory)) setCategory(savedCategory);
+      setTag(saved.tag ?? null);
+      if (saved.categoryId === null || BROADCAST_CATEGORIES.some((item) => item.id === saved.categoryId)) setCategoryId(saved.categoryId ?? null);
+      setStrangeSightings(Boolean(saved.strangeSightings));
+    }
     if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
-    setVibeGridOpen(Boolean(saved.vibeGridOpen));
+    if (!deepLinkLane) setVibeGridOpen(Boolean(saved.vibeGridOpen));
     setFocus(saved.focus ?? null);
     stateRestored.current = true;
   }, []);

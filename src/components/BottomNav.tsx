@@ -5,7 +5,7 @@ import { Map, Radio, Plus, UserRound, Compass } from "lucide-react";
 /** Five core tabs only. Everything else lives in the header menu (AppMenu). */
 const items = [
   { to: "/", label: "Home", icon: Map, exact: true },
-  { to: "/community", label: "Discover", icon: Compass, exact: false },
+  { to: "/events", label: "Discover", icon: Compass, exact: false },
   { to: "/post", label: "+ Post", icon: Plus, exact: false, primary: true },
   { to: "/hunt", label: "Earn", icon: Radio, exact: false },
   { to: "/profile", label: "Profile", icon: UserRound, exact: false },

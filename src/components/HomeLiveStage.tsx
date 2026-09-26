@@ -1,16 +1,13 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, KeyRound, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { requestCategoryArt } from "@/lib/category-art";
+import { BROADCAST_CATEGORY_ART, requestCategoryArt } from "@/lib/category-art";
+import { BROADCAST_CATEGORIES } from "@/lib/broadcast-categories";
 import { Button } from "@/components/ui/button";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
-import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json";
-import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
-import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
-import buildingPlaceholder from "@/assets/home/building-placeholder.jpg.asset.json";
 import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
 import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
 import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
@@ -67,13 +64,6 @@ const TABS: Array<{ key: ActivityTab; label: string }> = [
   { key: "bounty", label: "Bounties" },
   { key: "live", label: "Live" },
   { key: "alert", label: "Alerts" },
-];
-
-const HERO_PLACEHOLDERS = [
-  { src: streetPlaceholder.url, alt: "Crowds moving through a lively street event" },
-  { src: interiorPlaceholder.url, alt: "Modern interior ready for a real estate walkthrough" },
-  { src: capturePlaceholder.url, alt: "People capturing a live moment on their phones" },
-  { src: buildingPlaceholder.url, alt: "People arriving at a modern building" },
 ];
 
 /**
@@ -298,88 +288,52 @@ export function HomeLiveStage({
           >
             See what&apos;s happening. Right now.
           </h2>
-          <p className="relative mx-auto mt-2 max-w-xl text-center text-[0.75rem] font-normal leading-relaxed text-muted-foreground sm:text-sm [@media(max-height:520px)]:mt-1 [@media(max-height:520px)]:text-[0.72rem]">
-            Post a real-world task, or earn real cash completing them nearby — verified photos and video, on demand.
-          </p>
-
-          <div
-            className="relative mx-auto mt-5 grid w-full max-w-4xl grid-cols-4 gap-1.5 sm:gap-2 [@media(max-height:520px)]:mt-2"
-            aria-label="Examples of content people can request on Onlooker"
-          >
-            <span className="pointer-events-none absolute -top-3 left-0 font-mono text-[0.55rem] font-bold uppercase tracking-[0.3em] text-signal/40" aria-hidden>
-              Active feeds // 04
-            </span>
-            {HERO_PLACEHOLDERS.map((image, index) => (
-              <div
-                key={image.src}
-                className={`group relative aspect-[2/3] overflow-hidden rounded-sm border border-home-line bg-home-charcoal sm:aspect-[3/4] ${index % 2 === 1 ? "sm:-translate-y-2" : "sm:translate-y-1"}`}
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  width={1200}
-                  height={750}
-                  className="size-full object-cover grayscale-[35%] contrast-110 transition-[filter,transform] duration-200 group-hover:scale-105 group-hover:grayscale-0 motion-reduce:transform-none"
-                />
-                <span
-                  className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-foreground/5"
-                  aria-hidden
-                />
-                <span className="absolute left-1 top-1 font-mono text-[0.5rem] font-bold tracking-[0.2em] text-signal/80" aria-hidden>
-                  CAM_{String(index + 1).padStart(2, "0")}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="relative mx-auto mt-4 flex w-full max-w-md flex-col gap-2.5 [@media(max-height:520px)]:mt-2">
-            <Button type="button" onClick={onPostBounty} className="h-11 justify-between border border-signal bg-signal px-5 text-sm font-extrabold uppercase italic tracking-tight text-signal-foreground shadow-[0_0_28px_color-mix(in_oklab,var(--color-signal)_30%,transparent)] [clip-path:polygon(0_0,100%_0,97%_100%,3%_100%)] transition-[filter,transform] duration-150 hover:brightness-110 active:scale-[0.99] sm:h-12 [@media(max-height:520px)]:h-9">
-              <span className="inline-flex items-center gap-2"><CircleDollarSign className="size-4" /> Post bounty</span>
-              <span className="font-mono text-[0.6rem] font-bold not-italic tracking-[0.2em] text-signal-foreground">01</span>
-            </Button>
-            <Button type="button" onClick={onGoLive} variant="outline" className="h-11 justify-between border border-home-line bg-transparent px-5 text-sm font-bold uppercase italic tracking-tight text-foreground/85 transition-colors duration-150 hover:border-signal/60 hover:text-signal sm:h-12 [@media(max-height:520px)]:h-9">
-              <span className="inline-flex items-center gap-2"><Radio className="size-4" /> Go live</span>
-              <span className="relative flex size-1.5" aria-hidden>
-                <span className="absolute inset-0 animate-ping-slow rounded-full bg-live motion-reduce:animate-none" />
-                <span className="relative size-1.5 rounded-full bg-live" />
-              </span>
-            </Button>
-          </div>
-          <div className="relative mx-auto mt-4 w-full max-w-md border-t border-home-line pt-1">
-            <Link
-              to="/events"
-              className="group flex items-center justify-between gap-2 border-b border-home-line py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal [@media(max-height:520px)]:hidden"
-            >
-              <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors duration-150 group-hover:text-signal">
-                <Ticket className="size-3.5 shrink-0 text-signal" aria-hidden />
-                <span className="truncate">Venues &amp; events near you</span>
-              </span>
-              <span className="font-mono text-xs text-signal/70 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
-            </Link>
-            <Link
-              to="/verification"
-              className="group flex items-center justify-between gap-2 border-b border-home-line py-3 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal [@media(max-height:520px)]:hidden"
-            >
-              <span className="inline-flex min-w-0 items-center gap-2 text-[0.68rem] font-extrabold uppercase tracking-[0.2em] text-foreground/80 transition-colors duration-150 group-hover:text-signal">
-                <KeyRound className="size-3.5 shrink-0 text-signal" aria-hidden />
-                <span className="truncate">Verified on-site visits — the PIN handshake</span>
-              </span>
-              <span className="font-mono text-xs text-signal/70 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden>&gt;&gt;</span>
-            </Link>
-            <div className="flex justify-center pt-2 [@media(max-height:520px)]:hidden">
-              <button
-                type="button"
-                onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                className="border-b border-home-line px-1 pb-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-muted-foreground transition-colors duration-150 hover:border-signal/60 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-              >
-                New here? See how it works ↓
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* 2. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
+        {/* 2. Explore by vibe — real category cards, browsable without sign-in */}
+        <section aria-labelledby="home-explore-vibes">
+          <div className="mb-3 flex items-center justify-between gap-2 px-1">
+            <h3 id="home-explore-vibes" className="home-display text-[0.72rem] font-bold uppercase tracking-[0.14em] text-foreground">
+              Explore by vibe
+            </h3>
+            <Link
+              to="/community"
+              className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-signal/70 transition-colors hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
+            >
+              Open feed &gt;&gt;
+            </Link>
+          </div>
+          <div role="list" className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+            {BROADCAST_CATEGORIES.map((lane) => (
+              <Link
+                key={lane.id}
+                to="/community"
+                search={{ cat: lane.id }}
+                role="listitem"
+                className="group relative flex h-32 flex-col overflow-hidden rounded-2xl border border-home-line bg-home-charcoal text-left transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal motion-reduce:transform-none sm:h-40"
+              >
+                <img
+                  src={BROADCAST_CATEGORY_ART[lane.id]}
+                  alt={`${lane.label} category`}
+                  loading="lazy"
+                  className="absolute inset-0 size-full object-cover transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" aria-hidden />
+                <span className="absolute left-2 top-2 grid size-6 place-items-center rounded-md bg-background/70 text-sm backdrop-blur-sm" aria-hidden>
+                  {lane.icon}
+                </span>
+                <span className="relative mt-auto flex min-w-0 flex-col gap-0.5 p-3">
+                  <strong className="line-clamp-2 text-sm font-extrabold leading-tight text-foreground group-hover:text-signal">{lane.label}</strong>
+                  <small className="line-clamp-1 text-[0.65rem] font-semibold text-muted-foreground">
+                    {lane.subcategories.slice(0, 2).join(" · ")}
+                  </small>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
         <section
           id="how-it-works"
           aria-labelledby="home-how-it-works"
