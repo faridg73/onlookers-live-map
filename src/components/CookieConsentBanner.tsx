@@ -36,7 +36,7 @@ export function CookieConsentBanner() {
       aria-modal="false"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-description"
-      className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[80] mx-auto max-w-2xl border border-signal/45 bg-surface-raised p-4 shadow-2xl sm:bottom-5 sm:p-5"
+      className="fixed inset-x-3 bottom-[calc(var(--bottom-nav-height,0px)+max(0.75rem,env(safe-area-inset-bottom)))] z-[80] mx-auto max-w-2xl border border-signal/45 bg-surface-raised p-4 shadow-2xl sm:p-5"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-full border border-signal/50 bg-signal/10 text-signal">

@@ -472,18 +472,6 @@
     overscroll-behavior: none;
   }
 
-  html.native-shell body {
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  html.native-shell input,
-  html.native-shell textarea,
-  html.native-shell [contenteditable="true"] {
-    -webkit-user-select: text;
-    user-select: text;
-  }
-
   html.native-shell [class*="overflow-y-auto"],
   html.native-shell [class*="overflow-auto"] {
     -webkit-overflow-scrolling: touch;
@@ -491,6 +479,10 @@
 
   html.native-shell.keyboard-open [data-radix-dialog-content] {
     max-height: calc(100dvh - env(safe-area-inset-top) - 0.5rem);
+  }
+
+  html.native-shell.keyboard-open nav[aria-label="Primary navigation"] {
+    display: none;
   }
 
   /* Touch hardening for iOS, Android, Samsung and LG browsers. */
