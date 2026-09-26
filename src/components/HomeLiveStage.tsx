@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Fingerprint, Map, MapPin, Megaphone, Radar, Radio, ShieldCheck, Siren, Sparkles } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
@@ -11,6 +13,8 @@ import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
 import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
 import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
 import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
+import { useAuth } from "@/hooks/use-auth";
+import { hasMyProAccount } from "@/lib/pro-visits.functions";
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
@@ -129,6 +133,23 @@ export function HomeLiveStage({
   const navigate = useNavigate();
   const [tab, setTab] = useState<ActivityTab>("all");
   const { signedIn } = useOnlooker();
+  const { user, loading: authLoading } = useAuth();
+  const checkProAccount = useServerFn(hasMyProAccount);
+  const proAccount = useQuery({
+    queryKey: ["home-pro-account", user?.id],
+    queryFn: () => checkProAccount(),
+    enabled: Boolean(user),
+    staleTime: 60_000,
+  });
+
+  const openProfessionalExperience = async () => {
+    if (!user) {
+      await navigate({ to: "/verification" });
+      return;
+    }
+    const hasAccount = proAccount.data ?? (await proAccount.refetch()).data ?? false;
+    await navigate({ to: hasAccount ? "/pro-dashboard" : "/verification" });
+  };
 
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
@@ -338,9 +359,12 @@ export function HomeLiveStage({
           <p id="home-pros-label" className="mb-2 px-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.22em] text-tier-gold/80">
             For real estate &amp; property pros
           </p>
-          <Link
-            to="/verification"
-            className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-tier-gold/40 bg-home-obsidian p-4 transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-tier-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tier-gold motion-reduce:transform-none sm:flex-row sm:items-center sm:gap-4 sm:p-5"
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={authLoading}
+            onClick={() => void openProfessionalExperience()}
+            className="group relative flex h-auto w-full flex-col items-stretch justify-start gap-3 whitespace-normal overflow-hidden rounded-2xl border border-tier-gold/40 bg-home-obsidian p-4 text-left shadow-none transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-tier-gold hover:bg-home-obsidian focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tier-gold motion-reduce:transform-none sm:flex-row sm:items-center sm:gap-4 sm:p-5"
           >
             <span
               aria-hidden
@@ -373,7 +397,7 @@ export function HomeLiveStage({
             <span className="relative inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-tier-gold/50 bg-tier-gold/10 px-3.5 py-2 text-[0.65rem] font-extrabold uppercase tracking-[0.14em] text-tier-gold transition-colors group-hover:bg-tier-gold group-hover:text-background">
               See how it works <span aria-hidden>&rarr;</span>
             </span>
-          </Link>
+          </Button>
         </section>
 
         {/* 3. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
