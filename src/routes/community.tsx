@@ -223,7 +223,7 @@ function CommunityHub() {
     if (saved.view === "feed" || saved.view === "map" || saved.view === "alerts") setView(saved.view);
     if (saved.source === "all" || saved.source === "following") setSource(saved.source);
     if (RADIUS_CHOICES.some((item) => item.id === saved.radius)) setRadius(saved.radius ?? "near");
-    setVibeGridOpen(Boolean(saved.vibeGridOpen));
+    if (!deepLinkLane) setVibeGridOpen(Boolean(saved.vibeGridOpen));
     setFocus(saved.focus ?? null);
     stateRestored.current = true;
   }, []);
