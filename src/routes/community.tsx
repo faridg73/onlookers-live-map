@@ -98,7 +98,7 @@ function CommunityHub() {
   // preselects that lane so the feed opens already filtered to it.
   useEffect(() => {
     if (!cat) return;
-    const lane = broadcastCategoryById(cat as BroadcastCategoryId);
+    const lane = BROADCAST_CATEGORIES.find((entry) => entry.id === cat);
     if (!lane) return;
     setCategoryId(lane.id);
     setCategory(lane.communityCategory);
