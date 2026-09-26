@@ -108,6 +108,12 @@ function ContactScreen() {
         <p className="mx-auto mt-1 max-w-sm text-xs text-muted-foreground">
           Questions about bounties, payouts, disputes, or your account? Send us a message.
         </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Or email{" "}
+          <a href="mailto:support@onlooker.io" className="font-semibold text-signal underline underline-offset-2">
+            support@onlooker.io
+          </a>
+        </p>
       </header>
 
       <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
