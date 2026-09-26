@@ -13,13 +13,17 @@ import { communityTopicVisual } from "@/lib/community-topic-visuals";
 export function CategoryExampleCards({
   category,
   tag,
+  labelOverride,
   onStart,
 }: {
   category: CommunityCategory;
   tag?: string | null;
+  /** Display name of the selected vibe lane, shown instead of the broader category label. */
+  labelOverride?: string | null;
   onStart: (category: CommunityCategory) => void;
 }) {
   const def = categoryDef(category);
+  const laneLabel = labelOverride ?? def.label;
   const visual = COMMUNITY_VISUALS[category];
   const Icon = visual.icon;
   const seeds = exampleSeeds(category, tag).slice(0, 6);
@@ -28,7 +32,7 @@ export function CategoryExampleCards({
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
       <div className="flex flex-col items-center text-center">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-          <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
+          <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${laneLabel}`}
         </p>
         <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
           Stories waiting to happen
