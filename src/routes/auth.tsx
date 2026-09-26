@@ -252,13 +252,16 @@ function AuthScreen() {
       await beginAccountSwitch();
       rememberTermsAcceptance();
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+        // Public same-origin landing spot, so social sign-in returns to the
+        // sheet the person tapped instead of the home page.
+        redirect_uri: redirect ? `${window.location.origin}${redirect}` : window.location.origin,
       });
       if (result.error) throw result.error;
       if (!result.redirected) {
         const { data } = await supabase.auth.getSession();
         if (!data.session) throw new Error("Social sign-in did not return a fresh session.");
         await requireExactAuthenticatedUser(data.session);
+        await goAfterAuth();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Social sign-in failed.");
