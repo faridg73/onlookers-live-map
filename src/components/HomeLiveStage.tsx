@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Fingerprint, Map, MapPin, Megaphone, Radar, Radio, ShieldCheck, Siren, Sparkles } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { BROADCAST_CATEGORY_ART, requestCategoryArt } from "@/lib/category-art";
