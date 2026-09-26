@@ -222,7 +222,17 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
             </Button>
           </div>
         ) : (
-          <Button type="button" className="w-full" onClick={() => void navigate({ to: "/auth" })}>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              // Come back to this live stream sheet once signed in.
+              const params = new URLSearchParams(window.location.search);
+              params.set("action", "live");
+              const target = `${window.location.pathname}?${params.toString()}`;
+              void navigate({ to: "/auth", search: { redirect: target } });
+            }}
+          >
             Sign in
           </Button>
         )}
