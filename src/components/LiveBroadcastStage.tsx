@@ -159,7 +159,7 @@ export function LiveBroadcastStage({
         )}
 
         {requestKey && chatOpen && (
-          <div className="absolute inset-x-0 bottom-0 max-h-[65%] overflow-y-auto rounded-t-3xl border-t-2 border-border bg-surface px-3 pb-3 pt-2 text-left">
+          <div className="absolute inset-x-0 bottom-0 max-h-[65%] overflow-y-auto rounded-t-3xl border-t-2 border-border bg-surface px-3 pb-[max(0.75rem,calc(env(safe-area-inset-bottom)+0.75rem))] pt-2 text-left">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-muted-foreground">
                 Live chat
