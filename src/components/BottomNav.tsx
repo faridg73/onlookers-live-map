@@ -21,7 +21,7 @@ export function BottomNav() {
 
   useEffect(() => {
     const nav = navRef.current;
-    if (!nav || !isHome) {
+    if (!nav) {
       document.documentElement.style.setProperty("--bottom-nav-height", "0px");
       return;
     }
@@ -41,10 +41,10 @@ export function BottomNav() {
     <nav
       ref={navRef}
       aria-label="Primary navigation"
-      className={`pointer-events-auto z-40 border-t pb-safe backdrop-blur-2xl ${
+      className={`pointer-events-auto fixed inset-x-0 bottom-0 z-40 border-t pb-safe backdrop-blur-2xl ${
         isHome
-          ? "fixed inset-x-0 bottom-0 border-home-line bg-home-glass-strong shadow-2xl lg:inset-x-auto lg:bottom-5 lg:left-1/2 lg:-translate-x-1/2 lg:rounded-3xl lg:border lg:px-2 lg:pb-0 lg:shadow-[0_18px_50px_color-mix(in_oklab,var(--color-background)_70%,transparent)]"
-          : "relative mt-8 w-full border-border/70 bg-surface/85"
+          ? "border-home-line bg-home-glass-strong shadow-2xl lg:inset-x-auto lg:bottom-5 lg:left-1/2 lg:-translate-x-1/2 lg:rounded-3xl lg:border lg:px-2 lg:pb-0 lg:shadow-[0_18px_50px_color-mix(in_oklab,var(--color-background)_70%,transparent)]"
+          : "w-full border-border/70 bg-surface/95 shadow-2xl"
       }`}
     >
       <ul className="mx-auto flex w-full max-w-3xl items-stretch justify-between gap-1 px-2 pt-1 sm:px-4 lg:w-auto lg:max-w-none lg:gap-3 lg:px-2 lg:pb-1">

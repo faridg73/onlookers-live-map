@@ -51,7 +51,8 @@ export function BroadcastCategoryPicker({
   }, [open]);
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef}>
+      <div className="relative">
       <Button
         type="button"
         variant="outline"
@@ -136,6 +137,9 @@ export function BroadcastCategoryPicker({
           })}
         </div>
       )}
+      </div>
+
+
 
       {selected && <div className="mt-3 rounded-xl border border-white/10 bg-zinc-900/50 p-3 backdrop-blur-md">
         <p className="text-center text-[0.62rem] font-extrabold uppercase text-muted-foreground">
