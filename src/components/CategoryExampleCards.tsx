@@ -13,13 +13,17 @@ import { communityTopicVisual } from "@/lib/community-topic-visuals";
 export function CategoryExampleCards({
   category,
   tag,
+  labelOverride,
   onStart,
 }: {
   category: CommunityCategory;
   tag?: string | null;
+  /** Display name of the selected vibe lane, shown instead of the broader category label. */
+  labelOverride?: string | null;
   onStart: (category: CommunityCategory) => void;
 }) {
   const def = categoryDef(category);
+  const laneLabel = labelOverride ?? def.label;
   const visual = COMMUNITY_VISUALS[category];
   const Icon = visual.icon;
   const seeds = exampleSeeds(category, tag).slice(0, 6);
