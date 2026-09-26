@@ -274,6 +274,8 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
     .order("created_at", { ascending: false })
     .limit(120);
   if (category) query = query.eq("category", category);
+  // Expired Flash posts and removed posts never read as current, even the author's own.
+  query = query.or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`).is("hidden_at", null);
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
@@ -442,6 +444,87 @@ export async function pinCommunityPost(postId: string, credits: number) {
 
 export async function deleteCommunityPost(postId: string) {
   const { error } = await supabase.from("community_posts").delete().eq("id", postId);
+  if (error) throw new Error(error.message);
+}
+
+/** True while a post is still current (not an expired Flash post). */
+export function isPostLive(post: { expiresAt: string | null }) {
+  return !post.expiresAt || new Date(post.expiresAt).getTime() > Date.now();
+}
+
+export const REPORT_REASONS = [
+  { id: "spam", label: "Spam or scam" },
+  { id: "harassment", label: "Harassment or hate" },
+  { id: "sexual", label: "Nudity or sexual content" },
+  { id: "violence", label: "Violence or threats" },
+  { id: "ticketed", label: "Ticketed or copyrighted content" },
+  { id: "privacy", label: "Privacy violation" },
+  { id: "other", label: "Something else" },
+] as const;
+
+export async function reportCommunityPost(postId: string, reason: string, details = "") {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Sign in to report a post.");
+  const { error } = await supabase.from("content_reports").insert({
+    post_id: postId,
+    reporter_id: auth.user.id,
+    reason,
+    details: details.slice(0, 500),
+  });
+  if (error) {
+    if (/duplicate key/i.test(error.message)) throw new Error("You already reported this post.");
+    throw new Error(error.message);
+  }
+}
+
+export async function blockUser(userId: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Sign in to block someone.");
+  const { error } = await supabase.from("user_blocks").insert({ blocker_id: auth.user.id, blocked_id: userId });
+  if (error && !/duplicate key/i.test(error.message)) throw new Error(error.message);
+}
+
+export async function unblockUser(userId: string) {
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return;
+  const { error } = await supabase.from("user_blocks").delete().eq("blocker_id", auth.user.id).eq("blocked_id", userId);
+  if (error) throw new Error(error.message);
+}
+
+export async function listMyBlocks(): Promise<Array<{ id: string; name: string }>> {
+  const { data, error } = await supabase.from("user_blocks").select("blocked_id").order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  const ids = (data ?? []).map((r) => r.blocked_id);
+  if (ids.length === 0) return [];
+  const { data: cards } = await supabase.rpc("public_creator_cards", { _ids: ids });
+  const names = new Map((cards ?? []).map((c) => [c.id, c.name || "Onlooker"]));
+  return ids.map((id) => ({ id, name: names.get(id) ?? "Onlooker" }));
+}
+
+export type AdminContentReport = {
+  id: string;
+  post_id: string;
+  post_title: string;
+  post_body: string;
+  author_id: string;
+  author_name: string;
+  reporter_name: string;
+  reason: string;
+  details: string;
+  status: string;
+  post_hidden: boolean;
+  report_count: number;
+  created_at: string;
+};
+
+export async function listContentReports(): Promise<AdminContentReport[]> {
+  const { data, error } = await supabase.rpc("admin_content_reports");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as AdminContentReport[];
+}
+
+export async function resolveContentReport(reportId: string, action: "dismiss" | "remove" | "restore") {
+  const { error } = await supabase.rpc("resolve_content_report", { _report_id: reportId, _action: action });
   if (error) throw new Error(error.message);
 }
 
