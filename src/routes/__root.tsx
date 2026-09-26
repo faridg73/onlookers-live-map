@@ -162,8 +162,12 @@ function RootComponent() {
       <AuthProvider>
         <OnlookerProvider>
           <BoostProvider>
-            {/* The footer follows the page naturally; the non-Home nav is also in document flow. */}
-            <div className="flex flex-col bg-background text-foreground">
+            {/* Fixed navigation needs reserved space so page endings remain readable above it. */}
+            <div
+              className={`flex flex-col bg-background text-foreground ${
+                !embedded && pathname !== "/" ? "pb-[calc(var(--bottom-nav-height)+1rem)]" : ""
+              }`}
+            >
               {/* Route content sets its natural height so empty feeds do not create a black void. */}
               <main className="w-full">
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -174,7 +178,7 @@ function RootComponent() {
                 <Footer showLinks={pathname.startsWith("/profile")} />
               )}
             </div>
-            {/* Only Home's navigation floats; every other page's navigation stays in document flow. */}
+            {/* Navigation stays docked above the device home indicator on every app page. */}
             {!embedded && (
               <>
                 {pathname.startsWith("/profile") && <AppMenu />}
