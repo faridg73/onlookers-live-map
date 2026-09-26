@@ -144,6 +144,25 @@ function CommunityHub() {
       replace: true,
     });
   }, [action, navigate]);
+
+  /**
+   * Opens a composer sheet. Signed-out people go to sign-in first, carrying the
+   * lane and the action so they land straight back on this sheet afterwards.
+   */
+  const startAction = (kind: "live" | "post" | "event") => {
+    if (!user) {
+      const lane = categoryId ?? cat;
+      const target = `/community?${lane ? `cat=${encodeURIComponent(lane)}&` : ""}action=${kind}`;
+      void navigate({ to: "/auth", search: { redirect: target } });
+      return;
+    }
+    if (kind === "event") {
+      setListingEvent(true);
+      return;
+    }
+    setLiveFirst(kind === "live");
+    setComposing(true);
+  };
   const [loading, setLoading] = useState(true);
   /** Shown inline with a retry, so a failed load never leaves a blank page. */
   const [loadError, setLoadError] = useState<string | null>(null);
