@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Native releases use Capacitor 8 with a remote `https://onlooker.io` WebView shell; keep native behavior centralized in `src/lib/native.ts` so web behavior stays unchanged.
+- Release automation must preserve a signed Android APK/AAB and an iOS IPA artifact; iOS signing uses the decoded profile name explicitly so CI does not depend on a developer machine.

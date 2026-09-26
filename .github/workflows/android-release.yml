@@ -1,4 +1,4 @@
-name: Build Android App Bundle for Google Play
+name: Build Android APK and App Bundle
 
 on:
   push:
@@ -64,7 +64,7 @@ jobs:
           echo "::add-mask::$ANDROID_KEYSTORE_PASSWORD"
           printf 'RESOLVED_ANDROID_KEY_PASSWORD=%s\n' "$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
 
-      - name: Build signed release bundle
+      - name: Build signed release APK and bundle
         env:
           ANDROID_KEYSTORE_FILE: onlooker-upload.keystore
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -72,10 +72,17 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ env.RESOLVED_ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew
-          ./gradlew bundleRelease --no-daemon --stacktrace
+          ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace
         working-directory: android
 
-      - name: Upload bundle artifact
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: onlooker-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+      - name: Upload Play Store bundle
         uses: actions/upload-artifact@v4
         with:
           name: onlooker-release-aab
