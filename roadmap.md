@@ -15,6 +15,7 @@
 - [x] Move ticker readout under "The city is live" line
 
 ## In progress
+- [x] Starter feeds: exactly four cards for each of 16 vibes, backed by 64 exclusive non-overlapping photos
 - [x] Discover selected vibes: always show relevant visual posting ideas beneath every selected card on phones and web
 - [x] Home Pro card: route established signed-in professional accounts to Pro Dashboard; send signed-out and first-time accounts to verification onboarding
 - [x] Posting flow: add an inline credit top-up action, resume the exact bounty step after payment, and keep phone alerts below status bars

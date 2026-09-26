@@ -3,11 +3,11 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
-import { BROADCAST_CATEGORY_ART } from "@/lib/category-art";
 import type { BroadcastCategoryId } from "@/lib/broadcast-categories";
 import { categoryDef, type CommunityCategory } from "@/lib/community";
 import { broadcastExampleSeeds, exampleSeeds } from "@/lib/community-examples";
 import { communityTopicVisual } from "@/lib/community-topic-visuals";
+import { STARTER_VIBE_PHOTOS } from "@/lib/starter-vibe-photos";
 
 /**
  * Editorial starter stories for a lane that has no real posts nearby yet.
@@ -34,7 +34,8 @@ export function CategoryExampleCards({
     broadcastCategoryId && !tag
       ? broadcastExampleSeeds(broadcastCategoryId)
       : exampleSeeds(category, tag)
-  ).slice(0, 6);
+  ).slice(0, broadcastCategoryId && !tag ? 4 : 6);
+  const broadcastPhotos = broadcastCategoryId ? STARTER_VIBE_PHOTOS[broadcastCategoryId] : null;
 
   return (
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
@@ -49,8 +50,9 @@ export function CategoryExampleCards({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {seeds.map((seed) => {
+        {seeds.map((seed, index) => {
           const topicVisual = communityTopicVisual(category, seed.tag);
+          const starterPhoto = broadcastPhotos?.[index];
           return (
           <article
             key={seed.id}
@@ -58,8 +60,8 @@ export function CategoryExampleCards({
           >
             <div className={`relative aspect-[16/9] overflow-hidden ${visual.coverClass}`}>
               <LoopingPreview
-                 imageUrl={topicVisual?.image ?? (broadcastCategoryId ? BROADCAST_CATEGORY_ART[broadcastCategoryId] : visual.image)}
-                 alt={topicVisual?.alt ?? `${laneLabel} posting idea`}
+                 imageUrl={starterPhoto?.src ?? topicVisual?.image ?? visual.image}
+                 alt={starterPhoto?.alt ?? topicVisual?.alt ?? `${laneLabel} posting idea`}
                 icon={Icon}
                 coverClass={visual.coverClass}
               />
