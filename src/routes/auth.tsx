@@ -270,7 +270,7 @@ function AuthScreen() {
       <TwoFactorSetup
         onDone={() => {
           setOfferTwoFactor(false);
-          void navigate({ to: "/profile", replace: true });
+          void goAfterAuth();
         }}
       />
     );
