@@ -322,7 +322,7 @@
 				);
 				MARKETING_VERSION = 1.2;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
-				PRODUCT_BUNDLE_IDENTIFIER = app.lovable.onlooker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onlooker.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "farid ghafelpour";
@@ -350,7 +350,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = app.lovable.onlooker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.onlooker.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "farid ghafelpour";

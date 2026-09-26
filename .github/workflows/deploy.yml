@@ -65,7 +65,7 @@ jobs:
             <key>signingStyle</key><string>manual</string>
             <key>signingCertificate</key><string>Apple Distribution</string>
             <key>provisioningProfiles</key>
-            <dict><key>app.lovable.onlooker</key><string>$PROFILE_NAME</string></dict>
+            <dict><key>com.onlooker.app</key><string>$PROFILE_NAME</string></dict>
             <key>uploadSymbols</key><true/>
             <key>destination</key><string>export</string>
           </dict>
