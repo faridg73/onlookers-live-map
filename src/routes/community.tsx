@@ -53,10 +53,12 @@ import {
 } from "@/lib/strange-sightings";
 
 export const Route = createFileRoute("/community")({
-  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs" } =>
-    search["mystery"] === "report" || search["mystery"] === "logs"
+  validateSearch: (search: Record<string, unknown>): { mystery?: "report" | "logs"; cat?: string } => ({
+    ...(search["mystery"] === "report" || search["mystery"] === "logs"
       ? { mystery: search["mystery"] }
-      : {},
+      : {}),
+    ...(typeof search["cat"] === "string" ? { cat: search["cat"] } : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Community feed and local activity | Onlooker" },
@@ -83,7 +85,7 @@ function CommunityHub() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
-  const { mystery } = Route.useSearch();
+  const { mystery, cat } = Route.useSearch();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
