@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { VideoRecorder } from "@/components/VideoRecorder";
+import { AddressSearchField } from "@/components/AddressSearchField";
+import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
   COMMUNITY_CATEGORIES,
   FLASH_HOURS,
@@ -72,6 +74,7 @@ export function NewCommunityPostDialog({
   const [hours, setHours] = useState<number>(3);
   const [mediaPath, setMediaPath] = useState<string | null>(null);
   const [camera, setCamera] = useState(false);
+  const [spot, setSpot] = useState<PickedLocation | null>(null);
   const [busy, setBusy] = useState(false);
   const human = useHumanCheck("community-post");
 
@@ -121,7 +124,7 @@ export function NewCommunityPostDialog({
         data: { token: human.token ?? "", action: "community-post" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-      const coords = await resolveCoords(place);
+      const coords = spot ?? (await resolveCoords(place));
       await createCommunityPost({
         category: vibe ? vibe.communityCategory : category,
         title,
@@ -140,6 +143,7 @@ export function NewCommunityPostDialog({
       setTitle("");
       setBody("");
       setPlace("");
+      setSpot(null);
       setTags([]);
       setMediaPath(null);
       setFlash(false);
@@ -238,15 +242,32 @@ export function NewCommunityPostDialog({
           />
         </label>
 
-        <label className="mt-3 block text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          Where
-          <input
-            value={place}
-            onChange={(e) => setPlace(e.target.value)}
-            placeholder="Riverside Park, north gate"
-            className="mt-1 w-full rounded-xl border border-border bg-surface-raised px-3 py-2.5 text-sm font-medium normal-case tracking-normal text-foreground outline-none focus:border-signal"
-          />
-        </label>
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Where</p>
+          <div className="mt-1">
+            <AddressSearchField
+              placeholder="Search a place or address"
+              onPick={(next) => {
+                setSpot(next);
+                setPlace(next.formatted);
+              }}
+            />
+          </div>
+          <div className="mt-2 overflow-hidden rounded-xl">
+            <LocationPreviewMap
+              address={place}
+              selectedLocation={spot}
+              compact
+              onPick={(next) => {
+                setSpot(next);
+                setPlace(next.formatted);
+              }}
+            />
+          </div>
+          <p className="mt-1 text-[0.65rem] text-muted-foreground">
+            {spot ? `Pinned: ${spot.formatted}` : "Pick a suggestion, then drag the pin to the exact spot."}
+          </p>
+        </div>
 
         <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
           Tags
