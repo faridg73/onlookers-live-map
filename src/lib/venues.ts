@@ -485,7 +485,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
         slug: "abbot-kinney-first-fridays",
         name: "First Fridays Street Fair",
         area: "Abbot Kinney, Venice",
-        blurb: "Food trucks, stage sets and how far the fair stretches.",
+        blurb: "Food trucks, street stalls and how far the fair stretches.",
         emoji: "\u{1F3AA}",
         category: "events",
         latitude: 33.9899,
