@@ -186,12 +186,18 @@ export function CommunityFeedFilters({
               type="button"
               variant="outline"
               disabled={locationBusy}
-              onClick={() => void onUseMyLocation()}
+              onClick={() => void onUseMyLocation().then((ok) => ok && confirmAndClose())}
               className="w-full justify-center rounded-full border-white/15 bg-zinc-900/50 font-bold text-foreground hover:border-white/25"
             >
               {locationBusy ? <Loader2 className="size-4 animate-spin" /> : <LocateFixed className="size-4" />}
               {locationBusy ? "Locating…" : "Use my location"}
             </Button>
+
+            {saved && (
+              <p role="status" className="flex items-center gap-2 text-sm font-extrabold text-signal">
+                <Check className="size-4" aria-hidden /> Location updated
+              </p>
+            )}
 
             <form
               className="flex gap-2"
