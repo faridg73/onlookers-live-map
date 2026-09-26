@@ -992,6 +992,7 @@ function CommunityHub() {
         initialCamera={liveFirst}
         {...(strangeSightings ? { initialCategory: "general" as const, initialTitle: "Strange sighting near ", initialTags: [STRANGE_SIGHTINGS_ID, "UFO"] } : {})}
         {...(!strangeSightings && category !== "all" ? { initialCategory: category } : {})}
+        {...(!strangeSightings && categoryId ? { initialBroadcastCategoryId: categoryId } : {})}
       />
       </div>
 
