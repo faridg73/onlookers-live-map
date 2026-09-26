@@ -45,6 +45,16 @@ export const Route = createFileRoute("/auth")({
 function AuthScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { redirect } = Route.useSearch();
+
+  /** Sends the person where they were headed, or to their profile by default. */
+  const goAfterAuth = async () => {
+    if (redirect) {
+      await navigate({ href: redirect, replace: true });
+      return;
+    }
+    await navigate({ to: "/profile", replace: true });
+  };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
