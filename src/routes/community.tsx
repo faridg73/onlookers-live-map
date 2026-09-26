@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { vibeFromTags } from "@/lib/broadcast-categories";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
@@ -275,20 +276,24 @@ function CommunityHub() {
   }, []);
 
   const tagChoices = useMemo(() => {
+    if (categoryId) return broadcastCategoryById(categoryId).subcategories.map((s) => s.toLowerCase());
     const source =
       category === "all"
         ? COMMUNITY_CATEGORIES.flatMap((c) => c.tags)
         : (COMMUNITY_CATEGORIES.find((c) => c.id === category)?.tags ?? []);
     return [...new Set(source)].slice(0, 14);
-  }, [category]);
+  }, [category, categoryId]);
 
   const categoryPreviews = useMemo(() => {
-    const previews: Partial<Record<CommunityCategory, string>> = {};
+    const previews: Partial<Record<string, string>> = {};
     [...posts]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .forEach((post) => {
         const url = post.mediaPath ? media[post.mediaPath] : undefined;
-        if (url && !previews[post.category] && looksLikeVideo(url)) previews[post.category] = url;
+        if (!url || !looksLikeVideo(url)) return;
+        if (!previews[post.category]) previews[post.category] = url;
+        const vibe = vibeFromTags(post.tags);
+        if (vibe && !previews[`vibe:${vibe.id}`]) previews[`vibe:${vibe.id}`] = url;
       });
     return previews;
   }, [media, posts]);
@@ -533,7 +538,7 @@ function CommunityHub() {
               <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background via-background/70 to-transparent md:hidden" />
             </>
           )}
-        {vibeGridOpen ? (
+        {vibeGridOpen || selectedLane ? (
           <div
             role="list"
             aria-label="All category cards"
@@ -542,7 +547,7 @@ function CommunityHub() {
             {gridLanes.map((lane) => {
               const visual = COMMUNITY_VISUALS[lane.communityCategory] ?? COMMUNITY_VISUALS.general;
               const Icon = visual.icon;
-              const previewUrl = categoryPreviews[lane.communityCategory];
+              const previewUrl = categoryPreviews[`vibe:${lane.id}`];
               const active = categoryId === lane.id;
               return (
                 <div key={lane.id} role="listitem" className="min-w-0">

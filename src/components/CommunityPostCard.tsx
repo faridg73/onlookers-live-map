@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
+import { vibeFromTags } from "@/lib/broadcast-categories";
 import { AlertTriangle, BadgeCheck, CalendarDays, Clock, Flag, MapPin, Navigation, Pin, Radio, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ShareArtifactButton } from "@/components/ShareArtifactButton";
@@ -56,6 +57,8 @@ export function CommunityPostCard({
   const [voting, setVoting] = useState<"validate" | "flag" | null>(null);
   const [viewerTrustLevel, setViewerTrustLevel] = useState<TrustLevel>(1);
   const def = categoryDef(post.category);
+  const vibe = vibeFromTags(post.tags);
+  const categoryLabel = vibe ? vibe.label : def.label;
   // Older rows can carry a lane that no longer exists, so fall back instead of crashing.
   const visual = COMMUNITY_VISUALS[post.category] ?? COMMUNITY_VISUALS.general;
   const CategoryIcon = visual.icon;
@@ -115,7 +118,7 @@ export function CommunityPostCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/35" />
         <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-md border border-foreground/15 bg-background/75 px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.1em] text-foreground backdrop-blur-md">
-          <CategoryIcon className="size-3 text-muted-foreground" /> {def.label}
+          <CategoryIcon className="size-3 text-muted-foreground" /> {categoryLabel}
         </span>
         {pinned && (
           <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-md bg-signal px-2 py-0.5 text-[0.6rem] font-extrabold uppercase text-signal-foreground">
@@ -327,7 +330,7 @@ export function CommunityPostCard({
               kind: post.isFlash ? "meetup" : "discovery",
               title: post.title,
               place: post.place,
-              note: def.label,
+              note: categoryLabel,
               ...(mediaUrl ? { imageUrl: mediaUrl } : {}),
             }}
           />
