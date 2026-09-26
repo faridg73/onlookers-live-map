@@ -41,35 +41,6 @@ function revealFocusedField() {
   window.setTimeout(() => active.scrollIntoView({ block: "center", behavior: "smooth" }), 120);
 }
 
-function installIosEdgeSwipe(goBack: () => void) {
-  if (Capacitor.getPlatform() !== "ios") return;
-  let startX = 0;
-  let startY = 0;
-  let tracking = false;
-
-  document.addEventListener("touchstart", (event) => {
-    const touch = event.touches[0];
-    const target = event.target;
-    if (!touch || !(target instanceof Element) || target.closest("input, textarea, select, [contenteditable='true'], [data-swipe-lock]")) {
-      tracking = false;
-      return;
-    }
-    tracking = touch.clientX <= 24;
-    startX = touch.clientX;
-    startY = touch.clientY;
-  }, { passive: true });
-
-  document.addEventListener("touchend", (event) => {
-    if (!tracking) return;
-    tracking = false;
-    const touch = event.changedTouches[0];
-    if (!touch) return;
-    const deltaX = touch.clientX - startX;
-    const deltaY = Math.abs(touch.clientY - startY);
-    if (deltaX >= 88 && deltaX > deltaY * 1.35) goBack();
-  }, { passive: true });
-}
-
 // Call once from the root component (inside an effect). Registers:
 //  - appUrlOpen: emailed bounty/approval links open inside the installed app
 //  - backButton (Android): router back, exit only when there is nowhere to go
@@ -103,8 +74,6 @@ export async function initNativeShell(navigate: NavigateFn, canGoBack: () => boo
     document.documentElement.style.setProperty("--keyboard-height", "0px");
     document.documentElement.classList.remove("keyboard-open");
   });
-
-  installIosEdgeSwipe(goBack);
 
   await App.addListener("appUrlOpen", ({ url }) => {
     const path = pathFromAppUrl(url);
