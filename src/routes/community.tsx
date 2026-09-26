@@ -334,6 +334,7 @@ function CommunityHub() {
       });
 
     const inRange = posts
+      .filter(isPostLive)
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
 
