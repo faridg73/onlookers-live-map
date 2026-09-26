@@ -264,9 +264,9 @@ export function NewCommunityPostDialog({
               }}
             />
           </div>
-          <p className="mt-1 text-[0.65rem] text-muted-foreground">
-            {spot ? `Pinned: ${spot.formatted}` : "Pick a suggestion, then drag the pin to the exact spot."}
-          </p>
+          {!spot && (
+            <p className="mt-1 text-[0.65rem] text-muted-foreground">Pick a suggestion, then drag the pin to the exact spot.</p>
+          )}
         </div>
 
         <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
