@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Radio, Square } from "lucide-react";
 import { toast } from "sonner";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
+import { LiveCreatorStrip } from "@/components/LiveCreatorStrip";
 import { formatCredits, formatCreditCash } from "@/lib/credits";
 import {
   DEFAULT_STREAM_RATE,
@@ -40,6 +41,15 @@ export function PayPerMinuteStream({
     hostEarned: 0,
   });
   const [busy, setBusy] = useState(false);
+  const [stripOpen, setStripOpen] = useState(false);
+  const hostButton = (
+    <button type="button" onClick={() => setStripOpen(true)} className="underline decoration-dotted underline-offset-2">
+      {hostName}
+    </button>
+  );
+  const strip = (
+    <LiveCreatorStrip hostId={hostId} hostName={hostName} open={stripOpen} onOpenChange={setStripOpen} />
+  );
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stop = async () => {
@@ -104,7 +114,7 @@ export function PayPerMinuteStream({
     return (
       <div className="rounded-2xl border border-signal/40 bg-surface-raised p-4">
         <p className="flex items-center gap-1.5 text-sm font-bold text-foreground">
-          Watch {hostName} live {hostVerified && <VerifiedBadge className="size-3.5" />}
+          Watch {hostButton} live {hostVerified && <VerifiedBadge className="size-3.5" />}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           You pay by the minute and can stop any time. {hostShare(rate)} of every{" "}
@@ -134,6 +144,7 @@ export function PayPerMinuteStream({
         >
           <Radio className="size-4" /> {busy ? "Connecting…" : "Start live stream"}
         </button>
+        {strip}
       </div>
     );
   }
@@ -141,7 +152,7 @@ export function PayPerMinuteStream({
   return (
     <div className="rounded-2xl border border-signal bg-black p-4">
       <p className="flex items-center gap-2 text-sm font-extrabold text-signal">
-        <span className="size-2 animate-pulse rounded-full bg-signal" /> LIVE with {hostName} {hostVerified && <VerifiedBadge className="size-3.5" />}
+        <span className="size-2 animate-pulse rounded-full bg-signal" /> LIVE with {hostButton} {hostVerified && <VerifiedBadge className="size-3.5" />}
       </p>
       <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-surface-raised py-2">
@@ -172,6 +183,7 @@ export function PayPerMinuteStream({
       >
         <Square className="size-4" /> End session
       </button>
+      {strip}
     </div>
   );
 }

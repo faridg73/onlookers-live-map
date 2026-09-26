@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { formatCredits } from "@/lib/credits";
-import { Crown, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { fetchTopReporters, type TopReporter } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
-import { FollowButton } from "@/components/FollowButton";
+import { ReputationCard } from "@/components/ReputationCard";
 
 const MEDALS = ["text-signal", "text-foreground", "text-muted-foreground"];
 
@@ -72,32 +72,12 @@ export function Leaderboard({
               >
                 {i + 1}
               </span>
-              {r.avatar_url ? (
-                <img
-                  src={r.avatar_url}
-                  alt={`${r.display_name} avatar`}
-                  loading="lazy"
-                  className="size-9 shrink-0 rounded-full object-cover"
-                />
-              ) : (
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-raised font-display text-sm text-foreground">
-                  {r.display_name.slice(0, 2).toUpperCase()}
-                </span>
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1.5 truncate text-sm text-foreground">
-                  {r.display_name}
-                  {i === 0 && <Crown className="size-3.5 shrink-0 text-signal" />}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {r.clips} {r.clips === 1 ? "clip" : "clips"} sent
-                </p>
-                <FollowButton
-                  creatorId={r.user_id}
-                  creatorName={r.display_name}
-                  className="mt-1.5"
-                />
-              </div>
+              <ReputationCard
+                userId={r.user_id}
+                fallbackName={r.display_name}
+                fallbackAvatar={r.avatar_url}
+                className="min-w-0 flex-1"
+              />
               <span className="font-display text-lg text-signal">
                 {formatCredits(r.total_earned)}
               </span>
