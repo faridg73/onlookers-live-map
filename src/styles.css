@@ -149,11 +149,6 @@
   }
 }
 
-/* Flashing lime border hinting there is more to see (Browse venues & events link) */
-.venue-hint-flash {
-  border: 1px solid color-mix(in oklab, var(--signal) calc(0.5 * 100%), transparent);
-  animation: all-vibes-flash 1.4s ease-in-out infinite;
-}
 
 /* Bright lime highlight for the location search box under "Use my location" */
 .location-search-highlight {
