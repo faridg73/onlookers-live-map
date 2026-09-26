@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Map, Radio, Plus, UserRound, Compass } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 /** Five core tabs only. Everything else lives in the header menu (AppMenu). */
 const items = [
@@ -12,12 +13,34 @@ const items = [
 ] as const;
 
 const linkClass =
-  "group flex h-full w-full min-w-0 flex-col items-center justify-start gap-1 py-3 text-center text-[0.68rem] font-semibold leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
+  "group flex min-h-14 w-full min-w-0 flex-col items-center justify-center gap-1 py-2 text-center text-[0.68rem] font-semibold leading-tight text-muted-foreground transition-colors data-[status=active]:text-signal";
 
 export function BottomNav() {
   const isHome = useRouterState({ select: (state) => state.location.pathname === "/" });
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || !isHome) {
+      document.documentElement.style.setProperty("--bottom-nav-height", "0px");
+      return;
+    }
+    const updateHeight = () => {
+      document.documentElement.style.setProperty("--bottom-nav-height", `${nav.getBoundingClientRect().height}px`);
+    };
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(nav);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.setProperty("--bottom-nav-height", "0px");
+    };
+  }, [isHome]);
+
   return (
     <nav
+      ref={navRef}
+      aria-label="Primary navigation"
       className={`pointer-events-auto z-40 border-t pb-safe backdrop-blur-2xl ${
         isHome
           ? "fixed inset-x-0 bottom-0 border-home-line bg-home-glass-strong shadow-2xl lg:inset-x-auto lg:bottom-5 lg:left-1/2 lg:-translate-x-1/2 lg:rounded-3xl lg:border lg:px-2 lg:pb-0 lg:shadow-[0_18px_50px_color-mix(in_oklab,var(--color-background)_70%,transparent)]"

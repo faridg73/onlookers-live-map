@@ -6,10 +6,25 @@ const config: CapacitorConfig = {
   webDir: 'mobile-shell',
   server: { url: 'https://onlooker.io' },
   ios: {
-    contentInset: 'always',
+    contentInset: 'never',
+    allowsLinkPreview: false,
+    scrollEnabled: true,
   },
   android: {
     backgroundColor: '#000000',
+    allowMixedContent: false,
+  },
+  plugins: {
+    Keyboard: {
+      resize: 'body',
+      style: 'dark',
+      resizeOnFullScreen: true,
+    },
+    StatusBar: {
+      overlaysWebView: true,
+      style: 'LIGHT',
+      backgroundColor: '#000000',
+    },
   },
 };
 

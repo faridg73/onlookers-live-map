@@ -7,8 +7,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
+        let bridgeViewController = CAPBridgeViewController()
+        bridgeViewController.loadViewIfNeeded()
+        bridgeViewController.webView?.allowsBackForwardNavigationGestures = true
+        bridgeViewController.webView?.scrollView.bounces = true
+        bridgeViewController.webView?.scrollView.alwaysBounceVertical = false
+
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = CAPBridgeViewController()
+        window?.rootViewController = bridgeViewController
         window?.makeKeyAndVisible()
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)
