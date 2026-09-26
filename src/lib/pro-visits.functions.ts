@@ -53,6 +53,19 @@ export type ProDashboardData = {
   bookings: ProVisitBooking[];
 };
 
+/** Owner-scoped check used to send established professionals straight to their dashboard. */
+export const hasMyProAccount = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<boolean> => {
+    const { data, error } = await context.supabase
+      .from("pro_accounts")
+      .select("user_id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return Boolean(data);
+  });
+
 export const getMyProDashboard = createServerFn({ method: "GET" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .handler(async ({ context }): Promise<ProDashboardData> => {
