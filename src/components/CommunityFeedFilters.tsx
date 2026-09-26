@@ -136,27 +136,30 @@ export function CommunityFeedFilters({
     void resolvePlaceSuggestion({ data: { placeId: suggestion.placeId, sessionToken: sessionToken.current } })
       .then((place) => {
         if (place) {
-          onApplyPlace(place);
-        } else {
-          return onSearchArea(suggestion.text);
+          const applied = onApplyPlace(place);
+          if (applied) confirmAndClose(() => resetSearch());
+          return;
         }
-        return undefined;
+        return onSearchArea(suggestion.text).then((ok) => {
+          if (ok) confirmAndClose(() => resetSearch());
+        });
       })
-      .then(() => resetSearch())
       .catch(() => {
-        void onSearchArea(suggestion.text).then(() => resetSearch());
+        void onSearchArea(suggestion.text).then((ok) => {
+          if (ok) confirmAndClose(() => resetSearch());
+        });
       });
   };
 
   const submitTyped = () => {
     void onSearchArea(query).then((ok) => {
       if (!ok) return;
-      resetSearch();
+      confirmAndClose(() => resetSearch());
     });
   };
 
   return (
-    <Sheet>
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
         <Button
           type="button"
