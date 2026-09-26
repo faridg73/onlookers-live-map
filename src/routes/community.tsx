@@ -137,13 +137,13 @@ function CommunityHub() {
     }
     void navigate({
       to: "/community",
-      search: (prev) => {
-        const { action: _drop, ...rest } = prev;
-        return rest;
+      search: {
+        ...(cat ? { cat } : {}),
+        ...(mystery ? { mystery } : {}),
       },
       replace: true,
     });
-  }, [action, navigate]);
+  }, [action, cat, mystery, navigate]);
 
   /**
    * Opens a composer sheet. Signed-out people go to sign-in first, carrying the
