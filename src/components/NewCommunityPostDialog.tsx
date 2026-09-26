@@ -88,7 +88,7 @@ export function NewCommunityPostDialog({
   if (initialCamera) {
     return (
       <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 sm:items-center sm:p-6">
-        <div className="max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-3xl border border-border bg-surface px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-h-[92dvh] sm:p-5 sm:rounded-3xl">
+        <div className="max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-t-3xl border border-border bg-surface px-5 pb-[max(1.25rem,calc(env(safe-area-inset-bottom)+1rem))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-h-[92dvh] sm:p-5 sm:rounded-3xl">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-extrabold text-foreground">Start live stream</h2>
             <button type="button" aria-label="Close" onClick={() => onOpenChange(false)} className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm">
@@ -149,7 +149,7 @@ export function NewCommunityPostDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 sm:items-center sm:p-6">
-      <div className="max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border border-border bg-surface px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-h-[92dvh] sm:p-5 sm:rounded-3xl">
+      <div className="max-h-[calc(100dvh-max(0.5rem,env(safe-area-inset-top)))] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border border-border bg-surface px-5 pb-[max(1.25rem,calc(env(safe-area-inset-bottom)+1rem))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-h-[92dvh] sm:p-5 sm:rounded-3xl">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-extrabold text-foreground">Post to Discover</h2>
           <button type="button" aria-label="Close" onClick={() => onOpenChange(false)} className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm">

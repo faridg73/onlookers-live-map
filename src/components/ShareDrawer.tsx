@@ -50,7 +50,7 @@ export function ShareDrawer({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent className="max-h-[85vh] overflow-y-auto rounded-t-3xl border-border bg-surface px-5 pb-8">
+      <DrawerContent className="max-h-[85vh] overflow-y-auto rounded-t-3xl border-border bg-surface px-5 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1rem))]">
         <DrawerHeader className="text-left">
           <DrawerTitle className="font-display text-xl break-words text-foreground">Share this post</DrawerTitle>
           <DrawerDescription className="text-sm text-muted-foreground">
