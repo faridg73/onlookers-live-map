@@ -35,6 +35,12 @@ export function pathFromAppUrl(url: string): string | null {
 
 let initialized = false;
 
+function revealFocusedField() {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement)) return;
+  window.setTimeout(() => active.scrollIntoView({ block: "center", behavior: "smooth" }), 120);
+}
+
 // Call once from the root component (inside an effect). Registers:
 //  - appUrlOpen: emailed bounty/approval links open inside the installed app
 //  - backButton (Android): router back, exit only when there is nowhere to go
@@ -42,7 +48,32 @@ export async function initNativeShell(navigate: NavigateFn, canGoBack: () => boo
   if (initialized || !isNativeApp()) return;
   initialized = true;
 
-  const { App } = await import("@capacitor/app");
+  document.documentElement.classList.add("native-shell");
+
+  const [{ App }, { Keyboard, KeyboardResize, KeyboardStyle }, { StatusBar, Style }] = await Promise.all([
+    import("@capacitor/app"),
+    import("@capacitor/keyboard"),
+    import("@capacitor/status-bar"),
+  ]);
+
+  await StatusBar.setOverlaysWebView({ overlay: false });
+  await StatusBar.setStyle({ style: Style.Light });
+  await Keyboard.setResizeMode({ mode: KeyboardResize.Body });
+  await Keyboard.setStyle({ style: KeyboardStyle.Dark });
+  await Keyboard.setScroll({ isDisabled: false });
+
+  await Keyboard.addListener("keyboardWillShow", ({ keyboardHeight }) => {
+    document.documentElement.style.setProperty("--keyboard-height", `${keyboardHeight}px`);
+    document.documentElement.classList.add("keyboard-open");
+    revealFocusedField();
+  });
+
+  await Keyboard.addListener("keyboardDidShow", revealFocusedField);
+
+  await Keyboard.addListener("keyboardWillHide", () => {
+    document.documentElement.style.setProperty("--keyboard-height", "0px");
+    document.documentElement.classList.remove("keyboard-open");
+  });
 
   await App.addListener("appUrlOpen", ({ url }) => {
     const path = pathFromAppUrl(url);

@@ -267,6 +267,8 @@
 }
 
 :root {
+  --keyboard-height: 0px;
+  --bottom-nav-height: 6.75rem;
   --radius: 0.75rem;
   --background: oklch(0.14479 0 0); /* #0A0A0A true dark slate */
   --foreground: oklch(1 0 0); /* #FFFFFF */
@@ -460,6 +462,27 @@
     /* Avoid iOS/Android URL-bar height jumps inside fixed map + sheet layouts. */
     min-height: 100dvh;
     overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
+
+  html.native-shell,
+  html.native-shell body {
+    height: 100%;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+  }
+
+  html.native-shell [class*="overflow-y-auto"],
+  html.native-shell [class*="overflow-auto"] {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html.native-shell.keyboard-open [data-radix-dialog-content] {
+    max-height: calc(100dvh - env(safe-area-inset-top) - 0.5rem);
+  }
+
+  html.native-shell.keyboard-open nav[aria-label="Primary navigation"] {
+    display: none;
   }
 
   /* Touch hardening for iOS, Android, Samsung and LG browsers. */

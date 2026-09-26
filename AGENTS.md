@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Native releases use Capacitor 8 with a remote `https://onlooker.io` WebView shell; keep native behavior centralized in `src/lib/native.ts` so web behavior stays unchanged.

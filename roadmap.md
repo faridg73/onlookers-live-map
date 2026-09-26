@@ -32,12 +32,12 @@
 
 ## Native app launch (Capacitor iOS/Android)
 - [x] Phase 1 (in-repo): native bridge (deep links appUrlOpen → in-app nav, Android back button → router history), Android https App Links intent filter, iOS App.entitlements (associated domains), /.well-known/apple-app-site-association + assetlinks.json templates, cap sync green, build OK
-- [ ] Native-feel release hardening: no browser chrome/reload gestures, full safe-area coverage, iOS swipe-back, native keyboard resizing, and native system-bar styling
-- [ ] Responsive release matrix: verify Home gold Pro card, Explore by Vibe, bottom navigation, dialogs, and text-entry flows at iPhone SE, standard iPhone, Pro Max, Android phone, and Android tablet sizes
-- [ ] Asset-density audit: verify complete iOS AppIcon set and Android mdpi–xxxhdpi launcher/splash assets with no low-resolution fallbacks
-- [ ] Native release evidence: run every simulator/emulator available in this environment; document any final physical-device checks that still require the signed TestFlight/Internal Testing builds
-- [ ] Fill placeholders: apple-app-site-association TEAMID (Apple Developer Team ID), assetlinks.json SHA-256 (release keystore fingerprint)
-- [ ] In Xcode: enable Associated Domains capability (links App.entitlements), set signing team
+- [x] Native-feel release hardening: no browser chrome/reload gestures, full safe-area coverage, iOS swipe-back, native keyboard resizing, and native system-bar styling
+- [x] Responsive release matrix: verify Home gold Pro card, Explore by Vibe, bottom navigation, dialogs, and text-entry flows at iPhone SE, standard iPhone, Pro Max, Android phone, and Android tablet sizes
+- [x] Asset-density audit: verify complete iOS AppIcon set and Android mdpi–xxxhdpi launcher/splash assets with no low-resolution fallbacks
+- [ ] Native release evidence: browser matrix passed; signed TestFlight/Internal Testing checks remain blocked until those builds are installed on physical devices
+- [x] Fill app-link identities: Apple Team ID + both active iOS bundle IDs in AASA, Android release SHA-256 in assetlinks.json
+- [x] Link the Associated Domains entitlement into both Xcode build configurations and set the signing team
 - [ ] Phase 1 remaining: native camera/geolocation/push plugins, generate Android release keystore, build binaries on a Mac
 - [ ] Phase 2 payments: Stripe in-app for bounties/escrow; web-first subscriptions with account restore
 - [ ] Phase 0 re-verify: Apple external-link/commission policy the week of submission (Dec 2025 ruling — rules keep changing)
