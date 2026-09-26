@@ -67,8 +67,33 @@ export function CommunityFeedFilters({
   const [suggesting, setSuggesting] = useState(false);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
   const sessionToken = useRef<string>(crypto.randomUUID());
   const requestId = useRef(0);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Flash a confirmation, then auto-close the sheet so success is visible. */
+  const confirmAndClose = (after?: () => void) => {
+    if (savedTimer.current) clearTimeout(savedTimer.current);
+    setSaved(true);
+    savedTimer.current = setTimeout(() => {
+      setSaved(false);
+      setSheetOpen(false);
+      after?.();
+    }, 900);
+  };
+
+  // Clear any pending auto-close when the sheet closes for any reason.
+  useEffect(() => {
+    if (!sheetOpen) {
+      if (savedTimer.current) {
+        clearTimeout(savedTimer.current);
+        savedTimer.current = null;
+      }
+      setSaved(false);
+    }
+  }, [sheetOpen]);
 
   // Debounced live suggestions while the person types.
   useEffect(() => {
