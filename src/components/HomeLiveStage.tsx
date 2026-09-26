@@ -1,16 +1,13 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Fragment, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, KeyRound, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles, Ticket } from "lucide-react";
+import { BadgeCheck, ChevronDown, CircleDollarSign, Eye, Map, MapPin, Megaphone, Radar, Radio, Siren, Sparkles } from "lucide-react";
 import { formatAgo, type LiveRequest } from "@/lib/onlooker";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { requestCategoryArt } from "@/lib/category-art";
+import { BROADCAST_CATEGORY_ART, requestCategoryArt } from "@/lib/category-art";
+import { BROADCAST_CATEGORIES } from "@/lib/broadcast-categories";
 import { Button } from "@/components/ui/button";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
-import capturePlaceholder from "@/assets/home/capture-placeholder.jpg.asset.json";
-import interiorPlaceholder from "@/assets/home/interior-placeholder.jpg.asset.json";
-import streetPlaceholder from "@/assets/home/street-placeholder.jpg.asset.json";
-import buildingPlaceholder from "@/assets/home/building-placeholder.jpg.asset.json";
 import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
 import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
 import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
@@ -67,13 +64,6 @@ const TABS: Array<{ key: ActivityTab; label: string }> = [
   { key: "bounty", label: "Bounties" },
   { key: "live", label: "Live" },
   { key: "alert", label: "Alerts" },
-];
-
-const HERO_PLACEHOLDERS = [
-  { src: streetPlaceholder.url, alt: "Crowds moving through a lively street event" },
-  { src: interiorPlaceholder.url, alt: "Modern interior ready for a real estate walkthrough" },
-  { src: capturePlaceholder.url, alt: "People capturing a live moment on their phones" },
-  { src: buildingPlaceholder.url, alt: "People arriving at a modern building" },
 ];
 
 /**
