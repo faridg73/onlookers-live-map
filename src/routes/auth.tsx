@@ -185,7 +185,7 @@ function AuthScreen() {
         await queryClient.cancelQueries();
         queryClient.clear();
         toast.success("Welcome back.");
-        await navigate({ to: "/profile", replace: true });
+        await goAfterAuth();
       }
     } catch (err) {
       human.reset();
