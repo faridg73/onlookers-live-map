@@ -455,7 +455,7 @@ export async function listMyCommunityPosts(): Promise<CommunityPost[]> {
   if (!auth.user) return [];
   const { data, error } = await supabase
     .from("community_posts")
-    .select(COLUMNS + ", hidden_at")
+    .select(`${COLUMNS}, hidden_at` as typeof COLUMNS)
     .eq("user_id", auth.user.id)
     .order("created_at", { ascending: false })
     .limit(100);
