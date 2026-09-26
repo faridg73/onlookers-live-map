@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.onlookers_within_radius(double precision, double precision, numeric, uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.onlookers_within_radius(double precision, double precision, numeric, uuid) TO service_role;
