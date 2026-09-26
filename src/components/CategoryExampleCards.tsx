@@ -3,8 +3,10 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
+import { BROADCAST_CATEGORY_ART } from "@/lib/category-art";
+import type { BroadcastCategoryId } from "@/lib/broadcast-categories";
 import { categoryDef, type CommunityCategory } from "@/lib/community";
-import { exampleSeeds } from "@/lib/community-examples";
+import { broadcastExampleSeeds, exampleSeeds } from "@/lib/community-examples";
 import { communityTopicVisual } from "@/lib/community-topic-visuals";
 
 /**
@@ -14,19 +16,25 @@ export function CategoryExampleCards({
   category,
   tag,
   labelOverride,
+  broadcastCategoryId,
   onStart,
 }: {
   category: CommunityCategory;
   tag?: string | null;
   /** Display name of the selected vibe lane, shown instead of the broader category label. */
   labelOverride?: string | null;
+  broadcastCategoryId?: BroadcastCategoryId | null;
   onStart: (category: CommunityCategory) => void;
 }) {
   const def = categoryDef(category);
   const laneLabel = labelOverride ?? def.label;
   const visual = COMMUNITY_VISUALS[category];
   const Icon = visual.icon;
-  const seeds = exampleSeeds(category, tag).slice(0, 6);
+  const seeds = (
+    broadcastCategoryId && !tag
+      ? broadcastExampleSeeds(broadcastCategoryId)
+      : exampleSeeds(category, tag)
+  ).slice(0, 6);
 
   return (
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
@@ -50,8 +58,8 @@ export function CategoryExampleCards({
           >
             <div className={`relative aspect-[16/9] overflow-hidden ${visual.coverClass}`}>
               <LoopingPreview
-                imageUrl={topicVisual?.image ?? visual.image}
-                alt={topicVisual?.alt ?? `${def.label} starter idea`}
+                 imageUrl={topicVisual?.image ?? (broadcastCategoryId ? BROADCAST_CATEGORY_ART[broadcastCategoryId] : visual.image)}
+                 alt={topicVisual?.alt ?? `${laneLabel} posting idea`}
                 icon={Icon}
                 coverClass={visual.coverClass}
               />

@@ -643,6 +643,22 @@ function CommunityHub() {
         );
       })()}
 
+      {!loading && category !== "all" && (
+        <div className="mt-5 px-5 sm:px-8">
+          <CategoryExampleCards
+            category={category}
+            tag={tag}
+            labelOverride={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
+            broadcastCategoryId={categoryId}
+            onStart={(exampleCategory) => {
+              setCategory(exampleCategory);
+              setLiveFirst(false);
+              setComposing(true);
+            }}
+          />
+        </div>
+      )}
+
       {strangeSightings && (
         <section className="mx-5 mt-4 rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3 backdrop-blur-md sm:mx-8">
           <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">Mystery desk</p>
@@ -935,18 +951,6 @@ function CommunityHub() {
                 {radius === "tight" ? "Expand Radius to 5mi" : "Be the First to Post"}
               </Button>
             </div>
-          )}
-          {!loading && category !== "all" && visible.length === 0 && popularFallback.length === 0 && (
-            <CategoryExampleCards
-              category={category}
-              tag={tag}
-              labelOverride={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
-              onStart={(exampleCategory) => {
-                setCategory(exampleCategory);
-                setLiveFirst(false);
-                setComposing(true);
-              }}
-            />
           )}
           {!loading && category === "all" && posts.length === 0 && (
             <DiscoverStarterCards
