@@ -1464,6 +1464,7 @@ export type Database = {
           created_at: string
           display_name: string
           follower_count: number
+          following_count: number
           full_name: string
           hunter_level: number
           id: string
@@ -1494,6 +1495,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           follower_count?: number
+          following_count?: number
           full_name?: string
           hunter_level?: number
           id: string
@@ -1524,6 +1526,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           follower_count?: number
+          following_count?: number
           full_name?: string
           hunter_level?: number
           id?: string
@@ -3020,6 +3023,23 @@ export type Database = {
           is_incognito: boolean
           is_verified: boolean
           xp: number
+        }[]
+      }
+      public_reputation_cards: {
+        Args: { _ids: string[] }
+        Returns: {
+          avatar_url: string
+          bounties_completed: number
+          follower_count: number
+          following_count: number
+          handle: string
+          id: string
+          id_confirmed: boolean
+          is_verified: boolean
+          name: string
+          on_time_rate: number
+          rating: number
+          review_count: number
         }[]
       }
       public_request_markers: {
