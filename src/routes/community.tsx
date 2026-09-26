@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
-import { CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -432,9 +432,25 @@ function CommunityHub() {
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <div className="flex items-start justify-between gap-3">
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
-            <Compass className="size-4" /> Discover
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Go back"
+              onClick={() => {
+                if (canGoBack) {
+                  router.history.back();
+                  return;
+                }
+                void navigate({ to: "/" });
+              }}
+              className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm transition-colors hover:border-white/25 hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowLeft className="size-5" />
+            </button>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              <Compass className="size-4" /> Discover
+            </p>
+          </div>
           <button
             type="button"
             aria-label="Close community"
@@ -543,9 +559,9 @@ function CommunityHub() {
                       setStrangeSightings(false);
                     }}
                     aria-pressed={active}
-                    className={`group flex ${gridLanes.length === 1 ? "h-64 sm:h-72" : "h-40 sm:h-44 md:h-48"} w-full flex-col overflow-hidden rounded-xl border bg-zinc-900/50 backdrop-blur-md text-left transition-transform hover:-translate-y-0.5 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-white/10 hover:border-white/25"}`}
+                    className={`group flex ${gridLanes.length === 1 ? "relative h-64 sm:h-72" : "h-40 sm:h-44 md:h-48"} w-full flex-col overflow-hidden rounded-xl border bg-zinc-900/50 backdrop-blur-md text-left transition-transform hover:-translate-y-0.5 ${active ? "border-signal ring-2 ring-signal/40 shadow-[0_0_20px_rgba(204,255,0,0.18)]" : "border-white/10 hover:border-white/25"}`}
                   >
-                    <span className="relative block min-h-0 w-full flex-1 overflow-hidden">
+                    <span className={`relative block min-h-0 w-full overflow-hidden ${gridLanes.length === 1 ? "absolute inset-0" : "flex-1"}`}>
                       <LoopingPreview
                         videoUrl={previewUrl}
                         imageUrl={previewUrl ? undefined : BROADCAST_CATEGORY_ART[lane.id]}
@@ -557,7 +573,10 @@ function CommunityHub() {
                         {lane.icon}
                       </span>
                     </span>
-                    <span className="flex min-w-0 flex-1 flex-col items-center gap-0.5 px-2 py-2 text-center">
+                    {gridLanes.length === 1 && (
+                      <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent" />
+                    )}
+                    <span className={`flex min-w-0 flex-col items-center gap-0.5 px-2 py-2 text-center ${gridLanes.length === 1 ? "absolute inset-x-0 bottom-0 z-10 pb-4" : "flex-1"}`}>
                       <strong className="line-clamp-2 text-[0.9rem] font-extrabold leading-tight text-foreground">{lane.label}</strong>
                       <small className="line-clamp-2 text-[0.72rem] font-semibold leading-snug text-muted-foreground">
                         {lane.subcategories.slice(0, 2).join(" · ")}
