@@ -73,7 +73,7 @@ export function ContentReportsQueue() {
               ) : (
                 <Button size="sm" variant="destructive" disabled={busy === row.id} onClick={() => void act(row, "remove")}>Remove post</Button>
               )}
-              {row.status === "open" && (
+              {row.status !== "dismissed" && (
                 <Button size="sm" variant="outline" disabled={busy === row.id} onClick={() => void act(row, "dismiss")}>Dismiss</Button>
               )}
             </div>
