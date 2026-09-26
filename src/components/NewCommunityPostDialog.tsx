@@ -15,6 +15,7 @@ import {
 } from "@/lib/community";
 import { geocodeAddress } from "@/lib/geocode.functions";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
+import { broadcastCategoryById, type BroadcastCategoryId } from "@/lib/broadcast-categories";
 
 /** Posts need coordinates or they never land on the map. Try the typed place, then the device. */
 async function resolveCoords(place: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -49,6 +50,7 @@ export function NewCommunityPostDialog({
   initialCamera,
   initialTitle,
   initialTags,
+  initialBroadcastCategoryId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -58,6 +60,8 @@ export function NewCommunityPostDialog({
   initialCamera?: boolean;
   initialTitle?: string;
   initialTags?: string[];
+  /** Exact vibe the user came from; locks the post to it. */
+  initialBroadcastCategoryId?: BroadcastCategoryId;
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "general");
   const [title, setTitle] = useState("");
@@ -71,7 +75,8 @@ export function NewCommunityPostDialog({
   const [busy, setBusy] = useState(false);
   const human = useHumanCheck("community-post");
 
-  const def = categoryDef(category);
+  const vibe = initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
+  const def = categoryDef(vibe ? vibe.communityCategory : category);
 
   useEffect(() => {
     if (!open) return;
@@ -118,11 +123,13 @@ export function NewCommunityPostDialog({
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       const coords = await resolveCoords(place);
       await createCommunityPost({
-        category,
+        category: vibe ? vibe.communityCategory : category,
         title,
         body,
         place,
-        tags,
+        tags: vibe
+          ? Array.from(new Set([vibe.id, vibe.label.toLowerCase(), ...tags]))
+          : tags,
         mediaPath,
         isFlash: flash,
         flashHours: hours,
@@ -157,6 +164,15 @@ export function NewCommunityPostDialog({
           </button>
         </div>
 
+        {vibe ? (
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-signal bg-signal/10 p-3">
+            <span className="text-2xl" aria-hidden>{vibe.icon}</span>
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Posting to</p>
+              <p className="text-sm font-extrabold text-signal">{vibe.label}</p>
+            </div>
+          </div>
+        ) : (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {COMMUNITY_CATEGORIES.map((c) => (
             <button
@@ -179,6 +195,7 @@ export function NewCommunityPostDialog({
             </button>
           ))}
         </div>
+        )}
 
         <p className="mt-5 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-signal">
           <Sparkles className="size-4" /> Ice-Breakers
@@ -235,7 +252,7 @@ export function NewCommunityPostDialog({
           Tags
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
-          {def.tags.map((t) => {
+          {(vibe ? vibe.subcategories.map((s) => s.toLowerCase()) : def.tags).map((t) => {
             const on = tags.includes(t);
             return (
               <button
