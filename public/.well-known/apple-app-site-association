@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["Z4W5K7RA37.app.lovable.onlooker", "Z4W5K7RA37.com.onlooker.app"],
+        "appIDs": ["Z4W5K7RA37.com.onlooker.app"],
         "components": [{ "/": "/*" }]
       }
     ]
