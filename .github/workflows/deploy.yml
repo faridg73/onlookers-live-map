@@ -35,18 +35,18 @@ jobs:
 
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 14)
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
           CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 -d -o $CERTIFICATE_PATH
-          security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 -d -o "$CERTIFICATE_PATH"
+          security import "$CERTIFICATE_PATH" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
 
           PP_PATH=$RUNNER_TEMP/profile.mobileprovision
-          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 -d -o $PP_PATH
+          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 -d -o "$PP_PATH"
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           PROFILE_PLIST=$RUNNER_TEMP/profile.plist
           security cms -D -i "$PP_PATH" > "$PROFILE_PLIST"
@@ -113,26 +113,23 @@ jobs:
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath $RUNNER_TEMP/App.xcarchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
             DEVELOPMENT_TEAM=Z4W5K7RA37 \
             CODE_SIGN_STYLE=Manual \
             PROVISIONING_PROFILE_SPECIFIER="$IOS_PROFILE_NAME" \
             "${AUTH_ARGS[@]}"
 
           xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/App.xcarchive \
-            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
-            -exportPath $RUNNER_TEMP/build \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/build" \
             "${AUTH_ARGS[@]}"
 
-          IPA_PATH=$(ls $RUNNER_TEMP/build/*.ipa | head -n 1)
-
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA_PATH" \
-            --apiKey "$APP_STORE_KEY_ID" \
-            --apiIssuer "$APP_STORE_ISSUER_ID"
-
+          IPA_PATH=$(find "$RUNNER_TEMP/build" -maxdepth 1 -name '*.ipa' -print -quit)
+          if [ -z "$IPA_PATH" ]; then
+            echo "::error::The archive exported without an IPA."
+            exit 1
+          fi
           cp "$IPA_PATH" "$GITHUB_WORKSPACE/Onlooker.ipa"
 
       - name: Upload installable iOS package
@@ -141,3 +138,14 @@ jobs:
           name: onlooker-ios-ipa
           path: Onlooker.ipa
           if-no-files-found: error
+
+      - name: Upload to App Store Connect
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+        run: |
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$GITHUB_WORKSPACE/Onlooker.ipa" \
+            --apiKey "$APP_STORE_KEY_ID" \
+            --apiIssuer "$APP_STORE_ISSUER_ID"
