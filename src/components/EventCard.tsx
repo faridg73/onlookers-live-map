@@ -54,7 +54,7 @@ export function EventCard({ event, liveCount }: Props) {
     `Event: ${event.name}`,
     event.venueName ? `Venue: ${event.venueName}${event.city ? `, ${event.city}` : ""}` : null,
     `When: ${when}`,
-    "Pan across the crowd and the stage/field, then hold steady on the main action.",
+    "Film from outside the venue only: the crowd out front, the entry or box-office line, the marquee and the pre-event atmosphere on the public sidewalk. Do not film the stage, the field of play, any performance or any ticketed content.",
   ]
     .filter(Boolean)
     .join("\n");

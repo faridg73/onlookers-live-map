@@ -157,7 +157,7 @@ export const VENUE_GROUPS: VenueGroup[] = [
         slug: "hollywood-bowl",
         name: "Hollywood Bowl",
         area: "Hollywood Hills",
-        blurb: "Shuttle stop, picnic terraces and the stage sightline.",
+        blurb: "Shuttle stop, picnic terraces and the walk-up entrance lines.",
         emoji: "\u{1F3B6}",
         category: "events",
         latitude: 34.1122,
