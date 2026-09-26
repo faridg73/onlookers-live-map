@@ -32,7 +32,7 @@ export function CategoryExampleCards({
     <section aria-labelledby="lane-examples" className="mb-6 space-y-3">
       <div className="flex flex-col items-center text-center">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-          <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${def.label}`}
+          <Sparkles className="size-4" /> {tag ? `Explore #${tag}` : `Explore ${laneLabel}`}
         </p>
         <h2 id="lane-examples" className="mt-1 text-lg font-extrabold text-foreground">
           Stories waiting to happen

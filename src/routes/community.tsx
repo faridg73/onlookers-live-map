@@ -927,6 +927,7 @@ function CommunityHub() {
             <CategoryExampleCards
               category={category}
               tag={tag}
+              labelOverride={strangeSightings ? STRANGE_SIGHTINGS_LABEL : categoryId ? broadcastCategoryById(categoryId).label : null}
               onStart={(exampleCategory) => {
                 setCategory(exampleCategory);
                 setLiveFirst(false);
