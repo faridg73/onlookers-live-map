@@ -67,8 +67,33 @@ export function CommunityFeedFilters({
   const [suggesting, setSuggesting] = useState(false);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [saved, setSaved] = useState(false);
   const sessionToken = useRef<string>(crypto.randomUUID());
   const requestId = useRef(0);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Flash a confirmation, then auto-close the sheet so success is visible. */
+  const confirmAndClose = (after?: () => void) => {
+    if (savedTimer.current) clearTimeout(savedTimer.current);
+    setSaved(true);
+    savedTimer.current = setTimeout(() => {
+      setSaved(false);
+      setSheetOpen(false);
+      after?.();
+    }, 900);
+  };
+
+  // Clear any pending auto-close when the sheet closes for any reason.
+  useEffect(() => {
+    if (!sheetOpen) {
+      if (savedTimer.current) {
+        clearTimeout(savedTimer.current);
+        savedTimer.current = null;
+      }
+      setSaved(false);
+    }
+  }, [sheetOpen]);
 
   // Debounced live suggestions while the person types.
   useEffect(() => {
@@ -111,27 +136,30 @@ export function CommunityFeedFilters({
     void resolvePlaceSuggestion({ data: { placeId: suggestion.placeId, sessionToken: sessionToken.current } })
       .then((place) => {
         if (place) {
-          onApplyPlace(place);
-        } else {
-          return onSearchArea(suggestion.text);
+          const applied = onApplyPlace(place);
+          if (applied) confirmAndClose(() => resetSearch());
+          return;
         }
-        return undefined;
+        return onSearchArea(suggestion.text).then((ok) => {
+          if (ok) confirmAndClose(() => resetSearch());
+        });
       })
-      .then(() => resetSearch())
       .catch(() => {
-        void onSearchArea(suggestion.text).then(() => resetSearch());
+        void onSearchArea(suggestion.text).then((ok) => {
+          if (ok) confirmAndClose(() => resetSearch());
+        });
       });
   };
 
   const submitTyped = () => {
     void onSearchArea(query).then((ok) => {
       if (!ok) return;
-      resetSearch();
+      confirmAndClose(() => resetSearch());
     });
   };
 
   return (
-    <Sheet>
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
         <Button
           type="button"
@@ -158,12 +186,18 @@ export function CommunityFeedFilters({
               type="button"
               variant="outline"
               disabled={locationBusy}
-              onClick={() => void onUseMyLocation()}
+              onClick={() => void onUseMyLocation().then((ok) => ok && confirmAndClose())}
               className="w-full justify-center rounded-full border-white/15 bg-zinc-900/50 font-bold text-foreground hover:border-white/25"
             >
               {locationBusy ? <Loader2 className="size-4 animate-spin" /> : <LocateFixed className="size-4" />}
               {locationBusy ? "Locating…" : "Use my location"}
             </Button>
+
+            {saved && (
+              <p role="status" className="flex items-center gap-2 text-sm font-extrabold text-signal">
+                <Check className="size-4" aria-hidden /> Location updated
+              </p>
+            )}
 
             <form
               className="flex gap-2"
