@@ -93,6 +93,19 @@ function CommunityHub() {
   const [category, setCategory] = useState<CommunityCategory | "all">("all");
   const [tag, setTag] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<BroadcastCategoryId | null>(null);
+
+  // Deep link from the Home "Explore by vibe" grid: /community?cat=<lane id>
+  // preselects that lane so the feed opens already filtered to it.
+  useEffect(() => {
+    if (!cat) return;
+    const lane = broadcastCategoryById(cat as BroadcastCategoryId);
+    if (!lane) return;
+    setCategoryId(lane.id);
+    setCategory(lane.communityCategory);
+    setTag(null);
+    setStrangeSightings(false);
+    setVibeGridOpen(true);
+  }, [cat]);
   const [strangeSightings, setStrangeSightings] = useState(false);
   const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
