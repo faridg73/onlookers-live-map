@@ -32,6 +32,7 @@
 - [x] PIN handshake: expiry + single use, resend to agent, onlooker unreachable report (trip fee via dispute), account-free agent decline link with refund + kill fee
 
 ## Native app launch (Capacitor iOS/Android)
+- [ ] Release binaries: Android workflow now exports signed APK + AAB; iOS workflow now installs the signing profile securely and preserves the exported IPA; retrieve artifacts after external runners complete
 - [x] Phase 1 (in-repo): native bridge (deep links appUrlOpen → in-app nav, Android back button → router history), Android https App Links intent filter, iOS App.entitlements (associated domains), /.well-known/apple-app-site-association + assetlinks.json templates, cap sync green, build OK
 - [x] Native-feel release hardening: no browser chrome/reload gestures, full safe-area coverage, iOS swipe-back, native keyboard resizing, and native system-bar styling
 - [x] Responsive release matrix: verify Home gold Pro card, Explore by Vibe, bottom navigation, dialogs, and text-entry flows at iPhone SE, standard iPhone, Pro Max, Android phone, and Android tablet sizes
