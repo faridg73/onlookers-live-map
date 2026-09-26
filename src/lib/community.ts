@@ -206,6 +206,8 @@ export type CommunityPost = {
   flagCount: number;
   trustScore: number;
   reportStatus: "confirmed" | "disputed" | "unverified" | "expired" | null;
+  /** Set when moderation has taken the post out of the feeds. */
+  hiddenAt?: string | null;
 };
 
 const BUCKET = "chat-attachments";
