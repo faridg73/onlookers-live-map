@@ -15,6 +15,7 @@ import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
 import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
 import { useAuth } from "@/hooks/use-auth";
 import { hasMyProAccount } from "@/lib/pro-visits.functions";
+import { LatestNearYouRail } from "@/components/LatestNearYouRail";
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
@@ -541,6 +542,8 @@ export function HomeLiveStage({
             </div>
           )}
         </section>
+
+        <LatestNearYouRail />
 
         {/* 4. Recent results — completed bounties with verified proof, looping thumbnails */}
         <RecentCapturesFeed

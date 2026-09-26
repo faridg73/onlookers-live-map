@@ -85,7 +85,7 @@ export function LatestNearYouRail() {
             <li key={post.id} className="w-44 shrink-0 snap-start">
               <Link
                 to="/community"
-                search={vibe ? ({ cat: vibe.id } as never) : ({} as never)}
+                search={vibe ? { cat: vibe.id } : {}}
                 className="group block overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong hover:border-signal"
               >
                 <span className="relative block aspect-[4/3] overflow-hidden">
