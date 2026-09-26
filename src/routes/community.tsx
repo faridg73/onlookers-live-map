@@ -122,6 +122,28 @@ function CommunityHub() {
   const [listingEvent, setListingEvent] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
+
+  // Returning from sign-in with ?action=live|post|event reopens the exact sheet
+  // the person tapped before they were sent to the sign-in page.
+  const actionHandled = useRef(false);
+  useEffect(() => {
+    if (!action || actionHandled.current) return;
+    actionHandled.current = true;
+    if (action === "event") {
+      setListingEvent(true);
+    } else {
+      setLiveFirst(action === "live");
+      setComposing(true);
+    }
+    void navigate({
+      to: "/community",
+      search: (prev) => {
+        const { action: _drop, ...rest } = prev;
+        return rest;
+      },
+      replace: true,
+    });
+  }, [action, navigate]);
   const [loading, setLoading] = useState(true);
   /** Shown inline with a retry, so a failed load never leaves a blank page. */
   const [loadError, setLoadError] = useState<string | null>(null);
