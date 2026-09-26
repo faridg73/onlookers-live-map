@@ -37,6 +37,7 @@ import {
   type CommunityCategory,
   type CommunityPost,
 } from "@/lib/community";
+import { isPostLive } from "@/lib/community";
 import { CategoryExampleCards } from "@/components/CategoryExampleCards";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
@@ -334,6 +335,7 @@ function CommunityHub() {
       });
 
     const inRange = posts
+      .filter(isPostLive)
       .map((p) => ({ post: p, miles: distanceFor(p) }))
       .filter(({ miles }) => limit === null || (miles !== null && miles <= limit));
 

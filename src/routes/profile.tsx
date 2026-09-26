@@ -57,6 +57,7 @@ import { SocialLinks } from "@/components/Footer";
 import { AccountCenter } from "@/components/AccountCenter";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { fetchProfileStats, type ProfileStats } from "@/lib/profile-stats";
+import { BlockedAccounts } from "@/components/BlockedAccounts";
 
 
 export const Route = createFileRoute("/profile")({
@@ -344,6 +345,16 @@ function ProfileScreen() {
           </span>
           <ChevronRight className="size-4 text-muted-foreground" />
         </Link>
+        <a
+          href="mailto:support@onlooker.io"
+          className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+        >
+          <span className="flex items-center gap-3">
+            <Headphones className="size-4 text-signal" /> Email support
+          </span>
+          <span className="text-xs text-muted-foreground">support@onlooker.io</span>
+        </a>
+        <BlockedAccounts />
         <Link
           to="/disputes"
           className="flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"

@@ -318,6 +318,7 @@ export type Database = {
           event_starts_at: string | null
           expires_at: string | null
           flag_count: number
+          hidden_at: string | null
           id: string
           is_flash: boolean
           latitude: number | null
@@ -348,6 +349,7 @@ export type Database = {
           event_starts_at?: string | null
           expires_at?: string | null
           flag_count?: number
+          hidden_at?: string | null
           id?: string
           is_flash?: boolean
           latitude?: number | null
@@ -378,6 +380,7 @@ export type Database = {
           event_starts_at?: string | null
           expires_at?: string | null
           flag_count?: number
+          hidden_at?: string | null
           id?: string
           is_flash?: boolean
           latitude?: number | null
@@ -430,6 +433,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "community_report_votes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_reports: {
+        Row: {
+          created_at: string
+          details: string
+          id: string
+          post_id: string
+          reason: string
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string
+          id?: string
+          post_id: string
+          reason: string
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string
+          id?: string
+          post_id?: string
+          reason?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_reports_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
@@ -2128,6 +2175,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       user_credit_wallets: {
         Row: {
           created_at: string
@@ -2449,6 +2517,24 @@ export type Database = {
       admin_ban_user: {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
+      }
+      admin_content_reports: {
+        Args: never
+        Returns: {
+          author_id: string
+          author_name: string
+          created_at: string
+          details: string
+          id: string
+          post_body: string
+          post_hidden: boolean
+          post_id: string
+          post_title: string
+          reason: string
+          report_count: number
+          reporter_name: string
+          status: string
+        }[]
       }
       admin_moderation_log: {
         Args: { _limit?: number }
@@ -2989,6 +3075,10 @@ export type Database = {
       }
       request_is_live: { Args: { _request_id: string }; Returns: boolean }
       request_site_pin_state: { Args: { _request_id: string }; Returns: Json }
+      resolve_content_report: {
+        Args: { _action: string; _report_id: string }
+        Returns: undefined
+      }
       resolve_dispute:
         | {
             Args: { _award_spotter: boolean; _request_id: string }
