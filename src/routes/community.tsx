@@ -92,7 +92,7 @@ function CommunityHub() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   const navigate = useNavigate();
-  const { mystery, cat } = Route.useSearch();
+  const { mystery, cat, action } = Route.useSearch();
   const { user } = useAuth();
   const { requests } = useOnlooker();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
