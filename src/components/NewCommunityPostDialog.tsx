@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { VideoRecorder } from "@/components/VideoRecorder";
+import { broadcastExampleSeeds } from "@/lib/community-examples";
 import { AddressSearchField } from "@/components/AddressSearchField";
 import { LocationPreviewMap, type PickedLocation } from "@/components/LocationPreviewMap";
 import {
@@ -80,6 +81,9 @@ export function NewCommunityPostDialog({
 
   const vibe = initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
   const def = categoryDef(vibe ? vibe.communityCategory : category);
+  const iceBreakers = vibe
+    ? broadcastExampleSeeds(vibe.id).map((s) => ({ title: s.title, body: s.body }))
+    : def.iceBreakers;
 
   useEffect(() => {
     if (!open) return;
@@ -205,7 +209,7 @@ export function NewCommunityPostDialog({
           <Sparkles className="size-4" /> Ice-Breakers
         </p>
         <div className="mt-2 space-y-2">
-          {def.iceBreakers.map((ib) => (
+          {iceBreakers.map((ib) => (
             <button
               key={ib.title}
               type="button"

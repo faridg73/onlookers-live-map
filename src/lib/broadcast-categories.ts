@@ -166,3 +166,8 @@ export const BROADCAST_CATEGORIES: readonly BroadcastCategory[] = [
 export function broadcastCategoryById(id: BroadcastCategoryId): BroadcastCategory {
   return BROADCAST_CATEGORIES.find((category) => category.id === id) ?? DEFAULT_BROADCAST_CATEGORY;
 }
+/** The exact vibe a post was tagged with, if any (tags carry the vibe id). */
+export function vibeFromTags(tags: readonly string[]): BroadcastCategory | null {
+  const lower = tags.map((t) => t.toLowerCase());
+  return BROADCAST_CATEGORIES.find((c) => lower.includes(c.id)) ?? null;
+}

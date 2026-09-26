@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { MapPin, Sparkles } from "lucide-react";
 import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { BROADCAST_CATEGORIES } from "@/lib/broadcast-categories";
+import { STARTER_VIBE_PHOTOS } from "@/lib/starter-vibe-photos";
 import { COMMUNITY_VISUALS } from "@/lib/community-visuals";
 import { communityMediaUrls, isPostLive, listCommunityPosts, type CommunityPost } from "@/lib/community";
 
@@ -80,7 +81,8 @@ export function LatestNearYouRail() {
       <ul className="-mx-1 mt-3 flex snap-x gap-2.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
         {ranked.map(({ post, dist }) => {
           const vibe = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
-          const img = (post.mediaPath && media[post.mediaPath]) || COMMUNITY_VISUALS[post.category]?.image;
+          const vibeForImg = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
+          const img = (post.mediaPath && media[post.mediaPath]) || (vibeForImg && STARTER_VIBE_PHOTOS[vibeForImg.id]?.[0]?.src) || COMMUNITY_VISUALS[post.category]?.image;
           return (
             <li key={post.id} className="w-44 shrink-0 snap-start">
               <Link
