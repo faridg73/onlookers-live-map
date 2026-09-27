@@ -38,6 +38,19 @@ const config: CapacitorConfig = {
       style: 'LIGHT',
       backgroundColor: '#000000',
     },
+    // The splash is dismissed from the web layer (src/lib/native.ts) once the
+    // first real layout + fonts are ready, so a cold launch never shows a
+    // half-painted screen.
+    SplashScreen: {
+      launchAutoHide: false,
+      launchShowDuration: 0,
+      backgroundColor: '#000000',
+      showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true,
+      iosSpinnerStyle: 'small',
+      androidScaleType: 'CENTER_CROP',
+    },
   },
 };
 

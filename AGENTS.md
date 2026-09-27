@@ -9,6 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Native releases use Capacitor 8 with a remote `https://onlooker.io` WebView shell; keep native behavior centralized in `src/lib/native.ts` so web behavior stays unchanged.
+- Native releases use Capacitor 8 with a remote `https://www.onlooker.io` WebView shell (non-redirecting host, or Capacitor hands the load to Safari); keep native behavior centralized in `src/lib/native.ts` so web behavior stays unchanged.
+- iOS `SceneDelegate` must create the `UIWindow` and make it key before the bridge view controller loads its view, and the splash screen is hidden from `src/lib/native.ts` after fonts/first layout, so a cold launch never paints at the storyboard's legacy width.
 - Release automation must preserve a signed Android APK/AAB and an iOS IPA artifact; iOS signing uses the decoded profile name explicitly so CI does not depend on a developer machine.
 - Starter-vibe editorial cards use `src/lib/starter-vibe-photos.ts` as the exclusive 4-photo-per-vibe registry so photo reuse cannot occur across vibe feeds.
