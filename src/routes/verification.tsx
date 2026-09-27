@@ -143,7 +143,7 @@ function VerificationScreen() {
             {STEPS.map((step, i) => (
               <li
                 key={step.title}
-                className="flex gap-4 rounded-2xl border border-border bg-card p-4 sm:p-5"
+                className="flex gap-6 rounded-2xl border border-border bg-card p-4 pr-6 sm:gap-7 sm:p-5 sm:pr-8"
               >
                 <div className="flex flex-col items-center gap-1">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-signal/40 bg-signal/10">
@@ -170,7 +170,7 @@ function VerificationScreen() {
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {PROTECTIONS.map((item) => (
-              <div key={item.title} className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+              <div key={item.title} className="rounded-2xl border border-border bg-card p-4 pr-6 sm:p-5 sm:pr-8">
                 <span className="flex size-9 items-center justify-center rounded-lg border border-signal/40 bg-signal/10">
                   <item.icon className="size-4.5 text-signal" aria-hidden />
                 </span>

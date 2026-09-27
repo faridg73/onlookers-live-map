@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, X } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
