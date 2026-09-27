@@ -120,7 +120,11 @@ function DiscoverHome() {
   }, [view, targetKey]);
 
   const eventsGroup = discoveryGroupBySlug("events");
-  const { places: eventPlaces, loading: eventsLoading } = usePlaceList(eventsGroup, null, area, {
+  const {
+    places: eventPlaces,
+    loading: eventsLoading,
+    unavailable: eventsUnavailable,
+  } = usePlaceList(eventsGroup, null, area, {
     maxResults: 20,
   });
   const eventPhoto = usePlacePhotos(eventPlaces);
@@ -332,7 +336,9 @@ function DiscoverHome() {
                     })}
                 {!eventsLoading && eventPlaces.length === 0 && (
                   <p className="rounded-2xl border border-dashed border-border p-4 text-xs text-muted-foreground">
-                    No event venues found around {area.label} yet, try another city.
+                    {eventsUnavailable
+                      ? "Venue results are temporarily unavailable, check back soon."
+                      : `No event venues found around ${area.label} yet, try another city.`}
                   </p>
                 )}
               </ScrollableLane>

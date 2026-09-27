@@ -168,7 +168,11 @@ export const searchPlacesByCategory = createServerFn({ method: "POST" })
     if (!response.ok) {
       const body = await response.text();
       console.error(`[places] category search failed [${response.status}]: ${body}`);
-      return [];
+      // Surface the failure so the page can keep earlier results and explain
+      // the outage instead of claiming the area has no venues.
+      throw new Error(
+        response.status === 429 ? "VENUES_RATE_LIMITED" : `VENUES_UNAVAILABLE_${response.status}`,
+      );
     }
 
     const payload = (await response.json()) as { places?: RawPlace[] };
