@@ -27,7 +27,7 @@ export const Route = createFileRoute("/events")({
       {
         name: "description",
         content:
-          "Browse venues and events around your city — live sports, concerts, fight nights and public gatherings — see the crowd, then launch a live view bounty from that exact spot.",
+          "Browse venues and events around your city — live sports, concerts, fight nights, comedy, theater, festivals and expos — see the crowd, then launch a live view bounty from that exact spot.",
       },
       { property: "og:title", content: "Venues & Events Near You — Live Crowd Views | Onlooker" },
       {
@@ -43,11 +43,17 @@ export const Route = createFileRoute("/events")({
   errorComponent: RouteErrorPanel,
 });
 
+// Mirrors the provider taxonomies: Ticketmaster segments (Music, Sports, Arts & Theatre,
+// Miscellaneous), SeatGeek types (theater, broadway, comedy, …) and Eventbrite categories
+// (performing arts, comedy, expos, festivals & fairs).
 const TAGS = [
   { subId: "stadiums", tag: "Live Sports", keywords: ["sport", "basketball", "football", "baseball", "soccer", "hockey", "tennis", "golf", "motorsport", "racing"] },
-  { subId: "concerts", tag: "Concerts", keywords: ["music", "concert", "rock", "pop", "hip", "rap", "country", "jazz", "latin", "metal", "electronic", "r&b", "dance", "alternative", "blues", "folk"] },
+  { subId: "concerts", tag: "Concerts", keywords: ["music", "concert", "rock", "pop", "hip", "rap", "country", "jazz", "latin", "metal", "electronic", "r&b", "alternative", "blues", "folk"] },
   { subId: "fights", tag: "Fight Nights", keywords: ["boxing", "mma", "ufc", "wrestling", "fight", "martial"] },
-  { subId: "festivals", tag: "Public Gatherings", keywords: ["festival", "fair", "community", "theatre", "theater", "arts", "comedy", "family", "misc", "expo", "parade", "film"] },
+  { subId: "comedy", tag: "Comedy", keywords: ["comedy", "comedian", "stand-up", "standup", "improv"] },
+  { subId: "theater", tag: "Theater & Arts", keywords: ["theatre", "theater", "broadway", "musical", "opera", "ballet", "dance", "classical", "performing arts", "arts"] },
+  { subId: "festivals", tag: "Festivals & Fairs", keywords: ["festival", "fair", "parade", "carnival", "food & drink", "community", "family"] },
+  { subId: "expos", tag: "Expos & Trade Shows", keywords: ["expo", "trade show", "convention", "conference", "summit", "exhibition"] },
 ] as const;
 
 /** True when a listed event belongs to the selected tag. */
@@ -58,16 +64,6 @@ function eventMatchesTag(
   const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
   return meta.keywords.some((word) => haystack.includes(word));
 }
-
-/** Words that mark a listed event as belonging to a creator vibe. */
-const VIBE_EVENT_KEYWORDS: Record<string, string[]> = {
-  foodie: ["food", "wine", "beer", "taste", "culinary", "restaurant", "brunch", "dining", "chef"],
-  "car-spotters": ["auto", "car", "motor", "racing", "nascar", "monster", "truck", "bike"],
-  "style-scout": ["fashion", "style", "pop-up", "market", "expo", "design", "beauty"],
-  "street-music": ["music", "concert", "band", "dj", "jazz", "acoustic", "hip", "rock", "latin", "pop"],
-  "match-day": ["sport", "basketball", "football", "baseball", "soccer", "hockey", "game", "match"],
-  "market-finds": ["market", "flea", "swap", "craft", "vintage", "bazaar", "fair", "expo"],
-};
 
 const WEEKEND = [0, 5, 6];
 
@@ -82,18 +78,15 @@ function EventsScreen() {
   const sports = usePlaceList(group, "stadiums", area, { maxResults: 20 });
   const concerts = usePlaceList(group, "concerts", area, { maxResults: 20 });
   const fights = usePlaceList(group, "fights", area, { maxResults: 20 });
+  const comedy = usePlaceList(group, "comedy", area, { maxResults: 20 });
+  const theater = usePlaceList(group, "theater", area, { maxResults: 20 });
   const gatherings = usePlaceList(group, "festivals", area, { maxResults: 20 });
-  const foodGroup = discoveryGroupBySlug("food");
-  const transitGroup = discoveryGroupBySlug("transit");
-  const mallsGroup = discoveryGroupBySlug("malls");
-  const performancesGroup = discoveryGroupBySlug("performances");
-  const marketsGroup = discoveryGroupBySlug("markets");
-  const foodie = usePlaceList(foodGroup, null, area, { maxResults: 20, enabled: vibeId === "foodie" });
-  const cars = usePlaceList(transitGroup, null, area, { maxResults: 20, enabled: vibeId === "car-spotters" });
-  const style = usePlaceList(mallsGroup, null, area, { maxResults: 20, enabled: vibeId === "style-scout" });
-  const music = usePlaceList(performancesGroup, null, area, { maxResults: 20, enabled: vibeId === "street-music" });
-  const matchDay = usePlaceList(group, "stadiums", area, { maxResults: 20, enabled: vibeId === "match-day" });
-  const marketFinds = usePlaceList(marketsGroup, null, area, { maxResults: 20, enabled: vibeId === "market-finds" });
+  const expos = usePlaceList(group, "expos", area, { maxResults: 20 });
+  const vibeGroup = activeVibe ? discoveryGroupBySlug(activeVibe.groupSlug) : undefined;
+  const vibePlaces = usePlaceList(vibeGroup, activeVibe?.subId ?? null, area, {
+    maxResults: 20,
+    enabled: Boolean(activeVibe && vibeGroup),
+  });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
@@ -101,7 +94,7 @@ function EventsScreen() {
   });
 
   const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
-  const vibeKeywords = activeVibe ? (VIBE_EVENT_KEYWORDS[activeVibe.id] ?? []) : [];
+  const vibeKeywords = activeVibe?.eventKeywords ?? [];
   const visibleEvents = activeVibe
     ? events.filter((event) => {
         const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
@@ -111,17 +104,10 @@ function EventsScreen() {
       ? events.filter((event) => eventMatchesTag(event, activeTag))
       : events;
 
-
-  const buckets = [sports, concerts, fights, gatherings];
-  const vibeBuckets: Record<string, { group: DiscoveryGroup | undefined; places: DiscoveredPlace[]; loading: boolean }> = {
-    foodie: { group: foodGroup, places: foodie.places, loading: foodie.loading },
-    "car-spotters": { group: transitGroup, places: cars.places, loading: cars.loading },
-    "style-scout": { group: mallsGroup, places: style.places, loading: style.loading },
-    "street-music": { group: performancesGroup, places: music.places, loading: music.loading },
-    "match-day": { group, places: matchDay.places, loading: matchDay.loading },
-    "market-finds": { group: marketsGroup, places: marketFinds.places, loading: marketFinds.loading },
-  };
-  const activeBucket = activeVibe ? vibeBuckets[activeVibe.id] : null;
+  const buckets = [sports, concerts, fights, comedy, theater, gatherings, expos];
+  const activeBucket = activeVibe
+    ? { group: vibeGroup, places: vibePlaces.places, loading: vibePlaces.loading }
+    : null;
   const loading = activeBucket ? activeBucket.loading : buckets.some((b) => b.loading);
 
   const seen = new Set<string>();
@@ -207,7 +193,7 @@ function EventsScreen() {
         </SectionBoundary>
       </div>
 
-      {!activeVibe && <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
+      {!activeVibe && <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
         <button
           type="button"
           onClick={() => setFilter(null)}

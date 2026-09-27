@@ -47,6 +47,9 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
       { id: "concerts", label: "Concerts & shows", includedTypes: ["concert_hall", "performing_arts_theater"] },
       { id: "fights", label: "Fight nights & big screens", includedTypes: ["bar", "casino"] },
       { id: "festivals", label: "Festival grounds", includedTypes: ["amusement_park", "park"] },
+      { id: "comedy", label: "Comedy clubs", includedTypes: ["comedy_club"] },
+      { id: "theater", label: "Theaters & arts", includedTypes: ["performing_arts_theater", "opera_house"] },
+      { id: "expos", label: "Expos & trade shows", includedTypes: ["convention_center", "event_venue"] },
     ],
   },
   {
