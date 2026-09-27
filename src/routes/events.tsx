@@ -98,10 +98,12 @@ function EventsScreen() {
 
   const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
   const vibeKeywords = activeVibe?.eventKeywords ?? [];
+  const subKeywords = activeSub?.keywords ?? [];
   const visibleEvents = activeVibe
     ? events.filter((event) => {
         const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
-        return vibeKeywords.some((word) => haystack.includes(word));
+        if (!vibeKeywords.some((word) => haystack.includes(word))) return false;
+        return subKeywords.length === 0 || subKeywords.some((word) => haystack.includes(word));
       })
     : activeTag
       ? events.filter((event) => eventMatchesTag(event, activeTag))
