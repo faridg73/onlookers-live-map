@@ -59,6 +59,11 @@ export function fetchReputationCard(id: string): Promise<ReputationCard | null> 
   return p;
 }
 
+/** Drop a cached card so the next fetch shows fresh numbers (e.g. after a new rating). */
+export function invalidateReputationCard(id: string) {
+  cache.delete(id);
+}
+
 export function handleFor(card: { handle: string | null; name: string }): string {
   const h = card.handle || card.name.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "onlooker";
   return `@${h}`;

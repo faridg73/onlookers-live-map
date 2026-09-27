@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { ReputationCard } from "@/components/ReputationCard";
+import { HunterWithRating } from "@/components/RateHunterPrompt";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BadgeDollarSign,
@@ -230,10 +230,11 @@ export function PosterBountyDashboard() {
                   {stage.label} · {formatAgoISO(row.createdAt)}
                 </p>
                 {row.claimerId && (
-                  <ReputationCard
-                    userId={row.claimerId}
-                    fallbackName="Hunter"
-                    className="mt-3 rounded-xl border border-border bg-surface-raised p-3"
+                  <HunterWithRating
+                    requestId={row.id}
+                    hunterId={row.claimerId}
+                    complete={row.stage === "completed"}
+                    cardClassName="mt-3 rounded-xl border border-border bg-surface-raised p-3"
                   />
                 )}
 
