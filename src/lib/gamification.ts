@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrl } from "@/lib/profile";
 
 /** Reliability tiers earned by completing bounties (10 XP each, a level per 500 XP). */
 export type HunterTier = {
@@ -54,7 +55,7 @@ export async function fetchHunterStats(): Promise<HunterStats | null> {
     isIncognito: data.is_incognito ?? false,
     alias: data.alias ?? "Onlooker_Fox",
     displayName: data.display_name ?? "onlooker",
-    avatarUrl: data.avatar_url ?? null,
+    avatarUrl: await resolveAvatarUrl(data.avatar_url),
   };
 }
 

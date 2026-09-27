@@ -77,7 +77,56 @@ export function usernameProblem(username: string): string | null {
   return null;
 }
 
-/** Uploads a chosen image to private cloud storage and returns a long-lived link. */
+const AVATAR_BUCKET = "avatars";
+
+/**
+ * Stored avatar values are either a plain storage path or a legacy signed URL
+ * (signed URLs expire, which broke photos on cards). Extract the path either way.
+ * External URLs (e.g. OAuth provider avatars) have no path and return null.
+ */
+export function avatarPathFrom(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const signed = value.match(/\/object\/sign\/avatars\/([^?]+)/);
+  if (signed) return decodeURIComponent(signed[1]!);
+  if (value.startsWith("http")) return null;
+  return value;
+}
+
+/** Value safe to store on profiles.avatar_url: a storage path, or an external URL untouched. */
+export function storableAvatarValue(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return avatarPathFrom(value) ?? value;
+}
+
+/** Fresh signed URL for a stored avatar path; external URLs pass through. */
+export async function resolveAvatarUrl(value: string | null | undefined): Promise<string | null> {
+  if (!value) return null;
+  const path = avatarPathFrom(value);
+  if (!path) return value.startsWith("http") ? value : null;
+  const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrl(path, 60 * 60);
+  return data?.signedUrl ?? null;
+}
+
+/** Batch version of resolveAvatarUrl — one storage call for a whole list. */
+export async function resolveAvatarUrls(values: (string | null | undefined)[]): Promise<(string | null)[]> {
+  const paths = values.map(avatarPathFrom);
+  const unique = [...new Set(paths.filter((p): p is string => Boolean(p)))];
+  const signed = new Map<string, string>();
+  if (unique.length > 0) {
+    const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrls(unique, 60 * 60);
+    for (const entry of data ?? []) {
+      if (entry.path && entry.signedUrl) signed.set(entry.path, entry.signedUrl);
+    }
+  }
+  return values.map((value, i) => {
+    if (!value) return null;
+    const path = paths[i];
+    if (!path) return value.startsWith("http") ? value : null;
+    return signed.get(path) ?? null;
+  });
+}
+
+/** Uploads a chosen image to cloud storage and returns its permanent storage path. */
 export async function uploadAvatarFile(file: File): Promise<string> {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
@@ -85,23 +134,19 @@ export async function uploadAvatarFile(file: File): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Choose an image file.");
   if (file.size > 5 * 1024 * 1024) throw new Error("Images must be under 5 MB.");
 
-  const { data: existing } = await supabase.storage.from("avatars").list(user.id);
+  const { data: existing } = await supabase.storage.from(AVATAR_BUCKET).list(user.id);
   const oldPaths = (existing ?? []).map((entry) => `${user.id}/${entry.name}`);
 
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
   const path = `${user.id}/avatar-${Date.now()}.${ext || "jpg"}`;
 
   const { error } = await supabase.storage
-    .from("avatars")
+    .from(AVATAR_BUCKET)
     .upload(path, file, { contentType: file.type, upsert: true });
   if (error) throw error;
 
-  const { data: signed, error: signError } = await supabase.storage
-    .from("avatars")
-    .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
-  if (signError || !signed?.signedUrl) throw signError ?? new Error("Could not link your photo.");
-  if (oldPaths.length > 0) await supabase.storage.from("avatars").remove(oldPaths);
-  return signed.signedUrl;
+  if (oldPaths.length > 0) await supabase.storage.from(AVATAR_BUCKET).remove(oldPaths);
+  return path;
 }
 
 export async function updateMyProfile(input: {
@@ -128,7 +173,7 @@ export async function updateMyProfile(input: {
       full_name: fullName,
       location: location || null,
       bio: bio || null,
-      avatar_url: input.avatarUrl,
+      avatar_url: storableAvatarValue(input.avatarUrl),
     })
     .eq("id", auth.user.id)
     .select(PROFILE_COLUMNS)
@@ -185,7 +230,7 @@ export async function fetchMyProfile(expectedUserId?: string): Promise<MyProfile
     .maybeSingle();
   if (error) throw error;
 
-  if (data) return data as MyProfile;
+  if (data) return { ...(data as MyProfile), avatar_url: await resolveAvatarUrl(data.avatar_url) };
 
   const seed = {
     id: user.id,
@@ -231,7 +276,7 @@ export async function completeMyProfile(input: {
       legal_last_name: last,
       display_name: username,
       full_name: `${first} ${last}`.trim(),
-      avatar_url: input.avatar_url ?? null,
+      avatar_url: storableAvatarValue(input.avatar_url),
       onboarded: true,
       terms_accepted_at: readRememberedTerms() ?? new Date().toISOString(),
     })

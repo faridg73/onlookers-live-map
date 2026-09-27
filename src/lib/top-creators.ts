@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 export type TopCreator = {
   id: string;
@@ -33,11 +34,13 @@ export async function listTopCreators(limit = 12): Promise<TopCreator[]> {
     });
   }
 
+  const avatars = await resolveAvatarUrls(profiles.map((profile) => profile.avatar_url));
+
   return profiles
-    .map((profile) => ({
+    .map((profile, i) => ({
       id: profile.id,
       name: profile.name || "Onlooker",
-      avatarUrl: profile.avatar_url,
+      avatarUrl: avatars[i] ?? null,
       verified: Boolean(profile.is_verified),
       followerCount: profile.follower_count ?? 0,
       totalViews: activity.get(profile.id)?.views ?? 0,

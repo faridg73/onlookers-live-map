@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 export type ReputationCard = {
   id: string;
@@ -23,14 +24,16 @@ async function load(ids: string[]): Promise<Map<string, ReputationCard>> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)("public_reputation_cards", { _ids: ids });
   if (error) throw new Error(error.message);
-  const out = new Map<string, ReputationCard>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  for (const r of (data ?? []) as any[]) {
+  const rows = (data ?? []) as any[];
+  const avatars = await resolveAvatarUrls(rows.map((r) => r.avatar_url as string | null));
+  const out = new Map<string, ReputationCard>();
+  rows.forEach((r, i) => {
     out.set(r.id, {
       id: r.id,
       name: r.name || "Onlooker",
       handle: r.handle ?? null,
-      avatarUrl: r.avatar_url ?? null,
+      avatarUrl: avatars[i] ?? null,
       verified: Boolean(r.is_verified),
       followerCount: r.follower_count ?? 0,
       followingCount: r.following_count ?? 0,
@@ -40,7 +43,7 @@ async function load(ids: string[]): Promise<Map<string, ReputationCard>> {
       onTimeRate: r.on_time_rate ?? 0,
       idConfirmed: Boolean(r.id_confirmed),
     });
-  }
+  });
   return out;
 }
 

@@ -36,6 +36,20 @@ export type ExploreComment = {
 const BUCKET = "bounty-videos";
 
 /**
+ * Stored avatar values may be a plain storage path or a legacy signed URL
+ * (signed URLs expire, which broke photos). Sign a fresh short-lived link.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function signAvatar(admin: any, value: string | null | undefined): Promise<string | null> {
+  if (!value) return null;
+  const legacy = value.match(/\/object\/sign\/avatars\/([^?]+)/);
+  const path = legacy ? decodeURIComponent(legacy[1]!) : value.startsWith("http") ? null : value;
+  if (!path) return value.startsWith("http") ? value : null;
+  const { data } = await admin.storage.from("avatars").createSignedUrl(path, 60 * 60);
+  return data?.signedUrl ?? null;
+}
+
+/**
  * Public Explore feed. Clips live in a private bucket, so the server signs
  * short-lived playback links for anyone browsing — no sign-in required.
  */
@@ -92,7 +106,7 @@ export const listExploreClips = createServerFn({ method: "GET" })
           createdAt: r.created_at,
           views: r.view_count,
           uploaderName: r.uploader_name,
-          uploaderAvatar: r.uploader_avatar,
+          uploaderAvatar: await signAvatar(supabaseAdmin, r.uploader_avatar),
           comments: r.comment_count,
           reviews: r.review_count,
           rating: Number(r.average_rating),
@@ -123,13 +137,15 @@ export const listClipComments = createServerFn({ method: "GET" })
       .in("id", [...new Set(rows.map((r) => r.user_id))]);
 
     const byId = new Map((people ?? []).map((p) => [p.id, p]));
-    return rows.map((r) => ({
-      id: r.id,
-      body: r.body,
-      createdAt: r.created_at,
-      authorName: byId.get(r.user_id)?.display_name ?? "onlooker",
-      authorAvatar: byId.get(r.user_id)?.avatar_url ?? null,
-    }));
+    return Promise.all(
+      rows.map(async (r) => ({
+        id: r.id,
+        body: r.body,
+        createdAt: r.created_at,
+        authorName: byId.get(r.user_id)?.display_name ?? "onlooker",
+        authorAvatar: await signAvatar(supabaseAdmin, byId.get(r.user_id)?.avatar_url),
+      })),
+    );
   });
 
 /**

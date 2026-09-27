@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { signAvatar } from "@/lib/explore.functions";
 
 /** A completed, already-paid clip anyone can watch from the Global Feed map. */
 export type GlobalClip = {
@@ -56,7 +57,7 @@ export const listGlobalClips = createServerFn({ method: "GET" })
           createdAt: r.created_at,
           views: r.view_count,
           uploaderName: r.uploader_name,
-          uploaderAvatar: r.uploader_avatar,
+          uploaderAvatar: await signAvatar(supabaseAdmin, r.uploader_avatar),
           hunterLevel: r.hunter_level ?? 1,
           tipTotal: Number(r.tip_total ?? 0),
           latitude: r.latitude ?? null,

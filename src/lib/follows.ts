@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 /** Whether the signed-in user follows this creator, plus the live follower count. */
 export async function fetchFollowState(
@@ -76,10 +77,12 @@ export async function listFollowedCreators(): Promise<FollowedCreator[]> {
     console.error("[follows] could not load followed creator profiles", error);
     throw new Error(error.message);
   }
-  return (data ?? []).map((p) => ({
+  const rows = data ?? [];
+  const avatars = await resolveAvatarUrls(rows.map((p) => p.avatar_url));
+  return rows.map((p, i) => ({
     id: p.id,
     name: p.name || "Onlooker",
-    avatarUrl: p.avatar_url,
+    avatarUrl: avatars[i] ?? null,
     verified: Boolean(p.is_verified),
     followerCount: p.follower_count ?? 0,
   }));
