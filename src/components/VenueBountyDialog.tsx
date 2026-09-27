@@ -73,7 +73,7 @@ export function VenueBountyDialog({
   /** Pre-filled camera instructions for that event. */
   defaultNote?: string;
   /** Set when opened from a ticketed event card: shows the event chip + guardrail. */
-  eventContext?: { name: string; venueName: string | null; when: string; imageUrl: string | null };
+  eventContext?: { name: string; venueName: string | null; when: string; imageUrl: string | null } | undefined;
 }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
