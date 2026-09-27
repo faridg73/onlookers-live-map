@@ -34,11 +34,49 @@ export function pathFromAppUrl(url: string): string | null {
 }
 
 let initialized = false;
+let splashHidden = false;
 
 function revealFocusedField() {
   const active = document.activeElement;
   if (!(active instanceof HTMLElement)) return;
   window.setTimeout(() => active.scrollIntoView({ block: "center", behavior: "smooth" }), 120);
+}
+
+// Waits for the first *complete* layout: web fonts resolved plus two animation
+// frames, so the very first thing the user sees is the finished screen rather
+// than a half-painted one. Bounded by a timeout so a slow font CDN can never
+// leave the app stuck behind the splash.
+function firstPaintReady(timeoutMs = 2500): Promise<void> {
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    window.setTimeout(done, timeoutMs);
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
+    const ready = fonts?.ready ?? Promise.resolve();
+    void Promise.resolve(ready).then(() => {
+      requestAnimationFrame(() => requestAnimationFrame(done));
+    });
+  });
+}
+
+/**
+ * Hides the native splash screen once the web layer has finished its first
+ * full layout. Safe to call more than once; no-ops on the web.
+ */
+export async function hideNativeSplash() {
+  if (splashHidden || !isNativeApp()) return;
+  splashHidden = true;
+  try {
+    const { SplashScreen } = await import("@capacitor/splash-screen");
+    await firstPaintReady();
+    await SplashScreen.hide({ fadeOutDuration: 200 });
+  } catch {
+    // Splash plugin unavailable (older binary) — nothing to hide.
+  }
 }
 
 // Call once from the root component (inside an effect). Registers:
