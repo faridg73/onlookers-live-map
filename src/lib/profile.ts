@@ -113,9 +113,14 @@ export async function resolveAvatarUrls(values: (string | null | undefined)[]): 
   const unique = [...new Set(paths.filter((p): p is string => Boolean(p)))];
   const signed = new Map<string, string>();
   if (unique.length > 0) {
-    const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrls(unique, 60 * 60);
-    for (const entry of data ?? []) {
-      if (entry.path && entry.signedUrl) signed.set(entry.path, entry.signedUrl);
+    try {
+      const { signAvatarPaths } = await import("@/lib/avatar-urls.functions");
+      for (let i = 0; i < unique.length; i += 60) {
+        const batch = await signAvatarPaths({ data: { paths: unique.slice(i, i + 60) } });
+        for (const [path, url] of Object.entries(batch)) signed.set(path, url);
+      }
+    } catch (error) {
+      console.warn("[avatars] signing failed", error);
     }
   }
   return values.map((value, i) => {
