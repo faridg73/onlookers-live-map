@@ -128,6 +128,9 @@ function EventsScreen() {
     ? { group: vibeGroup, places: vibePlaces.places, loading: vibePlaces.loading || (showCoworking && coworking.isLoading) }
     : null;
   const loading = activeBucket ? activeBucket.loading : buckets.some((b) => b.loading);
+  const venuesUnavailable = activeVibe
+    ? vibePlaces.unavailable
+    : buckets.some((b) => b.unavailable);
 
   const seen = new Set<string>();
   const items: Array<{ place: DiscoveredPlace; tag: string; group: DiscoveryGroup }> = [];
@@ -363,9 +366,16 @@ function EventsScreen() {
             <div key={i} className="h-32 animate-pulse rounded-2xl border border-border bg-surface" />
           ))}
 
+        {!loading && venuesUnavailable && items.length > 0 && (
+          <p className="text-center text-xs text-muted-foreground">
+            Showing earlier results — live venue updates are temporarily unavailable.
+          </p>
+        )}
         {!loading && items.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            No trending venues found around {area.label} yet, try another city above.
+            {venuesUnavailable
+              ? "Venue results are temporarily unavailable, check back soon."
+              : `No trending venues found around ${area.label} yet, try another city above.`}
           </p>
         )}
       </div>}
