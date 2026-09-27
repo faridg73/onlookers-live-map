@@ -4,7 +4,12 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
-import { BLOCKED_REQUEST_MESSAGE, findForbiddenTerms } from "@/lib/moderation";
+import {
+  BLOCKED_REQUEST_MESSAGE,
+  EVENT_BLOCKED_MESSAGE,
+  findEventPerformanceTerms,
+  findForbiddenTerms,
+} from "@/lib/moderation";
 import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeMultiline, safeText } from "@/lib/sanitize";
 import { assertHuman } from "@/lib/turnstile.functions";
@@ -65,6 +70,13 @@ const createSchema = z.object({
   bountyTier: z.enum(["standard", "fast_catch", "priority_hunt"]).nullable().optional(),
   /** Cloudflare Turnstile token proving a person posted this request. */
   captchaToken: z.string().max(4000).nullable().optional(),
+  /**
+   * Set when the bounty was opened from a ticketed event card. Event-tied
+   * bounties may only ask for exterior, line, or pre/after-party footage —
+   * the performance phrases are blocked server-side so an API caller cannot
+   * skip the check the dialog runs.
+   */
+  eventTied: z.boolean().optional().default(false),
 });
 
 /** Current wallet balance for the signed-in requester. */
@@ -113,6 +125,22 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         source: "request",
       });
       throw new Error(BLOCKED_REQUEST_MESSAGE);
+    }
+
+    // Same guard for show-footage phrases on event-tied bounties; without it
+    // a direct API caller could bypass the dialog's warning entirely.
+    if (data.eventTied) {
+      const performanceHits = findEventPerformanceTerms(data.prompt, data.details, data.locationName);
+      if (performanceHits.length > 0) {
+        await supabaseAdmin.from("moderation_flags").insert({
+          user_id: context.userId,
+          title: data.prompt,
+          details: data.details ?? "",
+          matched_terms: performanceHits,
+          source: "request",
+        });
+        throw new Error(EVENT_BLOCKED_MESSAGE);
+      }
     }
 
     if (data.category === "realestate" && !data.authorizationConfirmed) {
