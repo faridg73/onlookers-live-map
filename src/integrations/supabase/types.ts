@@ -1208,54 +1208,6 @@ export type Database = {
           },
         ]
       }
-      posts: {
-        Row: {
-          author_name: string
-          caption: string
-          categories: string[]
-          created_at: string
-          id: string
-          is_live: boolean
-          media_path: string
-          media_type: string
-          place: string
-          title: string
-          updated_at: string
-          user_id: string
-          views: number
-        }
-        Insert: {
-          author_name?: string
-          caption?: string
-          categories?: string[]
-          created_at?: string
-          id?: string
-          is_live?: boolean
-          media_path: string
-          media_type?: string
-          place: string
-          title: string
-          updated_at?: string
-          user_id: string
-          views?: number
-        }
-        Update: {
-          author_name?: string
-          caption?: string
-          categories?: string[]
-          created_at?: string
-          id?: string
-          is_live?: boolean
-          media_path?: string
-          media_type?: string
-          place?: string
-          title?: string
-          updated_at?: string
-          user_id?: string
-          views?: number
-        }
-        Relationships: []
-      }
       pro_accounts: {
         Row: {
           company: string
