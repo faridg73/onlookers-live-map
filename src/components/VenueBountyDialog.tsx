@@ -73,7 +73,7 @@ export function VenueBountyDialog({
   /** Pre-filled camera instructions for that event. */
   defaultNote?: string;
   /** Set when opened from a ticketed event card: shows the event chip + guardrail. */
-  eventContext?: { name: string; venueName: string | null; when: string; imageUrl: string | null } | undefined;
+  eventContext?: { id: string; name: string; venueName: string | null; when: string; imageUrl: string | null } | undefined;
 }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
@@ -237,9 +237,9 @@ export function VenueBountyDialog({
         bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
         scheduledStartAt:
           mode === "clip" && scheduledStart ? scheduledStart.toISOString() : null,
-        // Tells the server to enforce the exterior-only rule too, so the
-        // check holds even if someone posts straight through the API.
-        eventTied: Boolean(eventContext),
+        // The server looks this event up itself and applies the
+        // exterior-only rule; nothing here asserts "event-tied".
+        eventId: eventContext?.id ?? null,
       });
       setBalance(locked.balance);
       addRequest({

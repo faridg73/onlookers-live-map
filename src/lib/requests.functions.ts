@@ -71,12 +71,11 @@ const createSchema = z.object({
   /** Cloudflare Turnstile token proving a person posted this request. */
   captchaToken: z.string().max(4000).nullable().optional(),
   /**
-   * Set when the bounty was opened from a ticketed event card. Event-tied
-   * bounties may only ask for exterior, line, or pre/after-party footage —
-   * the performance phrases are blocked server-side so an API caller cannot
-   * skip the check the dialog runs.
+   * Id of the listed event this bounty is for (e.g. "tm-…", "sg-…", "eb-…",
+   * "onlooker-…"). The server verifies it and applies the show-footage block
+   * itself — there is no client-asserted "event-tied" flag.
    */
-  eventTied: z.boolean().optional().default(false),
+  eventId: z.string().trim().min(1).max(140).nullable().optional(),
 });
 
 /** Current wallet balance for the signed-in requester. */
@@ -129,7 +128,14 @@ export const createBountyRequest = createServerFn({ method: "POST" })
 
     // Same guard for show-footage phrases on event-tied bounties; without it
     // a direct API caller could bypass the dialog's warning entirely.
-    if (data.eventTied) {
+    if (data.eventId) {
+      const { verifyListedEvent } = await import("./event-verify.server");
+      const verdict = await verifyListedEvent(data.eventId);
+      if (verdict === "not_found") {
+        throw new Error("We couldn't find that event. Pick it again from the events list.");
+      }
+      // "listed" and "unverifiable" (provider down) both get the block, so an
+      // outage never lets a real event's bounty skip the check.
       const performanceHits = findEventPerformanceTerms(data.prompt, data.details, data.locationName);
       if (performanceHits.length > 0) {
         await supabaseAdmin.from("moderation_flags").insert({
