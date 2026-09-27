@@ -363,3 +363,41 @@ export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
 
     return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => !!entry));
   });
+
+const textSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  query: z.enum(["coworking space", "startup incubator", "makerspace"]),
+  maxResults: z.number().int().min(1).max(20).default(12),
+});
+
+/** Public text search for fixed discovery phrases (e.g. coworking) near the browsing area. */
+export const searchPlacesByPhrase = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => textSchema.parse(data))
+  .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+    await enforceRateLimit(RATE_LIMITS.placesSearch);
+    const creds = credentials();
+    if (!creds) return [];
+    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${creds.lovableKey}`,
+        "X-Connection-Api-Key": creds.mapsKey,
+        "Content-Type": "application/json",
+        "X-Goog-FieldMask": DISCOVERY_FIELDS,
+      },
+      body: JSON.stringify({
+        textQuery: data.query,
+        pageSize: data.maxResults,
+        locationBias: {
+          circle: { center: { latitude: data.latitude, longitude: data.longitude }, radius: 30000 },
+        },
+      }),
+    });
+    if (!response.ok) {
+      console.error(`[places] phrase search failed [${response.status}]: ${await response.text()}`);
+      return [];
+    }
+    const payload = (await response.json()) as { places?: RawPlace[] };
+    return (payload.places ?? []).flatMap(toDiscovered);
+  });

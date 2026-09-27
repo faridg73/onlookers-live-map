@@ -19,6 +19,10 @@ import { CREATOR_VIBES } from "@/lib/creator-vibes";
 import type { DiscoveryGroup } from "@/lib/discovery";
 import { PageBackButton } from "@/components/PageBackButton";
 import { VibeOwnContent } from "@/components/VibeOwnContent";
+import { WeatherAlertsBanner } from "@/components/WeatherAlertsBanner";
+import { searchPlacesByPhrase } from "@/lib/places.functions";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 
 
 export const Route = createFileRoute("/events")({
@@ -91,6 +95,15 @@ function EventsScreen() {
     maxResults: 20,
     enabled: Boolean(activeVibe && vibeGroup && !hidePlaces),
   });
+  const showCoworking = activeVibe?.id === "tech-innovation" && (!activeSub || activeSub.subId === "hubs");
+  const phraseSearch = useServerFn(searchPlacesByPhrase);
+  const coworking = useQuery({
+    queryKey: ["coworking", area.latitude.toFixed(2), area.longitude.toFixed(2)],
+    queryFn: () =>
+      phraseSearch({ data: { latitude: area.latitude, longitude: area.longitude, query: "coworking space", maxResults: 12 } }),
+    enabled: showCoworking,
+    staleTime: 30 * 60_000,
+  });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
     weekendOnly: true,
@@ -112,13 +125,20 @@ function EventsScreen() {
 
   const buckets = [sports, concerts, fights, comedy, theater, gatherings, expos];
   const activeBucket = activeVibe
-    ? { group: vibeGroup, places: vibePlaces.places, loading: vibePlaces.loading }
+    ? { group: vibeGroup, places: vibePlaces.places, loading: vibePlaces.loading || (showCoworking && coworking.isLoading) }
     : null;
   const loading = activeBucket ? activeBucket.loading : buckets.some((b) => b.loading);
 
   const seen = new Set<string>();
   const items: Array<{ place: DiscoveredPlace; tag: string; group: DiscoveryGroup }> = [];
   if (activeVibe && activeBucket?.group) {
+    if (showCoworking) {
+      for (const place of coworking.data ?? []) {
+        if (seen.has(place.id)) continue;
+        seen.add(place.id);
+        items.push({ place, tag: "Coworking", group: activeBucket.group });
+      }
+    }
     // Big-box and mall listings are what made the style lane read as filler, but
     // never filter the lane down to nothing.
     const kept = activeVibe.excludeBigBox
@@ -275,6 +295,12 @@ function EventsScreen() {
             ))}
           </div>
         </div>
+      )}
+
+      {activeVibe?.id === "breaking-incidents" && (
+        <SectionBoundary label="Weather alerts">
+          <WeatherAlertsBanner latitude={area.latitude} longitude={area.longitude} />
+        </SectionBoundary>
       )}
 
       {activeVibe?.ownContent && (
