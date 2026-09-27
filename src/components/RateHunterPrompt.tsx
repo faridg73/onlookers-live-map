@@ -75,7 +75,7 @@ export function HunterWithRating({
 
   return (
     <>
-      <ReputationCard key={version} userId={hunterId} fallbackName="Hunter" className={cardClassName} />
+      <ReputationCard key={version} userId={hunterId} fallbackName="Hunter" className={cardClassName ?? ""} />
       {complete && typeof existing === "number" && (
         <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
           You rated this hunter {existing}
