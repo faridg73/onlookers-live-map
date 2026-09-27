@@ -166,14 +166,17 @@ function RootComponent() {
       <AuthProvider>
         <OnlookerProvider>
           <BoostProvider>
-            {/* Fixed navigation needs reserved space so page endings remain readable above it. */}
+            {/* Scrollable pages fill the viewport above the fixed navigation. The bottom
+                margin occupies the nav's measured footprint without painting a visible gap. */}
             <div
               className={`flex flex-col bg-background text-foreground ${
-                !embedded && pathname !== "/" ? "pb-[calc(var(--bottom-nav-height)+1rem)]" : ""
+                !embedded && pathname !== "/"
+                  ? "mb-[var(--bottom-nav-height)] min-h-[calc(100dvh-var(--bottom-nav-height))]"
+                  : ""
               }`}
             >
-              {/* Route content sets its natural height so empty feeds do not create a black void. */}
-              <main className="w-full">
+              {/* Growing content pins the footer to the navigation on short pages. */}
+              <main className="w-full flex-1">
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
                 <Outlet />
               </main>

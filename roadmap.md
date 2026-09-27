@@ -9,6 +9,7 @@
 - [x] Publish updated version
 - [x] Home: remove map canvas and use premium charcoal glass background; restore standard road maps globally
 - [x] Navigation: remove the top-right logo globally and show the secondary menu only on Profile
+- [x] Shared short-page layout: pin the footer directly above the fixed bottom navigation without native-app dead space
 
 ## Ticker readout
 - [x] Make LIVE/ALERTS/BOUNTIES/TOP POOL ticker items clickable

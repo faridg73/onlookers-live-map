@@ -108,7 +108,7 @@ const AUDIENCES: Array<{ icon: LucideIcon; title: string; body: string }> = [
 
 function VerificationScreen() {
   return (
-    <div className="min-h-screen bg-background pb-safe">
+    <div className="bg-background">
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-4 sm:px-6">
         <PageBackButton label="Home" fallback="/" />
 
