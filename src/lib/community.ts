@@ -298,6 +298,9 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
         verified: Boolean(p.is_verified),
       });
     }
+    const entries = [...authors.entries()];
+    const resolved = await resolveAvatarUrls(entries.map(([, a]) => a.avatar));
+    entries.forEach(([id, a], i) => authors.set(id, { ...a, avatar: resolved[i] ?? null }));
   }
 
   const posts: CommunityPost[] = rows.map((r) => ({

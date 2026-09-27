@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 /** Whether the signed-in user follows this creator, plus the live follower count. */
 export async function fetchFollowState(
