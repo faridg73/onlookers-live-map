@@ -140,9 +140,21 @@ const categorySchema = z.object({
 export const searchPlacesByCategory = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => categorySchema.parse(data))
   .handler(async ({ data }): Promise<{ places: DiscoveredPlace[]; unavailable: boolean }> => {
+    const cacheMod = await import("@/lib/venue-cache.server");
+    const key = cacheMod.venueCacheKey("category", data.latitude, data.longitude, [
+      [...data.includedTypes].sort(),
+      data.radiusMeters,
+      data.maxResults,
+    ]);
+    const cached = await cacheMod.readVenueCache(key);
+    if (cached?.fresh) return { places: cached.places, unavailable: false };
+    // If Google fails, older shared results are better than an empty list.
+    const stale = () =>
+      cached ? { places: cached.places, unavailable: false } : { places: [], unavailable: true };
+
     await enforceRateLimit(RATE_LIMITS.placesSearch);
     const creds = credentials();
-    if (!creds) return { places: [], unavailable: true };
+    if (!creds) return stale();
 
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
       method: "POST",
@@ -168,13 +180,13 @@ export const searchPlacesByCategory = createServerFn({ method: "POST" })
     if (!response.ok) {
       const body = await response.text();
       console.error(`[places] category search failed [${response.status}]: ${body}`);
-      // Report the outage as data (not a thrown error) so the page keeps
-      // earlier results and explains it instead of crashing.
-      return { places: [], unavailable: true };
+      return stale();
     }
 
     const payload = (await response.json()) as { places?: RawPlace[] };
-    return { places: (payload.places ?? []).flatMap(toDiscovered), unavailable: false };
+    const places = (payload.places ?? []).flatMap(toDiscovered);
+    await cacheMod.writeVenueCache(key, places);
+    return { places, unavailable: false };
   });
 
 /** Details for one place, used when opening a live place page. */
@@ -377,9 +389,14 @@ const textSchema = z.object({
 export const searchPlacesByPhrase = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => textSchema.parse(data))
   .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+    const cacheMod = await import("@/lib/venue-cache.server");
+    const key = cacheMod.venueCacheKey("phrase", data.latitude, data.longitude, [data.query, data.maxResults]);
+    const cached = await cacheMod.readVenueCache(key);
+    if (cached?.fresh) return cached.places;
+
     await enforceRateLimit(RATE_LIMITS.placesSearch);
     const creds = credentials();
-    if (!creds) return [];
+    if (!creds) return cached?.places ?? [];
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
       method: "POST",
       headers: {
@@ -398,8 +415,10 @@ export const searchPlacesByPhrase = createServerFn({ method: "POST" })
     });
     if (!response.ok) {
       console.error(`[places] phrase search failed [${response.status}]: ${await response.text()}`);
-      return [];
+      return cached?.places ?? [];
     }
     const payload = (await response.json()) as { places?: RawPlace[] };
-    return (payload.places ?? []).flatMap(toDiscovered);
+    const places = (payload.places ?? []).flatMap(toDiscovered);
+    await cacheMod.writeVenueCache(key, places);
+    return places;
   });
