@@ -6,6 +6,9 @@ import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeQuery } from "@/lib/sanitize";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+const MAP_RATE_LIMIT_COOLDOWN_MS = 15 * 60 * 1000;
+
+let mapRateLimitedUntil = 0;
 
 export type GeocodeResult = {
   latitude: number;
@@ -20,7 +23,19 @@ function credentials() {
   return { lovableKey, mapsKey };
 }
 
+function mapLookupIsCoolingDown() {
+  return Date.now() < mapRateLimitedUntil;
+}
+
+function handleRateLimitedResponse(response: Response) {
+  if (response.status !== 429) return false;
+  mapRateLimitedUntil = Date.now() + MAP_RATE_LIMIT_COOLDOWN_MS;
+  console.warn("Google Maps lookups are rate limited; pausing new lookups for 15 minutes.");
+  return true;
+}
+
 async function callGeocode(params: Record<string, string>): Promise<GeocodeResult | null> {
+  if (mapLookupIsCoolingDown()) return null;
   const { lovableKey, mapsKey } = credentials();
   const query = new URLSearchParams(params).toString();
   const response = await fetch(`${GATEWAY_URL}/maps/api/geocode/json?${query}`, {
@@ -30,6 +45,7 @@ async function callGeocode(params: Record<string, string>): Promise<GeocodeResul
     },
   });
 
+  if (handleRateLimitedResponse(response)) return null;
   if (response.status === 403) {
     throw new Error("Map lookup was denied. Check the map key restrictions.");
   }
@@ -92,6 +108,7 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<PlaceSuggestion[]> => {
     await enforceRateLimit(RATE_LIMITS.geocode);
+    if (mapLookupIsCoolingDown()) return [];
     const { lovableKey, mapsKey } = credentials();
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:autocomplete`, {
       method: "POST",
@@ -117,6 +134,7 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
       }),
     });
 
+    if (handleRateLimitedResponse(response)) return [];
     if (response.status === 403) {
       throw new Error("Map lookup was denied. Check the map key restrictions.");
     }
@@ -143,6 +161,7 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
     z.object({ placeId: z.string().trim().min(3).max(300), sessionToken: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data }): Promise<GeocodeResult | null> => {
+    if (mapLookupIsCoolingDown()) return null;
     const { lovableKey, mapsKey } = credentials();
     const response = await fetch(
       `${GATEWAY_URL}/places/v1/places/${encodeURIComponent(data.placeId)}?sessionToken=${data.sessionToken}`,
@@ -155,6 +174,7 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
       },
     );
 
+    if (handleRateLimitedResponse(response)) return null;
     if (response.status === 403) {
       throw new Error("Map lookup was denied. Check the map key restrictions.");
     }
