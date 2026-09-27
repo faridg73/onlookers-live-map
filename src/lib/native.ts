@@ -88,6 +88,11 @@ export async function initNativeShell(navigate: NavigateFn, canGoBack: () => boo
 
   document.documentElement.classList.add("native-shell");
 
+  // Reveal the app only after the first complete layout.
+  void hideNativeSplash();
+
+
+
   const [{ App }, { Keyboard, KeyboardResize, KeyboardStyle }, { StatusBar, Style }] = await Promise.all([
     import("@capacitor/app"),
     import("@capacitor/keyboard"),
