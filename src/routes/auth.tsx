@@ -56,6 +56,14 @@ function AuthScreen() {
     }
     await navigate({ to: "/profile", replace: true });
   };
+  /** Lets someone leave sign-in without an account: back if possible, else home. */
+  const leaveAuth = () => {
+    if (window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
+    } else {
+      void navigate({ to: "/", replace: true });
+    }
+  };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
