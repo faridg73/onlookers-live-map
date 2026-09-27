@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Flame, LayoutGrid, Map as MapIcon, Radar, X } from "lucide-react";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -107,6 +107,7 @@ function DiscoverHome() {
     if (search.b) setSelectedId(search.b.startsWith("db-") ? search.b : `db-${search.b}`);
   }, [search.b]);
   const navigate = useNavigate();
+  const router = useRouter();
   const openBounty = (id: string | null) => {
     setSelectedId(id);
     // Arrived from a bounty page to claim: keep the claim card here instead of bouncing back.
@@ -139,6 +140,16 @@ function DiscoverHome() {
       (r) => r.status === "open" && `${r.place} ${r.title}`.toLowerCase().includes(name.toLowerCase()),
     ).length;
 
+  // Return to wherever the visitor actually came from; Discover is the fallback
+  // because Browse places is reached from there.
+  const goBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.history.back();
+      return;
+    }
+    void navigate({ to: "/events" });
+  };
+
   return (
     <div className="discover-inter app-shell flex min-h-[calc(100vh-5rem)] flex-col pb-0! pt-safe">
       <RadarAlerts />
@@ -146,13 +157,7 @@ function DiscoverHome() {
       <div className="relative flex flex-col items-center">
         <button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1 && window.history.state?.idx > 0) {
-              window.history.back();
-            } else {
-              window.location.href = "/";
-            }
-          }}
+          onClick={goBack}
           aria-label="Go back"
           className="absolute left-0 top-0 inline-flex size-9 items-center justify-center rounded-full border border-signal/60 bg-surface text-signal shadow-md shadow-signal/20 transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -160,13 +165,7 @@ function DiscoverHome() {
         </button>
         <button
           type="button"
-          onClick={() => {
-            if (window.history.length > 1 && window.history.state?.idx > 0) {
-              window.history.back();
-            } else {
-              window.location.href = "/";
-            }
-          }}
+          onClick={goBack}
           aria-label="Close and go back"
           className="absolute right-0 top-0 inline-flex size-9 items-center justify-center rounded-full border-2 border-signal bg-surface text-signal shadow-md shadow-signal/30 transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
