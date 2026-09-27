@@ -287,7 +287,6 @@ export const BIG_BOX_CHAINS = [
   "dollar tree",
   "family dollar",
   "five below",
-  "five below",
   "big lots",
   "ross dress",
   "tj maxx",
