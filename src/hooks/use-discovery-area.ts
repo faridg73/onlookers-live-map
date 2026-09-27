@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
+import { findKnownCity } from "@/lib/known-cities";
 import { requestCurrentPosition } from "@/lib/geolocation";
 import { geocodeAddress, reverseGeocode } from "@/lib/geocode.functions";
 
