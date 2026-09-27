@@ -76,10 +76,12 @@ export async function listFollowedCreators(): Promise<FollowedCreator[]> {
     console.error("[follows] could not load followed creator profiles", error);
     throw new Error(error.message);
   }
-  return (data ?? []).map((p) => ({
+  const rows = data ?? [];
+  const avatars = await resolveAvatarUrls(rows.map((p) => p.avatar_url));
+  return rows.map((p, i) => ({
     id: p.id,
     name: p.name || "Onlooker",
-    avatarUrl: p.avatar_url,
+    avatarUrl: avatars[i] ?? null,
     verified: Boolean(p.is_verified),
     followerCount: p.follower_count ?? 0,
   }));

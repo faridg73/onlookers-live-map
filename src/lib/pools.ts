@@ -24,7 +24,7 @@ export async function fetchPoolIdentity(expectedUserId: string): Promise<PoolIde
   return {
     userId: data.id,
     username: data.username ?? data.display_name ?? "onlooker",
-    avatarUrl: data.avatar_url ?? null,
+    avatarUrl: await resolveAvatarUrl(data.avatar_url),
     hunterLevel: data.hunter_level ?? 1,
     isVerified: Boolean(data.is_verified),
   };
