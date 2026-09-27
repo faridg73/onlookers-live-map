@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { ReputationCard } from "@/components/ReputationCard";
+import { HunterWithRating } from "@/components/RateHunterPrompt";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -112,7 +112,7 @@ function VisitRow({ row, onResume, onCancel, cancelling }: { row: ProVisitBookin
   const stage=proVisitView(row); const deadline=row.autoReleaseAt ?? row.reservedUntil ?? row.requestExpiresAt; const controls=proVisitControls(row);
   return <article className="rounded-lg border border-border bg-card p-4"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="line-clamp-2 font-semibold text-foreground">{row.purpose}</h3><p className="mt-1 flex items-start gap-2 text-sm text-muted-foreground"><MapPin className="mt-0.5 size-4 shrink-0 text-signal"/>{row.address}</p></div><span className="shrink-0 text-xs font-bold uppercase text-signal">{VIEWS.find((v)=>v.id===stage)?.label}</span></div>
     <div className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-4"><p className="flex items-center gap-2"><CalendarClock className="size-4"/>{row.scheduledStartAt?format(new Date(row.scheduledStartAt),"MMM d, h:mm a"):"Time not set"}</p><p className="flex items-center gap-2"><UserRound className="size-4"/>{row.contactName}</p><p className="flex items-center gap-2"><Building2 className="size-4"/>{row.requestStatus ?? "Not published"}</p><p className="flex items-center gap-2"><Lock className="size-4"/>{escrowLabel(row.escrowStatus ?? null,row.escrowAmount ?? 0,row.payoutAmount ?? 0)}</p></div>
-    {row.claimerId && <ReputationCard userId={row.claimerId} fallbackName="Hunter" className="mt-3 rounded-lg border border-border bg-surface p-3"/>}
+    {row.claimerId && row.requestId && <HunterWithRating requestId={row.requestId} hunterId={row.claimerId} complete={row.requestStatus==="completed"} cardClassName="mt-3 rounded-lg border border-border bg-surface p-3"/>}
     {deadline && ["scheduled","progress"].includes(stage) && <DeadlineNote className="mt-3" deadline={deadline} prefix={row.submissionCount?"Approves in":"Updates in"} passed="Updating now"/>}
     <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-3">{controls.canContinue && <Button onClick={onResume} className="bg-signal text-signal-foreground">Continue setup <ChevronRight className="size-4"/></Button>}{row.requestId && <Button asChild variant="outline"><Link to="/b/$id" params={{id:row.requestId}}>View bounty</Link></Button>}{controls.canReview && <BountyVideoDialog request={asLiveRequest(row)}><Button className="bg-signal text-signal-foreground"><Camera className="size-4"/>Review footage ({row.submissionCount})</Button></BountyVideoDialog>}{controls.canCancel && <Button variant="outline" disabled={cancelling} onClick={onCancel}>{cancelling?<Loader2 className="size-4 animate-spin"/>:<Clock className="size-4"/>} Cancel</Button>}</div>
   </article>;
