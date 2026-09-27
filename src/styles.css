@@ -472,6 +472,11 @@
     overscroll-behavior: none;
   }
 
+  /* Website-only links add no value beside the native app's own navigation. */
+  html.native-shell [data-marketing-footer] {
+    display: none;
+  }
+
   html.native-shell [class*="overflow-y-auto"],
   html.native-shell [class*="overflow-auto"] {
     -webkit-overflow-scrolling: touch;

@@ -125,7 +125,10 @@ export function Footer({ showLinks = false }: { showLinks?: boolean }) {
   const [dmcaOpen, setDmcaOpen] = useState(false);
 
   return (
-    <footer className="mt-8 border-t border-border bg-surface px-4 py-6">
+    <footer
+      data-marketing-footer
+      className="mt-8 border-t border-border bg-surface px-4 py-6"
+    >
       <div className="mx-auto w-full max-w-7xl">
         {showLinks && (
           <nav className="mx-auto mb-8 flex w-full max-w-md flex-col divide-y divide-border/60 border-y border-border/60">
