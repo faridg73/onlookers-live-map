@@ -350,11 +350,23 @@ const photoSchema = z.object({
 export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => photoSchema.parse(data))
   .handler(async ({ data }): Promise<Record<string, string>> => {
+    const { readSharedCacheMany, writeSharedCache, PHOTO_CACHE_TTL_MS } = await import("@/lib/venue-cache.server");
+    const keyOf = (n: string) => `photo|${data.maxWidthPx}|${n}`;
+    const cached = await readSharedCacheMany<string>(data.photoNames.map(keyOf), PHOTO_CACHE_TTL_MS);
+    const result: Record<string, string> = {};
+    const missing: string[] = [];
+    for (const n of data.photoNames) {
+      const hit = cached.get(keyOf(n));
+      if (hit && typeof hit.value === "string") result[n] = hit.value;
+      if (!hit?.fresh) missing.push(n);
+    }
+    if (!missing.length) return result;
+
     const creds = credentials();
-    if (!creds) return {};
+    if (!creds) return result;
 
     const entries = await Promise.all(
-      data.photoNames.map(async (photoName) => {
+      missing.map(async (photoName) => {
         try {
           const response = await fetch(
             `${GATEWAY_URL}/places/v1/${photoName}/media?maxWidthPx=${data.maxWidthPx}&skipHttpRedirect=true`,
@@ -375,7 +387,10 @@ export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
       }),
     );
 
-    return Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => !!entry));
+    const fetched = entries.filter((entry): entry is readonly [string, string] => !!entry);
+    await writeSharedCache(fetched.map(([n, uri]) => ({ key: keyOf(n), value: uri })));
+    for (const [n, uri] of fetched) result[n] = uri;
+    return result;
   });
 
 const textSchema = z.object({
