@@ -173,7 +173,7 @@ export async function updateMyProfile(input: {
       full_name: fullName,
       location: location || null,
       bio: bio || null,
-      avatar_url: input.avatarUrl,
+      avatar_url: storableAvatarValue(input.avatarUrl),
     })
     .eq("id", auth.user.id)
     .select(PROFILE_COLUMNS)
@@ -230,7 +230,7 @@ export async function fetchMyProfile(expectedUserId?: string): Promise<MyProfile
     .maybeSingle();
   if (error) throw error;
 
-  if (data) return data as MyProfile;
+  if (data) return { ...(data as MyProfile), avatar_url: await resolveAvatarUrl(data.avatar_url) };
 
   const seed = {
     id: user.id,
@@ -276,7 +276,7 @@ export async function completeMyProfile(input: {
       legal_last_name: last,
       display_name: username,
       full_name: `${first} ${last}`.trim(),
-      avatar_url: input.avatar_url ?? null,
+      avatar_url: storableAvatarValue(input.avatar_url),
       onboarded: true,
       terms_accepted_at: readRememberedTerms() ?? new Date().toISOString(),
     })
