@@ -10,7 +10,7 @@ import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useLiveEvents } from "@/hooks/use-live-events";
-import { discoveryGroupBySlug } from "@/lib/discovery";
+import { discoveryGroupBySlug, isBigBoxPlace } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
@@ -18,6 +18,7 @@ import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { CREATOR_VIBES } from "@/lib/creator-vibes";
 import type { DiscoveryGroup } from "@/lib/discovery";
 import { PageBackButton } from "@/components/PageBackButton";
+import { VibeOwnContent } from "@/components/VibeOwnContent";
 
 
 export const Route = createFileRoute("/events")({
@@ -73,7 +74,10 @@ function EventsScreen() {
   const group = discoveryGroupBySlug("events")!;
   const [filter, setFilter] = useState<string | null>(null);
   const [vibeId, setVibeId] = useState<string | null>(null);
+  const [subFilter, setSubFilter] = useState<string | null>(null);
   const activeVibe = CREATOR_VIBES.find((vibe) => vibe.id === vibeId) ?? null;
+  const activeSub = activeVibe?.subFilters.find((s) => s.label === subFilter) ?? null;
+  const hidePlaces = Boolean(activeVibe?.ownContent?.hidePlaces);
 
   const sports = usePlaceList(group, "stadiums", area, { maxResults: 20 });
   const concerts = usePlaceList(group, "concerts", area, { maxResults: 20 });
@@ -83,9 +87,9 @@ function EventsScreen() {
   const gatherings = usePlaceList(group, "festivals", area, { maxResults: 20 });
   const expos = usePlaceList(group, "expos", area, { maxResults: 20 });
   const vibeGroup = activeVibe ? discoveryGroupBySlug(activeVibe.groupSlug) : undefined;
-  const vibePlaces = usePlaceList(vibeGroup, activeVibe?.subId ?? null, area, {
+  const vibePlaces = usePlaceList(vibeGroup, activeSub?.subId ?? activeVibe?.subId ?? null, area, {
     maxResults: 20,
-    enabled: Boolean(activeVibe && vibeGroup),
+    enabled: Boolean(activeVibe && vibeGroup && !hidePlaces),
   });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
@@ -95,10 +99,12 @@ function EventsScreen() {
 
   const activeTag = TAGS.find((meta) => meta.subId === filter) ?? null;
   const vibeKeywords = activeVibe?.eventKeywords ?? [];
+  const subKeywords = activeSub?.keywords ?? [];
   const visibleEvents = activeVibe
     ? events.filter((event) => {
         const haystack = `${event.category ?? ""} ${event.name}`.toLowerCase();
-        return vibeKeywords.some((word) => haystack.includes(word));
+        if (!vibeKeywords.some((word) => haystack.includes(word))) return false;
+        return subKeywords.length === 0 || subKeywords.some((word) => haystack.includes(word));
       })
     : activeTag
       ? events.filter((event) => eventMatchesTag(event, activeTag))
@@ -113,10 +119,16 @@ function EventsScreen() {
   const seen = new Set<string>();
   const items: Array<{ place: DiscoveredPlace; tag: string; group: DiscoveryGroup }> = [];
   if (activeVibe && activeBucket?.group) {
-    for (const place of activeBucket.places) {
+    // Big-box and mall listings are what made the style lane read as filler, but
+    // never filter the lane down to nothing.
+    const kept = activeVibe.excludeBigBox
+      ? activeBucket.places.filter((place) => !isBigBoxPlace(place.name, place.primaryType))
+      : activeBucket.places;
+    const list = kept.length > 0 ? kept : activeBucket.places.filter((place) => !isBigBoxPlace(place.name));
+    for (const place of list) {
       if (seen.has(place.id)) continue;
       seen.add(place.id);
-      items.push({ place, tag: activeVibe.label, group: activeBucket.group });
+      items.push({ place, tag: activeSub?.label ?? activeVibe.label, group: activeBucket.group });
     }
   } else {
     buckets.forEach((bucket, index) => {
@@ -183,6 +195,7 @@ function EventsScreen() {
           onSelect={(vibe) => {
             setVibeId(vibe?.id ?? null);
             setFilter(null);
+            setSubFilter(null);
           }}
         />
       </div>
@@ -225,6 +238,51 @@ function EventsScreen() {
         ))}
       </div>}
 
+      {activeVibe && (
+        <div className="mt-3">
+          <p className="text-[0.6rem] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
+            Narrow it down
+          </p>
+          <div className="-mx-1 mt-2 flex snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+            <button
+              type="button"
+              onClick={() => setSubFilter(null)}
+              aria-pressed={subFilter === null}
+              className={cn(
+                "shrink-0 snap-start rounded-xl border px-3 py-2 text-[0.64rem] font-extrabold uppercase tracking-[0.1em] transition-colors",
+                subFilter === null
+                  ? "border-signal bg-signal text-signal-foreground"
+                  : "border-border bg-surface text-muted-foreground",
+              )}
+            >
+              All {activeVibe.label.split(" ")[0]}
+            </button>
+            {activeVibe.subFilters.map((sub) => (
+              <button
+                key={sub.label}
+                type="button"
+                onClick={() => setSubFilter(sub.label === subFilter ? null : sub.label)}
+                aria-pressed={subFilter === sub.label}
+                className={cn(
+                  "shrink-0 snap-start rounded-xl border px-3 py-2 text-[0.64rem] font-extrabold uppercase tracking-[0.1em] transition-colors",
+                  subFilter === sub.label
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface text-muted-foreground",
+                )}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeVibe?.ownContent && (
+        <SectionBoundary label="Onlooker activity">
+          <VibeOwnContent vibe={activeVibe} keywords={activeSub?.keywords ?? []} />
+        </SectionBoundary>
+      )}
+
       {(eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
@@ -260,7 +318,7 @@ function EventsScreen() {
 
 
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {!hidePlaces && <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <TrendingCard
             key={item.place.id}
@@ -284,7 +342,7 @@ function EventsScreen() {
             No trending venues found around {area.label} yet, try another city above.
           </p>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

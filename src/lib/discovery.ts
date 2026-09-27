@@ -188,7 +188,130 @@ export const DISCOVERY_GROUPS: DiscoveryGroup[] = [
       { id: "fleamarkets", label: "Flea markets", includedTypes: ["market"] },
     ],
   },
+  {
+    slug: "pets",
+    fallbackGroups: ["scenic"],
+    name: "Pets & animals",
+    short: "Pets",
+    tagline: "Dog parks, vets, pet shops and adoption days",
+    emoji: "\u{1F43E}",
+    art: "from-signal/30 to-signal/20",
+    category: "community",
+    includedTypes: ["dog_park", "veterinary_care", "pet_store"],
+    subs: [
+      { id: "dogparks", label: "Dog parks", includedTypes: ["dog_park"] },
+      { id: "vets", label: "Vets & clinics", includedTypes: ["veterinary_care"] },
+      { id: "petshops", label: "Pet shops", includedTypes: ["pet_store"] },
+      { id: "wildlife", label: "Zoos & wildlife", includedTypes: ["zoo", "wildlife_park"] },
+    ],
+  },
+  {
+    slug: "fashion",
+    fallbackGroups: ["malls"],
+    name: "Style & street fashion",
+    short: "Style",
+    tagline: "Boutiques, thrift racks, sneaker drops and pop-ups",
+    emoji: "\u{2728}",
+    art: "from-signal/30 to-signal/20",
+    category: "street",
+    includedTypes: ["clothing_store", "shoe_store", "jewelry_store"],
+    subs: [
+      { id: "boutiques", label: "Boutiques", includedTypes: ["clothing_store"] },
+      { id: "sneakers", label: "Sneakers & shoes", includedTypes: ["shoe_store"] },
+      { id: "jewelry", label: "Jewelry & accessories", includedTypes: ["jewelry_store"] },
+      { id: "beauty", label: "Beauty & barbers", includedTypes: ["beauty_salon", "barber_shop"] },
+    ],
+  },
+  {
+    slug: "casual",
+    fallbackGroups: ["food", "scenic"],
+    name: "Casual hangouts",
+    short: "Hangouts",
+    tagline: "Cafés, plazas, parks and easy people-watching",
+    emoji: "\u{1F4AC}",
+    art: "from-signal/30 to-signal/20",
+    category: "street",
+    includedTypes: ["cafe", "coffee_shop", "park"],
+    subs: [
+      { id: "cafes", label: "Cafés", includedTypes: ["cafe", "coffee_shop"] },
+      { id: "plazas", label: "Plazas & squares", includedTypes: ["plaza", "tourist_attraction"] },
+      { id: "parks", label: "Parks", includedTypes: ["park"] },
+      { id: "libraries", label: "Libraries & study spots", includedTypes: ["library", "book_store"] },
+    ],
+  },
+  {
+    slug: "tech",
+    fallbackGroups: ["events"],
+    name: "Tech & innovation",
+    short: "Tech",
+    tagline: "Tech hubs, campuses, demo days and expos",
+    emoji: "\u{1F916}",
+    art: "from-signal/30 to-signal/20",
+    category: "events",
+    includedTypes: ["corporate_office", "university", "electronics_store"],
+    subs: [
+      { id: "hubs", label: "Tech hubs & offices", includedTypes: ["corporate_office"] },
+      { id: "campuses", label: "Campuses & labs", includedTypes: ["university"] },
+      { id: "gadgets", label: "Gadget shops", includedTypes: ["electronics_store"] },
+      { id: "expos", label: "Expos & conferences", includedTypes: ["convention_center", "event_venue"] },
+    ],
+  },
+  {
+    slug: "traffic",
+    fallbackGroups: ["transit"],
+    name: "Traffic & public updates",
+    short: "Traffic",
+    tagline: "Commute choke points, transit stops and closures",
+    emoji: "\u{1F6A6}",
+    art: "from-signal/30 to-signal/20",
+    category: "transit",
+    includedTypes: ["transit_station", "bus_station", "parking"],
+    subs: [
+      { id: "transit", label: "Transit stops", includedTypes: ["transit_station", "bus_station"] },
+      { id: "metro", label: "Metro & rail", includedTypes: ["subway_station", "train_station"] },
+      { id: "parking", label: "Parking & lots", includedTypes: ["parking"] },
+      { id: "fuel", label: "Fuel & rest stops", includedTypes: ["gas_station", "rest_stop"] },
+    ],
+  },
 ];
+
+/** Big-box and discount chains that make style/shopping lanes read as filler. */
+export const BIG_BOX_CHAINS = [
+  "walmart",
+  "target",
+  "costco",
+  "sam's club",
+  "sams club",
+  "kmart",
+  "dollar general",
+  "dollar tree",
+  "family dollar",
+  "five below",
+  "big lots",
+  "ross dress",
+  "tj maxx",
+  "t.j. maxx",
+  "marshalls",
+  "burlington",
+  "kohl's",
+  "kohls",
+  "old navy",
+  "goodwill outlet",
+  "home depot",
+  "lowe's",
+  "lowes",
+  "best buy outlet",
+];
+
+/** True when a place is a big-box, discount or mall listing rather than a real style spot. */
+export function isBigBoxPlace(name: string, primaryType?: string | null) {
+  const lower = name.toLowerCase();
+  if (BIG_BOX_CHAINS.some((chain) => lower.includes(chain))) return true;
+  const type = (primaryType ?? "").toLowerCase();
+  return ["shopping mall", "department store", "discount store", "supermarket", "warehouse"].some(
+    (word) => type.includes(word),
+  );
+}
 
 export function discoveryGroupBySlug(slug?: string) {
   return DISCOVERY_GROUPS.find((group) => group.slug === slug);
