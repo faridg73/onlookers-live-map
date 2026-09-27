@@ -52,6 +52,7 @@ const VIBE_LOOKUP: Record<BroadcastCategoryId, Lookup> = {
     ownContent: {
       bountyCategory: "community",
       blurb: "Live member reports and open requests for what's happening right now.",
+      hidePlaces: true,
     },
     subFilters: [
       { label: "Accidents", subId: null, keywords: ["accident", "crash", "collision"] },

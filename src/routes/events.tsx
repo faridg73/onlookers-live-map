@@ -119,10 +119,14 @@ function EventsScreen() {
   const seen = new Set<string>();
   const items: Array<{ place: DiscoveredPlace; tag: string; group: DiscoveryGroup }> = [];
   if (activeVibe && activeBucket?.group) {
-    for (const place of activeBucket.places) {
+    // Big-box and mall listings are what made the style lane read as filler, but
+    // never filter the lane down to nothing.
+    const kept = activeVibe.excludeBigBox
+      ? activeBucket.places.filter((place) => !isBigBoxPlace(place.name, place.primaryType))
+      : activeBucket.places;
+    const list = kept.length > 0 ? kept : activeBucket.places.filter((place) => !isBigBoxPlace(place.name));
+    for (const place of list) {
       if (seen.has(place.id)) continue;
-      // Big-box discount chains are what made the style lane read as filler.
-      if (activeVibe.excludeBigBox && isBigBoxPlace(place.name, place.primaryType)) continue;
       seen.add(place.id);
       items.push({ place, tag: activeSub?.label ?? activeVibe.label, group: activeBucket.group });
     }
