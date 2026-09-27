@@ -481,6 +481,7 @@ export type PostedBountyRow = {
   /** Claim snapshot from the onlooker working it. */
   claimStatus: string | null;
   claimedAt: string | null;
+  claimerId: string | null;
   /** Footage submitted against this bounty. */
   submissionCount: number;
   acceptedAt: string | null;
@@ -516,7 +517,7 @@ export const listMyPostedBounties = createServerFn({ method: "GET" })
         .in("request_id", ids),
       context.supabase
         .from("claims")
-        .select("request_id, status, claimed_at")
+        .select("request_id, status, claimed_at, spotter_id")
         .in("request_id", ids),
       context.supabase
         .from("bounty_videos")
@@ -573,6 +574,7 @@ export const listMyPostedBounties = createServerFn({ method: "GET" })
         autoReleaseAt: (escrow?.auto_release_at as string | null) ?? null,
         claimStatus: claim?.status ?? null,
         claimedAt: (claim?.claimed_at as string | null) ?? null,
+        claimerId: (claim?.spotter_id as string | null) ?? null,
         submissionCount: media?.count ?? 0,
         acceptedAt: media?.acceptedAt ?? null,
         payoutAmount: media?.payout ?? 0,
