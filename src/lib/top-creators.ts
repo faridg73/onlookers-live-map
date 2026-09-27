@@ -21,18 +21,21 @@ export async function listTopCreators(limit = 12): Promise<TopCreator[]> {
 
   const creatorIds = profiles.map((profile) => profile.id);
   const { data: posts } = await supabase
-    .from("posts")
-    .select("user_id, is_live, views")
+    .from("community_posts")
+    .select("user_id, view_count, expires_at")
     .in("user_id", creatorIds);
 
+  const now = Date.now();
   const activity = new Map<string, { views: number; live: boolean }>();
   for (const post of posts ?? []) {
     const current = activity.get(post.user_id) ?? { views: 0, live: false };
+    const isLive = post.expires_at ? new Date(post.expires_at).getTime() > now : false;
     activity.set(post.user_id, {
-      views: current.views + (post.views ?? 0),
-      live: current.live || Boolean(post.is_live),
+      views: current.views + (post.view_count ?? 0),
+      live: current.live || isLive,
     });
   }
+
 
   const avatars = await resolveAvatarUrls(profiles.map((profile) => profile.avatar_url));
 
