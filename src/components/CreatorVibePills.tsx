@@ -1,4 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
+import { Button } from "@/components/ui/button";
+import { CREATOR_VIBES, type CreatorVibe } from "@/lib/creator-vibes";
+import { cn } from "@/lib/utils";
 
 export function CreatorVibePills({
   activeId,

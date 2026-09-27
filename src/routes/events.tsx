@@ -27,7 +27,7 @@ export const Route = createFileRoute("/events")({
       {
         name: "description",
         content:
-          "Browse venues and events around your city — live sports, concerts, fight nights and public gatherings — see the crowd, then launch a live view bounty from that exact spot.",
+          "Browse venues and events around your city — live sports, concerts, fight nights, comedy, theater, festivals and expos — see the crowd, then launch a live view bounty from that exact spot.",
       },
       { property: "og:title", content: "Venues & Events Near You — Live Crowd Views | Onlooker" },
       {
@@ -193,7 +193,7 @@ function EventsScreen() {
         </SectionBoundary>
       </div>
 
-      {!activeVibe && <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5">
+      {!activeVibe && <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
         <button
           type="button"
           onClick={() => setFilter(null)}
