@@ -4,7 +4,20 @@ const config: CapacitorConfig = {
   appId: 'com.onlooker.app',
   appName: 'Onlooker',
   webDir: 'mobile-shell',
-  server: { url: 'https://onlooker.io' },
+  // Must be the final (non-redirecting) host: onlooker.io 302s to www, and
+  // Capacitor opens any navigation to a host outside server.url/allowNavigation
+  // in Safari — that was the "black screen → Safari" launch bug.
+  server: {
+    url: 'https://www.onlooker.io',
+    allowNavigation: [
+      'onlooker.io',
+      'www.onlooker.io',
+      'onlookerlive.com',
+      'www.onlookerlive.com',
+      '*.stripe.com',
+      'accounts.google.com',
+    ],
+  },
   ios: {
     contentInset: 'never',
     allowsLinkPreview: false,
