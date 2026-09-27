@@ -304,6 +304,24 @@ function AuthScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-32 pt-10">
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={leaveAuth}
+          aria-label="Go back"
+          className="inline-flex size-9 items-center justify-center rounded-full border border-signal/60 bg-surface text-signal shadow-md shadow-signal/20 transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={leaveAuth}
+          aria-label="Close and go back"
+          className="inline-flex size-9 items-center justify-center rounded-full border-2 border-signal bg-surface text-signal shadow-md shadow-signal/30 transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-4" aria-hidden />
+        </button>
+      </div>
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         {mode === "signin" ? (
           <>Sign <span className="text-signal">in</span></>
