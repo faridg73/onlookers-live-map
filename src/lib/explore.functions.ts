@@ -106,7 +106,7 @@ export const listExploreClips = createServerFn({ method: "GET" })
           createdAt: r.created_at,
           views: r.view_count,
           uploaderName: r.uploader_name,
-          uploaderAvatar: r.uploader_avatar,
+          uploaderAvatar: await signAvatar(supabaseAdmin, r.uploader_avatar),
           comments: r.comment_count,
           reviews: r.review_count,
           rating: Number(r.average_rating),
@@ -137,13 +137,15 @@ export const listClipComments = createServerFn({ method: "GET" })
       .in("id", [...new Set(rows.map((r) => r.user_id))]);
 
     const byId = new Map((people ?? []).map((p) => [p.id, p]));
-    return rows.map((r) => ({
-      id: r.id,
-      body: r.body,
-      createdAt: r.created_at,
-      authorName: byId.get(r.user_id)?.display_name ?? "onlooker",
-      authorAvatar: byId.get(r.user_id)?.avatar_url ?? null,
-    }));
+    return Promise.all(
+      rows.map(async (r) => ({
+        id: r.id,
+        body: r.body,
+        createdAt: r.created_at,
+        authorName: byId.get(r.user_id)?.display_name ?? "onlooker",
+        authorAvatar: await signAvatar(supabaseAdmin, byId.get(r.user_id)?.avatar_url),
+      })),
+    );
   });
 
 /**
