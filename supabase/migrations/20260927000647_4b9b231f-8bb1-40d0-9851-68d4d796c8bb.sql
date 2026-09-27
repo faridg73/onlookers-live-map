@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.validate_rating() FROM PUBLIC, anon, authenticated;
