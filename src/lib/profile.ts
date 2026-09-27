@@ -87,7 +87,7 @@ const AVATAR_BUCKET = "avatars";
 export function avatarPathFrom(value: string | null | undefined): string | null {
   if (!value) return null;
   const signed = value.match(/\/object\/sign\/avatars\/([^?]+)/);
-  if (signed) return decodeURIComponent(signed[1]);
+  if (signed) return decodeURIComponent(signed[1]!);
   if (value.startsWith("http")) return null;
   return value;
 }

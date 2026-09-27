@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/sanitize";
+import { resolveAvatarUrl } from "@/lib/profile";
 
 /** The signed-in person as shown on the pools page. */
 export type PoolIdentity = {
