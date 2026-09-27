@@ -303,10 +303,14 @@ export const BIG_BOX_CHAINS = [
   "best buy outlet",
 ];
 
-/** True when a place is a national big-box/discount store rather than a real style spot. */
-export function isBigBoxPlace(name: string) {
+/** True when a place is a big-box, discount or mall listing rather than a real style spot. */
+export function isBigBoxPlace(name: string, primaryType?: string | null) {
   const lower = name.toLowerCase();
-  return BIG_BOX_CHAINS.some((chain) => lower.includes(chain));
+  if (BIG_BOX_CHAINS.some((chain) => lower.includes(chain))) return true;
+  const type = (primaryType ?? "").toLowerCase();
+  return ["shopping mall", "department store", "discount store", "supermarket", "warehouse"].some(
+    (word) => type.includes(word),
+  );
 }
 
 export function discoveryGroupBySlug(slug?: string) {
