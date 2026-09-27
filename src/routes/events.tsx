@@ -120,8 +120,10 @@ function EventsScreen() {
   if (activeVibe && activeBucket?.group) {
     for (const place of activeBucket.places) {
       if (seen.has(place.id)) continue;
+      // Big-box discount chains are what made the style lane read as filler.
+      if (activeVibe.excludeBigBox && isBigBoxPlace(place.name)) continue;
       seen.add(place.id);
-      items.push({ place, tag: activeVibe.label, group: activeBucket.group });
+      items.push({ place, tag: activeSub?.label ?? activeVibe.label, group: activeBucket.group });
     }
   } else {
     buckets.forEach((bucket, index) => {
