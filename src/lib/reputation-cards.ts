@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 export type ReputationCard = {
   id: string;
@@ -42,7 +43,7 @@ async function load(ids: string[]): Promise<Map<string, ReputationCard>> {
       onTimeRate: r.on_time_rate ?? 0,
       idConfirmed: Boolean(r.id_confirmed),
     });
-  }
+  });
   return out;
 }
 
