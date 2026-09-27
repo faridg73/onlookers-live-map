@@ -23,7 +23,7 @@ const CITIES: Array<[string, string, number, number]> = [
 ];
 
 export function findKnownCity(query: string) {
-  const q = query.toLowerCase().split(",")[0].replace(/\s+/g, " ").trim();
+  const q = (query.toLowerCase().split(",")[0] ?? "").replace(/\s+/g, " ").trim();
   const hit = CITIES.find(([key]) => key === q);
   return hit ? { label: hit[1], latitude: hit[2], longitude: hit[3] } : null;
 }
