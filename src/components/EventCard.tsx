@@ -116,7 +116,7 @@ export function EventCard({ event, liveCount }: Props) {
               venue={venue}
               defaultTitle={`Outside ${event.name}`}
               defaultNote={prefillNote}
-              eventContext={{ name: event.name, venueName: event.venueName, when, imageUrl: event.imageUrl }}
+              eventContext={{ id: event.id, name: event.name, venueName: event.venueName, when, imageUrl: event.imageUrl }}
             >
               <button
                 type="button"
