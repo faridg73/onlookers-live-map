@@ -73,7 +73,10 @@ function EventsScreen() {
   const group = discoveryGroupBySlug("events")!;
   const [filter, setFilter] = useState<string | null>(null);
   const [vibeId, setVibeId] = useState<string | null>(null);
+  const [subFilter, setSubFilter] = useState<string | null>(null);
   const activeVibe = CREATOR_VIBES.find((vibe) => vibe.id === vibeId) ?? null;
+  const activeSub = activeVibe?.subFilters.find((s) => s.label === subFilter) ?? null;
+  const hidePlaces = Boolean(activeVibe?.ownContent?.hidePlaces);
 
   const sports = usePlaceList(group, "stadiums", area, { maxResults: 20 });
   const concerts = usePlaceList(group, "concerts", area, { maxResults: 20 });
