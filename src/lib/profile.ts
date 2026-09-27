@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/sanitize";
+import { signAvatarPaths } from "@/lib/avatar-urls.functions";
 
 export type MyProfile = {
   id: string;
@@ -114,7 +115,6 @@ export async function resolveAvatarUrls(values: (string | null | undefined)[]): 
   const signed = new Map<string, string>();
   if (unique.length > 0) {
     try {
-      const { signAvatarPaths } = await import("@/lib/avatar-urls.functions");
       for (let i = 0; i < unique.length; i += 60) {
         const batch = await signAvatarPaths({ data: { paths: unique.slice(i, i + 60) } });
         for (const [path, url] of Object.entries(batch)) signed.set(path, url);
