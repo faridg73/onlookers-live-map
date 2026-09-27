@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/sanitize";
+import { signAvatarPaths } from "@/lib/avatar-urls.functions";
 
 export type MyProfile = {
   id: string;
@@ -103,8 +104,8 @@ export async function resolveAvatarUrl(value: string | null | undefined): Promis
   if (!value) return null;
   const path = avatarPathFrom(value);
   if (!path) return value.startsWith("http") ? value : null;
-  const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrl(path, 60 * 60);
-  return data?.signedUrl ?? null;
+  const [url] = await resolveAvatarUrls([value]);
+  return url ?? null;
 }
 
 /** Batch version of resolveAvatarUrl — one storage call for a whole list. */
@@ -113,9 +114,13 @@ export async function resolveAvatarUrls(values: (string | null | undefined)[]): 
   const unique = [...new Set(paths.filter((p): p is string => Boolean(p)))];
   const signed = new Map<string, string>();
   if (unique.length > 0) {
-    const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrls(unique, 60 * 60);
-    for (const entry of data ?? []) {
-      if (entry.path && entry.signedUrl) signed.set(entry.path, entry.signedUrl);
+    try {
+      for (let i = 0; i < unique.length; i += 60) {
+        const batch = await signAvatarPaths({ data: { paths: unique.slice(i, i + 60) } });
+        for (const [path, url] of Object.entries(batch)) signed.set(path, url);
+      }
+    } catch (error) {
+      console.warn("[avatars] signing failed", error);
     }
   }
   return values.map((value, i) => {
