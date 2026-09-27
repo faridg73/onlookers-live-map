@@ -9,6 +9,27 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 const MAP_RATE_LIMIT_COOLDOWN_MS = 15 * 60 * 1000;
 
 let mapRateLimitedUntil = 0;
+const CITY_TTL = 30 * 24 * 60 * 60 * 1000;
+
+/** Shared across all visitors: reuse a saved answer, fall back to a stale one if Google refuses. */
+async function cachedLookup(
+  key: string,
+  ttlMs: number,
+  fetcher: () => Promise<GeocodeResult | null>,
+): Promise<GeocodeResult | null> {
+  const { readSharedCache, writeSharedCache } = await import("@/lib/venue-cache.server");
+  const hit = await readSharedCache<GeocodeResult>(key, ttlMs);
+  if (hit?.fresh) return hit.value;
+  const fresh = await fetcher().catch((e) => {
+    if (hit) return null;
+    throw e;
+  });
+  if (fresh) {
+    await writeSharedCache([{ key, value: fresh }]);
+    return fresh;
+  }
+  return hit?.value ?? null;
+}
 
 export type GeocodeResult = {
   latitude: number;
@@ -75,7 +96,8 @@ export const geocodeAddress = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ address: safeQuery(200, 3) }).parse(data))
   .handler(async ({ data }): Promise<GeocodeResult | null> => {
     await enforceRateLimit(RATE_LIMITS.geocode);
-    return callGeocode({ address: data.address });
+    const key = `geo|${data.address.toLowerCase().replace(/\s+/g, " ").trim()}`;
+    return cachedLookup(key, CITY_TTL, () => callGeocode({ address: data.address }));
   });
 
 /** Turns a dropped pin back into a street address. */
@@ -85,7 +107,8 @@ export const reverseGeocode = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<GeocodeResult | null> => {
     await enforceRateLimit(RATE_LIMITS.geocode);
-    return callGeocode({ latlng: `${data.latitude},${data.longitude}` });
+    const key = `rev|${data.latitude.toFixed(3)}|${data.longitude.toFixed(3)}`;
+    return cachedLookup(key, CITY_TTL, () => callGeocode({ latlng: `${data.latitude},${data.longitude}` }));
   });
 
 export type PlaceSuggestion = {
@@ -108,7 +131,11 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }): Promise<PlaceSuggestion[]> => {
     await enforceRateLimit(RATE_LIMITS.geocode);
-    if (mapLookupIsCoolingDown()) return [];
+    const cacheKey = `suggest|${data.scope ?? "areas"}|${data.input.toLowerCase().replace(/\s+/g, " ").trim()}`;
+    const { readSharedCache, writeSharedCache, SUGGEST_CACHE_TTL_MS } = await import("@/lib/venue-cache.server");
+    const hit = await readSharedCache<PlaceSuggestion[]>(cacheKey, SUGGEST_CACHE_TTL_MS);
+    if (hit?.fresh) return hit.value;
+    if (mapLookupIsCoolingDown()) return hit?.value ?? [];
     const { lovableKey, mapsKey } = credentials();
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:autocomplete`, {
       method: "POST",
@@ -134,7 +161,7 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
       }),
     });
 
-    if (handleRateLimitedResponse(response)) return [];
+    if (handleRateLimitedResponse(response)) return hit?.value ?? [];
     if (response.status === 403) {
       throw new Error("Map lookup was denied. Check the map key restrictions.");
     }
@@ -149,10 +176,12 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
       }>;
     };
 
-    return (payload.suggestions ?? [])
+    const suggestions = (payload.suggestions ?? [])
       .map((s) => ({ placeId: s.placePrediction?.placeId ?? "", text: s.placePrediction?.text?.text ?? "" }))
       .filter((s) => s.placeId && s.text)
       .slice(0, 6);
+    await writeSharedCache([{ key: cacheKey, value: suggestions }]);
+    return suggestions;
   });
 
 /** Resolves a chosen autocomplete suggestion to coordinates, ending the session. */
@@ -160,7 +189,11 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z.object({ placeId: z.string().trim().min(3).max(300), sessionToken: z.string().uuid() }).parse(data),
   )
-  .handler(async ({ data }): Promise<GeocodeResult | null> => {
+  .handler(async ({ data }): Promise<GeocodeResult | null> =>
+    cachedLookup(`place|${data.placeId}`, CITY_TTL, () => resolvePlace(data)),
+  );
+
+async function resolvePlace(data: { placeId: string; sessionToken: string }): Promise<GeocodeResult | null> {
     if (mapLookupIsCoolingDown()) return null;
     const { lovableKey, mapsKey } = credentials();
     const response = await fetch(
@@ -191,4 +224,4 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
     const lng = payload.location?.longitude;
     if (typeof lat !== "number" || typeof lng !== "number") return null;
     return { latitude: lat, longitude: lng, formatted: payload.formattedAddress ?? "" };
-  });
+}

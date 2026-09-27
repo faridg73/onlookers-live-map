@@ -45,3 +45,48 @@ export async function writeVenueCache(key: string, places: DiscoveredPlace[]): P
     console.error("[venue-cache] write failed", e);
   }
 }
+
+/** Generic shared cache on the same table for photo links and city lookups. */
+export async function readSharedCache<T>(key: string, ttlMs: number): Promise<{ value: T; fresh: boolean } | null> {
+  try {
+    const db = await admin();
+    const { data } = await db.from("venue_cache").select("places, fetched_at").eq("cache_key", key).maybeSingle();
+    if (!data) return null;
+    const age = Date.now() - new Date(data.fetched_at).getTime();
+    return { value: data.places as unknown as T, fresh: age < ttlMs };
+  } catch (e) {
+    console.error("[shared-cache] read failed", e);
+    return null;
+  }
+}
+
+export async function readSharedCacheMany<T>(keys: string[], ttlMs: number): Promise<Map<string, { value: T; fresh: boolean }>> {
+  const out = new Map<string, { value: T; fresh: boolean }>();
+  if (!keys.length) return out;
+  try {
+    const db = await admin();
+    const { data } = await db.from("venue_cache").select("cache_key, places, fetched_at").in("cache_key", keys);
+    for (const row of data ?? []) {
+      const age = Date.now() - new Date(row.fetched_at).getTime();
+      out.set(row.cache_key, { value: row.places as unknown as T, fresh: age < ttlMs });
+    }
+  } catch (e) {
+    console.error("[shared-cache] batch read failed", e);
+  }
+  return out;
+}
+
+export async function writeSharedCache(entries: Array<{ key: string; value: unknown }>): Promise<void> {
+  if (!entries.length) return;
+  try {
+    const db = await admin();
+    const now = new Date().toISOString();
+    await db.from("venue_cache").upsert(entries.map((e) => ({ cache_key: e.key, places: e.value as never, fetched_at: now })));
+  } catch (e) {
+    console.error("[shared-cache] write failed", e);
+  }
+}
+
+export const PHOTO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+export const CITY_CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+export const SUGGEST_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
