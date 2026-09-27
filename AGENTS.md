@@ -16,3 +16,4 @@
 - Non-Home pages rely on the root flex shell for usable viewport height and fixed-bottom-nav clearance; route wrappers must not add their own full-screen height or bottom-nav padding, preventing dead space on short pages.
 - Venue lookups (Google Places category + phrase search) go through the shared `venue_cache` table, keyed by ~5 km area + query, fresh for 6 h and served stale when Google fails — keeps the workspace's daily Maps cap from being hit by per-visitor lookups.
 - Profile photos are signed server-side by `signAvatarPaths` (only files currently set as a profile avatar); the avatars bucket has no public read rule — keeps photos public without exposing the bucket.
+- Google Maps geocoding and autocomplete treat provider 429 responses as temporary unavailability and pause retries for 15 minutes — prevents recoverable quota exhaustion from crashing the app.
