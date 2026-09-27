@@ -116,11 +116,7 @@ export function EventCard({ event, liveCount }: Props) {
               venue={venue}
               defaultTitle={`Outside ${event.name}`}
               defaultNote={prefillNote}
-              eventContext={
-                event.source === "onlooker"
-                  ? undefined
-                  : { name: event.name, venueName: event.venueName, when, imageUrl: event.imageUrl }
-              }
+              eventContext={{ name: event.name, venueName: event.venueName, when, imageUrl: event.imageUrl }}
             >
               <button
                 type="button"
@@ -154,7 +150,7 @@ export function EventCard({ event, liveCount }: Props) {
             </a>
           )}
         </div>
-        {venue && event.source !== "onlooker" ? (
+        {venue ? (
           <p className="text-center text-[0.68rem] text-muted-foreground">
             Can&apos;t make it? Get exterior, line, or pre/after-party footage from an onlooker nearby.
           </p>
