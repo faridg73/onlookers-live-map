@@ -104,8 +104,8 @@ export async function resolveAvatarUrl(value: string | null | undefined): Promis
   if (!value) return null;
   const path = avatarPathFrom(value);
   if (!path) return value.startsWith("http") ? value : null;
-  const { data } = await supabase.storage.from(AVATAR_BUCKET).createSignedUrl(path, 60 * 60);
-  return data?.signedUrl ?? null;
+  const [url] = await resolveAvatarUrls([value]);
+  return url ?? null;
 }
 
 /** Batch version of resolveAvatarUrl — one storage call for a whole list. */

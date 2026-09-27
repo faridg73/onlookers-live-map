@@ -14,7 +14,7 @@ export const signAvatarPaths = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<Record<string, string>> => {
     const paths = [...new Set(data.paths)].filter((p) => !p.includes(".."));
     if (paths.length === 0) return {};
-    const owners = [...new Set(paths.map((p) => p.split("/")[0]).filter(Boolean))];
+    const owners = [...new Set(paths.map((p) => p.split("/")[0] ?? "").filter(Boolean))];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("profiles")
