@@ -10,7 +10,7 @@ import { useDiscoveryArea } from "@/hooks/use-discovery-area";
 import { usePlaceList } from "@/hooks/use-place-list";
 import { usePlacePhotos } from "@/hooks/use-place-photos";
 import { useLiveEvents } from "@/hooks/use-live-events";
-import { discoveryGroupBySlug } from "@/lib/discovery";
+import { discoveryGroupBySlug, isBigBoxPlace } from "@/lib/discovery";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { cn } from "@/lib/utils";
 import type { DiscoveredPlace } from "@/lib/places.functions";
@@ -18,6 +18,7 @@ import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 import { CREATOR_VIBES } from "@/lib/creator-vibes";
 import type { DiscoveryGroup } from "@/lib/discovery";
 import { PageBackButton } from "@/components/PageBackButton";
+import { VibeOwnContent } from "@/components/VibeOwnContent";
 
 
 export const Route = createFileRoute("/events")({
@@ -190,6 +191,7 @@ function EventsScreen() {
           onSelect={(vibe) => {
             setVibeId(vibe?.id ?? null);
             setFilter(null);
+            setSubFilter(null);
           }}
         />
       </div>
@@ -232,6 +234,51 @@ function EventsScreen() {
         ))}
       </div>}
 
+      {activeVibe && (
+        <div className="mt-3">
+          <p className="text-[0.6rem] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
+            Narrow it down
+          </p>
+          <div className="-mx-1 mt-2 flex snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]">
+            <button
+              type="button"
+              onClick={() => setSubFilter(null)}
+              aria-pressed={subFilter === null}
+              className={cn(
+                "shrink-0 snap-start rounded-xl border px-3 py-2 text-[0.64rem] font-extrabold uppercase tracking-[0.1em] transition-colors",
+                subFilter === null
+                  ? "border-signal bg-signal text-signal-foreground"
+                  : "border-border bg-surface text-muted-foreground",
+              )}
+            >
+              All {activeVibe.label.split(" ")[0]}
+            </button>
+            {activeVibe.subFilters.map((sub) => (
+              <button
+                key={sub.label}
+                type="button"
+                onClick={() => setSubFilter(sub.label === subFilter ? null : sub.label)}
+                aria-pressed={subFilter === sub.label}
+                className={cn(
+                  "shrink-0 snap-start rounded-xl border px-3 py-2 text-[0.64rem] font-extrabold uppercase tracking-[0.1em] transition-colors",
+                  subFilter === sub.label
+                    ? "border-signal bg-signal text-signal-foreground"
+                    : "border-border bg-surface text-muted-foreground",
+                )}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeVibe?.ownContent && (
+        <SectionBoundary label="Onlooker activity">
+          <VibeOwnContent vibe={activeVibe} keywords={activeSub?.keywords ?? []} />
+        </SectionBoundary>
+      )}
+
       {(eventsLoading || visibleEvents.length > 0) && (
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
@@ -267,7 +314,7 @@ function EventsScreen() {
 
 
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {!hidePlaces && <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item) => (
           <TrendingCard
             key={item.place.id}
@@ -291,7 +338,7 @@ function EventsScreen() {
             No trending venues found around {area.label} yet, try another city above.
           </p>
         )}
-      </div>
+      </div>}
     </div>
   );
 }
