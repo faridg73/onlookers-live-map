@@ -2247,6 +2247,24 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_cache: {
+        Row: {
+          cache_key: string
+          fetched_at: string
+          places: Json
+        }
+        Insert: {
+          cache_key: string
+          fetched_at?: string
+          places?: Json
+        }
+        Update: {
+          cache_key?: string
+          fetched_at?: string
+          places?: Json
+        }
+        Relationships: []
+      }
       video_comments: {
         Row: {
           body: string
