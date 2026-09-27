@@ -27,7 +27,14 @@ import {
 } from "@/lib/bounty-pricing";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { categoryById, needsPermissionConfirmation } from "@/lib/onlooker";
-import { BLOCKED_REQUEST_MESSAGE, isRequestAllowed } from "@/lib/moderation";
+import {
+  BLOCKED_REQUEST_MESSAGE,
+  EVENT_BLOCKED_MESSAGE,
+  findEventPerformanceTerms,
+  isRequestAllowed,
+} from "@/lib/moderation";
+import { PlacePhoto } from "@/components/PlacePhoto";
+import { AlertTriangle } from "lucide-react";
 import type { Venue } from "@/lib/venues";
 
 type Mode = "live" | "clip";
@@ -57,6 +64,7 @@ export function VenueBountyDialog({
   children,
   defaultTitle,
   defaultNote,
+  eventContext,
 }: {
   venue: Venue;
   children: ReactNode;
@@ -64,6 +72,8 @@ export function VenueBountyDialog({
   defaultTitle?: string;
   /** Pre-filled camera instructions for that event. */
   defaultNote?: string;
+  /** Set when opened from a ticketed event card: shows the event chip + guardrail. */
+  eventContext?: { name: string; venueName: string | null; when: string; imageUrl: string | null } | undefined;
 }) {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
@@ -163,6 +173,10 @@ export function VenueBountyDialog({
     }
     if (!isRequestAllowed(title, note, venue.name)) {
       toast.error(BLOCKED_REQUEST_MESSAGE, { duration: 12000 });
+      return;
+    }
+    if (eventContext && findEventPerformanceTerms(title, note).length > 0) {
+      toast.error(EVENT_BLOCKED_MESSAGE, { duration: 12000 });
       return;
     }
     if (isCustom && customDeadline.getTime() <= Date.now()) {
@@ -283,6 +297,35 @@ export function VenueBountyDialog({
         </DialogHeader>
 
         <form onSubmit={submit} className="space-y-4">
+          {eventContext && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-2">
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-surface">
+                  <PlacePhoto
+                    src={eventContext.imageUrl}
+                    identity={eventContext.name}
+                    identityNote={eventContext.venueName}
+                    alt={eventContext.name}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-signal">Tied to event</p>
+                  <p className="truncate text-sm font-bold text-foreground">{eventContext.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {eventContext.venueName ?? "Venue TBA"} · {eventContext.when}
+                  </p>
+                </div>
+              </div>
+              <div role="note" className="flex items-start gap-2 rounded-xl border-2 border-destructive/60 bg-destructive/10 p-3 text-xs font-semibold text-foreground">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />
+                <span>
+                  Bounties tied to ticketed events can only request exterior, line, or pre/after-party
+                  footage — never a recording of the performance itself. Posts asking for show footage
+                  will be rejected.
+                </span>
+              </div>
+            </div>
+          )}
           <div className="flex gap-2">
             <button type="button" onClick={() => pickMode("live")} aria-pressed={mode === "live"} className={modeCard(mode === "live")}>
               <Radio className="size-4 text-signal" />
