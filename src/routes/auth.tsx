@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, X } from "lucide-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -54,6 +55,14 @@ function AuthScreen() {
       return;
     }
     await navigate({ to: "/profile", replace: true });
+  };
+  /** Lets someone leave sign-in without an account: back if possible, else home. */
+  const leaveAuth = () => {
+    if (window.history.length > 1 && window.history.state?.idx > 0) {
+      window.history.back();
+    } else {
+      void navigate({ to: "/", replace: true });
+    }
   };
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -303,6 +312,24 @@ function AuthScreen() {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-32 pt-10">
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={leaveAuth}
+          aria-label="Go back"
+          className="inline-flex size-9 items-center justify-center rounded-full border border-signal/60 bg-surface text-signal shadow-md shadow-signal/20 transition-colors hover:border-signal hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={leaveAuth}
+          aria-label="Close and go back"
+          className="inline-flex size-9 items-center justify-center rounded-full border-2 border-signal bg-surface text-signal shadow-md shadow-signal/30 transition-colors hover:bg-signal hover:text-signal-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-4" aria-hidden />
+        </button>
+      </div>
       <h1 className="font-display text-3xl tracking-tight text-foreground">
         {mode === "signin" ? (
           <>Sign <span className="text-signal">in</span></>
