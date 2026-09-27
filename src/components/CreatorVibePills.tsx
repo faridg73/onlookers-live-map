@@ -1,18 +1,4 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Car, Music, Sparkles, Store, Trophy, Utensils } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { CREATOR_VIBES, type CreatorVibe } from "@/lib/creator-vibes";
-import { cn } from "@/lib/utils";
-
-const ICONS = {
-  foodie: Utensils,
-  "car-spotters": Car,
-  "style-scout": Sparkles,
-  "street-music": Music,
-  "match-day": Trophy,
-  "market-finds": Store,
-} as const;
 
 export function CreatorVibePills({
   activeId,
@@ -48,7 +34,6 @@ export function CreatorVibePills({
           {allLabel}
         </Button>
         {CREATOR_VIBES.map((vibe) => {
-          const Icon = ICONS[vibe.id as keyof typeof ICONS] ?? Sparkles;
           const active = activeId === vibe.id;
           return (
             <Button
@@ -66,7 +51,7 @@ export function CreatorVibePills({
                   : "border-border bg-surface text-muted-foreground hover:border-signal/60 hover:text-foreground",
               )}
             >
-              <Icon className="size-3.5" aria-hidden />
+              <span aria-hidden>{vibe.icon}</span>
               {vibe.label}
             </Button>
           );
