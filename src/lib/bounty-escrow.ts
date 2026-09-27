@@ -77,6 +77,8 @@ export async function lockBounty(input: {
   bountyTier?: "standard" | "fast_catch" | "priority_hunt" | null;
   /** Human-check token from the posting form. */
   captchaToken?: string | null;
+  /** True when opened from a ticketed event card; enables the show-footage block. */
+  eventTied?: boolean;
 }): Promise<LockedBounty> {
   try {
     const { minutes = 60, ...rest } = input;

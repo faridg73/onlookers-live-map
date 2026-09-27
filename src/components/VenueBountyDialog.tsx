@@ -237,6 +237,9 @@ export function VenueBountyDialog({
         bountyType: mode === "live" ? "live_stream" : "pre_recorded_clip",
         scheduledStartAt:
           mode === "clip" && scheduledStart ? scheduledStart.toISOString() : null,
+        // Tells the server to enforce the exterior-only rule too, so the
+        // check holds even if someone posts straight through the API.
+        eventTied: Boolean(eventContext),
       });
       setBalance(locked.balance);
       addRequest({
