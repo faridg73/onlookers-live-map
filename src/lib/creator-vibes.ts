@@ -170,11 +170,11 @@ const VIBE_LOOKUP: Record<BroadcastCategoryId, Lookup> = {
   },
   "tech-innovation": {
     groupSlug: "tech",
-    eventKeywords: ["tech", "expo", "conference", "summit", "hackathon", "robot", "gaming", "startup", "ai", "demo day"],
+    eventKeywords: ["tech", "science & technology", "expo", "conference", "summit", "hackathon", "robot", "gaming", "startup", "founder", "mixer", "meetup", "demo day", "developer", " ai "],
     subFilters: [
-      { label: "Tech hubs", subId: "hubs", keywords: ["startup", "hub", "incubator", "coworking"] },
+      { label: "Coworking & hubs", subId: "hubs", keywords: ["startup", "hub", "incubator", "coworking", "founder", "mixer", "meetup"] },
       { label: "Campuses & labs", subId: "campuses", keywords: ["campus", "lab", "research", "university"] },
-      { label: "Expos & demos", subId: "expos", keywords: ["expo", "demo", "conference", "summit", "hackathon"] },
+      { label: "Hackathons & demos", subId: "expos", keywords: ["expo", "demo", "conference", "summit", "hackathon", "pitch"] },
       { label: "Gadgets & robotics", subId: "gadgets", keywords: ["gadget", "robot", "drone", "hardware"] },
     ],
   },
