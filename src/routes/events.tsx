@@ -86,9 +86,9 @@ function EventsScreen() {
   const gatherings = usePlaceList(group, "festivals", area, { maxResults: 20 });
   const expos = usePlaceList(group, "expos", area, { maxResults: 20 });
   const vibeGroup = activeVibe ? discoveryGroupBySlug(activeVibe.groupSlug) : undefined;
-  const vibePlaces = usePlaceList(vibeGroup, activeVibe?.subId ?? null, area, {
+  const vibePlaces = usePlaceList(vibeGroup, activeSub?.subId ?? activeVibe?.subId ?? null, area, {
     maxResults: 20,
-    enabled: Boolean(activeVibe && vibeGroup),
+    enabled: Boolean(activeVibe && vibeGroup && !hidePlaces),
   });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
