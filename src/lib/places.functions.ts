@@ -139,10 +139,10 @@ const categorySchema = z.object({
  */
 export const searchPlacesByCategory = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => categorySchema.parse(data))
-  .handler(async ({ data }): Promise<DiscoveredPlace[]> => {
+  .handler(async ({ data }): Promise<{ places: DiscoveredPlace[]; unavailable: boolean }> => {
     await enforceRateLimit(RATE_LIMITS.placesSearch);
     const creds = credentials();
-    if (!creds) return [];
+    if (!creds) return { places: [], unavailable: true };
 
     const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
       method: "POST",
@@ -168,15 +168,13 @@ export const searchPlacesByCategory = createServerFn({ method: "POST" })
     if (!response.ok) {
       const body = await response.text();
       console.error(`[places] category search failed [${response.status}]: ${body}`);
-      // Surface the failure so the page can keep earlier results and explain
-      // the outage instead of claiming the area has no venues.
-      throw new Error(
-        response.status === 429 ? "VENUES_RATE_LIMITED" : `VENUES_UNAVAILABLE_${response.status}`,
-      );
+      // Report the outage as data (not a thrown error) so the page keeps
+      // earlier results and explains it instead of crashing.
+      return { places: [], unavailable: true };
     }
 
     const payload = (await response.json()) as { places?: RawPlace[] };
-    return (payload.places ?? []).flatMap(toDiscovered);
+    return { places: (payload.places ?? []).flatMap(toDiscovered), unavailable: false };
   });
 
 /** Details for one place, used when opening a live place page. */

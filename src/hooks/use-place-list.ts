@@ -90,7 +90,12 @@ export function usePlaceList(
         maxResults,
       },
     })
-      .then((result) => {
+      .then(({ places: result, unavailable: failed }) => {
+        if (failed) {
+          pausedUntil = Date.now() + PAUSE_MS;
+          if (!cancelled) fallback();
+          return;
+        }
         cache.set(key, result);
         writeStore(key, result);
         if (!cancelled) {
@@ -99,7 +104,7 @@ export function usePlaceList(
         }
       })
       .catch((error) => {
-        console.error("[discovery] place list failed", error);
+        console.warn("[discovery] place list failed", error);
         pausedUntil = Date.now() + PAUSE_MS;
         if (!cancelled) fallback();
       })
