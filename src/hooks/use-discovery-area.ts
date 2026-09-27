@@ -124,9 +124,14 @@ export function useDiscoveryArea() {
     setBusy(true);
     setError(null);
     try {
-      const place = await geocodeAddress({ data: { address: trimmed } });
+      const place = await geocodeAddress({ data: { address: trimmed } }).catch(() => null);
       if (!place) {
-        setError("We couldn't find that city. Try adding the state or country.");
+        const known = findKnownCity(trimmed);
+        if (known) {
+          write(known);
+          return true;
+        }
+        setError("City search is temporarily unavailable. Try a major city name or Use my location.");
         return false;
       }
       write({
