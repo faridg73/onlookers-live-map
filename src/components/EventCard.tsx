@@ -54,7 +54,7 @@ export function EventCard({ event, liveCount }: Props) {
     `Event: ${event.name}`,
     event.venueName ? `Venue: ${event.venueName}${event.city ? `, ${event.city}` : ""}` : null,
     `When: ${when}`,
-    "Film from outside the venue only: the crowd out front, the entry or box-office line, the marquee and the pre-event atmosphere on the public sidewalk. Do not film the stage, the field of play, any performance or any ticketed content.",
+    "Film from outside the venue only: the crowd out front, the entry or box-office line, the marquee and the pre/after-party atmosphere on the public sidewalk.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -109,40 +109,56 @@ export function EventCard({ event, liveCount }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 border-t border-border">
-        {venue ? (
-          <VenueBountyDialog venue={venue} defaultTitle={event.name} defaultNote={prefillNote}>
-            <button
-              type="button"
-              className="flex items-center justify-center gap-2 bg-signal/10 py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/20"
+      <div className="space-y-2 border-t border-border p-3">
+        <div className="grid grid-cols-2 gap-2">
+          {venue ? (
+            <VenueBountyDialog
+              venue={venue}
+              defaultTitle={`Outside ${event.name}`}
+              defaultNote={prefillNote}
+              eventContext={
+                event.source === "onlooker"
+                  ? undefined
+                  : { name: event.name, venueName: event.venueName, when, imageUrl: event.imageUrl }
+              }
             >
-              <Video className="size-4" aria-hidden /> Trigger live view
-            </button>
-          </VenueBountyDialog>
-        ) : (
-          <span className="flex items-center justify-center py-3 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-            Location TBA
-          </span>
-        )}
+              <button
+                type="button"
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-signal px-2 py-3 text-center text-[0.66rem] font-extrabold uppercase leading-tight tracking-[0.1em] text-signal-foreground transition-opacity hover:opacity-90"
+              >
+                <Video className="size-4 shrink-0" aria-hidden /> Post a bounty for this event
+              </button>
+            </VenueBountyDialog>
+          ) : (
+            <span className="flex items-center justify-center rounded-xl border border-border py-3 text-[0.66rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+              Location TBA
+            </span>
+          )}
 
-        {event.source === "onlooker" ? (
-          <a
-            href={event.ticketUrl}
-            className="flex items-center justify-center gap-2 border-l border-border py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-surface-raised"
-          >
-            <MapPin className="size-4" aria-hidden /> See on map
-          </a>
-        ) : (
-          <a
-            href={event.ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="flex items-center justify-center gap-2 border-l border-border py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-foreground transition-colors hover:bg-surface-raised"
-          >
-            <Ticket className="size-4" aria-hidden /> Tickets
-            <ExternalLink className="size-3" aria-hidden />
-          </a>
-        )}
+          {event.source === "onlooker" ? (
+            <a
+              href={event.ticketUrl}
+              className="flex items-center justify-center gap-2 rounded-xl border border-border py-3 text-[0.66rem] font-extrabold uppercase tracking-[0.1em] text-foreground transition-colors hover:bg-surface-raised"
+            >
+              <MapPin className="size-4" aria-hidden /> See on map
+            </a>
+          ) : (
+            <a
+              href={event.ticketUrl}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="flex items-center justify-center gap-2 rounded-xl border border-border py-3 text-[0.66rem] font-extrabold uppercase tracking-[0.1em] text-foreground transition-colors hover:bg-surface-raised"
+            >
+              <Ticket className="size-4" aria-hidden /> Get Tickets
+              <ExternalLink className="size-3" aria-hidden />
+            </a>
+          )}
+        </div>
+        {venue && event.source !== "onlooker" ? (
+          <p className="text-center text-[0.68rem] text-muted-foreground">
+            Can&apos;t make it? Get exterior, line, or pre/after-party footage from an onlooker nearby.
+          </p>
+        ) : null}
       </div>
     </article>
   );

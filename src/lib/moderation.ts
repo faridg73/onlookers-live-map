@@ -40,3 +40,47 @@ export function findForbiddenTerms(...texts: Array<string | null | undefined>): 
 export function isRequestAllowed(...texts: Array<string | null | undefined>): boolean {
   return findForbiddenTerms(...texts).length === 0;
 }
+
+/**
+ * Extra phrases blocked only on bounties opened from a ticketed event card.
+ * Ticketed events can only be covered from outside: exterior, line, or
+ * pre/after-party. Anything asking for the show itself is rejected.
+ */
+export const EVENT_PERFORMANCE_TERMS = [
+  "record the show",
+  "film the show",
+  "stream the show",
+  "the whole show",
+  "full show",
+  "record the concert",
+  "film the concert",
+  "stream the concert",
+  "the performance",
+  "record the performance",
+  "the stage",
+  "on stage",
+  "onstage",
+  "the set",
+  "the game",
+  "the match",
+  "the fight",
+  "the field",
+  "the court",
+  "courtside",
+  "from my seat",
+  "from the seats",
+  "inside the arena",
+  "inside the stadium",
+  "inside the venue",
+  "the headliner",
+  "the opener",
+] as const;
+
+export const EVENT_BLOCKED_MESSAGE =
+  "Request Blocked: Bounties tied to ticketed events can only request exterior, line, or pre/after-party footage — never a recording of the performance itself. Remove any mention of the show, stage, game or seats and try again.";
+
+/** Performance-footage phrases found in an event-tied bounty's text. */
+export function findEventPerformanceTerms(...texts: Array<string | null | undefined>): string[] {
+  const haystack = ` ${normalise(texts.filter(Boolean).join(" "))} `;
+  return EVENT_PERFORMANCE_TERMS.filter((term) => haystack.includes(` ${normalise(term)} `));
+}
