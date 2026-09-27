@@ -2,6 +2,7 @@
 import { sanitizeText } from "@/lib/sanitize";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadMedia } from "@/lib/media-upload";
+import { resolveAvatarUrls } from "@/lib/profile";
 
 /** The broadcast lanes that open the Discover hub. */
 export type CommunityCategory =

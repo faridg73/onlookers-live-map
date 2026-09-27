@@ -36,6 +36,20 @@ export type ExploreComment = {
 const BUCKET = "bounty-videos";
 
 /**
+ * Stored avatar values may be a plain storage path or a legacy signed URL
+ * (signed URLs expire, which broke photos). Sign a fresh short-lived link.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function signAvatar(admin: any, value: string | null | undefined): Promise<string | null> {
+  if (!value) return null;
+  const legacy = value.match(/\/object\/sign\/avatars\/([^?]+)/);
+  const path = legacy ? decodeURIComponent(legacy[1]) : value.startsWith("http") ? null : value;
+  if (!path) return value.startsWith("http") ? value : null;
+  const { data } = await admin.storage.from("avatars").createSignedUrl(path, 60 * 60);
+  return data?.signedUrl ?? null;
+}
+
+/**
  * Public Explore feed. Clips live in a private bucket, so the server signs
  * short-lived playback links for anyone browsing — no sign-in required.
  */
