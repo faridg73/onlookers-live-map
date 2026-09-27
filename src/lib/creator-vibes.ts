@@ -31,7 +31,7 @@ export type CreatorVibe = {
    * Vibes with no honest external place source lead with Onlooker's own
    * bounties, streams and member posts instead of filler listings.
    */
-  ownContent: null | { bountyCategory: CategoryId; blurb: string; showPros?: boolean };
+  ownContent: null | { bountyCategory: CategoryId; blurb: string; showPros?: boolean; hidePlaces?: boolean };
   /** Big-box/discount chains are dropped from this vibe's place results. */
   excludeBigBox?: boolean;
 };
@@ -100,6 +100,7 @@ const VIBE_LOOKUP: Record<BroadcastCategoryId, Lookup> = {
     ownContent: {
       bountyCategory: "vehicles",
       blurb: "Member car spots and open requests for meets, exotics and builds nearby.",
+      hidePlaces: true,
     },
     subFilters: [
       { label: "Exotics & supercars", subId: null, keywords: ["exotic", "supercar", "ferrari", "lambo", "porsche", "mclaren"] },
@@ -147,6 +148,7 @@ const VIBE_LOOKUP: Record<BroadcastCategoryId, Lookup> = {
       bountyCategory: "realestate",
       blurb: "Verified property visits, open requests and our vetted Pro network.",
       showPros: true,
+      hidePlaces: true,
     },
     subFilters: [
       { label: "Property visits", subId: null, keywords: ["visit", "walkthrough", "inspection", "property"] },
