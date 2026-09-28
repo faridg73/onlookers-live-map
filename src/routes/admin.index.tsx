@@ -18,6 +18,7 @@ import {
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
 import { moderationReasonLabel } from "@/lib/moderation-reasons";
 import { ContentReportsQueue } from "@/components/admin/ContentReportsQueue";
+import { RiskFlagQueue } from "@/components/admin/RiskFlagQueue";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
