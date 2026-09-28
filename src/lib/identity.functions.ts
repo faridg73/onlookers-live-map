@@ -11,6 +11,7 @@ export type IdentityStatus = {
   feeCharged: boolean;
   country: string | null;
   pending: boolean;
+  frozen: boolean;
   error?: string;
 };
 
@@ -82,7 +83,7 @@ export const getIdentityStatus = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<IdentityStatus> => {
     const { data: profile } = await context.supabase
       .from("profiles")
-      .select("payout_identity_verified_at, payout_identity_fee_charged_at, payout_country")
+      .select("payout_identity_verified_at, payout_identity_fee_charged_at, payout_country, account_frozen_at")
       .eq("id", context.userId)
       .maybeSingle();
     const base: IdentityStatus = {
@@ -90,8 +91,9 @@ export const getIdentityStatus = createServerFn({ method: "GET" })
       feeCharged: Boolean(profile?.payout_identity_fee_charged_at),
       country: profile?.payout_country ?? null,
       pending: false,
+      frozen: Boolean(profile?.account_frozen_at),
     };
-    if (base.verified) return base;
+    if (base.verified && !base.frozen) return base;
 
     const { data: started } = await context.supabase
       .from("payout_security_logs")
@@ -113,7 +115,8 @@ export const getIdentityStatus = createServerFn({ method: "GET" })
       if (session.status === "verified") {
         const { markIdentityVerified } = await import("@/lib/identity.server");
         await markIdentityVerified(session as never, details.country);
-        return { ...base, verified: true, country: details.country ?? null };
+        const unfroze = session.metadata?.["kind"] === "account_unfreeze";
+        return { ...base, verified: true, frozen: unfroze ? false : base.frozen, country: base.country ?? details.country ?? null };
       }
       return { ...base, pending: session.status === "processing" };
     } catch (error) {
