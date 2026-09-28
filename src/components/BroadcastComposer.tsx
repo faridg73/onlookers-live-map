@@ -437,6 +437,17 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         </span>
       </label>
 
+      <p className="mt-2 text-xs leading-snug text-muted-foreground">
+        Keep it public, legal, and safe &mdash;{" "}
+        <Link
+          to="/terms"
+          hash={COMMUNITY_GUIDELINES_ANCHOR}
+          className="font-semibold text-foreground underline underline-offset-4"
+        >
+          see Community Guidelines
+        </Link>
+      </p>
+
       <Button
         type="button"
         disabled={posting || !agreed}
