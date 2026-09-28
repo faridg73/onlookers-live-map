@@ -40,7 +40,53 @@ export const submitCreditCashout = createServerFn({ method: "POST" })
       console.error("[cashout] credits failed", { userId: context.userId, message: error.message });
       return { error: /insufficient credits/i.test(error.message) ? "Insufficient Credits" : error.message };
     }
-    return { id: String(id) };
+    const payoutId = String(id);
+
+    // Send the money to the member's connected Stripe account right away.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createStripeClient, getStripeErrorMessage } = await import("@/lib/stripe.server");
+    const refund = async (reason: string) => {
+      await supabaseAdmin.rpc("refund_failed_credit_cashout" as never, { _payout_id: payoutId, _reason: reason } as never);
+      return { error: reason };
+    };
+    const [{ data: account }, { data: payout }] = await Promise.all([
+      supabaseAdmin
+        .from("payout_accounts")
+        .select("stripe_account_id, payouts_enabled, environment")
+        .eq("user_id", context.userId)
+        .maybeSingle(),
+      supabaseAdmin.from("payout_requests").select("cash_amount_usd").eq("id", payoutId).maybeSingle(),
+    ]);
+    if (!account?.payouts_enabled || !account.stripe_account_id) {
+      return refund("Connect a bank account before cashing out. Your Credits were returned.");
+    }
+    const cents = Math.round(Number(payout?.cash_amount_usd ?? 0) * 100);
+    if (cents <= 0) return refund("Cash-out amount is too small after fees. Your Credits were returned.");
+    try {
+      const stripe = createStripeClient(account.environment === "sandbox" ? "sandbox" : "live");
+      const transfer = await stripe.transfers.create(
+        {
+          amount: cents,
+          currency: "usd",
+          destination: account.stripe_account_id,
+          metadata: { payout_request_id: payoutId, user_id: context.userId },
+        },
+        { idempotencyKey: `credit_cashout_${payoutId}` },
+      );
+      await supabaseAdmin
+        .from("payout_requests")
+        .update({ status: "paid", stripe_transfer_id: transfer.id })
+        .eq("id", payoutId);
+      return { id: payoutId };
+    } catch (error) {
+      const raw = getStripeErrorMessage(error);
+      console.error("[cashout] transfer failed", { userId: context.userId, payoutId, raw });
+      return refund(
+        raw.includes("balance_insufficient") || /insufficient/i.test(raw)
+          ? "The payments account doesn't have enough balance to send this yet. Your Credits were returned."
+          : `Transfer failed: ${raw}. Your Credits were returned.`,
+      );
+    }
   });
 
 /** Files an earnings payout request for review. */
