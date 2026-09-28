@@ -56,4 +56,4 @@
 - [x] Free live streaming for any signed-in account (gate removed), Create account/Log in paths, welcome popup, 10-min new-account cooldown, 3 streams/hour cap, Report on live cards, "Live now" rail on Discover
 - [x] Signup polish: required visible mobile number field with SMS verification and neutral-until-typing password checklist
 - [x] Unified inline signup verification: explicit phone and email codes, locked verified fields, and account creation only after both pass
-- [ ] Signup form resilience: keep typed name/username/phone/email through refreshes and rejected verifications, and keep the sign-up form selected in the address bar
+- [x] Signup form resilience: keep typed name/username/phone/email through refreshes and rejected verifications, and keep the sign-up form selected in the address bar
