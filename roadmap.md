@@ -54,3 +54,4 @@
 - [x] Answer: which Google Maps lookups could move browser-side to ease the daily cap
 - [x] Community Guidelines: Terms section, required signup checkbox, non-blocking stream-setup reference link
 - [x] Free live streaming for any signed-in account (gate removed), Create account/Log in paths, welcome popup, 10-min new-account cooldown, 3 streams/hour cap, Report on live cards, "Live now" rail on Discover
+- [x] Signup polish: required visible mobile number field with SMS verification and neutral-until-typing password checklist
