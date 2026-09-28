@@ -12,11 +12,13 @@ import { clearPreviousAuthState, requireExactAuthenticatedUser } from "@/lib/aut
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
-import { PhoneVerification } from "@/components/PhoneVerification";
 import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
+import { InlineVerificationField } from "@/components/InlineVerificationField";
+import { confirmPhoneCode, sendPhoneCode } from "@/lib/phone-verify.functions";
+import { completeVerifiedSignup, confirmEmailSignupCode, sendEmailSignupCode } from "@/lib/signup-verification.functions";
 
 export const Route = createFileRoute("/auth")({
   // Carries where the person was headed before sign-in, e.g. the live stream sheet.
@@ -103,7 +105,11 @@ function AuthScreen() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [verifying, setVerifying] = useState(false);
+  const [emailProof, setEmailProof] = useState("");
+  const [phoneProof, setPhoneProof] = useState("");
+  const [verifiedPhone, setVerifiedPhone] = useState("");
+  const [emailVerificationError, setEmailVerificationError] = useState<string | null>(null);
+  const [phoneVerificationError, setPhoneVerificationError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [offerTwoFactor, setOfferTwoFactor] = useState(false);
@@ -187,6 +193,8 @@ function AuthScreen() {
               ? "Choose an available username."
               : phoneDigits.length < 10 || phoneDigits.length > 15
                 ? "Enter a valid mobile number, including area code."
+              : !emailProof || !phoneProof
+                ? "Verify both your email and mobile number before signing up."
               : !passwordMeetsRules(password)
                 ? "Your password doesn't meet every requirement yet."
                 : null;
@@ -200,27 +208,20 @@ function AuthScreen() {
         return;
       }
     }
-    if (!human.ready) {
-      const message =
-        mode === "signup"
-          ? "Finish the quick human check before creating your account."
-          : "Just a moment, finishing the security check.";
-      setFormError(message);
+    if (mode === "signin" && !human.ready) {
+      setFormError("Just a moment, finishing the security check.");
       return;
     }
     setBusy(true);
     try {
       const allowed = await checkAuthAttempt({ data: { email, mode } });
       if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
-      const check = await verifyHumanCheck({
-        data: { token: human.token ?? "", action: mode === "signup" ? "sign-up" : "sign-in" },
-      });
-      if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
+      if (mode === "signin") {
+        const check = await verifyHumanCheck({ data: { token: human.token ?? "", action: "sign-in" } });
+        if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
+      }
       if (mode === "signup") {
-        // Numbers are confirmed by text before the account is created.
-        await beginAccountSwitch();
-        rememberTermsAcceptance();
-        setVerifying(true);
+        await createAccount();
       } else {
         await beginAccountSwitch();
         rememberTermsAcceptance();
@@ -256,53 +257,102 @@ function AuthScreen() {
     }
   }
 
-  /** Creates the account once the mobile number has been confirmed by text. */
-  async function createAccount(phone: string) {
+  /** Creates an email-confirmed account only after both inline codes pass. */
+  async function createAccount() {
     setBusy(true);
     try {
       await beginAccountSwitch();
       rememberTermsAcceptance();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {
-            phone,
-            first_name: firstName.trim(),
-            last_name: lastName.trim(),
-            username: username.trim(),
-          },
+      const result = await completeVerifiedSignup({
+        data: {
+          email,
+          phone: verifiedPhone,
+          emailProof,
+          phoneProof,
+          password,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          username: username.trim(),
         },
       });
-      if (error) throw error;
-      setVerifying(false);
-      if (data.session && data.user) {
-        const authenticatedUser = await requireExactAuthenticatedUser(data.session);
-        if (authenticatedUser.id !== data.user.id) {
-          await clearPreviousAuthState();
-          throw new Error("The new account did not match. Please sign in again.");
-        }
-        await supabase.rpc("claim_verified_phone");
-        await queryClient.cancelQueries();
-        queryClient.clear();
-        // Offer (never force) two-factor right after the account exists.
-        setOfferTwoFactor(true);
-      } else {
-        setMode("signin");
-        setNeedsEmailConfirm(true);
-        setFormError(
-          "Number confirmed. We emailed a verification link to " +
-            email +
-            ", open it to activate your account, then sign in.",
-        );
-        toast.success("Check your email for the verification link.");
-      }
+      if (!result.ok) throw new Error(result.error);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.session || !data.user) throw error ?? new Error("Your account was created, but sign-in failed. Please sign in.");
+      const authenticatedUser = await requireExactAuthenticatedUser(data.session);
+      if (authenticatedUser.id !== data.user.id) throw new Error("The new account did not match. Please sign in again.");
+      await supabase.rpc("claim_verified_phone");
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      setOfferTwoFactor(true);
     } catch (err) {
-      setVerifying(false);
       const described = describeAuthError(err);
       setNeedsEmailConfirm(described.needsEmailConfirm);
       setFormError(described.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendEmailCode() {
+    setEmailVerificationError(null);
+    setBusy(true);
+    try {
+      const result = await sendEmailSignupCode({ data: { email } });
+      if (!result.ok) throw new Error(result.error);
+      toast.success("Email code sent.");
+      return true;
+    } catch (error) {
+      setEmailVerificationError(error instanceof Error ? error.message : "Could not send the code.");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verifyEmailCode(code: string) {
+    setEmailVerificationError(null);
+    setBusy(true);
+    try {
+      const result = await confirmEmailSignupCode({ data: { email, code } });
+      if (!result.ok || !result.proof) throw new Error(result.error ?? "That code didn't work.");
+      setEmailProof(result.proof);
+      toast.success("Email verified.");
+    } catch (error) {
+      setEmailVerificationError(error instanceof Error ? error.message : "That code didn't work.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendMobileCode() {
+    setPhoneVerificationError(null);
+    setBusy(true);
+    try {
+      const result = await sendPhoneCode({ data: { phone, email, humanToken: human.token ?? undefined, humanAction: "sign-up" } });
+      if (!result.ok || !result.phone) throw new Error(result.error ?? "Could not send the code.");
+      setVerifiedPhone(result.phone);
+      human.reset();
+      toast.success("Mobile code sent.");
+      return true;
+    } catch (error) {
+      setPhoneVerificationError(error instanceof Error ? error.message : "Could not send the code.");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verifyMobileCode(code: string) {
+    setPhoneVerificationError(null);
+    setBusy(true);
+    try {
+      const result = await confirmPhoneCode({ data: { phone: verifiedPhone || phone, email, code } });
+      if (!result.ok || !result.phone || !result.proof) throw new Error(result.error ?? "That code didn't work.");
+      setVerifiedPhone(result.phone);
+      setPhoneProof(result.proof);
+      toast.success("Mobile number verified.");
+    } catch (error) {
+      setPhoneVerificationError(error instanceof Error ? error.message : "That code didn't work.");
     } finally {
       setBusy(false);
     }
@@ -340,29 +390,6 @@ function AuthScreen() {
           void goAfterAuth();
         }}
       />
-    );
-  }
-
-  if (verifying) {
-    return (
-      <div className="mx-auto max-w-md px-4 pb-32 pt-10">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">
-          One last check
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Almost there, confirm your mobile number and we&rsquo;ll finish setting up{" "}
-          <span className="font-semibold text-foreground">{email}</span>.
-        </p>
-        <PhoneVerification
-          email={email}
-          initialPhone={phone}
-          onVerified={(phone) => void createAccount(phone)}
-          onCancel={() => {
-            setVerifying(false);
-            human.reset();
-          }}
-        />
-      </div>
     );
   }
 
@@ -464,27 +491,14 @@ function AuthScreen() {
                 <p className="mt-1 px-1 text-xs text-destructive">{nameState}</p>
               ) : null}
             </div>
-            <input
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Mobile number"
-              aria-label="Mobile number"
-              className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
-            />
+            <InlineVerificationField kind="phone" value={phone} setValue={setPhone} verified={Boolean(phoneProof)} busy={busy} error={phoneVerificationError} onSend={sendMobileCode} onVerify={(code) => void verifyMobileCode(code)} onChanged={() => { setPhoneProof(""); setVerifiedPhone(""); setPhoneVerificationError(null); }} />
           </>
         ) : null}
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@email.com"
-          className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
-        />
+        {mode === "signup" ? (
+          <InlineVerificationField kind="email" value={email} setValue={setEmail} verified={Boolean(emailProof)} busy={busy} error={emailVerificationError} onSend={sendEmailCode} onVerify={(code) => void verifyEmailCode(code)} onChanged={() => { setEmailProof(""); setPhoneProof(""); setVerifiedPhone(""); setEmailVerificationError(null); }} />
+        ) : (
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal" />
+        )}
         <input
           type="password"
           required
@@ -535,8 +549,8 @@ function AuthScreen() {
         ) : null}
         <button
           type="submit"
-          disabled={busy || !accepted || !human.ready || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free" || phone.replace(/\D/g, "").length < 10 || phone.replace(/\D/g, "").length > 15))}
-          aria-disabled={busy || !accepted || !human.ready}
+          disabled={busy || !accepted || (mode === "signin" && !human.ready) || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free" || !emailProof || !phoneProof))}
+          aria-disabled={busy || !accepted || (mode === "signin" && !human.ready)}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}
