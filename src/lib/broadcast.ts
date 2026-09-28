@@ -32,49 +32,63 @@ export const BROADCAST_AUDIENCES = [
 export const BROADCAST_SAFETY_NOTICE =
   "By going live, you agree to follow safety rules. No illegal activity or driving violations.";
 
-/** Level at which a creator can broadcast for free without a track record badge. */
-export const BROADCAST_MIN_LEVEL = 2;
+/** Max free streams one account can start per rolling hour (mirrored by a DB trigger). */
+export const BROADCAST_HOURLY_LIMIT = 3;
 
 export type BroadcastEligibility = {
   signedIn: boolean;
   allowed: boolean;
-  level: number;
-  completed: number;
-  /** Plain-language reason when broadcasting is not open yet. */
+  /** When a temporary block (new-account cooldown or hourly cap) lifts. */
+  retryAt: Date | null;
+  /** Plain-language reason when streaming is temporarily blocked. */
   reason: string;
 };
 
-/** Checks whether the signed-in person can stream for free. */
+/**
+ * Free streaming is open to every signed-in account. The only limits are a
+ * 10-minute cooldown for brand-new accounts and an hourly cap, both enforced
+ * server-side; this just explains them before the person fills the form.
+ */
 export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) {
+    return { signedIn: false, allowed: false, retryAt: null, reason: "" };
+  }
+  const { data } = await supabase.rpc("my_broadcast_status");
+  const row = (Array.isArray(data) ? data[0] : data) as
+    | { cooldown_until: string | null; streams_last_hour: number; next_slot_at: string | null }
+    | undefined;
+  const now = Date.now();
+  const cooldown = row?.cooldown_until ? new Date(row.cooldown_until) : null;
+  if (cooldown && cooldown.getTime() > now) {
     return {
-      signedIn: false,
+      signedIn: true,
       allowed: false,
-      level: 0,
-      completed: 0,
-      reason: "Sign in to start a free broadcast.",
+      retryAt: cooldown,
+      reason: "New accounts can start their first live stream 10 minutes after sign-up.",
     };
   }
-  const [trust, verification] = await Promise.all([
-    fetchTrustStats(auth.user.id).catch(() => null),
-    fetchMyVerification().catch(() => null),
-  ]);
-  const level = trust?.hunterLevel ?? 1;
-  const completed = trust?.completedClaims ?? 0;
-  const allowed =
-    Boolean(verification?.isVerified) || Boolean(trust?.verified) || level >= BROADCAST_MIN_LEVEL;
-  return {
-    signedIn: true,
-    allowed,
-    level,
-    completed,
-    reason: allowed
-      ? ""
-      : verification?.requestedAt
-        ? "Your creator verification is in review, free broadcasting unlocks once it's approved."
-        : "Free broadcasting opens once you're a verified creator, apply on your profile, or deliver a couple of paid captures to unlock it.",
-  };
+  if ((row?.streams_last_hour ?? 0) >= BROADCAST_HOURLY_LIMIT) {
+    return {
+      signedIn: true,
+      allowed: false,
+      retryAt: row?.next_slot_at ? new Date(row.next_slot_at) : null,
+      reason: `You can start up to ${BROADCAST_HOURLY_LIMIT} live streams per hour.`,
+    };
+  }
+  return { signedIn: true, allowed: true, retryAt: null, reason: "" };
+}
+
+/** Turns the database safeguard errors into readable messages. */
+export function describeBroadcastError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (/BROADCAST_COOLDOWN/.test(message)) {
+    return "New accounts can start their first live stream 10 minutes after sign-up.";
+  }
+  if (/BROADCAST_RATE_LIMIT/.test(message)) {
+    return `You can start up to ${BROADCAST_HOURLY_LIMIT} live streams per hour. Try again a bit later.`;
+  }
+  return message || "Couldn't start the broadcast.";
 }
 
 /** Publishes a free live broadcast to Discover and the nearby feed. */
