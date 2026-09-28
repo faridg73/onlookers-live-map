@@ -24,6 +24,7 @@ import { template as supportReceived } from './support-received'
 import { template as payoutReleased } from './payout-released'
 import { template as teamInvite } from './team-invite'
 import { template as signupCode } from './signup-code'
+import { template as payoutMethodChanged } from './payout-method-changed'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'dmca-report': dmcaReport,
@@ -32,4 +33,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payout-released': payoutReleased,
   'team-invite': teamInvite,
   'signup-code': signupCode,
+  'payout-method-changed': payoutMethodChanged,
 }
