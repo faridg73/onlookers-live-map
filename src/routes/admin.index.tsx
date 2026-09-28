@@ -18,6 +18,7 @@ import {
 import { listDisputes, type DisputeCase } from "@/lib/disputes";
 import { moderationReasonLabel } from "@/lib/moderation-reasons";
 import { ContentReportsQueue } from "@/components/admin/ContentReportsQueue";
+import { RiskFlagQueue } from "@/components/admin/RiskFlagQueue";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -152,6 +153,8 @@ function AdminDashboard() {
 
 
       {loading && <p className="mt-8 text-center text-sm text-muted-foreground">Loading…</p>}
+
+      <RiskFlagQueue />
 
       <section className="mt-8">
         <h2 className="flex items-center gap-2 font-display text-lg text-foreground">

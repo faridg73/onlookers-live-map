@@ -76,6 +76,35 @@ export async function listModerationFlags(): Promise<ModerationFlag[]> {
   return (data ?? []) as ModerationFlag[];
 }
 
+export type RiskFlag = {
+  id: string;
+  request_id: string | null;
+  flag_type: string;
+  status: string;
+  signals: Record<string, unknown>;
+  created_at: string;
+  payee_id: string | null;
+  payee_name: string | null;
+  payer_id: string | null;
+  payer_name: string | null;
+};
+
+/** Bounties whose payer and payee look like the same person (staff only). */
+export async function listRiskFlags(): Promise<RiskFlag[]> {
+  const { data, error } = await supabase.rpc("admin_risk_flags");
+  if (error) throw error;
+  return (data ?? []) as RiskFlag[];
+}
+
+/** Closes a risk flag once staff has reviewed it. */
+export async function resolveRiskFlag(id: string, status: "cleared" | "confirmed"): Promise<void> {
+  const { error } = await supabase
+    .from("bounty_risk_flags")
+    .update({ status, resolved_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
 export type DmcaNotice = {
   id: string;
   name: string;
