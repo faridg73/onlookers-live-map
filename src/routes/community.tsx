@@ -17,6 +17,8 @@ import {
   type RadiusChoiceId,
 } from "@/components/CommunityFeedFilters";
 import { NewCommunityPostDialog } from "@/components/NewCommunityPostDialog";
+import { LiveNowRail } from "@/components/LiveNowRail";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { GlobalFeedMap } from "@/components/GlobalFeedMap";
 import { DiscoverStarterCards } from "@/components/DiscoverStarterCards";
 import { Button } from "@/components/ui/button";
@@ -122,6 +124,7 @@ function CommunityHub() {
   const [listingEvent, setListingEvent] = useState(false);
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
+  const [welcomeLive, setWelcomeLive] = useState(false);
 
   // Returning from sign-in with ?action=live|post|event reopens the exact sheet
   // the person tapped before they were sent to the sign-in page.
@@ -133,7 +136,16 @@ function CommunityHub() {
       setListingEvent(true);
     } else {
       setLiveFirst(action === "live");
-      setComposing(true);
+      let greet = false;
+      try {
+        greet = action === "live" && sessionStorage.getItem("onlooker:welcome-live") === "1";
+        sessionStorage.removeItem("onlooker:welcome-live");
+      } catch {
+        /* storage unavailable */
+      }
+      // Just signed in for a live stream: welcome them first, then stream setup.
+      if (greet) setWelcomeLive(true);
+      else setComposing(true);
     }
     void navigate({
       to: "/community",
@@ -150,6 +162,12 @@ function CommunityHub() {
    * lane and the action so they land straight back on this sheet afterwards.
    */
   const startAction = (kind: "live" | "post" | "event") => {
+    // Live streaming opens its own sheet with Create account / Log in paths.
+    if (!user && kind === "live") {
+      setLiveFirst(true);
+      setComposing(true);
+      return;
+    }
     if (!user) {
       const lane = categoryId ?? cat;
       const target = `/community?${lane ? `cat=${encodeURIComponent(lane)}&` : ""}action=${kind}`;
@@ -547,6 +565,17 @@ function CommunityHub() {
           />
         </div>
       </header>
+
+      <LiveNowRail
+        posts={posts}
+        onChanged={() => void load()}
+        onOpen={(post) => {
+          if (post.latitude != null && post.longitude != null) {
+            setFocus({ lat: post.latitude, lng: post.longitude, label: post.title });
+          }
+          setView("map");
+        }}
+      />
 
       {/* The dropdown drives the cards: a selection narrows both views to that
           lane, "All live content" restores the full set. */}
@@ -1031,6 +1060,25 @@ function CommunityHub() {
         onOpenChange={setListingEvent}
         onPosted={() => void load()}
       />
+
+      <Dialog open={welcomeLive} onOpenChange={setWelcomeLive}>
+        <DialogContent className="border-border bg-surface sm:max-w-sm">
+          <DialogTitle className="font-display text-2xl text-foreground">
+            Welcome <span className="text-signal">back</span>
+          </DialogTitle>
+          <DialogDescription>You&rsquo;re signed in. Set up your stream and go live for free.</DialogDescription>
+          <Button
+            type="button"
+            className="mt-2 w-full gap-2"
+            onClick={() => {
+              setWelcomeLive(false);
+              setComposing(true);
+            }}
+          >
+            <Radio className="size-4" /> Set up my stream
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <NewCommunityPostDialog
         open={composing}
