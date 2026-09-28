@@ -28,6 +28,9 @@ function origin(): string {
   return "https://www.onlooker.io";
 }
 
+/** Reusable Stripe Identity flow for non-US members (document + matching selfie). */
+const INTERNATIONAL_ID_FLOW = "vf_1UKkltRYtIZ43KIo1ProHTI1";
+
 /** Starts the one-time ID check. US members get a document check; others add a selfie match. */
 export const startIdentityCheck = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
@@ -40,13 +43,18 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
       const stripe = createStripeClient(resolveStripeEnvForHost(host));
       const country = data.country.toUpperCase();
-      const session = await stripe.identity.verificationSessions.create({
-        type: "document",
-        options: { document: { require_matching_selfie: country !== "US", require_live_capture: true } },
+      const common = {
         metadata: { userId: context.userId, country, kind: "payout_identity" },
         client_reference_id: context.userId,
         return_url: `${origin()}/balance?id_check=done`,
-      });
+      };
+      // US: ID-number lookup only (no document, no selfie).
+      // International: the reusable document + live selfie flow set up in Stripe.
+      const session = await stripe.identity.verificationSessions.create(
+        country === "US"
+          ? { type: "id_number", ...common }
+          : { verification_flow: INTERNATIONAL_ID_FLOW, ...common },
+      );
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("payout_security_logs").insert({
         user_id: context.userId,
