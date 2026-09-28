@@ -5,7 +5,9 @@ import { z } from "zod";
 import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeQuery } from "@/lib/sanitize";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+/** Direct Google endpoints, called with the project's own key (no shared gateway quota). */
+const PLACES_BASE = "https://places.googleapis.com";
+const GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 const MAP_RATE_LIMIT_COOLDOWN_MS = 15 * 60 * 1000;
 
 let mapRateLimitedUntil = 0;
@@ -38,10 +40,9 @@ export type GeocodeResult = {
 };
 
 function credentials() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-  if (!lovableKey || !mapsKey) throw new Error("Map lookup is not configured.");
-  return { lovableKey, mapsKey };
+  const mapsKey = process.env["GOOGLE_PLACES_SERVER_KEY"];
+  if (!mapsKey) throw new Error("Map lookup is not configured.");
+  return { mapsKey };
 }
 
 function mapLookupIsCoolingDown() {
@@ -57,14 +58,9 @@ function handleRateLimitedResponse(response: Response) {
 
 async function callGeocode(params: Record<string, string>): Promise<GeocodeResult | null> {
   if (mapLookupIsCoolingDown()) return null;
-  const { lovableKey, mapsKey } = credentials();
-  const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${GATEWAY_URL}/maps/api/geocode/json?${query}`, {
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": mapsKey,
-    },
-  });
+  const { mapsKey } = credentials();
+  const query = new URLSearchParams({ ...params, key: mapsKey }).toString();
+  const response = await fetch(`${GEOCODE_URL}?${query}`);
 
   if (handleRateLimitedResponse(response)) return null;
   if (response.status === 403) {
@@ -82,6 +78,13 @@ async function callGeocode(params: Record<string, string>): Promise<GeocodeResul
       geometry?: { location?: { lat?: number; lng?: number } };
     }>;
   };
+
+  // The geocoder reports quota problems with HTTP 200, so pause on the body status too.
+  if (payload.status === "OVER_QUERY_LIMIT") {
+    mapRateLimitedUntil = Date.now() + MAP_RATE_LIMIT_COOLDOWN_MS;
+    console.warn("Google geocoding is over its quota; pausing new lookups for 15 minutes.");
+    return null;
+  }
 
   const first = payload.results?.[0];
   const lat = first?.geometry?.location?.lat;
@@ -136,12 +139,11 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
     const hit = await readSharedCache<PlaceSuggestion[]>(cacheKey, SUGGEST_CACHE_TTL_MS);
     if (hit?.fresh) return hit.value;
     if (mapLookupIsCoolingDown()) return hit?.value ?? [];
-    const { lovableKey, mapsKey } = credentials();
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:autocomplete`, {
+    const { mapsKey } = credentials();
+    const response = await fetch(`${PLACES_BASE}/v1/places:autocomplete`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": mapsKey,
+        "X-Goog-Api-Key": mapsKey,
         "Content-Type": "application/json",
         "X-Goog-FieldMask":
           "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text,suggestions.placePrediction.types",
@@ -195,13 +197,12 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
 
 async function resolvePlace(data: { placeId: string; sessionToken: string }): Promise<GeocodeResult | null> {
     if (mapLookupIsCoolingDown()) return null;
-    const { lovableKey, mapsKey } = credentials();
+    const { mapsKey } = credentials();
     const response = await fetch(
-      `${GATEWAY_URL}/places/v1/places/${encodeURIComponent(data.placeId)}?sessionToken=${data.sessionToken}`,
+      `${PLACES_BASE}/v1/places/${encodeURIComponent(data.placeId)}?sessionToken=${data.sessionToken}`,
       {
         headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": mapsKey,
+          "X-Goog-Api-Key": mapsKey,
           "X-Goog-FieldMask": "location,formattedAddress",
         },
       },
