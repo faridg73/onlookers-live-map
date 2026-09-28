@@ -59,6 +59,6 @@
 - [x] Signup form resilience: keep typed name/username/phone/email through refreshes and rejected verifications, and keep the sign-up form selected in the address bar
 - [x] Reserved and offensive usernames: block brand, staff, route, impersonation and profanity/slur names with the same "already taken" wording, enforced on the server too
 - [x] Fraud protection Phase 1: database foundations (ID-verified, freeze, 3-day hold, security log, risk flags)
-- [ ] Fraud protection Phase 2: Stripe Identity check on first cash-out
+- [x] Fraud protection Phase 2: Stripe Identity check on first cash-out
 - [ ] Fraud protection Phase 3: cash-out screen (available vs pending, 24h cooldown, re-check)
 - [ ] Fraud protection Phase 4: Freeze my account switch + change alerts
