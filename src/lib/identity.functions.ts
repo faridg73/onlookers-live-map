@@ -65,7 +65,7 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const session = await stripe.identity.verificationSessions.create(
         country === "US"
           ? { type: "id_number", ...common }
-          : { verification_flow: INTERNATIONAL_ID_FLOW, ...common },
+          : { verification_flow: INTERNATIONAL_ID_FLOW[env], ...common },
       );
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("payout_security_logs").insert({
