@@ -184,7 +184,7 @@ export function CreditPayoutDashboard() {
         message.includes("ID_CHECK_REQUIRED")
           ? "Please complete the one-time ID check first."
           : message.includes("PAYOUT_COOLDOWN")
-            ? "Cash-outs are paused for 24 hours after payout details change."
+            ? "Cash-outs are paused for a short while after payout details change."
             : message.includes("ON_HOLD")
               ? "Some of these Credits are still in their 3-day security hold."
               : message,
@@ -436,7 +436,7 @@ export function CreditPayoutDashboard() {
                 type="button"
                 onClick={() => void freezeNow()}
                 disabled={busy}
-                className="flex-1 rounded-xl bg-urgent px-3 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-urgent-foreground disabled:opacity-60"
+                className="flex-1 rounded-xl bg-urgent px-3 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-foreground disabled:opacity-60"
               >
                 Yes, freeze now
               </button>
