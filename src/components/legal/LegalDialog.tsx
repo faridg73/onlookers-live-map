@@ -50,7 +50,15 @@ export function LegalDialog({
               <DialogDescription>{BLURBS[doc]}</DialogDescription>
             </DialogHeader>
             <div className="pb-2">
-              {doc === "terms" ? <TermsBody /> : <PrivacyBody linkToTerms={false} />}
+              {doc === "terms" ? (
+                <TermsBody />
+              ) : doc === "guidelines" ? (
+                <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+                  <CommunityGuidelinesBody />
+                </div>
+              ) : (
+                <PrivacyBody linkToTerms={false} />
+              )}
             </div>
           </>
         ) : null}
