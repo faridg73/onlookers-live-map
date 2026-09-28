@@ -53,3 +53,4 @@
 - [ ] User action: rebuild TestFlight (820+) and confirm a fresh install cold-launches with correct first-frame rendering on Home and Discover
 - [x] Answer: which Google Maps lookups could move browser-side to ease the daily cap
 - [x] Community Guidelines: Terms section, required signup checkbox, non-blocking stream-setup reference link
+- [x] Free live streaming for any signed-in account (gate removed), Create account/Log in paths, welcome popup, 10-min new-account cooldown, 3 streams/hour cap, Report on live cards, "Live now" rail on Discover
