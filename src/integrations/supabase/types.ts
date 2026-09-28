@@ -163,6 +163,48 @@ export type Database = {
         }
         Relationships: []
       }
+      bounty_risk_flags: {
+        Row: {
+          counterparty_id: string | null
+          created_at: string
+          flag_type: string
+          id: string
+          request_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          signals: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          counterparty_id?: string | null
+          created_at?: string
+          flag_type: string
+          id?: string
+          request_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          signals?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          counterparty_id?: string | null
+          created_at?: string
+          flag_type?: string
+          id?: string
+          request_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          signals?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bounty_videos: {
         Row: {
           accepted_at: string | null
@@ -522,6 +564,7 @@ export type Database = {
           amount_gross: number
           amount_net: number
           amount_platform_fee: number
+          available_at: string
           created_at: string
           id: string
           receiver_wallet_id: string | null
@@ -533,6 +576,7 @@ export type Database = {
           amount_gross: number
           amount_net: number
           amount_platform_fee?: number
+          available_at?: string
           created_at?: string
           id?: string
           receiver_wallet_id?: string | null
@@ -544,6 +588,7 @@ export type Database = {
           amount_gross?: number
           amount_net?: number
           amount_platform_fee?: number
+          available_at?: string
           created_at?: string
           id?: string
           receiver_wallet_id?: string | null
@@ -1117,6 +1162,36 @@ export type Database = {
         }
         Relationships: []
       }
+      payout_security_logs: {
+        Row: {
+          created_at: string
+          details: Json
+          event_type: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       phone_otp_codes: {
         Row: {
           attempts: number
@@ -1436,6 +1511,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_frozen_at: string | null
           alias: string | null
           avatar_url: string | null
           banned_at: string | null
@@ -1455,6 +1531,9 @@ export type Database = {
           location: string | null
           onboarded: boolean
           onboarding_completed: boolean
+          payout_country: string | null
+          payout_identity_verified_at: string | null
+          payout_method_changed_at: string | null
           phone: string | null
           phone_verified_at: string | null
           rating: number
@@ -1467,6 +1546,7 @@ export type Database = {
           xp: number
         }
         Insert: {
+          account_frozen_at?: string | null
           alias?: string | null
           avatar_url?: string | null
           banned_at?: string | null
@@ -1486,6 +1566,9 @@ export type Database = {
           location?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
+          payout_country?: string | null
+          payout_identity_verified_at?: string | null
+          payout_method_changed_at?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           rating?: number
@@ -1498,6 +1581,7 @@ export type Database = {
           xp?: number
         }
         Update: {
+          account_frozen_at?: string | null
           alias?: string | null
           avatar_url?: string | null
           banned_at?: string | null
@@ -1517,6 +1601,9 @@ export type Database = {
           location?: string | null
           onboarded?: boolean
           onboarding_completed?: boolean
+          payout_country?: string | null
+          payout_identity_verified_at?: string | null
+          payout_method_changed_at?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           rating?: number
