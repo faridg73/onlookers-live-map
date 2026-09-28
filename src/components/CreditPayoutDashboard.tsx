@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2 } from "lucide-react";
+import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { fetchCreditWallet } from "@/lib/credits";
@@ -19,6 +19,7 @@ import {
   openPayoutAccount,
   startPayoutOnboarding,
 } from "@/lib/payouts.functions";
+import { getIdentityStatus, startIdentityCheck, type IdentityStatus } from "@/lib/identity.functions";
 
 /** Marker substring of the "Connect not enabled on this payments account" message. */
 const CONNECT_UNSUPPORTED_MARK = "Direct bank cash-outs";
@@ -36,6 +37,10 @@ export function CreditPayoutDashboard() {
   const loadStatus = useServerFn(getPayoutStatus);
   const beginOnboarding = useServerFn(startPayoutOnboarding);
   const openConnectedAccount = useServerFn(openPayoutAccount);
+  const loadIdentity = useServerFn(getIdentityStatus);
+  const beginIdentity = useServerFn(startIdentityCheck);
+  const [identity, setIdentity] = useState<IdentityStatus | null>(null);
+  const [idCountry, setIdCountry] = useState("US");
 
   const [credits, setCredits] = useState<number | null>(null);
   const [bank, setBank] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
@@ -51,6 +56,11 @@ export function CreditPayoutDashboard() {
       if (!wallet) return;
       setPayouts(await listCreditPayouts());
       try {
+        setIdentity(await loadIdentity());
+      } catch {
+        setIdentity(null);
+      }
+      try {
         const status = await loadStatus();
         setBank({ connected: status.connected, payoutsEnabled: status.payoutsEnabled });
         if (status.supported === false && status.error) setConnectNote(status.error);
@@ -60,7 +70,7 @@ export function CreditPayoutDashboard() {
     } catch (error) {
       console.error("[payouts] refresh failed", error);
     }
-  }, [loadStatus]);
+  }, [loadStatus, loadIdentity]);
 
   useEffect(() => {
     void refresh();
@@ -81,6 +91,21 @@ export function CreditPayoutDashboard() {
       const message = error instanceof Error ? error.message : "Could not open bank setup";
       if (message.includes(CONNECT_UNSUPPORTED_MARK)) setConnectNote(message);
       else toast.error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function startIdCheck() {
+    setBusy(true);
+    try {
+      const result = await beginIdentity({ data: { country: idCountry } });
+      if (result.error || !result.url) throw new Error(result.error ?? "Could not open the ID check");
+      const opened = window.open(result.url, "_blank", "noopener,noreferrer");
+      if (!opened) window.location.href = result.url;
+      toast.info("ID check opened in a new tab. Come back here when you're done.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not open the ID check");
     } finally {
       setBusy(false);
     }
@@ -121,7 +146,8 @@ export function CreditPayoutDashboard() {
       setAmount("");
       await refresh();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Cash out failed");
+      const message = error instanceof Error ? error.message : "Cash out failed";
+      toast.error(message.includes("ID_CHECK_REQUIRED") ? "Please complete the one-time ID check first." : message);
     } finally {
       setBusy(false);
     }
@@ -156,8 +182,54 @@ export function CreditPayoutDashboard() {
         {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
       </p>
 
-      {bank?.payoutsEnabled ? (
+      {bank?.payoutsEnabled && identity && !identity.verified ? (
+        <div className="mt-4 rounded-xl border border-signal/40 bg-signal/10 p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <ShieldCheck className="size-4 text-signal" /> One-time ID check before your first cash out
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            This keeps stolen accounts from draining earnings. A one-time fee of{" "}
+            {idCountry === "US" ? "$0.50" : "$1.50"} comes out of your first cash out. You only do this once.
+          </p>
+          {identity.pending ? (
+            <p className="mt-3 text-xs font-semibold text-signal">Your ID is being reviewed. This usually takes a few minutes.</p>
+          ) : (
+            <>
+              <select
+                value={idCountry}
+                onChange={(event) => setIdCountry(event.target.value)}
+                className="mt-3 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground"
+                aria-label="Where your ID is from"
+              >
+                <option value="US">ID from the United States</option>
+                <option value="XX">ID from another country</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => void startIdCheck()}
+                disabled={busy}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-sm font-bold text-signal-foreground disabled:opacity-60"
+              >
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+                Verify my ID
+              </button>
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            className="mt-2 w-full text-center text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            I finished, check again
+          </button>
+        </div>
+      ) : bank?.payoutsEnabled ? (
         <>
+          {identity?.verified && !identity.feeCharged && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              ID verified. A one-time {identity.country === "US" ? "$0.50" : "$1.50"} ID check fee comes out of this cash out.
+            </p>
+          )}
           <div className="mt-4 flex gap-2">
             <input
               inputMode="numeric"
