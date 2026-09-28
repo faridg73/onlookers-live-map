@@ -22,6 +22,7 @@ import {
 } from "@/lib/payouts.functions";
 import { getIdentityStatus, startIdentityCheck, type IdentityStatus } from "@/lib/identity.functions";
 import { freezeMyAccount } from "@/lib/account-security.functions";
+import { QaCreditTools } from "@/components/QaCreditTools";
 
 /** Marker substring of the "Connect not enabled on this payments account" message. */
 const CONNECT_UNSUPPORTED_MARK = "Direct bank cash-outs";
@@ -509,6 +510,8 @@ export function CreditPayoutDashboard() {
           </ul>
         )}
       </div>
+
+      <QaCreditTools onChanged={refresh} />
     </div>
   );
 }
