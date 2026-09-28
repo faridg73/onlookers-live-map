@@ -8,6 +8,7 @@ import {
   grantTestCredits,
   qaToolsEnabled,
   releaseCreditHolds,
+  resetCashoutThrottle,
 } from "@/lib/qa-credits.functions";
 
 /**
@@ -18,6 +19,7 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
   const checkEnabled = useServerFn(qaToolsEnabled);
   const grant = useServerFn(grantTestCredits);
   const release = useServerFn(releaseCreditHolds);
+  const resetThrottle = useServerFn(resetCashoutThrottle);
   const [enabled, setEnabled] = useState(false);
   const [credits, setCredits] = useState("100");
   const [onHold, setOnHold] = useState(false);
@@ -70,6 +72,18 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
     }
   }
 
+  async function clearThrottle() {
+    setBusy(true);
+    try {
+      await resetThrottle();
+      toast.success("Cash-out attempt counter cleared, try again now.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not clear the counter");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="mt-6 rounded-2xl border border-dashed border-signal/50 bg-signal/5 p-4">
       <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -115,6 +129,15 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
         className="mt-3 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
       >
         End the 3-day hold now
+      </button>
+
+      <button
+        type="button"
+        onClick={() => void clearThrottle()}
+        disabled={busy}
+        className="mt-2 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+      >
+        Reset cash-out attempt limit
       </button>
     </div>
   );
