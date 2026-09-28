@@ -509,6 +509,8 @@ export function CreditPayoutDashboard() {
           </ul>
         )}
       </div>
+
+      <QaCreditTools onChanged={refresh} />
     </div>
   );
 }
