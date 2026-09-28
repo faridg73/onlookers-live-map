@@ -9,7 +9,7 @@ type Props = {
   verified: boolean;
   busy: boolean;
   error: string | null;
-  onSend: () => void;
+  onSend: () => Promise<boolean>;
   onVerify: (code: string) => void;
   onChanged: () => void;
 };
@@ -26,8 +26,8 @@ export function InlineVerificationField({ kind, value, setValue, verified, busy,
     return () => window.clearTimeout(timer);
   }, [seconds]);
 
-  const send = () => {
-    onSend();
+  const send = async () => {
+    if (!(await onSend())) return;
     setSent(true);
     setSeconds(60);
   };
@@ -58,7 +58,7 @@ export function InlineVerificationField({ kind, value, setValue, verified, busy,
             <Check className="size-4" aria-hidden /> Verified
           </span>
         ) : (
-          <button type="button" onClick={send} disabled={busy || !value.trim() || (sent && seconds > 0)} className="min-w-24 rounded-2xl border border-signal px-3 text-sm font-semibold text-signal disabled:opacity-50">
+          <button type="button" onClick={() => void send()} disabled={busy || !value.trim() || (sent && seconds > 0)} className="min-w-24 rounded-2xl border border-signal px-3 text-sm font-semibold text-signal disabled:opacity-50">
             {sent && seconds > 0 ? `${seconds}s` : sent ? "Resend code" : "Send code"}
           </button>
         )}

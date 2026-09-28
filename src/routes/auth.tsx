@@ -303,8 +303,10 @@ function AuthScreen() {
       const result = await sendEmailSignupCode({ data: { email } });
       if (!result.ok) throw new Error(result.error);
       toast.success("Email code sent.");
+      return true;
     } catch (error) {
       setEmailVerificationError(error instanceof Error ? error.message : "Could not send the code.");
+      return false;
     }
   }
 
@@ -326,9 +328,12 @@ function AuthScreen() {
       const result = await sendPhoneCode({ data: { phone, email, humanToken: human.token ?? undefined, humanAction: "sign-up" } });
       if (!result.ok || !result.phone) throw new Error(result.error ?? "Could not send the code.");
       setVerifiedPhone(result.phone);
+      human.reset();
       toast.success("Mobile code sent.");
+      return true;
     } catch (error) {
       setPhoneVerificationError(error instanceof Error ? error.message : "Could not send the code.");
+      return false;
     }
   }
 
@@ -478,11 +483,11 @@ function AuthScreen() {
                 <p className="mt-1 px-1 text-xs text-destructive">{nameState}</p>
               ) : null}
             </div>
-            <InlineVerificationField kind="phone" value={phone} setValue={setPhone} verified={Boolean(phoneProof)} busy={busy} error={phoneVerificationError} onSend={() => void sendMobileCode()} onVerify={(code) => void verifyMobileCode(code)} onChanged={() => { setPhoneProof(""); setVerifiedPhone(""); setPhoneVerificationError(null); }} />
+            <InlineVerificationField kind="phone" value={phone} setValue={setPhone} verified={Boolean(phoneProof)} busy={busy} error={phoneVerificationError} onSend={sendMobileCode} onVerify={(code) => void verifyMobileCode(code)} onChanged={() => { setPhoneProof(""); setVerifiedPhone(""); setPhoneVerificationError(null); }} />
           </>
         ) : null}
         {mode === "signup" ? (
-          <InlineVerificationField kind="email" value={email} setValue={setEmail} verified={Boolean(emailProof)} busy={busy} error={emailVerificationError} onSend={() => void sendEmailCode()} onVerify={(code) => void verifyEmailCode(code)} onChanged={() => { setEmailProof(""); setPhoneProof(""); setVerifiedPhone(""); setEmailVerificationError(null); }} />
+          <InlineVerificationField kind="email" value={email} setValue={setEmail} verified={Boolean(emailProof)} busy={busy} error={emailVerificationError} onSend={sendEmailCode} onVerify={(code) => void verifyEmailCode(code)} onChanged={() => { setEmailProof(""); setPhoneProof(""); setVerifiedPhone(""); setEmailVerificationError(null); }} />
         ) : (
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal" />
         )}
