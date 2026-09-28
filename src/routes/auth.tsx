@@ -158,6 +158,42 @@ function AuthScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [offerTwoFactor, setOfferTwoFactor] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
+  // Restore anything typed before a refresh so the form is never wiped.
+  useEffect(() => {
+    const draft = readSignupDraft();
+    setFirstName((current) => current || draft.firstName);
+    setLastName((current) => current || draft.lastName);
+    setUsername((current) => current || draft.username);
+    setEmail((current) => current || draft.email);
+    setPhone((current) => current || draft.phone);
+    setDraftLoaded(true);
+  }, []);
+
+  // Keep the draft current while someone fills the sign-up form.
+  useEffect(() => {
+    if (!draftLoaded) return;
+    try {
+      window.sessionStorage.setItem(
+        SIGNUP_DRAFT_KEY,
+        JSON.stringify({ firstName, lastName, username, email, phone }),
+      );
+    } catch {
+      /* storage unavailable */
+    }
+  }, [draftLoaded, firstName, lastName, username, email, phone]);
+
+  /** Switches between the two forms and records the choice in the address bar. */
+  const switchMode = (next: "signin" | "signup") => {
+    setMode(next);
+    setFormError(null);
+    void navigate({
+      to: "/auth",
+      search: { ...(redirect ? { redirect } : {}), mode: next },
+      replace: true,
+    });
+  };
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
