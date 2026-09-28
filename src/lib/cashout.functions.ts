@@ -33,6 +33,11 @@ export const submitCreditCashout = createServerFn({ method: "POST" })
     const limited = await throttle(context.userId);
     if (limited) return { error: limited };
 
+    {
+      const { recordAccountSignal } = await import("@/lib/account-signals.server");
+      await recordAccountSignal(context.userId);
+    }
+
     const { data: id, error } = await context.supabase.rpc("request_credit_cashout", {
       _coins: data.credits,
     });

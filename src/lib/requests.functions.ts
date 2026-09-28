@@ -109,6 +109,12 @@ export const createBountyRequest = createServerFn({ method: "POST" })
 
     // Bots never get to lock credits or publish to the map.
     await enforceRateLimit(RATE_LIMITS.createRequest, context.userId);
+    // Network and device of the paying side, compared against the filming side
+    // when the bounty settles.
+    {
+      const { recordAccountSignal } = await import("@/lib/account-signals.server");
+      await recordAccountSignal(context.userId);
+    }
     await assertHuman(data.captchaToken, "create-bounty");
 
     // Content filter runs before any money moves: requests to film screens,
@@ -334,6 +340,10 @@ export const claimBountyRequest = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<{ claimId: string }> => {
     await enforceRateLimit(RATE_LIMITS.acceptBounty, context.userId);
+    {
+      const { recordAccountSignal } = await import("@/lib/account-signals.server");
+      await recordAccountSignal(context.userId);
+    }
     const { data: claimId, error } = await context.supabase.rpc("claim_bounty", {
       _request_id: data.id,
     });
