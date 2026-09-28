@@ -3221,6 +3221,10 @@ export type Database = {
           longest_streak: number
         }[]
       }
+      record_payout_identity_verified: {
+        Args: { _country: string; _uid: string; _unfreeze: boolean }
+        Returns: boolean
+      }
       reject_proof: {
         Args: { _reason: string; _request_id: string }
         Returns: boolean

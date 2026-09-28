@@ -118,7 +118,8 @@ export const getIdentityStatus = createServerFn({ method: "GET" })
       if (session.metadata?.["userId"] !== context.userId) return base;
       if (session.status === "verified") {
         const { markIdentityVerified } = await import("@/lib/identity.server");
-        await markIdentityVerified(session as never, details.country);
+        const saved = await markIdentityVerified(session as never, details.country);
+        if (!saved) return { ...base, error: "We couldn't save your ID check. Tap \"check again\" in a moment." };
         const unfroze = session.metadata?.["kind"] === "account_unfreeze";
         return { ...base, verified: true, frozen: unfroze ? false : base.frozen, country: base.country ?? details.country ?? null };
       }
