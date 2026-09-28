@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { COMMUNITY_GUIDELINES_ANCHOR } from "@/components/legal/legal-content";
 import {
   Camera,
   Lock,
@@ -436,6 +437,17 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
           {BROADCAST_SAFETY_NOTICE}
         </span>
       </label>
+
+      <p className="mt-2 text-xs leading-snug text-muted-foreground">
+        Keep it public, legal, and safe &mdash;{" "}
+        <Link
+          to="/terms"
+          hash={COMMUNITY_GUIDELINES_ANCHOR}
+          className="font-semibold text-foreground underline underline-offset-4"
+        >
+          see Community Guidelines
+        </Link>
+      </p>
 
       <Button
         type="button"

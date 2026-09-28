@@ -52,3 +52,4 @@
 - [x] Cold-launch first-paint fix: iOS window created/keyed before the bridge view loads (real device bounds), viewport locked to device width with no user zoom, unconditional horizontal-overflow cap on html/body, and native splash held until fonts + first layout are ready
 - [ ] User action: rebuild TestFlight (820+) and confirm a fresh install cold-launches with correct first-frame rendering on Home and Discover
 - [x] Answer: which Google Maps lookups could move browser-side to ease the daily cap
+- [x] Community Guidelines: Terms section, required signup checkbox, non-blocking stream-setup reference link
