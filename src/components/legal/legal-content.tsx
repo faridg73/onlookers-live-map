@@ -2,12 +2,51 @@
 import { Link } from "@tanstack/react-router";
 
 /** Shared heading + body wrapper used by the legal pages and the popups. */
-export function Section({ title, children }: { title: string; children: React.ReactNode }) {
+export function Section({
+  title,
+  id,
+  children,
+}: {
+  title: string;
+  id?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="mt-8">
+    <section className="mt-8 scroll-mt-24" {...(id ? { id } : {})}>
       <h2 className="font-display text-lg tracking-tight text-foreground">{title}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">{children}</div>
     </section>
+  );
+}
+
+/** Anchor used by the sign-up consent box and the broadcast setup reference link. */
+export const COMMUNITY_GUIDELINES_ANCHOR = "community-guidelines";
+
+/** The plain-language Community Guidelines, shown on /terms and in the sign-up popup. */
+export function CommunityGuidelinesBody() {
+  return (
+    <>
+      <p>
+        When you go live or post on Onlooker, keep it safe and legal. You may not stream or post:
+      </p>
+      <ul className="list-disc space-y-2 pl-5">
+        <li>Sexual content or nudity</li>
+        <li>Violence, gore, or anything meant to hurt someone</li>
+        <li>Anything involving a minor in an unsafe or inappropriate way</li>
+        <li>Illegal activity of any kind</li>
+        <li>Bullying, harassment, or targeting a specific person</li>
+        <li>Movies, shows, sports broadcasts, or other content you don&rsquo;t own the rights to</li>
+        <li>
+          Video of people filmed somewhere they&rsquo;d reasonably expect privacy &mdash; stick to
+          public places and public events
+        </li>
+      </ul>
+      <p>
+        Breaking these rules can get your stream shut down, your content removed, or your account
+        suspended. If you see a stream or post that breaks these rules, tap Report and our team will
+        review it.
+      </p>
+    </>
   );
 }
 
