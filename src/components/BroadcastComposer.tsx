@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { COMMUNITY_GUIDELINES_ANCHOR } from "@/components/legal/legal-content";
 import {
   Camera,
   Lock,
