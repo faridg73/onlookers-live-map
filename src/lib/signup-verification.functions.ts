@@ -56,6 +56,11 @@ export const completeVerifiedSignup = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const allowed = await withinRateLimit(RATE_LIMITS.auth, `signup-complete:${callerAddress()}:${data.email}`);
     if (!allowed) return { ok: false as const, error: RATE_LIMITED_MESSAGE };
+    // Reserved and offensive names are refused with the same wording as a duplicate.
+    const { isBlockedUsername } = await import("@/lib/username-blocklist");
+    if (isBlockedUsername(data.username)) {
+      return { ok: false as const, error: "That username is already taken, pick another." };
+    }
     const { consumeSignupProofs } = await import("@/lib/signup-verification.server");
     if (!(await consumeSignupProofs(data))) {
       return { ok: false as const, error: "One of your verifications expired or no longer matches. Verify both again." };
