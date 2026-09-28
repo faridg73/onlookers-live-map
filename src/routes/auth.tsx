@@ -326,6 +326,10 @@ function AuthScreen() {
 
   async function sendMobileCode() {
     setPhoneVerificationError(null);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setPhoneVerificationError("Enter a valid email above first, then send the mobile code.");
+      return false;
+    }
     setBusy(true);
     try {
       const result = await sendPhoneCode({ data: { phone, email, humanToken: human.token ?? undefined, humanAction: "sign-up" } });
@@ -344,6 +348,10 @@ function AuthScreen() {
 
   async function verifyMobileCode(code: string) {
     setPhoneVerificationError(null);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setPhoneVerificationError("Enter a valid email above first.");
+      return;
+    }
     setBusy(true);
     try {
       const result = await confirmPhoneCode({ data: { phone: verifiedPhone || phone, email, code } });
