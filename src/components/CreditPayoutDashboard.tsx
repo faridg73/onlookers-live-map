@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
+import { supabase } from "@/integrations/supabase/client";
 import { fetchCreditWallet } from "@/lib/credits";
 import {
   CREDITS_PER_USD,
@@ -41,6 +42,12 @@ export function CreditPayoutDashboard() {
   const beginIdentity = useServerFn(startIdentityCheck);
   const [identity, setIdentity] = useState<IdentityStatus | null>(null);
   const [idCountry, setIdCountry] = useState("US");
+  const [hold, setHold] = useState<{
+    available: number;
+    on_hold: number;
+    next_release_at: string | null;
+    cooldown_until: string | null;
+  } | null>(null);
 
   const [credits, setCredits] = useState<number | null>(null);
   const [bank, setBank] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
@@ -55,6 +62,8 @@ export function CreditPayoutDashboard() {
       setCredits(wallet?.creditBalance ?? null);
       if (!wallet) return;
       setPayouts(await listCreditPayouts());
+      const { data: holdData } = await supabase.rpc("my_cashout_status" as never);
+      setHold((holdData as never) ?? null);
       try {
         setIdentity(await loadIdentity());
       } catch {
@@ -135,6 +144,10 @@ export function CreditPayoutDashboard() {
       toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Credits ($10.00)`);
       return;
     }
+    if (hold && value > hold.available) {
+      toast.error(`Only ${hold.available} Credits have cleared the 3-day hold so far.`);
+      return;
+    }
     if (credits !== null && value > credits) {
       toast.error("Insufficient Credits");
       return;
@@ -147,7 +160,15 @@ export function CreditPayoutDashboard() {
       await refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Cash out failed";
-      toast.error(message.includes("ID_CHECK_REQUIRED") ? "Please complete the one-time ID check first." : message);
+      toast.error(
+        message.includes("ID_CHECK_REQUIRED")
+          ? "Please complete the one-time ID check first."
+          : message.includes("PAYOUT_COOLDOWN")
+            ? "Cash-outs are paused for 24 hours after payout details change."
+            : message.includes("ON_HOLD")
+              ? "Some of these Credits are still in their 3-day security hold."
+              : message,
+      );
     } finally {
       setBusy(false);
     }
@@ -155,7 +176,14 @@ export function CreditPayoutDashboard() {
 
   if (credits === null) return null;
 
-  const canCashOut = credits >= MIN_CASHOUT_CREDITS;
+  const available = hold ? hold.available : credits;
+  const canCashOut = available >= MIN_CASHOUT_CREDITS;
+  const idFeeUsd =
+    identity?.verified && !identity.feeCharged ? (identity.country === "US" ? 0.5 : 1.5) : 0;
+  const cooldownUntil = hold?.cooldown_until ? new Date(hold.cooldown_until) : null;
+  const coolingDown = cooldownUntil !== null && cooldownUntil.getTime() > Date.now();
+  const fmtTime = (d: Date) =>
+    d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
   return (
     <div className="mt-6 rounded-2xl border border-border bg-surface-raised p-4">
@@ -181,6 +209,28 @@ export function CreditPayoutDashboard() {
       <p className="mt-1 text-xs text-muted-foreground">
         {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
       </p>
+
+      {hold && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="rounded-xl border border-border bg-surface px-3 py-2">
+            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">Available to withdraw</p>
+            <p className="mt-0.5 text-sm font-bold text-live">
+              {hold.available} · ${creditsToUsd(hold.available).toFixed(2)}
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-surface px-3 py-2">
+            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">On hold (3-day security)</p>
+            <p className="mt-0.5 text-sm font-bold text-foreground">
+              {hold.on_hold} · ${creditsToUsd(hold.on_hold).toFixed(2)}
+            </p>
+            {hold.next_release_at && hold.on_hold > 0 && (
+              <p className="text-[0.62rem] text-muted-foreground">
+                Next release {fmtTime(new Date(hold.next_release_at))}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {bank?.payoutsEnabled && identity && !identity.verified ? (
         <div className="mt-4 rounded-xl border border-signal/40 bg-signal/10 p-3">
@@ -241,25 +291,31 @@ export function CreditPayoutDashboard() {
           </div>
           {amount && Number(amount) >= MIN_CASHOUT_CREDITS && (
             <p className="mt-2 text-xs font-semibold text-live">
-              You&apos;ll receive ${creditsToUsd(Number(amount)).toFixed(2)} in your bank.
+              You&apos;ll receive ${Math.max(creditsToUsd(Number(amount)) - idFeeUsd, 0).toFixed(2)} in your bank
+              {idFeeUsd > 0 ? ` (after the one-time $${idFeeUsd.toFixed(2)} ID check fee)` : ""}.
             </p>
           )}
           <button
             type="button"
             onClick={() => void cashOutCredits()}
-            disabled={busy}
+            disabled={busy || coolingDown}
             className="mt-3 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-signal font-display text-base font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-60"
           >
             {busy ? <Loader2 className="size-5 animate-spin" /> : <Landmark className="size-5" />}
             Cash out via Stripe Connect
           </button>
+          {coolingDown && cooldownUntil && (
+            <p className="mt-2 text-xs font-semibold text-signal">
+              Your payout details changed recently. For your safety, cash-outs unlock {fmtTime(cooldownUntil)}.
+            </p>
+          )}
           <p className="mt-2 text-xs text-muted-foreground">
             Transfers land in your connected bank account within 48 hours. Minimum{" "}
             {MIN_CASHOUT_CREDITS} Credits ($10.00).
           </p>
           {!canCashOut && (
             <p className="mt-2 text-xs text-urgent">
-              Earn {MIN_CASHOUT_CREDITS - credits} more credits to unlock your first cash out.
+              {MIN_CASHOUT_CREDITS - available} more cleared credits needed to unlock your first cash out.
             </p>
           )}
           <button
