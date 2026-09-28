@@ -209,11 +209,7 @@ function AuthScreen() {
       }
     }
     if (mode === "signin" && !human.ready) {
-      const message =
-        mode === "signup"
-          ? "Finish the quick human check before creating your account."
-          : "Just a moment, finishing the security check.";
-      setFormError(message);
+      setFormError("Just a moment, finishing the security check.");
       return;
     }
     setBusy(true);
