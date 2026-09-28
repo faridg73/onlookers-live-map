@@ -201,6 +201,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
     );
   }
 
+  if (!gate) {
+    return <p className="py-8 text-center text-sm text-muted-foreground">Getting things ready…</p>;
+  }
+
   if (gate && !gate.signedIn) {
     const goAuth = (mode: "signup" | "signin") => {
       // Come back to this live stream sheet once signed in.
