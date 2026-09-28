@@ -45,7 +45,8 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
     const { createStripeClient, getStripeErrorMessage, resolveStripeEnvForHost } = await import("@/lib/stripe.server");
     try {
       const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
-      const stripe = createStripeClient(resolveStripeEnvForHost(host));
+      const env = resolveStripeEnvForHost(host);
+      const stripe = createStripeClient(env);
       const country = data.country.toUpperCase();
       const { data: me } = await context.supabase
         .from("profiles")
