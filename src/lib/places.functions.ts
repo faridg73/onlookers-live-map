@@ -97,14 +97,9 @@ export const searchRequestVenues = createServerFn({ method: "POST" })
     const creds = credentials();
     if (!creds) throw new Error("Venue search is not configured.");
     const hasBias = typeof data.latitude === "number" && typeof data.longitude === "number";
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+    const response = await fetch(`${PLACES_BASE}/v1/places:searchText`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${creds.lovableKey}`,
-        "X-Connection-Api-Key": creds.mapsKey,
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask": DISCOVERY_FIELDS,
-      },
+      headers: placesHeaders(creds.mapsKey, DISCOVERY_FIELDS, true),
       body: JSON.stringify({
         textQuery: data.query,
         pageSize: data.maxResults,
@@ -165,14 +160,9 @@ export const searchPlacesByCategory = createServerFn({ method: "POST" })
     const creds = credentials();
     if (!creds) return stale();
 
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+    const response = await fetch(`${PLACES_BASE}/v1/places:searchNearby`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${creds.lovableKey}`,
-        "X-Connection-Api-Key": creds.mapsKey,
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask": DISCOVERY_FIELDS,
-      },
+      headers: placesHeaders(creds.mapsKey, DISCOVERY_FIELDS, true),
       body: JSON.stringify({
         includedTypes: data.includedTypes,
         maxResultCount: data.maxResults,
@@ -206,14 +196,12 @@ export const fetchPlaceById = createServerFn({ method: "POST" })
     if (!creds) return null;
 
     const response = await fetch(
-      `${GATEWAY_URL}/places/v1/places/${encodeURIComponent(data.placeId)}`,
+      `${PLACES_BASE}/v1/places/${encodeURIComponent(data.placeId)}`,
       {
-        headers: {
-          Authorization: `Bearer ${creds.lovableKey}`,
-          "X-Connection-Api-Key": creds.mapsKey,
-          "X-Goog-FieldMask":
-            "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount,photos",
-        },
+        headers: placesHeaders(
+          creds.mapsKey,
+          "id,displayName,formattedAddress,location,primaryTypeDisplayName,rating,userRatingCount,photos",
+        ),
       },
     );
 
