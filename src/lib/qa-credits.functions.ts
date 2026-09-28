@@ -43,6 +43,25 @@ export const grantTestCredits = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Clears the caller's cash-out attempt counters (their own and their current
+ * address) so a QA run isn't blocked by earlier test attempts.
+ */
+export const resetCashoutThrottle = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    assertPreviewOnly();
+    const { callerAddress, RATE_LIMITS } = await import("@/lib/rate-limit.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("rate_limits")
+      .delete()
+      .eq("bucket", RATE_LIMITS.cashout.bucket)
+      .in("identifier", [`user:${context.userId}`, `ip:${callerAddress()}`]);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 /** Ends the 3-day hold on the caller's held credits right away. */
 export const releaseCreditHolds = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
