@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
@@ -244,6 +245,27 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
             </p>
           ) : null}
         </div>
+        {gate.needsEmail ? (
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              void supabase.auth.getUser().then(async ({ data }) => {
+                const email = data.user?.email;
+                if (!email) return;
+                const { error } = await supabase.auth.resend({
+                  type: "signup",
+                  email,
+                  options: { emailRedirectTo: window.location.origin },
+                });
+                if (error) toast.error("Couldn't resend right now, try again in a minute.");
+                else toast.success("Verification email sent, check your inbox.");
+              });
+            }}
+          >
+            Resend email
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="outline"

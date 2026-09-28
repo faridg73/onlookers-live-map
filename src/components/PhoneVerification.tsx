@@ -16,6 +16,16 @@ type Props = {
   onCancel: () => void;
 };
 
+/** Maps server errors (expired code, number already used) to clear inline text. */
+function friendly(err: unknown, fallback: string) {
+  const msg = err instanceof Error ? err.message : "";
+  if (/expired/i.test(msg)) return "That code has expired. Tap Resend code to get a new one.";
+  if (/already (registered|in use|used|linked)/i.test(msg)) {
+    return "That number is already linked to another account. Sign in instead.";
+  }
+  return msg || fallback;
+}
+
 /** Two small screens: enter a mobile number, then type the code we text over. */
 export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   const [step, setStep] = useState<"number" | "code">("number");
@@ -24,6 +34,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   // Visible tick-box challenge: nobody can script the text-message trigger.
   const human = useHumanCheck("sms-code");
@@ -39,6 +50,12 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
   }, [seconds]);
 
   async function send(resend = false) {
+    setError(null);
+    const digits = phone.replace(/\D/g, "");
+    if (!resend && (digits.length < 10 || digits.length > 15)) {
+      setError("Enter a valid mobile number, including area code.");
+      return;
+    }
     setBusy(true);
     try {
       const result = await sendPhoneCode({
@@ -48,19 +65,20 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
       setSentTo(result.phone);
       setStep("code");
       setCode("");
-      setSeconds(45);
+      setSeconds(60);
       // Each tick is single-use, so ask again before another text goes out.
       human.reset();
       toast.success(resend ? "New code sent." : `Code sent to ${result.phone}.`);
     } catch (err) {
       human.reset();
-      toast.error(err instanceof Error ? err.message : "Could not send the code.");
+      setError(friendly(err, "Could not send the code."));
     } finally {
       setBusy(false);
     }
   }
 
   async function confirm(value: string) {
+    setError(null);
     setBusy(true);
     try {
       const result = await confirmPhoneCode({ data: { phone: sentTo, email, code: value } });
@@ -70,7 +88,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
     } catch (err) {
       setCode("");
       codeRef.current?.focus();
-      toast.error(err instanceof Error ? err.message : "That code didn't work.");
+      setError(friendly(err, "That code didn't work. Check it and try again."));
     } finally {
       setBusy(false);
     }
@@ -104,6 +122,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               placeholder="(555) 123-4567"
               className="w-full rounded-2xl border border-border bg-surface-raised px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
             />
+            {error ? <p role="alert" className="text-xs text-destructive">{error}</p> : null}
             {human.widget}
             {human.required && !human.token && (
               <p className="text-xs text-muted-foreground">
@@ -149,6 +168,7 @@ export function PhoneVerification({ email, onVerified, onCancel }: Props) {
               aria-label="Verification code"
               className="w-full rounded-2xl border border-border bg-surface-raised px-4 py-4 text-center font-display text-2xl tracking-[0.5em] text-foreground outline-none focus:border-signal"
             />
+            {error ? <p role="alert" className="text-xs text-destructive">{error}</p> : null}
             <button
               type="submit"
               disabled={busy || code.length !== CODE_LENGTH}
