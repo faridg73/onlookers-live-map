@@ -12,7 +12,6 @@ import { clearPreviousAuthState, requireExactAuthenticatedUser } from "@/lib/aut
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { checkAuthAttempt } from "@/lib/auth-guard.functions";
-import { PhoneVerification } from "@/components/PhoneVerification";
 import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";

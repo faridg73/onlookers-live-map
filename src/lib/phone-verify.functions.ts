@@ -48,7 +48,7 @@ export const confirmPhoneCode = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     phoneInput.extend({ code: z.string().trim().regex(/^\d{4,10}$/) }).parse(data),
   )
-  .handler(async ({ data }): Promise<{ ok: boolean; phone?: string; error?: string }> => {
+  .handler(async ({ data }): Promise<{ ok: boolean; phone?: string; proof?: string; error?: string }> => {
     const { normalizePhone } = await import("@/lib/sms.server");
     const number = normalizePhone(data.phone);
     if (!number) return { ok: false, error: "That mobile number does not look right." };
