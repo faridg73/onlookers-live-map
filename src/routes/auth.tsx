@@ -52,6 +52,51 @@ export const Route = createFileRoute("/auth")({
   component: AuthScreen,
 });
 
+/** Keeps typed sign-up details alive through a refresh or a rejected verification. */
+const SIGNUP_DRAFT_KEY = "onlooker:signup-draft:v1";
+
+type SignupDraft = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  phone: string;
+};
+
+const EMPTY_DRAFT: SignupDraft = {
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  phone: "",
+};
+
+function readSignupDraft(): SignupDraft {
+  if (typeof window === "undefined") return EMPTY_DRAFT;
+  try {
+    const raw = window.sessionStorage.getItem(SIGNUP_DRAFT_KEY);
+    if (!raw) return EMPTY_DRAFT;
+    const parsed = JSON.parse(raw) as Partial<SignupDraft>;
+    return {
+      firstName: typeof parsed.firstName === "string" ? parsed.firstName : "",
+      lastName: typeof parsed.lastName === "string" ? parsed.lastName : "",
+      username: typeof parsed.username === "string" ? parsed.username : "",
+      email: typeof parsed.email === "string" ? parsed.email : "",
+      phone: typeof parsed.phone === "string" ? parsed.phone : "",
+    };
+  } catch {
+    return EMPTY_DRAFT;
+  }
+}
+
+function clearSignupDraft() {
+  try {
+    window.sessionStorage.removeItem(SIGNUP_DRAFT_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 function AuthScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
