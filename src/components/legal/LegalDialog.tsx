@@ -7,18 +7,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PrivacyBody, TermsBody } from "@/components/legal/legal-content";
+import {
+  CommunityGuidelinesBody,
+  PrivacyBody,
+  TermsBody,
+} from "@/components/legal/legal-content";
 
-type LegalDoc = "terms" | "privacy";
+type LegalDoc = "terms" | "privacy" | "guidelines";
 
 const TITLES: Record<LegalDoc, string> = {
   terms: "Terms of Service",
   privacy: "Privacy Policy",
+  guidelines: "Community Guidelines",
 };
 
 const BLURBS: Record<LegalDoc, string> = {
   terms: "The rules for posting and filming live requests on Onlooker LLC.",
   privacy: "What we collect, why, and the control you keep over it.",
+  guidelines: "What you may and may not stream or post on Onlooker.",
 };
 
 /**
