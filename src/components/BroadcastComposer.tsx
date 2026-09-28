@@ -469,10 +469,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         <Radio className="size-4" />
         {posting ? "Starting…" : "Go live free"}
       </Button>
-      <p className="text-center text-xs text-signal">
-        Want targeted eyes on a place instead?{" "}
-        <button type="button" onClick={onSwitchToBounty} className="font-bold text-signal underline">
-          Post a paid flash bounty
+      <p className="text-center text-xs text-muted-foreground">
+        or{" "}
+        <button type="button" onClick={onSwitchToBounty} className="underline underline-offset-4">
+          post a bounty for a specific capture
         </button>
       </p>
       {phoneGate.gate}
