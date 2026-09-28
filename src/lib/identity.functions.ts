@@ -43,8 +43,15 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
       const stripe = createStripeClient(resolveStripeEnvForHost(host));
       const country = data.country.toUpperCase();
+      const { data: me } = await context.supabase
+        .from("profiles")
+        .select("account_frozen_at")
+        .eq("id", context.userId)
+        .maybeSingle();
+      // A frozen account's check is an unfreeze re-check.
+      const kind = me?.account_frozen_at ? "account_unfreeze" : "payout_identity";
       const common = {
-        metadata: { userId: context.userId, country, kind: "payout_identity" },
+        metadata: { userId: context.userId, country, kind },
         client_reference_id: context.userId,
         return_url: `${origin()}/balance?id_check=done`,
       };
