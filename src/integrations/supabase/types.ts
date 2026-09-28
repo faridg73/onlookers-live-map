@@ -711,6 +711,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_otp_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       engagement_streaks: {
         Row: {
           boost_passes: number
@@ -1896,6 +1923,36 @@ export type Database = {
           name?: string
           token?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      signup_verification_proofs: {
+        Row: {
+          binding_email: string
+          consumed_at: string | null
+          created_at: string
+          destination: string
+          expires_at: string
+          proof_hash: string
+          verification_kind: string
+        }
+        Insert: {
+          binding_email: string
+          consumed_at?: string | null
+          created_at?: string
+          destination: string
+          expires_at: string
+          proof_hash: string
+          verification_kind: string
+        }
+        Update: {
+          binding_email?: string
+          consumed_at?: string | null
+          created_at?: string
+          destination?: string
+          expires_at?: string
+          proof_hash?: string
+          verification_kind?: string
         }
         Relationships: []
       }
