@@ -2876,6 +2876,14 @@ export type Database = {
         Args: { _video_id: string }
         Returns: undefined
       }
+      my_broadcast_status: {
+        Args: never
+        Returns: {
+          cooldown_until: string
+          next_slot_at: string
+          streams_last_hour: number
+        }[]
+      }
       onlookers_within_radius: {
         Args: {
           _exclude_user_id?: string
