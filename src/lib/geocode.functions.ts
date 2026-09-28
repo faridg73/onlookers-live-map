@@ -58,14 +58,9 @@ function handleRateLimitedResponse(response: Response) {
 
 async function callGeocode(params: Record<string, string>): Promise<GeocodeResult | null> {
   if (mapLookupIsCoolingDown()) return null;
-  const { lovableKey, mapsKey } = credentials();
-  const query = new URLSearchParams(params).toString();
-  const response = await fetch(`${GATEWAY_URL}/maps/api/geocode/json?${query}`, {
-    headers: {
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": mapsKey,
-    },
-  });
+  const { mapsKey } = credentials();
+  const query = new URLSearchParams({ ...params, key: mapsKey }).toString();
+  const response = await fetch(`${GEOCODE_URL}?${query}`);
 
   if (handleRateLimitedResponse(response)) return null;
   if (response.status === 403) {
@@ -137,12 +132,11 @@ export const autocompletePlaces = createServerFn({ method: "POST" })
     const hit = await readSharedCache<PlaceSuggestion[]>(cacheKey, SUGGEST_CACHE_TTL_MS);
     if (hit?.fresh) return hit.value;
     if (mapLookupIsCoolingDown()) return hit?.value ?? [];
-    const { lovableKey, mapsKey } = credentials();
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:autocomplete`, {
+    const { mapsKey } = credentials();
+    const response = await fetch(`${PLACES_BASE}/v1/places:autocomplete`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": mapsKey,
+        "X-Goog-Api-Key": mapsKey,
         "Content-Type": "application/json",
         "X-Goog-FieldMask":
           "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text,suggestions.placePrediction.types",
@@ -196,13 +190,12 @@ export const resolvePlaceSuggestion = createServerFn({ method: "POST" })
 
 async function resolvePlace(data: { placeId: string; sessionToken: string }): Promise<GeocodeResult | null> {
     if (mapLookupIsCoolingDown()) return null;
-    const { lovableKey, mapsKey } = credentials();
+    const { mapsKey } = credentials();
     const response = await fetch(
-      `${GATEWAY_URL}/places/v1/places/${encodeURIComponent(data.placeId)}?sessionToken=${data.sessionToken}`,
+      `${PLACES_BASE}/v1/places/${encodeURIComponent(data.placeId)}?sessionToken=${data.sessionToken}`,
       {
         headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": mapsKey,
+          "X-Goog-Api-Key": mapsKey,
           "X-Goog-FieldMask": "location,formattedAddress",
         },
       },
