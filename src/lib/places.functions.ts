@@ -6,7 +6,8 @@ import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeQuery } from "@/lib/sanitize";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+/** Called directly with the project's own Places key, so no shared gateway quota applies. */
+const PLACES_BASE = "https://places.googleapis.com";
 
 export type NearbyPlace = {
   id: string;
@@ -53,10 +54,18 @@ const venueSearchSchema = z.object({
 
 
 function credentials() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-  if (!lovableKey || !mapsKey) return null;
-  return { lovableKey, mapsKey };
+  const mapsKey = process.env["GOOGLE_PLACES_SERVER_KEY"];
+  if (!mapsKey) return null;
+  return { mapsKey };
+}
+
+/** Auth + field-mask headers for a direct Places API (New) call. */
+function placesHeaders(mapsKey: string, fieldMask: string, json = false) {
+  return {
+    "X-Goog-Api-Key": mapsKey,
+    "X-Goog-FieldMask": fieldMask,
+    ...(json ? { "Content-Type": "application/json" } : {}),
+  };
 }
 
 function toDiscovered(raw: RawPlace): DiscoveredPlace[] {
