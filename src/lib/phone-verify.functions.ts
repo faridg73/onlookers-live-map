@@ -18,7 +18,7 @@ const phoneInput = z.object({
 /** Sends a one-time code by text before an account is created. */
 export const sendPhoneCode = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => phoneInput.parse(data))
-  .handler(async ({ data }): Promise<{ ok: boolean; phone?: string; error?: string }> => {
+  .handler(async ({ data }): Promise<{ ok: boolean; phone?: string; proof?: string; error?: string }> => {
     // Bots must clear the silent challenge before we spend an SMS.
     const { assertHuman } = await import("@/lib/turnstile.functions");
     try {
@@ -61,16 +61,7 @@ export const confirmPhoneCode = createServerFn({ method: "POST" })
     const result = await checkPhoneVerification(number, data.code);
     if (!result.ok) return { ok: false, error: result.error };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("phone_verifications")
-      .upsert(
-        { phone: number, email: data.email, verified_at: new Date().toISOString() },
-        { onConflict: "phone" },
-      );
-    if (error) {
-      console.error("[verify] could not record verified phone", error);
-      return { ok: false, error: "Your number was confirmed but we couldn't save it. Try again." };
-    }
-    return { ok: true, phone: number };
+    const { issueSignupProof } = await import("@/lib/signup-verification.server");
+    const proof = await issueSignupProof("phone", number, data.email);
+    return { ok: true, phone: number, proof };
   });
