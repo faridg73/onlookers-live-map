@@ -29,8 +29,11 @@ function origin(): string {
   return "https://www.onlooker.io";
 }
 
-/** Reusable Stripe Identity flow for non-US members (document + matching selfie). */
-const INTERNATIONAL_ID_FLOW = "vf_1UKkltRYtIZ43KIo1ProHTI1";
+/** Reusable Stripe Identity flows for non-US members (document + matching selfie), per Stripe mode. */
+const INTERNATIONAL_ID_FLOW: Record<"live" | "sandbox", string> = {
+  live: "vf_1UKkltRYtIZ43KIo1ProHTI1",
+  sandbox: "vf_1UKl18RYtIZ43KIo3O2rOl9E",
+};
 
 /** Starts the one-time ID check. US members get a document check; others add a selfie match. */
 export const startIdentityCheck = createServerFn({ method: "POST" })
