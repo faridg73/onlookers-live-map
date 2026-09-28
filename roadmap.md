@@ -57,4 +57,4 @@
 - [x] Signup polish: required visible mobile number field with SMS verification and neutral-until-typing password checklist
 - [x] Unified inline signup verification: explicit phone and email codes, locked verified fields, and account creation only after both pass
 - [x] Signup form resilience: keep typed name/username/phone/email through refreshes and rejected verifications, and keep the sign-up form selected in the address bar
-- [ ] Reserved and offensive usernames: block brand, staff, route, impersonation and profanity/slur names with the same "already taken" wording, enforced on the server too
+- [x] Reserved and offensive usernames: block brand, staff, route, impersonation and profanity/slur names with the same "already taken" wording, enforced on the server too
