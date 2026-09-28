@@ -32,6 +32,16 @@ export const sendPhoneCode = createServerFn({ method: "POST" })
     const number = normalizePhone(data.phone);
     if (!number) return { ok: false, error: "That mobile number does not look right." };
 
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existing } = await supabaseAdmin
+      .from("profiles")
+      .select("id")
+      .eq("phone", number)
+      .limit(1);
+    if (existing && existing.length > 0) {
+      return { ok: false, error: "That number is already linked to another account. Sign in instead." };
+    }
+
     const address = callerAddress();
     const perAddress = await withinRateLimit(RATE_LIMITS.sms, `verify:${address}`);
     const perNumber = await withinRateLimit(RATE_LIMITS.sms, `verify:num:${number}`);

@@ -208,7 +208,7 @@ function AuthScreen() {
         return;
       }
     }
-    if (!human.ready) {
+    if (mode === "signin" && !human.ready) {
       const message =
         mode === "signup"
           ? "Finish the quick human check before creating your account."
@@ -220,10 +220,10 @@ function AuthScreen() {
     try {
       const allowed = await checkAuthAttempt({ data: { email, mode } });
       if (!allowed.ok) throw new Error(allowed.error ?? "Please try again in a moment.");
-      const check = await verifyHumanCheck({
-        data: { token: human.token ?? "", action: mode === "signup" ? "sign-up" : "sign-in" },
-      });
-      if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
+      if (mode === "signin") {
+        const check = await verifyHumanCheck({ data: { token: human.token ?? "", action: "sign-in" } });
+        if (!check.ok) throw new Error("The security check didn't pass. Please try again.");
+      }
       if (mode === "signup") {
         await createAccount();
       } else {
@@ -299,6 +299,7 @@ function AuthScreen() {
 
   async function sendEmailCode() {
     setEmailVerificationError(null);
+    setBusy(true);
     try {
       const result = await sendEmailSignupCode({ data: { email } });
       if (!result.ok) throw new Error(result.error);
@@ -307,11 +308,14 @@ function AuthScreen() {
     } catch (error) {
       setEmailVerificationError(error instanceof Error ? error.message : "Could not send the code.");
       return false;
+    } finally {
+      setBusy(false);
     }
   }
 
   async function verifyEmailCode(code: string) {
     setEmailVerificationError(null);
+    setBusy(true);
     try {
       const result = await confirmEmailSignupCode({ data: { email, code } });
       if (!result.ok || !result.proof) throw new Error(result.error ?? "That code didn't work.");
@@ -319,11 +323,14 @@ function AuthScreen() {
       toast.success("Email verified.");
     } catch (error) {
       setEmailVerificationError(error instanceof Error ? error.message : "That code didn't work.");
+    } finally {
+      setBusy(false);
     }
   }
 
   async function sendMobileCode() {
     setPhoneVerificationError(null);
+    setBusy(true);
     try {
       const result = await sendPhoneCode({ data: { phone, email, humanToken: human.token ?? undefined, humanAction: "sign-up" } });
       if (!result.ok || !result.phone) throw new Error(result.error ?? "Could not send the code.");
@@ -334,11 +341,14 @@ function AuthScreen() {
     } catch (error) {
       setPhoneVerificationError(error instanceof Error ? error.message : "Could not send the code.");
       return false;
+    } finally {
+      setBusy(false);
     }
   }
 
   async function verifyMobileCode(code: string) {
     setPhoneVerificationError(null);
+    setBusy(true);
     try {
       const result = await confirmPhoneCode({ data: { phone: verifiedPhone || phone, email, code } });
       if (!result.ok || !result.phone || !result.proof) throw new Error(result.error ?? "That code didn't work.");
@@ -347,6 +357,8 @@ function AuthScreen() {
       toast.success("Mobile number verified.");
     } catch (error) {
       setPhoneVerificationError(error instanceof Error ? error.message : "That code didn't work.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -541,8 +553,8 @@ function AuthScreen() {
         ) : null}
         <button
           type="submit"
-          disabled={busy || !accepted || !human.ready || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free" || !emailProof || !phoneProof))}
-          aria-disabled={busy || !accepted || !human.ready}
+          disabled={busy || !accepted || (mode === "signin" && !human.ready) || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free" || !emailProof || !phoneProof))}
+          aria-disabled={busy || !accepted || (mode === "signin" && !human.ready)}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Sign up"}

@@ -18,3 +18,4 @@
 - Server-side Places/Geocoding calls hit Google directly with the `GOOGLE_PLACES_SERVER_KEY` secret, never the Lovable `google_maps` connector gateway (shared 6,000/day cap). Browser map tiles keep the browser-restricted connector key.
 - Profile photos are signed server-side by `signAvatarPaths` (only files currently set as a profile avatar); the avatars bucket has no public read rule — keeps photos public without exposing the bucket.
 - Google Maps geocoding and autocomplete treat provider 429 responses as temporary unavailability and pause retries for 15 minutes — prevents recoverable quota exhaustion from crashing the app.
+- Email/password signup is completed server-side only after one-time email and phone proofs match the submitted values; this prevents bypassing the inline verification gates.
