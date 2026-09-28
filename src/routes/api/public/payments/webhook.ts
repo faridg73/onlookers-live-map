@@ -277,7 +277,36 @@ async function handleWebhook(request: Request, env: StripeEnv) {
       else await endSubscription(sub);
       break;
     }
+    case "account.updated": {
+      const acct = event.data.object as Record<string, any>;
+      const supabase = getSupabase();
+      const { data: row } = await supabase
+        .from("payout_accounts")
+        .select("user_id, payouts_enabled")
+        .eq("stripe_account_id", String(acct["id"]))
+        .maybeSingle();
+      if (!row) {
+        console.log("[webhook] account.updated for unknown account", acct["id"]);
+        break;
+      }
+      const due: string[] = acct["requirements"]?.currently_due ?? [];
+      const payoutsEnabled = Boolean(acct["payouts_enabled"]);
+      const { error } = await supabase
+        .from("payout_accounts")
+        .update({
+          payouts_enabled: payoutsEnabled,
+          details_submitted: Boolean(acct["details_submitted"]),
+          requirements_note: due.slice(0, 4).join(", "),
+        })
+        .eq("stripe_account_id", String(acct["id"]));
+      if (error) throw new Error(error.message);
+      if (payoutsEnabled && !row.payouts_enabled) {
+        const { alertPayoutMethodChanged } = await import("@/lib/security-alerts.server");
+        await alertPayoutMethodChanged(row.user_id, `enabled-${acct["id"]}`);
+      }
+      console.log("[webhook] payout account synced", { account: acct["id"], payoutsEnabled });
       break;
+    }
     case "identity.verification_session.verified": {
       const { markIdentityVerified } = await import("@/lib/identity.server");
       await markIdentityVerified(event.data.object as never);
