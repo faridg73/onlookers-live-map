@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeText } from "@/lib/sanitize";
 import { signAvatarPaths } from "@/lib/avatar-urls.functions";
+import { isBlockedUsername } from "@/lib/username-blocklist";
 
 export type MyProfile = {
   id: string;
@@ -65,6 +66,8 @@ export type SecurityAnswers = Record<string, string>;
 export async function isUsernameAvailable(username: string): Promise<boolean> {
   const clean = username.trim();
   if (!clean) return false;
+  // Reserved and offensive names read as taken, so nobody can tell them apart.
+  if (isBlockedUsername(clean)) return false;
   const { data, error } = await supabase.rpc("is_username_available", { _username: clean });
   if (error) throw error;
   return Boolean(data);

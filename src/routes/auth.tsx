@@ -52,6 +52,51 @@ export const Route = createFileRoute("/auth")({
   component: AuthScreen,
 });
 
+/** Keeps typed sign-up details alive through a refresh or a rejected verification. */
+const SIGNUP_DRAFT_KEY = "onlooker:signup-draft:v1";
+
+type SignupDraft = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  phone: string;
+};
+
+const EMPTY_DRAFT: SignupDraft = {
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  phone: "",
+};
+
+function readSignupDraft(): SignupDraft {
+  if (typeof window === "undefined") return EMPTY_DRAFT;
+  try {
+    const raw = window.sessionStorage.getItem(SIGNUP_DRAFT_KEY);
+    if (!raw) return EMPTY_DRAFT;
+    const parsed = JSON.parse(raw) as Partial<SignupDraft>;
+    return {
+      firstName: typeof parsed.firstName === "string" ? parsed.firstName : "",
+      lastName: typeof parsed.lastName === "string" ? parsed.lastName : "",
+      username: typeof parsed.username === "string" ? parsed.username : "",
+      email: typeof parsed.email === "string" ? parsed.email : "",
+      phone: typeof parsed.phone === "string" ? parsed.phone : "",
+    };
+  } catch {
+    return EMPTY_DRAFT;
+  }
+}
+
+function clearSignupDraft() {
+  try {
+    window.sessionStorage.removeItem(SIGNUP_DRAFT_KEY);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 function AuthScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -59,6 +104,7 @@ function AuthScreen() {
 
   /** Sends the person where they were headed, or to their profile by default. */
   const goAfterAuth = async () => {
+    clearSignupDraft();
     if (redirect) {
       // The live stream sheet greets the person with a welcome popup.
       if (/[?&]action=live/.test(redirect)) {
@@ -113,6 +159,42 @@ function AuthScreen() {
   const [formError, setFormError] = useState<string | null>(null);
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [offerTwoFactor, setOfferTwoFactor] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
+  // Restore anything typed before a refresh so the form is never wiped.
+  useEffect(() => {
+    const draft = readSignupDraft();
+    setFirstName((current) => current || draft.firstName);
+    setLastName((current) => current || draft.lastName);
+    setUsername((current) => current || draft.username);
+    setEmail((current) => current || draft.email);
+    setPhone((current) => current || draft.phone);
+    setDraftLoaded(true);
+  }, []);
+
+  // Keep the draft current while someone fills the sign-up form.
+  useEffect(() => {
+    if (!draftLoaded) return;
+    try {
+      window.sessionStorage.setItem(
+        SIGNUP_DRAFT_KEY,
+        JSON.stringify({ firstName, lastName, username, email, phone }),
+      );
+    } catch {
+      /* storage unavailable */
+    }
+  }, [draftLoaded, firstName, lastName, username, email, phone]);
+
+  /** Switches between the two forms and records the choice in the address bar. */
+  const switchMode = (next: "signin" | "signup") => {
+    setMode(next);
+    setFormError(null);
+    void navigate({
+      to: "/auth",
+      search: { ...(redirect ? { redirect } : {}), mode: next },
+      replace: true,
+    });
+  };
   // Sign-up shows the visible tick box; sign-in runs the same challenge
   // silently so brute-force attempts get blocked without friction.
   const human = useHumanCheck(mode === "signup" ? "sign-up" : "sign-in", {
@@ -283,6 +365,7 @@ function AuthScreen() {
       await supabase.rpc("claim_verified_phone");
       await queryClient.cancelQueries();
       queryClient.clear();
+      clearSignupDraft();
       setOfferTwoFactor(true);
     } catch (err) {
       const described = describeAuthError(err);
@@ -572,7 +655,7 @@ function AuthScreen() {
 
       <button
         type="button"
-        onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+        onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
         className="mt-5 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
       >
         {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
