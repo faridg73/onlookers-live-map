@@ -154,6 +154,8 @@ function AdminDashboard() {
 
       {loading && <p className="mt-8 text-center text-sm text-muted-foreground">Loading…</p>}
 
+      <RiskFlagQueue />
+
       <section className="mt-8">
         <h2 className="flex items-center gap-2 font-display text-lg text-foreground">
           <BadgeDollarSign className="size-4 text-signal" /> Payout requests
