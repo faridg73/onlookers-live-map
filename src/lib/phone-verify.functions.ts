@@ -13,6 +13,7 @@ const phoneInput = z.object({
   phone: z.string().trim().min(7).max(24),
   email: z.string().trim().toLowerCase().email().max(255),
   humanToken: z.string().max(4000).optional(),
+  humanAction: z.enum(["sms-code", "sign-up"]).optional(),
 });
 
 /** Sends a one-time code by text before an account is created. */
@@ -22,7 +23,7 @@ export const sendPhoneCode = createServerFn({ method: "POST" })
     // Bots must clear the silent challenge before we spend an SMS.
     const { assertHuman } = await import("@/lib/turnstile.functions");
     try {
-      await assertHuman(data.humanToken, "sms-code");
+      await assertHuman(data.humanToken, data.humanAction ?? "sms-code");
     } catch {
       return { ok: false, error: "The security check didn't pass. Please try again." };
     }
