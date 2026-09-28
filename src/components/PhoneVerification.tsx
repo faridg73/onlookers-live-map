@@ -10,6 +10,8 @@ const CODE_LENGTH = 6;
 type Props = {
   /** Email the new account will use — ties the confirmed number to it. */
   email: string;
+  /** Number already entered on the signup form. */
+  initialPhone?: string;
   /** Called once the number is confirmed. */
   onVerified: (phone: string) => void;
   /** Called when someone backs out. */
@@ -27,9 +29,9 @@ function friendly(err: unknown, fallback: string) {
 }
 
 /** Two small screens: enter a mobile number, then type the code we text over. */
-export function PhoneVerification({ email, onVerified, onCancel }: Props) {
+export function PhoneVerification({ email, initialPhone = "", onVerified, onCancel }: Props) {
   const [step, setStep] = useState<"number" | "code">("number");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(initialPhone);
   const [sentTo, setSentTo] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);

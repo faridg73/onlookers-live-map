@@ -99,6 +99,7 @@ function AuthScreen() {
     return () => window.clearTimeout(timer);
   }, [username]);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -176,6 +177,7 @@ function AuthScreen() {
       return;
     }
     if (mode === "signup") {
+      const phoneDigits = phone.replace(/\D/g, "");
       const signupProblem =
         firstName.trim().length < 2 || lastName.trim().length < 2
           ? "Add your first and last name."
@@ -183,6 +185,8 @@ function AuthScreen() {
             ? "That username is already taken, pick another."
             : nameState !== "free"
               ? "Choose an available username."
+              : phoneDigits.length < 10 || phoneDigits.length > 15
+                ? "Enter a valid mobile number, including area code."
               : !passwordMeetsRules(password)
                 ? "Your password doesn't meet every requirement yet."
                 : null;
@@ -351,6 +355,7 @@ function AuthScreen() {
         </p>
         <PhoneVerification
           email={email}
+          initialPhone={phone}
           onVerified={(phone) => void createAccount(phone)}
           onCancel={() => {
             setVerifying(false);
@@ -459,6 +464,17 @@ function AuthScreen() {
                 <p className="mt-1 px-1 text-xs text-destructive">{nameState}</p>
               ) : null}
             </div>
+            <input
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Mobile number"
+              aria-label="Mobile number"
+              className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
+            />
           </>
         ) : null}
         <input
@@ -519,7 +535,7 @@ function AuthScreen() {
         ) : null}
         <button
           type="submit"
-          disabled={busy || !accepted || !human.ready || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free"))}
+          disabled={busy || !accepted || !human.ready || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free" || phone.replace(/\D/g, "").length < 10 || phone.replace(/\D/g, "").length > 15))}
           aria-disabled={busy || !accepted || !human.ready}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
