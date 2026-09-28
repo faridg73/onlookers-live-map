@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_signals: {
+        Row: {
+          device_hash: string | null
+          first_seen_at: string
+          id: string
+          ip_address: string | null
+          last_seen_at: string
+          user_id: string
+        }
+        Insert: {
+          device_hash?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_address?: string | null
+          last_seen_at?: string
+          user_id: string
+        }
+        Update: {
+          device_hash?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_address?: string | null
+          last_seen_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_preferences: {
         Row: {
           area_label: string
@@ -2688,6 +2715,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      admin_risk_flags: {
+        Args: never
+        Returns: {
+          created_at: string
+          flag_type: string
+          id: string
+          payee_id: string
+          payee_name: string
+          payer_id: string
+          payer_name: string
+          request_id: string
+          signals: Json
+          status: string
+        }[]
+      }
       admin_unban_user: { Args: { _user_id: string }; Returns: boolean }
       admin_warn_user: {
         Args: { _reason?: string; _user_id: string }
@@ -2877,6 +2919,10 @@ export type Database = {
           uploader_name: string
           view_count: number
         }[]
+      }
+      flag_bounty_self_dealing: {
+        Args: { _payee: string; _payer: string; _request_id: string }
+        Returns: Json
       }
       get_member_tiers: {
         Args: { _user_ids: string[] }
@@ -3210,6 +3256,10 @@ export type Database = {
         Returns: Json
       }
       qa_release_credit_holds: { Args: { _uid: string }; Returns: Json }
+      record_account_signal: {
+        Args: { _device: string; _ip: string; _uid: string }
+        Returns: undefined
+      }
       record_daily_engagement: {
         Args: never
         Returns: {
