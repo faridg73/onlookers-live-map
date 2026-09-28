@@ -26,6 +26,7 @@ import {
   BROADCAST_AUDIENCES,
   BROADCAST_SAFETY_NOTICE,
   BROADCAST_WINDOWS,
+  describeBroadcastError,
   fetchBroadcastEligibility,
   startFreeBroadcast,
   type BroadcastAudience,
@@ -148,7 +149,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       setLiveNow({ title: title.trim(), place: place.trim(), key: `broadcast-${Date.now()}` });
     } catch (error) {
       human.reset();
-      toast.error(error instanceof Error ? error.message : "Couldn't start the broadcast.");
+      toast.error(describeBroadcastError(error));
     } finally {
       setPosting(false);
     }
@@ -200,43 +201,57 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
     );
   }
 
+  if (!gate) {
+    return <p className="py-8 text-center text-sm text-muted-foreground">Getting things ready…</p>;
+  }
+
+  if (gate && !gate.signedIn) {
+    const goAuth = (mode: "signup" | "signin") => {
+      // Come back to this live stream sheet once signed in.
+      const params = new URLSearchParams(window.location.search);
+      params.set("action", "live");
+      const target = `${window.location.pathname}?${params.toString()}`;
+      void navigate({ to: "/auth", search: { redirect: target, mode } });
+    };
+    return (
+      <div className="mx-auto max-w-3xl animate-rise space-y-3">
+        <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
+          <Radio className="size-4 text-signal" /> Going live is free
+        </p>
+        <p className="text-sm text-muted-foreground">Sign in or create an account to start streaming.</p>
+        <Button type="button" className="w-full" onClick={() => goAuth("signup")}>
+          Create account
+        </Button>
+        <Button type="button" variant="outline" className="w-full" onClick={() => goAuth("signin")}>
+          Log in
+        </Button>
+      </div>
+    );
+  }
+
   if (gate && !gate.allowed) {
     return (
       <div className="mx-auto max-w-3xl animate-rise space-y-4">
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
-            <ShieldCheck className="size-4 text-signal" /> Free broadcasting isn&apos;t open yet
+            <ShieldCheck className="size-4 text-signal" /> Almost ready to go live
           </p>
-          <p className="mt-2 text-sm text-signal">{gate.reason}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{gate.reason}</p>
+          {gate.retryAt ? (
+            <p className="mt-1 text-sm font-semibold text-signal">
+              You can start at{" "}
+              {gate.retryAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.
+            </p>
+          ) : null}
         </div>
-        {gate.signedIn ? (
-          <div className="space-y-2">
-            <Button
-              type="button"
-              className="w-full"
-              onClick={() => void navigate({ to: "/profile" })}
-            >
-              Apply to become a verified creator
-            </Button>
-            <Button type="button" variant="outline" className="w-full" onClick={onSwitchToBounty}>
-              Post a paid flash bounty instead
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            className="w-full"
-            onClick={() => {
-              // Come back to this live stream sheet once signed in.
-              const params = new URLSearchParams(window.location.search);
-              params.set("action", "live");
-              const target = `${window.location.pathname}?${params.toString()}`;
-              void navigate({ to: "/auth", search: { redirect: target } });
-            }}
-          >
-            Sign in
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={() => void fetchBroadcastEligibility().then(setGate)}
+        >
+          Check again
+        </Button>
       </div>
     );
   }
@@ -458,10 +473,10 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         <Radio className="size-4" />
         {posting ? "Starting…" : "Go live free"}
       </Button>
-      <p className="text-center text-xs text-signal">
-        Want targeted eyes on a place instead?{" "}
-        <button type="button" onClick={onSwitchToBounty} className="font-bold text-signal underline">
-          Post a paid flash bounty
+      <p className="text-center text-xs text-muted-foreground">
+        or{" "}
+        <button type="button" onClick={onSwitchToBounty} className="underline underline-offset-4">
+          post a bounty for a specific capture
         </button>
       </p>
       {phoneGate.gate}

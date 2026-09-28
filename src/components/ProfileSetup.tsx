@@ -66,9 +66,12 @@ export function ProfileSetup() {
         // Guard against a stale fetch that resolved for a different account.
         if (profile.id !== signedInId) return;
         if (profile.onboarded) return;
-        setUsername(profile.username ?? "");
-        setFirstName(profile.legal_first_name ?? "");
-        setLastName(profile.legal_last_name ?? "");
+        // Fall back to what they typed on the signup form.
+        const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+        const str = (v: unknown) => (typeof v === "string" ? v : "");
+        setUsername(profile.username ?? str(meta["username"]));
+        setFirstName(profile.legal_first_name ?? str(meta["first_name"]));
+        setLastName(profile.legal_last_name ?? str(meta["last_name"]));
         setAvatarUrl(profile.avatar_url ?? "");
         setOpen(true);
       })

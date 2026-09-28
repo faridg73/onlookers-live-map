@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.enforce_broadcast_safeguards() FROM anon, authenticated, public;

@@ -1,12 +1,13 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { rememberTermsAcceptance } from "@/lib/profile";
+import { isUsernameAvailable, rememberTermsAcceptance, usernameProblem } from "@/lib/profile";
+import { PasswordChecklist, passwordMeetsRules } from "@/components/PasswordChecklist";
 import { clearPreviousAuthState, requireExactAuthenticatedUser } from "@/lib/auth-session";
 import { useHumanCheck } from "@/components/HumanCheck";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
@@ -19,10 +20,16 @@ import { TwoFactorSetup } from "@/components/TwoFactorSetup";
 
 export const Route = createFileRoute("/auth")({
   // Carries where the person was headed before sign-in, e.g. the live stream sheet.
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } =>
-    typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { redirect?: string; mode?: "signin" | "signup" } => ({
+    ...(typeof search["redirect"] === "string" && search["redirect"].startsWith("/")
       ? { redirect: search["redirect"] }
-      : {},
+      : {}),
+    ...(search["mode"] === "signup" || search["mode"] === "signin"
+      ? { mode: search["mode"] as "signin" | "signup" }
+      : {}),
+  }),
   head: () => ({
     meta: [
       { title: "Sign in to Onlooker, post and fulfil live bounties" },
@@ -46,11 +53,19 @@ export const Route = createFileRoute("/auth")({
 function AuthScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { redirect } = Route.useSearch();
+  const { redirect, mode: initialMode } = Route.useSearch();
 
   /** Sends the person where they were headed, or to their profile by default. */
   const goAfterAuth = async () => {
     if (redirect) {
+      // The live stream sheet greets the person with a welcome popup.
+      if (/[?&]action=live/.test(redirect)) {
+        try {
+          sessionStorage.setItem("onlooker:welcome-live", "1");
+        } catch {
+          /* storage unavailable */
+        }
+      }
       await navigate({ href: redirect, replace: true });
       return;
     }
@@ -64,7 +79,25 @@ function AuthScreen() {
       void navigate({ to: "/", replace: true });
     }
   };
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode ?? "signin");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
+  const [nameState, setNameState] = useState<"idle" | "checking" | "free" | "taken" | string>("idle");
+  // Live duplicate check on the username while typing.
+  useEffect(() => {
+    const clean = username.trim();
+    if (!clean) return setNameState("idle");
+    const problem = usernameProblem(clean);
+    if (problem) return setNameState(problem);
+    setNameState("checking");
+    const timer = window.setTimeout(() => {
+      isUsernameAvailable(clean)
+        .then((free) => setNameState(free ? "free" : "taken"))
+        .catch(() => setNameState("idle"));
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [username]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -142,6 +175,21 @@ function AuthScreen() {
       return;
     }
     if (mode === "signup") {
+      const signupProblem =
+        firstName.trim().length < 2 || lastName.trim().length < 2
+          ? "Add your first and last name."
+          : nameState === "taken"
+            ? "That username is already taken, pick another."
+            : nameState !== "free"
+              ? "Choose an available username."
+              : !passwordMeetsRules(password)
+                ? "Your password doesn't meet every requirement yet."
+                : null;
+      if (signupProblem) {
+        setFormError(signupProblem);
+        toast.error(signupProblem);
+        return;
+      }
       const weak = describePasswordProblem(password, email);
       if (weak) {
         setFormError(weak);
@@ -216,7 +264,15 @@ function AuthScreen() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin, data: { phone } },
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            phone,
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            username: username.trim(),
+          },
+        },
       });
       if (error) throw error;
       setVerifying(false);
@@ -368,6 +424,48 @@ function AuthScreen() {
       </div>
 
       <form onSubmit={submit} className="space-y-3">
+        {mode === "signup" ? (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+                autoComplete="given-name"
+                className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
+              />
+              <input
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name"
+                autoComplete="family-name"
+                className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
+              />
+            </div>
+            <div>
+              <input
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+                placeholder="Username"
+                autoCapitalize="none"
+                autoComplete="off"
+                className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
+              />
+              {nameState === "checking" ? (
+                <p className="mt-1 px-1 text-xs text-muted-foreground">Checking…</p>
+              ) : nameState === "free" ? (
+                <p className="mt-1 px-1 text-xs text-signal">“{username.trim()}” is available.</p>
+              ) : nameState === "taken" ? (
+                <p className="mt-1 px-1 text-xs text-destructive">That username is already taken.</p>
+              ) : nameState !== "idle" ? (
+                <p className="mt-1 px-1 text-xs text-destructive">{nameState}</p>
+              ) : null}
+            </div>
+          </>
+        ) : null}
         <input
           type="email"
           required
@@ -400,12 +498,8 @@ function AuthScreen() {
         ) : null}
         {mode === "signup" ? (
           <>
-            <PasswordStrengthMeter password={password} email={email} />
-            {!password ? (
-              <p className="px-1 text-xs text-muted-foreground">
-                At least 10 characters with a capital letter, a number and a symbol.
-              </p>
-            ) : null}
+            <PasswordChecklist password={password} />
+            {password ? <PasswordStrengthMeter password={password} email={email} /> : null}
           </>
         ) : null}
         {human.widget}
@@ -430,7 +524,7 @@ function AuthScreen() {
         ) : null}
         <button
           type="submit"
-          disabled={busy || !accepted || !human.ready}
+          disabled={busy || !accepted || !human.ready || (mode === "signup" && (!passwordMeetsRules(password) || nameState !== "free"))}
           aria-disabled={busy || !accepted || !human.ready}
           className="w-full rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:cursor-not-allowed disabled:opacity-50"
         >
