@@ -364,6 +364,7 @@ function AuthScreen() {
       await supabase.rpc("claim_verified_phone");
       await queryClient.cancelQueries();
       queryClient.clear();
+      clearSignupDraft();
       setOfferTwoFactor(true);
     } catch (err) {
       const described = describeAuthError(err);
@@ -653,7 +654,7 @@ function AuthScreen() {
 
       <button
         type="button"
-        onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+        onClick={() => switchMode(mode === "signin" ? "signup" : "signin")}
         className="mt-5 w-full text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
       >
         {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
