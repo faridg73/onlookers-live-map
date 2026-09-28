@@ -29,8 +29,11 @@ function origin(): string {
   return "https://www.onlooker.io";
 }
 
-/** Reusable Stripe Identity flow for non-US members (document + matching selfie). */
-const INTERNATIONAL_ID_FLOW = "vf_1UKkltRYtIZ43KIo1ProHTI1";
+/** Reusable Stripe Identity flows for non-US members (document + matching selfie), per Stripe mode. */
+const INTERNATIONAL_ID_FLOW: Record<"live" | "sandbox", string> = {
+  live: "vf_1UKkltRYtIZ43KIo1ProHTI1",
+  sandbox: "vf_1UKl18RYtIZ43KIo3O2rOl9E",
+};
 
 /** Starts the one-time ID check. US members get a document check; others add a selfie match. */
 export const startIdentityCheck = createServerFn({ method: "POST" })
@@ -42,7 +45,8 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
     const { createStripeClient, getStripeErrorMessage, resolveStripeEnvForHost } = await import("@/lib/stripe.server");
     try {
       const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
-      const stripe = createStripeClient(resolveStripeEnvForHost(host));
+      const env = resolveStripeEnvForHost(host);
+      const stripe = createStripeClient(env);
       const country = data.country.toUpperCase();
       const { data: me } = await context.supabase
         .from("profiles")
@@ -61,7 +65,7 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const session = await stripe.identity.verificationSessions.create(
         country === "US"
           ? { type: "id_number", ...common }
-          : { verification_flow: INTERNATIONAL_ID_FLOW, ...common },
+          : { verification_flow: INTERNATIONAL_ID_FLOW[env], ...common },
       );
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.from("payout_security_logs").insert({
