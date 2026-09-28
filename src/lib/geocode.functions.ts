@@ -5,7 +5,9 @@ import { z } from "zod";
 import { enforceRateLimit, RATE_LIMITS } from "@/lib/rate-limit.server";
 import { safeQuery } from "@/lib/sanitize";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+/** Direct Google endpoints, called with the project's own key (no shared gateway quota). */
+const PLACES_BASE = "https://places.googleapis.com";
+const GEOCODE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 const MAP_RATE_LIMIT_COOLDOWN_MS = 15 * 60 * 1000;
 
 let mapRateLimitedUntil = 0;
@@ -38,10 +40,9 @@ export type GeocodeResult = {
 };
 
 function credentials() {
-  const lovableKey = process.env["LOVABLE_API_KEY"];
-  const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-  if (!lovableKey || !mapsKey) throw new Error("Map lookup is not configured.");
-  return { lovableKey, mapsKey };
+  const mapsKey = process.env["GOOGLE_PLACES_SERVER_KEY"];
+  if (!mapsKey) throw new Error("Map lookup is not configured.");
+  return { mapsKey };
 }
 
 function mapLookupIsCoolingDown() {
