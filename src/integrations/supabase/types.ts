@@ -3067,6 +3067,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      payout_cooldown_interval: { Args: { _uid: string }; Returns: string }
       pending_verification_requests: {
         Args: never
         Returns: {
