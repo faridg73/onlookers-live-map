@@ -38,6 +38,8 @@ export type BroadcastEligibility = {
   allowed: boolean;
   /** When a temporary block (new-account cooldown or hourly cap) lifts. */
   retryAt: Date | null;
+  /** Email address not confirmed yet. */
+  needsEmail?: boolean;
   /** Plain-language reason when streaming is temporarily blocked. */
   reason: string;
 };
@@ -51,6 +53,15 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) {
     return { signedIn: false, allowed: false, retryAt: null, reason: "" };
+  }
+  if (!auth.user.email_confirmed_at) {
+    return {
+      signedIn: true,
+      allowed: false,
+      retryAt: null,
+      needsEmail: true,
+      reason: "Confirm your email before going live, open the link we sent to your inbox.",
+    };
   }
   const { data } = await supabase.rpc("my_broadcast_status");
   const row = (Array.isArray(data) ? data[0] : data) as
