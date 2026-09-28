@@ -63,3 +63,6 @@
 - [x] Fraud protection Phase 3: cash-out screen (available vs pending, 24h cooldown, re-check)
 - [ ] Fraud protection Phase 4: Freeze my account switch + change alerts
 - [x] Fraud Phase 4: freeze switch (ID re-check unfreezes), payout-change SMS+email alerts, 2-min test-mode payout wait
+- [x] Self-dealing detection: network/device/payout-destination comparison at bounty settlement, staff review queue, 7-day hold on flagged earnings
+- [ ] Step-up re-auth (password + fresh code) before opening bank linking
+- [ ] Withdrawal anomaly review flags (30-day >$1,500, single >80% of balance)
