@@ -229,19 +229,16 @@ const inputSchema = z.object({
 export const fetchNearbyPlaces = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<NearbyPlace[]> => {
-    const lovableKey = process.env["LOVABLE_API_KEY"];
-    const mapsKey = process.env["GOOGLE_MAPS_API_KEY"];
-    if (!lovableKey || !mapsKey) return [];
+    const creds = credentials();
+    if (!creds) return [];
 
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+    const response = await fetch(`${PLACES_BASE}/v1/places:searchNearby`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": mapsKey,
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask":
-          "places.id,places.displayName,places.location,places.primaryTypeDisplayName",
-      },
+      headers: placesHeaders(
+        creds.mapsKey,
+        "places.id,places.displayName,places.location,places.primaryTypeDisplayName",
+        true,
+      ),
       body: JSON.stringify({
         maxResultCount: 20,
         rankPreference: "POPULARITY",
@@ -305,14 +302,9 @@ export const fetchMapAreaPlaces = createServerFn({ method: "POST" })
     const creds = credentials();
     if (!creds) return [];
 
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchNearby`, {
+    const response = await fetch(`${PLACES_BASE}/v1/places:searchNearby`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${creds.lovableKey}`,
-        "X-Connection-Api-Key": creds.mapsKey,
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask": DISCOVERY_FIELDS,
-      },
+      headers: placesHeaders(creds.mapsKey, DISCOVERY_FIELDS, true),
       body: JSON.stringify({
         maxResultCount: data.maxResults,
         rankPreference: "POPULARITY",
@@ -366,13 +358,8 @@ export const fetchPlacePhotoUrls = createServerFn({ method: "POST" })
       missing.map(async (photoName) => {
         try {
           const response = await fetch(
-            `${GATEWAY_URL}/places/v1/${photoName}/media?maxWidthPx=${data.maxWidthPx}&skipHttpRedirect=true`,
-            {
-              headers: {
-                Authorization: `Bearer ${creds.lovableKey}`,
-                "X-Connection-Api-Key": creds.mapsKey,
-              },
-            },
+            `${PLACES_BASE}/v1/${photoName}/media?maxWidthPx=${data.maxWidthPx}&skipHttpRedirect=true`,
+            { headers: { "X-Goog-Api-Key": creds.mapsKey } },
           );
           if (!response.ok) return null;
           const payload = (await response.json()) as { photoUri?: string };
@@ -409,14 +396,9 @@ export const searchPlacesByPhrase = createServerFn({ method: "POST" })
     await enforceRateLimit(RATE_LIMITS.placesSearch);
     const creds = credentials();
     if (!creds) return cached?.places ?? [];
-    const response = await fetch(`${GATEWAY_URL}/places/v1/places:searchText`, {
+    const response = await fetch(`${PLACES_BASE}/v1/places:searchText`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${creds.lovableKey}`,
-        "X-Connection-Api-Key": creds.mapsKey,
-        "Content-Type": "application/json",
-        "X-Goog-FieldMask": DISCOVERY_FIELDS,
-      },
+      headers: placesHeaders(creds.mapsKey, DISCOVERY_FIELDS, true),
       body: JSON.stringify({
         textQuery: data.query,
         pageSize: data.maxResults,
