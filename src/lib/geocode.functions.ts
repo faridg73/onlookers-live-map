@@ -79,6 +79,13 @@ async function callGeocode(params: Record<string, string>): Promise<GeocodeResul
     }>;
   };
 
+  // The geocoder reports quota problems with HTTP 200, so pause on the body status too.
+  if (payload.status === "OVER_QUERY_LIMIT") {
+    mapRateLimitedUntil = Date.now() + MAP_RATE_LIMIT_COOLDOWN_MS;
+    console.warn("Google geocoding is over its quota; pausing new lookups for 15 minutes.");
+    return null;
+  }
+
   const first = payload.results?.[0];
   const lat = first?.geometry?.location?.lat;
   const lng = first?.geometry?.location?.lng;
