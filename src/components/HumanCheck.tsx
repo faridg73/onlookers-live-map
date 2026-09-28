@@ -178,14 +178,7 @@ function TurnstileWidget({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteKey, action, discreet]);
 
-  if (failed) {
-    if (discreet) return null;
-    return (
-      <p className="text-xs text-muted-foreground">
-        Skipping the human check on this device, you can carry on.
-      </p>
-    );
-  }
+  if (failed) return null;
 
   return <div ref={holder} className={discreet ? "" : "min-h-[65px]"} />;
 }

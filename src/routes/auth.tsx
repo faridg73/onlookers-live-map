@@ -137,7 +137,6 @@ function AuthScreen() {
     } catch (err) {
       const described = describeAuthError(err);
       setFormError(described.message);
-      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -159,7 +158,6 @@ function AuthScreen() {
       const described = describeAuthError(err);
       setNeedsEmailConfirm(described.needsEmailConfirm);
       setFormError(described.message);
-      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -171,7 +169,10 @@ function AuthScreen() {
     setNeedsEmailConfirm(false);
     if (!accepted) {
       setFormError("You must accept the Terms of Service to continue.");
-      toast.error("You must accept the Terms of Service to continue.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setFormError("Enter a valid email address, like you@email.com.");
       return;
     }
     if (mode === "signup") {
@@ -187,13 +188,11 @@ function AuthScreen() {
                 : null;
       if (signupProblem) {
         setFormError(signupProblem);
-        toast.error(signupProblem);
         return;
       }
       const weak = describePasswordProblem(password, email);
       if (weak) {
         setFormError(weak);
-        toast.error(weak);
         return;
       }
     }
@@ -203,7 +202,6 @@ function AuthScreen() {
           ? "Finish the quick human check before creating your account."
           : "Just a moment, finishing the security check.";
       setFormError(message);
-      toast.error(message);
       return;
     }
     setBusy(true);
@@ -249,7 +247,6 @@ function AuthScreen() {
       const described = describeAuthError(err);
       setNeedsEmailConfirm(described.needsEmailConfirm);
       setFormError(described.message);
-      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -302,7 +299,6 @@ function AuthScreen() {
       const described = describeAuthError(err);
       setNeedsEmailConfirm(described.needsEmailConfirm);
       setFormError(described.message);
-      toast.error(described.message);
     } finally {
       setBusy(false);
     }
@@ -310,7 +306,6 @@ function AuthScreen() {
 
   async function oauth(provider: "google" | "apple") {
     if (!accepted) {
-      toast.error("You must accept the Terms of Service to continue.");
       return;
     }
     try {
@@ -457,9 +452,9 @@ function AuthScreen() {
               {nameState === "checking" ? (
                 <p className="mt-1 px-1 text-xs text-muted-foreground">Checking…</p>
               ) : nameState === "free" ? (
-                <p className="mt-1 px-1 text-xs text-signal">“{username.trim()}” is available.</p>
+                <p className="mt-1 px-1 text-xs text-signal">✓ Available</p>
               ) : nameState === "taken" ? (
-                <p className="mt-1 px-1 text-xs text-destructive">That username is already taken.</p>
+                <p className="mt-1 px-1 text-xs text-destructive">✗ Already taken</p>
               ) : nameState !== "idle" ? (
                 <p className="mt-1 px-1 text-xs text-destructive">{nameState}</p>
               ) : null}
