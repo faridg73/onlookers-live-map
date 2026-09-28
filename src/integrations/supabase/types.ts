@@ -2828,6 +2828,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      credits_on_hold: { Args: { _uid: string }; Returns: number }
       decline_site_pin_authorization: {
         Args: { _note?: string; _token: string }
         Returns: Json
@@ -2904,6 +2905,10 @@ export type Database = {
           uploader_name: string
           view_count: number
         }[]
+      }
+      guard_cashout_hold_and_cooldown: {
+        Args: { _coins: number; _uid: string }
+        Returns: undefined
       }
       guard_cashout_velocity: { Args: { _uid: string }; Returns: undefined }
       has_role: {
@@ -3032,6 +3037,7 @@ export type Database = {
           streams_last_hour: number
         }[]
       }
+      my_cashout_status: { Args: never; Returns: Json }
       normalize_username_for_reservation: {
         Args: { _username: string }
         Returns: string
