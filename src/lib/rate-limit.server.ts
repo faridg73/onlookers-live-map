@@ -44,8 +44,29 @@ export const RATE_LIMITS = {
   cashout: { bucket: "cashout", limit: 5, windowSeconds: 3600 },
 } as const satisfies Record<string, RateLimitRule>;
 
+/** Generic fallback for callers that don't pass the rule they hit. */
 export const RATE_LIMITED_MESSAGE =
-  "That's a lot of tries in a short time. Please wait a minute and try again.";
+  "That's a lot of tries in a short time. Please wait a while and try again.";
+
+/**
+ * Seconds left in the current counting window. Windows are aligned to the clock
+ * (a 1-hour window starts on the hour), so the wait is the remainder of the
+ * window the caller is in — not the full window length.
+ */
+export function rateLimitWaitSeconds(rule: RateLimitRule): number {
+  const window = Math.max(rule.windowSeconds, 1);
+  return window - (Math.floor(Date.now() / 1000) % window);
+}
+
+/** Tells the member how long the block actually lasts, not a vague "a minute". */
+export function rateLimitedMessage(rule: RateLimitRule): string {
+  const seconds = rateLimitWaitSeconds(rule);
+  const wait =
+    seconds <= 90
+      ? `${Math.max(Math.ceil(seconds / 10) * 10, 20)} seconds`
+      : `${Math.ceil(seconds / 60)} minutes`;
+  return `That's a lot of tries in a short time. Please try again in about ${wait}.`;
+}
 
 /** Best-effort caller address, used when there is no signed-in member. */
 export function callerAddress(): string {
@@ -88,6 +109,6 @@ export async function enforceRateLimit(
   identifier?: string,
 ): Promise<void> {
   if (!(await withinRateLimit(rule, identifier))) {
-    throw new Error(RATE_LIMITED_MESSAGE);
+    throw new Error(rateLimitedMessage(rule));
   }
 }

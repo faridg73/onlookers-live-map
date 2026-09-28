@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/lib/auth-attacher";
 import {
   callerAddress,
-  RATE_LIMITED_MESSAGE,
+  rateLimitedMessage,
   RATE_LIMITS,
   withinRateLimit,
 } from "@/lib/rate-limit.server";
@@ -20,7 +20,7 @@ import {
 async function throttle(userId: string): Promise<string | null> {
   const perUser = await withinRateLimit(RATE_LIMITS.cashout, `user:${userId}`);
   const perAddress = await withinRateLimit(RATE_LIMITS.cashout, `ip:${callerAddress()}`);
-  return perUser && perAddress ? null : RATE_LIMITED_MESSAGE;
+  return perUser && perAddress ? null : rateLimitedMessage(RATE_LIMITS.cashout);
 }
 
 /** Redeems credits for cash. */
