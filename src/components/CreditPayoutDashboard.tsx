@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, ShieldCheck } from "lucide-react";
+import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ import {
   startPayoutOnboarding,
 } from "@/lib/payouts.functions";
 import { getIdentityStatus, startIdentityCheck, type IdentityStatus } from "@/lib/identity.functions";
+import { freezeMyAccount } from "@/lib/account-security.functions";
 
 /** Marker substring of the "Connect not enabled on this payments account" message. */
 const CONNECT_UNSUPPORTED_MARK = "Direct bank cash-outs";
@@ -47,7 +48,11 @@ export function CreditPayoutDashboard() {
     on_hold: number;
     next_release_at: string | null;
     cooldown_until: string | null;
+    frozen_at?: string | null;
+    test_mode?: boolean;
   } | null>(null);
+  const freezeAccount = useServerFn(freezeMyAccount);
+  const [confirmFreeze, setConfirmFreeze] = useState(false);
 
   const [credits, setCredits] = useState<number | null>(null);
   const [bank, setBank] = useState<{ connected: boolean; payoutsEnabled: boolean } | null>(null);
@@ -120,6 +125,21 @@ export function CreditPayoutDashboard() {
     }
   }
 
+  async function freezeNow() {
+    setBusy(true);
+    try {
+      const result = await freezeAccount();
+      if (result.error) throw new Error(result.error);
+      toast.success("Account frozen. Cash-outs are stopped until you pass an ID check.");
+      setConfirmFreeze(false);
+      await refresh();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not freeze your account");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function openAccount() {
     setBusy(true);
     try {
@@ -182,6 +202,7 @@ export function CreditPayoutDashboard() {
     identity?.verified && !identity.feeCharged ? (identity.country === "US" ? 0.5 : 1.5) : 0;
   const cooldownUntil = hold?.cooldown_until ? new Date(hold.cooldown_until) : null;
   const coolingDown = cooldownUntil !== null && cooldownUntil.getTime() > Date.now();
+  const frozen = Boolean(hold?.frozen_at) || Boolean(identity?.frozen);
   const fmtTime = (d: Date) =>
     d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
@@ -232,7 +253,47 @@ export function CreditPayoutDashboard() {
         </div>
       )}
 
-      {bank?.payoutsEnabled && identity && !identity.verified ? (
+      {frozen ? (
+        <div className="mt-4 rounded-xl border border-urgent/40 bg-urgent/10 p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Lock className="size-4 text-urgent" /> Your account is frozen
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            All cash-outs are stopped. Pass a quick ID check to unfreeze it. There&apos;s no fee for this check.
+          </p>
+          {identity?.pending ? (
+            <p className="mt-3 text-xs font-semibold text-signal">Your ID is being reviewed. This usually takes a few minutes.</p>
+          ) : (
+            <>
+              <select
+                value={idCountry}
+                onChange={(event) => setIdCountry(event.target.value)}
+                className="mt-3 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground"
+                aria-label="Where your ID is from"
+              >
+                <option value="US">ID from the United States</option>
+                <option value="XX">ID from another country</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => void startIdCheck()}
+                disabled={busy}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-sm font-bold text-signal-foreground disabled:opacity-60"
+              >
+                {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+                Verify my ID to unfreeze
+              </button>
+            </>
+          )}
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            className="mt-2 w-full text-center text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            I finished, check again
+          </button>
+        </div>
+      ) : bank?.payoutsEnabled && identity && !identity.verified ? (
         <div className="mt-4 rounded-xl border border-signal/40 bg-signal/10 p-3">
           <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <ShieldCheck className="size-4 text-signal" /> One-time ID check before your first cash out
@@ -307,6 +368,7 @@ export function CreditPayoutDashboard() {
           {coolingDown && cooldownUntil && (
             <p className="mt-2 text-xs font-semibold text-signal">
               Your payout details changed recently. For your safety, cash-outs unlock {fmtTime(cooldownUntil)}.
+              {hold?.test_mode ? " (Test mode: 2-minute wait.)" : ""}
             </p>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
@@ -356,6 +418,44 @@ export function CreditPayoutDashboard() {
                 Link your bank once and every future cash out is paid out automatically.
               </p>
             </>
+          )}
+        </div>
+      )}
+
+      {!frozen && (
+        <div className="mt-4 rounded-xl border border-border bg-surface p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Lock className="size-4 text-muted-foreground" /> Freeze my account
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Think someone else got in? Freezing stops every cash-out right away. Only an ID check can unfreeze it.
+          </p>
+          {confirmFreeze ? (
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => void freezeNow()}
+                disabled={busy}
+                className="flex-1 rounded-xl bg-urgent px-3 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-urgent-foreground disabled:opacity-60"
+              >
+                Yes, freeze now
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmFreeze(false)}
+                className="flex-1 rounded-xl border border-border px-3 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmFreeze(true)}
+              className="mt-3 w-full rounded-xl border border-urgent/50 px-3 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-urgent"
+            >
+              Freeze my account
+            </button>
           )}
         </div>
       )}
