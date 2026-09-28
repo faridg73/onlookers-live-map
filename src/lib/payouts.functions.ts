@@ -117,6 +117,11 @@ export const getPayoutStatus = createServerFn({ method: "GET" })
         })
         .eq("user_id", context.userId);
 
+      if (next.payoutsEnabled && !row.payouts_enabled) {
+        const { alertPayoutMethodChanged } = await import("@/lib/security-alerts.server");
+        await alertPayoutMethodChanged(context.userId, `enabled-${row.stripe_account_id}`);
+      }
+
       return { connected: true, ...next };
     } catch (error) {
       const unsupported = isConnectUnsupported(error);
@@ -178,6 +183,8 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
           stripe_account_id: accountId,
           environment: env,
         });
+        const { alertPayoutMethodChanged } = await import("@/lib/security-alerts.server");
+        await alertPayoutMethodChanged(context.userId, `link-${accountId}`);
       }
 
       const origin = appOrigin();
