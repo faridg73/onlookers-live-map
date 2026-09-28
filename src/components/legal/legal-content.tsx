@@ -111,6 +111,10 @@ export function TermsBody() {
         </p>
       </Section>
 
+      <Section title="Community Guidelines" id={COMMUNITY_GUIDELINES_ANCHOR}>
+        <CommunityGuidelinesBody />
+      </Section>
+
       <Section title="User-Generated Content (UGC) License">
         <p>
           <strong className="text-foreground">You keep ownership.</strong> Users retain full
