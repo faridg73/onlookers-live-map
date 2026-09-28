@@ -3205,6 +3205,11 @@ export type Database = {
           name: string
         }[]
       }
+      qa_grant_test_credits: {
+        Args: { _credits: number; _on_hold?: boolean; _uid: string }
+        Returns: Json
+      }
+      qa_release_credit_holds: { Args: { _uid: string }; Returns: Json }
       record_daily_engagement: {
         Args: never
         Returns: {
