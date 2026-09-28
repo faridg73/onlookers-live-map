@@ -2836,6 +2836,7 @@ export type Database = {
         }[]
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      is_reserved_username: { Args: { _username: string }; Returns: boolean }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       is_team_member: { Args: { _team_id: string }; Returns: boolean }
       is_team_owner: { Args: { _team_id: string }; Returns: boolean }
@@ -2940,6 +2941,10 @@ export type Database = {
           next_slot_at: string
           streams_last_hour: number
         }[]
+      }
+      normalize_username_for_reservation: {
+        Args: { _username: string }
+        Returns: string
       }
       onlookers_within_radius: {
         Args: {
