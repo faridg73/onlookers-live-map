@@ -104,6 +104,7 @@ function AuthScreen() {
 
   /** Sends the person where they were headed, or to their profile by default. */
   const goAfterAuth = async () => {
+    clearSignupDraft();
     if (redirect) {
       // The live stream sheet greets the person with a welcome popup.
       if (/[?&]action=live/.test(redirect)) {
