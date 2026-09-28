@@ -13,6 +13,21 @@ type IdentitySession = {
 export async function markIdentityVerified(session: IdentitySession, country?: string | null) {
   const userId = session.metadata?.["userId"];
   if (!userId || session.status !== "verified") return false;
+  if (session.metadata?.["kind"] === "account_unfreeze") {
+    const { data: frozen } = await supabaseAdmin
+      .from("profiles")
+      .update({ account_frozen_at: null })
+      .eq("id", userId)
+      .not("account_frozen_at", "is", null)
+      .select("id");
+    if (frozen?.length) {
+      await supabaseAdmin.from("payout_security_logs").insert({
+        user_id: userId,
+        event_type: "account_unfrozen",
+        details: { session: session.id },
+      });
+    }
+  }
   const { data: profile } = await supabaseAdmin
     .from("profiles")
     .select("payout_identity_verified_at")

@@ -62,3 +62,4 @@
 - [x] Fraud protection Phase 2: Stripe Identity check on first cash-out
 - [x] Fraud protection Phase 3: cash-out screen (available vs pending, 24h cooldown, re-check)
 - [ ] Fraud protection Phase 4: Freeze my account switch + change alerts
+- [x] Fraud Phase 4: freeze switch (ID re-check unfreezes), payout-change SMS+email alerts, 2-min test-mode payout wait
