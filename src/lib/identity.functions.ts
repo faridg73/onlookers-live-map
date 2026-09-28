@@ -1,0 +1,107 @@
+// Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
+import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { z } from "zod";
+
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/lib/auth-attacher";
+
+export type IdentityStatus = {
+  verified: boolean;
+  feeCharged: boolean;
+  country: string | null;
+  pending: boolean;
+  error?: string;
+};
+
+function origin(): string {
+  const req = getRequest();
+  for (const c of [req?.headers.get("origin"), req?.headers.get("referer"), req?.url]) {
+    if (!c) continue;
+    try {
+      const u = new URL(c);
+      if (u.protocol === "https:" || u.hostname === "localhost") return u.origin;
+    } catch {
+      /* ignore */
+    }
+  }
+  return "https://www.onlooker.io";
+}
+
+/** Starts the one-time ID check. US members get a document check; others add a selfie match. */
+export const startIdentityCheck = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .inputValidator((input: { country: string }) =>
+    z.object({ country: z.string().trim().length(2) }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ url?: string; error?: string }> => {
+    const { createStripeClient, getStripeErrorMessage, resolveStripeEnvForHost } = await import("@/lib/stripe.server");
+    try {
+      const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
+      const stripe = createStripeClient(resolveStripeEnvForHost(host));
+      const country = data.country.toUpperCase();
+      const session = await stripe.identity.verificationSessions.create({
+        type: "document",
+        options: { document: { require_matching_selfie: country !== "US", require_live_capture: true } },
+        metadata: { userId: context.userId, country, kind: "payout_identity" },
+        client_reference_id: context.userId,
+        return_url: `${origin()}/balance?id_check=done`,
+      });
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("payout_security_logs").insert({
+        user_id: context.userId,
+        event_type: "identity_started",
+        details: { session: session.id, country },
+      });
+      if (!session.url) return { error: "Could not open the ID check" };
+      return { url: session.url };
+    } catch (error) {
+      console.error("[identity] start failed", error);
+      return { error: getStripeErrorMessage(error) };
+    }
+  });
+
+/** Current ID-check state; also confirms a just-finished check with Stripe. */
+export const getIdentityStatus = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }): Promise<IdentityStatus> => {
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("payout_identity_verified_at, payout_identity_fee_charged_at, payout_country")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const base: IdentityStatus = {
+      verified: Boolean(profile?.payout_identity_verified_at),
+      feeCharged: Boolean(profile?.payout_identity_fee_charged_at),
+      country: profile?.payout_country ?? null,
+      pending: false,
+    };
+    if (base.verified) return base;
+
+    const { data: started } = await context.supabase
+      .from("payout_security_logs")
+      .select("details")
+      .eq("user_id", context.userId)
+      .eq("event_type", "identity_started")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const details = started?.details as { session?: string; country?: string } | null;
+    if (!details?.session) return base;
+
+    const { createStripeClient, resolveStripeEnvForHost, getStripeErrorMessage } = await import("@/lib/stripe.server");
+    try {
+      const host = getRequest()?.url ? new URL(getRequest()!.url).host : null;
+      const stripe = createStripeClient(resolveStripeEnvForHost(host));
+      const session = await stripe.identity.verificationSessions.retrieve(details.session);
+      if (session.metadata?.["userId"] !== context.userId) return base;
+      if (session.status === "verified") {
+        const { markIdentityVerified } = await import("@/lib/identity.server");
+        await markIdentityVerified(session as never, details.country);
+        return { ...base, verified: true, country: details.country ?? null };
+      }
+      return { ...base, pending: session.status === "processing" };
+    } catch (error) {
+      return { ...base, error: getStripeErrorMessage(error) };
+    }
+  });

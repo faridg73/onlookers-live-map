@@ -278,6 +278,11 @@ async function handleWebhook(request: Request, env: StripeEnv) {
       break;
     }
       break;
+    case "identity.verification_session.verified": {
+      const { markIdentityVerified } = await import("@/lib/identity.server");
+      await markIdentityVerified(event.data.object as never);
+      break;
+    }
     default:
       console.log("[webhook] unhandled event", event.type);
   }

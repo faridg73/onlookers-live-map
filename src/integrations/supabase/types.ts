@@ -1532,6 +1532,7 @@ export type Database = {
           onboarded: boolean
           onboarding_completed: boolean
           payout_country: string | null
+          payout_identity_fee_charged_at: string | null
           payout_identity_verified_at: string | null
           payout_method_changed_at: string | null
           phone: string | null
@@ -1567,6 +1568,7 @@ export type Database = {
           onboarded?: boolean
           onboarding_completed?: boolean
           payout_country?: string | null
+          payout_identity_fee_charged_at?: string | null
           payout_identity_verified_at?: string | null
           payout_method_changed_at?: string | null
           phone?: string | null
@@ -1602,6 +1604,7 @@ export type Database = {
           onboarded?: boolean
           onboarding_completed?: boolean
           payout_country?: string | null
+          payout_identity_fee_charged_at?: string | null
           payout_identity_verified_at?: string | null
           payout_method_changed_at?: string | null
           phone?: string | null
