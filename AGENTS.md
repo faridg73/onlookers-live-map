@@ -19,3 +19,4 @@
 - Profile photos are signed server-side by `signAvatarPaths` (only files currently set as a profile avatar); the avatars bucket has no public read rule — keeps photos public without exposing the bucket.
 - Google Maps geocoding and autocomplete treat provider 429 responses as temporary unavailability and pause retries for 15 minutes — prevents recoverable quota exhaustion from crashing the app.
 - Email/password signup is completed server-side only after one-time email and phone proofs match the submitted values; this prevents bypassing the inline verification gates.
+- Payout-change wait is 24h for live payout accounts and 2 min only for sandbox (test-money) accounts, decided in the database — lets preview testing run in one sitting without weakening production.
