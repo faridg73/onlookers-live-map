@@ -3225,6 +3225,10 @@ export type Database = {
         Args: { _country: string; _uid: string; _unfreeze: boolean }
         Returns: boolean
       }
+      refund_failed_credit_cashout: {
+        Args: { _payout_id: string; _reason: string }
+        Returns: boolean
+      }
       reject_proof: {
         Args: { _reason: string; _request_id: string }
         Returns: boolean
