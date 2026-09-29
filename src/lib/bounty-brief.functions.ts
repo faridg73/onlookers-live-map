@@ -35,7 +35,7 @@ const RESPONSE_SCHEMA = {
     instructions: {
       type: "string",
       description:
-        "2-4 sentences of concrete camera instructions: what to capture, from where, how long, what proves it.",
+        "2-4 sentences of practical guidance: what to look for, roughly where to stand, and what would make the clip useful. Describe it as guidance, not a strict shot list.",
     },
     safety: {
       type: "array",
