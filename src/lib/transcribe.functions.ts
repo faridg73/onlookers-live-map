@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/lib/auth-attacher";
 
 /**
  * Speech-to-text for the request composer.
@@ -29,7 +30,7 @@ const inputSchema = z.object({
 });
 
 export const transcribeSpeech = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }): Promise<{ text: string }> => {
     const apiKey = process.env["LOVABLE_API_KEY"];
