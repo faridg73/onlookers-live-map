@@ -332,7 +332,12 @@ function PostScreen() {
   const [firstPostGuideOpen, setFirstPostGuideOpen] = useState(false);
   const [hideFirstPostGuide, setHideFirstPostGuide] = useState(false);
   const [realEstateGuideOpen, setRealEstateGuideOpen] = useState(false);
-  const voice = useVoiceInput((text) => setPrompt(text));
+  // Spoken words are added to whatever is already typed, never replacing it.
+  const spokenBase = useRef("");
+  const voice = useVoiceInput((text) => {
+    const base = spokenBase.current.trim();
+    setPrompt(base ? `${base} ${text}` : text);
+  });
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
   const subcategoryOptions = subcategoriesFor(mainCategoryId);
