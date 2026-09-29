@@ -14,6 +14,8 @@ const inputSchema = z.object({
   category: z.string().trim().max(120).optional(),
   locationType: z.string().trim().max(60).optional(),
   place: z.string().trim().max(200).optional(),
+  /** Capture length the poster already chose, in minutes; null = open-ended live feed. */
+  durationMinutes: z.number().int().min(1).max(600).nullable().optional(),
 });
 
 export type BountyBriefSuggestion = {
