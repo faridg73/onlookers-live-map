@@ -9,15 +9,16 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Native releases use Capacitor 8 with a remote `https://www.onlooker.io` WebView shell (non-redirecting host, or Capacitor hands the load to Safari); keep native behavior centralized in `src/lib/native.ts` so web behavior stays unchanged.
-- iOS `SceneDelegate` must create the `UIWindow` and make it key before the bridge view controller loads its view, and the splash screen is hidden from `src/lib/native.ts` after fonts/first layout, so a cold launch never paints at the storyboard's legacy width.
-- Release automation must preserve a signed Android APK/AAB and an iOS IPA artifact; iOS signing uses the decoded profile name explicitly so CI does not depend on a developer machine.
+- Native releases use Capacitor 8 with remote `https://www.onlooker.io`; centralize native behavior in `src/lib/native.ts`.
+- iOS creates and keys `UIWindow` before bridge layout; `native.ts` hides splash after fonts/first layout.
+- Release automation preserves signed APK/AAB and IPA artifacts; iOS uses the decoded profile name.
 - Starter-vibe editorial cards use `src/lib/starter-vibe-photos.ts` as the exclusive 4-photo-per-vibe registry so photo reuse cannot occur across vibe feeds.
-- Non-Home pages rely on the root flex shell for usable viewport height and fixed-bottom-nav clearance; route wrappers must not add their own full-screen height or bottom-nav padding, preventing dead space on short pages.
+- Non-Home pages rely on the root flex shell for height/nav clearance; route wrappers add neither.
 - Venue lookups go through the shared `venue_cache` table, keyed by ~5 km area + query (6 h; stale on failure) — avoids per-visitor quota burn.
-- Server-side Places/Geocoding calls hit Google directly with the `GOOGLE_PLACES_SERVER_KEY` secret, never the Lovable `google_maps` connector gateway (shared 6,000/day cap). Browser map tiles keep the browser-restricted connector key.
-- Profile photos are signed server-side by `signAvatarPaths` (only files currently set as a profile avatar); the avatars bucket has no public read rule — keeps photos public without exposing the bucket.
+- Server Places/Geocoding calls Google directly with `GOOGLE_PLACES_SERVER_KEY`; browser map tiles use the restricted browser key.
+- Profile photos use server-signed avatar paths; the avatars bucket stays private.
 - Google Maps geocoding and autocomplete treat provider 429 responses as temporary unavailability and pause retries for 15 minutes — prevents recoverable quota exhaustion from crashing the app.
 - Email/password signup is completed server-side only after one-time email and phone proofs match the submitted values; this prevents bypassing the inline verification gates.
 - Payout-change wait is 24h for live payout accounts and 2 min only for sandbox (test-money) accounts, decided in the database — lets preview testing run in one sitting without weakening production.
 - Money-moving server functions record the caller's IP plus a hashed device signature into `account_signals`, and `accept_bounty_video` calls `flag_bounty_self_dealing` after payout — self-dealing is detected at settlement without blocking honest approvals.
+- Profile activity uses authenticated user-owned records only; never show examples as account history.
