@@ -8,6 +8,8 @@ import type { DiscoveryArea } from "@/hooks/use-discovery-area";
 type Options = {
   radiusMiles?: number;
   weekendOnly?: boolean;
+  /** Look ahead this many days from now instead of the weekend window. */
+  windowDays?: number;
   size?: number;
   /** "major" = arena scale, "local" = neighbourhood pop-ups, "all" = both. */
   scope?: "all" | "major" | "local";
@@ -15,7 +17,7 @@ type Options = {
 
 /** Live events happening around the area the person is browsing. */
 export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
-  const { radiusMiles = 50, weekendOnly = true, size = 20, scope = "all" } = options;
+  const { radiusMiles = 50, weekendOnly = true, windowDays, size = 20, scope = "all" } = options;
   const [events, setEvents] = useState<LiveEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +32,7 @@ export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
           longitude: area.longitude,
           radiusMiles,
           weekendOnly,
+          ...(windowDays ? { windowDays } : {}),
           size,
           scope,
         },
@@ -58,7 +61,7 @@ export function useLiveEvents(area: DiscoveryArea, options: Options = {}) {
     return () => {
       cancelled = true;
     };
-  }, [area.latitude, area.longitude, radiusMiles, weekendOnly, size, scope]);
+  }, [area.latitude, area.longitude, radiusMiles, weekendOnly, windowDays, size, scope]);
 
   return { events, loading };
 }
