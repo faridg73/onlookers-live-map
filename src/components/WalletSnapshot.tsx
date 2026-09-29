@@ -46,7 +46,7 @@ export function WalletSnapshot() {
       </div>
       <Link
         to="/balance"
-        className="inline-flex min-h-10 shrink-0 items-center rounded-full bg-live px-4 text-xs font-bold uppercase tracking-[0.12em] text-live-foreground hover:opacity-90"
+        className="inline-flex min-h-10 shrink-0 items-center rounded-full bg-live px-4 text-xs font-bold uppercase tracking-[0.12em] text-background hover:opacity-90"
       >
         Cash Out
       </Link>
