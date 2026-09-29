@@ -56,6 +56,8 @@ import { ProfileEditor } from "@/components/ProfileEditor";
 import { fetchProfileStats, type ProfileStats } from "@/lib/profile-stats";
 import { BlockedAccounts } from "@/components/BlockedAccounts";
 import { MyCommunityPosts } from "@/components/MyCommunityPosts";
+import { listMyRecentActivity, type ProfileActivityItem, type ProfileActivityKind } from "@/lib/profile-activity.functions";
+import { formatAgoISO } from "@/lib/onlooker";
 
 
 export const Route = createFileRoute("/profile")({
@@ -72,18 +74,21 @@ export const Route = createFileRoute("/profile")({
         property: "og:description",
         content: "Bounties earned as an onlooker and every live request you posted.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProfileScreen,
 });
 
 
-const ACTIVITY = [
-  { icon: Radio, text: "Claimed “How long is the ferry line?”", meta: "+80 Credits bounty · 12 min ago" },
-  { icon: PlusSquare, text: "Posted “Sunset from the east ridge?”", meta: "150 Credits bounty · 1 hr ago" },
-  { icon: Camera, text: "Sent a live shot of the night market", meta: "+60 Credits bounty · 2 hrs ago" },
-  { icon: Clock, text: "Request fulfilled: “Rooftop bar queue?”", meta: "+200 Credits bounty · yesterday" },
-];
+const ACTIVITY_COPY: Record<ProfileActivityKind, { icon: typeof Radio; verb: string }> = {
+  claimed: { icon: Radio, verb: "Claimed" },
+  posted: { icon: PlusSquare, verb: "Posted" },
+  submitted: { icon: Camera, verb: "Sent footage for" },
+  completed: { icon: Clock, verb: "Completed" },
+  streamed: { icon: Radio, verb: "Broadcast" },
+};
 
 function ProfileScreen() {
   const navigate = useNavigate();
@@ -97,6 +102,8 @@ function ProfileScreen() {
   const [showAllActivity, setShowAllActivity] = useState(false);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [memberTier, setMemberTier] = useState<string | null>(null);
+  const [activity, setActivity] = useState<ProfileActivityItem[] | null>(null);
+  const [activityFailed, setActivityFailed] = useState(false);
 
   // Paid membership badge — refreshes when a checkout completes.
   useEffect(() => {
@@ -106,6 +113,22 @@ function ProfileScreen() {
     void load();
     window.addEventListener("onlooker:credits-refresh", load);
     return () => { live = false; window.removeEventListener("onlooker:credits-refresh", load); };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user) { setActivity([]); return; }
+    let active = true;
+    setActivity(null);
+    setActivityFailed(false);
+    listMyRecentActivity()
+      .then((rows) => { if (active) setActivity(rows); })
+      .catch(() => {
+        if (active) {
+          setActivityFailed(true);
+          setActivity([]);
+        }
+      });
+    return () => { active = false; };
   }, [user?.id]);
 
   useEffect(() => {
@@ -287,26 +310,37 @@ function ProfileScreen() {
 
       <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
       <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-        {(showAllActivity ? ACTIVITY : ACTIVITY.slice(0, 2)).map(({ icon: Icon, text, meta }) => (
+        {activity === null ? (
+          <p className="rounded-2xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">Loading your activity…</p>
+        ) : activityFailed ? (
+          <p className="rounded-2xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">We couldn&apos;t load your activity right now.</p>
+        ) : activity.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">Your bounty and broadcast activity will appear here.</p>
+        ) : (showAllActivity ? activity : activity.slice(0, 2)).map((item) => {
+          const copy = ACTIVITY_COPY[item.kind];
+          const Icon = copy.icon;
+          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "+" : ""}${item.credits.toLocaleString()} Credits`;
+          return (
           <div
-            key={text}
+            key={item.id}
             className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3"
           >
             <Icon className="size-4 shrink-0 text-signal" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-foreground">{text}</p>
-              <p className="text-xs text-muted-foreground">{meta}</p>
+              <p className="truncate text-sm text-foreground">{copy.verb} “{item.title}”</p>
+              <p className="text-xs text-muted-foreground">{[creditLabel, formatAgoISO(item.occurredAt)].filter(Boolean).join(" · ")}</p>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
-      {ACTIVITY.length > 2 && (
+      {(activity?.length ?? 0) > 2 && (
         <button
           type="button"
           onClick={() => setShowAllActivity((v) => !v)}
           className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-signal"
         >
-          {showAllActivity ? "Show less" : `See all (${ACTIVITY.length})`}
+          {showAllActivity ? "Show less" : `See all (${activity?.length ?? 0})`}
         </button>
       )}
 
