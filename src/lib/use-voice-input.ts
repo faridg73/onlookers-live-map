@@ -150,7 +150,12 @@ export function useVoiceInput(onTranscript: (text: string) => void) {
         if (result.text) handler.current(result.text);
       } catch (cause) {
         if (alive.current) {
-          setError(cause instanceof Error ? cause.message : "Could not turn that recording into text.");
+          const message = cause instanceof Error ? cause.message : "";
+          setError(
+            /unauthorized/i.test(message)
+              ? "Sign in again to use voice input."
+              : message || "Could not turn that recording into text.",
+          );
         }
       } finally {
         if (alive.current) setTranscribing(false);
