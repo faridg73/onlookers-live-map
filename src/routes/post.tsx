@@ -1616,6 +1616,7 @@ function PostScreen() {
                   category={subcategory ? `${mainCategoryLabel} · ${subcategory}` : mainCategoryLabel}
                   locationType={locationType ? LOCATION_TYPES.find((type) => type.id === locationType)?.label ?? null : null}
                   place={place || null}
+                  durationMinutes={capture ?? null}
                   onApplyTitle={(value) => { setTitle(value.slice(0, 120)); scrollFieldToStart(titleRef.current); }}
                   onApplyInstructions={(value) => { setNote(value); scrollFieldToStart(noteRef.current); }}
                 />
