@@ -74,6 +74,8 @@ export const Route = createFileRoute("/profile")({
         property: "og:description",
         content: "Bounties earned as an onlooker and every live request you posted.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProfileScreen,
@@ -101,6 +103,7 @@ function ProfileScreen() {
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [memberTier, setMemberTier] = useState<string | null>(null);
   const [activity, setActivity] = useState<ProfileActivityItem[] | null>(null);
+  const [activityFailed, setActivityFailed] = useState(false);
 
   // Paid membership badge — refreshes when a checkout completes.
   useEffect(() => {
@@ -116,9 +119,15 @@ function ProfileScreen() {
     if (!user) { setActivity([]); return; }
     let active = true;
     setActivity(null);
+    setActivityFailed(false);
     listMyRecentActivity()
       .then((rows) => { if (active) setActivity(rows); })
-      .catch(() => { if (active) setActivity([]); });
+      .catch(() => {
+        if (active) {
+          setActivityFailed(true);
+          setActivity([]);
+        }
+      });
     return () => { active = false; };
   }, [user?.id]);
 
@@ -303,6 +312,8 @@ function ProfileScreen() {
       <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {activity === null ? (
           <p className="rounded-2xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">Loading your activity…</p>
+        ) : activityFailed ? (
+          <p className="rounded-2xl border border-border bg-surface p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">We couldn&apos;t load your activity right now.</p>
         ) : activity.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground md:col-span-2 xl:col-span-3">Your bounty and broadcast activity will appear here.</p>
         ) : (showAllActivity ? activity : activity.slice(0, 2)).map((item) => {
