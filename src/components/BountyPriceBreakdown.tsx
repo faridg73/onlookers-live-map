@@ -2,6 +2,13 @@
 import { Receipt } from "lucide-react";
 import type { BountyQuote } from "@/lib/bounty-pricing";
 
+/** How much this single step adds, so no line looks like another full charge. */
+function deltaLabel(delta: number, isBase: boolean) {
+  if (isBase) return `${delta} Credits`;
+  if (delta === 0) return "No extra";
+  return `${delta > 0 ? "+" : "−"}${Math.abs(delta)} ${Math.abs(delta) === 1 ? "Credit" : "Credits"}`;
+}
+
 /** Itemised credit breakdown so nobody locks funds without seeing the maths. */
 export function BountyPriceBreakdown({ quote }: { quote: BountyQuote }) {
   return (
@@ -11,13 +18,17 @@ export function BountyPriceBreakdown({ quote }: { quote: BountyQuote }) {
         Cost breakdown
       </p>
       <ul className="mt-2 space-y-1.5">
-        {quote.lines.map((line) => (
+        {quote.lines.map((line, index) => (
           <li key={line.label} className="flex items-baseline justify-between gap-3 text-xs">
             <span className="text-muted-foreground">
               <span className="font-semibold text-foreground">{line.label}</span> · {line.detail}
             </span>
-            <span className="shrink-0 font-extrabold tabular-nums text-foreground">
-              {line.runningTotal}
+            <span
+              className={`shrink-0 font-extrabold tabular-nums ${
+                index > 0 && line.delta === 0 ? "text-muted-foreground" : "text-foreground"
+              }`}
+            >
+              {deltaLabel(line.delta, index === 0)}
             </span>
           </li>
         ))}
