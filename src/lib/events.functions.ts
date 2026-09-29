@@ -432,6 +432,8 @@ const schema = z.object({
   radiusMiles: z.number().int().min(1).max(200).default(50),
   /** Limit to the upcoming weekend instead of the next 30 days. */
   weekendOnly: z.boolean().default(true),
+  /** Overrides both: look ahead this many days from now (e.g. 7 for the week ahead). */
+  windowDays: z.number().int().min(1).max(60).optional(),
   /** "major" = arena scale only, "local" = neighbourhood only, "all" = both. */
   scope: z.enum(["all", "major", "local"]).default("all"),
   size: z.number().int().min(1).max(50).default(18),
@@ -446,15 +448,16 @@ export const fetchTrendingEvents = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }): Promise<LiveEvent[]> => {
     const now = new Date();
-    const window = data.weekendOnly
-      ? weekendWindow(now)
-      : { start: now, end: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) };
+    const lookaheadDays = data.windowDays ?? (data.weekendOnly ? null : 30);
+    const window = lookaheadDays
+      ? { start: now, end: new Date(now.getTime() + lookaheadDays * 24 * 60 * 60 * 1000) }
+      : weekendWindow(now);
 
     const cacheKey = [
       data.latitude.toFixed(2),
       data.longitude.toFixed(2),
       data.radiusMiles,
-      data.weekendOnly ? "weekend" : "month",
+      lookaheadDays ? `d${lookaheadDays}` : "weekend",
       data.scope,
       data.size,
       window.start.toISOString().slice(0, 13),
