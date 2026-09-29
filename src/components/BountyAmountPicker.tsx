@@ -77,7 +77,8 @@ export function BountyAmountPicker({
             type="button"
             onClick={() => onChange(Math.max(min, safe - STEP))}
             aria-label="Lower the bounty"
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-foreground"
+            disabled={safe <= min}
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-foreground disabled:cursor-not-allowed disabled:opacity-35"
           >
             <Minus className="size-4" />
           </button>
