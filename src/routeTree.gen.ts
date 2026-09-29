@@ -24,6 +24,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as PayoutHistoryRouteImport } from './routes/payout-history'
 import { Route as PinDeclineRouteImport } from './routes/pin-decline'
 import { Route as PoolsRouteImport } from './routes/pools'
@@ -127,6 +128,11 @@ const HuntRoute = HuntRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembershipRoute = MembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PayoutHistoryRoute = PayoutHistoryRouteImport.update({
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/membership': typeof MembershipRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
@@ -341,6 +348,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/membership': typeof MembershipRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/membership': typeof MembershipRoute
   '/payout-history': typeof PayoutHistoryRoute
   '/pin-decline': typeof PinDeclineRoute
   '/pools': typeof PoolsRoute
@@ -436,6 +445,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/hunt'
     | '/leaderboard'
+    | '/membership'
     | '/payout-history'
     | '/pin-decline'
     | '/pools'
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/hunt'
     | '/leaderboard'
+    | '/membership'
     | '/payout-history'
     | '/pin-decline'
     | '/pools'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/hunt'
     | '/leaderboard'
+    | '/membership'
     | '/payout-history'
     | '/pin-decline'
     | '/pools'
@@ -575,6 +587,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  MembershipRoute: typeof MembershipRoute
   PayoutHistoryRoute: typeof PayoutHistoryRoute
   PinDeclineRoute: typeof PinDeclineRoute
   PoolsRoute: typeof PoolsRoute
@@ -711,6 +724,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membership': {
+      id: '/membership'
+      path: '/membership'
+      fullPath: '/membership'
+      preLoaderRoute: typeof MembershipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payout-history': {
@@ -935,6 +955,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
+  MembershipRoute: MembershipRoute,
   PayoutHistoryRoute: PayoutHistoryRoute,
   PinDeclineRoute: PinDeclineRoute,
   PoolsRoute: PoolsRoute,

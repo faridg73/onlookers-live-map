@@ -2,6 +2,11 @@
 import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Bell, Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
+import { WalletSnapshot } from "@/components/WalletSnapshot";
+import { MyEarningsCard } from "@/components/MyEarningsCard";
+import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
+import { Leaderboard } from "@/components/Leaderboard";
+import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
@@ -168,6 +173,12 @@ function HuntScreen() {
       <p className="mt-1 text-sm font-semibold text-signal">
         Open bounties you can claim right now, ranked for the fastest payout.
       </p>
+
+      <WalletSnapshot />
+      <MyEarningsCard />
+      <WeeklyTopOnlookers />
+      <Leaderboard limit={5} moreLink />
+      <MyBountyVideos />
 
       <div className="mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
         <div className={stat}>

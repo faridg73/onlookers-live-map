@@ -29,15 +29,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ProfileAccordion } from "@/components/ProfileAccordion";
+import { Sparkles } from "lucide-react";
 import { RequestCard } from "@/components/RequestCard";
 import { PosterBountyDashboard } from "@/components/PosterBountyDashboard";
 import { ProfessionalVisitsDashboard } from "@/components/pro/ProfessionalVisitsDashboard";
 import { useOnlooker } from "@/lib/onlooker-store";
-import { MyBountyVideos } from "@/components/MyBountyVideos";
-import { Leaderboard } from "@/components/Leaderboard";
-import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
 import { FollowingCreators } from "@/components/FollowingCreators";
-import { EarningsWallet } from "@/components/EarningsWallet";
 import { HunterStatusCard } from "@/components/HunterStatusCard";
 import { MembershipBadge } from "@/components/MembershipBadge";
 import { fetchUserWallet } from "@/lib/wallet-ledger";
@@ -54,7 +52,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { fetchMyProfile, type MyProfile } from "@/lib/profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { SocialLinks } from "@/components/Footer";
-import { AccountCenter } from "@/components/AccountCenter";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { fetchProfileStats, type ProfileStats } from "@/lib/profile-stats";
 import { BlockedAccounts } from "@/components/BlockedAccounts";
@@ -97,6 +94,7 @@ function ProfileScreen() {
   const [verified, setVerified] = useState(false);
   const [profile, setProfile] = useState<MyProfile | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [showAllActivity, setShowAllActivity] = useState(false);
   const [stats, setStats] = useState<ProfileStats | null>(null);
   const [memberTier, setMemberTier] = useState<string | null>(null);
 
@@ -226,9 +224,19 @@ function ProfileScreen() {
 
       <StreakCard />
 
-      <AccountCenter />
-
-      <MyBountyVideos />
+      <Link
+        to="/membership"
+        className="mt-6 flex items-center justify-between rounded-2xl border border-signal/40 bg-surface px-4 py-3 text-sm text-foreground hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <Sparkles className="size-5 text-signal" />
+          <span className="flex flex-col">
+            <span className="font-semibold">Onlooker+ membership — from $9.99/mo</span>
+            <span className="text-xs text-muted-foreground">Compare plans, top up credits, wallet history</span>
+          </span>
+        </span>
+        <ChevronRight className="size-4 text-signal" />
+      </Link>
 
       <MyCommunityPosts />
 
@@ -248,12 +256,13 @@ function ProfileScreen() {
 
       <HunterStatusCard />
 
-      <TrustLevelBadge className="mt-4" />
+      <ProfileAccordion title="Level & points" hint="Your trust level, points and Safety Tutorial">
+        <TrustLevelBadge className="mt-1" />
+      </ProfileAccordion>
       <CreatorVerificationCard />
 
       <AlertSettingsCard />
 
-      <EarningsWallet />
 
       <Link
         to="/pools"
@@ -278,7 +287,7 @@ function ProfileScreen() {
 
       <h2 className="mt-8 font-display text-lg text-foreground">Recent activity</h2>
       <div className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-        {ACTIVITY.map(({ icon: Icon, text, meta }) => (
+        {(showAllActivity ? ACTIVITY : ACTIVITY.slice(0, 2)).map(({ icon: Icon, text, meta }) => (
           <div
             key={text}
             className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3"
@@ -291,12 +300,17 @@ function ProfileScreen() {
           </div>
         ))}
       </div>
+      {ACTIVITY.length > 2 && (
+        <button
+          type="button"
+          onClick={() => setShowAllActivity((v) => !v)}
+          className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-signal"
+        >
+          {showAllActivity ? "Show less" : `See all (${ACTIVITY.length})`}
+        </button>
+      )}
 
       <FollowingCreators />
-
-      <WeeklyTopOnlookers />
-
-      <Leaderboard limit={5} moreLink />
 
       <ProfessionalVisitsDashboard />
 
@@ -313,8 +327,8 @@ function ProfileScreen() {
         )}
       </div>
 
-      <h2 className="mt-8 font-display text-lg text-foreground">Support &amp; legal</h2>
-      <div className="mt-3 space-y-2">
+      <ProfileAccordion title="Support & Legal" hint="How It Works, About, Contact, Disputes, FAQ, Terms, Privacy">
+      <div className="space-y-2">
         <button
           type="button"
           onClick={() => {
@@ -395,6 +409,7 @@ function ProfileScreen() {
           <ChevronRight className="size-4 text-muted-foreground" />
         </Link>
       </div>
+      </ProfileAccordion>
 
       <h2 className="mt-8 font-display text-lg text-foreground">Account</h2>
       <div className="mt-3">
