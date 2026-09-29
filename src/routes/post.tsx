@@ -1261,15 +1261,23 @@ function PostScreen() {
                       aria-pressed={voice.listening}
                       aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
                       title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
-                      onClick={voice.toggle}
-                      disabled={!voice.supported}
+                      onClick={() => {
+                        if (!voice.listening) spokenBase.current = prompt;
+                        voice.toggle();
+                      }}
+                      disabled={!voice.supported || voice.transcribing}
                       className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
                     >
                       {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
                     </Button>
                   </div>
                   {voice.listening && (
-                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">
+                      Listening… speak your request, then tap the mic again when you are done.
+                    </p>
+                  )}
+                  {voice.transcribing && (
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Writing down what you said…</p>
                   )}
                   <p
                     key={`helper:${promptContextKey}`}
