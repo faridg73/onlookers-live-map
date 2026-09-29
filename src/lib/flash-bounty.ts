@@ -208,15 +208,18 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
       label: `${condition.label} (+${condition.credits})`,
       detail: condition.blurb,
       multiplier: null,
+      delta: condition.credits,
       runningTotal: running,
     });
   }
   if (options.proMode) {
+    const before = running;
     running = Math.round(running * PRO_DISPATCH_MULTIPLIER);
     lines.push({
       label: "Pro / Media Desk dispatch",
       detail: `×${PRO_DISPATCH_MULTIPLIER} professional priority rate`,
       multiplier: PRO_DISPATCH_MULTIPLIER,
+      delta: running - before,
       runningTotal: running,
     });
     for (const option of proPicked) {
@@ -225,6 +228,7 @@ export function quoteFlashBounty(options: FlashBountyOptions) {
         label: `${option.label} (+${option.credits})`,
         detail: option.blurb,
         multiplier: null,
+        delta: option.credits,
         runningTotal: running,
       });
     }

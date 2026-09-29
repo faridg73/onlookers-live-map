@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { scrollFieldToStart } from "@/lib/field-scroll";
@@ -243,6 +243,7 @@ const ORIENTATIONS = [
 function PostScreen() {
   const { addRequest } = useOnlooker();
   const navigate = useNavigate();
+  const router = useRouter();
   const linkSavedVisit = useServerFn(linkProVisitBooking);
   const { mystery, mode: initialMode } = Route.useSearch();
   const phoneGate = usePhoneGate("before credits go into escrow");
@@ -331,7 +332,12 @@ function PostScreen() {
   const [firstPostGuideOpen, setFirstPostGuideOpen] = useState(false);
   const [hideFirstPostGuide, setHideFirstPostGuide] = useState(false);
   const [realEstateGuideOpen, setRealEstateGuideOpen] = useState(false);
-  const voice = useVoiceInput((text) => setPrompt(text));
+  // Spoken words are added to whatever is already typed, never replacing it.
+  const spokenBase = useRef("");
+  const voice = useVoiceInput((text) => {
+    const base = spokenBase.current.trim();
+    setPrompt(base ? `${base} ${text}` : text);
+  });
   const selectedCategory = broadcastCategoryById(categoryId);
   const category: CategoryId = selectedCategory.requestCategory;
   const subcategoryOptions = subcategoriesFor(mainCategoryId);
@@ -892,21 +898,50 @@ function PostScreen() {
       >
         <header className="shrink-0 border-b border-border bg-surface px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-extrabold uppercase text-signal">
-                {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
-              </p>
-              <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
-                {mode === null
-                  ? <>Broadcast, bounty or <span className="text-signal">visit?</span></>
-                  : mode === "broadcast"
-                    ? <>Stream to your <span className="text-signal">followers</span></>
-                    : step === 1
-                      ? <>What and <span className="text-signal">where?</span></>
-                      : step === 2
-                        ? <>How should it be <span className="text-signal">captured?</span></>
-                        : <>Reward &amp; <span className="text-signal">escrow</span></>}
-              </h1>
+            <div className="flex min-w-0 items-start gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                aria-label={
+                  mode === "bounty" && step > 1
+                    ? "Back a step"
+                    : mode !== null
+                      ? "Back to broadcast options"
+                      : "Go back"
+                }
+                onClick={() => {
+                  if (mode === "bounty" && step > 1) {
+                    setStep((step - 1) as 1 | 2 | 3);
+                    return;
+                  }
+                  if (mode !== null) {
+                    setMode(null);
+                    return;
+                  }
+                  if (window.history.length > 1) router.history.back();
+                  else void navigate({ to: "/" });
+                }}
+                className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 shadow-sm"
+              >
+                <ArrowLeft className="size-5 text-signal" />
+              </Button>
+              <div className="min-w-0">
+                <p className="text-xs font-extrabold uppercase text-signal">
+                  {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
+                </p>
+                <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
+                  {mode === null
+                    ? <>Broadcast, bounty or <span className="text-signal">visit?</span></>
+                    : mode === "broadcast"
+                      ? <>Stream to your <span className="text-signal">followers</span></>
+                      : step === 1
+                        ? <>What and <span className="text-signal">where?</span></>
+                        : step === 2
+                          ? <>How should it be <span className="text-signal">captured?</span></>
+                          : <>Reward &amp; <span className="text-signal">escrow</span></>}
+                </h1>
+              </div>
             </div>
             <Button type="button" variant="secondary" size="icon" aria-label="Close post request" onClick={() => void navigate({ to: "/" })} className="size-11 shrink-0 rounded-full border border-border bg-secondary/80 shadow-sm">
               <X className="size-5" />
@@ -1226,15 +1261,23 @@ function PostScreen() {
                       aria-pressed={voice.listening}
                       aria-label={voice.listening ? "Stop voice input" : "Speak your request"}
                       title={voice.supported ? "Tap to speak" : "Voice input is not supported in this browser"}
-                      onClick={voice.toggle}
-                      disabled={!voice.supported}
+                      onClick={() => {
+                        if (!voice.listening) spokenBase.current = prompt;
+                        voice.toggle();
+                      }}
+                      disabled={!voice.supported || voice.transcribing}
                       className={`shrink-0 rounded-full ${voice.listening ? "animate-pulse bg-signal text-signal-foreground" : "text-signal"}`}
                     >
                       {voice.supported ? <Mic className="size-5" /> : <MicOff className="size-5" />}
                     </Button>
                   </div>
                   {voice.listening && (
-                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Listening… speak your request.</p>
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">
+                      Listening… speak your request, then tap the mic again when you are done.
+                    </p>
+                  )}
+                  {voice.transcribing && (
+                    <p className="mt-2 pl-8 text-xs font-bold text-signal">Writing down what you said…</p>
                   )}
                   <p
                     key={`helper:${promptContextKey}`}
@@ -1573,6 +1616,7 @@ function PostScreen() {
                   category={subcategory ? `${mainCategoryLabel} · ${subcategory}` : mainCategoryLabel}
                   locationType={locationType ? LOCATION_TYPES.find((type) => type.id === locationType)?.label ?? null : null}
                   place={place || null}
+                  durationMinutes={capture ?? null}
                   onApplyTitle={(value) => { setTitle(value.slice(0, 120)); scrollFieldToStart(titleRef.current); }}
                   onApplyInstructions={(value) => { setNote(value); scrollFieldToStart(noteRef.current); }}
                 />

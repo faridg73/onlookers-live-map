@@ -11,6 +11,8 @@ type Props = {
   category?: string;
   locationType?: string | null;
   place?: string | null;
+  /** Capture length already chosen, in minutes; null = open-ended live feed. */
+  durationMinutes?: number | null;
   onApplyTitle: (title: string) => void;
   onApplyInstructions: (instructions: string) => void;
 };
@@ -25,6 +27,7 @@ export function BountyBriefAssistant({
   category,
   locationType,
   place,
+  durationMinutes,
   onApplyTitle,
   onApplyInstructions,
 }: Props) {
@@ -44,6 +47,7 @@ export function BountyBriefAssistant({
           ...(category ? { category } : {}),
           ...(locationType ? { locationType } : {}),
           ...(place ? { place: place.slice(0, 200) } : {}),
+          ...(durationMinutes !== undefined ? { durationMinutes } : {}),
         },
       });
       setResult(suggestion);

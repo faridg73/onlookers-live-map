@@ -14,6 +14,8 @@ const inputSchema = z.object({
   category: z.string().trim().max(120).optional(),
   locationType: z.string().trim().max(60).optional(),
   place: z.string().trim().max(200).optional(),
+  /** Capture length the poster already chose, in minutes; null = open-ended live feed. */
+  durationMinutes: z.number().int().min(1).max(600).nullable().optional(),
 });
 
 export type BountyBriefSuggestion = {
@@ -33,7 +35,7 @@ const RESPONSE_SCHEMA = {
     instructions: {
       type: "string",
       description:
-        "2-4 sentences of concrete camera instructions: what to capture, from where, how long, what proves it.",
+        "2-4 sentences of practical guidance: what to look for, roughly where to stand, and what would make the clip useful. Describe it as guidance, not a strict shot list.",
     },
     safety: {
       type: "array",
@@ -46,7 +48,9 @@ const RESPONSE_SCHEMA = {
 
 const SYSTEM_PROMPT = [
   "You help people write clear photo and video capture requests on Onlooker, a marketplace where nearby verified creators film real-world moments for a reward.",
-  "Rewrite the request so a stranger arriving on location knows exactly what to capture, from where, and what counts as proof.",
+  "Rewrite the request so a stranger arriving on location understands what the poster hopes to see and roughly where to stand.",
+  "Frame it as flexible guidance: ask for whatever is reasonably available and visible from a public spot at that moment, and say it is fine if some of it is not happening.",
+  "Never invent a recording length. If the poster's capture length is given, use only that length and nothing else; if it is not given, do not mention any length at all.",
   "Never suggest filming inside private residences without authorization, trespassing, confronting people, following individuals, filming minors, or approaching emergencies, crime scenes or hazards.",
   "Never suggest filming a ticketed event, concert, performance, stage, field of play, court, screen or any broadcast. For venues and events, only suggest exterior public vantage points: the crowd out front, entry and box-office lines, merch or food lines, parking and tailgates, the marquee, and the street atmosphere before or after the event.",
   "Safety notes must be practical and specific to this request: consent, public-space limits, distance from hazards, traffic, private property, and local recording rules.",
@@ -61,10 +65,18 @@ export const suggestBountyBrief = createServerFn({ method: "POST" })
       throw new Error("The suggestion helper is not configured yet.");
     }
 
+    const lengthLine =
+      data.durationMinutes === null
+        ? "Capture length chosen by the poster: an open-ended live feed, so do not name a number of seconds."
+        : typeof data.durationMinutes === "number"
+          ? `Capture length chosen by the poster: ${data.durationMinutes} minute${data.durationMinutes === 1 ? "" : "s"}. Use only this length if you mention length at all.`
+          : null;
+
     const context = [
       data.category ? `Category: ${data.category}` : null,
       data.locationType ? `Location type: ${data.locationType}` : null,
       data.place ? `Place: ${data.place}` : null,
+      lengthLine,
       `Request from the poster: ${data.request}`,
     ]
       .filter(Boolean)

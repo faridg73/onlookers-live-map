@@ -10,7 +10,8 @@ type Props = {
   place: DiscoveredPlace;
   group: DiscoveryGroup;
   tag: string;
-  photoUrl: string | null;
+  /** `undefined` while the photo is still resolving, `null` when there is none. */
+  photoUrl: string | null | undefined;
   liveCount: number;
   weekend: boolean;
 };

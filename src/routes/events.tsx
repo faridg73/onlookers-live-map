@@ -106,7 +106,9 @@ function EventsScreen() {
   });
   const { events, loading: eventsLoading } = useLiveEvents(area, {
     radiusMiles: 50,
-    weekendOnly: true,
+    // The week ahead, not just Friday–Sunday, so the feed matches its heading.
+    weekendOnly: false,
+    windowDays: 7,
     size: 50,
   });
 
@@ -197,7 +199,7 @@ function EventsScreen() {
         <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
           {activeVibe
             ? `${activeVibe.label} streams and places around ${area.label}.`
-            : `${weekend ? "Happening this weekend" : "Coming up"} around ${area.label} — tap any card to launch a live view from that exact spot.`}
+            : `Coming up this week around ${area.label} — tap any card to launch a live view from that exact spot.`}
         </p>
 
         <Link
@@ -316,7 +318,7 @@ function EventsScreen() {
         <section className="mt-5">
           <h2 className="inline-flex items-center gap-2 text-lg font-extrabold italic uppercase tracking-tight text-foreground">
             <Ticket className="size-4 text-signal" aria-hidden />{" "}
-            {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this weekend"}
+            {activeVibe ? `${activeVibe.label} events` : activeTag ? activeTag.tag : "Live events this week"}
           </h2>
           <p className="text-xs font-semibold text-signal">
             {activeVibe

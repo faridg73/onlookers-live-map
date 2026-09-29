@@ -3,6 +3,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
+  /** Photo URL, `null` when the place has no verified photo, `undefined` while still resolving. */
   src: string | null | undefined;
   alt: string;
   /** Name of the real venue/event, used for the identity tile when no verified photo exists. */
@@ -37,6 +38,17 @@ function hueOf(label: string) {
 export function PlacePhoto({ src, alt, identity, identityNote, className, eager = false }: Props) {
   const [failed, setFailed] = useState(false);
   const usable = src && !failed ? src : null;
+
+  // Photos arrive after the cards do; show a quiet placeholder while they load
+  // instead of initials that then swap to a picture.
+  if (src === undefined && !failed) {
+    return (
+      <div
+        aria-hidden
+        className={cn("size-full animate-pulse bg-surface-raised", className)}
+      />
+    );
+  }
 
   if (!usable) {
     const label = identity ?? alt;

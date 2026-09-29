@@ -129,6 +129,8 @@ export type PriceLine = {
   detail: string;
   /** Multiplier applied at this step, or null for the base row. */
   multiplier: number | null;
+  /** Credits this step adds on its own (0 when the step costs nothing extra). */
+  delta: number;
   /** Running credit total after this step. */
   runningTotal: number;
 };
@@ -185,11 +187,15 @@ export function quoteBounty(input: {
       ? "Open-ended live feed"
       : `${Math.round(input.durationMinutes)} min capture`;
 
+  const afterDuration = Math.round(exactAfterDuration);
+  const afterUrgency = Math.round(exactAfterUrgency);
+
   const lines: PriceLine[] = [
     {
       label: `${tier.label} base`,
       detail: tier.baseCredits ? "Fixed tier reward" : "Your chosen reward",
       multiplier: null,
+      delta: baseCredits,
       runningTotal: baseCredits,
     },
     {
@@ -201,7 +207,8 @@ export function quoteBounty(input: {
             ? "Base length, no extra"
             : `${pct(durationFactor)} for the extra minutes`,
       multiplier: durationFactor,
-      runningTotal: Math.round(exactAfterDuration),
+      delta: afterDuration - baseCredits,
+      runningTotal: afterDuration,
     },
     {
       label: "Schedule urgency",
@@ -210,7 +217,8 @@ export function quoteBounty(input: {
           ? "Relaxed window, no extra"
           : `${pct(urgencyFactor)} for a tight window`,
       multiplier: urgencyFactor,
-      runningTotal: Math.round(exactAfterUrgency),
+      delta: afterUrgency - afterDuration,
+      runningTotal: afterUrgency,
     },
     {
       label: "Conditions",
@@ -219,6 +227,7 @@ export function quoteBounty(input: {
           ? "Clear conditions, no extra"
           : `${pct(weatherFactor)}, ${conditionByMultiplier(weatherFactor).label.toLowerCase()}`,
       multiplier: weatherFactor,
+      delta: total - afterUrgency,
       runningTotal: total,
     },
   ];

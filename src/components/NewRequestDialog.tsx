@@ -38,7 +38,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
   const [place, setPlace] = useState("");
   const [locationType, setLocationType] = useState<LocationTypeId | null>(null);
   const [note, setNote] = useState("");
-  const [bounty, setBounty] = useState(20);
+  const [bounty, setBounty] = useState(MIN_BOUNTY);
   const [category, setCategory] = useState<CategoryId>("food");
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
