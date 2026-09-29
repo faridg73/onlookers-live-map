@@ -93,7 +93,7 @@ export function VenueBountyDialog({
   const [note, setNote] = useState(defaultNote ?? "");
   const titleRef = useRef<HTMLInputElement>(null);
   const noteRef = useRef<HTMLTextAreaElement>(null);
-  const [bounty, setBounty] = useState(20);
+  const [bounty, setBounty] = useState(MIN_BOUNTY);
   const [balance, setBalance] = useState<number | null>(null);
   const [posting, setPosting] = useState(false);
   const [permissionOk, setPermissionOk] = useState(false);
