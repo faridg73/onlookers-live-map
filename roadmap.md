@@ -70,4 +70,4 @@
 - [x] Earn tab: "Available to cash out now" uses the real cash-out available balance (holds shown separately), matching Balance & Cashout
 - [ ] Payout email: reflect the 3-day/7-day hold ("available to cash out on <date>") instead of "cash out anytime"
 
-- [ ] Show the real hold length on the "On hold" label (3 vs 7 day) instead of hard-coded "3-day"
+- [x] Show the real hold length on the "On hold" label (3 vs 7 day) instead of hard-coded "3-day"
