@@ -114,7 +114,7 @@ function Person({
       <rect x="3" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
       <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill={color} />
       <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill={light} />
-      <Tag label={tag} width={tagWidth} />
+      <Tag label={tag} width={tagWidth ?? 62} />
       <rect x="-28" y="30" width="9" height="30" rx="4" fill={color} transform="rotate(-25 -24 30)" />
       <rect x="19" y="30" width="9" height="26" rx="4" fill={color} transform="rotate(35 24 34)" />
       <circle cx="0" cy="2" r="19" fill={skin} />
@@ -549,8 +549,8 @@ export default function HandshakeExplainer() {
       </div>
 
       <div style={{ textAlign: "center", minHeight: 64, display: "flex", flexDirection: "column", gap: 6 }}>
-        <div style={{ fontSize: 17, fontWeight: 700 }}>{STEPS[step].title}</div>
-        <div style={{ fontSize: 13, color: "#9A9A9E", lineHeight: 1.5, maxWidth: 380 }}>{STEPS[step].caption}</div>
+        <div style={{ fontSize: 17, fontWeight: 700 }}>{STEPS[step]?.title}</div>
+        <div style={{ fontSize: 13, color: "#9A9A9E", lineHeight: 1.5, maxWidth: 380 }}>{STEPS[step]?.caption}</div>
       </div>
 
       <div style={{ position: "relative", width: "100%", height: 3, background: "#1A1B1E", borderRadius: 999 }}>
