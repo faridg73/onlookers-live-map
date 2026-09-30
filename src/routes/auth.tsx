@@ -465,7 +465,7 @@ function AuthScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-32 pt-10">
+    <div className="mx-auto max-w-md px-4 pb-12 pt-10">
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"

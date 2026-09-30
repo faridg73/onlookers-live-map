@@ -43,7 +43,7 @@ export function AuthMapBackdrop() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none relative mt-10 h-56 overflow-hidden rounded-2xl border border-border"
+      className="pointer-events-none relative mt-10 h-80 overflow-hidden rounded-2xl border border-border sm:h-96"
     >
       <div ref={holder} className="absolute inset-0" />
       {/* Dim the tiles so the map sits quietly behind the page theme. */}
