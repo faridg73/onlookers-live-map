@@ -17,6 +17,7 @@ import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
+import { AuthMapBackdrop } from "@/components/AuthMapBackdrop";
 import { InlineVerificationField } from "@/components/InlineVerificationField";
 import { confirmPhoneCode, sendPhoneCode } from "@/lib/phone-verify.functions";
 import { completeVerifiedSignup, confirmEmailSignupCode, sendEmailSignupCode } from "@/lib/signup-verification.functions";
@@ -464,7 +465,7 @@ function AuthScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-32 pt-10">
+    <div className="mx-auto max-w-md px-4 pb-12 pt-10">
       <div className="mb-4 flex items-center justify-between">
         <button
           type="button"
@@ -637,6 +638,8 @@ function AuthScreen() {
       >
         {mode === "signin" ? "New here? Create an account" : "Already have an account? Sign in"}
       </button>
+
+      <AuthMapBackdrop />
     </div>
   );
 }
