@@ -3256,6 +3256,7 @@ export type Database = {
         Returns: Json
       }
       qa_release_credit_holds: { Args: { _uid: string }; Returns: Json }
+      qa_reset_identity_status: { Args: { _uid: string }; Returns: undefined }
       qa_simulate_bounty_payout: {
         Args: { _bounty?: number; _hunter: string }
         Returns: Json
