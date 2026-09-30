@@ -115,7 +115,11 @@ export function CreditPayoutDashboard() {
   async function startIdCheck() {
     setBusy(true);
     try {
-      const result = await beginIdentity({ data: { country: idCountry } });
+      // Send the origin the member is actually browsing, so Stripe returns
+      // them to this site instead of the server's own localhost address.
+      const result = await beginIdentity({
+        data: { country: idCountry, returnOrigin: window.location.origin },
+      });
       if (result.error || !result.url) throw new Error(result.error ?? "Could not open the ID check");
       const opened = window.open(result.url, "_blank", "noopener,noreferrer");
       if (!opened) window.location.href = result.url;
