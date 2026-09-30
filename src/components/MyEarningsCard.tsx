@@ -28,17 +28,24 @@ export function MyEarningsCard() {
     }
     let alive = true;
     setLoading(true);
-    void fetchMyEarnings()
-      .then((next) => {
-        if (alive) setSummary(next);
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
+    // Reloads with the app-wide credit refresh so this breakdown always moves
+    // in step with the wallet box and the payout dashboard.
+    const load = () =>
+      void fetchMyEarnings()
+        .then((next) => {
+          if (alive) setSummary(next);
+        })
+        .finally(() => {
+          if (alive) setLoading(false);
+        });
+    load();
+    window.addEventListener("onlooker:credits-refresh", load);
     return () => {
       alive = false;
+      window.removeEventListener("onlooker:credits-refresh", load);
     };
   }, [user]);
+
 
   if (!user) return null;
 
