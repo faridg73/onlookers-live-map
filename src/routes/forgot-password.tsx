@@ -21,6 +21,23 @@ export const Route = createFileRoute("/forgot-password")({
 
 const PROVIDER_NAMES: Record<string, string> = { google: "Google", apple: "Apple", azure: "Microsoft" };
 
+/**
+ * The address the emailed link should open. The in-editor preview runs on an
+ * internal host that asks for a Lovable login when opened on a phone, so any
+ * link we mail out has to point at a public Onlooker address instead.
+ */
+function resetLinkOrigin(): string {
+  const origin = window.location.origin;
+  const host = window.location.hostname.toLowerCase();
+  const publicHost =
+    host === "onlooker.io" ||
+    host === "www.onlooker.io" ||
+    host === "onlookerlive.com" ||
+    host === "www.onlookerlive.com" ||
+    host === "onlooker.lovable.app";
+  return publicHost ? origin : "https://www.onlooker.io";
+}
+
 function ForgotPasswordScreen() {
   const check = useServerFn(checkResetEligibility);
   const [email, setEmail] = useState("");
@@ -48,7 +65,7 @@ function ForgotPasswordScreen() {
       }
       if (res?.status === "password") {
         const { error: err } = await supabase.auth.resetPasswordForEmail(addr, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${resetLinkOrigin()}/reset-password`,
         });
         if (err) throw err;
       }
