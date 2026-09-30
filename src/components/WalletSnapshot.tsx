@@ -1,31 +1,20 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Loader2, Wallet } from "lucide-react";
 
 import { useAuth } from "@/hooks/use-auth";
-import { fetchUserWallet } from "@/lib/wallet-ledger";
+import { useCashoutBalance, holdLabel } from "@/lib/cashout-balance";
 import { formatCreditCash } from "@/lib/credits";
 
-/** Compact wallet: credit balance, its cash value and a Cash Out link. */
+/**
+ * Compact wallet box: what can actually be cashed out, what is still held, and
+ * a Cash Out link. The headline figure must never be the raw wallet total —
+ * sitting next to a Cash Out button, that would promise held credits are
+ * spendable.
+ */
 export function WalletSnapshot() {
   const { user } = useAuth();
-  const [balance, setBalance] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    let alive = true;
-    const load = () =>
-      fetchUserWallet()
-        .then((w) => alive && setBalance(w?.creditBalance ?? 0))
-        .catch(() => alive && setBalance(0));
-    void load();
-    window.addEventListener("onlooker:credits-refresh", load);
-    return () => {
-      alive = false;
-      window.removeEventListener("onlooker:credits-refresh", load);
-    };
-  }, [user]);
+  const { balance, loading } = useCashoutBalance();
 
   if (!user) return null;
 
@@ -33,15 +22,27 @@ export function WalletSnapshot() {
     <section className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-live bg-live/10 p-4">
       <div className="min-w-0">
         <p className="flex items-center gap-2 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
-          <Wallet className="size-3.5 text-live" /> Wallet balance
+          <Wallet className="size-3.5 text-live" /> Available to cash out
         </p>
-        {balance === null ? (
+        {loading || !balance ? (
           <Loader2 className="mt-2 size-4 animate-spin text-muted-foreground" />
         ) : (
-          <p className="mt-1 truncate">
-            <span className="font-display text-3xl text-foreground">{balance.toLocaleString()}</span>{" "}
-            <span className="text-sm text-muted-foreground">credits · {formatCreditCash(balance)}</span>
-          </p>
+          <>
+            <p className="mt-1 truncate">
+              <span className="font-display text-3xl text-foreground">
+                {balance.availableCredits.toLocaleString()}
+              </span>{" "}
+              <span className="text-sm text-muted-foreground">
+                credits · {formatCreditCash(balance.availableCredits)}
+              </span>
+            </p>
+            {balance.onHoldCredits > 0 && (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {holdLabel(balance.holdDays)}: {balance.onHoldCredits.toLocaleString()} credits ·
+                wallet total {balance.totalCredits.toLocaleString()}
+              </p>
+            )}
+          </>
         )}
       </div>
       <Link

@@ -8,9 +8,11 @@ import {
   PLATFORM_FEE_RATE,
   creditsToUsdValue,
   fetchMyEarnings,
+  holdLabel,
   usd,
   type EarningsSummary,
 } from "@/lib/earnings";
+
 
 /** My Earnings: everything earned, the fee taken out, and what it is worth in cash. */
 export function MyEarningsCard() {
@@ -98,11 +100,12 @@ export function MyEarningsCard() {
             />
             {summary.onHoldCredits > 0 && (
               <Row
-                label="On hold (security review)"
+                label={holdLabel(summary.holdDays)}
                 value={`${summary.onHoldCredits} Credits`}
                 cash={usd(creditsToUsdValue(summary.onHoldCredits))}
               />
             )}
+
             {summary.pendingCredits > 0 && (
               <Row
                 label="Cash out in progress"
