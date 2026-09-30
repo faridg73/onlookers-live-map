@@ -52,6 +52,7 @@ export function CreditPayoutDashboard() {
     frozen_at?: string | null;
     test_mode?: boolean;
   } | null>(null);
+  const [holdDays, setHoldDays] = useState<number | null>(null);
   const freezeAccount = useServerFn(freezeMyAccount);
   const [confirmFreeze, setConfirmFreeze] = useState(false);
 
