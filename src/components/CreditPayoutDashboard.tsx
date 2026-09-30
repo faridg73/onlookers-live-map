@@ -4,8 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/integrations/supabase/client";
 import { fetchCreditWallet } from "@/lib/credits";
+import {
+  fetchCashoutBalance,
+  holdLabel,
+  type CashoutBalance,
+} from "@/lib/cashout-balance";
+
 import {
   CREDITS_PER_USD,
   MIN_CASHOUT_CREDITS,
@@ -44,15 +49,10 @@ export function CreditPayoutDashboard() {
   const beginIdentity = useServerFn(startIdentityCheck);
   const [identity, setIdentity] = useState<IdentityStatus | null>(null);
   const [idCountry, setIdCountry] = useState("US");
-  const [hold, setHold] = useState<{
-    available: number;
-    on_hold: number;
-    next_release_at: string | null;
-    cooldown_until: string | null;
-    frozen_at?: string | null;
-    test_mode?: boolean;
-  } | null>(null);
-  const [holdDays, setHoldDays] = useState<number | null>(null);
+  // Available / on-hold figures come from the one shared calculation, so this
+  // dashboard can never disagree with the earnings breakdown or wallet boxes.
+  const [hold, setHold] = useState<CashoutBalance | null>(null);
+
   const freezeAccount = useServerFn(freezeMyAccount);
   const [confirmFreeze, setConfirmFreeze] = useState(false);
 
@@ -69,25 +69,8 @@ export function CreditPayoutDashboard() {
       setCredits(wallet?.creditBalance ?? null);
       if (!wallet) return;
       setPayouts(await listCreditPayouts());
-      const { data: holdData } = await supabase.rpc("my_cashout_status" as never);
-      setHold((holdData as never) ?? null);
+      setHold(await fetchCashoutBalance());
 
-      // A hold is normally 3 days, but a payout flagged by self-dealing checks
-      // is held for 7. The label must state the real length for these credits,
-      // so it is measured from the payout records still waiting to clear.
-      const { data: pending } = await supabase
-        .from("credit_transactions")
-        .select("created_at, available_at")
-        .eq("receiver_wallet_id", wallet.id)
-        .gt("available_at", new Date().toISOString());
-      const lengths = (pending ?? [])
-        .map((row) => {
-          if (!row.created_at || !row.available_at) return 0;
-          const ms = new Date(row.available_at).getTime() - new Date(row.created_at).getTime();
-          return Math.round(ms / 86_400_000);
-        })
-        .filter((days) => days > 0);
-      setHoldDays(lengths.length ? Math.max(...lengths) : null);
       try {
         setIdentity(await loadIdentity());
       } catch {
@@ -183,9 +166,10 @@ export function CreditPayoutDashboard() {
       toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Credits ($10.00)`);
       return;
     }
-    if (hold && value > hold.available) {
-      toast.error(`Only ${hold.available} Credits have cleared the security hold so far.`);
+    if (hold && value > hold.availableCredits) {
+      toast.error(`Only ${hold.availableCredits} Credits have cleared the security hold so far.`);
       return;
+
     }
     if (credits !== null && value > credits) {
       toast.error("Insufficient Credits");
@@ -205,7 +189,7 @@ export function CreditPayoutDashboard() {
           : message.includes("PAYOUT_COOLDOWN")
             ? "Cash-outs are paused for a short while after payout details change."
             : message.includes("ON_HOLD")
-              ? `Some of these Credits are still in their ${holdDays ? `${holdDays}-day ` : ""}security hold.`
+              ? `Some of these Credits are still in their ${hold?.holdDays ? `${hold.holdDays}-day ` : ""}security hold.`
               : message,
       );
     } finally {
@@ -215,13 +199,14 @@ export function CreditPayoutDashboard() {
 
   if (credits === null) return null;
 
-  const available = hold ? hold.available : credits;
+  const available = hold ? hold.availableCredits : credits;
   const canCashOut = available >= MIN_CASHOUT_CREDITS;
   const idFeeUsd =
     identity?.verified && !identity.feeCharged ? (identity.country === "US" ? 0.5 : 1.5) : 0;
-  const cooldownUntil = hold?.cooldown_until ? new Date(hold.cooldown_until) : null;
+  const cooldownUntil = hold?.cooldownUntil ? new Date(hold.cooldownUntil) : null;
   const coolingDown = cooldownUntil !== null && cooldownUntil.getTime() > Date.now();
-  const frozen = Boolean(hold?.frozen_at) || Boolean(identity?.frozen);
+  const frozen = Boolean(hold?.frozenAt) || Boolean(identity?.frozen);
+
   const fmtTime = (d: Date) =>
     d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
@@ -255,21 +240,22 @@ export function CreditPayoutDashboard() {
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
             <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">Available to withdraw</p>
             <p className="mt-0.5 text-sm font-bold text-live">
-              {hold.available} · ${creditsToUsd(hold.available).toFixed(2)}
+              {hold.availableCredits} · ${creditsToUsd(hold.availableCredits).toFixed(2)}
             </p>
           </div>
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
             <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
-              {holdDays ? `On hold (${holdDays}-day security review)` : "On hold (security review)"}
+              {holdLabel(hold.holdDays)}
             </p>
             <p className="mt-0.5 text-sm font-bold text-foreground">
-              {hold.on_hold} · ${creditsToUsd(hold.on_hold).toFixed(2)}
+              {hold.onHoldCredits} · ${creditsToUsd(hold.onHoldCredits).toFixed(2)}
             </p>
-            {hold.next_release_at && hold.on_hold > 0 && (
+            {hold.nextReleaseAt && hold.onHoldCredits > 0 && (
               <p className="text-[0.62rem] text-muted-foreground">
-                Next release {fmtTime(new Date(hold.next_release_at))}
+                Next release {fmtTime(new Date(hold.nextReleaseAt))}
               </p>
             )}
+
           </div>
         </div>
       )}
@@ -389,7 +375,7 @@ export function CreditPayoutDashboard() {
           {coolingDown && cooldownUntil && (
             <p className="mt-2 text-xs font-semibold text-signal">
               Your payout details changed recently. For your safety, cash-outs unlock {fmtTime(cooldownUntil)}.
-              {hold?.test_mode ? " (Test mode: 2-minute wait.)" : ""}
+              {hold?.testMode ? " (Test mode: 2-minute wait.)" : ""}
             </p>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
