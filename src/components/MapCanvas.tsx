@@ -362,6 +362,8 @@ export function MapCanvas({
         return (
           request.id === selectedId ||
           activeLive ||
+          // A job this hunter claimed must stay visible so they can submit it.
+          (request.claimedByMe === true && !isClosed(request)) ||
           request.bountyTier === "priority_hunt" ||
           bountyTier(total) === "gold"
         );
