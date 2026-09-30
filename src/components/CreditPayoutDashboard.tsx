@@ -70,6 +70,23 @@ export function CreditPayoutDashboard() {
       setPayouts(await listCreditPayouts());
       const { data: holdData } = await supabase.rpc("my_cashout_status" as never);
       setHold((holdData as never) ?? null);
+
+      // A hold is normally 3 days, but a payout flagged by self-dealing checks
+      // is held for 7. The label must state the real length for these credits,
+      // so it is measured from the payout records still waiting to clear.
+      const { data: pending } = await supabase
+        .from("credit_transactions")
+        .select("created_at, available_at")
+        .eq("receiver_wallet_id", wallet.id)
+        .gt("available_at", new Date().toISOString());
+      const lengths = (pending ?? [])
+        .map((row) => {
+          if (!row.created_at || !row.available_at) return 0;
+          const ms = new Date(row.available_at).getTime() - new Date(row.created_at).getTime();
+          return Math.round(ms / 86_400_000);
+        })
+        .filter((days) => days > 0);
+      setHoldDays(lengths.length ? Math.max(...lengths) : null);
       try {
         setIdentity(await loadIdentity());
       } catch {
