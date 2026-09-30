@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Clock, MapPin, Navigation, Zap } from "lucide-react";
+import { ArrowLeft, Camera, Clock, MapPin, Navigation, Zap } from "lucide-react";
 
 import { BountyBidsPanel } from "@/components/BountyBidsPanel";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { BountyFocusMap } from "@/components/BountyFocusMap";
+import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { formatCreditCash } from "@/lib/credits";
 import { requestMapPosition } from "@/lib/onlooker";
@@ -63,6 +64,9 @@ function BountyPreview() {
   const place = request?.place ?? search.place;
   const pos = request ? requestMapPosition(request) : null;
   const isPoster = request?.requester === "you";
+  /** This hunter holds the claim, so the submission step belongs right here. */
+  const mine = !isPoster && Boolean(request?.claimedByMe);
+  const claimedByOther = !isPoster && !mine && request?.status === "claimed";
   const minutesLeft = request?.expiresAt ? Math.max(0, Math.round((request.expiresAt - Date.now()) / 60_000)) : null;
   const directions = pos ? `https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}` : null;
 
@@ -125,15 +129,30 @@ function BountyPreview() {
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           {isPoster
             ? "Onlookers nearby can see this on the map. You'll be notified when someone claims it and when footage arrives."
-            : "Head to the pin, claim the bounty, send back a live photo or clip, and take the payout."}
+            : mine
+              ? "You claimed this bounty. Film it on site, send the capture in, and the payout is released once the poster approves."
+              : claimedByOther
+                ? "Another onlooker already claimed this bounty, so it is no longer taking new claims."
+                : "Head to the pin, claim the bounty, send back a live photo or clip, and take the payout."}
         </p>
-        <Link
-          to="/discover"
-          search={{ view: "map", b: id, ...(pos ? { lat: pos.lat, lng: pos.lng, label: title ?? "Bounty" } : {}) }}
-          className="mt-6 block rounded-full bg-signal px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.12em] text-signal-foreground"
-        >
-          {isPoster ? "Manage on the map" : "Claim on the map"}
-        </Link>
+        {mine && request ? (
+          <BountyVideoDialog request={request}>
+            <button
+              type="button"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-signal px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.12em] text-signal-foreground"
+            >
+              <Camera className="size-4" /> Submit your capture
+            </button>
+          </BountyVideoDialog>
+        ) : (
+          <Link
+            to="/discover"
+            search={{ view: "map", b: id, ...(pos ? { lat: pos.lat, lng: pos.lng, label: title ?? "Bounty" } : {}) }}
+            className="mt-6 block rounded-full bg-signal px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.12em] text-signal-foreground"
+          >
+            {isPoster ? "Manage on the map" : claimedByOther ? "See it on the map" : "Claim on the map"}
+          </Link>
+        )}
       </div>
     </div>
   );
