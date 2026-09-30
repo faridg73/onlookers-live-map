@@ -56,6 +56,9 @@ export function HandshakeExplainerDialog({
             />
             Don&apos;t show this again
           </label>
+          <p className="mt-3 text-center text-[11px] text-muted-foreground/70">
+            © 2026 Onlooker. All rights reserved.
+          </p>
         </div>
       </DialogContent>
     </Dialog>

@@ -1021,7 +1021,9 @@ function PostScreen() {
                 onClick={() => setRealEstateGuideOpen(true)}
                 className="block w-full rounded-xl border border-border bg-background px-4 py-3 text-center text-sm font-extrabold text-foreground transition-colors hover:border-signal hover:text-signal"
               >
-                How the Onlooker Handshake works
+                How the Onlooker Handshake
+                <sup className="text-[0.65em]">™</sup>{" "}
+                works
               </button>
             </div>
           </div>

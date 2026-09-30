@@ -275,6 +275,7 @@ export default function HandshakeExplainer() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
         <div style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8B8C90" }}>
           The Onlooker Handshake
+          <sup style={{ fontSize: "0.7em", letterSpacing: 0, marginLeft: 1 }}>™</sup>
         </div>
         <button
           className="hsx-playbtn"
