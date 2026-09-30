@@ -269,30 +269,66 @@ export function BountyVideoDialog({
               </p>
             ) : (
             <div className="space-y-3" onDrop={blockFileDrop} onDragOver={blockFileDrop} onPaste={blockFilePaste}>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={2}
-                placeholder="Add a note for the poster (optional)"
-                className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
-              />
-              <button
-                type="button"
-                disabled={uploading || closed || pinLocked}
-                onClick={() => setCapturing(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" /> Sending…
-                  </>
-                ) : (
-                  <>
-                    <Camera className="size-4" />{" "}
-                    {view.captureLabel}
-                  </>
-                )}
-              </button>
+              {myPaid ? (
+                <div className="rounded-2xl border border-signal/50 bg-signal/10 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-signal">
+                    <CheckCircle2 className="size-4" /> Approved — you got paid
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    {formatCredits(Math.round(Number(myPaid.payout_amount)))} Credits are in your wallet. Nothing else
+                    to do on this bounty.
+                  </p>
+                </div>
+              ) : myPending ? (
+                <div className="rounded-2xl border border-signal/50 bg-signal/10 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-signal">
+                    <Timer className="size-4" /> Submitted — waiting for the poster to review
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                    Your clip is in, so nothing else is needed from you. You&rsquo;ll get paid once the poster approves
+                    it{autoApproveIn ? `, or automatically in ${autoApproveIn}` : ""}.
+                  </p>
+                </div>
+              ) : null}
+
+              {showCaptureTools ? (
+                <>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={2}
+                    placeholder="Add a note for the poster (optional)"
+                    className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none focus:border-signal"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploading || closed || pinLocked}
+                    onClick={() => setCapturing(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-signal px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-signal-foreground disabled:opacity-50"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" /> Sending…
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="size-4" />{" "}
+                        {mySubmissions.length > 0 ? "Film another clip" : view.captureLabel}
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  disabled={uploading || closed || pinLocked}
+                  onClick={() => setShowExtra(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground disabled:opacity-50"
+                >
+                  <Camera className="size-4" /> Submit another clip (optional)
+                </button>
+              )}
+
 
               {uploadStatus && (
                 <p className="flex items-center justify-center gap-2 text-xs font-semibold text-foreground">
