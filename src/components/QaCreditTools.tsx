@@ -77,7 +77,7 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
   async function runSimulatedBounty() {
     setBusy(true);
     try {
-      const result = await simulate({ data: { credits: 20 } });
+      const result = await simulate({ data: { credits: 24 } });
       toast.success(`Test bounty approved: ${result.net} credits earned and placed on the 3-day hold.`);
       await onChanged();
     } catch (error) {
@@ -143,7 +143,7 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
         disabled={busy}
         className="mt-3 w-full rounded-xl border border-signal/60 bg-signal/10 px-3 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
       >
-        Simulate a completed bounty payout (20 credits)
+        Simulate a completed bounty payout (20 credits after fees)
       </button>
 
       <button
