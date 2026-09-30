@@ -240,21 +240,22 @@ export function CreditPayoutDashboard() {
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
             <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">Available to withdraw</p>
             <p className="mt-0.5 text-sm font-bold text-live">
-              {hold.available} · ${creditsToUsd(hold.available).toFixed(2)}
+              {hold.availableCredits} · ${creditsToUsd(hold.availableCredits).toFixed(2)}
             </p>
           </div>
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
             <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
-              {holdDays ? `On hold (${holdDays}-day security review)` : "On hold (security review)"}
+              {holdLabel(hold.holdDays)}
             </p>
             <p className="mt-0.5 text-sm font-bold text-foreground">
-              {hold.on_hold} · ${creditsToUsd(hold.on_hold).toFixed(2)}
+              {hold.onHoldCredits} · ${creditsToUsd(hold.onHoldCredits).toFixed(2)}
             </p>
-            {hold.next_release_at && hold.on_hold > 0 && (
+            {hold.nextReleaseAt && hold.onHoldCredits > 0 && (
               <p className="text-[0.62rem] text-muted-foreground">
-                Next release {fmtTime(new Date(hold.next_release_at))}
+                Next release {fmtTime(new Date(hold.nextReleaseAt))}
               </p>
             )}
+
           </div>
         </div>
       )}
