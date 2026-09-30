@@ -24,6 +24,39 @@ export async function sendPayoutEmailForVideo(video: VideoRow) {
     .maybeSingle();
 
   const requestId = video.request_id.replace(/^db-/, "");
+
+  // The payout may sit in a security hold (3 days normally, 7 when self-dealing
+  // signals matched). Read the real release time from the ledger row so the
+  // email never promises money the hunter cannot withdraw yet.
+  let availableOn = "";
+  let holdDays: number | undefined;
+  const { data: wallet } = await supabaseAdmin
+    .from("user_credit_wallets")
+    .select("id")
+    .eq("user_id", video.uploader_id)
+    .maybeSingle();
+  if (wallet?.id) {
+    const { data: tx } = await supabaseAdmin
+      .from("credit_transactions")
+      .select("available_at, created_at")
+      .eq("receiver_wallet_id", wallet.id)
+      .eq("request_id", requestId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const releaseAt = tx?.available_at ? new Date(tx.available_at) : null;
+    if (releaseAt && releaseAt.getTime() > Date.now() + 60_000) {
+      availableOn = releaseAt.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+      const from = tx?.created_at ? new Date(tx.created_at).getTime() : Date.now();
+      holdDays = Math.max(1, Math.round((releaseAt.getTime() - from) / 86_400_000));
+    }
+  }
+
   const result = await sendTemplateEmail("payout-released", hunterEmail, {
     templateData: {
       hunterName: profile?.display_name || profile?.username || "",
@@ -31,6 +64,7 @@ export async function sendPayoutEmailForVideo(video: VideoRow) {
       place: video.request_place,
       credits: Math.round(Number(video.payout_amount)),
       bountyUrl: `https://onlooker.io/b/${requestId}`,
+      ...(availableOn ? { availableOn, holdDays } : {}),
     },
     idempotencyKey: `payout-released-${video.id}`,
   });

@@ -67,3 +67,5 @@
 - [x] Self-dealing detection: network/device/payout-destination comparison at bounty settlement, staff review queue, 7-day hold on flagged earnings
 - [ ] Step-up re-auth (password + fresh code) before opening bank linking
 - [ ] Withdrawal anomaly review flags (30-day >$1,500, single >80% of balance)
+- [x] Earn tab: "Available to cash out now" uses the real cash-out available balance (holds shown separately), matching Balance & Cashout
+- [ ] Payout email: reflect the 3-day/7-day hold ("available to cash out on <date>") instead of "cash out anytime"

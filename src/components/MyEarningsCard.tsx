@@ -96,6 +96,13 @@ export function MyEarningsCard() {
               value={`${summary.availableCredits} Credits`}
               cash={usd(creditsToUsdValue(summary.availableCredits))}
             />
+            {summary.onHoldCredits > 0 && (
+              <Row
+                label="On hold (security review)"
+                value={`${summary.onHoldCredits} Credits`}
+                cash={usd(creditsToUsdValue(summary.onHoldCredits))}
+              />
+            )}
             {summary.pendingCredits > 0 && (
               <Row
                 label="Cash out in progress"

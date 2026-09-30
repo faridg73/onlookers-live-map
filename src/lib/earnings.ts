@@ -13,8 +13,10 @@ export type EarningsSummary = {
   netCredits: number;
   /** How many payouts/earning events make up the total. */
   entries: number;
-  /** Credits sitting in the wallet right now. */
+  /** Credits that can actually be cashed out right now (holds excluded). */
   availableCredits: number;
+  /** Credits still inside a security hold and not yet spendable. */
+  onHoldCredits: number;
   /** Credits already redeemed for cash (completed payouts). */
   cashedOutCredits: number;
   cashedOutUsd: number;
@@ -29,6 +31,7 @@ const EMPTY: EarningsSummary = {
   netCredits: 0,
   entries: 0,
   availableCredits: 0,
+  onHoldCredits: 0,
   cashedOutCredits: 0,
   cashedOutUsd: 0,
   pendingCredits: 0,
@@ -51,6 +54,16 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
     .maybeSingle();
 
   const summary: EarningsSummary = { ...EMPTY, availableCredits: wallet?.credit_balance ?? 0 };
+
+  // The wallet balance still contains credits inside a security hold. The
+  // cash-out status is the single source of truth for what is spendable now,
+  // so the Earn tab never shows held funds as available.
+  const { data: cashout } = await supabase.rpc("my_cashout_status" as never);
+  const status = cashout as { available?: number; on_hold?: number } | null;
+  if (status && typeof status.available === "number") {
+    summary.availableCredits = Number(status.available) || 0;
+    summary.onHoldCredits = Number(status.on_hold ?? 0) || 0;
+  }
 
   if (wallet?.id) {
     const { data: rows } = await supabase
