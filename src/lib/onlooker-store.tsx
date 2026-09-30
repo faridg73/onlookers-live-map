@@ -44,6 +44,8 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     captureMinutes: row.captureMinutes,
     scheduledStartAt: row.scheduledStartAt ?? undefined,
     weatherMultiplier: row.weatherMultiplier,
+    claimedByMe: row.claimedByMe ?? false,
+    myClaimStatus: row.myClaimStatus ?? undefined,
   };
 }
 
