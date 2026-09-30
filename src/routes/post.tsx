@@ -39,7 +39,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { BountyAmountPicker } from "@/components/BountyAmountPicker";
 import { BountyBriefAssistant } from "@/components/BountyBriefAssistant";
 import { BountyConditionIcon } from "@/components/BountyConditionIcon";
-import { FirstPostGuide, RealEstateSecurityDialog } from "@/components/BountyEducationDialogs";
+import { FirstPostGuide } from "@/components/BountyEducationDialogs";
+import {
+  HandshakeExplainerDialog,
+  isHandshakeExplainerHidden,
+  setHandshakeExplainerHidden,
+} from "@/components/HandshakeExplainerDialog";
 import { GigCostBreakdown } from "@/components/GigCostBreakdown";
 import { BroadcastComposer } from "@/components/BroadcastComposer";
 import { BountyTipPicker } from "@/components/BountyTipPicker";
@@ -332,6 +337,10 @@ function PostScreen() {
   const [firstPostGuideOpen, setFirstPostGuideOpen] = useState(false);
   const [hideFirstPostGuide, setHideFirstPostGuide] = useState(false);
   const [realEstateGuideOpen, setRealEstateGuideOpen] = useState(false);
+  const [hideHandshakeExplainer, setHideHandshakeExplainer] = useState(false);
+  useEffect(() => {
+    setHideHandshakeExplainer(isHandshakeExplainerHidden());
+  }, []);
   // Spoken words are added to whatever is already typed, never replacing it.
   const spokenBase = useRef("");
   const voice = useVoiceInput((text) => {
@@ -654,7 +663,7 @@ function PostScreen() {
     setSubcategory(null);
     setPermissionOk(false);
     setVenueQuery(`${picked.query} near me`);
-    if (picked.id === "real-estate") setRealEstateGuideOpen(true);
+    if (picked.id === "real-estate" && !isHandshakeExplainerHidden()) setRealEstateGuideOpen(true);
     if (picked.id === "emergency-safety") {
       setTier("fast_catch");
       setMinutes(15);
@@ -1936,7 +1945,15 @@ function PostScreen() {
         }}
         onOpenChange={setFirstPostGuideOpen}
       />
-      <RealEstateSecurityDialog open={realEstateGuideOpen} onOpenChange={setRealEstateGuideOpen} />
+      <HandshakeExplainerDialog
+        open={realEstateGuideOpen}
+        onOpenChange={setRealEstateGuideOpen}
+        hideNextTime={hideHandshakeExplainer}
+        onHideNextTimeChange={(hidden) => {
+          setHideHandshakeExplainer(hidden);
+          setHandshakeExplainerHidden(hidden);
+        }}
+      />
 
       <BountyLiveDialog
         open={liveDialog !== null}
