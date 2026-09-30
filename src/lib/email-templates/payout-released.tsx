@@ -9,16 +9,26 @@ interface Props {
   place?: string
   credits?: number | string
   bountyUrl?: string
+  /** Formatted date the credits become withdrawable, when a hold applies. */
+  availableOn?: string
+  /** Length of the security hold in days, when one applies. */
+  holdDays?: number | string
 }
 
-const Email = ({ hunterName, bountyTitle, place, credits, bountyUrl }: Props) => (
+const Email = ({ hunterName, bountyTitle, place, credits, bountyUrl, availableOn, holdDays }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Your payout has been released — credits are in your wallet.</Preview>
+    <Preview>
+      {availableOn
+        ? `Your payout was approved — credits can be cashed out on ${availableOn}.`
+        : 'Your payout has been released — credits are in your wallet.'}
+    </Preview>
     <Body style={main}>
       <Container style={container}>
         <Text style={brand}>ONLOOKER</Text>
-        <Heading style={heading}>Your payout is on its way 🎉</Heading>
+        <Heading style={heading}>
+          {availableOn ? 'Your credits are on their way 🎉' : 'Your payout is on its way 🎉'}
+        </Heading>
         <Text style={text}>{hunterName ? `Hi ${hunterName},` : 'Hi there,'}</Text>
         <Text style={text}>
           Great news — the Poster approved your footage and released the payout
@@ -31,11 +41,31 @@ const Email = ({ hunterName, bountyTitle, place, credits, bountyUrl }: Props) =>
         </Text>
         <Section style={amountBox}>
           <Text style={amount}>{credits ?? ''} credits</Text>
-          <Text style={amountNote}>Added to your Onlooker wallet</Text>
+          <Text style={amountNote}>
+            {availableOn
+              ? `Available to cash out on ${availableOn}`
+              : 'Added to your Onlooker wallet'}
+          </Text>
         </Section>
-        <Text style={text}>
-          You can cash out your credits any time from your wallet, or use them to post your own bounties.
-        </Text>
+        {availableOn ? (
+          <>
+            <Text style={text}>
+              These credits are in your wallet but held for a short security review
+              {holdDays ? <> ({holdDays} days)</> : null}, so they can&rsquo;t be cashed out until{' '}
+              <strong>{availableOn}</strong>. You&rsquo;ll see them under &ldquo;On hold&rdquo; on
+              your Balance &amp; Cashout screen until then, and they move to &ldquo;Available to
+              withdraw&rdquo; automatically.
+            </Text>
+            <Text style={text}>
+              You can still use them right away to post your own bounties.
+            </Text>
+          </>
+        ) : (
+          <Text style={text}>
+            You can cash out your credits any time from your wallet, or use them to post your own
+            bounties.
+          </Text>
+        )}
         {bountyUrl ? (
           <Button style={button} href={bountyUrl}>
             View the bounty
