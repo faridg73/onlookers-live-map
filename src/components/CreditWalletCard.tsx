@@ -72,8 +72,10 @@ export function CreditWalletCard() {
         <span className="text-sm text-muted-foreground">credits</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Send credits to onlookers who film for you, 20% platform fee applies to each transfer.
+        Tip onlookers directly from their posts or live clips. A 20% platform fee applies to each
+        transfer.
       </p>
+
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div className="rounded-xl border border-border bg-surface px-3 py-2">
