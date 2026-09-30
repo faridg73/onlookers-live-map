@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Component, type ReactNode } from "react";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 
 /**
