@@ -232,7 +232,8 @@ export function CreditPayoutDashboard() {
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
+        {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00). A
+        one-time ID check fee ($0.50 US, $1.50 elsewhere) comes out of your first cash out only.
       </p>
 
       {hold && (
