@@ -221,7 +221,19 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
 
   const claim = useCallback((id: string) => {
     setRequests((prev) =>
-      prev.map((r) => (r.id === id && !isClosed(r) ? { ...r, status: "claimed" as const, responses: r.responses + 1 } : r)),
+      prev.map((r) =>
+        r.id === id && !isClosed(r)
+          ? {
+              ...r,
+              status: "claimed" as const,
+              responses: r.responses + 1,
+              // The claimer is this device, so unlock their submission controls
+              // immediately instead of waiting for the next 30s refresh.
+              claimedByMe: true,
+              myClaimStatus: r.myClaimStatus ?? "in_progress",
+            }
+          : r,
+      ),
     );
   }, []);
 
