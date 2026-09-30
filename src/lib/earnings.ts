@@ -56,16 +56,22 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
   const balance = wallet?.credit_balance ?? 0;
   const summary: EarningsSummary = { ...EMPTY, availableCredits: balance };
 
-  // The wallet balance still contains credits inside a security hold, so the
-  // Earn tab must subtract them. The cash-out status is the preferred source,
-  // but a failed or empty response used to silently fall back to the full
-  // balance and over-report what was spendable. The ledger is read directly as
-  // a second opinion, and the larger hold always wins: this figure is never
-  // allowed to exceed the amount that can actually be withdrawn.
+  // The wallet balance still contains credits inside a security hold, so every
+  // "available to cash out" figure must subtract them. This uses the exact same
+  // cash-out status as the payout dashboard so the two can never disagree, and
+  // reads the ledger as a second opinion. Values arrive as JSON, so they are
+  // coerced rather than type-checked (a string "39" used to be ignored, which
+  // silently reported the whole wallet as spendable), and the smallest
+  // available figure always wins.
   let held = 0;
   const { data: cashout, error: cashoutError } = await supabase.rpc("my_cashout_status" as never);
-  const status = cashout as { on_hold?: number } | null;
-  if (status && typeof status.on_hold === "number") held = Number(status.on_hold) || 0;
+  const status = cashout as { on_hold?: number | string; available?: number | string } | null;
+  if (status) {
+    const statusHeld = Number(status.on_hold);
+    if (Number.isFinite(statusHeld)) held = Math.max(held, statusHeld);
+    const statusAvailable = Number(status.available);
+    if (Number.isFinite(statusAvailable)) held = Math.max(held, balance - statusAvailable);
+  }
   if (cashoutError) console.warn("[earnings] cash-out status unavailable", cashoutError.message);
 
   if (wallet?.id) {
