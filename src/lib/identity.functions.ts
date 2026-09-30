@@ -12,8 +12,38 @@ export type IdentityStatus = {
   country: string | null;
   pending: boolean;
   frozen: boolean;
+  /** True when the last ID check did not pass and the member must try again. */
+  failed?: boolean;
+  /** Plain-language reason the last check failed, when Stripe gives one. */
+  failureReason?: string;
   error?: string;
 };
+
+/** Turns a Stripe Identity failure code into wording a member can act on. */
+function failureMessage(code: string | null | undefined, fallback?: string | null): string {
+  switch (code) {
+    case "document_expired":
+      return "That ID has expired. Try again with a current, unexpired ID.";
+    case "document_unverified_other":
+    case "document_type_not_supported":
+      return "We couldn't read that document. Try again with a passport or driver's licence.";
+    case "selfie_document_missing_photo":
+    case "selfie_face_mismatch":
+      return "Your selfie didn't match the photo on the ID. Try again in good lighting.";
+    case "selfie_manipulated":
+    case "selfie_unverified_other":
+      return "We couldn't confirm your selfie. Try again with your face fully in frame.";
+    case "id_number_mismatch":
+    case "id_number_unverified_other":
+      return "Those ID details didn't match official records. Check them and try again.";
+    case "consent_declined":
+      return "You need to accept the ID check terms to continue.";
+    case "under_supported_age":
+      return "You must be 18 or older to cash out.";
+    default:
+      return fallback || "Your ID check didn't pass. You can try again.";
+  }
+}
 
 function origin(): string {
   const req = getRequest();
