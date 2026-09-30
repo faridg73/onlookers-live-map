@@ -65,7 +65,7 @@ function ForgotPasswordScreen() {
       }
       if (res?.status === "password") {
         const { error: err } = await supabase.auth.resetPasswordForEmail(addr, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${resetLinkOrigin()}/reset-password`,
         });
         if (err) throw err;
       }
