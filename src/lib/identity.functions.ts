@@ -96,8 +96,13 @@ const INTERNATIONAL_ID_FLOW: Record<"live" | "sandbox", string> = {
 /** Starts the one-time ID check. US members get a document check; others add a selfie match. */
 export const startIdentityCheck = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((input: { country: string }) =>
-    z.object({ country: z.string().trim().length(2) }).parse(input),
+  .inputValidator((input: { country: string; returnOrigin?: string }) =>
+    z
+      .object({
+        country: z.string().trim().length(2),
+        returnOrigin: z.string().trim().url().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }): Promise<{ url?: string; error?: string }> => {
     const { createStripeClient, getStripeErrorMessage, resolveStripeEnvForHost } = await import("@/lib/stripe.server");
