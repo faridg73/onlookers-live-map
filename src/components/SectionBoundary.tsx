@@ -43,7 +43,7 @@ export class SectionBoundary extends Component<
 }
 
 /** Route-level fallback that keeps navigation available instead of a dead page. */
-export function RouteErrorPanel({ error, reset }: { error: Error; reset?: () => void }) {
+export function RouteErrorPanel({ error, reset }: { error: Error; reset?: () => void } | never) {
   console.error(error);
   return (
     <div className="app-shell pb-32 pt-10">
