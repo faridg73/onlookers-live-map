@@ -115,3 +115,30 @@ export const releaseCreditHolds = createServerFn({ method: "POST" })
     const released = Number((data as { released?: number } | null)?.released ?? 0);
     return { released };
   });
+
+/**
+ * Clears the caller's ID-check state so the one-time verification (and its
+ * fee) can be tested again from scratch. Preview hosts only.
+ */
+export const resetIdentityStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    assertPreviewOnly();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        payout_identity_verified_at: null,
+        payout_identity_fee_charged_at: null,
+        payout_country: null,
+      })
+      .eq("id", context.userId);
+    if (error) throw new Error(error.message);
+    // Drop the finished Stripe session records so the app doesn't re-read them.
+    await supabaseAdmin
+      .from("payout_security_logs")
+      .delete()
+      .eq("user_id", context.userId)
+      .in("event_type", ["identity_started", "identity_verified"]);
+    return { ok: true };
+  });
