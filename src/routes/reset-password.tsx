@@ -34,22 +34,43 @@ function ResetPasswordScreen() {
 
   useEffect(() => {
     // The recovery link signs the user in with a one-time recovery session.
-    // Wait for that session before showing the new-password form.
+    // Wait for that session before showing the new-password form. Reading the
+    // link takes a moment, so keep checking briefly instead of declaring it
+    // expired on the first look.
+    let done = false;
+    const finish = (ok: boolean) => {
+      if (done) return;
+      if (ok) {
+        done = true;
+        setReady(true);
+        setChecking(false);
+        return;
+      }
+      done = true;
+      setChecking(false);
+    };
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-        setReady(true);
-        setChecking(false);
-      }
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") finish(true);
     });
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setReady(true);
-      }
-      setChecking(false);
-    });
-    return () => subscription.unsubscribe();
+    let attempts = 0;
+    const poll = window.setInterval(() => {
+      attempts += 1;
+      void supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          finish(true);
+          window.clearInterval(poll);
+        } else if (attempts >= 8) {
+          finish(false);
+          window.clearInterval(poll);
+        }
+      });
+    }, 400);
+    return () => {
+      window.clearInterval(poll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function submit(e: React.FormEvent) {
