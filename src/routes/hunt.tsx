@@ -3,6 +3,7 @@ import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-
 import { useEffect, useMemo, useState } from "react";
 import { Bell, Camera, ChevronDown, Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
 import { EarnAccordionRow } from "@/components/EarnAccordionRow";
+import { AuthMapBackdrop } from "@/components/AuthMapBackdrop";
 import { useAuth } from "@/hooks/use-auth";
 import { creditsToUsdValue, fetchMyEarnings, usd, type EarningsSummary } from "@/lib/earnings";
 import { WalletSnapshot } from "@/components/WalletSnapshot";
@@ -463,6 +464,8 @@ function HuntScreen() {
       </div>
 
       <MyBountyVideos />
+
+      <AuthMapBackdrop />
     </div>
   );
 }
