@@ -13,8 +13,10 @@ export type EarningsSummary = {
   netCredits: number;
   /** How many payouts/earning events make up the total. */
   entries: number;
-  /** Credits sitting in the wallet right now. */
+  /** Credits that can actually be cashed out right now (holds excluded). */
   availableCredits: number;
+  /** Credits still inside a security hold and not yet spendable. */
+  onHoldCredits: number;
   /** Credits already redeemed for cash (completed payouts). */
   cashedOutCredits: number;
   cashedOutUsd: number;
