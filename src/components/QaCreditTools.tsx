@@ -21,6 +21,7 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
   const grant = useServerFn(grantTestCredits);
   const release = useServerFn(releaseCreditHolds);
   const resetThrottle = useServerFn(resetCashoutThrottle);
+  const simulate = useServerFn(simulateBountyPayout);
   const [enabled, setEnabled] = useState(false);
   const [credits, setCredits] = useState("100");
   const [onHold, setOnHold] = useState(false);
@@ -68,6 +69,19 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
       await onChanged();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not end the hold");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function runSimulatedBounty() {
+    setBusy(true);
+    try {
+      const result = await simulate({ data: { credits: 20 } });
+      toast.success(`Test bounty approved: ${result.net} credits earned and placed on the 3-day hold.`);
+      await onChanged();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not run the test bounty");
     } finally {
       setBusy(false);
     }
@@ -122,6 +136,15 @@ export function QaCreditTools({ onChanged }: { onChanged: () => void | Promise<v
         />
         Put these on the 3-day hold instead of available
       </label>
+
+      <button
+        type="button"
+        onClick={() => void runSimulatedBounty()}
+        disabled={busy}
+        className="mt-3 w-full rounded-xl border border-signal/60 bg-signal/10 px-3 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
+      >
+        Simulate a completed bounty payout (20 credits)
+      </button>
 
       <button
         type="button"
