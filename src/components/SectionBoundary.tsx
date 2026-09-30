@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { Component, type ReactNode } from "react";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 
 /**
@@ -43,7 +44,7 @@ export class SectionBoundary extends Component<
 }
 
 /** Route-level fallback that keeps navigation available instead of a dead page. */
-export function RouteErrorPanel({ error, reset }: { error: Error; reset?: () => void }) {
+export function RouteErrorPanel({ error, reset }: ErrorComponentProps) {
   console.error(error);
   return (
     <div className="app-shell pb-32 pt-10">

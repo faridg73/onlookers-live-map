@@ -52,6 +52,7 @@ export function CreditPayoutDashboard() {
     frozen_at?: string | null;
     test_mode?: boolean;
   } | null>(null);
+  const [holdDays, setHoldDays] = useState<number | null>(null);
   const freezeAccount = useServerFn(freezeMyAccount);
   const [confirmFreeze, setConfirmFreeze] = useState(false);
 
@@ -70,6 +71,23 @@ export function CreditPayoutDashboard() {
       setPayouts(await listCreditPayouts());
       const { data: holdData } = await supabase.rpc("my_cashout_status" as never);
       setHold((holdData as never) ?? null);
+
+      // A hold is normally 3 days, but a payout flagged by self-dealing checks
+      // is held for 7. The label must state the real length for these credits,
+      // so it is measured from the payout records still waiting to clear.
+      const { data: pending } = await supabase
+        .from("credit_transactions")
+        .select("created_at, available_at")
+        .eq("receiver_wallet_id", wallet.id)
+        .gt("available_at", new Date().toISOString());
+      const lengths = (pending ?? [])
+        .map((row) => {
+          if (!row.created_at || !row.available_at) return 0;
+          const ms = new Date(row.available_at).getTime() - new Date(row.created_at).getTime();
+          return Math.round(ms / 86_400_000);
+        })
+        .filter((days) => days > 0);
+      setHoldDays(lengths.length ? Math.max(...lengths) : null);
       try {
         setIdentity(await loadIdentity());
       } catch {
@@ -166,7 +184,7 @@ export function CreditPayoutDashboard() {
       return;
     }
     if (hold && value > hold.available) {
-      toast.error(`Only ${hold.available} Credits have cleared the 3-day hold so far.`);
+      toast.error(`Only ${hold.available} Credits have cleared the security hold so far.`);
       return;
     }
     if (credits !== null && value > credits) {
@@ -187,7 +205,7 @@ export function CreditPayoutDashboard() {
           : message.includes("PAYOUT_COOLDOWN")
             ? "Cash-outs are paused for a short while after payout details change."
             : message.includes("ON_HOLD")
-              ? "Some of these Credits are still in their 3-day security hold."
+              ? `Some of these Credits are still in their ${holdDays ? `${holdDays}-day ` : ""}security hold.`
               : message,
       );
     } finally {
@@ -241,7 +259,9 @@ export function CreditPayoutDashboard() {
             </p>
           </div>
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
-            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">On hold (3-day security)</p>
+            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+              {holdDays ? `On hold (${holdDays}-day security review)` : "On hold (security review)"}
+            </p>
             <p className="mt-0.5 text-sm font-bold text-foreground">
               {hold.on_hold} · ${creditsToUsd(hold.on_hold).toFixed(2)}
             </p>
