@@ -1,8 +1,10 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { CREDITS_PER_USD, PLATFORM_FEE_RATE, creditsToUsdValue } from "@/lib/credits";
+import { fetchCashoutBalance, holdLabel } from "@/lib/cashout-balance";
 
-export { CREDITS_PER_USD, PLATFORM_FEE_RATE, creditsToUsdValue };
+export { CREDITS_PER_USD, PLATFORM_FEE_RATE, creditsToUsdValue, holdLabel };
+
 
 export type EarningsSummary = {
   /** Credits earned before the platform fee. */
@@ -17,6 +19,9 @@ export type EarningsSummary = {
   availableCredits: number;
   /** Credits still inside a security hold and not yet spendable. */
   onHoldCredits: number;
+  /** Real length of the active hold in days (3 normally, 7 when flagged). */
+  holdDays: number | null;
+
   /** Credits already redeemed for cash (completed payouts). */
   cashedOutCredits: number;
   cashedOutUsd: number;
@@ -32,6 +37,8 @@ const EMPTY: EarningsSummary = {
   entries: 0,
   availableCredits: 0,
   onHoldCredits: 0,
+  holdDays: null,
+
   cashedOutCredits: 0,
   cashedOutUsd: 0,
   pendingCredits: 0,
@@ -49,43 +56,20 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
 
   const { data: wallet } = await supabase
     .from("user_credit_wallets")
-    .select("id, credit_balance")
+    .select("id")
     .eq("user_id", userId)
     .maybeSingle();
 
-  const balance = wallet?.credit_balance ?? 0;
-  const summary: EarningsSummary = { ...EMPTY, availableCredits: balance };
+  // Available / on-hold figures come from the one shared calculation so this
+  // breakdown can never disagree with the payout dashboard or wallet boxes.
+  const cashout = await fetchCashoutBalance();
+  const summary: EarningsSummary = {
+    ...EMPTY,
+    availableCredits: cashout.availableCredits,
+    onHoldCredits: cashout.onHoldCredits,
+    holdDays: cashout.holdDays,
+  };
 
-  // The wallet balance still contains credits inside a security hold, so every
-  // "available to cash out" figure must subtract them. This uses the exact same
-  // cash-out status as the payout dashboard so the two can never disagree, and
-  // reads the ledger as a second opinion. Values arrive as JSON, so they are
-  // coerced rather than type-checked (a string "39" used to be ignored, which
-  // silently reported the whole wallet as spendable), and the smallest
-  // available figure always wins.
-  let held = 0;
-  const { data: cashout, error: cashoutError } = await supabase.rpc("my_cashout_status" as never);
-  const status = cashout as { on_hold?: number | string; available?: number | string } | null;
-  if (status) {
-    const statusHeld = Number(status.on_hold);
-    if (Number.isFinite(statusHeld)) held = Math.max(held, statusHeld);
-    const statusAvailable = Number(status.available);
-    if (Number.isFinite(statusAvailable)) held = Math.max(held, balance - statusAvailable);
-  }
-  if (cashoutError) console.warn("[earnings] cash-out status unavailable", cashoutError.message);
-
-  if (wallet?.id) {
-    const { data: pending } = await supabase
-      .from("credit_transactions")
-      .select("amount_net, available_at")
-      .eq("receiver_wallet_id", wallet.id)
-      .gt("available_at", new Date().toISOString());
-    const ledgerHeld = (pending ?? []).reduce((sum, row) => sum + Number(row.amount_net ?? 0), 0);
-    held = Math.max(held, ledgerHeld);
-  }
-
-  summary.onHoldCredits = Math.min(Math.max(Math.round(held), 0), balance);
-  summary.availableCredits = Math.max(balance - summary.onHoldCredits, 0);
 
   if (wallet?.id) {
     const { data: rows } = await supabase
