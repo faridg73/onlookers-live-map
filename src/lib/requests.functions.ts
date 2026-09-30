@@ -421,6 +421,10 @@ export type ActiveRequestRow = {
   scheduledStartAt: string | null;
   /** Filming-conditions premium already priced into the bounty. */
   weatherMultiplier: number;
+  /** True when the signed-in onlooker is the hunter holding this claim. */
+  claimedByMe: boolean;
+  /** Status of the caller's own claim: in_progress, submitted or approved. */
+  myClaimStatus: string | null;
 };
 
 /**
@@ -442,7 +446,26 @@ export const listActiveRequests = createServerFn({ method: "GET" })
 
     if (error) throw new Error(error.message);
 
-    return (data ?? []).map((row) => ({
+    const rows = data ?? [];
+
+    // The hunter who claimed a bounty needs to recognise it as their own job,
+    // otherwise the claim looks like a dead end with no way to submit footage.
+    const myClaims = new Map<string, string>();
+    if (rows.length > 0) {
+      const { data: claimRows } = await context.supabase
+        .from("claims")
+        .select("request_id, status")
+        .eq("spotter_id", context.userId)
+        .in(
+          "request_id",
+          rows.map((row) => row.id),
+        );
+      for (const claim of claimRows ?? []) {
+        myClaims.set(claim.request_id as string, String(claim.status));
+      }
+    }
+
+    return rows.map((row) => ({
       id: row.id,
       requesterId: row.requester_id,
       prompt: row.prompt,
@@ -462,6 +485,8 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       captureMinutes: Number(row.custom_duration_minutes ?? row.duration_minutes ?? 5),
       scheduledStartAt: row.scheduled_start_at ?? null,
       weatherMultiplier: Number(row.weather_multiplier ?? 1),
+      claimedByMe: myClaims.has(row.id),
+      myClaimStatus: myClaims.get(row.id) ?? null,
     }));
   });
 

@@ -273,6 +273,10 @@ export type LiveRequest = {
   weatherMultiplier?: number | undefined;
   /** Declared location type: public, commercial, event_venue or owner_authorized */
   locationType?: string | undefined;
+  /** True when the signed-in onlooker is the hunter holding this claim */
+  claimedByMe?: boolean | undefined;
+  /** The caller's own claim status: in_progress, submitted or approved */
+  myClaimStatus?: string | undefined;
 };
 
 export type MapPosition = { lat: number; lng: number };

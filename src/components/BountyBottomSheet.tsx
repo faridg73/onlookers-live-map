@@ -78,6 +78,8 @@ export function BountyBottomSheet({
   const closed = isClosed(request);
   const isPoster = request.requester === "you";
   const claimable = !closed && !isPoster && request.status === "open";
+  /** Already claimed by this hunter: the camera is the next step, not a claim. */
+  const mineToSubmit = !closed && !isPoster && Boolean(request.claimedByMe);
   /** Funded pins ask for a live stream; everything else takes a recorded clip. */
   const wantsLive = request.bountyType === "live_stream";
 
@@ -258,8 +260,8 @@ export function BountyBottomSheet({
             {wantsLive && claimable && <div className="mt-4">{human.widget}</div>}
             <button
               type="button"
-              disabled={!claimable || accepting}
-              onClick={accept}
+              disabled={!claimable && !mineToSubmit ? true : accepting}
+              onClick={mineToSubmit && !claimable ? () => setCapturing(true) : accept}
               className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-signal font-display text-base font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-50"
             >
               {wantsLive ? <Radio className="size-5" /> : <Camera className="size-5" />}
@@ -268,7 +270,9 @@ export function BountyBottomSheet({
                   ? "Closed"
                   : isPoster
                     ? "This is your bounty"
-                    : "Already claimed"
+                    : mineToSubmit
+                      ? "Submit your capture"
+                      : "Already claimed"
                 : accepting
                   ? "Starting your live session…"
                   : wantsLive
