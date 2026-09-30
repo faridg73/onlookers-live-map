@@ -184,7 +184,7 @@ export function CreditPayoutDashboard() {
       return;
     }
     if (hold && value > hold.available) {
-      toast.error(`Only ${hold.available} Credits have cleared the 3-day hold so far.`);
+      toast.error(`Only ${hold.available} Credits have cleared the security hold so far.`);
       return;
     }
     if (credits !== null && value > credits) {
