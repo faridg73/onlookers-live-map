@@ -55,6 +55,16 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
 
   const summary: EarningsSummary = { ...EMPTY, availableCredits: wallet?.credit_balance ?? 0 };
 
+  // The wallet balance still contains credits inside a security hold. The
+  // cash-out status is the single source of truth for what is spendable now,
+  // so the Earn tab never shows held funds as available.
+  const { data: cashout } = await supabase.rpc("my_cashout_status" as never);
+  const status = cashout as { available?: number; on_hold?: number } | null;
+  if (status && typeof status.available === "number") {
+    summary.availableCredits = Number(status.available) || 0;
+    summary.onHoldCredits = Number(status.on_hold ?? 0) || 0;
+  }
+
   if (wallet?.id) {
     const { data: rows } = await supabase
       .from("credit_transactions")
