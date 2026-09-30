@@ -110,7 +110,7 @@ function VerificationScreen() {
   return (
     <div className="bg-background">
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-4 sm:px-6">
-        <PageBackButton label="Home" fallback="/" />
+        <PageBackButton label="Back" fallback="/post" />
 
         {/* Hero */}
         <header className="relative mt-6 overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-5 pb-7 pt-6 text-center sm:px-10">

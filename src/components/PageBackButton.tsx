@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 type PageBackButtonProps = {
   label: string;
-  fallback?: "/" | "/profile" | "/discover";
+  fallback?: "/" | "/profile" | "/discover" | "/post";
   className?: string;
 };
 
@@ -27,7 +27,7 @@ export function PageBackButton({ label, fallback = "/", className }: PageBackBut
       type="button"
       variant="secondary"
       onClick={goBack}
-      aria-label={`Back to ${label}`}
+      aria-label={label.toLowerCase() === "back" ? "Go back" : `Back to ${label}`}
       className={`h-11 min-w-11 rounded-full border border-border bg-secondary/80 px-3 text-sm font-bold text-foreground shadow-sm ${className ?? ""}`}
     >
       <ArrowLeft className="size-5 text-signal" aria-hidden />

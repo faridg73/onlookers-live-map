@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Link, createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { scrollFieldToStart } from "@/lib/field-scroll";
@@ -1006,16 +1006,35 @@ function PostScreen() {
                     until the visit is verified.
                   </span>
                   <span className="mt-2 block text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                    Built for real estate · <span className="text-signal">See how the handshake works →</span>
+                    Built for real estate ·{" "}
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setRealEstateGuideOpen(true);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setRealEstateGuideOpen(true);
+                        }
+                      }}
+                      className="cursor-pointer text-signal underline decoration-signal/50 underline-offset-2"
+                    >
+                      See how the handshake works →
+                    </span>
                   </span>
                 </span>
               </button>
-              <Link
-                to="/verification"
-                className="block rounded-xl border border-border bg-background px-4 py-3 text-center text-sm font-extrabold text-foreground transition-colors hover:border-signal hover:text-signal"
+              <button
+                type="button"
+                onClick={() => setRealEstateGuideOpen(true)}
+                className="block w-full rounded-xl border border-border bg-background px-4 py-3 text-center text-sm font-extrabold text-foreground transition-colors hover:border-signal hover:text-signal"
               >
                 How the Onlooker Handshake works
-              </Link>
+              </button>
             </div>
           </div>
         )}
