@@ -31,6 +31,7 @@ function ResetPasswordScreen() {
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [linkProblem, setLinkProblem] = useState<string | null>(null);
 
   useEffect(() => {
     // The emailed link carries a one-time recovery sign-in. Depending on how
@@ -153,8 +154,9 @@ function ResetPasswordScreen() {
       ) : !ready ? (
         <div className="mt-4 space-y-3">
           <p className="text-sm text-muted-foreground">
-            This reset link has expired or was already used. Request a fresh one from the sign-in
-            page.
+            {linkProblem
+              ? `${linkProblem} Request a fresh link from the sign-in page.`
+              : "This reset link has expired or was already used. Request a fresh one from the sign-in page."}
           </p>
           <button
             type="button"
