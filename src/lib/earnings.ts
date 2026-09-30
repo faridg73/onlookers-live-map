@@ -53,17 +53,33 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
     .eq("user_id", userId)
     .maybeSingle();
 
-  const summary: EarningsSummary = { ...EMPTY, availableCredits: wallet?.credit_balance ?? 0 };
+  const balance = wallet?.credit_balance ?? 0;
+  const summary: EarningsSummary = { ...EMPTY, availableCredits: balance };
 
-  // The wallet balance still contains credits inside a security hold. The
-  // cash-out status is the single source of truth for what is spendable now,
-  // so the Earn tab never shows held funds as available.
-  const { data: cashout } = await supabase.rpc("my_cashout_status" as never);
-  const status = cashout as { available?: number; on_hold?: number } | null;
-  if (status && typeof status.available === "number") {
-    summary.availableCredits = Number(status.available) || 0;
-    summary.onHoldCredits = Number(status.on_hold ?? 0) || 0;
+  // The wallet balance still contains credits inside a security hold, so the
+  // Earn tab must subtract them. The cash-out status is the preferred source,
+  // but a failed or empty response used to silently fall back to the full
+  // balance and over-report what was spendable. The ledger is read directly as
+  // a second opinion, and the larger hold always wins: this figure is never
+  // allowed to exceed the amount that can actually be withdrawn.
+  let held = 0;
+  const { data: cashout, error: cashoutError } = await supabase.rpc("my_cashout_status" as never);
+  const status = cashout as { on_hold?: number } | null;
+  if (status && typeof status.on_hold === "number") held = Number(status.on_hold) || 0;
+  if (cashoutError) console.warn("[earnings] cash-out status unavailable", cashoutError.message);
+
+  if (wallet?.id) {
+    const { data: pending } = await supabase
+      .from("credit_transactions")
+      .select("amount_net, available_at")
+      .eq("receiver_wallet_id", wallet.id)
+      .gt("available_at", new Date().toISOString());
+    const ledgerHeld = (pending ?? []).reduce((sum, row) => sum + Number(row.amount_net ?? 0), 0);
+    held = Math.max(held, ledgerHeld);
   }
+
+  summary.onHoldCredits = Math.min(Math.max(Math.round(held), 0), balance);
+  summary.availableCredits = Math.max(balance - summary.onHoldCredits, 0);
 
   if (wallet?.id) {
     const { data: rows } = await supabase
