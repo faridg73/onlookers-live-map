@@ -232,7 +232,8 @@ export function CreditPayoutDashboard() {
         </span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00).
+        {CREDITS_PER_USD} Credits = $1.00 USD. Cash out from {MIN_CASHOUT_CREDITS} credits ($10.00). A
+        one-time ID check fee ($0.50 US, $1.50 elsewhere) comes out of your first cash out only.
       </p>
 
       {hold && (
@@ -313,6 +314,15 @@ export function CreditPayoutDashboard() {
             <p className="mt-3 text-xs font-semibold text-signal">Your ID is being reviewed. This usually takes a few minutes.</p>
           ) : (
             <>
+              {identity.failed && (
+                <div className="mt-3 rounded-xl border border-urgent/40 bg-urgent/10 p-3">
+                  <p className="text-xs font-bold text-foreground">Your ID check didn&apos;t pass</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {identity.failureReason ?? "You can try again."} Cash-outs stay locked until a check passes.
+                    You are not charged for a failed attempt.
+                  </p>
+                </div>
+              )}
               <select
                 value={idCountry}
                 onChange={(event) => setIdCountry(event.target.value)}
@@ -329,7 +339,7 @@ export function CreditPayoutDashboard() {
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-sm font-bold text-signal-foreground disabled:opacity-60"
               >
                 {busy ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
-                Verify my ID
+                {identity.failed ? "Try the ID check again" : "Verify my ID"}
               </button>
             </>
           )}
