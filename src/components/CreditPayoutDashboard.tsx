@@ -375,7 +375,7 @@ export function CreditPayoutDashboard() {
           {coolingDown && cooldownUntil && (
             <p className="mt-2 text-xs font-semibold text-signal">
               Your payout details changed recently. For your safety, cash-outs unlock {fmtTime(cooldownUntil)}.
-              {hold?.test_mode ? " (Test mode: 2-minute wait.)" : ""}
+              {hold?.testMode ? " (Test mode: 2-minute wait.)" : ""}
             </p>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
