@@ -166,9 +166,10 @@ export function CreditPayoutDashboard() {
       toast.error(`Minimum cash out is ${MIN_CASHOUT_CREDITS} Credits ($10.00)`);
       return;
     }
-    if (hold && value > hold.available) {
-      toast.error(`Only ${hold.available} Credits have cleared the security hold so far.`);
+    if (hold && value > hold.availableCredits) {
+      toast.error(`Only ${hold.availableCredits} Credits have cleared the security hold so far.`);
       return;
+
     }
     if (credits !== null && value > credits) {
       toast.error("Insufficient Credits");
@@ -188,7 +189,7 @@ export function CreditPayoutDashboard() {
           : message.includes("PAYOUT_COOLDOWN")
             ? "Cash-outs are paused for a short while after payout details change."
             : message.includes("ON_HOLD")
-              ? `Some of these Credits are still in their ${holdDays ? `${holdDays}-day ` : ""}security hold.`
+              ? `Some of these Credits are still in their ${hold?.holdDays ? `${hold.holdDays}-day ` : ""}security hold.`
               : message,
       );
     } finally {
@@ -198,13 +199,14 @@ export function CreditPayoutDashboard() {
 
   if (credits === null) return null;
 
-  const available = hold ? hold.available : credits;
+  const available = hold ? hold.availableCredits : credits;
   const canCashOut = available >= MIN_CASHOUT_CREDITS;
   const idFeeUsd =
     identity?.verified && !identity.feeCharged ? (identity.country === "US" ? 0.5 : 1.5) : 0;
-  const cooldownUntil = hold?.cooldown_until ? new Date(hold.cooldown_until) : null;
+  const cooldownUntil = hold?.cooldownUntil ? new Date(hold.cooldownUntil) : null;
   const coolingDown = cooldownUntil !== null && cooldownUntil.getTime() > Date.now();
-  const frozen = Boolean(hold?.frozen_at) || Boolean(identity?.frozen);
+  const frozen = Boolean(hold?.frozenAt) || Boolean(identity?.frozen);
+
   const fmtTime = (d: Date) =>
     d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
