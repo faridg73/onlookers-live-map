@@ -1014,27 +1014,6 @@ function PostScreen() {
                     the onlooker with a one-tap link before filming — payment held in escrow
                     until the visit is verified.
                   </span>
-                  <span className="mt-2 block text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                    Built for real estate ·{" "}
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setRealEstateGuideOpen(true);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          setRealEstateGuideOpen(true);
-                        }
-                      }}
-                      className="cursor-pointer text-signal underline decoration-signal/50 underline-offset-2"
-                    >
-                      See how the handshake works →
-                    </span>
-                  </span>
                 </span>
               </button>
               <button
