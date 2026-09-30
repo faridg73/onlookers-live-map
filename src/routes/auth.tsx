@@ -602,14 +602,12 @@ function AuthScreen() {
         />
         {mode === "signin" ? (
           <div className="px-1 text-right">
-            <button
-              type="button"
-              onClick={() => void sendPasswordReset()}
-              disabled={busy}
-              className="text-xs text-muted-foreground underline-offset-4 hover:underline disabled:opacity-50"
+            <Link
+              to="/forgot-password"
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
             >
-              Forgot your password?
-            </button>
+              Forgot password?
+            </Link>
           </div>
         ) : null}
         {mode === "signup" ? (
