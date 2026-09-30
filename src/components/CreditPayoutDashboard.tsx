@@ -259,7 +259,9 @@ export function CreditPayoutDashboard() {
             </p>
           </div>
           <div className="rounded-xl border border-border bg-surface px-3 py-2">
-            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">On hold (3-day security)</p>
+            <p className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+              {holdDays ? `On hold (${holdDays}-day security review)` : "On hold (security review)"}
+            </p>
             <p className="mt-0.5 text-sm font-bold text-foreground">
               {hold.on_hold} · ${creditsToUsd(hold.on_hold).toFixed(2)}
             </p>
