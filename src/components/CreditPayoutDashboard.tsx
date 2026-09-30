@@ -205,7 +205,7 @@ export function CreditPayoutDashboard() {
           : message.includes("PAYOUT_COOLDOWN")
             ? "Cash-outs are paused for a short while after payout details change."
             : message.includes("ON_HOLD")
-              ? "Some of these Credits are still in their 3-day security hold."
+              ? `Some of these Credits are still in their ${holdDays ? `${holdDays}-day ` : ""}security hold.`
               : message,
       );
     } finally {
