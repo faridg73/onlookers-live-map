@@ -465,7 +465,7 @@ function HuntScreen() {
 
       <MyBountyVideos />
 
-      <AuthMapBackdrop />
+      <AuthMapBackdrop interactive />
     </div>
   );
 }
