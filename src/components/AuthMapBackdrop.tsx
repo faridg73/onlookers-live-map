@@ -20,7 +20,7 @@ export function AuthMapBackdrop({ interactive = false }: { interactive?: boolean
     loadGoogleMaps()
       .then((maps) => {
         if (cancelled || !holder.current) return;
-        new maps.Map(holder.current, {
+        const map = new maps.Map(holder.current, {
           center: FALLBACK,
           zoom: 12,
           mapTypeId: "hybrid",
@@ -46,6 +46,17 @@ export function AuthMapBackdrop({ interactive = false }: { interactive?: boolean
                 disableDoubleClickZoom: true,
               }),
         });
+        if (interactive && typeof navigator !== "undefined" && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              if (cancelled) return;
+              map.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+              map.setZoom(14);
+            },
+            () => undefined,
+            { timeout: 8000, maximumAge: 300_000 },
+          );
+        }
       })
       .catch(() => setFailed(true));
     return () => {
