@@ -125,20 +125,9 @@ export const resetIdentityStatus = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     assertPreviewOnly();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        payout_identity_verified_at: null,
-        payout_identity_fee_charged_at: null,
-        payout_country: null,
-      })
-      .eq("id", context.userId);
+    const { error } = await supabaseAdmin.rpc("qa_reset_identity_status" as never, {
+      _uid: context.userId,
+    } as never);
     if (error) throw new Error(error.message);
-    // Drop the finished Stripe session records so the app doesn't re-read them.
-    await supabaseAdmin
-      .from("payout_security_logs")
-      .delete()
-      .eq("user_id", context.userId)
-      .in("event_type", ["identity_started", "identity_verified"]);
     return { ok: true };
   });
