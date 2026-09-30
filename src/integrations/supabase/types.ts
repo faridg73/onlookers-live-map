@@ -2735,6 +2735,7 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: number
       }
+      auth_providers_for_email: { Args: { _email: string }; Returns: string[] }
       authorize_site_pin_resend: {
         Args: { _request_id: string }
         Returns: Json
