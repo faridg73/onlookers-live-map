@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleOff, HandCoins, Loader2, Radar, ShieldCheck } from "lucide-react";
+import { Camera, CircleOff, HandCoins, Loader2, Radar, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { RequestCard } from "@/components/RequestCard";
 import { BoostBounty } from "@/components/BoostBounty";
+import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { InstantSnippetButton } from "@/components/InstantSnippetButton";
 import { isClosed } from "@/lib/onlooker-store";
 import { useBoosts } from "@/lib/boosts-store";
@@ -163,23 +164,33 @@ export function BountyDetailsDialog({
 
           <InstantSnippetButton request={request} userPosition={userPosition} autoStart={autoSnap} />
 
-          <Button
-            type="button"
-            disabled={!claimable || checking}
-            className="mt-2 h-12 w-full rounded-xl font-bold"
-            onClick={() => void beginClaim()}
-          >
-            <ShieldCheck className="mr-2 size-4" />
-            {checking
-              ? "Checking availability…"
-              : request.status === "expired"
-                ? "Expired"
-                : done
-                  ? "Closed"
-                  : request.status === "claimed"
-                    ? "Already claimed"
-                    : "Claim this bounty"}
-          </Button>
+          {request.claimedByMe && !done ? (
+            /* The hunter holding this claim needs the submission step, not a
+               dead "Already claimed" button. */
+            <BountyVideoDialog request={request}>
+              <Button type="button" className="mt-2 h-12 w-full rounded-xl font-bold">
+                <Camera className="mr-2 size-4" /> Submit your capture
+              </Button>
+            </BountyVideoDialog>
+          ) : (
+            <Button
+              type="button"
+              disabled={!claimable || checking}
+              className="mt-2 h-12 w-full rounded-xl font-bold"
+              onClick={() => void beginClaim()}
+            >
+              <ShieldCheck className="mr-2 size-4" />
+              {checking
+                ? "Checking availability…"
+                : request.status === "expired"
+                  ? "Expired"
+                  : done
+                    ? "Closed"
+                    : request.status === "claimed"
+                      ? "Already claimed"
+                      : "Claim this bounty"}
+            </Button>
+          )}
         </DialogContent>
       </Dialog>
 
