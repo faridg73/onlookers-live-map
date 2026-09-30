@@ -62,6 +62,46 @@ export const resetCashoutThrottle = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const QA_POSTER_EMAIL = "qa-poster@onlooker.test";
+
+/**
+ * Runs a whole test bounty (posted, claimed, clip submitted, approved) so the
+ * caller earns credits through the real approval money path. The earning lands
+ * on the 3-day security hold like any genuine payout.
+ */
+export const simulateBountyPayout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ credits: z.number().int().min(1).max(1000) }).parse(data))
+  .handler(async ({ data, context }) => {
+    assertPreviewOnly();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const run = async () =>
+      supabaseAdmin.rpc("qa_simulate_bounty_payout" as never, {
+        _hunter: context.userId,
+        _bounty: data.credits,
+      } as never);
+
+    let { data: result, error } = await run();
+    if (error?.message?.includes("qa_poster_missing")) {
+      // The simulator needs a second account to post the bounty; create it once.
+      const created = await supabaseAdmin.auth.admin.createUser({
+        email: QA_POSTER_EMAIL,
+        password: crypto.randomUUID(),
+        email_confirm: true,
+        user_metadata: { username: "qa_poster", full_name: "QA Test Poster" },
+      });
+      if (created.error && !/already/i.test(created.error.message)) {
+        throw new Error(created.error.message);
+      }
+      ({ data: result, error } = await run());
+    }
+    if (error) throw new Error(error.message);
+
+    const row = (result ?? {}) as { net?: number; available_at?: string | null };
+    return { net: Number(row.net ?? 0), availableAt: row.available_at ?? null };
+  });
+
 /** Ends the 3-day hold on the caller's held credits right away. */
 export const releaseCreditHolds = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
