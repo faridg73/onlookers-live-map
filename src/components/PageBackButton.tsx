@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 type PageBackButtonProps = {
   label: string;
-  fallback?: "/" | "/profile" | "/discover";
+  fallback?: "/" | "/profile" | "/discover" | "/post";
   className?: string;
 };
 
