@@ -22,6 +22,7 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as HuntRouteImport } from './routes/hunt'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as MembershipRouteImport } from './routes/membership'
@@ -118,6 +119,11 @@ const FaqRoute = FaqRouteImport.update({
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HuntRoute = HuntRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/membership': typeof MembershipRoute
@@ -346,6 +353,7 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/membership': typeof MembershipRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/feed': typeof FeedRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/hunt': typeof HuntRoute
   '/leaderboard': typeof LeaderboardRoute
   '/membership': typeof MembershipRoute
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/forgot-password'
     | '/hunt'
     | '/leaderboard'
     | '/membership'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/forgot-password'
     | '/hunt'
     | '/leaderboard'
     | '/membership'
@@ -537,6 +548,7 @@ export interface FileRouteTypes {
     | '/explore'
     | '/faq'
     | '/feed'
+    | '/forgot-password'
     | '/hunt'
     | '/leaderboard'
     | '/membership'
@@ -585,6 +597,7 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   FeedRoute: typeof FeedRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HuntRoute: typeof HuntRoute
   LeaderboardRoute: typeof LeaderboardRoute
   MembershipRoute: typeof MembershipRoute
@@ -710,6 +723,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hunt': {
@@ -953,6 +973,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   FeedRoute: FeedRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HuntRoute: HuntRoute,
   LeaderboardRoute: LeaderboardRoute,
   MembershipRoute: MembershipRoute,
