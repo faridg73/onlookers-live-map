@@ -121,7 +121,7 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const common = {
         metadata: { userId: context.userId, country, kind },
         client_reference_id: context.userId,
-        return_url: `${origin()}/balance?id_check=done`,
+        return_url: `${origin(data.returnOrigin)}/balance?id_check=done`,
       };
       // US: ID-number lookup only (no document, no selfie).
       // International: the reusable document + live selfie flow set up in Stripe.
