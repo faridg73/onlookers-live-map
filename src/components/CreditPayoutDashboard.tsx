@@ -90,6 +90,14 @@ export function CreditPayoutDashboard() {
 
   useEffect(() => {
     void refresh();
+    // Coming back from the ID check: confirm the result, then tidy the address
+    // bar so the marker doesn't stick around on later visits.
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("id_check")) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("id_check");
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+      toast.info("Checking your ID result…");
+    }
   }, [refresh]);
 
   async function connectBank() {
@@ -115,7 +123,11 @@ export function CreditPayoutDashboard() {
   async function startIdCheck() {
     setBusy(true);
     try {
-      const result = await beginIdentity({ data: { country: idCountry } });
+      // Send the origin the member is actually browsing, so Stripe returns
+      // them to this site instead of the server's own localhost address.
+      const result = await beginIdentity({
+        data: { country: idCountry, returnOrigin: window.location.origin },
+      });
       if (result.error || !result.url) throw new Error(result.error ?? "Could not open the ID check");
       const opened = window.open(result.url, "_blank", "noopener,noreferrer");
       if (!opened) window.location.href = result.url;

@@ -45,13 +45,41 @@ function failureMessage(code: string | null | undefined, fallback?: string | nul
   }
 }
 
-function origin(): string {
+/** Hosts we will send a member back to after Stripe. */
+function isTrustedHost(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  return (
+    h === "onlooker.io" ||
+    h === "www.onlooker.io" ||
+    h === "onlookerlive.com" ||
+    h === "www.onlookerlive.com" ||
+    h.endsWith(".lovable.app") ||
+    h.endsWith(".lovableproject.com")
+  );
+}
+
+/**
+ * The public origin to return to after the ID check. Never localhost: the
+ * server itself runs on localhost, so trusting its own URL would send members
+ * to their own machine. Prefers the browser-supplied origin when it is a host
+ * we recognise, then the proxied request host, then production.
+ */
+function origin(browserOrigin?: string | null): string {
   const req = getRequest();
-  for (const c of [req?.headers.get("origin"), req?.headers.get("referer"), req?.url]) {
+  const forwardedHost = req?.headers.get("x-forwarded-host");
+  const candidates = [
+    browserOrigin,
+    req?.headers.get("origin"),
+    req?.headers.get("referer"),
+    forwardedHost ? `https://${forwardedHost.split(",")[0]!.trim()}` : null,
+  ];
+  for (const c of candidates) {
     if (!c) continue;
     try {
       const u = new URL(c);
-      if (u.protocol === "https:" || u.hostname === "localhost") return u.origin;
+      if (u.protocol !== "https:") continue;
+      if (!isTrustedHost(u.hostname)) continue;
+      return u.origin;
     } catch {
       /* ignore */
     }
@@ -68,8 +96,13 @@ const INTERNATIONAL_ID_FLOW: Record<"live" | "sandbox", string> = {
 /** Starts the one-time ID check. US members get a document check; others add a selfie match. */
 export const startIdentityCheck = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
-  .inputValidator((input: { country: string }) =>
-    z.object({ country: z.string().trim().length(2) }).parse(input),
+  .inputValidator((input: { country: string; returnOrigin?: string }) =>
+    z
+      .object({
+        country: z.string().trim().length(2),
+        returnOrigin: z.string().trim().url().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }): Promise<{ url?: string; error?: string }> => {
     const { createStripeClient, getStripeErrorMessage, resolveStripeEnvForHost } = await import("@/lib/stripe.server");
@@ -88,7 +121,7 @@ export const startIdentityCheck = createServerFn({ method: "POST" })
       const common = {
         metadata: { userId: context.userId, country, kind },
         client_reference_id: context.userId,
-        return_url: `${origin()}/balance?id_check=done`,
+        return_url: `${origin(data.returnOrigin)}/balance?id_check=done`,
       };
       // US: ID-number lookup only (no document, no selfie).
       // International: the reusable document + live selfie flow set up in Stripe.
