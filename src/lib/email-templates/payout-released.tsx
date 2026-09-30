@@ -80,7 +80,9 @@ const Email = ({ hunterName, bountyTitle, place, credits, bountyUrl, availableOn
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `Payout released${data?.['credits'] ? `: ${data['credits']} credits` : ''} — Onlooker`,
+    data?.['availableOn']
+      ? `Payout approved${data?.['credits'] ? `: ${data['credits']} credits` : ''} — available ${data['availableOn']} — Onlooker`
+      : `Payout released${data?.['credits'] ? `: ${data['credits']} credits` : ''} — Onlooker`,
   displayName: 'Payout released',
   previewData: {
     hunterName: 'Alex',
@@ -88,6 +90,8 @@ export const template = {
     place: '255 S Olive St, Los Angeles',
     credits: 235,
     bountyUrl: 'https://onlooker.io',
+    availableOn: 'Oct 3, 2026',
+    holdDays: 3,
   },
 } satisfies TemplateEntry
 
