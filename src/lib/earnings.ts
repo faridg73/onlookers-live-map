@@ -31,6 +31,7 @@ const EMPTY: EarningsSummary = {
   netCredits: 0,
   entries: 0,
   availableCredits: 0,
+  onHoldCredits: 0,
   cashedOutCredits: 0,
   cashedOutUsd: 0,
   pendingCredits: 0,
