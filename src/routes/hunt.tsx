@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Bell, Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
+import { Bell, Camera, Clock, CoinsIcon, Navigation, Radio, X } from "lucide-react";
 import { WalletSnapshot } from "@/components/WalletSnapshot";
 import { MyEarningsCard } from "@/components/MyEarningsCard";
 import { WeeklyTopOnlookers } from "@/components/WeeklyTopOnlookers";
@@ -9,6 +9,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { MyBountyVideos } from "@/components/MyBountyVideos";
 import { RequestCard } from "@/components/RequestCard";
 import { BountyDetailsDialog } from "@/components/BountyDetailsDialog";
+import { BountyVideoDialog } from "@/components/BountyVideoDialog";
 import { HunterEarningBanner } from "@/components/HunterEarningBanner";
 import { LiveBountyMapBox, type LiveBountyPin } from "@/components/LiveBountyMapBox";
 import { UrgencyBadge } from "@/components/UrgencyBadge";
@@ -101,6 +102,19 @@ function HuntScreen() {
     [requests],
   );
 
+  /** Bounties this hunter claimed and still has to film and submit. */
+  const activeJobs = useMemo(
+    () =>
+      requests
+        .filter((r) => r.claimedByMe && r.status === "claimed")
+        .map((r) => ({
+          request: r,
+          payout: r.bounty + boostOf(r.id),
+          left: minutesLeft(r.expiresAt, r.expiresInMin),
+        })),
+    [requests, boostOf],
+  );
+
   const list = useMemo(() => {
     const withMeta = open.map((r) => ({
       request: r,
@@ -173,6 +187,41 @@ function HuntScreen() {
       <p className="mt-1 text-sm font-semibold text-signal">
         Open bounties you can claim right now, ranked for the fastest payout.
       </p>
+
+      {/* Jobs this hunter already claimed come first: without them a claim has
+          no visible route to the submission step. */}
+      {activeJobs.length > 0 && (
+        <section className="mt-4 rounded-2xl border border-signal/40 bg-signal/5 p-3">
+          <h2 className="text-[0.66rem] font-extrabold uppercase tracking-[0.12em] text-signal">
+            Active jobs you claimed
+          </h2>
+          <ul className="mt-2 space-y-2">
+            {activeJobs.map(({ request, payout, left }) => (
+              <li
+                key={request.id}
+                className="rounded-xl border border-border bg-surface p-3"
+              >
+                <p className="font-semibold text-foreground">{request.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{request.place}</p>
+                <div className="mt-1 flex items-center gap-3 text-[0.68rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                  <span className="text-signal">{formatCredits(payout)} credits</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="size-3" aria-hidden /> {left} min left
+                  </span>
+                </div>
+                <BountyVideoDialog request={request}>
+                  <button
+                    type="button"
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-signal px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
+                  >
+                    <Camera className="size-4" aria-hidden /> Submit your capture
+                  </button>
+                </BountyVideoDialog>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <WalletSnapshot />
       <MyEarningsCard />
