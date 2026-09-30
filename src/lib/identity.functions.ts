@@ -153,6 +153,15 @@ export const getIdentityStatus = createServerFn({ method: "GET" })
         const unfroze = session.metadata?.["kind"] === "account_unfreeze";
         return { ...base, verified: true, frozen: unfroze ? false : base.frozen, country: base.country ?? details.country ?? null };
       }
+      const lastError = (session as { last_error?: { code?: string | null; reason?: string | null } | null })
+        .last_error;
+      if (session.status === "requires_input" && lastError) {
+        return {
+          ...base,
+          failed: true,
+          failureReason: failureMessage(lastError.code, lastError.reason),
+        };
+      }
       return { ...base, pending: session.status === "processing" };
     } catch (error) {
       return { ...base, error: getStripeErrorMessage(error) };
