@@ -20,7 +20,7 @@ export function AuthMapBackdrop({ interactive = false }: { interactive?: boolean
     loadGoogleMaps()
       .then((maps) => {
         if (cancelled || !holder.current) return;
-        new maps.Map(holder.current, {
+        const map = new maps.Map(holder.current, {
           center: FALLBACK,
           zoom: 12,
           mapTypeId: "hybrid",
