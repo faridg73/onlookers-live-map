@@ -74,10 +74,19 @@ export function BountyVideoDialog({
   const [shareLabel, setShareLabel] = useState("");
   const [justSent, setJustSent] = useState<BountyVideo | null>(null);
   const [pinState, setPinState] = useState<SitePinState | null>(null);
+  /** Extra clips are opt-in once this hunter already sent one in. */
+  const [showExtra, setShowExtra] = useState(false);
   /** Real estate bounties stay locked until the on-site PIN handshake passes. */
   const pinLocked = Boolean(pinState?.required) && !pinState?.verifiedByMe && !pinState?.mine;
   const view = bountyViewState(request.status, { pinLocked });
   const closed = view.closed;
+
+  /** What this hunter already sent in, so the panel can say where it stands. */
+  const mySubmissions = videos.filter((v) => user?.id && v.uploader_id === user.id);
+  const myPaid = mySubmissions.find((v) => v.accepted_at) ?? null;
+  const myPending = myPaid ? null : (mySubmissions[0] ?? null);
+  const showCaptureTools = mySubmissions.length === 0 || showExtra;
+
 
 
   async function shareClip(video: BountyVideo) {
