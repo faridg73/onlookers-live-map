@@ -33,42 +33,85 @@ function ResetPasswordScreen() {
   const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
-    // The recovery link signs the user in with a one-time recovery session.
-    // Wait for that session before showing the new-password form. Reading the
-    // link takes a moment, so keep checking briefly instead of declaring it
-    // expired on the first look.
+    // The emailed link carries a one-time recovery sign-in. Depending on how
+    // the link was opened it arrives either in the part after the "#" (works
+    // on any device) or as a "code" in the address. Handle both, then show the
+    // new-password form.
     let done = false;
     const finish = (ok: boolean) => {
       if (done) return;
-      if (ok) {
-        done = true;
-        setReady(true);
-        setChecking(false);
-        return;
-      }
       done = true;
+      setReady(ok);
       setChecking(false);
     };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") finish(true);
     });
-    let attempts = 0;
-    const poll = window.setInterval(() => {
-      attempts += 1;
-      void supabase.auth.getSession().then(({ data }) => {
-        if (data.session) {
+
+    let poll: number | undefined;
+
+    const run = async () => {
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const query = new URLSearchParams(window.location.search);
+
+      const linkError = hash.get("error_description") ?? query.get("error_description");
+      if (linkError) {
+        setLinkProblem(linkError);
+        finish(false);
+        return;
+      }
+
+      const accessToken = hash.get("access_token");
+      const refreshToken = hash.get("refresh_token");
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        window.history.replaceState({}, "", window.location.pathname);
+        finish(!error);
+        if (error) setLinkProblem(error.message);
+        return;
+      }
+
+      const code = query.get("code");
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          window.history.replaceState({}, "", window.location.pathname);
           finish(true);
-          window.clearInterval(poll);
-        } else if (attempts >= 8) {
-          finish(false);
-          window.clearInterval(poll);
+          return;
         }
-      });
-    }, 400);
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        finish(true);
+        return;
+      }
+
+      let attempts = 0;
+      poll = window.setInterval(() => {
+        attempts += 1;
+        void supabase.auth.getSession().then(({ data: later }) => {
+          if (later.session) {
+            finish(true);
+            window.clearInterval(poll);
+          } else if (attempts >= 8) {
+            finish(false);
+            window.clearInterval(poll);
+          }
+        });
+      }, 400);
+    };
+
+    void run();
+
     return () => {
-      window.clearInterval(poll);
+      if (poll) window.clearInterval(poll);
       subscription.unsubscribe();
     };
   }, []);
