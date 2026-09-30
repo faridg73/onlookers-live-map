@@ -17,6 +17,7 @@ import { LegalConsent } from "@/components/legal/LegalConsent";
 import { describeAuthError, describePasswordProblem } from "@/lib/auth-errors";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 import { TwoFactorSetup } from "@/components/TwoFactorSetup";
+import { AuthMapBackdrop } from "@/components/AuthMapBackdrop";
 import { InlineVerificationField } from "@/components/InlineVerificationField";
 import { confirmPhoneCode, sendPhoneCode } from "@/lib/phone-verify.functions";
 import { completeVerifiedSignup, confirmEmailSignupCode, sendEmailSignupCode } from "@/lib/signup-verification.functions";
