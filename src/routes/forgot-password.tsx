@@ -2,8 +2,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
 import { checkResetEligibility } from "@/lib/password-reset.functions";
+import { sendRecoveryEmail } from "@/lib/password-reset-client";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -64,9 +64,10 @@ function ForgotPasswordScreen() {
         return;
       }
       if (res?.status === "password") {
-        const { error: err } = await supabase.auth.resetPasswordForEmail(addr, {
-          redirectTo: `${resetLinkOrigin()}/reset-password`,
-        });
+        const { error: err } = await sendRecoveryEmail(
+          addr,
+          `${resetLinkOrigin()}/reset-password`,
+        );
         if (err) throw err;
       }
       setSent(true);
