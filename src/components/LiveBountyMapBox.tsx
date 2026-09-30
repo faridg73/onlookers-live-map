@@ -24,10 +24,14 @@ export function LiveBountyMapBox({
   pins,
   center,
   label = "Live bounty map",
+  heightClass,
+  hideHeader,
 }: {
   pins: LiveBountyPin[];
   center?: { lat: number; lng: number } | null;
   label?: string;
+  heightClass?: string;
+  hideHeader?: boolean;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -85,7 +89,7 @@ export function LiveBountyMapBox({
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-surface" aria-label={label}>
-      <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className={"flex items-center justify-between gap-3 px-4 py-3" + (hideHeader ? " hidden" : "")}>
         <p className="inline-flex items-center gap-2 font-display text-base font-bold text-foreground">
           <MapPin className="size-4 text-signal" aria-hidden /> {label}
         </p>
@@ -93,7 +97,7 @@ export function LiveBountyMapBox({
           Full map
         </Link>
       </div>
-      <div className="relative h-56 w-full bg-background sm:h-64">
+      <div className={"relative w-full bg-background " + (heightClass ?? "h-56 sm:h-64")}>
         <div ref={holder} className="size-full" />
         {failed && (
           <p className="absolute inset-0 grid place-items-center px-6 text-center text-xs text-muted-foreground">
