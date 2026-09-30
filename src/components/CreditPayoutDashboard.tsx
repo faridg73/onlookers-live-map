@@ -4,8 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, Banknote, CoinsIcon, ExternalLink, Landmark, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/integrations/supabase/client";
 import { fetchCreditWallet } from "@/lib/credits";
+import {
+  fetchCashoutBalance,
+  holdLabel,
+  type CashoutBalance,
+} from "@/lib/cashout-balance";
+
 import {
   CREDITS_PER_USD,
   MIN_CASHOUT_CREDITS,
@@ -44,15 +49,10 @@ export function CreditPayoutDashboard() {
   const beginIdentity = useServerFn(startIdentityCheck);
   const [identity, setIdentity] = useState<IdentityStatus | null>(null);
   const [idCountry, setIdCountry] = useState("US");
-  const [hold, setHold] = useState<{
-    available: number;
-    on_hold: number;
-    next_release_at: string | null;
-    cooldown_until: string | null;
-    frozen_at?: string | null;
-    test_mode?: boolean;
-  } | null>(null);
-  const [holdDays, setHoldDays] = useState<number | null>(null);
+  // Available / on-hold figures come from the one shared calculation, so this
+  // dashboard can never disagree with the earnings breakdown or wallet boxes.
+  const [hold, setHold] = useState<CashoutBalance | null>(null);
+
   const freezeAccount = useServerFn(freezeMyAccount);
   const [confirmFreeze, setConfirmFreeze] = useState(false);
 
