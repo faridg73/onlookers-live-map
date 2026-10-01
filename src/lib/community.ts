@@ -553,19 +553,18 @@ export const REPORT_REASONS = [
   { id: "other", label: "Something else" },
 ] as const;
 
-export async function reportCommunityPost(postId: string, reason: string, details = "") {
+/** Files a report on a post or clip into the staff queue (and emails support). */
+export async function reportContent(target: "post" | "clip", id: string, reason: string, details = "") {
   const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) throw new Error("Sign in to report a post.");
-  const { error } = await supabase.from("content_reports").insert({
-    post_id: postId,
-    reporter_id: auth.user.id,
-    reason,
-    details: details.slice(0, 500),
-  });
-  if (error) {
-    if (/duplicate key/i.test(error.message)) throw new Error("You already reported this post.");
-    throw new Error(error.message);
-  }
+  if (!auth.user) throw new Error(`Sign in to report a ${target}.`);
+  const { submitContentReport } = await import("@/lib/content-reports.functions");
+  const reasonLabel = REPORT_REASONS.find((r) => r.id === reason)?.label;
+  const res = await submitContentReport({ data: { target, id, reason, reasonLabel, details } });
+  if (!res.ok) throw new Error(res.error ?? "Couldn't send that report.");
+}
+
+export async function reportCommunityPost(postId: string, reason: string, details = "") {
+  return reportContent("post", postId, reason, details);
 }
 
 export async function blockUser(userId: string) {
