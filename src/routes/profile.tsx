@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { clearPreviousAuthState } from "@/lib/auth-session";
 import { AccountDeletion } from "@/components/ProfileEditor";
+import { bountyFeeCredits, bountyNetCredits } from "@/lib/credits";
+import { planVisitLimit, PRO_PLANS, isTrialPlan } from "@/lib/pro-plans";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -95,8 +97,9 @@ const ACTIVITY_COPY: Record<ProfileActivityKind, { icon: typeof Radio; verb: str
 function ProfileScreen() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { requests } = useOnlooker();
+  const [proAccount, setProAccount] = useState<{ plan: string; visits_used: number } | null>(null);
   const mine = requests.filter((r) => r.requester === "you");
   const [verified, setVerified] = useState(false);
   const [profile, setProfile] = useState<MyProfile | null>(null);
@@ -106,6 +109,19 @@ function ProfileScreen() {
   const [memberTier, setMemberTier] = useState<string | null>(null);
   const [activity, setActivity] = useState<ProfileActivityItem[] | null>(null);
   const [activityFailed, setActivityFailed] = useState(false);
+
+  // Professional plan shortcut: plan name + visits left this month.
+  useEffect(() => {
+    if (!user) { setProAccount(null); return; }
+    let live = true;
+    void supabase
+      .from("pro_accounts")
+      .select("plan, visits_used")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => { if (live) setProAccount((data as { plan: string; visits_used: number } | null) ?? null); });
+    return () => { live = false; };
+  }, [user?.id]);
 
   // Paid membership badge — refreshes when a checkout completes.
   useEffect(() => {
@@ -207,6 +223,30 @@ function ProfileScreen() {
   }, []);
 
 
+  if (authLoading) {
+    return <div className="app-shell pb-32 pt-[max(env(safe-area-inset-top),3rem)]" aria-busy="true" />;
+  }
+  if (!user) {
+    return (
+      <div className="app-shell pb-32 pt-[max(env(safe-area-inset-top),3rem)]">
+        <div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-surface p-6 text-center">
+          <h1 className="font-display text-2xl text-foreground">Your Onlooker profile</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in or create a free account to post bounties, film for others, and see your balance.
+          </p>
+          <div className="mt-5 grid gap-2">
+            <Link to="/auth" search={{ mode: "signup" } as never} className="rounded-full bg-signal px-4 py-3 text-sm font-bold text-signal-foreground">Create account</Link>
+            <Link to="/auth" className="rounded-full border border-border px-4 py-3 text-sm font-semibold text-foreground">Log in</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const proLimit = proAccount ? planVisitLimit(proAccount.plan) : null;
+  const proPlanName = proAccount ? (isTrialPlan(proAccount.plan) ? "Free trial" : PRO_PLANS.find((p) => p.id === proAccount.plan)?.name ?? proAccount.plan) : null;
+  const proVisitsLeft = proAccount && proLimit !== null ? Math.max(0, proLimit - proAccount.visits_used) : null;
+
   return (
     <div className="app-shell pb-32 pt-[max(env(safe-area-inset-top),3rem)]">
       <Link
@@ -261,10 +301,32 @@ function ProfileScreen() {
           <Sparkles className="size-5 text-signal" />
           <span className="flex flex-col">
             <span className="font-semibold">Onlooker+ membership — from $9.99/mo</span>
-            <span className="text-xs text-muted-foreground">Compare plans and see your wallet history</span>
+            <span className="text-xs text-muted-foreground">For everyday posters and viewers · monthly credits and priority alerts</span>
           </span>
         </span>
         <ChevronRight className="size-4 text-signal" />
+      </Link>
+
+      <Link
+        to={proAccount ? "/pro-dashboard" : "/verification"}
+        className="mt-3 flex items-center justify-between rounded-2xl border border-tier-gold/40 bg-surface px-4 py-3 text-sm text-foreground hover:border-tier-gold hover:bg-surface-raised"
+      >
+        <span className="flex items-center gap-3">
+          <Building2 className="size-5 text-tier-gold" />
+          <span className="flex flex-col">
+            <span className="font-semibold text-tier-gold">
+              {proAccount ? `Pro plan: ${proPlanName}` : "For real estate & property pros"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {proAccount
+                ? proVisitsLeft === null
+                  ? "Unlimited Verified Visits this month · open your visit dashboard"
+                  : `${proVisitsLeft} of ${proLimit} Verified Visits left this month · open your visit dashboard`
+                : "Verified Visits for agents, managers & builders · plans from $49/mo"}
+            </span>
+          </span>
+        </span>
+        <ChevronRight className="size-4 text-tier-gold" />
       </Link>
 
       <MyCommunityPosts />
@@ -325,7 +387,14 @@ function ProfileScreen() {
         ) : (showAllActivity ? activity : activity.slice(0, 2)).map((item) => {
           const copy = ACTIVITY_COPY[item.kind];
           const Icon = copy.icon;
-          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "Bounty value " : ""}${item.credits.toLocaleString()} cr${item.kind === "completed" || item.kind === "streamed" ? " (before 20% fee)" : ""}`;
+          const settled = item.kind === "completed" || item.kind === "streamed";
+          const creditLabel = item.credits == null
+            ? null
+            : settled
+              ? `Bounty ${item.credits.toLocaleString()} cr · fee ${bountyFeeCredits(item.credits).toLocaleString()} cr · you received ${bountyNetCredits(item.credits).toLocaleString()} cr`
+              : item.kind === "claimed" || item.kind === "submitted"
+                ? `You'll receive ${bountyNetCredits(item.credits).toLocaleString()} cr (bounty ${item.credits.toLocaleString()} cr − 15% fee)`
+                : `${item.credits.toLocaleString()} cr`;
           return (
           <div
             key={item.id}
