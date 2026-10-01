@@ -333,7 +333,7 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
               <span
                 className={cn(
                   "size-1.5 rounded-full",
-                  chip === "Stream is live" ? "bg-live" : "bg-signal",
+                  chip === "Filming now" ? "bg-live" : "bg-signal",
                 )}
               />
               {chip}
