@@ -178,11 +178,11 @@ export function ChatInbox({
                   {tab === "streamers" ? <Radio className="size-5" /> : <MessageCircle className="size-5" />}
                 </span>
                 <p className="mt-4 text-sm font-bold text-foreground">
-                  {tab === "streamers" ? "No active stream chats" : "No bounty discussions yet"}
+                  {tab === "streamers" ? "No active filming chats" : "No bounty discussions yet"}
                 </p>
                 <p className="mt-1 max-w-64 text-xs leading-relaxed text-muted-foreground">
                   {tab === "streamers"
-                    ? "Live coordination appears here when an onlooker claims your bounty."
+                    ? "Filming coordination appears here when an onlooker claims your bounty."
                     : "Your first conversation opens when a bounty is claimed."}
                 </p>
               </div>
@@ -295,7 +295,7 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-live opacity-70" />
               <span className="relative inline-flex size-2 rounded-full bg-live" />
             </span>
-            {tab === "streamers" ? "Live coordination" : "Bounty activity"}
+            {tab === "streamers" ? "Filming coordination" : "Bounty activity"}
           </p>
           <h3 className="mt-2 font-display text-xl font-extrabold text-foreground">
             Stay close to the action.

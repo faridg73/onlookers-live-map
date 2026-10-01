@@ -31,13 +31,13 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "Onlooker, Live views from people already there" },
+      { title: "Onlooker, Fresh views from people already there" },
       {
         name: "description",
         content:
           "Onlooker connects on-the-spot video with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
       },
-      { property: "og:title", content: "Onlooker | Live proof backed by locked credits" },
+      { property: "og:title", content: "Onlooker | Real proof backed by locked credits" },
       {
         property: "og:description",
         content: "Post a bounty, lock credits, and release them only after real-world proof is verified.",

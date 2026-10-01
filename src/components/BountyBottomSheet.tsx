@@ -95,12 +95,12 @@ export function BountyBottomSheet({
       human.reset();
       onClaim?.(request!.id);
       setCapturing(true);
-      toast.success("You're live for this bounty", {
+      toast.success("You're filming for this bounty", {
         description: `${payout} Credits are reserved for you, film the spot and send it in.`,
       });
     } catch (error) {
       human.reset();
-      toast.error(error instanceof Error ? error.message : "Could not start this bounty stream.");
+      toast.error(error instanceof Error ? error.message : "Could not start filming for this bounty.");
     } finally {
       setAccepting(false);
     }
@@ -139,7 +139,7 @@ export function BountyBottomSheet({
       await uploadBountyVideo({
         file,
         request: request!,
-        note: "Filmed live from the map after accepting the bounty.",
+        note: "Filmed on the spot after accepting the bounty.",
         onStatus: setStatus,
       });
       toast.success("Sent to the poster for review.");
@@ -274,7 +274,7 @@ export function BountyBottomSheet({
                       ? "Submit your capture"
                       : "Already claimed"
                 : accepting
-                  ? "Starting your live session…"
+                  ? "Starting your filming session…"
                   : wantsLive
                     ? "Start filming for this bounty"
                     : "Accept & Open Camera"}

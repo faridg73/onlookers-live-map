@@ -550,7 +550,7 @@ function CommunityHub() {
             allowAll
             laneLabel="Discover category"
             menuLabel="Browse all categories"
-            allLabel="All live content"
+            allLabel="All content"
             onCategoryChange={(next) => {
               setCategoryId(next);
               if (!next) {
@@ -579,7 +579,7 @@ function CommunityHub() {
       />
 
       {/* The dropdown drives the cards: a selection narrows both views to that
-          lane, "All live content" restores the full set. */}
+          lane, "All content" restores the full set. */}
       {(() => {
         const selectedLane = categoryId ? broadcastCategoryById(categoryId) : null;
         const gridLanes = selectedLane
@@ -1048,7 +1048,7 @@ function CommunityHub() {
             <div className="mt-6">
               <RecentCapturesFeed
                 title="Recent captures"
-                blurb="Quiet nearby right now, here are streams that already wrapped."
+                blurb="Quiet nearby right now, here are captures that already wrapped."
               />
             </div>
           )}

@@ -36,16 +36,16 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in to Onlooker, post and fulfil live bounties" },
+      { title: "Sign in to Onlooker, post and fulfil bounties" },
       {
         name: "description",
         content:
-          "Sign in to Onlooker to post live view bounties, upload fulfilment videos and replay them any time.",
+          "Sign in to Onlooker to post view bounties, upload fulfilment videos and replay them any time.",
       },
       { property: "og:title", content: "Sign in to Onlooker" },
       {
         property: "og:description",
-        content: "Sign in to post live view bounties and upload fulfilment videos.",
+        content: "Sign in to post view bounties and upload fulfilment videos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -493,7 +493,7 @@ function AuthScreen() {
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Sign in to request or film real-world views, entry lines, seat views, queues and venue
-        atmospheres, captured live on location.
+        atmospheres, captured on location.
       </p>
 
       <LegalConsent accepted={accepted} onChange={setAccepted} />

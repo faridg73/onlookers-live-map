@@ -72,7 +72,7 @@ export function CreatorVerificationCard() {
       const result = await confirmCreatorPhoneCode({ data: { phone: sentTo, code: value } });
       if (!result.ok) throw new Error(result.error ?? "That code didn't work.");
       setStatus({ isVerified: true, requestedAt: null });
-      toast.success("You're verified. Free live broadcasting is unlocked.");
+      toast.success("Phone number confirmed. Free filming posts are unlocked.");
     } catch (err) {
       setCode("");
       codeRef.current?.focus();
@@ -89,21 +89,21 @@ export function CreatorVerificationCard() {
     <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="inline-flex items-center gap-2 text-sm font-bold text-foreground">
-          <ShieldCheck className="size-4 text-signal" /> Creator verification
+          <ShieldCheck className="size-4 text-signal" /> Confirm your phone number
         </p>
         {status.isVerified && <VerifiedBadge variant="pill" />}
       </div>
 
       {status.isVerified ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Your number is confirmed and your account is verified. The green check mark shows next to
+          Your phone number is confirmed. The green check mark shows next to
           your name everywhere, and you can start filming for free straight away.
         </p>
       ) : step === "number" ? (
         <>
           <p className="mt-2 text-xs text-muted-foreground">
-            Confirm your mobile number to get verified instantly. Verified creators get a check mark
-            next to their name and can broadcast live for free, with no credits held.
+            Confirm your mobile number to unlock free filming. Members with a confirmed number get a check mark
+            next to their name and can post free filming broadcasts, with no credits held.
           </p>
           <form
             onSubmit={(e) => {

@@ -30,6 +30,9 @@ export function LatestNearYouRail() {
   const { area } = useDiscoveryArea();
   const [posts, setPosts] = useState<CommunityPost[] | null>(null);
   const [media, setMedia] = useState<Record<string, string>>({});
+  const [mediaReady, setMediaReady] = useState(false);
+  /** Cards whose picture failed to load are dropped, never shown as an empty box. */
+  const [broken, setBroken] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let alive = true;
@@ -39,7 +42,10 @@ export function LatestNearYouRail() {
         const live = rows.filter(isPostLive);
         setPosts(live);
         const urls = await communityMediaUrls(live.slice(0, 30)).catch(() => ({}));
-        if (alive) setMedia(urls);
+        if (alive) {
+          setMedia(urls);
+          setMediaReady(true);
+        }
       })
       .catch(() => alive && setPosts([]));
     return () => {
@@ -50,6 +56,9 @@ export function LatestNearYouRail() {
   const ranked = useMemo(() => {
     if (!posts) return [];
     return posts
+      .filter((post) => !broken.has(post.id))
+      // A post with its own upload that can't be fetched is skipped entirely.
+      .filter((post) => !post.mediaPath || !mediaReady || Boolean(media[post.mediaPath]))
       .map((post) => ({
         post,
         dist:
@@ -64,7 +73,7 @@ export function LatestNearYouRail() {
         return new Date(b.post.createdAt).getTime() - new Date(a.post.createdAt).getTime();
       })
       .slice(0, 12);
-  }, [posts, area.latitude, area.longitude]);
+  }, [posts, area.latitude, area.longitude, broken, media, mediaReady]);
 
   if (!posts || ranked.length === 0) return null;
 
@@ -83,6 +92,7 @@ export function LatestNearYouRail() {
           const vibe = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
           const vibeForImg = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
           const img = (post.mediaPath && media[post.mediaPath]) || (vibeForImg && STARTER_VIBE_PHOTOS[vibeForImg.id]?.[0]?.src) || COMMUNITY_VISUALS[post.category]?.image;
+          if (!img) return null;
           return (
             <li key={post.id} className="w-44 shrink-0 snap-start">
               <Link
@@ -91,7 +101,7 @@ export function LatestNearYouRail() {
                 className="group block overflow-hidden rounded-2xl border border-home-line bg-home-glass-strong hover:border-signal"
               >
                 <span className="relative block aspect-[4/3] overflow-hidden">
-                  {img && <img src={img} alt="" className="absolute inset-0 size-full object-cover" loading="lazy" />}
+                  {img && <img src={img} alt="" className="absolute inset-0 size-full object-cover" loading="lazy" onError={() => setBroken((prev) => new Set(prev).add(post.id))} />}
                   <span className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" aria-hidden />
                   {vibe && (
                     <span className="absolute left-2 top-2 rounded-md bg-background/70 px-1.5 py-0.5 text-[0.55rem] font-extrabold uppercase text-foreground">

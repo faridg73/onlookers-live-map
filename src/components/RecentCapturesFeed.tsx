@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Clock, Eye, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { Clock, Eye, Flag, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { DmcaReportModal } from "@/components/DmcaReportModal";
 import { toast } from "sonner";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { fetchAllExploreClips, fetchExploreClips, type ExploreClip } from "@/lib/explore";
@@ -38,6 +39,8 @@ export function RecentCapturesFeed({
   /** Which card's options menu is open (by clip id). */
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  /** Link of the clip being reported (opens the report form). */
+  const [reportUrl, setReportUrl] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -254,6 +257,19 @@ export function RecentCapturesFeed({
                         >
                           <MapPin className="size-3.5 text-signal" aria-hidden /> View on map
                         </button>
+                        {myId !== clip.uploaderId && (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setMenuFor(null);
+                              setReportUrl(`${window.location.origin}/explore?clip=${clip.id}`);
+                            }}
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-colors hover:bg-background"
+                          >
+                            <Flag className="size-3.5 text-signal" aria-hidden /> Report
+                          </button>
+                        )}
                         {(isStaff || (myId && myId === clip.uploaderId)) && (
                           <button
                             type="button"
@@ -275,6 +291,11 @@ export function RecentCapturesFeed({
           );
         })}
       </ul>
+      <DmcaReportModal
+        open={reportUrl !== null}
+        onOpenChange={(v) => !v && setReportUrl(null)}
+        defaultContentUrl={reportUrl ?? ""}
+      />
     </section>
   );
 }

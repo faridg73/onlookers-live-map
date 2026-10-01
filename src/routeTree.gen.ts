@@ -16,6 +16,7 @@ import { Route as BalanceRouteImport } from './routes/balance'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CopyrightRouteImport } from './routes/copyright'
+import { Route as DeleteAccountRouteImport } from './routes/delete-account'
 import { Route as DisputesRouteImport } from './routes/disputes'
 import { Route as DmcaRouteImport } from './routes/dmca'
 import { Route as EventsRouteImport } from './routes/events'
@@ -89,6 +90,11 @@ const ContactRoute = ContactRouteImport.update({
 const CopyrightRoute = CopyrightRouteImport.update({
   id: '/copyright',
   path: '/copyright',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeleteAccountRoute = DeleteAccountRouteImport.update({
+  id: '/delete-account',
+  path: '/delete-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisputesRoute = DisputesRouteImport.update({
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/events': typeof EventsRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/events': typeof EventsRoute
@@ -396,6 +404,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/copyright': typeof CopyrightRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/disputes': typeof DisputesRoute
   '/dmca': typeof DmcaRoute
   '/events': typeof EventsRoute
@@ -446,6 +455,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/copyright'
+    | '/delete-account'
     | '/disputes'
     | '/dmca'
     | '/events'
@@ -494,6 +504,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/copyright'
+    | '/delete-account'
     | '/disputes'
     | '/dmca'
     | '/events'
@@ -542,6 +553,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/copyright'
+    | '/delete-account'
     | '/disputes'
     | '/dmca'
     | '/events'
@@ -591,6 +603,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   CopyrightRoute: typeof CopyrightRoute
+  DeleteAccountRoute: typeof DeleteAccountRoute
   DisputesRoute: typeof DisputesRoute
   DmcaRoute: typeof DmcaRoute
   EventsRoute: typeof EventsRoute
@@ -681,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/copyright'
       fullPath: '/copyright'
       preLoaderRoute: typeof CopyrightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delete-account': {
+      id: '/delete-account'
+      path: '/delete-account'
+      fullPath: '/delete-account'
+      preLoaderRoute: typeof DeleteAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disputes': {
@@ -967,6 +987,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   CopyrightRoute: CopyrightRoute,
+  DeleteAccountRoute: DeleteAccountRoute,
   DisputesRoute: DisputesRoute,
   DmcaRoute: DmcaRoute,
   EventsRoute: EventsRoute,

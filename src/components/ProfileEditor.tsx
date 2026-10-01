@@ -4,7 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { Camera, Loader2, MapPin, Trash2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
+import { Link } from "@tanstack/react-router";
 import { deleteMyAccount } from "@/lib/account.functions";
+import { fetchCashoutBalance } from "@/lib/cashout-balance";
 import { updateMyProfile, uploadAvatarFile, type MyProfile } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -114,6 +116,27 @@ export function AccountDeletion({ onDeleted }: { onDeleted: () => void }) {
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
   const removeAccount = useServerFn(deleteMyAccount);
+  /** Credits the person would lose: wallet balance and credits locked in open bounties. */
+  const [money, setMoney] = useState<{ balance: number; available: number; escrow: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    void (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return;
+      const [cash, esc] = await Promise.all([
+        fetchCashoutBalance(),
+        supabase.from("escrows").select("amount").eq("requester_id", uid).in("status", ["held", "reserved", "submitted", "disputed"]),
+      ]);
+      const escrow = (esc.data ?? []).reduce((s, r) => s + Number(r.amount ?? 0), 0);
+      if (alive) setMoney({ balance: cash.totalCredits, available: cash.availableCredits, escrow });
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [open]);
 
   async function confirmDeletion() {
     if (confirmation !== "DELETE") return;
@@ -134,6 +157,17 @@ export function AccountDeletion({ onDeleted }: { onDeleted: () => void }) {
       <Dialog open={open} onOpenChange={(next) => { setOpen(next); if (!next) setConfirmation(""); }}>
         <DialogContent className="max-w-md border-destructive/50">
           <DialogHeader><DialogTitle className="text-destructive">Permanently delete account?</DialogTitle><DialogDescription>This cannot be undone. Your profile, posts, bounties, uploads, wallet history, and account access will be permanently removed.</DialogDescription></DialogHeader>
+          {money && (money.balance > 0 || money.escrow > 0) && (
+            <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs text-foreground">
+              <p className="font-bold">You still have credits on this account</p>
+              <ul className="mt-1 list-disc space-y-0.5 pl-4 text-muted-foreground">
+                <li>Credit balance: {money.balance.toLocaleString()} cr ({money.available.toLocaleString()} cr ready to cash out)</li>
+                {money.escrow > 0 && <li>Held in escrow for open bounties: {money.escrow.toLocaleString()} cr</li>}
+              </ul>
+              <p className="mt-2 text-muted-foreground">Deleting your account forfeits these credits. Cash out or cancel open bounties first.</p>
+              <Link to="/balance" onClick={() => setOpen(false)} className="mt-2 inline-flex min-h-9 items-center font-bold text-signal underline">Cash out first</Link>
+            </div>
+          )}
           <label className="grid gap-2 text-sm font-medium text-foreground">Type DELETE to confirm<Input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder="DELETE" autoCapitalize="characters" autoComplete="off" /></label>
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>

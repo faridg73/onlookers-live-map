@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
+import { clearPreviousAuthState } from "@/lib/auth-session";
+import { AccountDeletion } from "@/components/ProfileEditor";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -67,12 +69,12 @@ export const Route = createFileRoute("/profile")({
       {
         name: "description",
         content:
-          "Track the bounties you earned as an onlooker and every live request you posted.",
+          "Track the bounties you earned as an onlooker and every request you posted.",
       },
       { property: "og:title", content: "Your Onlooker Profile" },
       {
         property: "og:description",
-        content: "Bounties earned as an onlooker and every live request you posted.",
+        content: "Bounties earned as an onlooker and every request you posted.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -141,7 +143,7 @@ function ProfileScreen() {
   }, [user?.id]);
 
   const STATS = [
-    { icon: Wallet, label: "Total earned", value: stats?.totalEarned != null ? stats.totalEarned.toLocaleString() : "—" },
+    { icon: Wallet, label: "Earned as onlooker", value: stats?.totalEarned != null ? `${stats.totalEarned.toLocaleString()} cr` : "—" },
     { icon: Camera, label: "Shots sent", value: stats?.shots != null ? String(stats.shots) : "—" },
     { icon: Star, label: "Rating", value: stats?.rating != null ? stats.rating.toFixed(1) : "New" },
   ];
@@ -167,12 +169,16 @@ function ProfileScreen() {
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    // End the session on the server for every device, then wipe every
+    // local copy so reopening Profile can never restore it.
+    await supabase.auth.signOut({ scope: "global" }).catch(() => undefined);
+    try {
+      await clearPreviousAuthState();
+    } catch {
       toast.error("Could not sign out. Please try again.");
       return;
     }
-    navigate({ to: "/auth", replace: true });
+    window.location.replace("/auth");
   }
 
   // Coming back from checkout: confirm the payment and pull the new balance in.
@@ -319,7 +325,7 @@ function ProfileScreen() {
         ) : (showAllActivity ? activity : activity.slice(0, 2)).map((item) => {
           const copy = ACTIVITY_COPY[item.kind];
           const Icon = copy.icon;
-          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "+" : ""}${item.credits.toLocaleString()} Credits`;
+          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "Bounty value " : ""}${item.credits.toLocaleString()} cr${item.kind === "completed" || item.kind === "streamed" ? " (before 20% fee)" : ""}`;
           return (
           <div
             key={item.id}
@@ -354,7 +360,7 @@ function ProfileScreen() {
       <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {mine.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            You haven't posted a live request yet.
+            You haven't posted a request yet.
           </p>
         ) : (
           mine.map((r) => <RequestCard key={r.id} request={r} />)
@@ -457,6 +463,9 @@ function ProfileScreen() {
           </span>
           <ChevronRight className="size-4 text-destructive" />
         </button>
+        <div className="mt-2 px-1">
+          <AccountDeletion onDeleted={() => window.location.replace("/auth")} />
+        </div>
       </div>
 
 

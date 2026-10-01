@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { supabase } from "@/integrations/supabase/client";
 import { fetchCreditWallet } from "@/lib/credits";
+import { EARNING_TYPES } from "@/lib/earnings";
 
 export type ProfileStats = { credits: number | null; totalEarned: number | null; shots: number | null; rating: number | null };
 
@@ -27,7 +28,7 @@ export async function fetchProfileStats(userId: string): Promise<ProfileStats> {
       .from("credit_transactions")
       .select("amount_net")
       .eq("receiver_wallet_id", wallet.id)
-      .in("transaction_type", ["bounty_payout", "direct_tip"]);
+      .in("transaction_type", EARNING_TYPES);
     if (!error) {
       totalEarned = (earnings ?? []).reduce((sum, row) => sum + (row.amount_net ?? 0), 0);
     }

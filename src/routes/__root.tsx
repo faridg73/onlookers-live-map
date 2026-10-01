@@ -26,6 +26,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { initNativeShell } from "@/lib/native";
+import { startUpdateCheck } from "@/lib/update-check";
 
 function NotFoundComponent() {
   return (
@@ -96,10 +97,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
       },
-      { title: "Onlooker, Live views from people already there" },
+      { title: "Onlooker, Fresh views from people already there" },
       {
         name: "description",
-        content: "Post a bounty and get a live photo of any place from someone standing there now.",
+        content: "Post a bounty and get a fresh photo of any place from someone standing there now.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -159,6 +160,7 @@ function RootComponent() {
   // Native shell (Capacitor iOS/Android): deep links open in-app,
   // Android back button walks router history. No-ops in the browser.
   const router = useRouter();
+  useEffect(() => startUpdateCheck(), []);
   useEffect(() => {
     void initNativeShell(
       (path) => void router.navigate({ to: path }),

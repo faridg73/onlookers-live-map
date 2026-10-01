@@ -400,7 +400,7 @@ function HuntScreen() {
           className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-3 text-left"
         >
           <span className="truncate text-sm font-bold text-foreground">
-            📍 Live bounty map <span className="text-muted-foreground">· {pins.length} nearby</span>
+            📍 Bounty map <span className="text-muted-foreground">· {pins.length} nearby</span>
           </span>
           <ChevronDown className={"size-4 shrink-0 text-muted-foreground transition-transform duration-200 " + (mapOpen ? "rotate-180" : "")} aria-hidden />
         </button>
@@ -443,7 +443,7 @@ function HuntScreen() {
       <div className="mt-3 space-y-2">
         {user && (
           <EarnAccordionRow
-            title="My Earnings"
+            title="Earned as onlooker"
             summary={
               earnings
                 ? `${earnings.netCredits} cr · ${usd(creditsToUsdValue(earnings.netCredits))}`

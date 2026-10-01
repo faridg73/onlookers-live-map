@@ -16,8 +16,8 @@ export function BroadcastCategoryPicker({
   onCategoryChange,
   onSubcategoryChange,
   allowAll = false,
-  laneLabel = "Broadcast lane",
-  menuLabel = "Choose a broadcast lane",
+  laneLabel = "Post lane",
+  menuLabel = "Choose a post lane",
   allLabel = "All categories",
 }: {
   categoryId: BroadcastCategoryId | null;

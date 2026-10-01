@@ -110,7 +110,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       setPlace(formatted);
       setSpot({ latitude, longitude, formatted });
     } catch {
-      toast.error("Allow location access to broadcast from where you are.");
+      toast.error("Allow location access to post from where you are.");
     } finally {
       setGpsBusy(false);
     }
@@ -118,11 +118,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
 
   const goLive = async () => {
     if (title.trim().length < 4) {
-      toast.error("Give your broadcast a short title people can read at a glance.");
+      toast.error("Give your post a short title people can read at a glance.");
       return;
     }
     if (!spot || !place.trim()) {
-      toast.error("Pick where you're streaming from, use your location or tap the map.");
+      toast.error("Pick where you're filming from, use your location or tap the map.");
       return;
     }
     if (!isRequestAllowed(title, body, place)) {
@@ -155,7 +155,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         latitude: spot.latitude,
         longitude: spot.longitude,
       });
-      toast.success("You're broadcasting", {
+      toast.success("You're filming", {
         description: "Followers and people nearby can see it on Discover. No credits held.",
       });
       // Open the live camera view so the creator sees their own feed while live.

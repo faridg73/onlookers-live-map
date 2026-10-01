@@ -210,7 +210,7 @@ function PoolsScreen() {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="What should happen? e.g. Live view of the stadium gates"
+                  placeholder="What should happen? e.g. Fresh view of the stadium gates"
                   className={fieldClass(errors.title)}
                 />
                 {errors.title && (

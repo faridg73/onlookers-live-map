@@ -230,7 +230,7 @@ export function MyCommunityPosts() {
                 <div className="mt-3 grid gap-2">
                   {live && (
                     <Button asChild>
-                      <Link to="/live/$id" params={{ id: selected.id }} search={{ title: selected.title, place: selected.place }}>Open live view</Link>
+                      <Link to="/live/$id" params={{ id: selected.id }} search={{ title: selected.title, place: selected.place }}>Open view</Link>
                     </Button>
                   )}
                   {!live && isBroadcastPost(selected) && isPostLive(selected) && !selected.hiddenAt && (

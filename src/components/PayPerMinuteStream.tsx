@@ -88,8 +88,8 @@ export function PayPerMinuteStream({
           .catch(async (err: unknown) => {
             toast.error(
               err instanceof Error && /insufficient/i.test(err.message)
-                ? "You're out of Credits, the live session ended."
-                : "The live session ended.",
+                ? "You're out of Credits, the filming session ended."
+                : "The filming session ended.",
             );
             if (timer.current) clearInterval(timer.current);
             timer.current = null;
@@ -103,7 +103,7 @@ export function PayPerMinuteStream({
           ? "You need more Credits to start watching."
           : err instanceof Error
             ? err.message
-            : "Couldn't start the live session.",
+            : "Couldn't start the filming session.",
       );
     } finally {
       setBusy(false);

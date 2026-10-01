@@ -353,7 +353,7 @@ export function venueFromPlace(place: DiscoveredPlace, group: DiscoveryGroup): V
     name: place.name,
     area: place.address ? areaFromAddress(place.address) : group.short,
     blurb: place.primaryType
-      ? `${place.primaryType}${place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}, ask for a live look at what's happening here right now.`
+      ? `${place.primaryType}${place.rating ? ` · ${place.rating.toFixed(1)}★` : ""}, ask for a fresh look at what's happening here right now.`
       : "Ask for a live look at what's happening here right now.",
     emoji: group.emoji,
     category: group.category,

@@ -35,7 +35,7 @@ const TABS: { id: TabId; label: string; stages: PostedBountyStage[] }[] = [
 ];
 
 const EMPTY: Record<TabId, string> = {
-  open: "Nothing open right now — post a bounty and it lands here the moment it's live.",
+  open: "Nothing open right now — post a bounty and it lands here the moment it's posted.",
   progress: "No bounty is being worked yet. Open ones show up here as soon as an onlooker claims them.",
   settled: "Nothing settled yet. Approved footage and refunds will stack up here.",
 };

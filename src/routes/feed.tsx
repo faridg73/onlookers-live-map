@@ -26,16 +26,16 @@ import { RouteErrorPanel, SectionBoundary } from "@/components/SectionBoundary";
 export const Route = createFileRoute("/feed")({
   head: () => ({
     meta: [
-      { title: "Live Requests Feed | Onlooker" },
+      { title: "Open Requests Feed | Onlooker" },
       {
         name: "description",
         content:
-          "Every open live photo request near you, ranked by bounty and time left. Claim one and shoot it.",
+          "Every open photo request near you, ranked by bounty and time left. Claim one and shoot it.",
       },
-      { property: "og:title", content: "Live Requests Feed | Onlooker" },
+      { property: "og:title", content: "Open Requests Feed | Onlooker" },
       {
         property: "og:description",
-        content: "Open live photo requests near you, ranked by bounty and time left.",
+        content: "Open photo requests near you, ranked by bounty and time left.",
       },
     ],
   }),
@@ -404,7 +404,7 @@ function FeedScreen() {
         )}
         {list.length === 0 && (
           <SectionBoundary label="Recent captures">
-            <RecentCapturesFeed blurb="Nothing live nearby, watch captures that already wrapped." />
+            <RecentCapturesFeed blurb="Nothing new nearby, watch captures that already wrapped." />
           </SectionBoundary>
         )}
       </div>

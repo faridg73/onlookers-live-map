@@ -75,7 +75,7 @@ export function TrendingCard({ place, group, tag, photoUrl, liveCount, weekend }
           type="button"
           className="flex w-full items-center justify-center gap-2 border-t border-border bg-signal/10 py-3 text-[0.68rem] font-extrabold uppercase tracking-[0.14em] text-signal transition-colors hover:bg-signal/20"
         >
-          <Video className="size-4" aria-hidden /> Trigger live view
+          <Video className="size-4" aria-hidden /> Request a view
         </button>
       </VenueBountyDialog>
     </article>

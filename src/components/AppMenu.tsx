@@ -30,7 +30,7 @@ const LINKS = [
   { to: "/discover", label: "Venues & Events", note: "Browse real places and what's on", icon: Users },
   { to: "/balance", label: "Balance & Cashout", note: "Credits, top-ups and payouts", icon: Wallet },
   { to: "/payout-history", label: "Payout history", note: "Every cash-out you've made", icon: Receipt },
-  { to: "/feed", label: "Live requests", note: "Open bounties on the board", icon: Radio },
+  { to: "/feed", label: "Open requests", note: "Open bounties on the board", icon: Radio },
   { to: "/pools", label: "Group pools", note: "Chip in on a shared bounty", icon: CircleDollarSign },
   { to: "/leaderboard", label: "Top reporters", note: "This week's best onlookers", icon: Trophy },
   { to: "/disputes", label: "Dispute center", note: "Open or follow a dispute", icon: Scale },
@@ -122,7 +122,7 @@ export function AppMenu() {
               <span className="min-w-0">
                 <span className="block text-sm font-extrabold text-foreground">Live Inbox</span>
                 <span className="block text-xs font-semibold text-signal">
-                  {unread > 0 ? `${unread} unread` : "Your bounty and stream chats"}
+                  {unread > 0 ? `${unread} unread` : "Your bounty chats"}
                 </span>
               </span>
             </button>

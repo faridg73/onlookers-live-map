@@ -33,7 +33,7 @@ export const PLUS_PLANS: PlusPlan[] = [
     creditsLabel: "50 credits",
     perks: [
       "50 credits every month",
-      "Ad-free live feed",
+      "Ad-free feed",
       "Saved areas and alerts",
     ],
     accent: {
@@ -75,7 +75,7 @@ export const PLUS_PLANS: PlusPlan[] = [
     perks: [
       "350+ credits every month",
       "Pro / Media Desk dispatch tools",
-      "Raw archive stream and extended retention",
+      "Raw archive and extended retention",
     ],
     accent: {
       text: "text-signal",
