@@ -99,7 +99,7 @@ export const listExploreClips = createServerFn({ method: "GET" })
           uploaderId: clipRow?.uploader_id ?? "",
           latitude: req?.latitude ?? null,
           longitude: req?.longitude ?? null,
-          title: r.request_title,
+          title: String(r.request_title ?? "").replace(/[\s,·–-]*\bActive now\b/gi, "").trim() || "Capture",
           place: r.request_place,
           note: r.note,
           bounty: Number(r.bounty_amount),
