@@ -1,9 +1,10 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, ImageOff, MapPin } from "lucide-react";
+import { ChevronRight, ImageOff, MapPin, Radio } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { LiveBroadcastStage } from "@/components/LiveBroadcastStage";
 import { useOnlooker } from "@/lib/onlooker-store";
 import { refundBounty } from "@/lib/bounty-escrow";
 import type { LiveRequest } from "@/lib/onlooker";
@@ -19,6 +20,7 @@ import {
   isBroadcastPost,
   isPostLive,
   listMyCommunityPosts,
+  pingBroadcast,
   type CommunityPost,
 } from "@/lib/community";
 
@@ -61,6 +63,15 @@ export function MyCommunityPosts() {
   const [busy, setBusy] = useState<string | null>(null);
   const [selected, setSelected] = useState<CommunityPost | null>(null);
   const [selectedReq, setSelectedReq] = useState<LiveRequest | null>(null);
+  /** Free broadcast the owner is streaming right now from My posts. */
+  const [stage, setStage] = useState<{ id: string; title: string; place: string } | null>(null);
+  // Heartbeat keeps the broadcast in Live now only while the camera is open.
+  useEffect(() => {
+    if (!stage) return;
+    void pingBroadcast(stage.id);
+    const timer = window.setInterval(() => void pingBroadcast(stage.id), 30_000);
+    return () => window.clearInterval(timer);
+  }, [stage?.id]);
   const { requests, remove: removeRequest } = useOnlooker();
   const myRequests = requests.filter((r) => r.requester === "you" && (r.status === "open" || r.status === "claimed"));
 
@@ -112,6 +123,19 @@ export function MyCommunityPosts() {
   }
 
   if (!user) return null;
+  if (stage) {
+    return (
+      <LiveBroadcastStage
+        title={stage.title}
+        place={stage.place}
+        save={`broadcast-${Date.now()}`}
+        onEnd={() => {
+          setStage(null);
+          load();
+        }}
+      />
+    );
+  }
   const total = (posts?.length ?? 0) + myRequests.length;
 
   return (
@@ -207,6 +231,18 @@ export function MyCommunityPosts() {
                   {live && (
                     <Button asChild>
                       <Link to="/live/$id" params={{ id: selected.id }} search={{ title: selected.title, place: selected.place }}>Open live view</Link>
+                    </Button>
+                  )}
+                  {!live && isBroadcastPost(selected) && isPostLive(selected) && !selected.hiddenAt && (
+                    <Button
+                      size="lg"
+                      className="gap-2"
+                      onClick={() => {
+                        setStage({ id: selected.id, title: selected.title, place: selected.place || "" });
+                        setSelected(null);
+                      }}
+                    >
+                      <Radio className="size-4" aria-hidden /> Go live
                     </Button>
                   )}
                   <Button variant="destructive" disabled={busy === selected.id} onClick={() => void remove(selected)}>
