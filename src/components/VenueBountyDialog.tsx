@@ -377,29 +377,38 @@ export function VenueBountyDialog({
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               {mode === "live" ? "Start window" : "Delivery deadline"}
             </span>
-            <div className="flex flex-wrap gap-2">
-              {windows.map(({ minutes: m, label }) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => {
-                    setMinutes(m);
-                    setCustomDeadline(null);
-                  }}
-                  aria-pressed={!isCustom && minutes === m}
-                  className={pill(!isCustom && minutes === m)}
-                >
-                  {label}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => setCustomOpen(true)}
-                aria-pressed={isCustom}
-                className={pill(isCustom)}
+            <div className="flex items-center gap-2">
+              <select
+                aria-label={mode === "live" ? "Start window" : "Delivery deadline"}
+                value={isCustom ? "custom" : String(minutes)}
+                onChange={(e) => {
+                  if (e.target.value === "custom") {
+                    setCustomOpen(true);
+                    return;
+                  }
+                  setMinutes(Number(e.target.value));
+                  setCustomDeadline(null);
+                }}
+                className="field min-w-0 flex-1 bg-background text-foreground [color-scheme:dark]"
               >
-                {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
-              </button>
+                {windows.map(({ minutes: m, label }) => (
+                  <option key={m} value={String(m)}>
+                    {label}
+                  </option>
+                ))}
+                <option value="custom">
+                  {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+                </option>
+              </select>
+              {isCustom && (
+                <button
+                  type="button"
+                  onClick={() => setCustomOpen(true)}
+                  className="shrink-0 text-xs font-semibold text-signal underline underline-offset-2"
+                >
+                  Change
+                </button>
+              )}
             </div>
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
               <Timer className="mt-0.5 size-3.5 shrink-0 text-signal" />
@@ -414,30 +423,26 @@ export function VenueBountyDialog({
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               {mode === "live" ? "Stream length" : "Clip length"}
             </span>
-            <div className="flex flex-wrap gap-2">
+            <select
+              aria-label={mode === "live" ? "Stream length" : "Clip length"}
+              value={customDuration !== null ? "custom" : String(durationMin)}
+              onChange={(e) => {
+                if (e.target.value === "custom") {
+                  setCustomDuration(customDuration ?? durationMin);
+                  return;
+                }
+                setDurationMin(Number(e.target.value));
+                setCustomDuration(null);
+              }}
+              className="field w-full bg-background text-foreground [color-scheme:dark]"
+            >
               {LIVE_DURATIONS.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => {
-                    setDurationMin(d);
-                    setCustomDuration(null);
-                  }}
-                  aria-pressed={customDuration === null && durationMin === d}
-                  className={pill(customDuration === null && durationMin === d)}
-                >
+                <option key={d} value={String(d)}>
                   {d} min
-                </button>
+                </option>
               ))}
-              <button
-                type="button"
-                onClick={() => setCustomDuration(customDuration ?? durationMin)}
-                aria-pressed={customDuration !== null}
-                className={pill(customDuration !== null)}
-              >
-                Custom
-              </button>
-            </div>
+              <option value="custom">Custom</option>
+            </select>
             {customDuration !== null && (
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 <input
