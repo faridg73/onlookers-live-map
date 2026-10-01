@@ -235,7 +235,7 @@ function ProfileScreen() {
             Sign in or create a free account to post bounties, film for others, and see your balance.
           </p>
           <div className="mt-5 grid gap-2">
-            <Link to="/auth" search={{ mode: "signup" } as never} className="rounded-full bg-signal px-4 py-3 text-sm font-bold text-signal-foreground">Create account</Link>
+            <Link to="/auth" search={{ mode: "signup" }} className="rounded-full bg-signal px-4 py-3 text-sm font-bold text-signal-foreground">Create account</Link>
             <Link to="/auth" className="rounded-full border border-border px-4 py-3 text-sm font-semibold text-foreground">Log in</Link>
           </div>
         </div>
