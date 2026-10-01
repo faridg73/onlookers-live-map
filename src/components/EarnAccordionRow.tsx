@@ -22,7 +22,7 @@ export function EarnAccordionRow({
         aria-expanded={open}
         className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 py-3 text-left"
       >
-        <span className="min-w-0 truncate text-sm">
+        <span className="min-w-0 text-sm leading-tight">
           <span className="font-bold text-foreground">{title}</span>
           {summary != null && <span className="text-muted-foreground"> — {summary}</span>}
         </span>
