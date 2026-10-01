@@ -186,7 +186,7 @@ function DiscoverHome() {
           Browse places
         </h1>
         <p className="mt-2 px-12 text-center text-sm text-muted-foreground">
-          Pick a spot and ask for a <span className="font-bold text-signal">live</span> view.
+          Pick a spot and ask for a <span className="font-bold text-signal">fresh</span> view.
         </p>
       </div>
 
@@ -327,7 +327,7 @@ function DiscoverHome() {
                             </span>
                             {live > 0 && (
                               <span className="mt-1 block text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-signal">
-                                {live} live now
+                                {live} filming now
                               </span>
                             )}
                           </div>

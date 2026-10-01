@@ -63,7 +63,7 @@ export const BRAND_TAG_TEXT = BRAND_HASHTAGS.map((tag) => `#${tag}`).join(" ");
 
 /** Caption used on every platform, so shares read consistently. */
 export function shareCaption(subject: ShareSubject): string {
-  const lead = subject.kind === "live" ? "🔴 LIVE NOW" : "📍 Live view wanted";
+  const lead = subject.kind === "live" ? "🎥 FILMING NOW" : "📍 Fresh view wanted";
   const reward = subject.credits ? ` · ${Math.round(subject.credits)} Credits` : "";
   return `${lead}: ${subject.title}, ${subject.place}${reward}\n${BRAND_TAG_TEXT}`;
 }

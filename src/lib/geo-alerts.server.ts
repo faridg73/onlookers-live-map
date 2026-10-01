@@ -198,12 +198,12 @@ export async function notifyLocalOnlookersOfBounty(
     : `Bounty Alert: ${where}`;
   const minutes = Number(request.duration_minutes ?? 0);
   const ask = liveNow
-    ? `Start a ${minutes > 0 ? `${minutes}-minute ` : ""}live stream of the ${readableCategory(
+    ? `Start a ${minutes > 0 ? `${minutes}-minute ` : ""}clip of the ${readableCategory(
         request.category,
         request.prompt,
       )}`
     : `Film the ${readableCategory(request.category, request.prompt)}`;
-  const body = `${ask}, ${net} Credits are already locked in escrow and pay out once your stream is verified.`;
+  const body = `${ask}, ${net} Credits are already locked in escrow and pay out once your clip is verified.`;
   const path = `/?b=${request.id}&snap=1`;
 
   await supabaseAdmin.from("notifications").insert(

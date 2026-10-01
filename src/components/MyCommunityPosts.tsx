@@ -34,7 +34,7 @@ type PostStatus = { label: string; tone: string };
 function postStatus(post: CommunityPost): PostStatus {
   if (post.hiddenAt) return { label: "Under review", tone: "bg-destructive/15 text-destructive" };
   if (!isPostLive(post)) return { label: "Expired", tone: "bg-surface-raised text-muted-foreground" };
-  if (isActivelyStreaming(post)) return { label: "Live", tone: "bg-destructive text-destructive-foreground" };
+  if (isActivelyStreaming(post)) return { label: "Filming", tone: "bg-destructive text-destructive-foreground" };
   if (isBroadcastPost(post)) return { label: "Not streaming", tone: "bg-surface-raised text-muted-foreground" };
   return { label: "Posted", tone: "bg-signal/15 text-signal" };
 }
@@ -242,7 +242,7 @@ export function MyCommunityPosts() {
                         setSelected(null);
                       }}
                     >
-                      <Radio className="size-4" aria-hidden /> Go live
+                      <Radio className="size-4" aria-hidden /> Start filming
                     </Button>
                   )}
                   <Button variant="destructive" disabled={busy === selected.id} onClick={() => void remove(selected)}>

@@ -142,7 +142,7 @@ export function PayPerMinuteStream({
           onClick={() => void join()}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-signal px-4 py-3 text-sm font-extrabold uppercase tracking-[0.12em] text-signal-foreground disabled:opacity-60"
         >
-          <Radio className="size-4" /> {busy ? "Connecting…" : "Start live stream"}
+          <Radio className="size-4" /> {busy ? "Connecting…" : "Start filming"}
         </button>
         {strip}
       </div>

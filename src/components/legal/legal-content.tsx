@@ -27,7 +27,7 @@ export function CommunityGuidelinesBody() {
   return (
     <>
       <p>
-        When you go live or post on Onlooker, keep it safe and legal. You may not stream or post:
+        When you film or post on Onlooker, keep it safe and legal. You may not stream or post:
       </p>
       <ul className="list-disc space-y-2 pl-5">
         <li>Sexual content or nudity</li>

@@ -61,7 +61,7 @@ export function BountyBriefBadges({
       )}
       <span className={chip}>
         {isClip ? <Video className={icon} /> : <Radio className={cn(icon, "text-live")} />}
-        {isClip ? "Recorded clip" : "Live stream"}
+        {isClip ? "By a deadline" : "Film it now"}
       </span>
       {minutes ? (
         <span className={chip}>

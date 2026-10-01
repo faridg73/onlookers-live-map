@@ -12,7 +12,7 @@ export type CaptureOption = {
 
 /** Selectable capture lengths shown in the post wizard. */
 export const CAPTURE_OPTIONS: CaptureOption[] = [
-  { id: "live", label: "Live Feed", minutes: null },
+  { id: "live", label: "Open-ended", minutes: null },
   { id: "1", label: "1 min", minutes: 1 },
   { id: "5", label: "5 min", minutes: 5 },
   { id: "10", label: "10 min", minutes: 10 },
@@ -86,6 +86,6 @@ export function suggestedBountyForCapture(minutes: CaptureDuration): number {
 
 /** Human label used in cards, escrow notes and hunter instructions. */
 export function captureDurationLabel(minutes: CaptureDuration, live = false): string {
-  if (minutes === null) return "Continuous live feed";
-  return live ? `${minutes} min live session` : `${minutes} min clip`;
+  if (minutes === null) return "Open-ended clip";
+  return live ? `${minutes} min clip` : `${minutes} min clip`;
 }

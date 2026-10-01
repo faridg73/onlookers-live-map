@@ -166,7 +166,7 @@ export function RequestViewPinDialog({
             <Globe2 className="size-6 text-signal" /> Request a view
           </DialogTitle>
           <DialogDescription>
-            Fund a live stream from this exact spot. Anyone standing near the pin gets a bounty
+            Fund a fresh clip from this exact spot. Anyone standing near the pin gets a bounty
             alert straight away.
           </DialogDescription>
         </DialogHeader>
@@ -309,7 +309,7 @@ export function RequestViewPinDialog({
             <ul className="space-y-1.5 text-xs font-medium text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Radio className="size-3.5 text-signal" />
-                {REQUEST_VIEW_DURATION_MINUTES}-minute live stream from the pin
+                {REQUEST_VIEW_DURATION_MINUTES}-minute clip from the pin
               </li>
               <li className="flex items-center gap-2">
                 <Radio className="size-3.5 text-signal" />

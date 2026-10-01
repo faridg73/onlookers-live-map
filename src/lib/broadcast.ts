@@ -28,7 +28,7 @@ export const BROADCAST_AUDIENCES = [
 
 /** Community guidelines line shown right above the go-live button. */
 export const BROADCAST_SAFETY_NOTICE =
-  "By going live, you agree to follow safety rules. No illegal activity or driving violations.";
+  "By filming, you agree to follow safety rules. No illegal activity or driving violations.";
 
 /** Max free streams one account can start per rolling hour (mirrored by a DB trigger). */
 export const BROADCAST_HOURLY_LIMIT = 3;
@@ -60,7 +60,7 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
       allowed: false,
       retryAt: null,
       needsEmail: true,
-      reason: "Confirm your email before going live, open the link we sent to your inbox.",
+      reason: "Confirm your email before filming, open the link we sent to your inbox.",
     };
   }
   const { data } = await supabase.rpc("my_broadcast_status");
@@ -74,7 +74,7 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
       signedIn: true,
       allowed: false,
       retryAt: cooldown,
-      reason: "New accounts can start their first live stream 10 minutes after sign-up.",
+      reason: "New accounts can start filming 10 minutes after sign-up.",
     };
   }
   if ((row?.streams_last_hour ?? 0) >= BROADCAST_HOURLY_LIMIT) {
@@ -82,7 +82,7 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
       signedIn: true,
       allowed: false,
       retryAt: row?.next_slot_at ? new Date(row.next_slot_at) : null,
-      reason: `You can start up to ${BROADCAST_HOURLY_LIMIT} live streams per hour.`,
+      reason: `You can start up to ${BROADCAST_HOURLY_LIMIT} filming sessions per hour.`,
     };
   }
   return { signedIn: true, allowed: true, retryAt: null, reason: "" };
@@ -92,10 +92,10 @@ export async function fetchBroadcastEligibility(): Promise<BroadcastEligibility>
 export function describeBroadcastError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error ?? "");
   if (/BROADCAST_COOLDOWN/.test(message)) {
-    return "New accounts can start their first live stream 10 minutes after sign-up.";
+    return "New accounts can start filming 10 minutes after sign-up.";
   }
   if (/BROADCAST_RATE_LIMIT/.test(message)) {
-    return `You can start up to ${BROADCAST_HOURLY_LIMIT} live streams per hour. Try again a bit later.`;
+    return `You can start up to ${BROADCAST_HOURLY_LIMIT} filming sessions per hour. Try again a bit later.`;
   }
   return message || "Couldn't start the broadcast.";
 }

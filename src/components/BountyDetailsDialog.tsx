@@ -147,7 +147,7 @@ export function BountyDetailsDialog({
           <DialogHeader>
             <DialogTitle className="font-display">Bounty details</DialogTitle>
             <DialogDescription>
-              Review everything before you commit to capturing this live view.
+              Review everything before you commit to filming this clip.
             </DialogDescription>
           </DialogHeader>
 

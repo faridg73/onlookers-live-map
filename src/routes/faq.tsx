@@ -110,7 +110,7 @@ const CATEGORIES: FAQCategory[] = [
   },
   {
     id: "streaming",
-    label: "Live Streaming & Media",
+    label: "Filming & Media",
     shortLabel: "Streaming",
     description: "Camera access, uploads, acceptable capture, and privacy.",
     icon: Radio,

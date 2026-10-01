@@ -25,7 +25,7 @@ export const Route = createFileRoute("/live/$id")({
   }),
   head: ({ match, params }) => {
     const { title, place } = match.search as Search;
-    const heading = `🔴 Live now${place ? `, ${place}` : ""} · Onlooker`;
+    const heading = `🎥 Filming now${place ? `, ${place}` : ""} · Onlooker`;
     const desc = `${title ?? "A live view is streaming right now"}${
       place ? ` at ${place}` : ""
     }. Watch it live on Onlooker. #Onlooker`;
@@ -80,7 +80,7 @@ function LiveSharePage() {
         </div>
         <div className="px-5 py-6">
           <h1 className="font-display text-3xl leading-tight text-foreground">
-            {title ?? "Someone is live right now"}
+            {title ?? "Someone is filming right now"}
           </h1>
           {place && (
             <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">

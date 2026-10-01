@@ -42,7 +42,7 @@ function HomeLiveNow() {
           <span className="absolute inset-0 animate-ping rounded-full bg-destructive opacity-75 motion-reduce:animate-none" />
           <span className="relative size-2 rounded-full bg-destructive" />
         </span>
-        Live now{live.length > 0 ? ` · ${live.length}` : ""}
+        Filming now{live.length > 0 ? ` · ${live.length}` : ""}
       </h3>
       {live.length === 0 ? (
         <p className="mt-2 text-[0.7rem] font-semibold text-muted-foreground">Nobody is streaming right now.</p>
@@ -122,7 +122,7 @@ const HOW_IT_WORKS: Array<{ step: string; title: string; body: string; icon: typ
 const TABS: Array<{ key: ActivityTab; label: string }> = [
   { key: "all", label: "All" },
   { key: "bounty", label: "Bounties" },
-  { key: "live", label: "Live" },
+  { key: "live", label: "Filming" },
   { key: "alert", label: "Alerts" },
 ];
 
@@ -131,9 +131,9 @@ const TABS: Array<{ key: ActivityTab; label: string }> = [
  * invitations (not fake listings) so the feed still feels alive and clickable.
  */
 const SHOWCASE: Array<{ key: string; category: string; kind: "live" | "bounty"; label: string; title: string; place: string; credits: number }> = [
-  { key: "sc-street", category: "street", kind: "live", label: "Be first live", title: "Go live from the busiest block in your city", place: "Your neighborhood", credits: 40 },
+  { key: "sc-street", category: "street", kind: "live", label: "Be first to film", title: "Film the busiest block in your city", place: "Your neighborhood", credits: 40 },
   { key: "sc-food", category: "food", kind: "bounty", label: "Open a bounty", title: "Ask for the line at tonight's hot spot", place: "Nearby restaurants", credits: 60 },
-  { key: "sc-events", category: "events", kind: "live", label: "Be first live", title: "Stream the crowd before the show starts", place: "Local venues", credits: 80 },
+  { key: "sc-events", category: "events", kind: "live", label: "Be first to film", title: "Film the crowd before the show starts", place: "Local venues", credits: 80 },
   { key: "sc-vehicles", category: "vehicles", kind: "bounty", label: "Open a bounty", title: "Pay for a quick look at traffic ahead", place: "Main routes", credits: 100 },
 ];
 
@@ -234,7 +234,7 @@ export function HomeLiveStage({
             type="button"
             onClick={() => (liveRequest ? onOpenLive(liveRequest) : navigate({ to: "/discover" }))}
             className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
-            aria-label={`${liveCount} live streams — open`}
+            aria-label={`${liveCount} filming now — open`}
           >
             LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
           </button>
@@ -539,7 +539,7 @@ export function HomeLiveStage({
           {signedIn === false ? (
             <div className="mt-3 flex flex-col items-center justify-center gap-1.5 rounded-2xl border border-signal/40 bg-home-glass-strong p-6 text-center">
               <p className="text-[0.72rem] font-extrabold text-foreground">Sign in to see live bounties near you</p>
-              <p className="text-[0.62rem] font-semibold text-muted-foreground">Bounties, live streams and alerts are only shown to members. Joining is free.</p>
+              <p className="text-[0.62rem] font-semibold text-muted-foreground">Bounties, fresh clips and alerts are only shown to members. Joining is free.</p>
               <Button asChild size="sm" className="mt-1 h-8 rounded-lg px-3 text-[0.6rem] font-extrabold uppercase">
                 <Link to="/auth">Sign in or join free</Link>
               </Button>

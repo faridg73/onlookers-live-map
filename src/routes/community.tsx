@@ -902,7 +902,7 @@ function CommunityHub() {
             onClick={() => startAction("live")}
             className="rounded-full border-white/15 text-xs font-extrabold uppercase tracking-[0.1em] text-foreground"
           >
-            <Radio className="size-4" /> Start live stream
+            <Radio className="size-4" /> Start filming
           </Button>
           <Button
             type="button"
@@ -1067,7 +1067,7 @@ function CommunityHub() {
           <DialogTitle className="font-display text-2xl text-foreground">
             Welcome <span className="text-signal">back</span>
           </DialogTitle>
-          <DialogDescription>You&rsquo;re signed in. Set up your stream and go live for free.</DialogDescription>
+          <DialogDescription>You&rsquo;re signed in. Set up your camera and start filming for free.</DialogDescription>
           <Button
             type="button"
             className="mt-2 w-full gap-2"

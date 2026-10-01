@@ -86,7 +86,7 @@ export function BountyBottomSheet({
   async function goLive() {
     const target = request!.dbId ?? request!.id;
     if (!human.ready) {
-      toast.error("Finish the quick human check before you go live for this bounty.");
+      toast.error("Finish the quick human check before you film this bounty.");
       return;
     }
     setAccepting(true);
@@ -276,7 +276,7 @@ export function BountyBottomSheet({
                 : accepting
                   ? "Starting your live session…"
                   : wantsLive
-                    ? "Go live for this bounty"
+                    ? "Start filming for this bounty"
                     : "Accept & Open Camera"}
             </button>
             <div className="mt-3">

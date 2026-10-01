@@ -34,13 +34,13 @@ export function LiveNowRail({
   return (
     <>
     {live.length > 0 && (
-    <section aria-label="Live now" className="mt-5 px-5 sm:px-8">
+    <section aria-label="Filming now" className="mt-5 px-5 sm:px-8">
       <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-foreground">
         <span className="relative flex size-2">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-destructive opacity-75" />
           <span className="relative inline-flex size-2 rounded-full bg-destructive" />
         </span>
-        Live now · {live.length}
+        Filming now · {live.length}
       </p>
       <div className="mt-3 flex snap-x gap-3 overflow-x-auto pb-2">
         {live.map((post) => (

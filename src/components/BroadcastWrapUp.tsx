@@ -121,7 +121,7 @@ export function BroadcastWrapUp({
             onClick={onGoLiveAgain}
             className="h-12 w-full gap-2 bg-signal font-extrabold uppercase tracking-[0.12em] text-signal-foreground"
           >
-            <Radio className="size-4" /> Go live again
+            <Radio className="size-4" /> Film again
           </Button>
           <Button type="button" variant="outline" onClick={onProfile} className="h-12 w-full gap-2">
             <User className="size-4 text-signal" /> View my broadcasts

@@ -19,7 +19,7 @@ export const REQUEST_VIEW_DURATION_MINUTES = 5;
 export const REQUEST_VIEW_WINDOWS = [30, 60, 180] as const;
 export const DEFAULT_REQUEST_VIEW_WINDOW = 60;
 
-export const REQUEST_VIEW_TITLE = "Request a view, go live from this pin";
+export const REQUEST_VIEW_TITLE = "Request a view, film from this pin";
 
 export type ViewTierPreset = {
   id: BountyTierId;
@@ -109,7 +109,7 @@ export function postRequestedView(
     "Format: Request a View (global pin)",
     `Requested capture: ${REQUEST_VIEW_DURATION_MINUTES} min live session`,
     "Camera: Wide establishing · Vertical",
-    "Someone funded a live view of this exact spot, start a live stream from the pin and show what you can see.",
+    "Someone funded a fresh view of this exact spot, film a clip from the pin and show what you can see.",
   ].join("\n");
 
   return lockBounty({

@@ -207,7 +207,7 @@ export function VenueBountyDialog({
       : "";
     const header =
       mode === "live"
-        ? `Live: ${captureMinutes}-minute stream from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
+        ? `Film it now: ${captureMinutes}-minute clip from ${venue.name}, starting ${windowLabel.toLowerCase()}.`
         : `Clip: ${captureMinutes}-minute live-captured video from ${venue.name}, delivered ${isCustom ? windowLabel : `within ${windowLabel.toLowerCase()}`}.${startNote}`;
     const details = `${header}\n${note.trim()}`;
     // The store still wants a countdown; derive one from the calendar pick.
@@ -333,12 +333,12 @@ export function VenueBountyDialog({
           <div className="flex gap-2">
             <button type="button" onClick={() => pickMode("live")} aria-pressed={mode === "live"} className={modeCard(mode === "live")}>
               <Radio className="size-4 text-signal" />
-              <p className="mt-1.5 text-sm font-extrabold text-foreground">Live stream</p>
-              <p className="text-xs text-muted-foreground">Watch it happen in real time, you pick the length</p>
+              <p className="mt-1.5 text-sm font-extrabold text-foreground">Film it now</p>
+              <p className="text-xs text-muted-foreground">An onlooker films it on the spot. You get the clip as soon as they finish, and you pick the length.</p>
             </button>
             <button type="button" onClick={() => pickMode("clip")} aria-pressed={mode === "clip"} className={modeCard(mode === "clip")}>
               <Video className="size-4 text-signal" />
-              <p className="mt-1.5 text-sm font-extrabold text-foreground">Pre-recorded clip</p>
+              <p className="mt-1.5 text-sm font-extrabold text-foreground">By a deadline</p>
               <p className="text-xs text-muted-foreground">Delivered by a hard deadline</p>
             </button>
           </div>
@@ -428,7 +428,7 @@ export function VenueBountyDialog({
 
           <div className="space-y-2">
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
-              {mode === "live" ? "Stream length" : "Clip length"}
+              {"Clip length"}
             </span>
             <Select
               value={customDuration !== null ? "custom" : String(durationMin)}
@@ -442,7 +442,7 @@ export function VenueBountyDialog({
               }}
             >
               <SelectTrigger
-                aria-label={mode === "live" ? "Stream length" : "Clip length"}
+                aria-label={"Clip length"}
                 className="h-11 w-full rounded-xl border-border bg-background text-foreground"
               >
                 <SelectValue />

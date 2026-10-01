@@ -472,7 +472,7 @@ function ProfileScreen() {
           </DialogHeader>
           <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p className="text-foreground">
-              Onlooker is a real-time broadcast marketplace. It connects people who want to see a place right now with creators who are already standing there.
+              Onlooker is an on-the-spot video marketplace. It connects people who want to see a place right now with creators who are already standing there.
             </p>
             <p>
               The best moments are never scripted. They happen around the corner or across the ocean, and they only stay interesting for a moment. We built Onlooker so anyone can tap a map, post a live request, and get an honest look from a real person on the ground, with bounties held securely until the job is done.

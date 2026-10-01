@@ -97,7 +97,7 @@ export function CreatorVerificationCard() {
       {status.isVerified ? (
         <p className="mt-2 text-xs text-muted-foreground">
           Your number is confirmed and your account is verified. The green check mark shows next to
-          your name everywhere, and you can go live for free straight away.
+          your name everywhere, and you can start filming for free straight away.
         </p>
       ) : step === "number" ? (
         <>

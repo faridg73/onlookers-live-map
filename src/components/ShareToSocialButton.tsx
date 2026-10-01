@@ -58,7 +58,7 @@ export function ShareToSocialButton({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {subject.kind === "live" && <Radio className="size-4 shrink-0 text-signal" />}
-            <span className="break-words">Share {subject.kind === "live" ? "this live stream" : "this pin"}</span>
+            <span className="break-words">Share {subject.kind === "live" ? "this clip" : "this pin"}</span>
           </DialogTitle>
           <DialogDescription className="break-words">
             Anywhere you paste this link it shows a preview card with the title, the location pin

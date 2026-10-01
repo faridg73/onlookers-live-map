@@ -227,8 +227,8 @@ type PlaceCategoryId = (typeof PLACE_CATEGORIES)[number]["id"];
 
 
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
-  { id: "live", label: "Go Live Now", copy: "Alert nearby onlookers immediately", icon: Radio },
-  { id: "clip", label: "Request Video Clip", copy: "Receive a short live-captured video", icon: Video },
+  { id: "live", label: "Film it now", copy: "An onlooker films it on the spot. You get the clip as soon as they finish, and you pick the length.", icon: Radio },
+  { id: "clip", label: "Request Video Clip", copy: "Receive a short video clip by your deadline", icon: Video },
   { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
 
@@ -761,7 +761,7 @@ function PostScreen() {
       return;
     }
     if (note.trim().length < 10) {
-      toast.error("Tell the onlooker exactly what to film before going live.");
+      toast.error("Tell the onlooker exactly what to film before posting.");
       return;
     }
     if (customDeadline && customDeadline.getTime() <= Date.now()) {
@@ -986,7 +986,7 @@ function PostScreen() {
                     Free social broadcast
                   </span>
                   <span className="mt-1 block text-sm text-signal">
-                    You go live from your phone and stream to your followers and people nearby. No credits, no escrow.
+                    You film it from your phone and share it with your followers and people nearby. No credits, no escrow.
                   </span>
                   <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">You film it</span>
                 </span>
@@ -1502,7 +1502,7 @@ function PostScreen() {
 
                 <div className="rounded-xl border border-border bg-background p-3">
                   <p className="text-xs font-bold uppercase text-muted-foreground">
-                    {action === "live" ? "Stream length" : "Clip length"}
+                    {"Clip length"}
                   </p>
                   <Select
                     value={customCapture ? "custom" : String(capture)}
@@ -1635,7 +1635,7 @@ function PostScreen() {
                     <span>
                       <span className="block text-sm font-extrabold text-foreground">Keep private</span>
                       <span className="block text-xs font-medium text-muted-foreground">
-                        Only you can watch. It never appears in Live now, on the map or on Discover, and its replay stays out of Recent captures.
+                        Only you can watch. It never appears in Filming now, on the map or on Discover, and its replay stays out of Recent captures.
                       </span>
                     </span>
                   </label>
