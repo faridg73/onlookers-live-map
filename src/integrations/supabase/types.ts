@@ -1961,6 +1961,8 @@ export type Database = {
           duration_minutes: number
           expires_at: string
           id: string
+          is_private: boolean
+          is_verified_visit: boolean
           latitude: number
           location_name: string
           location_type: string | null
@@ -1985,6 +1987,8 @@ export type Database = {
           duration_minutes?: number
           expires_at?: string
           id?: string
+          is_private?: boolean
+          is_verified_visit?: boolean
           latitude: number
           location_name?: string
           location_type?: string | null
@@ -2009,6 +2013,8 @@ export type Database = {
           duration_minutes?: number
           expires_at?: string
           id?: string
+          is_private?: boolean
+          is_verified_visit?: boolean
           latitude?: number
           location_name?: string
           location_type?: string | null
@@ -2978,6 +2984,7 @@ export type Database = {
         }[]
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
+      is_private_request: { Args: { _request_id: string }; Returns: boolean }
       is_reserved_username: { Args: { _username: string }; Returns: boolean }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
       is_team_member: { Args: { _team_id: string }; Returns: boolean }
