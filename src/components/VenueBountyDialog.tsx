@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { scrollFieldToStart } from "@/lib/field-scroll";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
@@ -378,28 +379,34 @@ export function VenueBountyDialog({
               {mode === "live" ? "Start window" : "Delivery deadline"}
             </span>
             <div className="flex items-center gap-2">
-              <select
-                aria-label={mode === "live" ? "Start window" : "Delivery deadline"}
+              <Select
                 value={isCustom ? "custom" : String(minutes)}
-                onChange={(e) => {
-                  if (e.target.value === "custom") {
+                onValueChange={(v) => {
+                  if (v === "custom") {
                     setCustomOpen(true);
                     return;
                   }
-                  setMinutes(Number(e.target.value));
+                  setMinutes(Number(v));
                   setCustomDeadline(null);
                 }}
-                className="field min-w-0 flex-1 bg-background text-foreground [color-scheme:dark]"
               >
-                {windows.map(({ minutes: m, label }) => (
-                  <option key={m} value={String(m)}>
-                    {label}
-                  </option>
-                ))}
-                <option value="custom">
-                  {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
-                </option>
-              </select>
+                <SelectTrigger
+                  aria-label={mode === "live" ? "Start window" : "Delivery deadline"}
+                  className="h-11 min-w-0 flex-1 rounded-xl border-border bg-background text-foreground"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {windows.map(({ minutes: m, label }) => (
+                    <SelectItem key={m} value={String(m)} className="py-2.5">
+                      {label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="custom" className="py-2.5">
+                    {isCustom ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               {isCustom && (
                 <button
                   type="button"
@@ -423,26 +430,32 @@ export function VenueBountyDialog({
             <span className="text-[0.7rem] font-extrabold uppercase tracking-[0.16em] text-foreground">
               {mode === "live" ? "Stream length" : "Clip length"}
             </span>
-            <select
-              aria-label={mode === "live" ? "Stream length" : "Clip length"}
+            <Select
               value={customDuration !== null ? "custom" : String(durationMin)}
-              onChange={(e) => {
-                if (e.target.value === "custom") {
+              onValueChange={(v) => {
+                if (v === "custom") {
                   setCustomDuration(customDuration ?? durationMin);
                   return;
                 }
-                setDurationMin(Number(e.target.value));
+                setDurationMin(Number(v));
                 setCustomDuration(null);
               }}
-              className="field w-full bg-background text-foreground [color-scheme:dark]"
             >
-              {LIVE_DURATIONS.map((d) => (
-                <option key={d} value={String(d)}>
-                  {d} min
-                </option>
-              ))}
-              <option value="custom">Custom</option>
-            </select>
+              <SelectTrigger
+                aria-label={mode === "live" ? "Stream length" : "Clip length"}
+                className="h-11 w-full rounded-xl border-border bg-background text-foreground"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LIVE_DURATIONS.map((d) => (
+                  <SelectItem key={d} value={String(d)} className="py-2.5">
+                    {d} min
+                  </SelectItem>
+                ))}
+                <SelectItem value="custom" className="py-2.5">Custom</SelectItem>
+              </SelectContent>
+            </Select>
             {customDuration !== null && (
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 <input
