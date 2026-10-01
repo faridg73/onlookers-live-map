@@ -4,8 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendTestAlertText } from "@/lib/sms.functions";
 import { savePushToken, removePushToken } from "@/lib/push.functions";
 import { toast } from "sonner";
-import { Bell, BellOff, BellRing, Mail, MapPin, MessageSquare } from "lucide-react";
+import { Bell, BellOff, BellRing, ChevronDown, Mail, MapPin, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EarnAccordionRow } from "@/components/EarnAccordionRow";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/use-auth";
@@ -33,6 +34,7 @@ export function AlertSettingsCard() {
   const [prefs, setPrefs] = useState<AlertPreferences>(DEFAULT_ALERT_PREFERENCES);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [radiusMenuOpen, setRadiusMenuOpen] = useState(false);
   const [smsState, setSmsState] = useState<{ ok: boolean; message: string } | null>(null);
   const [pushState, setPushState] = useState<{ loading: boolean; registered: boolean; message?: string }>({
     loading: false,
@@ -183,6 +185,12 @@ export function AlertSettingsCard() {
       { key: "sms_enabled", label: "Text message", icon: MessageSquare, hint: "Texts your phone with the place, payout and claim link" },
       { key: "email_enabled", label: "Email", icon: Mail, hint: "Starts once your sending address is verified" },
     ];
+  const enabledChannelCount =
+    Number(prefs.push_enabled) +
+    Number(prefs.sms_enabled) +
+    Number(prefs.email_enabled) +
+    Number(pushState.registered);
+  const channelSummary = `${enabledChannelCount} on · ${4 - enabledChannelCount} off`;
 
   return (
     <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
@@ -191,131 +199,143 @@ export function AlertSettingsCard() {
         Choose how far away you want to hear about new bounties, and how we reach you.
       </p>
 
-      <div className="mt-4 space-y-2">
-        {rows.map(({ key, label, hint, icon: Icon }) => (
-          <div
-            key={key}
-            className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-raised px-3 py-3"
-          >
-            <div className="min-w-0">
-              <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <Icon className="size-4 text-signal" /> {label}
-              </p>
-              <p className="mt-0.5 text-[0.7rem] text-muted-foreground">{hint}</p>
+      <div className="mt-4">
+        <EarnAccordionRow title="Notification channels" summary={channelSummary}>
+          <div className="space-y-2">
+            {rows.map(({ key, label, hint, icon: Icon }) => (
+              <div
+                key={key}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-surface-raised px-3 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <Icon className="size-4 shrink-0 text-signal" /> {label}
+                  </p>
+                  <p className="mt-0.5 text-[0.7rem] text-muted-foreground">{hint}</p>
+                </div>
+                <Switch checked={prefs[key]} onCheckedChange={(v) => set(key, v)} aria-label={label} />
+              </div>
+            ))}
+
+            <div className="rounded-xl border border-border bg-surface-raised p-3">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    {pushState.registered ? (
+                      <BellRing className="size-4 shrink-0 text-signal" />
+                    ) : (
+                      <Bell className="size-4 shrink-0 text-muted-foreground" />
+                    )}{" "}
+                    Phone push alerts
+                  </p>
+                  <p className="mt-0.5 text-[0.7rem] text-muted-foreground">
+                    {pushState.registered
+                      ? "You'll get bounty alerts even when the app is closed."
+                      : "Wake your phone when a bounty drops nearby, even with the app closed."}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant={pushState.registered ? "outline" : "default"}
+                  size="sm"
+                  className="h-9 shrink-0 rounded-xl font-bold"
+                  disabled={pushState.loading}
+                  onClick={() => void togglePush()}
+                >
+                  {pushState.loading ? (
+                    "Working…"
+                  ) : pushState.registered ? (
+                    <>
+                      <BellOff className="mr-1.5 size-4" /> Disable
+                    </>
+                  ) : (
+                    <>
+                      <Bell className="mr-1.5 size-4" /> Enable
+                    </>
+                  )}
+                </Button>
+              </div>
+              {pushState.message && (
+                <p className={`mt-2 text-[0.7rem] ${pushState.registered ? "text-signal" : "text-muted-foreground"}`}>
+                  {pushState.message}
+                </p>
+              )}
             </div>
-            <Switch checked={prefs[key]} onCheckedChange={(v) => set(key, v)} aria-label={label} />
           </div>
-        ))}
+        </EarnAccordionRow>
       </div>
 
-      <div className="mt-3 rounded-xl border border-border bg-surface-raised p-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              {pushState.registered ? (
-                <BellRing className="size-4 text-signal" />
-              ) : (
-                <Bell className="size-4 text-muted-foreground" />
-              )}{" "}
-              Phone push alerts
-            </p>
-            <p className="mt-0.5 text-[0.7rem] text-muted-foreground">
-              {pushState.registered
-                ? "You'll get bounty alerts even when the app is closed."
-                : "Wake your phone when a bounty drops nearby, even with the app closed."}
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant={pushState.registered ? "outline" : "default"}
-            size="sm"
-            className="h-9 shrink-0 rounded-xl font-bold"
-            disabled={pushState.loading}
-            onClick={() => void togglePush()}
-          >
-            {pushState.loading ? (
-              "Working…"
-            ) : pushState.registered ? (
-              <>
-                <BellOff className="mr-1.5 size-4" /> Disable
-              </>
-            ) : (
-              <>
-                <Bell className="mr-1.5 size-4" /> Enable
-              </>
-            )}
-          </Button>
-        </div>
-        {pushState.message && (
-          <p
-            className={`mt-2 text-[0.7rem] ${
-              pushState.registered ? "text-signal" : "text-muted-foreground"
-            }`}
-          >
-            {pushState.message}
+      <div className="mt-3 space-y-2">
+        <Input
+          type="tel"
+          inputMode="tel"
+          placeholder="Mobile number for texts, e.g. (213) 555-0134"
+          value={prefs.phone}
+          onChange={(e) => set("phone", e.target.value)}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 w-full rounded-xl font-bold"
+          disabled={testing || prefs.phone.trim().length < 5}
+          onClick={() => void sendTest()}
+        >
+          {testing ? "Texting you…" : "Send a test text"}
+        </Button>
+        {smsState && (
+          <p className={`text-[0.7rem] ${smsState.ok ? "text-signal" : "text-destructive"}`}>
+            {smsState.message}
           </p>
         )}
       </div>
 
-      {prefs.sms_enabled && (
-        <div className="mt-3 space-y-2">
-          <Input
-            type="tel"
-            inputMode="tel"
-            placeholder="Mobile number for texts, e.g. (213) 555-0134"
-            value={prefs.phone}
-            onChange={(e) => set("phone", e.target.value)}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            className="h-10 w-full rounded-xl font-bold"
-            disabled={testing || prefs.phone.trim().length < 5}
-            onClick={() => void sendTest()}
-          >
-            {testing ? "Texting you…" : "Send a test text"}
-          </Button>
-          {smsState && (
-            <p
-              className={`text-[0.7rem] ${
-                smsState.ok ? "text-signal" : "text-destructive"
-              }`}
-            >
-              {smsState.message}
-            </p>
-          )}
-        </div>
-      )}
-
       <p className="mt-5 text-[0.7rem] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
         Alert radius
       </p>
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {RADIUS_CHOICES.map((miles: number) => (
-          <button
-            key={miles}
-            type="button"
-            aria-pressed={prefs.radius_miles === miles}
-            onClick={() => set("radius_miles", miles)}
-            className={`rounded-xl border px-2 py-2 text-sm font-bold ${
-              prefs.radius_miles === miles
-                ? "border-signal bg-signal text-signal-foreground"
-                : "border-border bg-surface-raised text-foreground"
-            }`}
-          >
-            {miles} mi
-          </button>
-        ))}
+      <div className="relative mt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setRadiusMenuOpen((open) => !open)}
+          aria-expanded={radiusMenuOpen}
+          aria-label="Alert radius"
+          className="h-10 w-full justify-between rounded-full border-border bg-surface-raised px-4 text-sm font-bold text-foreground hover:bg-secondary"
+        >
+          <span>📍 {prefs.radius_miles} mi</span>
+          <ChevronDown className={`size-4 shrink-0 transition-transform duration-200 ${radiusMenuOpen ? "rotate-180" : ""}`} aria-hidden />
+        </Button>
+        {radiusMenuOpen && (
+          <div className="absolute inset-x-0 top-full z-20 mt-1 rounded-xl border border-border bg-surface-raised p-2 shadow-lg">
+            <div className="grid grid-cols-2 gap-1">
+              {RADIUS_CHOICES.map((miles: number) => (
+                <Button
+                  key={miles}
+                  type="button"
+                  variant="ghost"
+                  aria-pressed={prefs.radius_miles === miles}
+                  onClick={() => {
+                    set("radius_miles", miles);
+                    setRadiusMenuOpen(false);
+                  }}
+                  className={`h-9 justify-start rounded-lg px-3 text-xs font-bold ${prefs.radius_miles === miles ? "text-signal" : "text-foreground"}`}
+                >
+                  {miles} mi
+                </Button>
+              ))}
+            </div>
+            <Input
+              className="mt-2"
+              type="number"
+              min={1}
+              step={1}
+              aria-label="Custom alert radius in miles"
+              placeholder="Custom distance in miles"
+              value={prefs.radius_miles}
+              onChange={(e) => set("radius_miles", Math.max(1, Number(e.target.value) || 1))}
+            />
+          </div>
+        )}
       </div>
-      <Input
-        className="mt-2"
-        type="number"
-        min={1}
-        step={1}
-        placeholder="Any distance in miles"
-        value={prefs.radius_miles}
-        onChange={(e) => set("radius_miles", Math.max(1, Number(e.target.value) || 1))}
-      />
       <p className="mt-1.5 text-[0.7rem] text-muted-foreground">
         Set any distance you like — city-wide, statewide or further. There is no maximum.
       </p>
