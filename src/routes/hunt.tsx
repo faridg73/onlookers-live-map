@@ -405,7 +405,7 @@ function HuntScreen() {
         </button>
         {mapOpen && (
           <div className="px-2 pb-2">
-            <LiveBountyMapBox pins={pins} center={position} heightClass="h-[130px]" hideHeader />
+            <LiveBountyMapBox pins={pins} center={position} heightClass="h-48 sm:h-56" hideHeader />
             <Link to="/" className="mt-1.5 block text-right text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal">
               Full map
             </Link>

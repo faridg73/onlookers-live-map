@@ -939,7 +939,7 @@ function PostScreen() {
                 <p className="text-xs font-extrabold uppercase text-signal">
                   {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
                 </p>
-                <h1 id="post-wizard-title" className="font-display text-xl font-extrabold text-foreground">
+                <h1 id="post-wizard-title" className="break-words font-display text-xl font-extrabold text-foreground [overflow-wrap:anywhere]">
                   {mode === null
                     ? <>Broadcast, bounty or <span className="text-signal">visit?</span></>
                     : mode === "broadcast"
