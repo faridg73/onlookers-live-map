@@ -16,6 +16,62 @@ import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
 import { useAuth } from "@/hooks/use-auth";
 import { hasMyProAccount } from "@/lib/pro-visits.functions";
 import { LatestNearYouRail } from "@/components/LatestNearYouRail";
+import { liveStreamsFrom } from "@/components/LiveNowRail";
+import { listCommunityPosts, type CommunityPost } from "@/lib/community";
+import { useEffect } from "react";
+
+/** Home "Live now": only public free broadcasts whose camera is checking in. */
+function HomeLiveNow() {
+  const [live, setLive] = useState<CommunityPost[]>([]);
+  useEffect(() => {
+    let alive = true;
+    const load = () =>
+      void listCommunityPosts()
+        .then((rows) => alive && setLive(liveStreamsFrom(rows)))
+        .catch(() => {});
+    load();
+    const timer = window.setInterval(load, 30_000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, []);
+  return (
+    <section aria-labelledby="home-live-now" className="rounded-3xl border border-home-line bg-home-glass p-3.5 backdrop-blur-2xl sm:p-4">
+      <h3 id="home-live-now" className="home-display flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.14em] text-foreground">
+        <span className="relative flex size-2" aria-hidden>
+          <span className="absolute inset-0 animate-ping rounded-full bg-destructive opacity-75 motion-reduce:animate-none" />
+          <span className="relative size-2 rounded-full bg-destructive" />
+        </span>
+        Live now{live.length > 0 ? ` · ${live.length}` : ""}
+      </h3>
+      {live.length === 0 ? (
+        <p className="mt-2 text-[0.7rem] font-semibold text-muted-foreground">Nobody is streaming right now.</p>
+      ) : (
+        <div className="mt-3 flex snap-x gap-3 overflow-x-auto pb-1">
+          {live.map((post) => (
+            <Link
+              key={post.id}
+              to="/live/$id"
+              params={{ id: post.id }}
+              search={{ title: post.title, place: post.place }}
+              className="w-60 shrink-0 snap-start rounded-2xl border border-signal/40 bg-card p-3 hover:border-signal"
+            >
+              <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[0.6rem] font-extrabold uppercase text-destructive-foreground">
+                <Radio className="size-3" /> Live
+              </span>
+              <p className="mt-2 line-clamp-2 text-sm font-bold text-foreground">{post.title}</p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">@{post.authorName}</p>
+              <p className="mt-1 flex items-center gap-1 truncate text-xs text-signal">
+                <MapPin className="size-3 shrink-0" /> {post.place}
+              </p>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 type ActivityTab = "all" | "bounty" | "live" | "alert";
 
@@ -311,6 +367,9 @@ export function HomeLiveStage({
             See what&apos;s happening. Right now.
           </h2>
         </div>
+
+        {/* Live now — public free broadcasts that are actually streaming, first in the feed */}
+        <HomeLiveNow />
 
         {/* 2. Explore by vibe — real category cards, browsable without sign-in */}
         <section aria-labelledby="home-explore-vibes">
