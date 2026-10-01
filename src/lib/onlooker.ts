@@ -277,6 +277,9 @@ export type LiveRequest = {
   claimedByMe?: boolean | undefined;
   /** The caller's own claim status: in_progress, submitted or approved */
   myClaimStatus?: string | undefined;
+  /** Private bounty or Verified Visit: claimable on Hunt, hidden from public surfaces. */
+  isPrivate?: boolean | undefined;
+  isVerifiedVisit?: boolean | undefined;
 };
 
 export type MapPosition = { lat: number; lng: number };
