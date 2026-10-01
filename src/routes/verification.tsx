@@ -61,7 +61,7 @@ const STEPS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   {
     icon: BadgeCheck,
     title: "Verification unlocks submission",
-    body: "A verified visit unlocks footage submission for Poster review. Once approved (or auto-approved after the review window), the escrowed payout releases. If the contact never shows or responds, the Hunter can report it and receive a partial trip fee — you never pay for a visit that didn't happen, and Hunters never lose out for a no-show contact.",
+    body: "A verified visit unlocks footage submission for Poster review. Once approved (or auto-approved after the review window), the escrowed payout releases. If the contact never shows or responds, the onlooker can report it. You get the bounty back minus a trip fee of 25% of the bounty, which goes to the onlooker for their time — you never pay the full bounty for a visit that didn't happen.",
   },
 ];
 
@@ -74,12 +74,12 @@ const PROTECTIONS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   {
     icon: ShieldX,
     title: "One-tap decline, no account needed",
-    body: "If the contact never authorized the visit, a secure link in their message cancels it instantly. You're refunded and the Onlooker still receives a trip fee for their time.",
+    body: "If the contact never authorized the visit, a secure link in their message cancels it instantly. You get the bounty back minus a trip fee of 25% of the bounty, which goes to the onlooker for their time. If no onlooker had claimed it yet, you get the full bounty back.",
   },
   {
     icon: Undo2,
     title: "Unreachable? You're covered",
-    body: "If the Onlooker arrives and the contact never approves or shares the PIN, they can report the contact unreachable after a fair wait. You get the bounty back minus a small kill fee for the wasted trip.",
+    body: "If the Onlooker arrives and the contact never approves or shares the PIN, they can report the contact unreachable after a fair wait. You get the bounty back minus a trip fee of 25% of the bounty, which goes to the onlooker for their time.",
   },
   {
     icon: Smartphone,

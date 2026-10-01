@@ -82,7 +82,7 @@ export async function listDisputesDetailed(): Promise<DetailedDisputeCase[]> {
   }));
 }
 
-/** Moderator decision: split the escrow — kill fee to the reporter, rest refunded. */
+/** Moderator decision: split the escrow — trip fee to the reporter, rest refunded. */
 export async function resolveDisputeSplit(
   requestId: string,
   spotterPercent: number,

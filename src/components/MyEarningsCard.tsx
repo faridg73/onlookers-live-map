@@ -5,7 +5,6 @@ import { CoinsIcon, Loader2, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   CREDITS_PER_USD,
-  PLATFORM_FEE_RATE,
   creditsToUsdValue,
   fetchMyEarnings,
   holdLabel,
