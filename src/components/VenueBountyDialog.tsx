@@ -292,7 +292,7 @@ export function VenueBountyDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="top-[calc(env(safe-area-inset-top)+0.75rem)] max-h-[calc(100dvh-env(safe-area-inset-top)-1.5rem)] translate-y-0 overflow-x-hidden overflow-y-auto overscroll-contain [&>*]:min-w-0 sm:top-1/2 sm:max-h-[90dvh] sm:max-w-md sm:-translate-y-1/2">
+      <DialogContent className="top-[calc(env(safe-area-inset-top)+0.75rem)] max-h-[calc(100dvh-env(safe-area-inset-top)-1.5rem)] translate-y-0 overflow-x-hidden overflow-y-auto overscroll-contain [&>*]:min-w-0 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1.5rem))] sm:top-1/2 sm:max-h-[90dvh] sm:max-w-md sm:-translate-y-1/2">
         <DialogHeader className="min-w-0">
           <DialogTitle className="font-display text-xl break-words">Post a bounty</DialogTitle>
           <DialogDescription className="min-w-0 break-words [overflow-wrap:anywhere] line-clamp-3">

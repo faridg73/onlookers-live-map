@@ -551,7 +551,7 @@ export default function HandshakeExplainer() {
 
       <div style={{ textAlign: "center", minHeight: 64, display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ fontSize: 17, fontWeight: 700 }}>{STEPS[step]?.title}</div>
-        <div style={{ fontSize: 13, color: "#9A9A9E", lineHeight: 1.5, maxWidth: 380 }}>{STEPS[step]?.caption}</div>
+        <div style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.5, maxWidth: 380 }}>{STEPS[step]?.caption}</div>
       </div>
 
       <div style={{ position: "relative", width: "100%", height: 3, background: "#1A1B1E", borderRadius: 999 }}>

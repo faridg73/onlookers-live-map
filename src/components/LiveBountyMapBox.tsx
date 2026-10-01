@@ -135,7 +135,7 @@ export function LiveBountyMapBox({
         <p className="inline-flex items-center gap-2 font-display text-base font-bold text-foreground">
           <MapPin className="size-4 text-signal" aria-hidden /> {label}
         </p>
-        <Link to="/" className="text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal">
+        <Link to="/discover" search={{ view: "map", ...(center ? { lat: center.lat, lng: center.lng, label: "You" } : {}) }} className="text-[0.62rem] font-extrabold uppercase tracking-[0.08em] text-signal">
           Full map
         </Link>
       </div>
