@@ -389,7 +389,7 @@ export function VenueBountyDialog({
                   setMinutes(Number(e.target.value));
                   setCustomDeadline(null);
                 }}
-                className="field min-w-0 flex-1 bg-background text-foreground"
+                className="field min-w-0 flex-1 bg-background text-foreground [color-scheme:dark]"
               >
                 {windows.map(({ minutes: m, label }) => (
                   <option key={m} value={String(m)}>
@@ -434,7 +434,7 @@ export function VenueBountyDialog({
                 setDurationMin(Number(e.target.value));
                 setCustomDuration(null);
               }}
-              className="field w-full bg-background text-foreground"
+              className="field w-full bg-background text-foreground [color-scheme:dark]"
             >
               {LIVE_DURATIONS.map((d) => (
                 <option key={d} value={String(d)}>
