@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
+import { clearPreviousAuthState } from "@/lib/auth-session";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -141,7 +142,7 @@ function ProfileScreen() {
   }, [user?.id]);
 
   const STATS = [
-    { icon: Wallet, label: "Total earned", value: stats?.totalEarned != null ? stats.totalEarned.toLocaleString() : "—" },
+    { icon: Wallet, label: "Earned as onlooker", value: stats?.totalEarned != null ? `${stats.totalEarned.toLocaleString()} cr` : "—" },
     { icon: Camera, label: "Shots sent", value: stats?.shots != null ? String(stats.shots) : "—" },
     { icon: Star, label: "Rating", value: stats?.rating != null ? stats.rating.toFixed(1) : "New" },
   ];
