@@ -46,6 +46,8 @@ function fromRow(row: ActiveRequestRow): LiveRequest {
     weatherMultiplier: row.weatherMultiplier,
     claimedByMe: row.claimedByMe ?? false,
     myClaimStatus: row.myClaimStatus ?? undefined,
+    isPrivate: row.isPrivate,
+    isVerifiedVisit: row.isVerifiedVisit,
   };
 }
 
@@ -78,7 +80,10 @@ type NewRequest = {
 };
 
 type Store = {
+  /** Public-safe list: private requests only appear to their poster or claimer. */
   requests: LiveRequest[];
+  /** Everything the backend returned, including private claimable jobs — Hunt and bounty pages only. */
+  allRequests: LiveRequest[];
   /** null while checking; false = visitor not signed in (bounties hidden). */
   signedIn: boolean | null;
   selectedId: string | null;
@@ -237,9 +242,14 @@ export function OnlookerProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const publicRequests = useMemo(
+    () => requests.filter((r) => !r.isPrivate || r.requester === "you" || r.claimedByMe),
+    [requests],
+  );
+
   const value = useMemo(
-    () => ({ requests, signedIn, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
-    [requests, signedIn, selectedId, addRequest, claim, remove, updateLocationType],
+    () => ({ requests: publicRequests, allRequests: requests, signedIn, selectedId, select: setSelectedId, addRequest, claim, remove, updateLocationType }),
+    [publicRequests, requests, signedIn, selectedId, addRequest, claim, remove, updateLocationType],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -57,7 +57,7 @@ function BountyPreview() {
   const search = Route.useSearch();
   const router = useRouter();
   const canGoBack = useCanGoBack();
-  const { requests, signedIn } = useOnlooker();
+  const { allRequests: requests, signedIn } = useOnlooker();
   const request = requests.find((r) => r.id === id || r.dbId === id || `db-${r.dbId}` === id) ?? null;
   const credits = Math.max(0, Math.round(request?.bounty ?? search.amt ?? 0));
   const title = request?.title ?? search.title;

@@ -66,7 +66,8 @@ function minutesLeft(expiresAt?: number, expiresInMin?: number) {
 const RADIUS_PRESETS_MI = [5, 25, 50, 100, 250, 500] as const;
 
 function HuntScreen() {
-  const { requests, claim } = useOnlooker();
+  // Hunt lists every claimable job, private ones included; the map uses the same list.
+  const { allRequests: requests, claim } = useOnlooker();
   const { boostOf } = useBoosts();
   const [position, setPosition] = useState<MapPosition | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -429,6 +429,8 @@ export type ActiveRequestRow = {
   claimedByMe: boolean;
   /** Status of the caller's own claim: in_progress, submitted or approved. */
   myClaimStatus: string | null;
+  isPrivate: boolean;
+  isVerifiedVisit: boolean;
 };
 
 /**
@@ -441,7 +443,7 @@ export const listActiveRequests = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("requests")
       .select(
-        "id, requester_id, prompt, details, location_name, location_type, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier",
+        "id, requester_id, prompt, details, location_name, location_type, bounty_amount, category, latitude, longitude, expires_at, created_at, status, bounty_tier, bounty_type, duration_minutes, custom_duration_minutes, scheduled_start_at, weather_multiplier, is_private, is_verified_visit",
       )
       .in("status", ["open", "claimed"])
       .gt("expires_at", new Date().toISOString())
@@ -491,6 +493,8 @@ export const listActiveRequests = createServerFn({ method: "GET" })
       weatherMultiplier: Number(row.weather_multiplier ?? 1),
       claimedByMe: myClaims.has(row.id),
       myClaimStatus: myClaims.get(row.id) ?? null,
+      isPrivate: Boolean(row.is_private),
+      isVerifiedVisit: Boolean(row.is_verified_visit),
     }));
   });
 
