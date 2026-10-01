@@ -5,6 +5,8 @@ import { fetchCashoutBalance, holdLabel } from "@/lib/cashout-balance";
 
 export { CREDITS_PER_USD, PLATFORM_FEE_RATE, creditsToUsdValue, holdLabel };
 
+/** The only ledger entries that count as money earned as an onlooker. */
+export const EARNING_TYPES = ["bounty_payout", "direct_tip"];
 
 export type EarningsSummary = {
   /** Credits earned before the platform fee. */
@@ -72,10 +74,13 @@ export async function fetchMyEarnings(): Promise<EarningsSummary> {
 
 
   if (wallet?.id) {
+    // Earned as an onlooker = bounty payouts + tips received. Purchases,
+    // refunds and test top-ups are balance, not earnings (same rule as Profile).
     const { data: rows } = await supabase
       .from("credit_transactions")
       .select("amount_gross, amount_platform_fee, amount_net")
-      .eq("receiver_wallet_id", wallet.id);
+      .eq("receiver_wallet_id", wallet.id)
+      .in("transaction_type", EARNING_TYPES);
 
     for (const row of rows ?? []) {
       summary.grossCredits += Number(row.amount_gross ?? 0);

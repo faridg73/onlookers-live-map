@@ -443,7 +443,7 @@ function HuntScreen() {
       <div className="mt-3 space-y-2">
         {user && (
           <EarnAccordionRow
-            title="My Earnings"
+            title="Earned as onlooker"
             summary={
               earnings
                 ? `${earnings.netCredits} cr · ${usd(creditsToUsdValue(earnings.netCredits))}`
