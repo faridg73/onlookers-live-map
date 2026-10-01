@@ -120,7 +120,7 @@ export function RealEstateSecurityDialog({ open, onOpenChange }: RealEstateSecur
 
         <div className="space-y-3 px-5 sm:px-7">
           {[
-            ["Escrow lock", "Onlooker securely holds the bounty reward when the request goes live."],
+            ["Escrow lock", "Onlooker securely holds the bounty reward when the request is posted."],
             ["Private 6-digit PIN", "A unique code and claim link are sent to your authorized property contact."],
             ["On-site verification", "The onlooker must receive and enter the PIN at the property before capture and payout unlock."],
           ].map(([label, copy], index) => (

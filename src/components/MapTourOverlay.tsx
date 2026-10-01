@@ -10,11 +10,11 @@ const steps = [
   {
     icon: Radio,
     title: "Get live eyes anywhere",
-    body: "Post a bounty on any place in the world. A nearby onlooker goes live and streams it back to you within minutes.",
+    body: "Post a bounty on any place in the world. A nearby onlooker films it and sends the clip back to you within minutes.",
   },
   {
     icon: Coins,
-    title: "Pins are live requests",
+    title: "Pins are open requests",
     body: "Every pin on the map is someone paying to see that spot right now. Gold pins are high bounties, tap any pin to watch or claim it.",
   },
   {
