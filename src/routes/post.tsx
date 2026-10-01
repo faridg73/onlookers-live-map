@@ -611,7 +611,7 @@ function PostScreen() {
     scrollFieldToStart(noteRef.current);
     if (parsed.action === "live") setMinutes(15);
     setCustomCapture(false);
-    applyCapture(parsed.action === "live" ? null : (parsed.durationMinutes ?? 5), parsed.action);
+    applyCapture(parsed.action === "live" ? 15 : (parsed.durationMinutes ?? 5), parsed.action, parsed.action === "live");
     if (parsed.action === "meetup") {
       setMinutes(60);
       setCategoryId("community-culture");
@@ -862,7 +862,7 @@ function PostScreen() {
           await linkSavedVisit({ data: { bookingId: proVisitBookingId, requestId: locked.id } });
           setProVisitBookingId(null);
         } catch {
-          toast.error("The bounty is live, but its dashboard link is still updating.");
+          toast.error("Your bounty is posted, but its dashboard link is still updating.");
         }
       }
       setBalance(locked.balance);
@@ -1466,7 +1466,7 @@ function PostScreen() {
                         setMinutes(15);
                         setCustomCapture(false);
                         setScheduledStart(null);
-                        applyCapture(null, id);
+                        applyCapture(15, id, true);
                       }
                       if (id === "clip" && capture === null) {
                         setCustomCapture(false);
@@ -1564,7 +1564,6 @@ function PostScreen() {
                     />
                     <p className="mt-2 text-xs font-medium text-muted-foreground">
                       {captureDurationLabel(capture, action === "live")}
-                      {capture === null && " — the onlooker streams until you end the session."}
                     </p>
                   </div>
                 </div>
