@@ -26,7 +26,7 @@ export const Route = createFileRoute("/live/$id")({
   head: ({ match, params }) => {
     const { title, place } = match.search as Search;
     const heading = `🎥 Filming now${place ? `, ${place}` : ""} · Onlooker`;
-    const desc = `${title ?? "A live view is streaming right now"}${
+    const desc = `${title ?? "Someone is filming right now"}${
       place ? ` at ${place}` : ""
     }. Watch it live on Onlooker. #Onlooker`;
     const url = `${SITE}/live/${params["id"]}`;
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/live/$id")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BroadcastEvent",
-            name: title ?? "Onlooker live view",
+            name: title ?? "Onlooker view",
             isLiveBroadcast: true,
             location: place ? { "@type": "Place", name: place } : undefined,
             url,
@@ -106,8 +106,8 @@ function LiveSharePage() {
               subject={{
                 kind: "live",
                 id,
-                title: title ?? "Live on Onlooker",
-                place: place ?? "Onlooker live map",
+                title: title ?? "On Onlooker",
+                place: place ?? "Onlooker map",
                 credits,
                 latitude: lat ?? null,
                 longitude: lng ?? null,

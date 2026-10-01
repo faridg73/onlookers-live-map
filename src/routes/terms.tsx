@@ -6,7 +6,7 @@ import { TermsBody } from "@/components/legal/legal-content";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service | Onlooker LLC live view bounties" },
+      { title: "Terms of Service | Onlooker LLC view bounties" },
       {
         name: "description",
         content:
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/terms")({
       {
         property: "og:description",
         content:
-          "Read the rules for posting and fulfilling live view bounties on Onlooker LLC, including safety, privacy and liability terms.",
+          "Read the rules for posting and fulfilling view bounties on Onlooker LLC, including safety, privacy and liability terms.",
       },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },

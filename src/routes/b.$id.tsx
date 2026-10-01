@@ -27,10 +27,10 @@ export const Route = createFileRoute("/b/$id")({
     const { amt, place, title } = match.search as Search;
     const heading = amt
       ? `${Math.round(amt).toLocaleString()} Credits bounty${place ? `, ${place}` : ""} · Onlooker`
-      : "Live view bounty · Onlooker";
+      : "View bounty · Onlooker";
     const desc = title
       ? `${title}${place ? ` at ${place}` : ""}. Capture a live photo or clip and claim the bounty.`
-      : "Open this bounty on the Onlooker map and claim it with a live photo or clip.";
+      : "Open this bounty on the Onlooker map and claim it with a fresh photo or clip.";
     const url = `https://onlooker.io/b/${match.params.id}`;
     const image = "https://onlooker.io/og-onlooker.jpg";
     return {
@@ -133,7 +133,7 @@ function BountyPreview() {
               ? "You claimed this bounty. Film it on site, send the capture in, and the payout is released once the poster approves."
               : claimedByOther
                 ? "Another onlooker already claimed this bounty, so it is no longer taking new claims."
-                : "Head to the pin, claim the bounty, send back a live photo or clip, and take the payout."}
+                : "Head to the pin, claim the bounty, send back a fresh photo or clip, and take the payout."}
         </p>
         {mine && request ? (
           <BountyVideoDialog request={request}>

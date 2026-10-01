@@ -195,7 +195,7 @@ export function embedSnippet(subject: ShareSubject): string {
 export function mapEmbedSnippet(): string {
   return [
     `<iframe src="${mapEmbedLink()}"`,
-    '  title="Onlooker live map" width="100%" height="560" loading="lazy"',
+    '  title="Onlooker map" width="100%" height="560" loading="lazy"',
     '  style="border:0;border-radius:16px" allow="fullscreen"></iframe>',
   ].join("\n");
 }

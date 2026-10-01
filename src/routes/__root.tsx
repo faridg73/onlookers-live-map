@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Onlooker, Fresh views from people already there" },
       {
         name: "description",
-        content: "Post a bounty and get a live photo of any place from someone standing there now.",
+        content: "Post a bounty and get a fresh photo of any place from someone standing there now.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

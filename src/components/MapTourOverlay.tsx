@@ -9,7 +9,7 @@ const STORAGE_KEY = "onlooker-map-tour-seen";
 const steps = [
   {
     icon: Radio,
-    title: "Get live eyes anywhere",
+    title: "Get eyes anywhere",
     body: "Post a bounty on any place in the world. A nearby onlooker films it and sends the clip back to you within minutes.",
   },
   {

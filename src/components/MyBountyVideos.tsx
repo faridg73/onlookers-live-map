@@ -86,9 +86,9 @@ export function MyBountyVideos() {
       await deleteBountyVideo(video);
       setVideos((prev) => prev.filter((row) => row.id !== video.id));
       setPlaying((current) => (current?.id === video.id ? null : current));
-      toast.success("Stream removed from your history.");
+      toast.success("Clip removed from your history.");
     } catch {
-      toast.error("Couldn't delete that stream. Try again.");
+      toast.error("Couldn't delete that clip. Try again.");
     } finally {
       setDeleting(null);
     }
@@ -155,9 +155,9 @@ export function MyBountyVideos() {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Delete this stream?</AlertDialogTitle>
+                          <AlertDialogTitle>Delete this clip?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            “{v.request_title || "Live broadcast"}” will be removed from your
+                            “{v.request_title || "Clip"}” will be removed from your
                             profile history permanently. This can't be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -182,7 +182,7 @@ export function MyBountyVideos() {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-foreground">
-                          {v.request_title || "Live broadcast"}
+                          {v.request_title || "Clip"}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
                           {v.request_place} · {new Date(v.created_at).toLocaleDateString()} · {formatDuration(v.duration_seconds)}
@@ -288,7 +288,7 @@ export function MyBountyVideos() {
                     key={video.id}
                     className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 rounded-xl bg-surface-raised px-3 py-2 text-xs"
                   >
-                    <span className="truncate text-foreground">{video.request_title || "Live broadcast"}</span>
+                    <span className="truncate text-foreground">{video.request_title || "Clip"}</span>
                     <span className="inline-flex items-center gap-1 text-muted-foreground">
                       <Eye className="size-3" /> {Number(video.view_count ?? 0)}
                     </span>

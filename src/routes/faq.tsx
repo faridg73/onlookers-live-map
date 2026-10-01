@@ -27,13 +27,13 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "Get help with Onlooker bounties, payouts, community reporting, live media, real estate verification, account safety, and compliance.",
+          "Get help with Onlooker bounties, payouts, community reporting, filmed media, real estate verification, account safety, and compliance.",
       },
       { property: "og:title", content: "Onlooker Help Center" },
       {
         property: "og:description",
         content:
-          "Clear guidance for bounties, reporting, streaming, property verification, safety, and platform policies.",
+          "Clear guidance for bounties, reporting, filming, property verification, safety, and platform policies.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -116,7 +116,7 @@ const CATEGORIES: FAQCategory[] = [
     icon: Radio,
     questions: [
       {
-        question: "How do I start and finish a live broadcast?",
+        question: "How do I start and finish a free filming post?",
         answer: `Choose POST, select the broadcast option, choose a category and vibe, set a location and audience, then grant camera and microphone access. On supported phones, Onlooker uses the device's native front or rear camera. Desktop devices can use a webcam or upload a file. Ending a broadcast opens a wrap-up confirming upload status and available stream results.`,
       },
       {
@@ -128,7 +128,7 @@ const CATEGORIES: FAQCategory[] = [
         answer: `Uploads can briefly show a processing or media-analysis state while the file is secured and prepared for playback. Keep the app open until upload confirmation appears. If playback is unavailable, use the provided open/download fallback, check your connection, and confirm the browser supports the recording format. Re-uploading a compatible MP4 or WebM file may resolve device-specific playback issues.`,
       },
       {
-        question: "Who can see my broadcast or submitted media?",
+        question: "Who can see my post or submitted media?",
         answer: `Visibility follows the audience selected at posting and the purpose of the content. Public or nearby broadcasts may appear in discovery surfaces, while bounty media is shared through the request and review flow. Onlooker may retain and review relevant media for safety, disputes, legal compliance, and enforcement as described in the Privacy Policy and Terms of Service.`,
       },
     ],

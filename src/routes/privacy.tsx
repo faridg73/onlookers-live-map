@@ -6,7 +6,7 @@ import { PrivacyBody } from "@/components/legal/legal-content";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy | Onlooker LLC live view bounties" },
+      { title: "Privacy Policy | Onlooker LLC view bounties" },
       {
         name: "description",
         content:

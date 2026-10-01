@@ -80,7 +80,7 @@ export function FollowButton({
 
   async function toggle() {
     if (!user) {
-      toast("Sign in to follow creators and get their live alerts.");
+      toast("Sign in to follow creators and get their alerts.");
       return;
     }
     if (busy) return;

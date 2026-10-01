@@ -51,7 +51,7 @@ export const listMyRecentActivity = createServerFn({ method: "GET" })
       })),
       ...(streams.data ?? []).map((row): ProfileActivityItem => {
         const request = row.request_id ? requestById.get(row.request_id) : null;
-        return { id: `stream-${row.id}`, kind: "streamed", title: request?.prompt ?? "Live broadcast", credits: Number(row.credits_earned) || null, occurredAt: row.started_at };
+        return { id: `stream-${row.id}`, kind: "streamed", title: request?.prompt ?? "Clip", credits: Number(row.credits_earned) || null, occurredAt: row.started_at };
       }),
     ];
 

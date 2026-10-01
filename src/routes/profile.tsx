@@ -68,12 +68,12 @@ export const Route = createFileRoute("/profile")({
       {
         name: "description",
         content:
-          "Track the bounties you earned as an onlooker and every live request you posted.",
+          "Track the bounties you earned as an onlooker and every request you posted.",
       },
       { property: "og:title", content: "Your Onlooker Profile" },
       {
         property: "og:description",
-        content: "Bounties earned as an onlooker and every live request you posted.",
+        content: "Bounties earned as an onlooker and every request you posted.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

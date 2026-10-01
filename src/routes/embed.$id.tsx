@@ -29,10 +29,10 @@ export const Route = createFileRoute("/embed/$id")({
         { title: heading },
         {
           name: "description",
-          content: "Embeddable Onlooker live view card for news sites and blogs.",
+          content: "Embeddable Onlooker view card for news sites and blogs.",
         },
         { property: "og:title", content: heading },
-        { property: "og:description", content: "Embeddable Onlooker live view card." },
+        { property: "og:description", content: "Embeddable Onlooker view card." },
         { name: "robots", content: "noindex" },
       ],
     };
@@ -63,7 +63,7 @@ function EmbedCard() {
         </div>
         <div className="px-4 py-5">
           <h1 className="font-display text-xl leading-tight text-foreground">
-            {title ?? "Live view on Onlooker"}
+            {title ?? "View on Onlooker"}
           </h1>
           {place && (
             <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/leaderboard")({
       { property: "og:title", content: "Top Reporters on Onlooker" },
       {
         property: "og:description",
-        content: "See which onlookers have collected the most bounty cash for live views.",
+        content: "See which onlookers have collected the most bounty cash for captures.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

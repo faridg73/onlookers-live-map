@@ -33,13 +33,13 @@ export const Route = createFileRoute("/discover/")({
       {
         name: "description",
         content:
-          "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a live view.",
+          "Browse live sports and events, nightlife strips, malls, airports, coastlines and landmarks around your city, then request a view.",
       },
       { property: "og:title", content: "Browse Places Near You | Onlooker Views" },
       {
         property: "og:description",
         content:
-          "Trending events, live sports and local hotspots around your city, request a live view from someone already there.",
+          "Trending events, live sports and local hotspots around your city, request a fresh view from someone already there.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -201,7 +201,7 @@ function DiscoverHome() {
           {(
             [
               { id: "grid", label: "Show categories", icon: LayoutGrid },
-              { id: "map", label: "Show live map", icon: MapIcon },
+              { id: "map", label: "Show map", icon: MapIcon },
             ] as const
           ).map((tab) => (
             <button

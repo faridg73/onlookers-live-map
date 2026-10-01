@@ -11,13 +11,13 @@ export const Route = createFileRoute("/embed/")({
   loader: () => listEmbedMarkers(),
   head: () => ({
     meta: [
-      { title: "Onlooker live map, embed" },
+      { title: "Onlooker map, embed" },
       {
         name: "description",
-        content: "Embeddable board of active Onlooker live views around the world.",
+        content: "Embeddable board of active Onlooker views around the world.",
       },
-      { property: "og:title", content: "Onlooker live map, embed" },
-      { property: "og:description", content: "Active Onlooker live views around the world." },
+      { property: "og:title", content: "Onlooker map, embed" },
+      { property: "og:description", content: "Active Onlooker views around the world." },
       { name: "robots", content: "noindex" },
     ],
   }),
