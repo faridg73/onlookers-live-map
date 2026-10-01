@@ -6,7 +6,7 @@ const LABELS: Array<{ match: RegExp; label: string; icon: typeof Camera }> = [
   { match: /^format$/i, label: "Format", icon: Film },
   { match: /^(requested capture|capture type|capture)$/i, label: "Capture Type", icon: Timer },
   { match: /^(camera|camera guidance)$/i, label: "Camera Guidance", icon: Camera },
-  { match: /^(live|stream)$/i, label: "Live", icon: Radio },
+  { match: /^(live|stream)$/i, label: "Film it now", icon: Radio },
 ];
 
 type Row = { label: string; value: string; icon: typeof Camera };

@@ -28,9 +28,9 @@ const STEPS = [
       "The Hunter taps “I'm on site.” The agent — present or not — sees their name and photo and approves the code.",
   },
   {
-    title: "5 · Hunter films & sends it live",
+    title: "5 · Hunter films & sends the clip",
     caption:
-      "Once access is granted, the Hunter follows the instructions and records the walkthrough, streaming it straight to the poster.",
+      "Once access is granted, the Hunter follows the instructions and records the walkthrough and sends the clip to the poster as soon as they finish.",
   },
   {
     title: "6 · Approved & paid",
@@ -486,7 +486,7 @@ export default function HandshakeExplainer() {
                 <rect x="-24" y="-30" width="48" height="60" rx="8" fill="#16171A" stroke="#D6FF3E" strokeWidth="1.4" />
                 <rect x="-18" y="-22" width="36" height="24" rx="3" fill="#0E0F11" />
                 <path className="hsx-play-pulse" d="M-4,-14 L-4,-2 L6,-8 Z" fill="#D6FF3E" />
-                <text x="0" y="8" textAnchor="middle" fill="#9A9A9E" fontSize="8" fontFamily="inherit">LIVE FEED</text>
+                <text x="0" y="8" textAnchor="middle" fill="#9A9A9E" fontSize="8" fontFamily="inherit">FILMING</text>
                 <rect x="-14" y="16" width="28" height="6" rx="3" fill="#2A2B2E" />
               </g>
             </svg>

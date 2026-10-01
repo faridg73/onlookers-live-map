@@ -20,12 +20,12 @@ const steps = [
   {
     icon: Globe2,
     title: "Request a view anywhere",
-    body: "Use the REQUEST button to drop a pin on any location and fund a live stream there, a concert, a street, a beach.",
+    body: "Use the REQUEST button to drop a pin on any location and fund a fresh clip from there, a concert, a street, a beach.",
   },
   {
     icon: Zap,
     title: "Flash, happening here now",
-    body: "Standing somewhere interesting? Hit FLASH to instantly alert nearby onlookers to go live at your exact spot and earn.",
+    body: "Standing somewhere interesting? Hit FLASH to instantly alert nearby onlookers to film your exact spot and earn.",
   },
 ];
 

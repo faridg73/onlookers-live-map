@@ -87,7 +87,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   } | null>(null);
   const human = useHumanCheck("community-post");
   // Live actions need a mobile number confirmed by text, social sign-ins included.
-  const phoneGate = usePhoneGate("before you go live");
+  const phoneGate = usePhoneGate("before you start filming");
   const selectedCategory = broadcastCategoryById(categoryId);
 
   useEffect(() => {
@@ -130,11 +130,11 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       return;
     }
     if (!agreed) {
-      toast.error("Accept the safety reminder before going live.");
+      toast.error("Accept the safety reminder before you start filming.");
       return;
     }
     if (!human.ready) {
-      toast.error("Finish the quick human check before going live.");
+      toast.error("Finish the quick human check before you start filming.");
       return;
     }
     if (!(await phoneGate.ensureVerified(() => void goLive()))) return;
@@ -229,7 +229,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
     return (
       <div className="mx-auto max-w-3xl animate-rise space-y-3">
         <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
-          <Radio className="size-4 text-signal" /> Going live is free
+          <Radio className="size-4 text-signal" /> Filming is free
         </p>
         <p className="text-sm text-muted-foreground">Sign in or create an account to start streaming.</p>
         <Button type="button" className="w-full" onClick={() => goAuth("signup")}>
@@ -247,7 +247,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
       <div className="mx-auto max-w-3xl animate-rise space-y-4">
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="flex items-center gap-2 text-sm font-extrabold text-foreground">
-            <ShieldCheck className="size-4 text-signal" /> Almost ready to go live
+            <ShieldCheck className="size-4 text-signal" /> Almost ready to film
           </p>
           <p className="mt-2 text-sm text-muted-foreground">{gate.reason}</p>
           {gate.retryAt ? (
@@ -382,7 +382,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
             type="button"
             variant="outline"
             aria-pressed={micOn}
-            aria-label={micOn ? "Mute microphone before going live" : "Unmute microphone"}
+            aria-label={micOn ? "Mute microphone before filming" : "Unmute microphone"}
             onClick={() => setMicOn((current) => !current)}
             className={`size-11 rounded-full p-0 ${micOn ? "border-signal text-signal" : ""}`}
           >
@@ -505,7 +505,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         className="h-12 w-full gap-2 text-sm font-extrabold uppercase tracking-[0.14em]"
       >
         <Radio className="size-4" />
-        {posting ? "Starting…" : "Go live free"}
+        {posting ? "Starting…" : "Start filming free"}
       </Button>
       <p className="text-center text-xs text-muted-foreground">
         or{" "}

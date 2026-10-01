@@ -25,7 +25,7 @@ export const FLASH_MIN_BOUNTY_CREDITS = 40;
 export const FLASH_DURATION_MINUTES = 5;
 export const FLASH_WINDOW_MINUTES = 15;
 
-export const FLASH_TITLE = "Happening here now, go live";
+export const FLASH_TITLE = "Happening here now, film it";
 
 export type FlashTierPreset = {
   id: BountyTierId;
@@ -287,7 +287,7 @@ export function postFlashBounty(
   const selectedCategory = broadcastCategoryById(resolved.categoryId ?? "breaking-incidents");
 
   const details = [
-    "Format: Go Live Now (flash bounty)",
+    "Format: Film it now (flash bounty)",
     `Requested capture: ${FLASH_DURATION_MINUTES} min live session`,
     "Camera: Wide establishing · Vertical",
     `Category: ${selectedCategory.label}`,
@@ -309,7 +309,7 @@ export function postFlashBounty(
         ]
       : []),
     ...(resolved.instructions ? [`Instructions: ${resolved.instructions}`] : []),
-    "Something is happening right here right now, start a live stream from this exact spot and show what you can see.",
+    "Something is happening right here right now, film a clip from this exact spot and show what you can see.",
   ].join("\n");
 
   return lockBounty({

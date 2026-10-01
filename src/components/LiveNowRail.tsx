@@ -34,13 +34,13 @@ export function LiveNowRail({
   return (
     <>
     {live.length > 0 && (
-    <section aria-label="Live now" className="mt-5 px-5 sm:px-8">
+    <section aria-label="Filming now" className="mt-5 px-5 sm:px-8">
       <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-foreground">
         <span className="relative flex size-2">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-destructive opacity-75" />
           <span className="relative inline-flex size-2 rounded-full bg-destructive" />
         </span>
-        Live now · {live.length}
+        Filming now · {live.length}
       </p>
       <div className="mt-3 flex snap-x gap-3 overflow-x-auto pb-2">
         {live.map((post) => (
@@ -56,7 +56,7 @@ export function LiveNowRail({
               className="block w-full text-left active:opacity-80"
             >
               <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-destructive-foreground">
-                <Radio className="size-3" /> Live
+                <Radio className="size-3" /> FILMING
               </span>
               <p className="mt-2 line-clamp-2 text-sm font-bold text-foreground">{post.title}</p>
               <p className="mt-1 truncate text-xs text-muted-foreground">@{post.authorName}</p>

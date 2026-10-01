@@ -132,7 +132,7 @@ export function CommunityPostCard({
         )}
         {watching && (
           <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md bg-live px-2 py-0.5 text-[0.65rem] font-extrabold text-background shadow-lg">
-            <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> Live
+            <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> FILMING
           </span>
         )}
       </div>
@@ -251,7 +251,7 @@ export function CommunityPostCard({
               size="sm"
               className="h-8 rounded-lg px-2.5 text-[0.65rem] font-extrabold uppercase tracking-[0.08em]"
             >
-              <Radio className="size-3.5" /> {watching ? "Hide" : "Join live"}
+              <Radio className="size-3.5" /> {watching ? "Hide" : "See post"}
             </Button>
           )}
           {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}

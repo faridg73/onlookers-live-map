@@ -214,12 +214,12 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
       toast.error(
         `Not enough Credits, this flash bounty locks ${formatCredits(
           totalCredits,
-        )} and you have ${formatCredits(Math.round(balance))}. Buy credits to go live here.`,
+        )} and you have ${formatCredits(Math.round(balance))}. Buy credits to post here.`,
       );
       return;
     }
     if (!legalRelease) {
-      toast.error("Accept the legal release and indemnification before going live.");
+      toast.error("Accept the legal release and indemnification before posting.");
       return;
     }
     if (permissionNeeded && !permissionOk) {
@@ -227,7 +227,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
       return;
     }
     if (!human.ready) {
-      toast.error("Finish the quick human check before going live.");
+      toast.error("Finish the quick human check before posting.");
       return;
     }
     if (!(await phoneGate.ensureVerified(() => void post()))) return;
@@ -242,7 +242,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
       addRequest({
         title: FLASH_TITLE,
         place: spot.formatted,
-        note: `Live now, ${FLASH_DURATION_MINUTES} minute stream from this exact spot.`,
+        note: `Film it now, ${FLASH_DURATION_MINUTES}-minute clip from this exact spot.`,
         bounty: totalCredits,
         category: selectedCategory.requestCategory,
         dbId: locked.id,
@@ -656,7 +656,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
               <li className="flex items-center gap-2">
                 <Timer className="size-3.5 shrink-0 text-signal" />
                 <span>
-                  <span className="font-bold text-foreground">Window:</span> {FLASH_DURATION_MINUTES}-minute live stream, expires in {FLASH_WINDOW_MINUTES} minutes
+                  <span className="font-bold text-foreground">Window:</span> {FLASH_DURATION_MINUTES}-minute clip, expires in {FLASH_WINDOW_MINUTES} minutes
                 </span>
               </li>
             </ul>
@@ -748,7 +748,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
             >
               {posting
                 ? "Locking credits, starting camera…"
-                : `Go live here, lock ${formatCredits(totalCredits)}`}
+                : `Post here, lock ${formatCredits(totalCredits)}`}
             </Button>
             {!legalRelease && (
               <p className="text-xs font-bold text-destructive">

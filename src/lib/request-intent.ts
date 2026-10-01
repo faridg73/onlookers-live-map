@@ -46,7 +46,7 @@ export function parseRequestIntent(prompt: string): ParsedRequestIntent {
   const durationText = durationMinutes ? `${durationMinutes}-minute ` : "short ";
   const instructions = action === "meetup"
     ? `Show the meetup location and current atmosphere from a lawful public area. ${clean}`
-    : `Capture a ${durationText}${action === "live" ? "live view" : "video clip"} using the outward-facing camera. ${clean}`;
+    : `Capture a ${durationText}${"video clip"} using the outward-facing camera. ${clean}`;
 
   return { action, durationMinutes, venue, locationContext, title, instructions };
 }

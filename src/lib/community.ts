@@ -159,7 +159,7 @@ export const COMMUNITY_CATEGORIES: CommunityCategoryDef[] = [
       },
       {
         title: "Ask a local anything",
-        body: "Live from the main square, answering questions about the area in real time.",
+        body: "Live from the main square, answering questions about the area.",
       },
     ],
   },

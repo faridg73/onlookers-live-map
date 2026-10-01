@@ -199,7 +199,7 @@ export function ChatInbox({
                         <span className="relative grid size-10 shrink-0 place-items-center rounded-full bg-background font-display text-sm font-extrabold text-foreground">
                           {thread.title.trim().charAt(0).toUpperCase() || "B"}
                           {chatStage(thread.status) === "active" && (
-                            <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface-raised bg-live" aria-label="Live now" />
+                            <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface-raised bg-live" aria-label="Filming now" />
                           )}
                         </span>
                         <span className="min-w-0">

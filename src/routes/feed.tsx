@@ -216,7 +216,7 @@ function FeedScreen() {
   return (
     <div className="app-shell pb-32 pt-safe">
       <PageBackButton label="Live requests" className="mb-4" />
-      <h1 className="font-display text-3xl tracking-tight text-foreground"><span className="text-signal">Live</span> requests</h1>
+      <h1 className="font-display text-3xl tracking-tight text-foreground"><span className="text-signal">Open</span> requests</h1>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         <p className="text-sm text-muted-foreground">
           <span className="text-signal">${pot}</span> in open bounties within {radiusLabel} of you.

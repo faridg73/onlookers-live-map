@@ -71,7 +71,7 @@ const COPY: Record<CommunityCategory, Record<string, SeedCopy>> = {
   },
   general: {
     "just looking around": { kicker: "Around town", title: "Golden-hour walk through the old quarter", body: "No agenda, just a live wander past the sights, shops and whatever catches the light." },
-    "ask me anything": { kicker: "AMA", title: "Local for ten years, ask me anything", body: "Live from the main square, answering questions about the neighborhood in real time." },
+    "ask me anything": { kicker: "AMA", title: "Local for ten years, ask me anything", body: "Live from the main square, answering questions about the neighborhood." },
     "day in the life": { kicker: "Day in the life", title: "Morning shift at the family bakery", body: "Live from the counter during the breakfast rush, showing what goes into a normal day." },
     "scenic views": { kicker: "Scenic views", title: "Sunset from the overlook before the fog", body: "A calm live view from the ridge with time-lapse-worthy light." },
   },

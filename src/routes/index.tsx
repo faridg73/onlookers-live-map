@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Onlooker connects live streaming with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
+          "Onlooker connects on-the-spot video with real-world accountability. Post a bounty, lock credits, and release them after verified proof.",
       },
       { property: "og:title", content: "Onlooker | Live proof backed by locked credits" },
       {
