@@ -107,7 +107,7 @@ function PoolsScreen() {
     }
     if (balance < starter) {
       toast.error(
-        `Not enough Credits, opening this pool puts ${starter} behind it and you have ${balance}. Top up on your balance page.`,
+        `Not enough Credits, opening this pool puts ${starter} behind it and you have ${balance}. You can add Credits while posting a bounty.`,
       );
       return;
     }
@@ -146,7 +146,7 @@ function PoolsScreen() {
   const chipIn = async (pool: BountyPool, amount: number) => {
     if (balance !== null && balance < amount) {
       toast.error(
-        `Not enough Credits, you have ${balance} and this chip-in needs ${amount}. Top up on your balance page.`,
+        `Not enough Credits, you have ${balance} and this chip-in needs ${amount}. You can add Credits while posting a bounty.`,
       );
       return;
     }
@@ -292,7 +292,7 @@ function PoolsScreen() {
                 </p>
                 {balance !== null && balance < starter && (
                   <p className="mt-1 text-xs text-destructive">
-                    You have {balance} Credits, top up before opening this pool.
+                    You have {balance} Credits, add more while posting a bounty before opening this pool.
                   </p>
                 )}
               </div>
