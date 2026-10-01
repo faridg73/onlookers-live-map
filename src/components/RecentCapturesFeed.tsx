@@ -42,15 +42,18 @@ export function RecentCapturesFeed({
   const navigate = useNavigate();
 
   useEffect(() => {
-    void supabase.auth.getUser().then(async ({ data }) => {
-      setMyId(data.user?.id ?? null);
-      if (data.user?.id) {
-        const { data: staff } = await supabase.rpc("is_review_staff", {
-          _user_id: data.user.id,
-        });
-        setIsStaff(Boolean(staff));
-      }
+    const apply = async (id: string | null) => {
+      setMyId(id);
+      if (!id) return setIsStaff(false);
+      const { data: staff } = await supabase.rpc("is_review_staff", { _user_id: id });
+      setIsStaff(Boolean(staff));
+    };
+    void supabase.auth.getSession().then(({ data }) => apply(data.session?.user.id ?? null));
+    // Stay in sync with sign-in/out so owners always see Delete on their captures.
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      void apply(session?.user.id ?? null);
     });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   // Tap anywhere outside the open menu closes it.
