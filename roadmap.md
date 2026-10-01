@@ -17,7 +17,7 @@
 - [x] Move ticker readout under "The city is live" line
 
 ## In progress
-- [ ] Full responsive audit: every content route, modal, sheet, menu, post-flow state, auth/settings screen at 375, 390–430, 768, 1024, and 1280+ widths; fix and retest all overflow, overlap, clipping, media scaling, modal sizing, and safe-area failures
+- [x] Full responsive audit: every content route, modal, sheet, menu, post-flow state, auth/settings screen at 375, 390–430, 768, 1024, and 1280+ widths; fixed the Earn summary clipping and retested overflow, modal sizing, and safe areas
 - [x] Profile Recent Activity: real signed-in bounty, footage, and broadcast history
 - [x] Starter feeds: exactly four cards for each of 16 vibes, backed by 64 exclusive non-overlapping photos
 - [x] Discover selected vibes: always show relevant visual posting ideas beneath every selected card on phones and web
