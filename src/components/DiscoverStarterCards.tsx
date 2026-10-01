@@ -21,7 +21,7 @@ const STARTERS: Array<{
   },
   {
     category: "general",
-    title: "Share a skill or a local view live",
+    title: "Film a skill or a local view",
     note: "Film something worth showing and share it with nearby people.",
     image: tutorialImage,
     Icon: BookOpen,

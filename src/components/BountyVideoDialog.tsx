@@ -160,7 +160,7 @@ export function BountyVideoDialog({
       setThumbs(await thumbnailUrls(rows));
       const mine = rows.find((row) => row.uploader_id === user?.id);
       if (mine) setJustSent(mine);
-      toast.success("Live capture sent to this bounty.");
+      toast.success("Capture sent to this bounty.");
     } catch (err) {
       const reason = describeUploadError(err, { bucket: "bounty-videos", sizeBytes: file.size });
       setUploadError(reason);
@@ -435,7 +435,7 @@ export function BountyVideoDialog({
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-foreground">
-                        {v.note || "Live view capture"}
+                        {v.note || "On-site capture"}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(v.created_at).toLocaleString()}

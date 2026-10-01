@@ -147,15 +147,15 @@ export const Route = createFileRoute("/post")({
   }),
   head: () => ({
     meta: [
-      { title: "Post a Live Request | Onlooker" },
+      { title: "Post a Request | Onlooker" },
       {
         name: "description",
-        content: "Describe what you need, choose the exact place, and post a secure live request.",
+        content: "Describe what you need, choose the exact place, and post a secure request.",
       },
-      { property: "og:title", content: "Post a Live Request | Onlooker" },
+      { property: "og:title", content: "Post a Request | Onlooker" },
       {
         property: "og:description",
-        content: "Describe what you need, choose the exact place, and post a secure live request.",
+        content: "Describe what you need, choose the exact place, and post a secure request.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -229,7 +229,7 @@ type PlaceCategoryId = (typeof PLACE_CATEGORIES)[number]["id"];
 const ACTIONS: Array<{ id: RequestAction; label: string; copy: string; icon: typeof Radio }> = [
   { id: "live", label: "Film it now", copy: "An onlooker films it on the spot. You get the clip as soon as they finish, and you pick the length.", icon: Radio },
   { id: "clip", label: "Request Video Clip", copy: "Receive a short video clip by your deadline", icon: Video },
-  { id: "meetup", label: "Spontaneous Meetup", copy: "Broadcast a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
+  { id: "meetup", label: "Spontaneous Meetup", copy: "Post a time-sensitive alert for nearby users to gather or meet up right now.", icon: Zap },
 ];
 
 /** How the requester wants the shot framed. */
@@ -504,7 +504,7 @@ function PostScreen() {
   useEffect(() => {
     if (mystery !== "1") return;
     setMode("bounty");
-    setPrompt("Request a live video of a strange sighting, unexplained light, or unusual aircraft");
+    setPrompt("Request a video of a strange sighting, unexplained light, or unusual aircraft");
     setTitle("Investigate a strange sighting");
     setNote("Capture a clear, steady view of the sighting and its surroundings without approaching anything unsafe.");
     scrollFieldToStart(titleRef.current);
@@ -593,7 +593,7 @@ function PostScreen() {
 
   const continueFromPrompt = () => {
     if (prompt.trim().length < 8) {
-      toast.error("Describe the live view you want in one short sentence.");
+      toast.error("Describe the view you want in one short sentence.");
       return;
     }
     if (!spot || !place.trim()) {
@@ -923,7 +923,7 @@ function PostScreen() {
                   mode === "bounty" && step > 1
                     ? "Back a step"
                     : mode !== null
-                      ? "Back to broadcast options"
+                      ? "Back to post options"
                       : "Go back"
                 }
                 onClick={() => {
@@ -1519,7 +1519,7 @@ function PostScreen() {
                     }}
                   >
                     <SelectTrigger
-                      aria-label={action === "live" ? "Stream length" : "Clip length"}
+                      aria-label={action === "live" ? "Clip length" : "Clip length"}
                       className="mt-3 h-11 w-full rounded-xl border-border bg-background text-foreground"
                     >
                       <SelectValue />

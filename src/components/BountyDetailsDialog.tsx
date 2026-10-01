@@ -93,7 +93,7 @@ export function BountyDetailsDialog({
       if (isClosed(request) || request.status !== "open" || expiredNow) {
         setUnavailableReason(
           expiredNow
-            ? "This request has expired and is no longer accepting live captures."
+            ? "This request has expired and is no longer accepting captures."
             : "The poster has already closed this request, so it is no longer available.",
         );
         return;
@@ -110,7 +110,7 @@ export function BountyDetailsDialog({
           if (data.status !== "open" || dbExpired) {
             setUnavailableReason(
               dbExpired
-                ? "This request has expired and is no longer accepting live captures."
+                ? "This request has expired and is no longer accepting captures."
                 : data.status === "claimed"
                   ? "Another onlooker has already claimed this request."
                   : "The poster has already closed this request, so it is no longer available.",

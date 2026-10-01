@@ -84,7 +84,7 @@ export function BroadcastWrapUp({
             <CloudUpload className="mt-0.5 size-3.5 shrink-0 text-signal" />
             {saved
               ? `Recording uploaded to your library${duration ? ` · ${duration}` : ""}. Watch or share it any time from your profile.`
-              : "No recording was saved for this session — your broadcast still went out live."}
+              : "No recording was saved for this session — your post still went out."}
           </p>
         </div>
 
