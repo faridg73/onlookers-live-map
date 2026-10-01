@@ -1026,7 +1026,7 @@ function PostScreen() {
                     the onlooker with a one-tap link before filming — payment held in escrow
                     until the visit is verified.
                   </span>
-                  <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">An onlooker films it · checked in by PIN</span>
+                  <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">A verified onlooker films it</span>
                 </span>
               </button>
               <button

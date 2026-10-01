@@ -14,6 +14,9 @@ import { distanceMiles, requestMapPosition } from "@/lib/onlooker";
 import type { LiveRequest, MapPosition } from "@/lib/onlooker";
 import { Button } from "@/components/ui/button";
 import { claimBountyRequest } from "@/lib/requests.functions";
+import { getIdentityStatus } from "@/lib/identity.functions";
+import { VerifyIdToClaimButton } from "@/components/VerifyIdToClaimButton";
+import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +66,14 @@ export function BountyDetailsDialog({
   const saveClaim = useServerFn(claimBountyRequest);
   const { boostOf } = useBoosts();
   const done = isClosed(request);
+  const readIdentity = useServerFn(getIdentityStatus);
+  const needsId = Boolean(request.isVerifiedVisit) && request.requester !== "you";
+  const identity = useQuery({
+    queryKey: ["identity-status"],
+    queryFn: () => readIdentity(),
+    enabled: open && needsId,
+  });
+  const idBlocked = needsId && !(identity.data?.verified && !identity.data.frozen);
   const claimable = !done && request.status === "open" && !!onClaim;
   const pooled = boostOf(request.id);
   const pool = request.bounty + pooled;
@@ -172,6 +183,14 @@ export function BountyDetailsDialog({
                 <Camera className="mr-2 size-4" /> Submit your capture
               </Button>
             </BountyVideoDialog>
+          ) : claimable && idBlocked ? (
+            identity.isLoading ? (
+              <Button type="button" disabled className="mt-2 h-12 w-full rounded-xl font-bold">
+                <Loader2 className="mr-2 size-4 animate-spin" /> Checking your ID status…
+              </Button>
+            ) : (
+              <VerifyIdToClaimButton country={identity.data?.country ?? null} />
+            )
           ) : (
             <Button
               type="button"
