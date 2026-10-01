@@ -11,6 +11,9 @@ import {
   type BillingCycle,
   type PlusPlan,
 } from "@/lib/subscriptions";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
 import { SubscriptionCheckoutSheet } from "@/components/SubscriptionCheckoutSheet";
 import type { SubscriptionTier } from "@/lib/wallet-ledger";
 
@@ -28,7 +31,17 @@ export function PlusMark({ className = "", label }: { className?: string; label?
 /** Three-tier Onlooker+ pricing with a monthly / yearly billing toggle. */
 export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: SubscriptionTier }) {
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
-  const [checkout, setCheckout] = useState<PlusPlan | null>(null);
+  const [checkout, setCheckoutRaw] = useState<PlusPlan | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const setCheckout = (plan: PlusPlan | null) => {
+    if (plan && !user) {
+      toast("Sign in to choose a plan.");
+      void navigate({ to: "/auth" });
+      return;
+    }
+    setCheckoutRaw(plan);
+  };
 
   return (
     <div>
@@ -143,7 +156,7 @@ export function OnlookerPlusPlans({ currentTier = "free" }: { currentTier?: Subs
                 }}
                 className={`mt-4 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition disabled:cursor-default disabled:opacity-50 ${plan.accent.chip}`}
               >
-                {active ? "Current plan" : `Get ${plan.name}`}
+                {active ? "Current plan" : user ? `Get ${plan.name}` : `Sign in to get ${plan.name}`}
               </button>
             </div>
           );
