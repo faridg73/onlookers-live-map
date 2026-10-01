@@ -193,6 +193,8 @@ export type CommunityPost = {
   pinnedUntil: string | null;
   pinnedCredits: number;
   createdAt: string;
+  /** Last write; a live broadcast refreshes it every ~30s as a heartbeat. */
+  updatedAt?: string | null;
   /** Set when the post is a real local event listing with a start date and time. */
   eventStartsAt: string | null;
   authorName: string;
@@ -213,7 +215,7 @@ export type CommunityPost = {
 
 const BUCKET = "chat-attachments";
 const COLUMNS =
-  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at, event_starts_at, report_incident_type, report_radius_m, media_analysis_status, reporter_trust_level, validation_count, flag_count, trust_score, report_status";
+  "id, user_id, category, tags, title, body, place, latitude, longitude, media_path, aspect, is_flash, expires_at, pinned_until, pinned_credits, created_at, updated_at, event_starts_at, report_incident_type, report_radius_m, media_analysis_status, reporter_trust_level, validation_count, flag_count, trust_score, report_status";
 
 function isPinned(post: { pinnedUntil: string | null }) {
   return Boolean(post.pinnedUntil && new Date(post.pinnedUntil).getTime() > Date.now());
@@ -250,6 +252,7 @@ async function listPublicCommunityPosts(
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
+    updatedAt: r.updated_at ?? null,
     eventStartsAt: r.event_starts_at ?? null,
     authorName: r.author_name ?? "Onlooker",
     authorAvatar: null,
@@ -321,6 +324,7 @@ export async function listCommunityPosts(category?: CommunityCategory): Promise<
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
+    updatedAt: r.updated_at ?? null,
     eventStartsAt: r.event_starts_at ?? null,
     authorName: authors.get(r.user_id)?.name ?? "Onlooker",
     authorAvatar: authors.get(r.user_id)?.avatar ?? null,
@@ -482,6 +486,7 @@ export async function listMyCommunityPosts(): Promise<CommunityPost[]> {
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
+    updatedAt: r.updated_at ?? null,
     eventStartsAt: r.event_starts_at ?? null,
     authorName: "You",
     authorAvatar: null,
@@ -508,6 +513,32 @@ export async function listMyCommunityPosts(): Promise<CommunityPost[]> {
 }
 
 /** True while a post is still current (not an expired Flash post). */
+/** Free broadcast post (one tapped "Go live"), as opposed to a regular post. */
+export function isBroadcastPost(post: { isFlash: boolean; tags: string[] }) {
+  return post.isFlash && post.tags.includes("free broadcast");
+}
+
+/** How recently the broadcaster's camera must have checked in to count as streaming. */
+export const BROADCAST_HEARTBEAT_MS = 90_000;
+
+/** True only while the broadcaster's camera is actually on and checking in. */
+export function isActivelyStreaming(post: CommunityPost) {
+  if (!isBroadcastPost(post) || !isPostLive(post)) return false;
+  const beat = post.updatedAt ? new Date(post.updatedAt).getTime() : 0;
+  return Date.now() - beat < BROADCAST_HEARTBEAT_MS;
+}
+
+/** Heartbeat from the broadcaster's camera screen. */
+export async function pingBroadcast(postId: string) {
+  await supabase.from("community_posts").update({ updated_at: new Date().toISOString() }).eq("id", postId);
+}
+
+/** Ends a broadcast so it drops out of "Live now" immediately. */
+export async function endBroadcast(postId: string) {
+  const now = new Date().toISOString();
+  await supabase.from("community_posts").update({ expires_at: now, updated_at: now }).eq("id", postId);
+}
+
 export function isPostLive(post: { expiresAt: string | null }) {
   return !post.expiresAt || new Date(post.expiresAt).getTime() > Date.now();
 }
