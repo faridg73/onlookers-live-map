@@ -117,7 +117,7 @@ const CATEGORIES: FAQCategory[] = [
     questions: [
       {
         question: "How do I start and finish a live broadcast?",
-        answer: `Choose POST, select the broadcast option, choose a category and vibe, set a location and audience, then grant camera and microphone access. On supported phones, Onlooker Live uses the device's native front or rear camera. Desktop devices can use a webcam or upload a file. Ending a broadcast opens a wrap-up confirming upload status and available stream results.`,
+        answer: `Choose POST, select the broadcast option, choose a category and vibe, set a location and audience, then grant camera and microphone access. On supported phones, Onlooker uses the device's native front or rear camera. Desktop devices can use a webcam or upload a file. Ending a broadcast opens a wrap-up confirming upload status and available stream results.`,
       },
       {
         question: "What can I record or upload?",

@@ -158,7 +158,7 @@ export async function buildShareCard(artifact: ShareArtifact): Promise<File> {
 export async function shareCaption(artifact: ShareArtifact): Promise<string> {
   const link = await referralLink();
   const bits = [artifact.title, artifact.place].filter(Boolean).join(", ");
-  return `${bits}\nLive on Onlooker 👀 ${link}\n#OnlookerLive #LiveView`;
+  return `${bits}\nOn Onlooker 👀 ${link}\n#Onlooker #LiveView`;
 }
 
 /**

@@ -12,7 +12,7 @@ import { toast } from "sonner";
  */
 
 export const SITE_URL = "https://onlooker.io";
-export const BRAND_HASHTAGS = ["Onlooker", "OnlookerLive"] as const;
+export const BRAND_HASHTAGS = ["Onlooker"] as const;
 
 export type ShareSubject = {
   /** A live broadcast, or a funded pin on the map. */
