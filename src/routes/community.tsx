@@ -568,6 +568,7 @@ function CommunityHub() {
 
       <LiveNowRail
         posts={posts}
+        requests={requests}
         onChanged={() => void load()}
         onOpen={(post) => {
           if (post.latitude != null && post.longitude != null) {
