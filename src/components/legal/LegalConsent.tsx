@@ -62,7 +62,7 @@ export function LegalConsent({
           </button>
           <label htmlFor="accept-legal" className="cursor-pointer">
             , acknowledging that I operate independently, assume all legal and physical liability,
-            will only record in lawful public spaces without trespassing, and hold Onlooker LLC harmless
+            will only record in public spaces, or on private property where I have the owner's or manager's permission, without trespassing, and hold Onlooker LLC harmless
             from any legal actions.
           </label>
         </span>

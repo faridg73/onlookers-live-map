@@ -89,7 +89,7 @@ export function CreatorVerificationCard() {
     <section className="mt-6 rounded-2xl border border-border bg-surface p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="inline-flex items-center gap-2 text-sm font-bold text-foreground">
-          <ShieldCheck className="size-4 text-signal" /> Creator verification
+          <ShieldCheck className="size-4 text-signal" /> Confirm your phone number
         </p>
         {status.isVerified && <VerifiedBadge variant="pill" />}
       </div>
