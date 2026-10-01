@@ -253,7 +253,7 @@ export function FlashBountyButton({ variant }: { variant: "map" | "nav" | "crisi
       human.reset();
       setOpen(false);
       setPosting(false);
-      toast.success("Flash bounty is live", {
+      toast.success("Your flash bounty is posted", {
         description: `Onlookers near you were alerted. ${formatCredits(
           totalCredits,
         )} held in escrow for ${FLASH_WINDOW_MINUTES} minutes.`,

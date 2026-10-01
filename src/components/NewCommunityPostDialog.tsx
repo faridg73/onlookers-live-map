@@ -143,7 +143,7 @@ export function NewCommunityPostDialog({
         latitude: coords?.latitude ?? null,
         longitude: coords?.longitude ?? null,
       });
-      toast.success(flash ? "Flash Meetup is live, the clock is running." : "Posted to Discover.");
+      toast.success(flash ? "Flash Meetup is posted, the clock is running." : "Posted to Discover.");
       setTitle("");
       setBody("");
       setPlace("");
