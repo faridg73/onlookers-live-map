@@ -184,7 +184,7 @@ export function quoteBounty(input: {
   const pct = (m: number) => `${m >= 1 ? "+" : ""}${Math.round((m - 1) * 100)}%`;
   const lengthLabel =
     input.durationMinutes === null
-      ? "Open-ended live feed"
+      ? "Clip"
       : `${Math.round(input.durationMinutes)} min capture`;
 
   const afterDuration = Math.round(exactAfterDuration);
