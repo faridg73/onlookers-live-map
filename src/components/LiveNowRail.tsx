@@ -56,7 +56,7 @@ export function LiveNowRail({
               className="block w-full text-left active:opacity-80"
             >
               <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[0.14em] text-destructive-foreground">
-                <Radio className="size-3" /> Live
+                <Radio className="size-3" /> FILMING
               </span>
               <p className="mt-2 line-clamp-2 text-sm font-bold text-foreground">{post.title}</p>
               <p className="mt-1 truncate text-xs text-muted-foreground">@{post.authorName}</p>
