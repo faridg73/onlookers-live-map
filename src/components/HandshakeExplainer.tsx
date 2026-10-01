@@ -18,7 +18,7 @@ const STEPS = [
       "A one-time 6-digit backup PIN is texted and emailed to the on-site agent. No account needed on their side.",
   },
   {
-    title: "3 · onlooker heads to the location",
+    title: "3 · Onlooker heads to the location",
     caption:
       "The app sends the onlooker straight to the property. They travel to the address on the bounty.",
   },
@@ -28,7 +28,7 @@ const STEPS = [
       "The onlooker taps “I'm on site.” The agent — present or not — sees their name and photo and approves the code.",
   },
   {
-    title: "5 · onlooker films & sends the clip",
+    title: "5 · Onlooker films & sends the clip",
     caption:
       "Once access is granted, the onlooker follows the instructions and records the walkthrough and sends the clip to the poster as soon as they finish.",
   },
