@@ -7,9 +7,9 @@ export const Route = createFileRoute("/membership")({
   head: () => ({
     meta: [
       { title: "Onlooker+ Membership — Compare Plans" },
-      { name: "description", content: "Compare Observer, Hunter and Operative Onlooker+ plans, top up credits and see your wallet history." },
+      { name: "description", content: "Compare Observer, Hunter and Operative Onlooker+ plans and see your wallet history." },
       { property: "og:title", content: "Onlooker+ Membership — Compare Plans" },
-      { property: "og:description", content: "Compare Onlooker+ plans, top up credits and see your wallet history." },
+      { property: "og:description", content: "Compare Onlooker+ plans and see your wallet history." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -28,7 +28,7 @@ function MembershipPage() {
         <ArrowLeft className="size-4" />
       </Link>
       <h1 className="font-display text-2xl tracking-tight text-foreground">Onlooker+ membership</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Compare plans, top up credits and view your history.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Compare plans and view your history.</p>
       <AccountCenter />
     </div>
   );

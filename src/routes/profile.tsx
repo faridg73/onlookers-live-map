@@ -255,7 +255,7 @@ function ProfileScreen() {
           <Sparkles className="size-5 text-signal" />
           <span className="flex flex-col">
             <span className="font-semibold">Onlooker+ membership — from $9.99/mo</span>
-            <span className="text-xs text-muted-foreground">Compare plans, top up credits, wallet history</span>
+            <span className="text-xs text-muted-foreground">Compare plans and see your wallet history</span>
           </span>
         </span>
         <ChevronRight className="size-4 text-signal" />
