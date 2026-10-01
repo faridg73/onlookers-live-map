@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CloudRain, FileUp, Gavel, Loader2, ShieldAlert } from "lucide-react";
+import { CloudRain, FileUp, Gavel, Loader2, ShieldAlert, X } from "lucide-react";
+import { PageBackButton } from "@/components/PageBackButton";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -100,7 +101,17 @@ function DisputesScreen() {
   }, [user, refresh, loadConditionsJobs]);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),3rem)] sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-32 pt-[max(env(safe-area-inset-top),1rem)] sm:px-6 lg:px-8">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <PageBackButton label="Back" fallback="/profile" />
+        <Link
+          to="/"
+          aria-label="Close dispute center"
+          className="grid size-11 shrink-0 place-items-center rounded-full border border-border bg-secondary/80 text-foreground shadow-sm"
+        >
+          <X className="size-5" aria-hidden />
+        </Link>
+      </div>
       <header className="flex items-start gap-3">
         <ShieldAlert className="mt-1 size-6 text-signal" />
         <div>

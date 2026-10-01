@@ -61,14 +61,45 @@ export function LiveBountyMapBox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [ready, setReady] = useState(false);
+  const me = useRef<google.maps.Marker | null>(null);
+  useEffect(() => {
+    if (map.current) return;
+    const t = setInterval(() => {
+      if (map.current) {
+        setReady(true);
+        clearInterval(t);
+      }
+    }, 150);
+    return () => clearInterval(t);
+  }, []);
+
   useEffect(() => {
     const instance = map.current;
-    if (!instance || typeof google === "undefined") return;
+    if (!ready || !instance || typeof google === "undefined") return;
     markers.current.forEach((marker) => marker.setMap(null));
     markers.current = [];
-    if (pins.length === 0) return;
-
-    const bounds = new google.maps.LatLngBounds();
+    me.current?.setMap(null);
+    me.current = null;
+    if (center) {
+      me.current = new google.maps.Marker({
+        map: instance,
+        position: center,
+        title: "You are here",
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 7,
+          fillColor: "#CCFF00",
+          fillOpacity: 1,
+          strokeColor: "#000000",
+          strokeWeight: 2,
+        },
+      });
+    }
+    // Pins within ~50 mi of the user frame the view; far ones never hijack it.
+    const near = center
+      ? pins.filter((p) => Math.hypot(p.lat - center.lat, p.lng - center.lng) < 0.75)
+      : pins;
     pins.forEach((pin) => {
       const marker = new google.maps.Marker({
         map: instance,
@@ -77,15 +108,26 @@ export function LiveBountyMapBox({
       });
       marker.addListener("click", () => setActive(pin));
       markers.current.push(marker);
-      bounds.extend({ lat: pin.lat, lng: pin.lng });
     });
-    if (pins.length === 1) {
-      instance.setCenter({ lat: pins[0]!.lat, lng: pins[0]!.lng });
+    google.maps.event.trigger(instance, "resize");
+    if (center && near.length === 0) {
+      instance.setCenter(center);
+      instance.setZoom(13);
+      return;
+    }
+    if (!center && pins.length === 0) return;
+    const bounds = new google.maps.LatLngBounds();
+    if (center) bounds.extend(center);
+    near.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }));
+    if (near.length === 1 && !center) {
+      instance.setCenter({ lat: near[0]!.lat, lng: near[0]!.lng });
       instance.setZoom(14);
     } else {
       instance.fitBounds(bounds, 40);
+      const z = instance.getZoom();
+      if (z !== undefined && z > 15) instance.setZoom(15);
     }
-  }, [pins]);
+  }, [pins, center?.lat, center?.lng, ready]);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-surface" aria-label={label}>
