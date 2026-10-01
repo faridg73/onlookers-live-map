@@ -26,6 +26,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { useSessionScroll } from "@/hooks/use-session-scroll";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { initNativeShell } from "@/lib/native";
+import { startUpdateCheck } from "@/lib/update-check";
 
 function NotFoundComponent() {
   return (
@@ -159,6 +160,7 @@ function RootComponent() {
   // Native shell (Capacitor iOS/Android): deep links open in-app,
   // Android back button walks router history. No-ops in the browser.
   const router = useRouter();
+  useEffect(() => startUpdateCheck(), []);
   useEffect(() => {
     void initNativeShell(
       (path) => void router.navigate({ to: path }),
