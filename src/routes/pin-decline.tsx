@@ -74,8 +74,8 @@ function PinDeclinePage() {
             </p>
             <p className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-background/70 p-3 text-xs leading-relaxed text-muted-foreground">
               <Check className="mt-0.5 size-4 shrink-0 text-signal" />
-              The money the poster set aside has been returned to them, and the person who already
-              travelled to the property is paid a small trip fee — nothing further is charged to you.
+              The poster gets the bounty back minus a trip fee of 25% of the bounty, which goes to the
+              onlooker who already travelled to the property. Nothing is charged to you.
             </p>
           </>
         ) : (

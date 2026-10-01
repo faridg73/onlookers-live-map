@@ -136,7 +136,7 @@ export async function verifySitePin(requestId: string, pin: string): Promise<Sit
 
 /**
  * The onlooker is on site but the agent never relayed the PIN. Holds the money
- * and sends the trip to review for a partial kill fee, instead of leaving the
+ * and sends the trip to review for a partial trip fee, instead of leaving the
  * onlooker with nothing for the journey.
  */
 export async function reportAgentUnreachable(requestId: string, description: string) {

@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Hunter reputation card plus, once the job is complete, a one-time
- * "Rate your hunter" prompt for the client. The database enforces one
+ * "Rate your onlooker" prompt for the client. The database enforces one
  * rating per job per client and only after the hunter's work was approved.
  */
 export function HunterWithRating({
@@ -75,7 +75,7 @@ export function HunterWithRating({
 
   return (
     <>
-      <ReputationCard key={version} userId={hunterId} fallbackName="Hunter" className={cardClassName ?? ""} />
+      <ReputationCard key={version} userId={hunterId} fallbackName="Onlooker" className={cardClassName ?? ""} />
       {complete && typeof existing === "number" && (
         <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
           You rated this hunter {existing}
@@ -84,7 +84,7 @@ export function HunterWithRating({
       )}
       {showPrompt && (
         <div className="mt-3 rounded-xl border border-signal/40 bg-surface-raised p-3">
-          <p className="text-sm font-semibold text-foreground">Rate your hunter</p>
+          <p className="text-sm font-semibold text-foreground">Rate your onlooker</p>
           <div className="mt-2 flex gap-1" onMouseLeave={() => setHover(0)}>
             {[1, 2, 3, 4, 5].map((n) => (
               <button

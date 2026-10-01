@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Clock, Eye, Flag, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
-import { DmcaReportModal } from "@/components/DmcaReportModal";
+import { Ban, Clock, Eye, Flag, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { ReportDialog } from "@/components/ReportDialog";
+import { blockUser } from "@/lib/community";
 import { toast } from "sonner";
 import { LoopingPreview } from "@/components/LoopingPreview";
 import { fetchAllExploreClips, fetchExploreClips, type ExploreClip } from "@/lib/explore";
@@ -40,7 +41,19 @@ export function RecentCapturesFeed({
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   /** Link of the clip being reported (opens the report form). */
-  const [reportUrl, setReportUrl] = useState<string | null>(null);
+  const [reportTarget, setReportTarget] = useState<{ kind: "clip"; id: string } | null>(null);
+  const [blocked, setBlocked] = useState<Set<string>>(new Set());
+  const blockUploader = async (uploaderId: string) => {
+    setMenuFor(null);
+    if (!window.confirm("Block this person? You won't see their clips anymore.")) return;
+    try {
+      await blockUser(uploaderId);
+      setBlocked((prev) => new Set(prev).add(uploaderId));
+      toast.success("Blocked. Undo anytime from your profile.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't block.");
+    }
+  };
   const menuRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
@@ -167,7 +180,7 @@ export function RecentCapturesFeed({
       <p className="mt-1 text-xs text-muted-foreground">{blurb}</p>
 
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-        {clips.map((clip) => {
+        {clips.filter((c) => !c.uploaderId || !blocked.has(c.uploaderId)).map((clip) => {
           const playing = playingId === clip.id && Boolean(clip.videoUrl);
           return (
             <li
@@ -263,11 +276,25 @@ export function RecentCapturesFeed({
                             role="menuitem"
                             onClick={() => {
                               setMenuFor(null);
-                              setReportUrl(`${window.location.origin}/explore?clip=${clip.id}`);
+                              if (!myId) {
+                                toast.error("Sign in to report a clip.");
+                                return;
+                              }
+                              setReportTarget({ kind: "clip", id: clip.id });
                             }}
                             className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-colors hover:bg-background"
                           >
                             <Flag className="size-3.5 text-signal" aria-hidden /> Report
+                          </button>
+                        )}
+                        {myId && clip.uploaderId && myId !== clip.uploaderId && (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => void blockUploader(clip.uploaderId!)}
+                            className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-colors hover:bg-background"
+                          >
+                            <Ban className="size-3.5 text-signal" aria-hidden /> Block user
                           </button>
                         )}
                         {(isStaff || (myId && myId === clip.uploaderId)) && (
@@ -291,11 +318,7 @@ export function RecentCapturesFeed({
           );
         })}
       </ul>
-      <DmcaReportModal
-        open={reportUrl !== null}
-        onOpenChange={(v) => !v && setReportUrl(null)}
-        defaultContentUrl={reportUrl ?? ""}
-      />
+      <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />
     </section>
   );
 }

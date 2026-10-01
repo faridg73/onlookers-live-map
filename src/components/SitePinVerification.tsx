@@ -182,8 +182,8 @@ export function SitePinVerification({
         </p>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
           {state.declinedAt ? `Reported ${new Date(state.declinedAt).toLocaleString()}. ` : ""}
-          This bounty is cancelled and the PIN no longer works. The poster&apos;s money was returned,
-          and the onlooker who had already travelled is paid a trip fee.
+          This bounty is cancelled and the PIN no longer works. The poster gets the bounty back minus a
+          trip fee of 25% of the bounty, which goes to the onlooker who had already travelled.
           {state.declineNote ? ` They added: “${state.declineNote}”` : ""}
         </p>
       </div>
@@ -397,8 +397,8 @@ export function SitePinVerification({
                 </button>
               </div>
               <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                The bounty money stays held while our team reviews it, and you&apos;re paid a partial
-                trip fee for the journey you already made.
+                The bounty money stays held while our team reviews it, and the poster gets it back
+                minus a trip fee of 25% of the bounty, which is paid to you for the trip.
               </p>
             </>
           ) : (

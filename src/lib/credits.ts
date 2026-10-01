@@ -22,6 +22,14 @@ export type CreditLedgerEntry = {
 
 /** Platform cut kept from every credit movement. */
 export const PLATFORM_FEE_RATE = 0.2;
+/** Bounty payouts: the platform keeps 15% of the bounty, rounded to whole credits. Tips, bids and per-minute filming use PLATFORM_FEE_RATE (20%, rounded down). */
+export const BOUNTY_FEE_RATE = 0.15;
+export function bountyFeeCredits(credits: number): number {
+  return Math.round(credits * BOUNTY_FEE_RATE);
+}
+export function bountyNetCredits(credits: number): number {
+  return credits - bountyFeeCredits(credits);
+}
 
 /** Reads the signed-in member's Credits wallet, creating it on first visit. */
 export async function fetchCreditWallet(): Promise<CreditWallet | null> {

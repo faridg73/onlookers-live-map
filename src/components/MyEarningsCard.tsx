@@ -5,7 +5,6 @@ import { CoinsIcon, Loader2, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   CREDITS_PER_USD,
-  PLATFORM_FEE_RATE,
   creditsToUsdValue,
   fetchMyEarnings,
   holdLabel,
@@ -89,7 +88,7 @@ export function MyEarningsCard() {
               cash={usd(creditsToUsdValue(summary.grossCredits))}
             />
             <Row
-              label={`Platform fee (${Math.round(PLATFORM_FEE_RATE * 100)}%)`}
+              label="Platform fee (15% on bounties, 20% on tips)"
               value={`− ${summary.feeCredits} Credits`}
               cash={`− ${usd(creditsToUsdValue(summary.feeCredits))}`}
               tone="fee"
@@ -130,8 +129,8 @@ export function MyEarningsCard() {
           </dl>
 
           <p className="mt-3 text-[0.7rem] leading-relaxed text-muted-foreground">
-            Every payout is shown in full: the bounty amount, the{" "}
-            {Math.round(PLATFORM_FEE_RATE * 100)}% platform fee, and the credits you keep. Nothing
+            Every payout is shown in full: the bounty amount, the
+            platform fee (15% on bounties, 20% on tips), and the credits you keep. Nothing
             else is deducted.
           </p>
         </>

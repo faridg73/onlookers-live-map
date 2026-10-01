@@ -6,6 +6,9 @@ import { Check, Loader2, Lock, ShieldCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getStripe } from "@/lib/stripe";
 import { startProCheckout } from "@/lib/pro.functions";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
 import { PRO_PLANS, TRIAL_VISITS, formatUsd, type ProPlan, type ProPlanId } from "@/lib/pro-plans";
 
 interface ProPaywallDialogProps {
@@ -43,7 +46,18 @@ export function ProPaywallDialog({
   onClose,
 }: ProPaywallDialogProps) {
   const [selected, setSelected] = useState<ProPlanId>(initialPlan);
-  const [checkoutPlan, setCheckoutPlan] = useState<ProPlan | null>(null);
+  const [checkoutPlan, setCheckoutPlanRaw] = useState<ProPlan | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const setCheckoutPlan = (next: ProPlan | null) => {
+    if (next && !user) {
+      toast("Sign in to choose a plan.");
+      onClose();
+      void navigate({ to: "/auth" });
+      return;
+    }
+    setCheckoutPlanRaw(next);
+  };
   const copy = HEADLINES[reason];
   const plan = PRO_PLANS.find((p) => p.id === selected) ?? PRO_PLANS[1]!;
 

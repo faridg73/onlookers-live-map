@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { creditsToUsdValue, PLATFORM_FEE_RATE } from "@/lib/credits";
+import { creditsToUsdValue, bountyNetCredits } from "@/lib/credits";
 
 /**
  * Average door-to-door speed for a short local trip: slower than a highway
@@ -43,7 +43,7 @@ export function tripValue({
   const onSite = Math.max(2, Math.round(onSiteMinutes ?? DEFAULT_ON_SITE_MINUTES));
   const travel = travelMinutes(miles);
   const totalMinutes = travel * 2 + onSite;
-  const payoutUsd = creditsToUsdValue(credits - Math.floor(credits * PLATFORM_FEE_RATE));
+  const payoutUsd = creditsToUsdValue(bountyNetCredits(credits));
   const hourlyUsd = Math.round((payoutUsd / (totalMinutes / 60)) * 100) / 100;
   return { travelMinutes: travel, onSiteMinutes: onSite, totalMinutes, payoutUsd, hourlyUsd };
 }

@@ -196,6 +196,22 @@ export function TermsBody() {
         </p>
       </Section>
 
+      <Section title="Platform Fees">
+        <p>
+          When a bounty is approved, Onlooker keeps 15% of the bounty as its platform fee, rounded
+          to the nearest whole credit, and the onlooker receives the rest. Example: a 46-credit
+          bounty has a 7-credit fee, so the onlooker receives 39 credits. Tips, bids and per-minute
+          filming carry a 20% platform fee, rounded down. The amount an onlooker will receive is
+          shown before they claim.
+        </p>
+        <p>
+          <strong className="text-foreground">Trip fee.</strong> If a Verified Visit can&apos;t go
+          ahead because the on-site contact declines it, can&apos;t be reached, or doesn&apos;t show
+          up, the poster is refunded the bounty minus a trip fee of 25% of the bounty, which goes to
+          the onlooker for their time (less the 15% platform fee on that amount).
+        </p>
+      </Section>
+
       <Section title="Assumption of Risk, Liability Waiver &amp; Indemnification">
         <p>
           <strong className="text-foreground">Explicit assumption of risk.</strong> Participation in

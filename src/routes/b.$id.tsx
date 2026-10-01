@@ -172,7 +172,7 @@ function BountyPreview() {
           </Link>
         )}
       </div>
-      {/* Hunters see the map first (where to go); Posters see status first. */}
+      {/* onlookers see the map first (where to go); Posters see status first. */}
       {isPoster ? <>{detailsBlock}{mapBlock}</> : <>{mapBlock}{detailsBlock}</>}
       <BountyBidsPanel requestId={id} />
     </div>

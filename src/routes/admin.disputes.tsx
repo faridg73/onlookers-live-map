@@ -263,7 +263,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
     setRuling(true);
     try {
       await resolveDisputeSplit(item.request_id, killFee, note);
-      toast.success(`Split settled — ${killFee}% kill fee to the reporter, rest refunded.`);
+      toast.success(`Split settled — ${killFee}% trip fee to the reporter, rest refunded.`);
       await refreshRate();
       onResolved();
     } catch (err) {
@@ -460,7 +460,7 @@ function ReviewCase({ item, onResolved }: { item: DetailedDisputeCase; onResolve
 
           <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-raised px-3 py-2.5">
             <span className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
-              Kill fee split
+              Trip fee split
             </span>
             <input
               type="number"

@@ -553,19 +553,18 @@ export const REPORT_REASONS = [
   { id: "other", label: "Something else" },
 ] as const;
 
-export async function reportCommunityPost(postId: string, reason: string, details = "") {
+/** Files a report on a post or clip into the staff queue (and emails support). */
+export async function reportContent(target: "post" | "clip", id: string, reason: string, details = "") {
   const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) throw new Error("Sign in to report a post.");
-  const { error } = await supabase.from("content_reports").insert({
-    post_id: postId,
-    reporter_id: auth.user.id,
-    reason,
-    details: details.slice(0, 500),
-  });
-  if (error) {
-    if (/duplicate key/i.test(error.message)) throw new Error("You already reported this post.");
-    throw new Error(error.message);
-  }
+  if (!auth.user) throw new Error(`Sign in to report a ${target}.`);
+  const { submitContentReport } = await import("@/lib/content-reports.functions");
+  const reasonLabel = REPORT_REASONS.find((r) => r.id === reason)?.label;
+  const res = await submitContentReport({ data: { target, id, reason, reasonLabel, details } });
+  if (!res.ok) throw new Error(res.error ?? "Couldn't send that report.");
+}
+
+export async function reportCommunityPost(postId: string, reason: string, details = "") {
+  return reportContent("post", postId, reason, details);
 }
 
 export async function blockUser(userId: string) {
@@ -594,7 +593,10 @@ export async function listMyBlocks(): Promise<Array<{ id: string; name: string }
 
 export type AdminContentReport = {
   id: string;
-  post_id: string;
+  kind: "post" | "clip";
+  post_id: string | null;
+  video_id: string | null;
+  author_suspended: boolean;
   post_title: string;
   post_body: string;
   author_id: string;
@@ -614,7 +616,7 @@ export async function listContentReports(): Promise<AdminContentReport[]> {
   return (data ?? []) as AdminContentReport[];
 }
 
-export async function resolveContentReport(reportId: string, action: "dismiss" | "remove" | "restore") {
+export async function resolveContentReport(reportId: string, action: "dismiss" | "remove" | "restore" | "suspend" | "unsuspend") {
   const { error } = await supabase.rpc("resolve_content_report", { _report_id: reportId, _action: action });
   if (error) throw new Error(error.message);
 }
