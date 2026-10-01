@@ -252,7 +252,7 @@ async function listPublicCommunityPosts(
     pinnedUntil: r.pinned_until,
     pinnedCredits: r.pinned_credits ?? 0,
     createdAt: r.created_at,
-    updatedAt: r.updated_at ?? null,
+    updatedAt: null,
     eventStartsAt: r.event_starts_at ?? null,
     authorName: r.author_name ?? "Onlooker",
     authorAvatar: null,
