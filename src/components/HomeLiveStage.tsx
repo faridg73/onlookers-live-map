@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -18,7 +18,6 @@ import { hasMyProAccount } from "@/lib/pro-visits.functions";
 import { LatestNearYouRail } from "@/components/LatestNearYouRail";
 import { liveStreamsFrom } from "@/components/LiveNowRail";
 import { listCommunityPosts, type CommunityPost } from "@/lib/community";
-import { useEffect } from "react";
 
 /** Home "Live now": only public free broadcasts whose camera is checking in. */
 function HomeLiveNow() {
