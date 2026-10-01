@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useState } from "react";
 import { clearPreviousAuthState } from "@/lib/auth-session";
+import { AccountDeletion } from "@/components/ProfileEditor";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   BadgeDollarSign,
@@ -462,6 +463,9 @@ function ProfileScreen() {
           </span>
           <ChevronRight className="size-4 text-destructive" />
         </button>
+        <div className="mt-2 px-1">
+          <AccountDeletion onDeleted={() => window.location.replace("/auth")} />
+        </div>
       </div>
 
 
