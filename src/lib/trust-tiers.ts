@@ -30,7 +30,7 @@ export const TRUST_TIERS: TrustTierDef[] = [
     name: "Provisional Contributor",
     blurb: "Number confirmed or reputation earned",
     unlocks: "Post ordinary community reports, photos and meetups.",
-    nextStep: "Get the verified creator mark to file emergency and urgent alerts.",
+    nextStep: "Confirm your phone number to file emergency and urgent alerts.",
     badge: "border-signal/50 bg-signal/10 text-signal",
   },
   {
@@ -71,7 +71,7 @@ export function incidentById(id: string): IncidentType | undefined {
 }
 
 export const EMERGENCY_LOCKED_NOTE =
-  "Emergency lanes need the verified creator mark. Verify on your profile to unlock them.";
+  "Emergency lanes need a confirmed phone number. Confirm it on your profile to unlock them.";
 
 /** Trust level for the signed-in member, defaulting to level 1. */
 export async function fetchMyTrustLevel(): Promise<TrustLevel> {

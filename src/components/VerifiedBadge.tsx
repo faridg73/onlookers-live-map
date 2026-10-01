@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export function VerifiedBadge({
   variant = "icon",
   className,
-  title = "Verified creator",
+  title = "Phone number confirmed",
 }: {
   variant?: "icon" | "pill";
   className?: string;
