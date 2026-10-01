@@ -23,6 +23,7 @@ const LINKS = [
   { to: "/terms", label: "Terms", icon: FileText },
   { to: "/privacy", label: "Privacy", icon: Shield },
   { to: "/copyright", label: "Copyright Policy", icon: Copyright },
+  { to: "/delete-account", label: "Delete account", icon: Shield },
 ] as const;
 
 const SOCIAL_LINKS = [
