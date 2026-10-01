@@ -325,7 +325,7 @@ function ProfileScreen() {
         ) : (showAllActivity ? activity : activity.slice(0, 2)).map((item) => {
           const copy = ACTIVITY_COPY[item.kind];
           const Icon = copy.icon;
-          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "+" : ""}${item.credits.toLocaleString()} Credits`;
+          const creditLabel = item.credits == null ? null : `${item.kind === "claimed" || item.kind === "submitted" ? "Up to " : item.kind === "completed" || item.kind === "streamed" ? "Bounty value " : ""}${item.credits.toLocaleString()} cr${item.kind === "completed" || item.kind === "streamed" ? " (before 20% fee)" : ""}`;
           return (
           <div
             key={item.id}
