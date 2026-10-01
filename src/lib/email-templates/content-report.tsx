@@ -36,7 +36,7 @@ const Email = ({ kind, title, reason, details, reportId, reviewUrl }: Props) => 
 
 export const template = {
   component: Email,
-  subject: (d: Record<string, any>) => `New report on a ${d.kind || 'post'} | Onlooker`,
+  subject: (d: Record<string, any>) => `New report on a ${d['kind'] || 'post'} | Onlooker`,
   displayName: 'Content report alert',
   to: 'support@onlooker.io',
   previewData: {
