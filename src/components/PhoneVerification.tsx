@@ -105,7 +105,7 @@ export function PhoneVerification({ email, initialPhone = "", onVerified, onCanc
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             We text a {CODE_LENGTH}-digit code to make sure you&rsquo;re a real person before your
-            account goes live.
+            account is ready.
           </p>
           <form
             onSubmit={(e) => {

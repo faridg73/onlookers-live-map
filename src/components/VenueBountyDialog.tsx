@@ -254,7 +254,7 @@ export function VenueBountyDialog({
         dbId: locked.id,
         expiresInMin: effectiveMinutes,
       });
-      toast.success("Bounty is live", {
+      toast.success("Your bounty is posted", {
         description: `${total} Credits held in escrow · ${windowLabel}`,
       });
       setOpen(false);

@@ -340,7 +340,7 @@ export function HomeLiveStage({
                 <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
                 <span className="relative size-1.5 rounded-full bg-signal" />
               </span>
-              The city is live
+              Happening now
             </p>
           </div>
 

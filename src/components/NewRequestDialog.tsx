@@ -103,7 +103,7 @@ export function NewRequestDialog({ children }: { children: ReactNode }) {
         accessCode: codeNeeded ? accessCode.trim() : undefined,
         dbId: locked.id,
       });
-      toast.success("Request is live", {
+      toast.success("Your request is posted", {
         description: `${bounty} Credits locked from your credit wallet until it's fulfilled.`,
       });
       setTitle("");

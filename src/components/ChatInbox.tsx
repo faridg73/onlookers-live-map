@@ -325,7 +325,7 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
 
       <div className="mt-5 px-2 text-center">
         <div className="flex flex-wrap items-center justify-center gap-1.5" aria-hidden>
-          {["Stream is live", "Heading there now", "ETA 5 mins"].map((chip) => (
+          {["Filming now", "Heading there now", "ETA 5 mins"].map((chip) => (
             <span
               key={chip}
               className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-[0.65rem] font-bold text-muted-foreground"
@@ -333,7 +333,7 @@ function SignedOutInboxPreview({ tab, onSignIn }: { tab: InboxTab; onSignIn: () 
               <span
                 className={cn(
                   "size-1.5 rounded-full",
-                  chip === "Stream is live" ? "bg-live" : "bg-signal",
+                  chip === "Filming now" ? "bg-live" : "bg-signal",
                 )}
               />
               {chip}

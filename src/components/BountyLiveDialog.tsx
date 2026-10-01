@@ -27,7 +27,7 @@ export function BountyLiveDialog({ open, onOpenChange, title, credits, deadlineL
         <DialogHeader className="items-start gap-1 border-b border-border px-5 pb-4 pt-6 text-left">
           <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-display font-extrabold leading-tight text-white">
             <CheckCircle2 className="size-6 shrink-0 text-signal" aria-hidden />
-            Your bounty is live
+            Your bounty is posted
           </DialogTitle>
           <DialogDescription className="text-sm font-medium leading-relaxed text-white/90">
             {title ? `\u201C${title}\u201D is now visible to onlookers nearby.` : "Your bounty is now visible to onlookers nearby."}

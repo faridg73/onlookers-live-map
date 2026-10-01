@@ -12,7 +12,6 @@ export type CaptureOption = {
 
 /** Selectable capture lengths shown in the post wizard. */
 export const CAPTURE_OPTIONS: CaptureOption[] = [
-  { id: "live", label: "Open-ended", minutes: null },
   { id: "1", label: "1 min", minutes: 1 },
   { id: "5", label: "5 min", minutes: 5 },
   { id: "10", label: "10 min", minutes: 10 },
