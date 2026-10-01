@@ -2984,7 +2984,6 @@ export type Database = {
         }[]
       }
       increment_clip_views: { Args: { _video_id: string }; Returns: number }
-      is_disputed_request: { Args: { _request_id: string }; Returns: boolean }
       is_private_request: { Args: { _request_id: string }; Returns: boolean }
       is_reserved_username: { Args: { _username: string }; Returns: boolean }
       is_review_staff: { Args: { _user_id: string }; Returns: boolean }
