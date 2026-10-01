@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { claimBountyRequest } from "@/lib/requests.functions";
 import { getIdentityStatus } from "@/lib/identity.functions";
 import { VerifyIdToClaimButton } from "@/components/VerifyIdToClaimButton";
+import { bountyFeeCredits, bountyNetCredits } from "@/lib/credits";
 import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
@@ -175,6 +176,12 @@ export function BountyDetailsDialog({
 
           <InstantSnippetButton request={request} userPosition={userPosition} autoStart={autoSnap} />
 
+          {claimable && (
+            <p className="mt-2 rounded-xl border border-signal/30 bg-signal/5 px-3 py-2 text-center text-xs text-foreground">
+              You'll receive <strong>{bountyNetCredits(pool).toLocaleString()} cr</strong>
+              {" "}· bounty {pool.toLocaleString()} cr · fee {bountyFeeCredits(pool).toLocaleString()} cr (15%)
+            </p>
+          )}
           {request.claimedByMe && !done ? (
             /* The hunter holding this claim needs the submission step, not a
                dead "Already claimed" button. */
