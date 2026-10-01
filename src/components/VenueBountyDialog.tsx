@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { scrollFieldToStart } from "@/lib/field-scroll";
 import { useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
