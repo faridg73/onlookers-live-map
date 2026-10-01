@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
+import { endBroadcast, pingBroadcast } from "@/lib/community";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { COMMUNITY_GUIDELINES_ANCHOR } from "@/components/legal/legal-content";
@@ -65,7 +66,18 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
   const [gpsBusy, setGpsBusy] = useState(false);
   const [posting, setPosting] = useState(false);
   /** Set once the broadcast is published, which opens the live camera stage. */
-  const [liveNow, setLiveNow] = useState<{ title: string; place: string; key: string } | null>(null);
+  const [liveNow, setLiveNow] = useState<{ title: string; place: string; key: string; postId: string } | null>(null);
+  // Heartbeat while the camera is on: Discover only shows "Live" for posts that keep checking in.
+  useEffect(() => {
+    const postId = liveNow?.postId;
+    if (!postId) return;
+    void pingBroadcast(postId);
+    const timer = window.setInterval(() => void pingBroadcast(postId), 30_000);
+    return () => {
+      window.clearInterval(timer);
+      void endBroadcast(postId);
+    };
+  }, [liveNow?.postId]);
   /** Closing summary shown once the stream ends. */
   const [wrapUp, setWrapUp] = useState<{
     title: string;
@@ -132,7 +144,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         data: { token: human.token ?? "", action: "community-post" },
       });
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
-      await startFreeBroadcast({
+      const postId = await startFreeBroadcast({
         category: selectedCategory.communityCategory,
         title: title.trim(),
         body: body.trim(),
@@ -147,7 +159,7 @@ export function BroadcastComposer({ onSwitchToBounty }: { onSwitchToBounty: () =
         description: "Followers and people nearby can see it on Discover. No credits held.",
       });
       // Open the live camera view so the creator sees their own feed while live.
-      setLiveNow({ title: title.trim(), place: place.trim(), key: `broadcast-${Date.now()}` });
+      setLiveNow({ title: title.trim(), place: place.trim(), key: `broadcast-${Date.now()}`, postId });
     } catch (error) {
       human.reset();
       toast.error(describeBroadcastError(error));
