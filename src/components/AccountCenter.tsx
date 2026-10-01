@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnlookerPlusPlans, PlusMark } from "@/components/OnlookerPlusPlans";
-import { WalletTopUpSection } from "@/components/WalletTopUpSection";
 import { TransactionLedgerTable } from "@/components/TransactionLedgerTable";
 import {
   fetchUserWallet,
@@ -84,9 +83,6 @@ export function AccountCenter() {
           <TabsTrigger value="plus" className="flex-1 text-xs sm:text-sm">
             Onlooker+
           </TabsTrigger>
-          <TabsTrigger value="topup" className="flex-1 text-xs sm:text-sm">
-            Top up
-          </TabsTrigger>
           <TabsTrigger value="history" className="flex-1 text-xs sm:text-sm">
             History
           </TabsTrigger>
@@ -94,9 +90,6 @@ export function AccountCenter() {
 
         <TabsContent value="plus" className="mt-4">
           <OnlookerPlusPlans currentTier={tier} />
-        </TabsContent>
-        <TabsContent value="topup" className="mt-4">
-          <WalletTopUpSection />
         </TabsContent>
         <TabsContent value="history" className="mt-4">
           <TransactionLedgerTable entries={entries} loading={loading} />

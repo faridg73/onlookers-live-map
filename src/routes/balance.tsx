@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { CreditWalletCard } from "@/components/CreditWalletCard";
-import { BuyCreditsCard } from "@/components/BuyCreditsCard";
 import { CreditPayoutDashboard } from "@/components/CreditPayoutDashboard";
 import { MyEarningsCard } from "@/components/MyEarningsCard";
 import { creditPackageById } from "@/lib/credit-packages";
@@ -159,7 +158,6 @@ function BalanceScreen() {
             )}
           </div>
 
-          <BuyCreditsCard />
           <MyEarningsCard />
           <CreditPayoutDashboard />
         </>
