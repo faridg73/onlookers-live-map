@@ -236,7 +236,7 @@ export function HomeLiveStage({
             className="rounded-full px-1 transition-colors duration-150 hover:text-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal"
             aria-label={`${liveCount} filming now — open`}
           >
-            LIVE <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
+            FILMING <span className="text-signal">{String(liveCount).padStart(2, "0")}</span>
           </button>
         ),
       });

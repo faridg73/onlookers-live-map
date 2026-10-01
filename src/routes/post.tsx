@@ -1622,7 +1622,7 @@ function PostScreen() {
 
                 {verifiedVisit ? (
                   <p className="rounded-xl border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
-                    Verified Visits are always private: only you can watch, and they never appear in Live now, on the map or on Discover.
+                    Verified Visits are always private: only you can watch, and they never appear in Filming now, on the map or on Discover.
                   </p>
                 ) : (
                   <label className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">

@@ -152,7 +152,7 @@ export function PayPerMinuteStream({
   return (
     <div className="rounded-2xl border border-signal bg-black p-4">
       <p className="flex items-center gap-2 text-sm font-extrabold text-signal">
-        <span className="size-2 animate-pulse rounded-full bg-signal" /> LIVE with {hostButton} {hostVerified && <VerifiedBadge className="size-3.5" />}
+        <span className="size-2 animate-pulse rounded-full bg-signal" /> FILMING with {hostButton} {hostVerified && <VerifiedBadge className="size-3.5" />}
       </p>
       <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-surface-raised py-2">
