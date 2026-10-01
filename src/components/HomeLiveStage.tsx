@@ -45,7 +45,7 @@ function HomeLiveNow() {
         Filming now{live.length > 0 ? ` · ${live.length}` : ""}
       </h3>
       {live.length === 0 ? (
-        <p className="mt-2 text-[0.7rem] font-semibold text-muted-foreground">Nobody is streaming right now.</p>
+        <p className="mt-2 text-[0.7rem] font-semibold text-muted-foreground">Nobody is filming right now.</p>
       ) : (
         <div className="mt-3 flex snap-x gap-3 overflow-x-auto pb-1">
           {live.map((post) => (
@@ -512,7 +512,7 @@ export function HomeLiveStage({
                 <span className="relative size-2 rounded-full bg-signal" />
               </span>
               <h3 id="home-activity" className="home-display text-[0.72rem] font-bold uppercase tracking-[0.14em] text-foreground">
-                Live activity near you
+                Fresh activity near you
               </h3>
             </div>
             <div role="tablist" aria-label="Filter activity" className="grid grid-cols-4 overflow-hidden rounded-lg border border-border">

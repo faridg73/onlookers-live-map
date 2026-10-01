@@ -493,7 +493,7 @@ function AuthScreen() {
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Sign in to request or film real-world views, entry lines, seat views, queues and venue
-        atmospheres, captured live on location.
+        atmospheres, captured on location.
       </p>
 
       <LegalConsent accepted={accepted} onChange={setAccepted} />

@@ -23,7 +23,7 @@ export type LiveBountyPin = {
 export function LiveBountyMapBox({
   pins,
   center,
-  label = "Live bounty map",
+  label = "Bounty map",
   heightClass,
   hideHeader,
 }: {

@@ -101,7 +101,7 @@ export function MyBountyVideos() {
           <p className="text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
             Creator profile hub
           </p>
-          <h2 className="mt-1 font-display text-xl text-foreground">Stream history & analytics</h2>
+          <h2 className="mt-1 font-display text-xl text-foreground">Clip history & analytics</h2>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-signal/40 bg-signal/10 px-3 py-1 text-xs font-semibold text-signal">
           <Radio className="size-3.5" /> {videos.length} broadcast{videos.length === 1 ? "" : "s"}
@@ -126,7 +126,7 @@ export function MyBountyVideos() {
         <Tabs defaultValue="history" className="mt-4">
           <TabsList className="w-full">
             <TabsTrigger value="history" className="flex-1 text-xs sm:text-sm">
-              Stream history
+              Clip history
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex-1 text-xs sm:text-sm">
               Analytics

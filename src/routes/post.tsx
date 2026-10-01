@@ -1005,7 +1005,7 @@ function PostScreen() {
                     Paid flash bounty
                   </span>
                   <span className="mt-1 block text-sm text-signal">
-                    Ask someone standing there for a live look. Fast Catch (+50%), Priority
+                    Ask someone standing there for a fresh look. Fast Catch (+50%), Priority
                     Hunt (+100%) or your own amount, held in escrow until you approve.
                   </span>
                   <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">An onlooker films it</span>

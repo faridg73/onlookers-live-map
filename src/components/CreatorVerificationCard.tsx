@@ -103,7 +103,7 @@ export function CreatorVerificationCard() {
         <>
           <p className="mt-2 text-xs text-muted-foreground">
             Confirm your mobile number to get verified instantly. Verified creators get a check mark
-            next to their name and can broadcast live for free, with no credits held.
+            next to their name and can post free filming broadcasts, with no credits held.
           </p>
           <form
             onSubmit={(e) => {

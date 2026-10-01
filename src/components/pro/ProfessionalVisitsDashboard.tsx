@@ -77,7 +77,7 @@ export function ProfessionalVisitsDashboard() {
           <h2 id="verified-visits-dashboard" className="font-display text-lg text-foreground">
             <span className="text-signal">Verified</span> Visits
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Scheduled property visits and their live progress.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Scheduled property visits and their progress.</p>
         </div>
         <div className="flex items-center gap-2">
           {loading && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-label="Loading visits" />}

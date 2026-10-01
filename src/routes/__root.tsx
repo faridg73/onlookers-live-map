@@ -96,7 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
       },
-      { title: "Onlooker, Live views from people already there" },
+      { title: "Onlooker, Fresh views from people already there" },
       {
         name: "description",
         content: "Post a bounty and get a live photo of any place from someone standing there now.",

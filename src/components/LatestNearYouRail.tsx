@@ -92,6 +92,7 @@ export function LatestNearYouRail() {
           const vibe = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
           const vibeForImg = BROADCAST_CATEGORIES.find((c) => post.tags.some((t) => t.toLowerCase() === c.id));
           const img = (post.mediaPath && media[post.mediaPath]) || (vibeForImg && STARTER_VIBE_PHOTOS[vibeForImg.id]?.[0]?.src) || COMMUNITY_VISUALS[post.category]?.image;
+          if (!img) return null;
           return (
             <li key={post.id} className="w-44 shrink-0 snap-start">
               <Link

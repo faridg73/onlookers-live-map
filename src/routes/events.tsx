@@ -28,17 +28,17 @@ import { useServerFn } from "@tanstack/react-start";
 export const Route = createFileRoute("/events")({
   head: () => ({
     meta: [
-      { title: "Venues & Events Near You — Live Crowd Views | Onlooker" },
+      { title: "Venues & Events Near You — Fresh Crowd Views | Onlooker" },
       {
         name: "description",
         content:
-          "Browse venues and events around your city — live sports, concerts, fight nights, comedy, theater, festivals and expos — see the crowd, then launch a live view bounty from that exact spot.",
+          "Browse venues and events around your city — live sports, concerts, fight nights, comedy, theater, festivals and expos — see the crowd, then request a view from that exact spot.",
       },
-      { property: "og:title", content: "Venues & Events Near You — Live Crowd Views | Onlooker" },
+      { property: "og:title", content: "Venues & Events Near You — Fresh Crowd Views | Onlooker" },
       {
         property: "og:description",
         content:
-          "Stadiums, concert halls and hotspots in your region with active bounty counts and one-tap live view requests.",
+          "Stadiums, concert halls and hotspots in your region with active bounty counts and one-tap view requests.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -191,7 +191,7 @@ function EventsScreen() {
             <span className="absolute inset-0 animate-ping-slow rounded-full bg-signal motion-reduce:animate-none" />
             <span className="relative size-1.5 rounded-full bg-signal" />
           </span>
-          Crowd radar // live
+          Crowd radar
         </p>
         <h1 className="relative mt-3 inline-flex items-center gap-2 text-3xl font-extrabold italic uppercase leading-[0.95] tracking-tighter text-signal drop-shadow-[0_0_22px_color-mix(in_oklab,var(--color-signal)_35%,transparent)]">
           <Flame className="size-6 shrink-0" aria-hidden /> Venues &amp; events
@@ -199,7 +199,7 @@ function EventsScreen() {
         <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
           {activeVibe
             ? `${activeVibe.label} streams and places around ${area.label}.`
-            : `Coming up this week around ${area.label} — tap any card to launch a live view from that exact spot.`}
+            : `Coming up this week around ${area.label} — tap any card to request a view from that exact spot.`}
         </p>
 
         <Link
