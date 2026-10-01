@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Clock, Eye, Flag, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
+import { Ban, Clock, Eye, Flag, MapPin, MoreVertical, Play, Share2, Trash2, Video } from "lucide-react";
 import { ReportDialog } from "@/components/ReportDialog";
 import { blockUser } from "@/lib/community";
 import { toast } from "sonner";
@@ -180,7 +180,7 @@ export function RecentCapturesFeed({
       <p className="mt-1 text-xs text-muted-foreground">{blurb}</p>
 
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-        {clips.map((clip) => {
+        {clips.filter((c) => !c.uploaderId || !blocked.has(c.uploaderId)).map((clip) => {
           const playing = playingId === clip.id && Boolean(clip.videoUrl);
           return (
             <li
