@@ -10,7 +10,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -149,6 +149,11 @@ function RootComponent() {
   const location = useRouterState({ select: (state) => state.location });
   const pathname = location.pathname;
   const embedded = pathname.startsWith("/embed");
+  // Every page change starts at the top. Layout effects run before page-level
+  // passive effects, so feeds that restore a saved Back position still can.
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+  }, [pathname]);
   useSessionScroll(`onlooker:scroll:route:${location.href}`);
 
   // Native shell (Capacitor iOS/Android): deep links open in-app,

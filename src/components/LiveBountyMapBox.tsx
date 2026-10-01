@@ -62,6 +62,20 @@ export function LiveBountyMapBox({
   }, []);
 
   const [ready, setReady] = useState(false);
+  // Re-measure when the box opens or resizes so the map fills it, not half of it.
+  useEffect(() => {
+    const el = holder.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      const instance = map.current;
+      if (!instance || typeof google === "undefined") return;
+      const c = instance.getCenter();
+      google.maps.event.trigger(instance, "resize");
+      if (c) instance.setCenter(c);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ready]);
   const me = useRef<google.maps.Marker | null>(null);
   useEffect(() => {
     if (map.current) return;

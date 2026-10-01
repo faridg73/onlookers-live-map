@@ -1491,39 +1491,35 @@ function PostScreen() {
                   <p className="text-xs font-bold uppercase text-muted-foreground">
                     {action === "live" ? "Stream length" : "Clip length"}
                   </p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {CAPTURE_OPTIONS.map((option) => {
-                      const on = !customCapture && capture === option.minutes;
-                      return (
-                        <Button
-                          key={option.id}
-                          type="button"
-                          variant="outline"
-                          aria-pressed={on}
-                          onClick={() => {
-                            setCustomCapture(false);
-                            applyCapture(option.minutes);
-                          }}
-                          className={pill(on)}
-                        >
-                          {option.minutes === null && <Radio className="size-3.5" />}
-                          {option.label}
-                        </Button>
-                      );
-                    })}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      aria-pressed={customCapture}
-                      onClick={() => {
+                  <Select
+                    value={customCapture ? "custom" : String(capture)}
+                    onValueChange={(v) => {
+                      if (v === "custom") {
                         setCustomCapture(true);
                         applyCapture(capture ?? 10, action, true);
-                      }}
-                      className={pill(customCapture)}
+                        return;
+                      }
+                      const option = CAPTURE_OPTIONS.find((o) => String(o.minutes) === v);
+                      if (!option) return;
+                      setCustomCapture(false);
+                      applyCapture(option.minutes);
+                    }}
+                  >
+                    <SelectTrigger
+                      aria-label={action === "live" ? "Stream length" : "Clip length"}
+                      className="mt-3 h-11 w-full rounded-xl border-border bg-background text-foreground"
                     >
-                      Custom
-                    </Button>
-                  </div>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CAPTURE_OPTIONS.map((option) => (
+                        <SelectItem key={option.id} value={String(option.minutes)} className="py-2.5">
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="custom" className="py-2.5">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {customCapture && (
                     <label className="mt-3 flex items-center gap-2">
                       <input
@@ -1810,34 +1806,44 @@ function PostScreen() {
                     How soon you need it — this does not change your{" "}
                     {captureDurationLabel(capture, action === "live")} clip length.
                   </p>
-                  <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                    {DEADLINES.map((deadline) => {
-                      const on = !customDeadline && minutes === deadline.minutes;
-                      return (
-                        <Button
-                          key={deadline.minutes}
-                          type="button"
-                          variant="outline"
-                          aria-pressed={on}
-                          onClick={() => {
-                            setCustomDeadline(null);
-                            setMinutes(deadline.minutes);
-                          }}
-                          className={pill(on)}
-                        >
-                          {deadline.label}
-                        </Button>
-                      );
-                    })}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      aria-pressed={Boolean(customDeadline)}
-                      onClick={() => setDeadlineOpen(true)}
-                      className={`${pill(Boolean(customDeadline))} h-auto whitespace-normal py-2`}
+                  <div className="mt-3 flex items-center gap-2">
+                    <Select
+                      value={customDeadline ? "custom" : String(minutes)}
+                      onValueChange={(v) => {
+                        if (v === "custom") {
+                          setDeadlineOpen(true);
+                          return;
+                        }
+                        setCustomDeadline(null);
+                        setMinutes(Number(v));
+                      }}
                     >
-                      {customDeadline ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
-                    </Button>
+                      <SelectTrigger
+                        aria-label="Request deadline"
+                        className="h-11 min-w-0 flex-1 rounded-xl border-border bg-background text-foreground"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DEADLINES.map((deadline) => (
+                          <SelectItem key={deadline.minutes} value={String(deadline.minutes)} className="py-2.5">
+                            {deadline.label}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="custom" className="py-2.5">
+                          {customDeadline ? format(customDeadline, "MMM d, h:mm a") : "Custom"}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {customDeadline && (
+                      <button
+                        type="button"
+                        onClick={() => setDeadlineOpen(true)}
+                        className="shrink-0 text-xs font-semibold text-signal underline underline-offset-2"
+                      >
+                        Change
+                      </button>
+                    )}
                   </div>
                 </div>
 
