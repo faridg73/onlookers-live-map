@@ -458,6 +458,16 @@
     text-size-adjust: 100%;
   }
 
+  /* Text must grow with larger system fonts: headings, labels and buttons wrap
+     instead of clipping. Utility classes (e.g. whitespace-nowrap) still win. */
+  h1, h2, h3, h4, h5, h6, p, label, button, [role="button"], a {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  button, [role="button"] {
+    height: auto;
+  }
+
   html {
     /* Avoid iOS/Android URL-bar height jumps inside fixed map + sheet layouts. */
     min-height: 100dvh;
