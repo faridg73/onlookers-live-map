@@ -254,6 +254,9 @@ function PostScreen() {
   const phoneGate = usePhoneGate("before credits go into escrow");
   const searchVenues = useServerFn(searchRequestVenues);
   const [mode, setMode] = useState<"broadcast" | "bounty" | null>(initialMode ?? null);
+  /** Verified Visits are always private; flash bounties are public unless "Keep private" is ticked. */
+  const [verifiedVisit, setVerifiedVisit] = useState(false);
+  const [keepPrivate, setKeepPrivate] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const formScrollRef = useRef<HTMLDivElement | null>(null);
   /** Every step change — and leaving the "Choose how you go live" picker — starts the form at the absolute top. */
@@ -474,6 +477,7 @@ function PostScreen() {
     try {
       const d = JSON.parse(raw) as ProVisitDraft;
       setMode("bounty");
+      setVerifiedVisit(true);
       setCategoryId("real-estate");
       setMainCategoryId("real-estate");
       setPlaceCategoryId(null);
@@ -645,6 +649,7 @@ function PostScreen() {
    *  approval-link handshake, so agents and property managers can post directly. */
   const startVerifiedVisit = () => {
     setMode("bounty");
+    setVerifiedVisit(true);
     setPlaceCategoryId(null);
     setCategoryId("real-estate");
     setMainCategoryId("real-estate");
@@ -849,6 +854,8 @@ function PostScreen() {
         customDurationMinutes: customCapture ? capture : null,
         weatherMultiplier: weather,
         bountyTier: tier,
+        isPrivate: verifiedVisit || keepPrivate,
+        verifiedVisit,
       });
       if (proVisitBookingId) {
         try {
@@ -937,7 +944,7 @@ function PostScreen() {
               </Button>
               <div className="min-w-0">
                 <p className="text-xs font-extrabold uppercase text-signal">
-                  {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how you go live"}
+                  {mode === "bounty" ? `Step ${step} of 3` : mode === "broadcast" ? "Free broadcast" : "Choose how it gets filmed."}
                 </p>
                 <h1 id="post-wizard-title" className="break-words font-display text-xl font-extrabold text-foreground [overflow-wrap:anywhere]">
                   {mode === null
@@ -979,13 +986,17 @@ function PostScreen() {
                     Free social broadcast
                   </span>
                   <span className="mt-1 block text-sm text-signal">
-                    Verified onlookers stream to followers and people nearby. No credits, no escrow.
+                    You go live from your phone and stream to your followers and people nearby. No credits, no escrow.
                   </span>
+                  <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">You film it</span>
                 </span>
               </button>
               <button
                 type="button"
-                onClick={() => setMode("bounty")}
+                onClick={() => {
+                  setVerifiedVisit(false);
+                  setMode("bounty");
+                }}
                 className="flex w-full items-start gap-3 rounded-xl border border-border bg-background p-4 text-left transition-colors hover:border-signal"
               >
                 <Zap className="mt-0.5 size-6 shrink-0 text-signal" />
@@ -997,6 +1008,7 @@ function PostScreen() {
                     Ask someone standing there for a live look. Fast Catch (+50%), Priority
                     Hunt (+100%) or your own amount, held in escrow until you approve.
                   </span>
+                  <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">An onlooker films it</span>
                 </span>
               </button>
               <button
@@ -1014,6 +1026,7 @@ function PostScreen() {
                     the onlooker with a one-tap link before filming — payment held in escrow
                     until the visit is verified.
                   </span>
+                  <span className="mt-2 inline-block rounded-md border border-border px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-[0.1em] text-muted-foreground">A verified onlooker films it</span>
                 </span>
               </button>
               <button
@@ -1607,6 +1620,26 @@ function PostScreen() {
                   </div>
                 </div>
 
+                {verifiedVisit ? (
+                  <p className="rounded-xl border border-border bg-background p-3 text-xs font-medium text-muted-foreground">
+                    Verified Visits are always private: only you can watch, and they never appear in Live now, on the map or on Discover.
+                  </p>
+                ) : (
+                  <label className="flex items-start gap-3 rounded-xl border border-border bg-background p-3">
+                    <input
+                      type="checkbox"
+                      checked={keepPrivate}
+                      onChange={(e) => setKeepPrivate(e.target.checked)}
+                      className="mt-0.5 size-4 accent-[var(--color-signal)]"
+                    />
+                    <span>
+                      <span className="block text-sm font-extrabold text-foreground">Keep private</span>
+                      <span className="block text-xs font-medium text-muted-foreground">
+                        Only you can watch. It never appears in Live now, on the map or on Discover, and its replay stays out of Recent captures.
+                      </span>
+                    </span>
+                  </label>
+                )}
                 <label className="block space-y-2">
                   <span className="text-xs font-bold uppercase text-muted-foreground">Request title</span>
                   <input ref={titleRef} value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={120} className="field" />
