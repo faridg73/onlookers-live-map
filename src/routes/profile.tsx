@@ -167,12 +167,16 @@ function ProfileScreen() {
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    // End the session on the server for every device, then wipe every
+    // local copy so reopening Profile can never restore it.
+    await supabase.auth.signOut({ scope: "global" }).catch(() => undefined);
+    try {
+      await clearPreviousAuthState();
+    } catch {
       toast.error("Could not sign out. Please try again.");
       return;
     }
-    navigate({ to: "/auth", replace: true });
+    window.location.replace("/auth");
   }
 
   // Coming back from checkout: confirm the payment and pull the new balance in.
@@ -354,7 +358,7 @@ function ProfileScreen() {
       <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {mine.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            You haven't posted a live request yet.
+            You haven't posted a request yet.
           </p>
         ) : (
           mine.map((r) => <RequestCard key={r.id} request={r} />)
