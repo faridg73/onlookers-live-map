@@ -79,6 +79,10 @@ export async function lockBounty(input: {
   captchaToken?: string | null;
   /** Listed event id when opened from an event card; the server verifies it. */
   eventId?: string | null;
+  /** Only the poster can watch; hidden from Live now, map, Discover and replays. */
+  isPrivate?: boolean;
+  /** Verified Visit posts are always private (enforced in the database too). */
+  verifiedVisit?: boolean;
 }): Promise<LockedBounty> {
   try {
     const { minutes = 60, ...rest } = input;

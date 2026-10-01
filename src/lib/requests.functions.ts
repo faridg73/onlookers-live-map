@@ -76,6 +76,8 @@ const createSchema = z.object({
    * itself — there is no client-asserted "event-tied" flag.
    */
   eventId: z.string().trim().min(1).max(140).nullable().optional(),
+  isPrivate: z.boolean().optional().default(false),
+  verifiedVisit: z.boolean().optional().default(false),
 });
 
 /** Current wallet balance for the signed-in requester. */
@@ -210,6 +212,8 @@ export const createBountyRequest = createServerFn({ method: "POST" })
         custom_duration_minutes: data.customDurationMinutes ?? null,
         weather_multiplier: data.weatherMultiplier ?? 1,
         bounty_tier: data.bountyTier ?? "standard",
+        is_private: data.isPrivate || data.verifiedVisit,
+        is_verified_visit: data.verifiedVisit,
       })
       .select("id")
       .single();
