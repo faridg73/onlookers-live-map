@@ -18,24 +18,24 @@ const STEPS = [
       "A one-time 6-digit backup PIN is texted and emailed to the on-site agent. No account needed on their side.",
   },
   {
-    title: "3 · Hunter heads to the location",
+    title: "3 · onlooker heads to the location",
     caption:
-      "The app sends the Hunter straight to the property. They travel to the address on the bounty.",
+      "The app sends the onlooker straight to the property. They travel to the address on the bounty.",
   },
   {
     title: "4 · On-site, code approved",
     caption:
-      "The Hunter taps “I'm on site.” The agent — present or not — sees their name and photo and approves the code.",
+      "The onlooker taps “I'm on site.” The agent — present or not — sees their name and photo and approves the code.",
   },
   {
-    title: "5 · Hunter films & sends the clip",
+    title: "5 · onlooker films & sends the clip",
     caption:
-      "Once access is granted, the Hunter follows the instructions and records the walkthrough and sends the clip to the poster as soon as they finish.",
+      "Once access is granted, the onlooker follows the instructions and records the walkthrough and sends the clip to the poster as soon as they finish.",
   },
   {
     title: "6 · Approved & paid",
     caption:
-      "The poster reviews and approves — or after 2 hours it auto-releases either way. Escrow pays out, Hunter's happy.",
+      "The poster reviews and approves — or after 2 hours it auto-releases either way. Escrow pays out, onlooker's happy.",
   },
 ];
 

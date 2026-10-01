@@ -55,8 +55,8 @@ const STEPS: Array<{ icon: LucideIcon; title: string; body: string }> = [
   },
   {
     icon: KeyRound,
-    title: "One tap approves the Hunter",
-    body: "Once the Hunter has claimed the bounty and arrives, they tap “I'm on site.” The contact instantly gets a link showing the Hunter's name and photo, and taps Approve — or “This isn't the right person,” which blocks that Hunter and sends the visit to review. The Hunter's screen updates right away. Can't open the link? The contact can give the backup PIN in person or by phone instead. Only the Hunter who claimed the bounty can be approved.",
+    title: "One tap approves the onlooker",
+    body: "Once the onlooker has claimed the bounty and arrives, they tap “I'm on site.” The contact instantly gets a link showing the onlooker's name and photo, and taps Approve — or “This isn't the right person,” which blocks that onlooker and sends the visit to review. The onlooker's screen updates right away. Can't open the link? The contact can give the backup PIN in person or by phone instead. Only the onlooker who claimed the bounty can be approved.",
   },
   {
     icon: BadgeCheck,
