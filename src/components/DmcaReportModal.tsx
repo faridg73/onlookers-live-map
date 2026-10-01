@@ -28,13 +28,19 @@ const PROHIBITED = [
 export function DmcaReportModal({
   open,
   onOpenChange,
+  defaultContentUrl = "",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Prefills the reported link when opened from a clip's menu. */
+  defaultContentUrl?: string;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [contentUrl, setContentUrl] = useState("");
+  const [contentUrl, setContentUrl] = useState(defaultContentUrl);
+  useEffect(() => {
+    if (open && defaultContentUrl) setContentUrl(defaultContentUrl);
+  }, [open, defaultContentUrl]);
   const [reasonCode, setReasonCode] = useState<ModerationReasonCode>("other_policy_violation");
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
