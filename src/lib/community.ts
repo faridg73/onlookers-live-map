@@ -593,7 +593,10 @@ export async function listMyBlocks(): Promise<Array<{ id: string; name: string }
 
 export type AdminContentReport = {
   id: string;
-  post_id: string;
+  kind: "post" | "clip";
+  post_id: string | null;
+  video_id: string | null;
+  author_suspended: boolean;
   post_title: string;
   post_body: string;
   author_id: string;
@@ -613,7 +616,7 @@ export async function listContentReports(): Promise<AdminContentReport[]> {
   return (data ?? []) as AdminContentReport[];
 }
 
-export async function resolveContentReport(reportId: string, action: "dismiss" | "remove" | "restore") {
+export async function resolveContentReport(reportId: string, action: "dismiss" | "remove" | "restore" | "suspend" | "unsuspend") {
   const { error } = await supabase.rpc("resolve_content_report", { _report_id: reportId, _action: action });
   if (error) throw new Error(error.message);
 }
