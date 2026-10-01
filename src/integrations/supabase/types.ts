@@ -240,6 +240,7 @@ export type Database = {
           created_at: string
           duration_seconds: number | null
           expired_at: string | null
+          hidden_at: string | null
           id: string
           is_instant: boolean
           is_public: boolean
@@ -263,6 +264,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           expired_at?: string | null
+          hidden_at?: string | null
           id?: string
           is_instant?: boolean
           is_public?: boolean
@@ -286,6 +288,7 @@ export type Database = {
           created_at?: string
           duration_seconds?: number | null
           expired_at?: string | null
+          hidden_at?: string | null
           id?: string
           is_instant?: boolean
           is_public?: boolean
@@ -514,34 +517,37 @@ export type Database = {
           created_at: string
           details: string
           id: string
-          post_id: string
+          post_id: string | null
           reason: string
           reporter_id: string
           resolved_at: string | null
           resolved_by: string | null
           status: string
+          video_id: string | null
         }
         Insert: {
           created_at?: string
           details?: string
           id?: string
-          post_id: string
+          post_id?: string | null
           reason: string
           reporter_id: string
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
+          video_id?: string | null
         }
         Update: {
           created_at?: string
           details?: string
           id?: string
-          post_id?: string
+          post_id?: string | null
           reason?: string
           reporter_id?: string
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string
+          video_id?: string | null
         }
         Relationships: [
           {
@@ -549,6 +555,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_reports_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_videos"
             referencedColumns: ["id"]
           },
         ]
@@ -2679,9 +2692,11 @@ export type Database = {
         Returns: {
           author_id: string
           author_name: string
+          author_suspended: boolean
           created_at: string
           details: string
           id: string
+          kind: string
           post_body: string
           post_hidden: boolean
           post_id: string
@@ -2690,6 +2705,7 @@ export type Database = {
           report_count: number
           reporter_name: string
           status: string
+          video_id: string
         }[]
       }
       admin_moderation_log: {
