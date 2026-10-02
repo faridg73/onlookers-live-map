@@ -3182,6 +3182,7 @@ export type Database = {
         Args: { _amount: number; _note?: string; _request_id: string }
         Returns: string
       }
+      platform_fee_rate: { Args: never; Returns: number }
       platform_metrics: {
         Args: never
         Returns: {
