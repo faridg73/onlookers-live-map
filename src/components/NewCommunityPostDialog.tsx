@@ -54,6 +54,7 @@ export function NewCommunityPostDialog({
   initialTitle,
   initialTags,
   initialBroadcastCategoryId,
+  sighting = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -65,6 +66,8 @@ export function NewCommunityPostDialog({
   initialTags?: string[];
   /** Exact vibe the user came from; locks the post to it. */
   initialBroadcastCategoryId?: BroadcastCategoryId;
+  /** Locks the post to Strange Sightings & UFO. */
+  sighting?: boolean;
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "general");
   const [title, setTitle] = useState("");
@@ -79,11 +82,18 @@ export function NewCommunityPostDialog({
   const [busy, setBusy] = useState(false);
   const human = useHumanCheck("community-post");
 
-  const vibe = initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
+  const vibe = !sighting && initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
   const def = categoryDef(vibe ? vibe.communityCategory : category);
-  const iceBreakers = vibe
-    ? broadcastExampleSeeds(vibe.id).map((s) => ({ title: s.title, body: s.body }))
-    : def.iceBreakers;
+  const iceBreakers = sighting
+    ? SIGHTING_ICE_BREAKERS
+    : vibe
+      ? broadcastExampleSeeds(vibe.id).map((s) => ({ title: s.title, body: s.body }))
+      : def.iceBreakers;
+  const tagChoices = sighting
+    ? STRANGE_SIGHTINGS_SUBCATEGORIES.map((s) => s.toLowerCase())
+    : vibe
+      ? vibe.subcategories.map((s) => s.toLowerCase())
+      : def.tags;
 
   useEffect(() => {
     if (!open) return;
