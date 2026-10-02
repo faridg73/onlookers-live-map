@@ -88,7 +88,7 @@ export function MyEarningsCard() {
               cash={usd(creditsToUsdValue(summary.grossCredits))}
             />
             <Row
-              label="Platform fee (15% on bounties, 20% on tips)"
+              label="Platform fee (15%)"
               value={`− ${summary.feeCredits} Credits`}
               cash={`− ${usd(creditsToUsdValue(summary.feeCredits))}`}
               tone="fee"
@@ -130,7 +130,7 @@ export function MyEarningsCard() {
 
           <p className="mt-3 text-[0.7rem] leading-relaxed text-muted-foreground">
             Every payout is shown in full: the bounty amount, the
-            platform fee (15% on bounties, 20% on tips), and the credits you keep. Nothing
+            15% platform fee, and the credits you keep. Nothing
             else is deducted.
           </p>
         </>

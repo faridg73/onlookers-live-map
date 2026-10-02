@@ -74,7 +74,7 @@ export function BountyBottomSheet({
   if (!request) return null;
 
   const tier = bountyTier(pool);
-  const payout = pool - Math.floor(pool * PLATFORM_FEE_RATE);
+  const payout = pool - Math.round(pool * PLATFORM_FEE_RATE);
   const closed = isClosed(request);
   const isPoster = request.requester === "you";
   const claimable = !closed && !isPoster && request.status === "open";

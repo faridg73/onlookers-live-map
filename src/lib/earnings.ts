@@ -11,7 +11,7 @@ export const EARNING_TYPES = ["bounty_payout", "direct_tip"];
 export type EarningsSummary = {
   /** Credits earned before the platform fee. */
   grossCredits: number;
-  /** The 20% platform fee taken out of those earnings. */
+  /** The 15% platform fee taken out of those earnings. */
   feeCredits: number;
   /** Credits actually paid into the wallet. */
   netCredits: number;

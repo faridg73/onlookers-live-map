@@ -72,7 +72,7 @@ export function CreditWalletCard() {
         <span className="text-sm text-muted-foreground">credits</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Tip onlookers directly from their posts or live clips. A 20% platform fee applies to each
+        Tip onlookers directly from their posts or live clips. A 15% platform fee applies to each
         transfer.
       </p>
 
