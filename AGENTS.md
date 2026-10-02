@@ -25,3 +25,4 @@
 
 - All platform fees use one rate: PLATFORM_FEE_RATE in src/lib/credits.ts and public.platform_fee_rate() in the database, rounded to the nearest credit — keeps every fee from drifting apart.
 - Peer tips are gated twice: TIPPING_ENABLED in src/lib/credits.ts (buttons) and public.tipping_enabled() in the database (tip_credits direct tips, tip_hunter) — flip both together; bounty-bundled tips are never gated.
+- Pay-per-minute viewing and bounty bidding are gated twice: PAY_PER_MINUTE_ENABLED / BIDDING_ENABLED in src/lib/credits.ts and public.pay_per_minute_enabled() / public.bidding_enabled() in the database — flip both together; watching stays free.
