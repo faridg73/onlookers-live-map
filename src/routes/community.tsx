@@ -125,6 +125,7 @@ function CommunityHub() {
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [welcomeLive, setWelcomeLive] = useState(false);
+  const [quickSighting, setQuickSighting] = useState(false);
 
   // Returning from sign-in with ?action=live|post|event reopens the exact sheet
   // the person tapped before they were sent to the sign-in page.
@@ -132,7 +133,9 @@ function CommunityHub() {
   useEffect(() => {
     if (!action || actionHandled.current) return;
     actionHandled.current = true;
-    if (action === "event") {
+    if (action === "live" && cat === STRANGE_SIGHTINGS_ID) {
+      setQuickSighting(true);
+    } else if (action === "event") {
       setListingEvent(true);
     } else {
       setLiveFirst(action === "live");
