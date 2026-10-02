@@ -20,16 +20,23 @@ export type CreditLedgerEntry = {
   createdAt: string;
 };
 
-/** Platform cut kept from every credit movement. */
-export const PLATFORM_FEE_RATE = 0.2;
-/** Bounty payouts: the platform keeps 15% of the bounty, rounded to whole credits. Tips, bids and per-minute filming use PLATFORM_FEE_RATE (20%, rounded down). */
-export const BOUNTY_FEE_RATE = 0.15;
-export function bountyFeeCredits(credits: number): number {
-  return Math.round(credits * BOUNTY_FEE_RATE);
+/**
+ * The one platform fee used everywhere (bounties, Verified Visits, trip fees,
+ * bids, tips, per-minute filming), rounded to the nearest whole credit.
+ * Mirrors public.platform_fee_rate() in the database.
+ */
+export const PLATFORM_FEE_RATE = 0.15;
+export const PLATFORM_FEE_PERCENT = Math.round(PLATFORM_FEE_RATE * 100);
+export function platformFeeCredits(credits: number): number {
+  return Math.round(credits * PLATFORM_FEE_RATE);
 }
+export const bountyFeeCredits = platformFeeCredits;
 export function bountyNetCredits(credits: number): number {
-  return credits - bountyFeeCredits(credits);
+  return credits - platformFeeCredits(credits);
 }
+
+/** Peer-to-peer tip buttons are switched off for launch; flip to true to bring them back. */
+export const TIPPING_ENABLED = false;
 
 /** Reads the signed-in member's Credits wallet, creating it on first visit. */
 export async function fetchCreditWallet(): Promise<CreditWallet | null> {
@@ -85,7 +92,7 @@ export async function listCreditTransactions(
 
 /**
  * Atomically moves credits from the signed-in member to another member:
- * balance check, debit, 20% platform fee, credit of the net amount, ledger entry.
+ * balance check, debit, platform fee (PLATFORM_FEE_RATE), credit of the net amount, ledger entry.
  */
 export async function tipCredits(options: {
   receiverId: string;

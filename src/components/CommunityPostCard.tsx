@@ -8,6 +8,7 @@ import { ShareToSocialButton } from "@/components/ShareToSocialButton";
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
+import { TIPPING_ENABLED } from "@/lib/credits";
 import { HunterBadge } from "@/components/HunterBadge";
 import { MembershipBadge } from "@/components/MembershipBadge";
 import { VerifiedBadge } from "@/components/VerifiedBadge";
@@ -254,7 +255,7 @@ export function CommunityPostCard({
               <Radio className="size-3.5" /> {watching ? "Hide" : "See post"}
             </Button>
           )}
-          {!isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
+          {TIPPING_ENABLED && !isMine && <TipCreditsButton receiverId={post.userId} receiverName={post.authorName} />}
           {!isMine && <PostSafetyMenu postId={post.id} authorId={post.userId} authorName={post.authorName} onChanged={onChanged} />}
           {!isMine && isReport && reportStatus !== "expired" && (
             <>

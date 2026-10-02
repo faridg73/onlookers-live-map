@@ -67,7 +67,7 @@ const CATEGORIES: FAQCategory[] = [
       },
       {
         question: "How are bounty payments split?",
-        answer: `For an accepted fulfillment, 85% of the bounty goes to the onlooker who captured the media and 15% (rounded to the nearest whole credit) is kept by Onlooker as the platform fee. For example: bounty 46 cr · fee 7 cr · onlooker receives 39 cr. Onlookers see what they'll receive before they claim. Tips carry a 20% fee, rounded down. The complete amount and split are shown before the poster confirms the request.`,
+        answer: `For an accepted fulfillment, 85% of the bounty goes to the onlooker who captured the media and 15% (rounded to the nearest whole credit) is kept by Onlooker as the platform fee. For example: bounty 46 cr · fee 7 cr · onlooker receives 39 cr. Onlookers see what they'll receive before they claim. Tips, bids and per-minute filming use the same 15% fee. The complete amount and split are shown before the poster confirms the request.`,
       },
       {
         question: "What is the two-hour review window?",

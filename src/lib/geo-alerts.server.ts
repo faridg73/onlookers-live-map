@@ -10,8 +10,9 @@ export const GEOFENCE_RADIUS_MILES = 1.5;
 /** Widest ring we ever consider, before each person's own alert distance applies. */
 export const OUTER_RADIUS_MILES = 25;
 
-/** The 20% platform cut, matching the credit ledger. */
-export const CREDIT_FEE_RATE = 0.2;
+/** The platform cut, matching the credit ledger. */
+export { PLATFORM_FEE_RATE as CREDIT_FEE_RATE } from "@/lib/credits";
+import { PLATFORM_FEE_RATE as CREDIT_FEE_RATE } from "@/lib/credits";
 
 const CATEGORY_COPY: Record<string, string> = {
   lines: "entry line",
@@ -132,7 +133,7 @@ export async function notifyLocalOnlookersOfBounty(
   const gross = Math.round(Number(request.bounty_amount ?? 0));
   if (!(gross > 0)) return { nearby: 0, pushed: 0 };
 
-  const net = gross - Math.floor(gross * CREDIT_FEE_RATE);
+  const net = gross - Math.round(gross * CREDIT_FEE_RATE);
 
   // Cast the wide net once, then keep only the people whose own alert distance
   // covers this pin — someone set to 2 miles never hears about a 20-mile pin.

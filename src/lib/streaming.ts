@@ -8,7 +8,7 @@ export const DEFAULT_STREAM_RATE = 4;
 
 /** What the host keeps out of each charged minute. */
 export function hostShare(creditsPerMinute: number) {
-  return creditsPerMinute - Math.floor(creditsPerMinute * PLATFORM_FEE_RATE);
+  return creditsPerMinute - Math.round(creditsPerMinute * PLATFORM_FEE_RATE);
 }
 
 export type StreamMeter = {
