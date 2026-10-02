@@ -114,7 +114,7 @@ export function PayPerMinuteStream({
     return (
       <div className="rounded-2xl border border-signal/40 bg-surface-raised p-4">
         <p className="flex items-center gap-1.5 text-sm font-bold text-foreground">
-          Watch {hostButton} live {hostVerified && <VerifiedBadge className="size-3.5" />}
+          Watch {hostButton} filming {hostVerified && <VerifiedBadge className="size-3.5" />}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           You pay by the minute and can stop any time. {hostShare(rate)} of every{" "}
