@@ -92,7 +92,7 @@ export async function listCreditTransactions(
 
 /**
  * Atomically moves credits from the signed-in member to another member:
- * balance check, debit, 20% platform fee, credit of the net amount, ledger entry.
+ * balance check, debit, platform fee (PLATFORM_FEE_RATE), credit of the net amount, ledger entry.
  */
 export async function tipCredits(options: {
   receiverId: string;
