@@ -273,7 +273,12 @@ function CommunityHub() {
     const deepLinkCat = new URLSearchParams(window.location.search).get("cat");
     const deepLinkLane = deepLinkCat ? BROADCAST_CATEGORIES.find((entry) => entry.id === deepLinkCat) : null;
     const savedCategory = saved.category;
-    if (deepLinkLane) {
+    if (deepLinkCat === STRANGE_SIGHTINGS_ID) {
+      setCategoryId(null);
+      setCategory("all");
+      setTag(null);
+      setStrangeSightings(true);
+    } else if (deepLinkLane) {
       setCategoryId(deepLinkLane.id);
       setCategory(deepLinkLane.communityCategory);
       setTag(null);
