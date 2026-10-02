@@ -509,6 +509,7 @@ function CommunityHub() {
 
   return (
     <main className="overflow-x-hidden bg-background">
+      {quickSighting && <SightingQuickLive onClose={() => setQuickSighting(false)} />}
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <div className="flex items-start justify-between gap-3">
