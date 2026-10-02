@@ -27,18 +27,20 @@ type HandshakeExplainerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   hideNextTime: boolean;
-  onHideNextTimeChange: (hidden: boolean) => void;
+  onHideNextTimeChange?: (hidden: boolean) => void;
+  footer?: React.ReactNode;
 };
 
 /**
  * The animated handshake walkthrough as an overlay. Closing it (X or backdrop tap)
- * leaves the person exactly where they were in the post flow — no navigation.
+ * leaves the person exactly where they were — no navigation.
  */
 export function HandshakeExplainerDialog({
   open,
   onOpenChange,
   hideNextTime,
   onHideNextTimeChange,
+  footer,
 }: HandshakeExplainerDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,6 +51,8 @@ export function HandshakeExplainerDialog({
         </DialogDescription>
         <div className="px-3 pb-3 pt-10 sm:px-5 sm:pb-5">
           <HandshakeExplainer />
+          {footer}
+          {onHideNextTimeChange && (
           <label className="mt-4 flex cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-border bg-background px-4 py-3 text-sm font-bold text-muted-foreground">
             <Checkbox
               checked={hideNextTime}
@@ -56,6 +60,7 @@ export function HandshakeExplainerDialog({
             />
             Don&apos;t show this again
           </label>
+          )}
           <p className="mt-3 text-center text-[11px] text-muted-foreground/70">
             © 2026 Onlooker. All rights reserved.
           </p>

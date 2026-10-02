@@ -10,6 +10,7 @@ import { BROADCAST_CATEGORY_ART, requestCategoryArt } from "@/lib/category-art";
 import { BROADCAST_CATEGORIES } from "@/lib/broadcast-categories";
 import { Button } from "@/components/ui/button";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
+import { HandshakeExplainerDialog } from "@/components/HandshakeExplainerDialog";
 import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
 import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
 import step3Thumb from "@/assets/home/step3-verified-results.jpg.asset.json";
@@ -206,6 +207,7 @@ export function HomeLiveStage({
     const hasAccount = proAccount.data ?? (await proAccount.refetch()).data ?? false;
     await navigate({ to: hasAccount ? "/pro-dashboard" : "/verification" });
   };
+  const [explainerOpen, setExplainerOpen] = useState(false);
 
   const activeRequests = requests.filter((request) => request.status === "open" || request.status === "claimed");
   const liveCount = activeRequests.filter(isLiveRequest).length;
@@ -422,7 +424,7 @@ export function HomeLiveStage({
             type="button"
             variant="ghost"
             disabled={authLoading}
-            onClick={() => void openProfessionalExperience()}
+            onClick={() => setExplainerOpen(true)}
             className="group relative flex h-auto w-full flex-col items-stretch justify-start gap-3 whitespace-normal overflow-hidden rounded-2xl border border-tier-gold/40 bg-home-obsidian p-4 text-left shadow-none transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-tier-gold hover:bg-home-obsidian focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tier-gold motion-reduce:transform-none sm:flex-row sm:items-center sm:gap-4 sm:p-5"
           >
             <span
@@ -457,6 +459,25 @@ export function HomeLiveStage({
               See how it works <span aria-hidden>&rarr;</span>
             </span>
           </Button>
+          <HandshakeExplainerDialog
+            open={explainerOpen}
+            onOpenChange={setExplainerOpen}
+            hideNextTime={false}
+            footer={
+              <Button
+                type="button"
+                variant="outline"
+                disabled={authLoading}
+                onClick={() => {
+                  setExplainerOpen(false);
+                  void openProfessionalExperience();
+                }}
+                className="mt-4 w-full border-tier-gold/50 text-tier-gold hover:bg-tier-gold hover:text-background"
+              >
+                View full pro plans &amp; details &rarr;
+              </Button>
+            }
+          />
         </section>
 
         {/* 3. How Onlooker works — slightly lighter charcoal to separate from hero and feed */}
