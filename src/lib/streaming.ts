@@ -38,7 +38,7 @@ export async function billStreamMinute(sessionId: string): Promise<StreamMeter> 
   if (error) {
     if (/insufficient credits/i.test(error.message)) throw new Error("Insufficient Credits");
     if (/minutes_billed.*ambiguous/i.test(error.message)) {
-      throw new Error("The live meter could not update. End this session and try again.");
+      throw new Error("The filming meter could not update. End this session and try again.");
     }
     throw new Error(error.message);
   }
