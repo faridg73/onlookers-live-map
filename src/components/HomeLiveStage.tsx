@@ -10,6 +10,8 @@ import { BROADCAST_CATEGORY_ART, requestCategoryArt } from "@/lib/category-art";
 import { BROADCAST_CATEGORIES } from "@/lib/broadcast-categories";
 import { Button } from "@/components/ui/button";
 import { RecentCapturesFeed } from "@/components/RecentCapturesFeed";
+import { StrangeSightingsSpotlight } from "@/components/StrangeSightingsSpotlight";
+import { matchesStrangeSighting, STRANGE_SIGHTINGS_ID } from "@/lib/strange-sightings";
 import { HandshakeExplainerDialog } from "@/components/HandshakeExplainerDialog";
 import step1Thumb from "@/assets/home/step1-post-bounty.jpg.asset.json";
 import step2Thumb from "@/assets/home/step2-hunter-claims.jpg.asset.json";
@@ -20,6 +22,10 @@ import { LatestNearYouRail } from "@/components/LatestNearYouRail";
 import { liveStreamsFrom } from "@/components/LiveNowRail";
 import { listCommunityPosts, type CommunityPost } from "@/lib/community";
 
+function isSighting(post: CommunityPost) {
+  return post.tags.some((t) => t.toLowerCase() === STRANGE_SIGHTINGS_ID) || matchesStrangeSighting(post.title);
+}
+
 /** Home "Live now": only public free broadcasts whose camera is checking in. */
 function HomeLiveNow() {
   const [live, setLive] = useState<CommunityPost[]>([]);
@@ -27,7 +33,7 @@ function HomeLiveNow() {
     let alive = true;
     const load = () =>
       void listCommunityPosts()
-        .then((rows) => alive && setLive(liveStreamsFrom(rows)))
+        .then((rows) => alive && setLive([...liveStreamsFrom(rows)].sort((a, b) => Number(isSighting(b)) - Number(isSighting(a)))))
         .catch(() => {});
     load();
     const timer = window.setInterval(load, 30_000);
@@ -58,7 +64,7 @@ function HomeLiveNow() {
               className="w-60 shrink-0 snap-start rounded-2xl border border-signal/40 bg-card p-3 hover:border-signal"
             >
               <span className="inline-flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 text-[0.6rem] font-extrabold uppercase text-destructive-foreground">
-                <Radio className="size-3" /> Live
+                <Radio className="size-3" /> {isSighting(post) ? "Sky sighting · Live" : "Live"}
               </span>
               <p className="mt-2 line-clamp-2 text-sm font-bold text-foreground">{post.title}</p>
               <p className="mt-1 truncate text-xs text-muted-foreground">@{post.authorName}</p>
@@ -414,6 +420,9 @@ export function HomeLiveStage({
             ))}
           </div>
         </section>
+
+        {/* 2a. Strange Sightings — free, public, one-tap live/upload */}
+        <StrangeSightingsSpotlight />
 
         {/* 2b. Real Estate & Property Pros — professional-tier verification pitch */}
         <section aria-labelledby="home-pros-label">
