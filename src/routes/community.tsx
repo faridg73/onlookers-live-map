@@ -4,6 +4,7 @@ import { vibeFromTags } from "@/lib/broadcast-categories";
 import { Link, createFileRoute, useCanGoBack, useNavigate, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, CalendarPlus, Check, Compass, Filter, Map as MapIcon, Plus, Radio, Rows3, Siren, UserCheck, X } from "lucide-react";
 import { NewLocalEventDialog } from "@/components/NewLocalEventDialog";
+import { SightingQuickLive } from "@/components/SightingQuickLive";
 import { CommunityPostCard } from "@/components/CommunityPostCard";
 import { BroadcastCategoryPicker } from "@/components/BroadcastCategoryPicker";
 import { ScrollableLane } from "@/components/ScrollableLane";
@@ -125,6 +126,7 @@ function CommunityHub() {
   const [vibeGridOpen, setVibeGridOpen] = useState(false);
   const [liveFirst, setLiveFirst] = useState(false);
   const [welcomeLive, setWelcomeLive] = useState(false);
+  const [quickSighting, setQuickSighting] = useState(false);
 
   // Returning from sign-in with ?action=live|post|event reopens the exact sheet
   // the person tapped before they were sent to the sign-in page.
@@ -132,7 +134,9 @@ function CommunityHub() {
   useEffect(() => {
     if (!action || actionHandled.current) return;
     actionHandled.current = true;
-    if (action === "event") {
+    if (action === "live" && cat === STRANGE_SIGHTINGS_ID) {
+      setQuickSighting(true);
+    } else if (action === "event") {
       setListingEvent(true);
     } else {
       setLiveFirst(action === "live");
@@ -505,6 +509,7 @@ function CommunityHub() {
 
   return (
     <main className="overflow-x-hidden bg-background">
+      {quickSighting && <SightingQuickLive onClose={() => setQuickSighting(false)} />}
       <div className="mx-auto w-full max-w-7xl">
       <header className="px-5 pt-[calc(env(safe-area-inset-top)+1.25rem)] sm:px-8">
         <div className="flex items-start justify-between gap-3">
