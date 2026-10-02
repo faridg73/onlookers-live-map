@@ -7,36 +7,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
  */
 
 const STEPS = [
-  {
-    title: "1 · Poster funds the bounty",
-    caption:
-      "The poster describes the property visit and the on-site contact, then funds it. Payment sits in escrow — nothing is released yet.",
-  },
-  {
-    title: "2 · A one-time PIN goes out",
-    caption:
-      "A one-time 6-digit backup PIN is texted and emailed to the on-site agent. No account needed on their side.",
-  },
-  {
-    title: "3 · Onlooker heads to the location",
-    caption:
-      "The app sends the onlooker straight to the property. They travel to the address on the bounty.",
-  },
-  {
-    title: "4 · On-site, code approved",
-    caption:
-      "The onlooker taps “I'm on site.” The agent — present or not — sees their name and photo and approves the code.",
-  },
-  {
-    title: "5 · Onlooker films & sends the clip",
-    caption:
-      "Once access is granted, the onlooker follows the instructions and records the walkthrough and sends the clip to the poster as soon as they finish.",
-  },
-  {
-    title: "6 · Approved & paid",
-    caption:
-      "The poster reviews and approves — or after 2 hours it auto-releases either way. Escrow pays out, onlooker's happy.",
-  },
+  { title: "1 · Poster funds the bounty", caption: "The poster describes the property visit and the on-site contact, then funds it. Payment sits in escrow. Nothing is released yet." },
+  { title: "2 · A one-time PIN goes out", caption: "A one-time 6-digit backup PIN is texted and emailed to the on-site agent, with a link to cancel if the visit wasn't authorized. No account needed on their side." },
+  { title: "3 · The onlooker heads to the location", caption: "The app sends the onlooker straight to the property address on the bounty." },
+  { title: "4 · On site, code approved", caption: "The onlooker taps \u201cI'm on site.\u201d The agent, whether there or not, sees their name and photo and approves." },
+  { title: "5 · The onlooker films & sends the clip", caption: "Once access is granted, the onlooker follows the instructions, films the walkthrough, and sends the clip to the poster as soon as they finish." },
+  { title: "6 · Approved & paid", caption: "The poster has 2 hours to review and approve, or it releases automatically when the review window ends. Escrow pays the onlooker. If the contact never shows, the poster gets the bounty back minus a 25% trip fee for the onlooker." },
 ];
 
 const STEP_MS = 9500;
@@ -93,7 +69,7 @@ function HouseBackdrop({ skyId }: { skyId: string }) {
   );
 }
 
-/** Poster / Agent / Hunter body, teal or orange, with a role tag above the head. */
+/** Poster / Agent / Onlooker body, teal or orange, with a role tag above the head. */
 function Person({
   color,
   skin,
@@ -107,7 +83,7 @@ function Person({
   tag: string;
   tagWidth?: number;
 }) {
-  const light = color === "#2E8B87" ? "#3EA39E" : "#C67C3E";
+  const light = color === "#2E8B87" ? "#3EA39E" : color === "#3B5BA5" ? "#4C6DBF" : "#C67C3E";
   return (
     <>
       <rect x="-11" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
@@ -176,7 +152,8 @@ export default function HandshakeExplainer() {
         color: "#F2F2F3",
         border: "1px solid #222327",
         borderRadius: 20,
-        padding: 28,
+        padding: "clamp(14px, 4vw, 28px)",
+        overflowX: "hidden",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -266,6 +243,9 @@ export default function HandshakeExplainer() {
         @keyframes hsxConfetti { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 46px) rotate(140deg); } }
 
         .hsx-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2B2E; border: none; padding: 0; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease; }
+        .hsx-dothit { display: inline-flex; align-items: center; justify-content: center; width: 18px; flex-shrink: 0; height: 32px; background: none; border: none; padding: 0; cursor: pointer; }
+        .hsx-navbtn { min-height: 40px; padding: 0 10px; flex-shrink: 0; border-radius: 999px; border: 1px solid #2A2B2E; background: #131417; color: #F2F2F3; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .hsx-navbtn:hover { border-color: #D6FF3E; color: #D6FF3E; }
         .hsx-dot.hsx-on { background: #D6FF3E; transform: scale(1.3); }
         .hsx-track-fill { position: absolute; top: 0; left: 0; bottom: 0; background: #D6FF3E; border-radius: 999px; transition: width 0.45s ease; }
         .hsx-playbtn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #2A2B2E; background: #131417; color: #E8E8EA; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; flex-shrink: 0; }
@@ -288,7 +268,7 @@ export default function HandshakeExplainer() {
 
       <div
         className={paused ? "hsx-paused" : ""}
-        style={{ position: "relative", width: "100%", maxWidth: 424, height: 260, borderRadius: 16, overflow: "hidden", flexShrink: 0 }}
+        style={{ position: "relative", width: "100%", maxWidth: 424, aspectRatio: "424 / 260", height: "auto", borderRadius: 16, overflow: "hidden", flexShrink: 0 }}
       >
         {step === 0 && (
           <div className="hsx-scene">
@@ -390,11 +370,11 @@ export default function HandshakeExplainer() {
                 <g className="hsx-walk-body-mid">
                   <g className="hsx-leg-a" transform="translate(-4,0)"><rect x="-11" y="62" width="9" height="30" rx="4" fill="#2B2D31" /></g>
                   <g className="hsx-leg-b" transform="translate(4,0)"><rect x="3" y="62" width="9" height="30" rx="4" fill="#2B2D31" /></g>
-                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#2E8B87" />
-                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#3EA39E" />
-                  <Tag label="HUNTER" width={62} />
-                  <g className="hsx-arm-a" transform="translate(-24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#2E8B87" /></g>
-                  <g className="hsx-arm-b" transform="translate(24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#2E8B87" /></g>
+                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#3B5BA5" />
+                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#4C6DBF" />
+                  <Tag label="ONLOOKER" width={72} />
+                  <g className="hsx-arm-a" transform="translate(-24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#3B5BA5" /></g>
+                  <g className="hsx-arm-b" transform="translate(24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#3B5BA5" /></g>
                   <circle cx="0" cy="2" r="19" fill="#E8B88A" />
                   <circle cx="-6" cy="0" r="2" fill="#20211f" />
                   <circle cx="6" cy="0" r="2" fill="#20211f" />
@@ -425,11 +405,11 @@ export default function HandshakeExplainer() {
                 <g className="hsx-walk-body">
                   <g className="hsx-leg-a" transform="translate(-4,0)"><rect x="-11" y="62" width="9" height="30" rx="4" fill="#2B2D31" /></g>
                   <g className="hsx-leg-b" transform="translate(4,0)"><rect x="3" y="62" width="9" height="30" rx="4" fill="#2B2D31" /></g>
-                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#2E8B87" />
-                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#3EA39E" />
-                  <Tag label="HUNTER" width={62} />
-                  <g className="hsx-arm-a" transform="translate(-24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#2E8B87" /></g>
-                  <g className="hsx-arm-b" transform="translate(24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#2E8B87" /></g>
+                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#3B5BA5" />
+                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#4C6DBF" />
+                  <Tag label="ONLOOKER" width={72} />
+                  <g className="hsx-arm-a" transform="translate(-24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#3B5BA5" /></g>
+                  <g className="hsx-arm-b" transform="translate(24,36)"><rect x="-4" y="0" width="9" height="26" rx="4" fill="#3B5BA5" /></g>
                   <circle cx="0" cy="2" r="19" fill="#E8B88A" />
                   <circle cx="-6" cy="0" r="2" fill="#20211f" />
                   <circle cx="6" cy="0" r="2" fill="#20211f" />
@@ -458,11 +438,11 @@ export default function HandshakeExplainer() {
                 <g className="hsx-idle">
                   <rect x="-11" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
                   <rect x="3" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
-                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#2E8B87" />
-                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#3EA39E" />
-                  <Tag label="HUNTER" width={62} />
-                  <rect x="-28" y="30" width="9" height="20" rx="4" fill="#2E8B87" transform="rotate(-70 -24 30)" />
-                  <rect x="19" y="18" width="9" height="30" rx="4" fill="#2E8B87" transform="rotate(-95 24 20)" />
+                  <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#3B5BA5" />
+                  <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#4C6DBF" />
+                  <Tag label="ONLOOKER" width={72} />
+                  <rect x="-28" y="30" width="9" height="20" rx="4" fill="#3B5BA5" transform="rotate(-70 -24 30)" />
+                  <rect x="19" y="18" width="9" height="30" rx="4" fill="#3B5BA5" transform="rotate(-95 24 20)" />
                   <circle cx="0" cy="2" r="19" fill="#E8B88A" />
                   <circle cx="-6" cy="0" r="2" fill="#20211f" />
                   <circle cx="6" cy="0" r="2" fill="#20211f" />
@@ -486,7 +466,7 @@ export default function HandshakeExplainer() {
                 <rect x="-24" y="-30" width="48" height="60" rx="8" fill="#16171A" stroke="#D6FF3E" strokeWidth="1.4" />
                 <rect x="-18" y="-22" width="36" height="24" rx="3" fill="#0E0F11" />
                 <path className="hsx-play-pulse" d="M-4,-14 L-4,-2 L6,-8 Z" fill="#D6FF3E" />
-                <text x="0" y="8" textAnchor="middle" fill="#9A9A9E" fontSize="8" fontFamily="inherit">FILMING</text>
+                <text x="0" y="8" textAnchor="middle" fill="#9A9A9E" fontSize="8" fontFamily="inherit">NEW CLIP</text>
                 <rect x="-14" y="16" width="28" height="6" rx="3" fill="#2A2B2E" />
               </g>
             </svg>
@@ -507,7 +487,7 @@ export default function HandshakeExplainer() {
                   <circle r="9" fill="none" stroke="#9A9A9E" strokeWidth="1.4" />
                   <path d="M0,0 L0,-6 M0,0 L4,1" stroke="#9A9A9E" strokeWidth="1.3" strokeLinecap="round" fill="none" />
                 </g>
-                <text x="2" y="-12" textAnchor="middle" fill="#9A9A9E" fontSize="8.5" fontFamily="inherit">APPROVED OR 2H</text>
+                <text x="2" y="-12" textAnchor="middle" fill="#9A9A9E" fontSize="8.5" fontFamily="inherit">APPROVE OR AUTO 2H</text>
               </g>
 
               <circle className="hsx-arc-coin" cx="284" cy="70" r="6" fill="#D6FF3E" style={{ animationDelay: "0.2s" }} />
@@ -515,7 +495,7 @@ export default function HandshakeExplainer() {
               <circle className="hsx-arc-coin" cx="276" cy="64" r="5" fill="#D6FF3E" style={{ animationDelay: "0.8s" }} />
 
               <rect className="hsx-confetti" x="270" y="105" width="5" height="5" fill="#D6FF3E" style={{ "--dx": "-28px", animationDelay: "1.55s" } as React.CSSProperties} />
-              <rect className="hsx-confetti" x="300" y="100" width="5" height="5" fill="#3EA39E" style={{ "--dx": "14px", animationDelay: "1.7s" } as React.CSSProperties} />
+              <rect className="hsx-confetti" x="300" y="100" width="5" height="5" fill="#4C6DBF" style={{ "--dx": "14px", animationDelay: "1.7s" } as React.CSSProperties} />
               <rect className="hsx-confetti" x="285" y="95" width="5" height="5" fill="#E8B88A" style={{ "--dx": "-6px", animationDelay: "1.85s" } as React.CSSProperties} />
 
               <g transform="translate(196,108)">
@@ -524,11 +504,11 @@ export default function HandshakeExplainer() {
                   <g className="hsx-cheer">
                     <rect x="-11" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
                     <rect x="3" y="62" width="9" height="30" rx="4" fill="#2B2D31" />
-                    <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#2E8B87" />
-                    <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#3EA39E" />
-                    <Tag label="HUNTER" width={62} />
-                    <rect x="16" y="6" width="9" height="30" rx="4" fill="#2E8B87" transform="rotate(-100 20 10)" />
-                    <rect x="-28" y="32" width="9" height="26" rx="4" fill="#2E8B87" transform="rotate(20 -24 32)" />
+                    <path d="M-20,26 Q0,10 20,26 L15,68 Q0,76 -15,68 Z" fill="#3B5BA5" />
+                    <path d="M-20,26 Q0,10 20,26 L18,34 Q0,20 -18,34 Z" fill="#4C6DBF" />
+                    <Tag label="ONLOOKER" width={72} />
+                    <rect x="16" y="6" width="9" height="30" rx="4" fill="#3B5BA5" transform="rotate(-100 20 10)" />
+                    <rect x="-28" y="32" width="9" height="26" rx="4" fill="#3B5BA5" transform="rotate(20 -24 32)" />
                     <circle cx="0" cy="2" r="19" fill="#E8B88A" />
                     <circle cx="-6" cy="0" r="2" fill="#20211f" />
                     <circle cx="6" cy="0" r="2" fill="#20211f" />
@@ -551,22 +531,34 @@ export default function HandshakeExplainer() {
 
       <div style={{ textAlign: "center", minHeight: 64, display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ fontSize: 17, fontWeight: 700 }}>{STEPS[step]?.title}</div>
-        <div style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.5, maxWidth: 380 }}>{STEPS[step]?.caption}</div>
+        <div style={{ fontSize: 13, color: "#FFFFFF", lineHeight: 1.5, maxWidth: 380, overflowWrap: "anywhere" }} aria-live="polite">{STEPS[step]?.caption}</div>
       </div>
 
       <div style={{ position: "relative", width: "100%", height: 3, background: "#1A1B1E", borderRadius: 999 }}>
         <div className="hsx-track-fill" style={{ width: `${trackPct}%` }} />
       </div>
 
-      <div style={{ display: "flex", gap: 9, alignItems: "center" }}>
-        {STEPS.map((s, i) => (
-          <button
-            key={i}
-            className={`hsx-dot ${i === step ? "hsx-on" : ""}`}
-            onClick={() => goTo(i)}
-            aria-label={`Step ${i + 1}: ${s.title}`}
-          />
-        ))}
+      <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 4, flexWrap: "nowrap" }}>
+        <button type="button" className="hsx-navbtn" onClick={() => goTo((step - 1 + STEPS.length) % STEPS.length)} aria-label="Previous step">
+          &larr; Back
+        </button>
+        <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+          {STEPS.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              className="hsx-dothit"
+              onClick={() => goTo(i)}
+              aria-label={`Step ${i + 1}: ${s.title}`}
+              aria-current={i === step ? "step" : undefined}
+            >
+              <span className={`hsx-dot ${i === step ? "hsx-on" : ""}`} />
+            </button>
+          ))}
+        </div>
+        <button type="button" className="hsx-navbtn" onClick={() => goTo((step + 1) % STEPS.length)} aria-label="Next step">
+          Next &rarr;
+        </button>
       </div>
     </div>
   );
