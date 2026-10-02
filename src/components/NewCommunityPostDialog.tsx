@@ -19,6 +19,18 @@ import {
 import { geocodeAddress } from "@/lib/geocode.functions";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { broadcastCategoryById, type BroadcastCategoryId } from "@/lib/broadcast-categories";
+import {
+  STRANGE_SIGHTINGS_ID,
+  STRANGE_SIGHTINGS_LABEL,
+  STRANGE_SIGHTINGS_SUBCATEGORIES,
+} from "@/lib/strange-sightings";
+
+const SIGHTING_ICE_BREAKERS = [
+  { title: "🛸 Fast-moving light spotted over the area", body: "Bright light moving faster than any plane, no sound. Filmed from the ground." },
+  { title: "☄️ Green fireball streak across the night sky", body: "Saw a glowing streak cross the sky for a few seconds before it faded." },
+  { title: "✨ Lights hovering in formation", body: "Several lights holding still in a pattern, then moving together." },
+  { title: "🔊 Strange sound in the sky", body: "Loud unexplained hum or boom heard outside. Recorded what I could." },
+];
 
 /** Posts need coordinates or they never land on the map. Try the typed place, then the device. */
 async function resolveCoords(place: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -54,6 +66,7 @@ export function NewCommunityPostDialog({
   initialTitle,
   initialTags,
   initialBroadcastCategoryId,
+  sighting = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -65,6 +78,8 @@ export function NewCommunityPostDialog({
   initialTags?: string[];
   /** Exact vibe the user came from; locks the post to it. */
   initialBroadcastCategoryId?: BroadcastCategoryId;
+  /** Locks the post to Strange Sightings & UFO. */
+  sighting?: boolean;
 }) {
   const [category, setCategory] = useState<CommunityCategory>(initialCategory ?? "general");
   const [title, setTitle] = useState("");
@@ -79,11 +94,18 @@ export function NewCommunityPostDialog({
   const [busy, setBusy] = useState(false);
   const human = useHumanCheck("community-post");
 
-  const vibe = initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
+  const vibe = !sighting && initialBroadcastCategoryId ? broadcastCategoryById(initialBroadcastCategoryId) : null;
   const def = categoryDef(vibe ? vibe.communityCategory : category);
-  const iceBreakers = vibe
-    ? broadcastExampleSeeds(vibe.id).map((s) => ({ title: s.title, body: s.body }))
-    : def.iceBreakers;
+  const iceBreakers = sighting
+    ? SIGHTING_ICE_BREAKERS
+    : vibe
+      ? broadcastExampleSeeds(vibe.id).map((s) => ({ title: s.title, body: s.body }))
+      : def.iceBreakers;
+  const tagChoices = sighting
+    ? STRANGE_SIGHTINGS_SUBCATEGORIES.map((s) => s.toLowerCase())
+    : vibe
+      ? vibe.subcategories.map((s) => s.toLowerCase())
+      : def.tags;
 
   useEffect(() => {
     if (!open) return;
@@ -130,13 +152,15 @@ export function NewCommunityPostDialog({
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       const coords = spot ?? (await resolveCoords(place));
       await createCommunityPost({
-        category: vibe ? vibe.communityCategory : category,
+        category: sighting ? "general" : vibe ? vibe.communityCategory : category,
         title,
         body,
         place,
-        tags: vibe
-          ? Array.from(new Set([vibe.id, vibe.label.toLowerCase(), ...tags]))
-          : tags,
+        tags: sighting
+          ? Array.from(new Set([STRANGE_SIGHTINGS_ID, "strange sighting", "ufo", ...tags]))
+          : vibe
+            ? Array.from(new Set([vibe.id, vibe.label.toLowerCase(), ...tags]))
+            : tags,
         mediaPath,
         isFlash: flash,
         flashHours: hours,
@@ -172,7 +196,15 @@ export function NewCommunityPostDialog({
           </button>
         </div>
 
-        {vibe ? (
+        {sighting ? (
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-signal bg-signal/10 p-3">
+            <span className="text-2xl" aria-hidden>🛸</span>
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Posting to · free &amp; public</p>
+              <p className="text-sm font-extrabold text-signal">{STRANGE_SIGHTINGS_LABEL}</p>
+            </div>
+          </div>
+        ) : vibe ? (
           <div className="mt-4 flex items-center gap-3 rounded-2xl border border-signal bg-signal/10 p-3">
             <span className="text-2xl" aria-hidden>{vibe.icon}</span>
             <div>

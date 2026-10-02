@@ -1096,9 +1096,9 @@ function CommunityHub() {
         onOpenChange={setComposing}
         onPosted={() => void load()}
         initialCamera={liveFirst}
-        {...(strangeSightings ? { initialCategory: "general" as const, initialTitle: "Strange sighting near ", initialTags: [STRANGE_SIGHTINGS_ID, "UFO"] } : {})}
-        {...(!strangeSightings && category !== "all" ? { initialCategory: category } : {})}
-        {...(!strangeSightings && categoryId ? { initialBroadcastCategoryId: categoryId } : {})}
+        {...(strangeSightings || cat === STRANGE_SIGHTINGS_ID ? { sighting: true } : {})}
+        {...(!(strangeSightings || cat === STRANGE_SIGHTINGS_ID) && category !== "all" ? { initialCategory: category } : {})}
+        {...(!(strangeSightings || cat === STRANGE_SIGHTINGS_ID) && categoryId ? { initialBroadcastCategoryId: categoryId } : {})}
       />
       </div>
 
