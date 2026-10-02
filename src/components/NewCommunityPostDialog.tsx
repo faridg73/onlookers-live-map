@@ -196,7 +196,15 @@ export function NewCommunityPostDialog({
           </button>
         </div>
 
-        {vibe ? (
+        {sighting ? (
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-signal bg-signal/10 p-3">
+            <span className="text-2xl" aria-hidden>🛸</span>
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Posting to · free &amp; public</p>
+              <p className="text-sm font-extrabold text-signal">{STRANGE_SIGHTINGS_LABEL}</p>
+            </div>
+          </div>
+        ) : vibe ? (
           <div className="mt-4 flex items-center gap-3 rounded-2xl border border-signal bg-signal/10 p-3">
             <span className="text-2xl" aria-hidden>{vibe.icon}</span>
             <div>
