@@ -2800,6 +2800,7 @@ export type Database = {
             Returns: undefined
           }
       begin_bounty_submission: { Args: { _request_id: string }; Returns: Json }
+      bidding_enabled: { Args: never; Returns: boolean }
       bill_stream_minute: {
         Args: { _session_id: string }
         Returns: {
@@ -3163,6 +3164,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      pay_per_minute_enabled: { Args: never; Returns: boolean }
       payout_cooldown_interval: { Args: { _uid: string }; Returns: string }
       pending_verification_requests: {
         Args: never

@@ -3,6 +3,7 @@ import { createFileRoute, Link, useCanGoBack, useRouter } from "@tanstack/react-
 import { ArrowLeft, Camera, Clock, MapPin, Navigation, Zap } from "lucide-react";
 
 import { BountyBidsPanel } from "@/components/BountyBidsPanel";
+import { BIDDING_ENABLED } from "@/lib/credits";
 import { BountyBriefBadges } from "@/components/BountyBriefBadges";
 import { BountyFocusMap } from "@/components/BountyFocusMap";
 import { BountyVideoDialog } from "@/components/BountyVideoDialog";
@@ -174,7 +175,7 @@ function BountyPreview() {
       </div>
       {/* onlookers see the map first (where to go); Posters see status first. */}
       {isPoster ? <>{detailsBlock}{mapBlock}</> : <>{mapBlock}{detailsBlock}</>}
-      <BountyBidsPanel requestId={id} />
+      {BIDDING_ENABLED && <BountyBidsPanel requestId={id} />}
     </div>
   );
 }

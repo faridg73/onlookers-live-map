@@ -160,3 +160,8 @@ export const formatCreditWords = (credits: number) => {
 
 /** Cash equivalent, e.g. "$12.00". */
 export const formatCreditCash = (credits: number) => `$${creditsToUsdValue(credits).toFixed(2)}`;
+
+/** Pay-per-minute viewing switch. Must be flipped together with public.pay_per_minute_enabled(). Watching is free. */
+export const PAY_PER_MINUTE_ENABLED = false;
+/** Bounty bidding switch. Must be flipped together with public.bidding_enabled(). Onlookers claim directly. */
+export const BIDDING_ENABLED = false;
