@@ -243,8 +243,8 @@ export default function HandshakeExplainer() {
         @keyframes hsxConfetti { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 46px) rotate(140deg); } }
 
         .hsx-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2B2E; border: none; padding: 0; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease; }
-        .hsx-dothit { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 32px; background: none; border: none; padding: 0; cursor: pointer; }
-        .hsx-navbtn { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #2A2B2E; background: #131417; color: #F2F2F3; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .hsx-dothit { display: inline-flex; align-items: center; justify-content: center; width: 18px; flex-shrink: 0; height: 32px; background: none; border: none; padding: 0; cursor: pointer; }
+        .hsx-navbtn { min-height: 40px; padding: 0 10px; flex-shrink: 0; border-radius: 999px; border: 1px solid #2A2B2E; background: #131417; color: #F2F2F3; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .hsx-navbtn:hover { border-color: #D6FF3E; color: #D6FF3E; }
         .hsx-dot.hsx-on { background: #D6FF3E; transform: scale(1.3); }
         .hsx-track-fill { position: absolute; top: 0; left: 0; bottom: 0; background: #D6FF3E; border-radius: 999px; transition: width 0.45s ease; }
@@ -538,7 +538,7 @@ export default function HandshakeExplainer() {
         <div className="hsx-track-fill" style={{ width: `${trackPct}%` }} />
       </div>
 
-      <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "space-between", gap: 4, flexWrap: "nowrap" }}>
         <button type="button" className="hsx-navbtn" onClick={() => goTo((step - 1 + STEPS.length) % STEPS.length)} aria-label="Previous step">
           &larr; Back
         </button>

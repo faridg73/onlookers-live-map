@@ -472,7 +472,7 @@ export function HomeLiveStage({
                   setExplainerOpen(false);
                   void openProfessionalExperience();
                 }}
-                className="mt-4 w-full border-tier-gold/50 text-tier-gold hover:bg-tier-gold hover:text-background"
+                className="mt-4 h-auto min-h-11 w-full whitespace-normal border-tier-gold/50 text-tier-gold hover:bg-tier-gold hover:text-background"
               >
                 View full pro plans &amp; details &rarr;
               </Button>

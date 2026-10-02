@@ -49,7 +49,7 @@ export function HandshakeExplainerDialog({
         <DialogDescription className="sr-only">
           A six-step walkthrough of the escrow, one-time PIN, on-site approval and payout.
         </DialogDescription>
-        <div className="px-3 pb-3 pt-10 sm:px-5 sm:pb-5">
+        <div className="px-3 pb-3 pt-16 sm:px-5 sm:pb-5">
           <HandshakeExplainer />
           {footer}
           {onHideNextTimeChange && (
