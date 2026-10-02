@@ -3487,6 +3487,7 @@ export type Database = {
         Args: { _amount: number; _video_id: string }
         Returns: number
       }
+      tipping_enabled: { Args: never; Returns: boolean }
       top_reporters: {
         Args: { _limit?: number }
         Returns: {
