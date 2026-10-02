@@ -147,6 +147,14 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
         const email = (context.claims as { email?: string } | undefined)?.email;
         const customerId = await resolveCustomer(stripe, { userId, email });
 
+        // First credit purchase: ask Stripe for the bank's 3D Secure check
+        // whenever the card supports it. Cards without 3DS still go through.
+        const { count: priorPurchases } = await context.supabase
+          .from("credit_purchases")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId);
+        const firstPurchase = (priorPurchases ?? 0) === 0;
+
         const metadata = {
           userId,
           kind: "credit_purchase",
@@ -166,8 +174,11 @@ export const startCreditPurchase = createServerFn({ method: "POST" })
           ...(customerId ? { customer: customerId } : {}),
           payment_intent_data: {
             description: `${pack.name}, ${pack.credits} Credits`,
-            metadata,
+            metadata: { ...metadata, firstPurchase: String(firstPurchase) },
           },
+          ...(firstPurchase
+            ? { payment_method_options: { card: { request_three_d_secure: "any" as const } } }
+            : {}),
           // Creates a paid invoice so the receipt email includes a
           // downloadable/printable PDF invoice and receipt.
           invoice_creation: {
