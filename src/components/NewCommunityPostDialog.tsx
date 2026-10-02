@@ -19,6 +19,18 @@ import {
 import { geocodeAddress } from "@/lib/geocode.functions";
 import { verifyHumanCheck } from "@/lib/turnstile.functions";
 import { broadcastCategoryById, type BroadcastCategoryId } from "@/lib/broadcast-categories";
+import {
+  STRANGE_SIGHTINGS_ID,
+  STRANGE_SIGHTINGS_LABEL,
+  STRANGE_SIGHTINGS_SUBCATEGORIES,
+} from "@/lib/strange-sightings";
+
+const SIGHTING_ICE_BREAKERS = [
+  { title: "🛸 Fast-moving light spotted over the area", body: "Bright light moving faster than any plane, no sound. Filmed from the ground." },
+  { title: "☄️ Green fireball streak across the night sky", body: "Saw a glowing streak cross the sky for a few seconds before it faded." },
+  { title: "✨ Lights hovering in formation", body: "Several lights holding still in a pattern, then moving together." },
+  { title: "🔊 Strange sound in the sky", body: "Loud unexplained hum or boom heard outside. Recorded what I could." },
+];
 
 /** Posts need coordinates or they never land on the map. Try the typed place, then the device. */
 async function resolveCoords(place: string): Promise<{ latitude: number; longitude: number } | null> {
@@ -140,13 +152,15 @@ export function NewCommunityPostDialog({
       if (!check.ok) throw new Error("The human check didn't pass. Please try again.");
       const coords = spot ?? (await resolveCoords(place));
       await createCommunityPost({
-        category: vibe ? vibe.communityCategory : category,
+        category: sighting ? "general" : vibe ? vibe.communityCategory : category,
         title,
         body,
         place,
-        tags: vibe
-          ? Array.from(new Set([vibe.id, vibe.label.toLowerCase(), ...tags]))
-          : tags,
+        tags: sighting
+          ? Array.from(new Set([STRANGE_SIGHTINGS_ID, "strange sighting", "ufo", ...tags]))
+          : vibe
+            ? Array.from(new Set([vibe.id, vibe.label.toLowerCase(), ...tags]))
+            : tags,
         mediaPath,
         isFlash: flash,
         flashHours: hours,
