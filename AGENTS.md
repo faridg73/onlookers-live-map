@@ -22,3 +22,6 @@
 - Payout-change wait is 24h for live payout accounts and 2 min only for sandbox (test-money) accounts, decided in the database — lets preview testing run in one sitting without weakening production.
 - Money-moving server functions record the caller's IP plus a hashed device signature into `account_signals`, and `accept_bounty_video` calls `flag_bounty_self_dealing` after payout — self-dealing is detected at settlement without blocking honest approvals.
 - Profile activity uses authenticated user-owned records only; never show examples as account history.
+
+- All platform fees use one rate: PLATFORM_FEE_RATE in src/lib/credits.ts and public.platform_fee_rate() in the database, rounded to the nearest credit — keeps every fee from drifting apart.
+- Peer tip buttons are gated by TIPPING_ENABLED in src/lib/credits.ts — tipping can be turned back on without rebuilding the UI.
