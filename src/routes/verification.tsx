@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Onlooker LLC. All rights reserved. Proprietary and confidential.
 import { createFileRoute, Link } from "@tanstack/react-router";
+import HandshakeExplainer from "@/components/HandshakeExplainer";
 import {
   BadgeCheck,
   Building2,
@@ -111,6 +112,10 @@ function VerificationScreen() {
     <div className="bg-background">
       <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-4 sm:px-6">
         <PageBackButton label="Back" fallback="/post" />
+
+        <div className="mt-4">
+          <HandshakeExplainer />
+        </div>
 
         {/* Hero */}
         <header className="relative mt-6 overflow-hidden rounded-3xl border border-home-line bg-home-obsidian px-5 pb-7 pt-6 text-center sm:px-10">
