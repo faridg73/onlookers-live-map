@@ -24,4 +24,4 @@
 - Profile activity uses authenticated user-owned records only; never show examples as account history.
 
 - All platform fees use one rate: PLATFORM_FEE_RATE in src/lib/credits.ts and public.platform_fee_rate() in the database, rounded to the nearest credit — keeps every fee from drifting apart.
-- Peer tip buttons are gated by TIPPING_ENABLED in src/lib/credits.ts — tipping can be turned back on without rebuilding the UI.
+- Peer tips are gated twice: TIPPING_ENABLED in src/lib/credits.ts (buttons) and public.tipping_enabled() in the database (tip_credits direct tips, tip_hunter) — flip both together; bounty-bundled tips are never gated.
