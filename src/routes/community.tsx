@@ -117,6 +117,16 @@ function CommunityHub() {
     setVibeGridOpen(true);
   }, [cat]);
   const [strangeSightings, setStrangeSightings] = useState(false);
+  // Sighting mode only applies while no other lane/category is picked.
+  const inSightings = strangeSightings && !categoryId && category === "all";
+  // Leaving sighting mode (any other lane picked) drops the stale ?cat= link
+  // so later posts open in their own category, not the UFO form.
+  useEffect(() => {
+    if (strangeSightings && (categoryId || category !== "all")) setStrangeSightings(false);
+    if (cat === STRANGE_SIGHTINGS_ID && (categoryId || category !== "all")) {
+      void navigate({ to: "/community", search: {}, replace: true });
+    }
+  }, [categoryId, category, strangeSightings, cat, navigate]);
   const [view, setView] = useState<"feed" | "map" | "alerts">("feed");
   const [source, setSource] = useState<"all" | "following">("all");
   const filtersActive = view === "alerts" || source === "following";
@@ -563,6 +573,7 @@ function CommunityHub() {
             allLabel="All content"
             onCategoryChange={(next) => {
               setCategoryId(next);
+              setStrangeSightings(false);
               if (!next) {
                 setCategory("all");
                 setTag(null);
@@ -752,7 +763,7 @@ function CommunityHub() {
         </div>
       )}
 
-      {strangeSightings && (
+      {inSightings && (
         <section className="mx-5 mt-4 rounded-xl border border-white/10 bg-zinc-900/50 px-4 py-3 backdrop-blur-md sm:mx-8">
           <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-muted-foreground">Mystery desk</p>
           <h2 className="mt-1 text-lg font-extrabold text-foreground">Report, investigate, or request proof</h2>
@@ -1096,9 +1107,9 @@ function CommunityHub() {
         onOpenChange={setComposing}
         onPosted={() => void load()}
         initialCamera={liveFirst}
-        {...(strangeSightings || cat === STRANGE_SIGHTINGS_ID ? { sighting: true } : {})}
-        {...(!(strangeSightings || cat === STRANGE_SIGHTINGS_ID) && category !== "all" ? { initialCategory: category } : {})}
-        {...(!(strangeSightings || cat === STRANGE_SIGHTINGS_ID) && categoryId ? { initialBroadcastCategoryId: categoryId } : {})}
+        {...(inSightings ? { sighting: true } : {})}
+        {...(!inSightings && category !== "all" ? { initialCategory: category } : {})}
+        {...(!inSightings && categoryId ? { initialBroadcastCategoryId: categoryId } : {})}
       />
       </div>
 
