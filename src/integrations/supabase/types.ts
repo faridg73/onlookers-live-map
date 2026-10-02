@@ -381,6 +381,32 @@ export type Database = {
           },
         ]
       }
+      clip_views: {
+        Row: {
+          video_id: string
+          viewed_at: string
+          viewer_id: string
+        }
+        Insert: {
+          video_id: string
+          viewed_at?: string
+          viewer_id: string
+        }
+        Update: {
+          video_id?: string
+          viewed_at?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clip_views_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "bounty_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
           aspect: string
