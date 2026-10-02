@@ -4,6 +4,7 @@ import { HandCoins } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
+import { TIPPING_ENABLED } from "@/lib/credits";
 import { formatCreditCash } from "@/lib/credits";
 
 const REACTIONS = ["\u{1F525}", "\u{2764}\u{FE0F}", "\u{1F440}", "\u{1F62E}"] as const;
@@ -86,14 +87,14 @@ export function LiveReactions({ videoId }: { videoId: string }) {
             {emoji}
           </button>
         ))}
-        <button
+        {TIPPING_ENABLED && <button
           type="button"
           onClick={() => void tip()}
           disabled={tipping}
           className="ml-auto inline-flex items-center gap-1 rounded-full bg-signal px-3 py-2 text-[0.66rem] font-extrabold uppercase tracking-[0.1em] text-signal-foreground disabled:opacity-60"
         >
           <HandCoins className="size-3.5" aria-hidden /> Tip {MICRO_TIP} Credits
-        </button>
+        </button>}
       </div>
     </>
   );

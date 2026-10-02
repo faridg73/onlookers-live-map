@@ -201,7 +201,7 @@ export function TermsBody() {
           When a bounty is approved, Onlooker keeps 15% of the bounty as its platform fee, rounded
           to the nearest whole credit, and the onlooker receives the rest. Example: a 46-credit
           bounty has a 7-credit fee, so the onlooker receives 39 credits. Tips, bids and per-minute
-          filming carry a 20% platform fee, rounded down. The amount an onlooker will receive is
+          filming carry the same 15% platform fee. The amount an onlooker will receive is
           shown before they claim.
         </p>
         <p>

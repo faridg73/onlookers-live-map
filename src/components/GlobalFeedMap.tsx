@@ -9,6 +9,7 @@ import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import { SHARED_MAP_OPTIONS } from "@/lib/map-style";
 import { listGlobalClips, type GlobalClip } from "@/lib/global-feed.functions";
 import { MICRO_TIP, tipHunter } from "@/lib/tips";
+import { TIPPING_ENABLED } from "@/lib/credits";
 import { formatCredits } from "@/lib/credits";
 import { formatAgoISO, REGIONAL_CENTER } from "@/lib/onlooker";
 import { STRANGE_SIGHTINGS_ID, matchesStrangeSighting } from "@/lib/strange-sightings";
@@ -411,7 +412,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
               <span className="ml-2 font-bold text-signal">{formatCredits(tips)} tipped</span>
             )}
           </span>
-          <button
+          {TIPPING_ENABLED && <button
             type="button"
             disabled={tipping}
             onClick={() => void tip()}
@@ -419,7 +420,7 @@ function GlobalClipBubble({ clip, compact = false }: { clip: GlobalClip; compact
           >
             {tipping ? <Loader2 className="size-3.5 animate-spin" /> : <CoinsIcon className="size-3.5" />}
             Micro-Tip Onlooker {MICRO_TIP} Credits
-          </button>
+          </button>}
         </div>
       </div>
     </article>
