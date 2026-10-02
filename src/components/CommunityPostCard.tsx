@@ -7,6 +7,7 @@ import { ShareArtifactButton } from "@/components/ShareArtifactButton";
 import { ShareToSocialButton } from "@/components/ShareToSocialButton";
 import { LoopingPreview, looksLikeVideo } from "@/components/LoopingPreview";
 import { PayPerMinuteStream } from "@/components/PayPerMinuteStream";
+import { PAY_PER_MINUTE_ENABLED } from "@/lib/credits";
 import { TipCreditsButton } from "@/components/TipCreditsButton";
 import { TIPPING_ENABLED } from "@/lib/credits";
 import { HunterBadge } from "@/components/HunterBadge";
@@ -131,7 +132,7 @@ export function CommunityPostCard({
             <Clock className="size-3" /> {left}
           </span>
         )}
-        {watching && (
+        {PAY_PER_MINUTE_ENABLED && watching && (
           <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-md bg-live px-2 py-0.5 text-[0.65rem] font-extrabold text-background shadow-lg">
             <span className="size-1.5 animate-pulse rounded-full bg-background motion-reduce:animate-none" /> FILMING
           </span>
@@ -245,7 +246,7 @@ export function CommunityPostCard({
               <Navigation className="size-3.5" /> Map pin
             </Button>
           )}
-          {!isMine && (
+          {PAY_PER_MINUTE_ENABLED && !isMine && (
             <Button
               type="button"
               onClick={() => setWatching((v) => !v)}
@@ -368,7 +369,7 @@ export function CommunityPostCard({
           </div>
         )}
 
-        {watching && (
+        {PAY_PER_MINUTE_ENABLED && watching && (
           <div className="mt-3">
             <PayPerMinuteStream
               hostId={post.userId}
